@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <!--<script src="your_jquery.js"></script> &lt;!&ndash;加载你的jquery脚本&ndash;&gt;-->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <title>Title</title>
+</head>
+<body>
+
+<!--一个注册框-->
+<div>
+    <input type="text" id="user_name" name="user_name" placeholder="请输入姓名">
+    <input type="text" id="user_phone" name="user_phone" placeholder="请输入手机号码">
+    <input type="hidden" id="page_url" name="page_url" value="http://current_page_url">
+    <input type="button" id="submit_btn" value="提交">
+</div>
+<form method="post" action="/register">
+    <input type="text"  name="user_name" placeholder="请输入姓名">
+    <input type="text" name="user_phone" placeholder="请输入手机号码">
+    <input type="submit" value="提交">
+</form>
+<script>
+$(function(){
+    // 验证手机号码的函数,不合法的手机号码会返回false
+    validate_phone = function (phone) {
+        var myreg = /^(((1[3-9][0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+        if (myreg.test(phone)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+
+//    var reg_url = "http://39.108.67.178:5000/register";   // 定义注册地址
+    var reg_url = "http://127.0.0.1:5000/register";   // 测试定义注册地址
+
+    // 定义一个注册函数并绑定提交按钮
+    $("#submit_btn").click(function(){
+        var user_name = $.trim($("#user_name").val());
+        var user_phone = $.trim($("#user_phone").val());
+        var page_url = $.trim($("#page_url").val());
+        if(user_name == "" || !validate_phone(user_phone)){
+            alert("用户名和密码不能为空");   // 请替换为对应的注册失败的弹窗效果
+        }
+        else{
+            var args = {"user_name": user_name, "user_phone": user_phone, "page_url": page_url};
+            $.post(reg_url, args, function(data){
+                var result = JSON.parse(data);
+                if(result['message'] != "success"){
+                    // 注册失败
+                    alert(result['message']); // 弹出失败消息。请替换为对应的注册失败的弹窗效果
+                }
+                else{
+                    alert("注册成功");  // 请替换为对应的注册失败的弹窗效果
+                }
+
+            });
+        }
+    });
+
+
+});
+</script>
+
+</body>
+</html>

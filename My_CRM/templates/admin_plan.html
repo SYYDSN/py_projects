@@ -1,0 +1,174 @@
+{% extends "admin_template.html" %}
+{% block extend_js %}
+<script src="../static/js/admin_plan.js"></script>
+{% endblock %}
+{% block extend_css %}
+<link rel="stylesheet" href="../static/css/admin_user.css">
+{% endblock %}
+{% block main %}
+<div class="col-lg-12 col-md-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div style="display:none" id="customer_count">{{ plan_count }}</div><button id="add_btn" onclick="add_plan()" class="btn btn-primary btn-xs">添加</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <table id="user_table" class="table table-hover">
+                <tr>
+                    <th>序号</th>
+                    <th>策略说明</th>
+                    <th>成员数</th>
+                    <th>开始时间</th>
+                    <th>状态</th>
+                    <th>创建日期</th>
+                    <th>操作</th>
+                </tr>
+                <tr id="{{ default_plan.sn }}">
+                    <td>默认</td>
+                    <td data-type="item"  class="plan_name">{{ default_plan.plan_name }}</td>
+                    <td data-type="item"  class="user_name">{{ default_plan.member_count }}</td>
+                    <td data-type="item"  class="page_url">{{ default_plan.update_date }}</td>
+                    <td data-type="item"  class="plan_status"><a data-id="{{ default_plan.sn }}" style="{{ 'color: #428bca' if default_plan.plan_status == 1 else 'color: black' }}" onclick="change_status($(this))" href="javascript:;">{{ "激活" if default_plan.plan_status == 1 else "停用" }}</a></td>
+                    <td data-type="item"  class="create_date">{{ default_plan.create_date }}</td>
+                    <td>
+                    <div class="btn-group btn-group-xs" role="group">
+                        <!--<div class="btn-group btn btn-default drop_user" role="group"  data-id="{{ default_plan.sn }}" onclick="show_detail($(this))">详情</div>-->
+                        <!--<div class="btn-group btn btn-default drop_user" role="group"  data-id="{{ default_plan.user_sn }}" onclick="edit($(this))">调整</div>-->
+                    </div>
+                    </td>
+                </tr>
+                {% for plan in plan_count_data %}
+                <tr id="{{ plan.sn }}">
+                    <td>{{ loop.index }}</td>
+                    <td data-type="item"  class="plan_name">{{ plan.plan_name }}</td>
+                    <td data-type="item"  class="user_name">{{ plan.member_count }}</td>
+                    <td data-type="item"  class="page_url">{{ plan.update_date }}</td>
+                    <td data-type="item"  class="plan_status"><a data-id="{{ plan.sn }}" style="{{ 'color: #428bca' if plan.plan_status == 1 else 'color: black' }}" onclick="change_status($(this))" href="javascript:;">{{ "激活" if plan.plan_status == 1 else "停用" }}</a></td>
+                    <td data-type="item"  class="create_date">{{ plan.create_date }}</td>
+                    <td>
+                    <div class="btn-group btn-group-xs" role="group">
+                        <div class="btn-group btn btn-default drop_user" role="group"  data-id="{{ plan.sn }}" onclick="delete_plan($(this))">删除</div>
+                        <div class="btn-group btn btn-default drop_user" role="group"  data-id="{{ plan.sn }}" onclick="edit($(this))">调整</div>
+                    </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <!-- 底部分页 -->
+    <div class="row text-center">
+        <nav aria-label>
+            <ul id="page_list" class="pagination">
+                <li class="{{ 'disabled' if index_range[0] == 1 else '' }}"><a  href="/manage/plan?index={{ prev_index }}"  aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                {% for index in index_range %}
+                <li class="{{ 'active' if index == current_index else '' }}">
+                    <a href="/manage/plan?index={{ index }}">{{ index }}</a>
+                </li>
+                {% endfor %}
+                <li  class="{{ 'disabled' if index_range[-1] == max_index else '' }}"><a  href="/manage/plan?index={{ next_index }}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+    <!--模态框-->
+    <button id="pop_modal" style="display: none" type="button" class="btn btn-primary btn-lg" data-toggle="modal"
+            data-target="#myModal">
+        Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="height: auto">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" style="text-align: center" id="myModalLabel">编辑公司信息</h4>
+                </div>
+                <div class="modal-body">
+                    <style>
+                        .modal-body>.row{
+                            margin-top:10px;
+                            margin-bottom:10px;
+                        }
+                    </style>
+
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <label for="plan_name">策略简述：</label>
+                        </div>
+                        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+                            <input type="text" id="plan_name" style="width:80%" placeholder="请输入策略的简要描述">
+                            <input type="hidden"  id="sn">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <label for="plan_type">分配方式：</label>
+                        </div>
+                        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+                            <div class="switch">
+                                <input id="plan_type" type="checkbox" checked/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <label for="plan_member">成员选择：</label>
+                        </div>
+                        <div id="plan_member" class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                            <table class="table">
+                             {% for k, v in member_dict.items() %}
+                                {% if (loop.index % 2) == 1 %}
+                                <tr>
+                                {% endif %}
+                                <td><input style="margin-top:10px" type="checkbox" class="is_default"></td>
+                                <td>
+                                    <div class="input-group">
+                                        <span class="input-group-addon company_name">{{ v }}</span>
+                                        <input style="border-right:none" type="text" data-sn="{{ k }}" data-recode="" class="form-control per_num" placeholder="限整数">
+                                        <span style="border-left:none;background-color:white;padding-left:0px" class="input-group-addon company_name">%</span>
+                                    </div>
+                                </td>
+                                {% if (loop.index % 2) == 0 %}
+                                </tr>
+                                {% endif %}
+                             {% endfor %}
+
+                            <!--<tr>
+                                <td><input checked style="margin-top:10px" type="checkbox" class="is_default"></td>
+                                <td>
+                                    <div class="input-group">
+                                        <span class="input-group-addon" class="company_name">迅迭</span>
+                                        <input type="text" class="form-control per_num" placeholder="">
+                                    </div>
+                                </td>
+                                <td><input checked style="margin-top:10px" type="checkbox" class="is_default"></td>
+                                <td>
+                                    <div class="input-group">
+                                        <span class="input-group-addon" class="company_name">迅迭</span>
+                                        <input type="text" class="form-control per_num" placeholder="">
+                                    </div>
+                                </td>
+                            </tr>-->
+
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="save_plan" type="button" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--模态框结束-->
+
+{% endblock %}

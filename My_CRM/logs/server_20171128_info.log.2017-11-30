@@ -1,0 +1,4093 @@
+2017-12-01 09:12:00,017 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:12:00,037 server.py[line:298] INFO 
+2017-12-01 09:12:00,940 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:12:00,941 server.py[line:298] INFO 
+2017-12-01 09:12:01,120 server.py[line:206] INFO 
+2017-12-01 09:12:01,173 server.py[line:206] INFO 
+2017-12-01 09:12:01,219 server.py[line:206] INFO 
+2017-12-01 09:12:01,269 server.py[line:206] INFO 
+2017-12-01 09:12:01,327 server.py[line:206] INFO 
+2017-12-01 09:12:01,375 server.py[line:206] INFO 
+2017-12-01 09:12:01,427 server.py[line:206] INFO 
+2017-12-01 09:12:01,477 server.py[line:206] INFO 
+2017-12-01 09:12:01,530 server.py[line:206] INFO 
+2017-12-01 09:12:01,580 server.py[line:206] INFO 
+2017-12-01 09:12:01,629 server.py[line:206] INFO 
+2017-12-01 09:13:01,042 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:13:01,042 server.py[line:298] INFO 
+2017-12-01 09:13:01,791 server.py[line:206] INFO 
+2017-12-01 09:13:01,846 server.py[line:206] INFO 
+2017-12-01 09:13:01,892 server.py[line:206] INFO 
+2017-12-01 09:13:01,932 server.py[line:206] INFO 
+2017-12-01 09:13:01,975 server.py[line:206] INFO 
+2017-12-01 09:13:02,032 server.py[line:206] INFO 
+2017-12-01 09:13:02,074 server.py[line:206] INFO 
+2017-12-01 09:13:02,114 server.py[line:206] INFO 
+2017-12-01 09:13:02,152 server.py[line:206] INFO 
+2017-12-01 09:13:02,198 server.py[line:206] INFO 
+2017-12-01 09:13:02,238 server.py[line:206] INFO 
+2017-12-01 09:13:02,277 server.py[line:206] INFO 
+2017-12-01 09:14:01,750 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:14:01,751 server.py[line:298] INFO 
+2017-12-01 09:14:01,755 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:14:01,755 server.py[line:298] INFO 
+2017-12-01 09:14:02,510 server.py[line:206] INFO 
+2017-12-01 09:14:02,561 server.py[line:206] INFO 
+2017-12-01 09:14:02,601 server.py[line:206] INFO 
+2017-12-01 09:14:02,647 server.py[line:206] INFO 
+2017-12-01 09:14:02,702 server.py[line:206] INFO 
+2017-12-01 09:14:02,746 server.py[line:206] INFO 
+2017-12-01 09:14:02,786 server.py[line:206] INFO 
+2017-12-01 09:14:02,826 server.py[line:206] INFO 
+2017-12-01 09:14:02,869 server.py[line:206] INFO 
+2017-12-01 09:14:02,915 server.py[line:206] INFO 
+2017-12-01 09:14:02,970 server.py[line:206] INFO 
+2017-12-01 09:15:03,129 server.py[line:206] INFO 
+2017-12-01 09:16:03,093 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:16:03,094 server.py[line:298] INFO 
+2017-12-01 09:17:03,778 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:17:03,780 server.py[line:298] INFO 
+2017-12-01 09:17:04,623 server.py[line:206] INFO 
+2017-12-01 09:17:04,673 server.py[line:206] INFO 
+2017-12-01 09:17:04,716 server.py[line:206] INFO 
+2017-12-01 09:17:04,759 server.py[line:206] INFO 
+2017-12-01 09:17:04,815 server.py[line:206] INFO 
+2017-12-01 09:17:04,865 server.py[line:206] INFO 
+2017-12-01 09:17:04,908 server.py[line:206] INFO 
+2017-12-01 09:17:04,952 server.py[line:206] INFO 
+2017-12-01 09:17:04,997 server.py[line:206] INFO 
+2017-12-01 09:17:05,040 server.py[line:206] INFO 
+2017-12-01 09:17:05,083 server.py[line:206] INFO 
+2017-12-01 09:18:04,535 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:18:04,536 server.py[line:298] INFO 
+2017-12-01 09:19:05,201 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:19:05,201 server.py[line:298] INFO 
+2017-12-01 09:19:05,938 server.py[line:206] INFO 
+2017-12-01 09:19:05,987 server.py[line:206] INFO 
+2017-12-01 09:19:06,044 server.py[line:206] INFO 
+2017-12-01 09:19:06,091 server.py[line:206] INFO 
+2017-12-01 09:19:06,140 server.py[line:206] INFO 
+2017-12-01 09:19:06,203 server.py[line:206] INFO 
+2017-12-01 09:19:06,257 server.py[line:206] INFO 
+2017-12-01 09:19:06,307 server.py[line:206] INFO 
+2017-12-01 09:19:06,354 server.py[line:206] INFO 
+2017-12-01 09:19:06,404 server.py[line:206] INFO 
+2017-12-01 09:19:06,459 server.py[line:206] INFO 
+2017-12-01 09:19:06,508 server.py[line:206] INFO 
+2017-12-01 09:20:05,902 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:20:05,902 server.py[line:298] INFO 
+2017-12-01 09:20:05,903 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:20:05,903 server.py[line:298] INFO 
+2017-12-01 09:20:06,666 server.py[line:206] INFO 
+2017-12-01 09:21:06,632 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:21:06,632 server.py[line:298] INFO 
+2017-12-01 09:21:07,343 server.py[line:206] INFO 
+2017-12-01 09:21:07,456 server.py[line:206] INFO 
+2017-12-01 09:21:07,521 server.py[line:206] INFO 
+2017-12-01 09:21:07,585 server.py[line:206] INFO 
+2017-12-01 09:21:07,643 server.py[line:206] INFO 
+2017-12-01 09:21:07,706 server.py[line:206] INFO 
+2017-12-01 09:21:07,752 server.py[line:206] INFO 
+2017-12-01 09:21:07,793 server.py[line:206] INFO 
+2017-12-01 09:21:07,838 server.py[line:206] INFO 
+2017-12-01 09:21:07,880 server.py[line:206] INFO 
+2017-12-01 09:21:07,920 server.py[line:206] INFO 
+2017-12-01 09:21:07,961 server.py[line:206] INFO 
+2017-12-01 09:22:07,309 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:22:07,310 server.py[line:298] INFO 
+2017-12-01 09:22:07,311 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:22:07,311 server.py[line:298] INFO 
+2017-12-01 09:23:08,096 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:23:08,096 server.py[line:298] INFO 
+2017-12-01 09:23:08,852 server.py[line:206] INFO 
+2017-12-01 09:23:08,905 server.py[line:206] INFO 
+2017-12-01 09:24:08,726 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:24:08,726 server.py[line:298] INFO 
+2017-12-01 09:24:08,729 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:24:08,729 server.py[line:298] INFO 
+2017-12-01 09:24:09,482 server.py[line:206] INFO 
+2017-12-01 09:25:09,445 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:25:09,445 server.py[line:298] INFO 
+2017-12-01 09:25:10,174 server.py[line:206] INFO 
+2017-12-01 09:25:10,224 server.py[line:206] INFO 
+2017-12-01 09:25:10,271 server.py[line:206] INFO 
+2017-12-01 09:25:10,318 server.py[line:206] INFO 
+2017-12-01 09:25:10,377 server.py[line:206] INFO 
+2017-12-01 09:25:10,423 server.py[line:206] INFO 
+2017-12-01 09:25:10,474 server.py[line:206] INFO 
+2017-12-01 09:25:10,516 server.py[line:206] INFO 
+2017-12-01 09:25:10,562 server.py[line:206] INFO 
+2017-12-01 09:25:10,607 server.py[line:206] INFO 
+2017-12-01 09:25:10,651 server.py[line:206] INFO 
+2017-12-01 09:26:10,095 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:26:10,096 server.py[line:298] INFO 
+2017-12-01 09:26:10,853 server.py[line:206] INFO 
+2017-12-01 09:26:10,905 server.py[line:206] INFO 
+2017-12-01 09:26:10,947 server.py[line:206] INFO 
+2017-12-01 09:26:10,995 server.py[line:206] INFO 
+2017-12-01 09:26:11,066 server.py[line:206] INFO 
+2017-12-01 09:26:11,129 server.py[line:206] INFO 
+2017-12-01 09:26:11,172 server.py[line:206] INFO 
+2017-12-01 09:26:11,214 server.py[line:206] INFO 
+2017-12-01 09:26:11,285 server.py[line:206] INFO 
+2017-12-01 09:26:11,330 server.py[line:206] INFO 
+2017-12-01 09:26:11,382 server.py[line:206] INFO 
+2017-12-01 09:27:10,778 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:27:10,778 server.py[line:298] INFO 
+2017-12-01 09:27:11,548 server.py[line:206] INFO 
+2017-12-01 09:28:11,513 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:28:11,514 server.py[line:298] INFO 
+2017-12-01 09:28:11,515 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:28:11,515 server.py[line:298] INFO 
+2017-12-01 09:28:12,210 server.py[line:206] INFO 
+2017-12-01 09:28:12,258 server.py[line:206] INFO 
+2017-12-01 09:28:12,311 server.py[line:206] INFO 
+2017-12-01 09:28:12,354 server.py[line:206] INFO 
+2017-12-01 09:28:12,397 server.py[line:206] INFO 
+2017-12-01 09:28:12,456 server.py[line:206] INFO 
+2017-12-01 09:28:12,501 server.py[line:206] INFO 
+2017-12-01 09:28:12,543 server.py[line:206] INFO 
+2017-12-01 09:28:12,587 server.py[line:206] INFO 
+2017-12-01 09:28:12,631 server.py[line:206] INFO 
+2017-12-01 09:28:12,675 server.py[line:206] INFO 
+2017-12-01 09:28:12,718 server.py[line:206] INFO 
+2017-12-01 09:29:12,167 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:29:12,168 server.py[line:298] INFO 
+2017-12-01 09:29:15,437 server.py[line:206] INFO 
+2017-12-01 09:29:15,502 server.py[line:206] INFO 
+2017-12-01 09:29:15,582 server.py[line:206] INFO 
+2017-12-01 09:29:17,525 server.py[line:206] INFO 
+2017-12-01 09:30:12,854 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:30:12,855 server.py[line:298] INFO 
+2017-12-01 09:30:13,794 server.py[line:206] INFO 
+2017-12-01 09:30:13,843 server.py[line:206] INFO 
+2017-12-01 09:30:13,885 server.py[line:206] INFO 
+2017-12-01 09:30:13,927 server.py[line:206] INFO 
+2017-12-01 09:30:13,984 server.py[line:206] INFO 
+2017-12-01 09:30:14,030 server.py[line:206] INFO 
+2017-12-01 09:30:14,075 server.py[line:206] INFO 
+2017-12-01 09:30:14,118 server.py[line:206] INFO 
+2017-12-01 09:30:14,161 server.py[line:206] INFO 
+2017-12-01 09:30:14,204 server.py[line:206] INFO 
+2017-12-01 09:30:14,246 server.py[line:206] INFO 
+2017-12-01 09:30:18,364 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:30:18,365 server.py[line:298] INFO 
+2017-12-01 09:31:13,704 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:31:13,705 server.py[line:298] INFO 
+2017-12-01 09:31:13,706 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:31:13,706 server.py[line:298] INFO 
+2017-12-01 09:31:14,396 server.py[line:206] INFO 
+2017-12-01 09:32:14,362 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:32:14,362 server.py[line:298] INFO 
+2017-12-01 09:32:14,365 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:32:14,365 server.py[line:298] INFO 
+2017-12-01 09:32:15,067 server.py[line:206] INFO 
+2017-12-01 09:33:15,029 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:33:15,029 server.py[line:298] INFO 
+2017-12-01 09:33:15,773 server.py[line:206] INFO 
+2017-12-01 09:34:16,485 server.py[line:206] INFO 
+2017-12-01 09:35:16,449 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:35:16,449 server.py[line:298] INFO 
+2017-12-01 09:35:16,450 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:35:16,450 server.py[line:298] INFO 
+2017-12-01 09:36:17,107 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:36:17,108 server.py[line:298] INFO 
+2017-12-01 09:36:17,862 server.py[line:206] INFO 
+2017-12-01 09:36:17,913 server.py[line:206] INFO 
+2017-12-01 09:36:17,956 server.py[line:206] INFO 
+2017-12-01 09:36:17,999 server.py[line:206] INFO 
+2017-12-01 09:36:18,056 server.py[line:206] INFO 
+2017-12-01 09:36:18,102 server.py[line:206] INFO 
+2017-12-01 09:36:18,146 server.py[line:206] INFO 
+2017-12-01 09:36:18,188 server.py[line:206] INFO 
+2017-12-01 09:36:18,242 server.py[line:206] INFO 
+2017-12-01 09:36:18,287 server.py[line:206] INFO 
+2017-12-01 09:36:18,332 server.py[line:206] INFO 
+2017-12-01 09:37:17,787 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:37:17,788 server.py[line:298] INFO 
+2017-12-01 09:37:18,550 server.py[line:206] INFO 
+2017-12-01 09:37:18,606 server.py[line:206] INFO 
+2017-12-01 09:37:18,649 server.py[line:206] INFO 
+2017-12-01 09:37:18,698 server.py[line:206] INFO 
+2017-12-01 09:37:18,758 server.py[line:206] INFO 
+2017-12-01 09:37:18,810 server.py[line:206] INFO 
+2017-12-01 09:37:18,857 server.py[line:206] INFO 
+2017-12-01 09:37:18,905 server.py[line:206] INFO 
+2017-12-01 09:37:18,953 server.py[line:206] INFO 
+2017-12-01 09:37:18,999 server.py[line:206] INFO 
+2017-12-01 09:37:19,049 server.py[line:206] INFO 
+2017-12-01 09:38:18,463 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:38:18,464 server.py[line:298] INFO 
+2017-12-01 09:38:18,465 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:38:18,465 server.py[line:298] INFO 
+2017-12-01 09:39:19,886 server.py[line:206] INFO 
+2017-12-01 09:39:19,935 server.py[line:206] INFO 
+2017-12-01 09:39:19,988 server.py[line:206] INFO 
+2017-12-01 09:39:20,065 server.py[line:206] INFO 
+2017-12-01 09:39:20,111 server.py[line:206] INFO 
+2017-12-01 09:39:20,172 server.py[line:206] INFO 
+2017-12-01 09:39:20,222 server.py[line:206] INFO 
+2017-12-01 09:39:20,269 server.py[line:206] INFO 
+2017-12-01 09:39:20,313 server.py[line:206] INFO 
+2017-12-01 09:39:20,357 server.py[line:206] INFO 
+2017-12-01 09:39:20,418 server.py[line:206] INFO 
+2017-12-01 09:39:20,489 server.py[line:206] INFO 
+2017-12-01 09:40:19,854 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:40:19,854 server.py[line:298] INFO 
+2017-12-01 09:40:20,658 server.py[line:206] INFO 
+2017-12-01 09:41:20,623 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:41:20,623 server.py[line:298] INFO 
+2017-12-01 09:41:20,624 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:41:20,625 server.py[line:298] INFO 
+2017-12-01 09:41:21,367 server.py[line:206] INFO 
+2017-12-01 09:42:22,191 server.py[line:206] INFO 
+2017-12-01 09:43:22,148 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:43:22,148 server.py[line:298] INFO 
+2017-12-01 09:44:22,900 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:44:22,900 server.py[line:298] INFO 
+2017-12-01 09:44:23,629 server.py[line:206] INFO 
+2017-12-01 09:44:23,682 server.py[line:206] INFO 
+2017-12-01 09:44:23,732 server.py[line:206] INFO 
+2017-12-01 09:44:23,781 server.py[line:206] INFO 
+2017-12-01 09:44:23,838 server.py[line:206] INFO 
+2017-12-01 09:44:23,882 server.py[line:206] INFO 
+2017-12-01 09:44:23,930 server.py[line:206] INFO 
+2017-12-01 09:44:23,977 server.py[line:206] INFO 
+2017-12-01 09:44:24,028 server.py[line:206] INFO 
+2017-12-01 09:44:24,070 server.py[line:206] INFO 
+2017-12-01 09:44:24,119 server.py[line:206] INFO 
+2017-12-01 09:46:25,038 server.py[line:206] INFO 
+2017-12-01 09:47:24,998 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:47:24,999 server.py[line:298] INFO 
+2017-12-01 09:47:25,957 server.py[line:206] INFO 
+2017-12-01 09:47:26,006 server.py[line:206] INFO 
+2017-12-01 09:47:26,058 server.py[line:206] INFO 
+2017-12-01 09:47:26,103 server.py[line:206] INFO 
+2017-12-01 09:47:26,147 server.py[line:206] INFO 
+2017-12-01 09:47:26,212 server.py[line:206] INFO 
+2017-12-01 09:47:26,264 server.py[line:206] INFO 
+2017-12-01 09:47:26,318 server.py[line:206] INFO 
+2017-12-01 09:47:26,361 server.py[line:206] INFO 
+2017-12-01 09:47:26,407 server.py[line:206] INFO 
+2017-12-01 09:47:26,456 server.py[line:206] INFO 
+2017-12-01 09:47:26,506 server.py[line:206] INFO 
+2017-12-01 09:48:25,915 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:48:25,916 server.py[line:298] INFO 
+2017-12-01 09:48:25,918 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:48:25,918 server.py[line:298] INFO 
+2017-12-01 09:48:25,919 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:48:25,919 server.py[line:298] INFO 
+2017-12-01 09:49:26,647 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:49:26,647 server.py[line:298] INFO 
+2017-12-01 09:49:27,352 server.py[line:206] INFO 
+2017-12-01 09:49:27,522 server.py[line:206] INFO 
+2017-12-01 09:49:27,573 server.py[line:206] INFO 
+2017-12-01 09:49:27,624 server.py[line:206] INFO 
+2017-12-01 09:49:27,686 server.py[line:206] INFO 
+2017-12-01 09:49:27,737 server.py[line:206] INFO 
+2017-12-01 09:49:27,786 server.py[line:206] INFO 
+2017-12-01 09:49:27,841 server.py[line:206] INFO 
+2017-12-01 09:49:27,888 server.py[line:206] INFO 
+2017-12-01 09:49:27,935 server.py[line:206] INFO 
+2017-12-01 09:49:27,978 server.py[line:206] INFO 
+2017-12-01 09:50:28,249 server.py[line:206] INFO 
+2017-12-01 09:50:28,303 server.py[line:206] INFO 
+2017-12-01 09:50:28,350 server.py[line:206] INFO 
+2017-12-01 09:50:28,395 server.py[line:206] INFO 
+2017-12-01 09:50:28,480 server.py[line:206] INFO 
+2017-12-01 09:50:28,554 server.py[line:206] INFO 
+2017-12-01 09:50:28,599 server.py[line:206] INFO 
+2017-12-01 09:50:28,644 server.py[line:206] INFO 
+2017-12-01 09:50:28,688 server.py[line:206] INFO 
+2017-12-01 09:50:28,733 server.py[line:206] INFO 
+2017-12-01 09:50:28,778 server.py[line:206] INFO 
+2017-12-01 09:51:28,104 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:51:28,104 server.py[line:298] INFO 
+2017-12-01 09:52:29,660 server.py[line:206] INFO 
+2017-12-01 09:52:29,785 server.py[line:206] INFO 
+2017-12-01 09:52:29,857 server.py[line:206] INFO 
+2017-12-01 09:52:29,904 server.py[line:206] INFO 
+2017-12-01 09:52:29,966 server.py[line:206] INFO 
+2017-12-01 09:52:30,018 server.py[line:206] INFO 
+2017-12-01 09:52:30,094 server.py[line:206] INFO 
+2017-12-01 09:52:30,138 server.py[line:206] INFO 
+2017-12-01 09:52:30,190 server.py[line:206] INFO 
+2017-12-01 09:52:30,242 server.py[line:206] INFO 
+2017-12-01 09:52:30,288 server.py[line:206] INFO 
+2017-12-01 09:53:30,537 server.py[line:206] INFO 
+2017-12-01 09:53:30,600 server.py[line:206] INFO 
+2017-12-01 09:53:30,659 server.py[line:206] INFO 
+2017-12-01 09:53:30,709 server.py[line:206] INFO 
+2017-12-01 09:53:30,775 server.py[line:206] INFO 
+2017-12-01 09:53:30,831 server.py[line:206] INFO 
+2017-12-01 09:53:30,887 server.py[line:206] INFO 
+2017-12-01 09:53:30,942 server.py[line:206] INFO 
+2017-12-01 09:53:30,994 server.py[line:206] INFO 
+2017-12-01 09:53:31,049 server.py[line:206] INFO 
+2017-12-01 09:53:31,101 server.py[line:206] INFO 
+2017-12-01 09:54:30,425 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:54:30,426 server.py[line:298] INFO 
+2017-12-01 09:54:30,426 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:54:30,427 server.py[line:298] INFO 
+2017-12-01 09:55:31,241 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:55:31,241 server.py[line:298] INFO 
+2017-12-01 09:55:32,174 server.py[line:206] INFO 
+2017-12-01 09:56:22,983 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:56:22,984 server.py[line:298] INFO 
+2017-12-01 09:56:22,985 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:56:22,985 server.py[line:298] INFO 
+2017-12-01 09:56:32,140 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:56:32,140 server.py[line:298] INFO 
+2017-12-01 09:56:33,222 server.py[line:206] INFO 
+2017-12-01 09:56:33,272 server.py[line:206] INFO 
+2017-12-01 09:56:33,332 server.py[line:206] INFO 
+2017-12-01 09:56:33,385 server.py[line:206] INFO 
+2017-12-01 09:56:33,440 server.py[line:206] INFO 
+2017-12-01 09:56:33,504 server.py[line:206] INFO 
+2017-12-01 09:56:33,563 server.py[line:206] INFO 
+2017-12-01 09:56:33,651 server.py[line:206] INFO 
+2017-12-01 09:56:33,711 server.py[line:206] INFO 
+2017-12-01 09:56:33,769 server.py[line:206] INFO 
+2017-12-01 09:56:33,815 server.py[line:206] INFO 
+2017-12-01 09:56:33,898 server.py[line:206] INFO 
+2017-12-01 09:57:24,044 server.py[line:206] INFO 
+2017-12-01 09:57:24,096 server.py[line:206] INFO 
+2017-12-01 09:57:24,150 server.py[line:206] INFO 
+2017-12-01 09:57:24,198 server.py[line:206] INFO 
+2017-12-01 09:57:24,242 server.py[line:206] INFO 
+2017-12-01 09:57:24,304 server.py[line:206] INFO 
+2017-12-01 09:57:24,355 server.py[line:206] INFO 
+2017-12-01 09:57:24,402 server.py[line:206] INFO 
+2017-12-01 09:57:24,447 server.py[line:206] INFO 
+2017-12-01 09:57:24,493 server.py[line:206] INFO 
+2017-12-01 09:57:24,538 server.py[line:206] INFO 
+2017-12-01 09:57:24,583 server.py[line:206] INFO 
+2017-12-01 09:57:33,184 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:57:33,185 server.py[line:298] INFO 
+2017-12-01 09:57:34,234 server.py[line:206] INFO 
+2017-12-01 09:58:24,005 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:58:24,006 server.py[line:298] INFO 
+2017-12-01 09:58:34,047 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 09:58:34,047 server.py[line:298] INFO 
+2017-12-01 09:58:35,253 server.py[line:206] INFO 
+2017-12-01 09:58:35,307 server.py[line:206] INFO 
+2017-12-01 09:58:35,350 server.py[line:206] INFO 
+2017-12-01 09:58:35,400 server.py[line:206] INFO 
+2017-12-01 09:58:35,460 server.py[line:206] INFO 
+2017-12-01 09:58:35,509 server.py[line:206] INFO 
+2017-12-01 09:58:35,562 server.py[line:206] INFO 
+2017-12-01 09:58:35,615 server.py[line:206] INFO 
+2017-12-01 09:58:35,664 server.py[line:206] INFO 
+2017-12-01 09:58:35,707 server.py[line:206] INFO 
+2017-12-01 09:58:35,751 server.py[line:206] INFO 
+2017-12-01 09:59:25,585 server.py[line:206] INFO 
+2017-12-01 09:59:35,954 server.py[line:206] INFO 
+2017-12-01 09:59:36,021 server.py[line:206] INFO 
+2017-12-01 10:00:26,260 server.py[line:206] INFO 
+2017-12-01 10:00:35,870 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:00:35,870 server.py[line:298] INFO 
+2017-12-01 10:00:35,874 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:00:35,874 server.py[line:298] INFO 
+2017-12-01 10:00:36,828 server.py[line:206] INFO 
+2017-12-01 10:01:26,224 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:01:26,224 server.py[line:298] INFO 
+2017-12-01 10:01:26,988 server.py[line:206] INFO 
+2017-12-01 10:01:27,041 server.py[line:206] INFO 
+2017-12-01 10:01:27,094 server.py[line:206] INFO 
+2017-12-01 10:01:27,137 server.py[line:206] INFO 
+2017-12-01 10:01:27,180 server.py[line:206] INFO 
+2017-12-01 10:01:27,243 server.py[line:206] INFO 
+2017-12-01 10:01:27,288 server.py[line:206] INFO 
+2017-12-01 10:01:27,330 server.py[line:206] INFO 
+2017-12-01 10:01:27,374 server.py[line:206] INFO 
+2017-12-01 10:01:27,415 server.py[line:206] INFO 
+2017-12-01 10:01:27,457 server.py[line:206] INFO 
+2017-12-01 10:01:27,499 server.py[line:206] INFO 
+2017-12-01 10:01:37,642 server.py[line:206] INFO 
+2017-12-01 10:01:37,690 server.py[line:206] INFO 
+2017-12-01 10:01:37,755 server.py[line:206] INFO 
+2017-12-01 10:01:37,804 server.py[line:206] INFO 
+2017-12-01 10:01:37,858 server.py[line:206] INFO 
+2017-12-01 10:01:37,924 server.py[line:206] INFO 
+2017-12-01 10:01:37,982 server.py[line:206] INFO 
+2017-12-01 10:01:38,026 server.py[line:206] INFO 
+2017-12-01 10:01:38,082 server.py[line:206] INFO 
+2017-12-01 10:01:38,137 server.py[line:206] INFO 
+2017-12-01 10:01:38,185 server.py[line:206] INFO 
+2017-12-01 10:01:38,244 server.py[line:206] INFO 
+2017-12-01 10:02:26,947 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:02:26,948 server.py[line:298] INFO 
+2017-12-01 10:02:26,950 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:02:26,950 server.py[line:298] INFO 
+2017-12-01 10:02:27,669 server.py[line:206] INFO 
+2017-12-01 10:02:27,724 server.py[line:206] INFO 
+2017-12-01 10:02:27,779 server.py[line:206] INFO 
+2017-12-01 10:02:27,825 server.py[line:206] INFO 
+2017-12-01 10:02:27,869 server.py[line:206] INFO 
+2017-12-01 10:02:27,939 server.py[line:206] INFO 
+2017-12-01 10:02:27,987 server.py[line:206] INFO 
+2017-12-01 10:02:28,033 server.py[line:206] INFO 
+2017-12-01 10:02:28,081 server.py[line:206] INFO 
+2017-12-01 10:02:28,129 server.py[line:206] INFO 
+2017-12-01 10:02:28,173 server.py[line:206] INFO 
+2017-12-01 10:02:28,217 server.py[line:206] INFO 
+2017-12-01 10:02:37,600 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:02:37,600 server.py[line:298] INFO 
+2017-12-01 10:02:37,601 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:02:37,601 server.py[line:298] INFO 
+2017-12-01 10:02:38,465 server.py[line:206] INFO 
+2017-12-01 10:02:38,517 server.py[line:206] INFO 
+2017-12-01 10:02:38,561 server.py[line:206] INFO 
+2017-12-01 10:02:38,608 server.py[line:206] INFO 
+2017-12-01 10:02:38,669 server.py[line:206] INFO 
+2017-12-01 10:02:38,716 server.py[line:206] INFO 
+2017-12-01 10:02:38,762 server.py[line:206] INFO 
+2017-12-01 10:02:38,807 server.py[line:206] INFO 
+2017-12-01 10:02:38,850 server.py[line:206] INFO 
+2017-12-01 10:02:38,896 server.py[line:206] INFO 
+2017-12-01 10:02:38,941 server.py[line:206] INFO 
+2017-12-01 10:03:27,634 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:03:27,634 server.py[line:298] INFO 
+2017-12-01 10:03:27,636 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:03:27,636 server.py[line:298] INFO 
+2017-12-01 10:03:38,388 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:03:38,388 server.py[line:298] INFO 
+2017-12-01 10:03:39,153 server.py[line:206] INFO 
+2017-12-01 10:03:39,209 server.py[line:206] INFO 
+2017-12-01 10:03:39,274 server.py[line:206] INFO 
+2017-12-01 10:03:39,324 server.py[line:206] INFO 
+2017-12-01 10:03:39,387 server.py[line:206] INFO 
+2017-12-01 10:03:39,490 server.py[line:206] INFO 
+2017-12-01 10:03:39,568 server.py[line:206] INFO 
+2017-12-01 10:03:39,645 server.py[line:206] INFO 
+2017-12-01 10:03:39,710 server.py[line:206] INFO 
+2017-12-01 10:03:39,768 server.py[line:206] INFO 
+2017-12-01 10:03:39,818 server.py[line:206] INFO 
+2017-12-01 10:04:28,338 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:04:28,338 server.py[line:298] INFO 
+2017-12-01 10:04:29,054 server.py[line:206] INFO 
+2017-12-01 10:04:29,098 server.py[line:206] INFO 
+2017-12-01 10:04:29,150 server.py[line:206] INFO 
+2017-12-01 10:04:29,193 server.py[line:206] INFO 
+2017-12-01 10:04:29,237 server.py[line:206] INFO 
+2017-12-01 10:04:29,329 server.py[line:206] INFO 
+2017-12-01 10:04:29,380 server.py[line:206] INFO 
+2017-12-01 10:04:29,506 server.py[line:206] INFO 
+2017-12-01 10:04:29,610 server.py[line:206] INFO 
+2017-12-01 10:04:29,660 server.py[line:206] INFO 
+2017-12-01 10:04:29,708 server.py[line:206] INFO 
+2017-12-01 10:04:29,773 server.py[line:206] INFO 
+2017-12-01 10:10:01,938 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:10:01,939 server.py[line:298] INFO 
+2017-12-01 10:10:02,280 server.py[line:206] INFO 
+2017-12-01 10:11:02,243 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:11:02,244 server.py[line:298] INFO 
+2017-12-01 10:11:03,045 server.py[line:206] INFO 
+2017-12-01 10:11:03,096 server.py[line:206] INFO 
+2017-12-01 10:11:03,139 server.py[line:206] INFO 
+2017-12-01 10:11:03,188 server.py[line:206] INFO 
+2017-12-01 10:11:03,256 server.py[line:206] INFO 
+2017-12-01 10:11:03,303 server.py[line:206] INFO 
+2017-12-01 10:11:03,347 server.py[line:206] INFO 
+2017-12-01 10:11:03,394 server.py[line:206] INFO 
+2017-12-01 10:11:03,625 server.py[line:206] INFO 
+2017-12-01 10:11:03,671 server.py[line:206] INFO 
+2017-12-01 10:11:03,714 server.py[line:206] INFO 
+2017-12-01 10:12:02,964 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:12:02,964 server.py[line:298] INFO 
+2017-12-01 10:13:03,836 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:13:03,836 server.py[line:298] INFO 
+2017-12-01 10:13:04,581 server.py[line:206] INFO 
+2017-12-01 10:14:05,284 server.py[line:206] INFO 
+2017-12-01 10:14:05,338 server.py[line:206] INFO 
+2017-12-01 10:14:05,381 server.py[line:206] INFO 
+2017-12-01 10:14:05,425 server.py[line:206] INFO 
+2017-12-01 10:14:05,494 server.py[line:206] INFO 
+2017-12-01 10:14:05,546 server.py[line:206] INFO 
+2017-12-01 10:14:05,601 server.py[line:206] INFO 
+2017-12-01 10:14:05,644 server.py[line:206] INFO 
+2017-12-01 10:14:05,687 server.py[line:206] INFO 
+2017-12-01 10:14:05,730 server.py[line:206] INFO 
+2017-12-01 10:14:05,774 server.py[line:206] INFO 
+2017-12-01 10:15:05,222 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:15:05,223 server.py[line:298] INFO 
+2017-12-01 10:15:05,989 server.py[line:206] INFO 
+2017-12-01 10:15:06,042 server.py[line:206] INFO 
+2017-12-01 10:15:06,088 server.py[line:206] INFO 
+2017-12-01 10:15:06,133 server.py[line:206] INFO 
+2017-12-01 10:15:06,188 server.py[line:206] INFO 
+2017-12-01 10:15:06,233 server.py[line:206] INFO 
+2017-12-01 10:15:06,276 server.py[line:206] INFO 
+2017-12-01 10:15:06,319 server.py[line:206] INFO 
+2017-12-01 10:15:06,362 server.py[line:206] INFO 
+2017-12-01 10:15:06,404 server.py[line:206] INFO 
+2017-12-01 10:15:06,447 server.py[line:206] INFO 
+2017-12-01 10:16:05,904 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:16:05,905 server.py[line:298] INFO 
+2017-12-01 10:16:05,907 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:16:05,907 server.py[line:298] INFO 
+2017-12-01 10:16:06,654 server.py[line:206] INFO 
+2017-12-01 10:16:06,706 server.py[line:206] INFO 
+2017-12-01 10:16:06,748 server.py[line:206] INFO 
+2017-12-01 10:16:06,790 server.py[line:206] INFO 
+2017-12-01 10:16:06,848 server.py[line:206] INFO 
+2017-12-01 10:16:06,893 server.py[line:206] INFO 
+2017-12-01 10:16:06,935 server.py[line:206] INFO 
+2017-12-01 10:16:06,978 server.py[line:206] INFO 
+2017-12-01 10:16:07,020 server.py[line:206] INFO 
+2017-12-01 10:16:07,066 server.py[line:206] INFO 
+2017-12-01 10:16:07,108 server.py[line:206] INFO 
+2017-12-01 10:17:06,567 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:17:06,568 server.py[line:298] INFO 
+2017-12-01 10:17:07,265 server.py[line:206] INFO 
+2017-12-01 10:18:07,230 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:18:07,230 server.py[line:298] INFO 
+2017-12-01 10:18:07,231 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:18:07,231 server.py[line:298] INFO 
+2017-12-01 10:18:07,977 server.py[line:206] INFO 
+2017-12-01 10:18:08,028 server.py[line:206] INFO 
+2017-12-01 10:18:08,070 server.py[line:206] INFO 
+2017-12-01 10:18:08,130 server.py[line:206] INFO 
+2017-12-01 10:18:08,196 server.py[line:206] INFO 
+2017-12-01 10:18:08,246 server.py[line:206] INFO 
+2017-12-01 10:18:08,292 server.py[line:206] INFO 
+2017-12-01 10:18:08,336 server.py[line:206] INFO 
+2017-12-01 10:18:08,380 server.py[line:206] INFO 
+2017-12-01 10:18:08,435 server.py[line:206] INFO 
+2017-12-01 10:18:08,481 server.py[line:206] INFO 
+2017-12-01 10:20:08,610 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:20:08,610 server.py[line:298] INFO 
+2017-12-01 10:20:09,506 server.py[line:206] INFO 
+2017-12-01 10:20:09,555 server.py[line:206] INFO 
+2017-12-01 10:20:09,598 server.py[line:206] INFO 
+2017-12-01 10:20:09,639 server.py[line:206] INFO 
+2017-12-01 10:20:09,697 server.py[line:206] INFO 
+2017-12-01 10:20:09,742 server.py[line:206] INFO 
+2017-12-01 10:20:09,784 server.py[line:206] INFO 
+2017-12-01 10:20:09,825 server.py[line:206] INFO 
+2017-12-01 10:20:09,867 server.py[line:206] INFO 
+2017-12-01 10:20:09,909 server.py[line:206] INFO 
+2017-12-01 10:20:09,952 server.py[line:206] INFO 
+2017-12-01 10:21:09,406 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:21:09,407 server.py[line:298] INFO 
+2017-12-01 10:21:09,408 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:21:09,408 server.py[line:298] INFO 
+2017-12-01 10:21:10,106 server.py[line:206] INFO 
+2017-12-01 10:22:10,865 server.py[line:206] INFO 
+2017-12-01 10:22:10,920 server.py[line:206] INFO 
+2017-12-01 10:22:10,961 server.py[line:206] INFO 
+2017-12-01 10:22:11,007 server.py[line:206] INFO 
+2017-12-01 10:22:11,063 server.py[line:206] INFO 
+2017-12-01 10:22:11,106 server.py[line:206] INFO 
+2017-12-01 10:22:11,153 server.py[line:206] INFO 
+2017-12-01 10:22:11,206 server.py[line:206] INFO 
+2017-12-01 10:22:11,249 server.py[line:206] INFO 
+2017-12-01 10:22:11,290 server.py[line:206] INFO 
+2017-12-01 10:22:11,332 server.py[line:206] INFO 
+2017-12-01 10:23:11,531 server.py[line:206] INFO 
+2017-12-01 10:23:11,581 server.py[line:206] INFO 
+2017-12-01 10:23:11,623 server.py[line:206] INFO 
+2017-12-01 10:23:11,665 server.py[line:206] INFO 
+2017-12-01 10:23:11,722 server.py[line:206] INFO 
+2017-12-01 10:23:11,769 server.py[line:206] INFO 
+2017-12-01 10:23:11,813 server.py[line:206] INFO 
+2017-12-01 10:23:11,859 server.py[line:206] INFO 
+2017-12-01 10:23:11,903 server.py[line:206] INFO 
+2017-12-01 10:23:11,946 server.py[line:206] INFO 
+2017-12-01 10:23:11,990 server.py[line:206] INFO 
+2017-12-01 10:24:11,446 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:24:11,447 server.py[line:298] INFO 
+2017-12-01 10:24:12,195 server.py[line:206] INFO 
+2017-12-01 10:24:12,255 server.py[line:206] INFO 
+2017-12-01 10:24:12,298 server.py[line:206] INFO 
+2017-12-01 10:24:12,340 server.py[line:206] INFO 
+2017-12-01 10:24:12,407 server.py[line:206] INFO 
+2017-12-01 10:24:12,520 server.py[line:206] INFO 
+2017-12-01 10:24:12,564 server.py[line:206] INFO 
+2017-12-01 10:24:12,608 server.py[line:206] INFO 
+2017-12-01 10:24:12,649 server.py[line:206] INFO 
+2017-12-01 10:24:12,691 server.py[line:206] INFO 
+2017-12-01 10:24:12,734 server.py[line:206] INFO 
+2017-12-01 10:25:12,881 server.py[line:206] INFO 
+2017-12-01 10:26:12,845 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:26:12,846 server.py[line:298] INFO 
+2017-12-01 10:27:14,215 server.py[line:206] INFO 
+2017-12-01 10:28:14,180 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:28:14,180 server.py[line:298] INFO 
+2017-12-01 10:28:14,975 server.py[line:206] INFO 
+2017-12-01 10:29:14,941 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:29:14,942 server.py[line:298] INFO 
+2017-12-01 10:29:15,883 server.py[line:206] INFO 
+2017-12-01 10:29:15,926 server.py[line:206] INFO 
+2017-12-01 10:29:15,978 server.py[line:206] INFO 
+2017-12-01 10:29:16,020 server.py[line:206] INFO 
+2017-12-01 10:29:16,061 server.py[line:206] INFO 
+2017-12-01 10:29:16,117 server.py[line:206] INFO 
+2017-12-01 10:29:16,159 server.py[line:206] INFO 
+2017-12-01 10:29:16,201 server.py[line:206] INFO 
+2017-12-01 10:29:16,249 server.py[line:206] INFO 
+2017-12-01 10:29:16,294 server.py[line:206] INFO 
+2017-12-01 10:29:16,337 server.py[line:206] INFO 
+2017-12-01 10:29:16,377 server.py[line:206] INFO 
+2017-12-01 10:30:15,838 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:30:15,845 server.py[line:298] INFO 
+2017-12-01 10:30:15,846 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:30:15,846 server.py[line:298] INFO 
+2017-12-01 10:31:16,495 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:31:16,497 server.py[line:298] INFO 
+2017-12-01 10:31:17,521 server.py[line:206] INFO 
+2017-12-01 10:32:17,417 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:32:17,418 server.py[line:298] INFO 
+2017-12-01 10:32:18,238 server.py[line:206] INFO 
+2017-12-01 10:32:18,287 server.py[line:206] INFO 
+2017-12-01 10:32:18,336 server.py[line:206] INFO 
+2017-12-01 10:32:18,388 server.py[line:206] INFO 
+2017-12-01 10:32:18,459 server.py[line:206] INFO 
+2017-12-01 10:32:18,510 server.py[line:206] INFO 
+2017-12-01 10:32:18,561 server.py[line:206] INFO 
+2017-12-01 10:32:18,605 server.py[line:206] INFO 
+2017-12-01 10:32:18,656 server.py[line:206] INFO 
+2017-12-01 10:32:18,708 server.py[line:206] INFO 
+2017-12-01 10:32:18,759 server.py[line:206] INFO 
+2017-12-01 10:33:18,150 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:33:18,151 server.py[line:298] INFO 
+2017-12-01 10:33:18,157 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:33:18,158 server.py[line:298] INFO 
+2017-12-01 10:33:18,962 server.py[line:206] INFO 
+2017-12-01 10:33:19,014 server.py[line:206] INFO 
+2017-12-01 10:33:19,056 server.py[line:206] INFO 
+2017-12-01 10:33:19,100 server.py[line:206] INFO 
+2017-12-01 10:33:19,160 server.py[line:206] INFO 
+2017-12-01 10:33:19,207 server.py[line:206] INFO 
+2017-12-01 10:33:19,253 server.py[line:206] INFO 
+2017-12-01 10:33:19,296 server.py[line:206] INFO 
+2017-12-01 10:33:19,338 server.py[line:206] INFO 
+2017-12-01 10:33:19,384 server.py[line:206] INFO 
+2017-12-01 10:33:19,430 server.py[line:206] INFO 
+2017-12-01 10:34:19,643 server.py[line:206] INFO 
+2017-12-01 10:34:19,691 server.py[line:206] INFO 
+2017-12-01 10:34:19,742 server.py[line:206] INFO 
+2017-12-01 10:34:19,783 server.py[line:206] INFO 
+2017-12-01 10:34:19,824 server.py[line:206] INFO 
+2017-12-01 10:34:19,879 server.py[line:206] INFO 
+2017-12-01 10:34:19,922 server.py[line:206] INFO 
+2017-12-01 10:34:19,963 server.py[line:206] INFO 
+2017-12-01 10:34:20,006 server.py[line:206] INFO 
+2017-12-01 10:34:20,048 server.py[line:206] INFO 
+2017-12-01 10:34:20,091 server.py[line:206] INFO 
+2017-12-01 10:34:20,134 server.py[line:206] INFO 
+2017-12-01 10:35:19,600 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:35:19,603 server.py[line:298] INFO 
+2017-12-01 10:35:19,604 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:35:19,605 server.py[line:298] INFO 
+2017-12-01 10:36:20,263 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:36:20,357 server.py[line:298] INFO 
+2017-12-01 10:36:21,104 server.py[line:206] INFO 
+2017-12-01 10:36:21,167 server.py[line:206] INFO 
+2017-12-01 10:36:21,216 server.py[line:206] INFO 
+2017-12-01 10:36:21,262 server.py[line:206] INFO 
+2017-12-01 10:36:21,347 server.py[line:206] INFO 
+2017-12-01 10:36:21,411 server.py[line:206] INFO 
+2017-12-01 10:36:21,473 server.py[line:206] INFO 
+2017-12-01 10:36:21,551 server.py[line:206] INFO 
+2017-12-01 10:36:21,596 server.py[line:206] INFO 
+2017-12-01 10:36:21,641 server.py[line:206] INFO 
+2017-12-01 10:36:21,684 server.py[line:206] INFO 
+2017-12-01 10:37:21,019 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:37:21,020 server.py[line:298] INFO 
+2017-12-01 10:37:21,900 server.py[line:206] INFO 
+2017-12-01 10:37:21,950 server.py[line:206] INFO 
+2017-12-01 10:37:21,996 server.py[line:206] INFO 
+2017-12-01 10:37:22,039 server.py[line:206] INFO 
+2017-12-01 10:37:22,100 server.py[line:206] INFO 
+2017-12-01 10:37:22,146 server.py[line:206] INFO 
+2017-12-01 10:37:22,189 server.py[line:206] INFO 
+2017-12-01 10:37:22,240 server.py[line:206] INFO 
+2017-12-01 10:37:22,283 server.py[line:206] INFO 
+2017-12-01 10:37:22,328 server.py[line:206] INFO 
+2017-12-01 10:37:22,372 server.py[line:206] INFO 
+2017-12-01 10:38:21,817 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:38:21,817 server.py[line:298] INFO 
+2017-12-01 10:39:23,214 server.py[line:206] INFO 
+2017-12-01 10:40:23,174 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:40:23,175 server.py[line:298] INFO 
+2017-12-01 10:40:23,927 server.py[line:206] INFO 
+2017-12-01 10:40:23,989 server.py[line:206] INFO 
+2017-12-01 10:40:24,046 server.py[line:206] INFO 
+2017-12-01 10:40:24,089 server.py[line:206] INFO 
+2017-12-01 10:40:24,133 server.py[line:206] INFO 
+2017-12-01 10:40:24,196 server.py[line:206] INFO 
+2017-12-01 10:40:24,243 server.py[line:206] INFO 
+2017-12-01 10:40:24,291 server.py[line:206] INFO 
+2017-12-01 10:40:24,351 server.py[line:206] INFO 
+2017-12-01 10:40:24,395 server.py[line:206] INFO 
+2017-12-01 10:40:24,448 server.py[line:206] INFO 
+2017-12-01 10:40:24,497 server.py[line:206] INFO 
+2017-12-01 10:41:23,885 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:41:23,885 server.py[line:298] INFO 
+2017-12-01 10:41:23,887 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:41:23,887 server.py[line:298] INFO 
+2017-12-01 10:42:25,346 server.py[line:206] INFO 
+2017-12-01 10:42:25,410 server.py[line:206] INFO 
+2017-12-01 10:42:25,478 server.py[line:206] INFO 
+2017-12-01 10:42:25,547 server.py[line:206] INFO 
+2017-12-01 10:42:25,617 server.py[line:206] INFO 
+2017-12-01 10:42:25,695 server.py[line:206] INFO 
+2017-12-01 10:42:25,742 server.py[line:206] INFO 
+2017-12-01 10:42:25,787 server.py[line:206] INFO 
+2017-12-01 10:42:25,831 server.py[line:206] INFO 
+2017-12-01 10:42:25,886 server.py[line:206] INFO 
+2017-12-01 10:42:25,947 server.py[line:206] INFO 
+2017-12-01 10:42:26,012 server.py[line:206] INFO 
+2017-12-01 10:43:25,305 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:43:25,306 server.py[line:298] INFO 
+2017-12-01 10:43:26,190 server.py[line:206] INFO 
+2017-12-01 10:44:26,149 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:44:26,151 server.py[line:298] INFO 
+2017-12-01 10:44:26,155 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:44:26,155 server.py[line:298] INFO 
+2017-12-01 10:44:26,869 server.py[line:206] INFO 
+2017-12-01 10:45:26,823 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:45:26,823 server.py[line:298] INFO 
+2017-12-01 10:45:27,697 server.py[line:206] INFO 
+2017-12-01 10:46:27,661 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:46:27,661 server.py[line:298] INFO 
+2017-12-01 10:46:28,456 server.py[line:206] INFO 
+2017-12-01 10:46:28,510 server.py[line:206] INFO 
+2017-12-01 10:46:28,557 server.py[line:206] INFO 
+2017-12-01 10:46:28,601 server.py[line:206] INFO 
+2017-12-01 10:46:28,657 server.py[line:206] INFO 
+2017-12-01 10:46:28,707 server.py[line:206] INFO 
+2017-12-01 10:46:28,751 server.py[line:206] INFO 
+2017-12-01 10:46:28,794 server.py[line:206] INFO 
+2017-12-01 10:46:28,838 server.py[line:206] INFO 
+2017-12-01 10:46:28,881 server.py[line:206] INFO 
+2017-12-01 10:46:28,925 server.py[line:206] INFO 
+2017-12-01 10:47:28,365 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:47:28,365 server.py[line:298] INFO 
+2017-12-01 10:47:29,134 server.py[line:206] INFO 
+2017-12-01 10:47:29,422 server.py[line:206] INFO 
+2017-12-01 10:47:29,473 server.py[line:206] INFO 
+2017-12-01 10:47:29,517 server.py[line:206] INFO 
+2017-12-01 10:47:29,578 server.py[line:206] INFO 
+2017-12-01 10:47:29,637 server.py[line:206] INFO 
+2017-12-01 10:47:29,683 server.py[line:206] INFO 
+2017-12-01 10:47:29,728 server.py[line:206] INFO 
+2017-12-01 10:47:29,791 server.py[line:206] INFO 
+2017-12-01 10:47:29,838 server.py[line:206] INFO 
+2017-12-01 10:47:29,881 server.py[line:206] INFO 
+2017-12-01 10:48:29,049 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:48:29,049 server.py[line:298] INFO 
+2017-12-01 10:48:29,050 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:48:29,050 server.py[line:298] INFO 
+2017-12-01 10:49:29,999 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:49:30,002 server.py[line:298] INFO 
+2017-12-01 10:49:30,764 server.py[line:206] INFO 
+2017-12-01 10:49:30,811 server.py[line:206] INFO 
+2017-12-01 10:49:30,865 server.py[line:206] INFO 
+2017-12-01 10:49:30,910 server.py[line:206] INFO 
+2017-12-01 10:49:30,959 server.py[line:206] INFO 
+2017-12-01 10:49:31,328 server.py[line:206] INFO 
+2017-12-01 10:49:31,375 server.py[line:206] INFO 
+2017-12-01 10:49:31,422 server.py[line:206] INFO 
+2017-12-01 10:49:31,468 server.py[line:206] INFO 
+2017-12-01 10:49:31,514 server.py[line:206] INFO 
+2017-12-01 10:49:31,562 server.py[line:206] INFO 
+2017-12-01 10:49:31,609 server.py[line:206] INFO 
+2017-12-01 10:50:30,718 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:50:30,718 server.py[line:298] INFO 
+2017-12-01 10:50:31,653 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:50:31,654 server.py[line:298] INFO 
+2017-12-01 10:51:32,415 server.py[line:206] INFO 
+2017-12-01 10:51:32,459 server.py[line:206] INFO 
+2017-12-01 10:51:32,506 server.py[line:206] INFO 
+2017-12-01 10:51:32,545 server.py[line:206] INFO 
+2017-12-01 10:51:32,584 server.py[line:206] INFO 
+2017-12-01 10:51:32,638 server.py[line:206] INFO 
+2017-12-01 10:51:32,679 server.py[line:206] INFO 
+2017-12-01 10:51:32,721 server.py[line:206] INFO 
+2017-12-01 10:51:32,760 server.py[line:206] INFO 
+2017-12-01 10:51:32,800 server.py[line:206] INFO 
+2017-12-01 10:51:32,841 server.py[line:206] INFO 
+2017-12-01 10:51:32,883 server.py[line:206] INFO 
+2017-12-01 10:52:32,374 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:52:32,375 server.py[line:298] INFO 
+2017-12-01 10:52:32,379 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:52:32,379 server.py[line:298] INFO 
+2017-12-01 10:52:32,380 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:52:32,380 server.py[line:298] INFO 
+2017-12-01 10:53:33,000 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:53:33,000 server.py[line:298] INFO 
+2017-12-01 10:53:33,728 server.py[line:206] INFO 
+2017-12-01 10:53:33,790 server.py[line:206] INFO 
+2017-12-01 10:53:33,842 server.py[line:206] INFO 
+2017-12-01 10:53:33,893 server.py[line:206] INFO 
+2017-12-01 10:53:33,939 server.py[line:206] INFO 
+2017-12-01 10:53:34,004 server.py[line:206] INFO 
+2017-12-01 10:53:34,050 server.py[line:206] INFO 
+2017-12-01 10:53:34,096 server.py[line:206] INFO 
+2017-12-01 10:53:34,142 server.py[line:206] INFO 
+2017-12-01 10:53:34,185 server.py[line:206] INFO 
+2017-12-01 10:53:34,229 server.py[line:206] INFO 
+2017-12-01 10:53:34,275 server.py[line:206] INFO 
+2017-12-01 10:54:33,689 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:54:33,692 server.py[line:298] INFO 
+2017-12-01 10:54:33,693 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 10:54:33,693 server.py[line:298] INFO 
+2017-12-01 10:54:34,430 server.py[line:206] INFO 
+2017-12-01 10:55:35,152 server.py[line:206] INFO 
+2017-12-01 10:55:35,196 server.py[line:206] INFO 
+2017-12-01 10:55:35,249 server.py[line:206] INFO 
+2017-12-01 10:55:35,291 server.py[line:206] INFO 
+2017-12-01 10:55:35,334 server.py[line:206] INFO 
+2017-12-01 10:55:35,391 server.py[line:206] INFO 
+2017-12-01 10:55:35,435 server.py[line:206] INFO 
+2017-12-01 10:55:35,477 server.py[line:206] INFO 
+2017-12-01 10:55:35,522 server.py[line:206] INFO 
+2017-12-01 10:55:35,566 server.py[line:206] INFO 
+2017-12-01 10:55:35,608 server.py[line:206] INFO 
+2017-12-01 10:55:35,653 server.py[line:206] INFO 
+2017-12-01 11:11:44,442 server.py[line:206] INFO 
+2017-12-01 11:49:28,959 server.py[line:206] INFO 
+2017-12-01 11:49:31,140 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:49:31,141 server.py[line:298] INFO 
+2017-12-01 11:49:31,665 server.py[line:206] INFO 
+2017-12-01 11:49:31,718 server.py[line:206] INFO 
+2017-12-01 11:49:31,776 server.py[line:206] INFO 
+2017-12-01 11:49:31,824 server.py[line:206] INFO 
+2017-12-01 11:49:31,891 server.py[line:206] INFO 
+2017-12-01 11:49:31,950 server.py[line:206] INFO 
+2017-12-01 11:49:31,993 server.py[line:206] INFO 
+2017-12-01 11:49:32,040 server.py[line:206] INFO 
+2017-12-01 11:49:32,083 server.py[line:206] INFO 
+2017-12-01 11:49:32,128 server.py[line:206] INFO 
+2017-12-01 11:49:32,512 server.py[line:206] INFO 
+2017-12-01 11:50:32,504 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:50:32,505 server.py[line:298] INFO 
+2017-12-01 11:51:32,663 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:51:32,664 server.py[line:298] INFO 
+2017-12-01 11:51:33,365 server.py[line:206] INFO 
+2017-12-01 11:51:33,412 server.py[line:206] INFO 
+2017-12-01 11:51:33,472 server.py[line:206] INFO 
+2017-12-01 11:51:33,591 server.py[line:206] INFO 
+2017-12-01 11:51:33,641 server.py[line:206] INFO 
+2017-12-01 11:51:33,707 server.py[line:206] INFO 
+2017-12-01 11:51:33,756 server.py[line:206] INFO 
+2017-12-01 11:51:33,797 server.py[line:206] INFO 
+2017-12-01 11:51:33,841 server.py[line:206] INFO 
+2017-12-01 11:51:33,888 server.py[line:206] INFO 
+2017-12-01 11:51:33,932 server.py[line:206] INFO 
+2017-12-01 11:51:33,974 server.py[line:206] INFO 
+2017-12-01 11:52:34,191 server.py[line:206] INFO 
+2017-12-01 11:52:34,244 server.py[line:206] INFO 
+2017-12-01 11:52:34,291 server.py[line:206] INFO 
+2017-12-01 11:52:34,336 server.py[line:206] INFO 
+2017-12-01 11:52:34,401 server.py[line:206] INFO 
+2017-12-01 11:52:34,449 server.py[line:206] INFO 
+2017-12-01 11:52:34,496 server.py[line:206] INFO 
+2017-12-01 11:52:34,547 server.py[line:206] INFO 
+2017-12-01 11:52:34,593 server.py[line:206] INFO 
+2017-12-01 11:52:34,637 server.py[line:206] INFO 
+2017-12-01 11:52:34,681 server.py[line:206] INFO 
+2017-12-01 11:53:34,111 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:53:34,112 server.py[line:298] INFO 
+2017-12-01 11:53:34,891 server.py[line:206] INFO 
+2017-12-01 11:53:34,945 server.py[line:206] INFO 
+2017-12-01 11:53:35,226 server.py[line:206] INFO 
+2017-12-01 11:53:35,276 server.py[line:206] INFO 
+2017-12-01 11:53:35,348 server.py[line:206] INFO 
+2017-12-01 11:53:35,395 server.py[line:206] INFO 
+2017-12-01 11:53:35,443 server.py[line:206] INFO 
+2017-12-01 11:53:35,495 server.py[line:206] INFO 
+2017-12-01 11:53:35,538 server.py[line:206] INFO 
+2017-12-01 11:53:35,583 server.py[line:206] INFO 
+2017-12-01 11:53:35,628 server.py[line:206] INFO 
+2017-12-01 11:54:34,814 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:54:34,814 server.py[line:298] INFO 
+2017-12-01 11:54:35,795 server.py[line:206] INFO 
+2017-12-01 11:55:35,760 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:55:35,761 server.py[line:298] INFO 
+2017-12-01 11:55:35,762 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:55:35,764 server.py[line:298] INFO 
+2017-12-01 11:55:36,525 server.py[line:206] INFO 
+2017-12-01 11:55:36,576 server.py[line:206] INFO 
+2017-12-01 11:55:36,615 server.py[line:206] INFO 
+2017-12-01 11:55:36,659 server.py[line:206] INFO 
+2017-12-01 11:55:36,719 server.py[line:206] INFO 
+2017-12-01 11:55:36,763 server.py[line:206] INFO 
+2017-12-01 11:55:36,804 server.py[line:206] INFO 
+2017-12-01 11:55:36,848 server.py[line:206] INFO 
+2017-12-01 11:55:36,898 server.py[line:206] INFO 
+2017-12-01 11:55:36,943 server.py[line:206] INFO 
+2017-12-01 11:55:36,986 server.py[line:206] INFO 
+2017-12-01 11:56:36,449 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:56:36,449 server.py[line:298] INFO 
+2017-12-01 11:57:14,567 server.py[line:206] INFO 
+2017-12-01 11:57:37,122 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:57:37,122 server.py[line:298] INFO 
+2017-12-01 11:57:37,894 server.py[line:206] INFO 
+2017-12-01 11:57:37,942 server.py[line:206] INFO 
+2017-12-01 11:57:37,984 server.py[line:206] INFO 
+2017-12-01 11:57:38,026 server.py[line:206] INFO 
+2017-12-01 11:57:38,084 server.py[line:206] INFO 
+2017-12-01 11:57:38,129 server.py[line:206] INFO 
+2017-12-01 11:57:38,170 server.py[line:206] INFO 
+2017-12-01 11:57:38,210 server.py[line:206] INFO 
+2017-12-01 11:57:38,251 server.py[line:206] INFO 
+2017-12-01 11:57:38,292 server.py[line:206] INFO 
+2017-12-01 11:57:38,335 server.py[line:206] INFO 
+2017-12-01 11:58:37,815 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:58:37,815 server.py[line:298] INFO 
+2017-12-01 11:58:37,818 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:58:37,818 server.py[line:298] INFO 
+2017-12-01 11:58:38,547 server.py[line:206] INFO 
+2017-12-01 11:58:38,600 server.py[line:206] INFO 
+2017-12-01 11:58:38,644 server.py[line:206] INFO 
+2017-12-01 11:58:38,686 server.py[line:206] INFO 
+2017-12-01 11:58:38,758 server.py[line:206] INFO 
+2017-12-01 11:58:38,803 server.py[line:206] INFO 
+2017-12-01 11:58:38,847 server.py[line:206] INFO 
+2017-12-01 11:58:38,891 server.py[line:206] INFO 
+2017-12-01 11:58:38,939 server.py[line:206] INFO 
+2017-12-01 11:58:38,983 server.py[line:206] INFO 
+2017-12-01 11:58:39,031 server.py[line:206] INFO 
+2017-12-01 11:59:38,468 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 11:59:38,468 server.py[line:298] INFO 
+2017-12-01 11:59:39,290 server.py[line:206] INFO 
+2017-12-01 11:59:39,340 server.py[line:206] INFO 
+2017-12-01 11:59:39,383 server.py[line:206] INFO 
+2017-12-01 11:59:39,424 server.py[line:206] INFO 
+2017-12-01 11:59:39,480 server.py[line:206] INFO 
+2017-12-01 11:59:39,527 server.py[line:206] INFO 
+2017-12-01 11:59:39,569 server.py[line:206] INFO 
+2017-12-01 11:59:39,611 server.py[line:206] INFO 
+2017-12-01 11:59:39,653 server.py[line:206] INFO 
+2017-12-01 11:59:39,696 server.py[line:206] INFO 
+2017-12-01 11:59:39,737 server.py[line:206] INFO 
+2017-12-01 12:00:39,205 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:00:39,205 server.py[line:298] INFO 
+2017-12-01 12:00:39,210 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:00:39,210 server.py[line:298] INFO 
+2017-12-01 12:00:39,904 server.py[line:206] INFO 
+2017-12-01 12:01:40,801 server.py[line:206] INFO 
+2017-12-01 12:02:40,765 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:02:40,766 server.py[line:298] INFO 
+2017-12-01 12:03:41,444 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:03:41,444 server.py[line:298] INFO 
+2017-12-01 12:03:42,166 server.py[line:206] INFO 
+2017-12-01 12:04:42,936 server.py[line:206] INFO 
+2017-12-01 12:05:42,903 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:05:42,903 server.py[line:298] INFO 
+2017-12-01 12:06:43,591 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:06:43,591 server.py[line:298] INFO 
+2017-12-01 12:06:44,261 server.py[line:206] INFO 
+2017-12-01 12:06:44,309 server.py[line:206] INFO 
+2017-12-01 12:06:44,358 server.py[line:206] INFO 
+2017-12-01 12:06:44,400 server.py[line:206] INFO 
+2017-12-01 12:06:44,441 server.py[line:206] INFO 
+2017-12-01 12:06:44,512 server.py[line:206] INFO 
+2017-12-01 12:06:44,560 server.py[line:206] INFO 
+2017-12-01 12:06:44,603 server.py[line:206] INFO 
+2017-12-01 12:06:44,644 server.py[line:206] INFO 
+2017-12-01 12:06:44,686 server.py[line:206] INFO 
+2017-12-01 12:06:44,727 server.py[line:206] INFO 
+2017-12-01 12:06:44,769 server.py[line:206] INFO 
+2017-12-01 12:07:44,229 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:07:44,230 server.py[line:298] INFO 
+2017-12-01 12:07:44,930 server.py[line:206] INFO 
+2017-12-01 12:08:44,895 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:08:44,895 server.py[line:298] INFO 
+2017-12-01 12:08:45,587 server.py[line:206] INFO 
+2017-12-01 12:08:45,633 server.py[line:206] INFO 
+2017-12-01 12:08:45,687 server.py[line:206] INFO 
+2017-12-01 12:08:45,730 server.py[line:206] INFO 
+2017-12-01 12:08:45,773 server.py[line:206] INFO 
+2017-12-01 12:08:45,832 server.py[line:206] INFO 
+2017-12-01 12:08:45,881 server.py[line:206] INFO 
+2017-12-01 12:08:45,925 server.py[line:206] INFO 
+2017-12-01 12:08:45,972 server.py[line:206] INFO 
+2017-12-01 12:08:46,015 server.py[line:206] INFO 
+2017-12-01 12:08:46,056 server.py[line:206] INFO 
+2017-12-01 12:08:46,114 server.py[line:206] INFO 
+2017-12-01 12:09:45,548 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:09:45,548 server.py[line:298] INFO 
+2017-12-01 12:09:45,552 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:09:45,552 server.py[line:298] INFO 
+2017-12-01 12:09:45,553 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:09:45,554 server.py[line:298] INFO 
+2017-12-01 12:09:46,338 server.py[line:206] INFO 
+2017-12-01 12:09:46,437 server.py[line:206] INFO 
+2017-12-01 12:09:46,627 server.py[line:206] INFO 
+2017-12-01 12:09:46,759 server.py[line:206] INFO 
+2017-12-01 12:10:47,026 server.py[line:206] INFO 
+2017-12-01 12:10:47,072 server.py[line:206] INFO 
+2017-12-01 12:10:47,169 server.py[line:206] INFO 
+2017-12-01 12:10:47,213 server.py[line:206] INFO 
+2017-12-01 12:10:47,316 server.py[line:206] INFO 
+2017-12-01 12:10:47,364 server.py[line:206] INFO 
+2017-12-01 12:10:47,452 server.py[line:206] INFO 
+2017-12-01 12:10:47,529 server.py[line:206] INFO 
+2017-12-01 12:11:46,989 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:11:46,990 server.py[line:298] INFO 
+2017-12-01 12:11:46,991 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:11:46,991 server.py[line:298] INFO 
+2017-12-01 12:11:47,802 server.py[line:206] INFO 
+2017-12-01 12:11:47,853 server.py[line:206] INFO 
+2017-12-01 12:11:47,898 server.py[line:206] INFO 
+2017-12-01 12:11:48,006 server.py[line:206] INFO 
+2017-12-01 12:11:48,057 server.py[line:206] INFO 
+2017-12-01 12:11:48,150 server.py[line:206] INFO 
+2017-12-01 12:11:48,199 server.py[line:206] INFO 
+2017-12-01 12:11:48,286 server.py[line:206] INFO 
+2017-12-01 12:12:48,465 server.py[line:206] INFO 
+2017-12-01 12:12:48,682 server.py[line:206] INFO 
+2017-12-01 12:12:48,832 server.py[line:206] INFO 
+2017-12-01 12:12:48,978 server.py[line:206] INFO 
+2017-12-01 12:13:49,199 server.py[line:206] INFO 
+2017-12-01 12:13:49,353 server.py[line:206] INFO 
+2017-12-01 12:13:49,454 server.py[line:206] INFO 
+2017-12-01 12:13:49,512 server.py[line:206] INFO 
+2017-12-01 12:13:49,606 server.py[line:206] INFO 
+2017-12-01 12:13:49,648 server.py[line:206] INFO 
+2017-12-01 12:13:49,738 server.py[line:206] INFO 
+2017-12-01 12:13:50,020 server.py[line:206] INFO 
+2017-12-01 12:14:49,162 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:14:49,163 server.py[line:298] INFO 
+2017-12-01 12:14:50,087 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:14:50,088 server.py[line:298] INFO 
+2017-12-01 12:14:50,210 server.py[line:206] INFO 
+2017-12-01 12:14:50,269 server.py[line:206] INFO 
+2017-12-01 12:14:50,367 server.py[line:206] INFO 
+2017-12-01 12:14:50,483 server.py[line:206] INFO 
+2017-12-01 12:14:50,533 server.py[line:206] INFO 
+2017-12-01 12:14:50,635 server.py[line:206] INFO 
+2017-12-01 12:14:50,684 server.py[line:206] INFO 
+2017-12-01 12:14:50,778 server.py[line:206] INFO 
+2017-12-01 12:15:50,172 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:15:50,172 server.py[line:298] INFO 
+2017-12-01 12:15:50,174 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:15:50,174 server.py[line:298] INFO 
+2017-12-01 12:15:50,948 server.py[line:206] INFO 
+2017-12-01 12:15:51,132 server.py[line:206] INFO 
+2017-12-01 12:15:51,281 server.py[line:206] INFO 
+2017-12-01 12:15:51,405 server.py[line:206] INFO 
+2017-12-01 12:16:51,641 server.py[line:206] INFO 
+2017-12-01 12:16:51,904 server.py[line:206] INFO 
+2017-12-01 12:16:52,042 server.py[line:206] INFO 
+2017-12-01 12:16:52,178 server.py[line:206] INFO 
+2017-12-01 12:17:52,410 server.py[line:206] INFO 
+2017-12-01 12:17:52,462 server.py[line:206] INFO 
+2017-12-01 12:17:52,510 server.py[line:206] INFO 
+2017-12-01 12:17:52,610 server.py[line:206] INFO 
+2017-12-01 12:17:52,659 server.py[line:206] INFO 
+2017-12-01 12:17:52,755 server.py[line:206] INFO 
+2017-12-01 12:17:52,809 server.py[line:206] INFO 
+2017-12-01 12:17:52,899 server.py[line:206] INFO 
+2017-12-01 12:18:52,321 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:18:52,321 server.py[line:298] INFO 
+2017-12-01 12:18:52,363 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:18:52,364 server.py[line:298] INFO 
+2017-12-01 12:19:54,113 server.py[line:206] INFO 
+2017-12-01 12:19:54,307 server.py[line:206] INFO 
+2017-12-01 12:19:54,454 server.py[line:206] INFO 
+2017-12-01 12:19:54,588 server.py[line:206] INFO 
+2017-12-01 12:20:54,806 server.py[line:206] INFO 
+2017-12-01 12:20:54,907 server.py[line:206] INFO 
+2017-12-01 12:20:55,001 server.py[line:206] INFO 
+2017-12-01 12:20:55,060 server.py[line:206] INFO 
+2017-12-01 12:20:55,150 server.py[line:206] INFO 
+2017-12-01 12:20:55,196 server.py[line:206] INFO 
+2017-12-01 12:20:55,289 server.py[line:206] INFO 
+2017-12-01 12:20:55,335 server.py[line:206] INFO 
+2017-12-01 12:21:54,773 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:21:54,774 server.py[line:298] INFO 
+2017-12-01 12:22:56,278 server.py[line:206] INFO 
+2017-12-01 12:22:56,330 server.py[line:206] INFO 
+2017-12-01 12:22:56,381 server.py[line:206] INFO 
+2017-12-01 12:22:56,489 server.py[line:206] INFO 
+2017-12-01 12:22:56,540 server.py[line:206] INFO 
+2017-12-01 12:22:56,639 server.py[line:206] INFO 
+2017-12-01 12:22:56,699 server.py[line:206] INFO 
+2017-12-01 12:22:56,814 server.py[line:206] INFO 
+2017-12-01 12:23:57,054 server.py[line:206] INFO 
+2017-12-01 12:23:57,113 server.py[line:206] INFO 
+2017-12-01 12:23:57,206 server.py[line:206] INFO 
+2017-12-01 12:23:57,330 server.py[line:206] INFO 
+2017-12-01 12:23:57,431 server.py[line:206] INFO 
+2017-12-01 12:23:57,578 server.py[line:206] INFO 
+2017-12-01 12:24:57,886 server.py[line:206] INFO 
+2017-12-01 12:24:58,007 server.py[line:206] INFO 
+2017-12-01 12:24:58,070 server.py[line:206] INFO 
+2017-12-01 12:24:58,191 server.py[line:206] INFO 
+2017-12-01 12:24:58,243 server.py[line:206] INFO 
+2017-12-01 12:24:58,347 server.py[line:206] INFO 
+2017-12-01 12:24:58,402 server.py[line:206] INFO 
+2017-12-01 12:24:58,516 server.py[line:206] INFO 
+2017-12-01 12:25:57,788 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:25:57,788 server.py[line:298] INFO 
+2017-12-01 12:25:57,797 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:25:57,797 server.py[line:298] INFO 
+2017-12-01 12:25:58,691 server.py[line:206] INFO 
+2017-12-01 12:25:58,929 server.py[line:206] INFO 
+2017-12-01 12:25:59,141 server.py[line:206] INFO 
+2017-12-01 12:25:59,311 server.py[line:206] INFO 
+2017-12-01 12:26:59,598 server.py[line:206] INFO 
+2017-12-01 12:26:59,651 server.py[line:206] INFO 
+2017-12-01 12:26:59,698 server.py[line:206] INFO 
+2017-12-01 12:26:59,803 server.py[line:206] INFO 
+2017-12-01 12:26:59,851 server.py[line:206] INFO 
+2017-12-01 12:26:59,946 server.py[line:206] INFO 
+2017-12-01 12:26:59,991 server.py[line:206] INFO 
+2017-12-01 12:27:00,080 server.py[line:206] INFO 
+2017-12-01 12:28:00,252 server.py[line:206] INFO 
+2017-12-01 12:28:00,435 server.py[line:206] INFO 
+2017-12-01 12:28:00,591 server.py[line:206] INFO 
+2017-12-01 12:28:00,719 server.py[line:206] INFO 
+2017-12-01 12:29:00,217 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:29:00,217 server.py[line:298] INFO 
+2017-12-01 12:29:00,936 server.py[line:206] INFO 
+2017-12-01 12:29:01,027 server.py[line:206] INFO 
+2017-12-01 12:29:01,110 server.py[line:206] INFO 
+2017-12-01 12:29:01,168 server.py[line:206] INFO 
+2017-12-01 12:29:01,258 server.py[line:206] INFO 
+2017-12-01 12:29:01,306 server.py[line:206] INFO 
+2017-12-01 12:29:01,385 server.py[line:206] INFO 
+2017-12-01 12:29:01,429 server.py[line:206] INFO 
+2017-12-01 12:30:01,605 server.py[line:206] INFO 
+2017-12-01 12:30:01,792 server.py[line:206] INFO 
+2017-12-01 12:30:01,949 server.py[line:206] INFO 
+2017-12-01 12:30:02,077 server.py[line:206] INFO 
+2017-12-01 12:31:02,332 server.py[line:206] INFO 
+2017-12-01 12:31:02,387 server.py[line:206] INFO 
+2017-12-01 12:31:02,428 server.py[line:206] INFO 
+2017-12-01 12:31:02,543 server.py[line:206] INFO 
+2017-12-01 12:31:02,589 server.py[line:206] INFO 
+2017-12-01 12:31:02,683 server.py[line:206] INFO 
+2017-12-01 12:31:02,725 server.py[line:206] INFO 
+2017-12-01 12:31:02,819 server.py[line:206] INFO 
+2017-12-01 12:32:02,255 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:32:02,256 server.py[line:298] INFO 
+2017-12-01 12:32:02,257 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:32:02,258 server.py[line:298] INFO 
+2017-12-01 12:33:03,700 server.py[line:206] INFO 
+2017-12-01 12:33:03,889 server.py[line:206] INFO 
+2017-12-01 12:33:04,034 server.py[line:206] INFO 
+2017-12-01 12:33:04,166 server.py[line:206] INFO 
+2017-12-01 12:34:03,663 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:34:03,664 server.py[line:298] INFO 
+2017-12-01 12:34:04,379 server.py[line:206] INFO 
+2017-12-01 12:34:04,572 server.py[line:206] INFO 
+2017-12-01 12:34:04,725 server.py[line:206] INFO 
+2017-12-01 12:34:04,861 server.py[line:206] INFO 
+2017-12-01 12:35:05,121 server.py[line:206] INFO 
+2017-12-01 12:35:05,176 server.py[line:206] INFO 
+2017-12-01 12:35:05,221 server.py[line:206] INFO 
+2017-12-01 12:35:05,317 server.py[line:206] INFO 
+2017-12-01 12:35:05,365 server.py[line:206] INFO 
+2017-12-01 12:35:05,450 server.py[line:206] INFO 
+2017-12-01 12:35:05,498 server.py[line:206] INFO 
+2017-12-01 12:35:05,587 server.py[line:206] INFO 
+2017-12-01 12:36:05,802 server.py[line:206] INFO 
+2017-12-01 12:36:05,854 server.py[line:206] INFO 
+2017-12-01 12:36:05,900 server.py[line:206] INFO 
+2017-12-01 12:36:06,004 server.py[line:206] INFO 
+2017-12-01 12:36:06,050 server.py[line:206] INFO 
+2017-12-01 12:36:06,136 server.py[line:206] INFO 
+2017-12-01 12:36:06,181 server.py[line:206] INFO 
+2017-12-01 12:36:06,272 server.py[line:206] INFO 
+2017-12-01 12:37:05,723 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:37:05,723 server.py[line:298] INFO 
+2017-12-01 12:37:05,725 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:37:05,725 server.py[line:298] INFO 
+2017-12-01 12:37:06,447 server.py[line:206] INFO 
+2017-12-01 12:37:06,546 server.py[line:206] INFO 
+2017-12-01 12:37:06,633 server.py[line:206] INFO 
+2017-12-01 12:37:06,689 server.py[line:206] INFO 
+2017-12-01 12:37:06,787 server.py[line:206] INFO 
+2017-12-01 12:37:06,829 server.py[line:206] INFO 
+2017-12-01 12:37:06,916 server.py[line:206] INFO 
+2017-12-01 12:37:06,958 server.py[line:206] INFO 
+2017-12-01 12:38:07,197 server.py[line:206] INFO 
+2017-12-01 12:38:07,295 server.py[line:206] INFO 
+2017-12-01 12:38:07,454 server.py[line:206] INFO 
+2017-12-01 12:38:07,590 server.py[line:206] INFO 
+2017-12-01 12:39:07,858 server.py[line:206] INFO 
+2017-12-01 12:39:07,907 server.py[line:206] INFO 
+2017-12-01 12:39:07,961 server.py[line:206] INFO 
+2017-12-01 12:39:08,009 server.py[line:206] INFO 
+2017-12-01 12:39:08,057 server.py[line:206] INFO 
+2017-12-01 12:39:08,124 server.py[line:206] INFO 
+2017-12-01 12:39:08,173 server.py[line:206] INFO 
+2017-12-01 12:39:08,220 server.py[line:206] INFO 
+2017-12-01 12:39:08,270 server.py[line:206] INFO 
+2017-12-01 12:39:08,317 server.py[line:206] INFO 
+2017-12-01 12:39:08,370 server.py[line:206] INFO 
+2017-12-01 12:39:08,421 server.py[line:206] INFO 
+2017-12-01 12:40:07,823 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:40:07,824 server.py[line:298] INFO 
+2017-12-01 12:40:07,825 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:40:07,825 server.py[line:298] INFO 
+2017-12-01 12:40:07,826 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:40:07,826 server.py[line:298] INFO 
+2017-12-01 12:40:08,632 server.py[line:206] INFO 
+2017-12-01 12:40:08,685 server.py[line:206] INFO 
+2017-12-01 12:40:08,729 server.py[line:206] INFO 
+2017-12-01 12:40:08,773 server.py[line:206] INFO 
+2017-12-01 12:40:08,875 server.py[line:206] INFO 
+2017-12-01 12:40:08,922 server.py[line:206] INFO 
+2017-12-01 12:40:09,006 server.py[line:206] INFO 
+2017-12-01 12:40:09,051 server.py[line:206] INFO 
+2017-12-01 12:41:09,270 server.py[line:206] INFO 
+2017-12-01 12:41:09,368 server.py[line:206] INFO 
+2017-12-01 12:41:09,458 server.py[line:206] INFO 
+2017-12-01 12:41:09,533 server.py[line:206] INFO 
+2017-12-01 12:41:09,631 server.py[line:206] INFO 
+2017-12-01 12:41:09,677 server.py[line:206] INFO 
+2017-12-01 12:41:09,771 server.py[line:206] INFO 
+2017-12-01 12:41:09,818 server.py[line:206] INFO 
+2017-12-01 12:42:09,237 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:42:09,237 server.py[line:298] INFO 
+2017-12-01 12:42:10,047 server.py[line:206] INFO 
+2017-12-01 12:42:10,140 server.py[line:206] INFO 
+2017-12-01 12:42:10,291 server.py[line:206] INFO 
+2017-12-01 12:42:10,422 server.py[line:206] INFO 
+2017-12-01 12:43:09,961 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:43:09,962 server.py[line:298] INFO 
+2017-12-01 12:43:10,693 server.py[line:206] INFO 
+2017-12-01 12:43:10,801 server.py[line:206] INFO 
+2017-12-01 12:43:10,891 server.py[line:206] INFO 
+2017-12-01 12:43:10,951 server.py[line:206] INFO 
+2017-12-01 12:43:11,046 server.py[line:206] INFO 
+2017-12-01 12:43:11,090 server.py[line:206] INFO 
+2017-12-01 12:43:11,180 server.py[line:206] INFO 
+2017-12-01 12:43:11,227 server.py[line:206] INFO 
+2017-12-01 12:44:11,443 server.py[line:206] INFO 
+2017-12-01 12:44:11,494 server.py[line:206] INFO 
+2017-12-01 12:44:11,537 server.py[line:206] INFO 
+2017-12-01 12:44:11,640 server.py[line:206] INFO 
+2017-12-01 12:44:11,690 server.py[line:206] INFO 
+2017-12-01 12:44:11,778 server.py[line:206] INFO 
+2017-12-01 12:44:11,819 server.py[line:206] INFO 
+2017-12-01 12:44:11,906 server.py[line:206] INFO 
+2017-12-01 12:45:11,364 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:45:11,365 server.py[line:298] INFO 
+2017-12-01 12:45:11,365 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:45:11,366 server.py[line:298] INFO 
+2017-12-01 12:45:12,122 server.py[line:206] INFO 
+2017-12-01 12:45:12,225 server.py[line:206] INFO 
+2017-12-01 12:45:12,374 server.py[line:206] INFO 
+2017-12-01 12:45:12,523 server.py[line:206] INFO 
+2017-12-01 12:46:12,814 server.py[line:206] INFO 
+2017-12-01 12:46:12,912 server.py[line:206] INFO 
+2017-12-01 12:46:12,999 server.py[line:206] INFO 
+2017-12-01 12:46:13,059 server.py[line:206] INFO 
+2017-12-01 12:46:13,155 server.py[line:206] INFO 
+2017-12-01 12:46:13,197 server.py[line:206] INFO 
+2017-12-01 12:46:13,283 server.py[line:206] INFO 
+2017-12-01 12:46:13,325 server.py[line:206] INFO 
+2017-12-01 12:47:13,549 server.py[line:206] INFO 
+2017-12-01 12:47:13,607 server.py[line:206] INFO 
+2017-12-01 12:47:13,651 server.py[line:206] INFO 
+2017-12-01 12:47:13,762 server.py[line:206] INFO 
+2017-12-01 12:47:13,809 server.py[line:206] INFO 
+2017-12-01 12:47:13,901 server.py[line:206] INFO 
+2017-12-01 12:47:13,946 server.py[line:206] INFO 
+2017-12-01 12:47:14,035 server.py[line:206] INFO 
+2017-12-01 12:48:13,464 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:48:13,466 server.py[line:298] INFO 
+2017-12-01 12:48:13,470 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:48:13,470 server.py[line:298] INFO 
+2017-12-01 12:48:14,211 server.py[line:206] INFO 
+2017-12-01 12:48:14,396 server.py[line:206] INFO 
+2017-12-01 12:48:14,547 server.py[line:206] INFO 
+2017-12-01 12:48:14,681 server.py[line:206] INFO 
+2017-12-01 12:49:14,899 server.py[line:206] INFO 
+2017-12-01 12:49:14,952 server.py[line:206] INFO 
+2017-12-01 12:49:15,007 server.py[line:206] INFO 
+2017-12-01 12:49:15,051 server.py[line:206] INFO 
+2017-12-01 12:49:15,094 server.py[line:206] INFO 
+2017-12-01 12:49:15,163 server.py[line:206] INFO 
+2017-12-01 12:49:15,210 server.py[line:206] INFO 
+2017-12-01 12:49:15,262 server.py[line:206] INFO 
+2017-12-01 12:49:15,305 server.py[line:206] INFO 
+2017-12-01 12:49:15,347 server.py[line:206] INFO 
+2017-12-01 12:49:15,391 server.py[line:206] INFO 
+2017-12-01 12:49:15,447 server.py[line:206] INFO 
+2017-12-01 12:51:16,424 server.py[line:206] INFO 
+2017-12-01 12:51:16,630 server.py[line:206] INFO 
+2017-12-01 12:51:16,781 server.py[line:206] INFO 
+2017-12-01 12:51:16,911 server.py[line:206] INFO 
+2017-12-01 12:52:17,129 server.py[line:206] INFO 
+2017-12-01 12:52:17,315 server.py[line:206] INFO 
+2017-12-01 12:52:17,461 server.py[line:206] INFO 
+2017-12-01 12:52:17,598 server.py[line:206] INFO 
+2017-12-01 12:53:17,819 server.py[line:206] INFO 
+2017-12-01 12:53:17,870 server.py[line:206] INFO 
+2017-12-01 12:53:17,923 server.py[line:206] INFO 
+2017-12-01 12:53:17,966 server.py[line:206] INFO 
+2017-12-01 12:53:18,013 server.py[line:206] INFO 
+2017-12-01 12:53:18,076 server.py[line:206] INFO 
+2017-12-01 12:53:18,122 server.py[line:206] INFO 
+2017-12-01 12:53:18,170 server.py[line:206] INFO 
+2017-12-01 12:53:18,216 server.py[line:206] INFO 
+2017-12-01 12:53:18,258 server.py[line:206] INFO 
+2017-12-01 12:53:18,304 server.py[line:206] INFO 
+2017-12-01 12:53:18,349 server.py[line:206] INFO 
+2017-12-01 12:54:17,779 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:54:17,780 server.py[line:298] INFO 
+2017-12-01 12:54:17,781 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:54:17,781 server.py[line:298] INFO 
+2017-12-01 12:54:17,784 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:54:17,785 server.py[line:298] INFO 
+2017-12-01 12:55:19,227 server.py[line:206] INFO 
+2017-12-01 12:55:19,326 server.py[line:206] INFO 
+2017-12-01 12:55:19,416 server.py[line:206] INFO 
+2017-12-01 12:55:19,475 server.py[line:206] INFO 
+2017-12-01 12:55:19,578 server.py[line:206] INFO 
+2017-12-01 12:55:19,623 server.py[line:206] INFO 
+2017-12-01 12:55:19,716 server.py[line:206] INFO 
+2017-12-01 12:55:19,763 server.py[line:206] INFO 
+2017-12-01 12:56:19,187 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:56:19,188 server.py[line:298] INFO 
+2017-12-01 12:57:20,673 server.py[line:206] INFO 
+2017-12-01 12:57:20,719 server.py[line:206] INFO 
+2017-12-01 12:57:20,769 server.py[line:206] INFO 
+2017-12-01 12:57:20,812 server.py[line:206] INFO 
+2017-12-01 12:57:20,856 server.py[line:206] INFO 
+2017-12-01 12:57:20,911 server.py[line:206] INFO 
+2017-12-01 12:57:20,956 server.py[line:206] INFO 
+2017-12-01 12:57:21,009 server.py[line:206] INFO 
+2017-12-01 12:57:21,050 server.py[line:206] INFO 
+2017-12-01 12:57:21,094 server.py[line:206] INFO 
+2017-12-01 12:57:21,140 server.py[line:206] INFO 
+2017-12-01 12:57:21,184 server.py[line:206] INFO 
+2017-12-01 12:58:21,415 server.py[line:206] INFO 
+2017-12-01 12:58:21,509 server.py[line:206] INFO 
+2017-12-01 12:58:21,660 server.py[line:206] INFO 
+2017-12-01 12:58:21,792 server.py[line:206] INFO 
+2017-12-01 12:59:21,333 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 12:59:21,333 server.py[line:298] INFO 
+2017-12-01 12:59:22,052 server.py[line:206] INFO 
+2017-12-01 12:59:22,245 server.py[line:206] INFO 
+2017-12-01 12:59:22,402 server.py[line:206] INFO 
+2017-12-01 12:59:22,535 server.py[line:206] INFO 
+2017-12-01 13:00:22,758 server.py[line:206] INFO 
+2017-12-01 13:00:22,943 server.py[line:206] INFO 
+2017-12-01 13:00:23,095 server.py[line:206] INFO 
+2017-12-01 13:00:23,225 server.py[line:206] INFO 
+2017-12-01 13:01:23,493 server.py[line:206] INFO 
+2017-12-01 13:01:23,597 server.py[line:206] INFO 
+2017-12-01 13:01:23,750 server.py[line:206] INFO 
+2017-12-01 13:01:23,883 server.py[line:206] INFO 
+2017-12-01 13:02:23,415 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:02:23,416 server.py[line:298] INFO 
+2017-12-01 13:02:24,141 server.py[line:206] INFO 
+2017-12-01 13:02:24,397 server.py[line:206] INFO 
+2017-12-01 13:02:24,538 server.py[line:206] INFO 
+2017-12-01 13:02:24,673 server.py[line:206] INFO 
+2017-12-01 13:03:24,851 server.py[line:206] INFO 
+2017-12-01 13:03:24,898 server.py[line:206] INFO 
+2017-12-01 13:03:24,991 server.py[line:206] INFO 
+2017-12-01 13:03:25,034 server.py[line:206] INFO 
+2017-12-01 13:03:25,148 server.py[line:206] INFO 
+2017-12-01 13:03:25,192 server.py[line:206] INFO 
+2017-12-01 13:03:25,281 server.py[line:206] INFO 
+2017-12-01 13:03:25,328 server.py[line:206] INFO 
+2017-12-01 13:04:25,591 server.py[line:206] INFO 
+2017-12-01 13:04:25,686 server.py[line:206] INFO 
+2017-12-01 13:04:25,827 server.py[line:206] INFO 
+2017-12-01 13:04:25,950 server.py[line:206] INFO 
+2017-12-01 13:05:25,512 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:05:25,513 server.py[line:298] INFO 
+2017-12-01 13:05:26,203 server.py[line:206] INFO 
+2017-12-01 13:05:26,244 server.py[line:206] INFO 
+2017-12-01 13:05:26,335 server.py[line:206] INFO 
+2017-12-01 13:05:26,375 server.py[line:206] INFO 
+2017-12-01 13:05:26,493 server.py[line:206] INFO 
+2017-12-01 13:05:26,534 server.py[line:206] INFO 
+2017-12-01 13:05:26,616 server.py[line:206] INFO 
+2017-12-01 13:05:26,656 server.py[line:206] INFO 
+2017-12-01 13:06:26,916 server.py[line:206] INFO 
+2017-12-01 13:06:26,970 server.py[line:206] INFO 
+2017-12-01 13:06:27,013 server.py[line:206] INFO 
+2017-12-01 13:06:27,112 server.py[line:206] INFO 
+2017-12-01 13:06:27,159 server.py[line:206] INFO 
+2017-12-01 13:06:27,245 server.py[line:206] INFO 
+2017-12-01 13:06:27,291 server.py[line:206] INFO 
+2017-12-01 13:06:27,378 server.py[line:206] INFO 
+2017-12-01 13:07:26,835 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:07:26,838 server.py[line:298] INFO 
+2017-12-01 13:07:26,839 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:07:26,839 server.py[line:298] INFO 
+2017-12-01 13:07:27,617 server.py[line:206] INFO 
+2017-12-01 13:07:27,670 server.py[line:206] INFO 
+2017-12-01 13:07:27,769 server.py[line:206] INFO 
+2017-12-01 13:07:27,878 server.py[line:206] INFO 
+2017-12-01 13:07:27,980 server.py[line:206] INFO 
+2017-12-01 13:07:28,083 server.py[line:206] INFO 
+2017-12-01 13:08:28,360 server.py[line:206] INFO 
+2017-12-01 13:08:28,413 server.py[line:206] INFO 
+2017-12-01 13:08:28,457 server.py[line:206] INFO 
+2017-12-01 13:08:28,570 server.py[line:206] INFO 
+2017-12-01 13:08:28,619 server.py[line:206] INFO 
+2017-12-01 13:08:28,707 server.py[line:206] INFO 
+2017-12-01 13:08:28,754 server.py[line:206] INFO 
+2017-12-01 13:08:28,841 server.py[line:206] INFO 
+2017-12-01 13:09:29,015 server.py[line:206] INFO 
+2017-12-01 13:09:29,125 server.py[line:206] INFO 
+2017-12-01 13:09:29,225 server.py[line:206] INFO 
+2017-12-01 13:09:29,289 server.py[line:206] INFO 
+2017-12-01 13:09:29,396 server.py[line:206] INFO 
+2017-12-01 13:09:29,446 server.py[line:206] INFO 
+2017-12-01 13:09:29,545 server.py[line:206] INFO 
+2017-12-01 13:09:29,838 server.py[line:206] INFO 
+2017-12-01 13:10:28,980 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:10:28,980 server.py[line:298] INFO 
+2017-12-01 13:10:29,909 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:10:29,909 server.py[line:298] INFO 
+2017-12-01 13:10:30,010 server.py[line:206] INFO 
+2017-12-01 13:10:30,057 server.py[line:206] INFO 
+2017-12-01 13:10:30,177 server.py[line:206] INFO 
+2017-12-01 13:10:30,223 server.py[line:206] INFO 
+2017-12-01 13:10:30,333 server.py[line:206] INFO 
+2017-12-01 13:10:30,381 server.py[line:206] INFO 
+2017-12-01 13:10:30,473 server.py[line:206] INFO 
+2017-12-01 13:10:30,520 server.py[line:206] INFO 
+2017-12-01 13:11:29,975 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:11:29,976 server.py[line:298] INFO 
+2017-12-01 13:11:29,978 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:11:29,979 server.py[line:298] INFO 
+2017-12-01 13:11:30,744 server.py[line:206] INFO 
+2017-12-01 13:11:30,843 server.py[line:206] INFO 
+2017-12-01 13:11:30,931 server.py[line:206] INFO 
+2017-12-01 13:11:30,988 server.py[line:206] INFO 
+2017-12-01 13:11:31,074 server.py[line:206] INFO 
+2017-12-01 13:11:31,120 server.py[line:206] INFO 
+2017-12-01 13:11:31,206 server.py[line:206] INFO 
+2017-12-01 13:11:31,250 server.py[line:206] INFO 
+2017-12-01 13:12:31,468 server.py[line:206] INFO 
+2017-12-01 13:12:31,519 server.py[line:206] INFO 
+2017-12-01 13:12:31,563 server.py[line:206] INFO 
+2017-12-01 13:12:31,662 server.py[line:206] INFO 
+2017-12-01 13:12:31,706 server.py[line:206] INFO 
+2017-12-01 13:12:31,794 server.py[line:206] INFO 
+2017-12-01 13:12:31,836 server.py[line:206] INFO 
+2017-12-01 13:12:31,922 server.py[line:206] INFO 
+2017-12-01 13:13:31,392 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:13:31,393 server.py[line:298] INFO 
+2017-12-01 13:13:32,145 server.py[line:206] INFO 
+2017-12-01 13:13:32,199 server.py[line:206] INFO 
+2017-12-01 13:13:32,246 server.py[line:206] INFO 
+2017-12-01 13:13:32,352 server.py[line:206] INFO 
+2017-12-01 13:13:32,397 server.py[line:206] INFO 
+2017-12-01 13:13:32,494 server.py[line:206] INFO 
+2017-12-01 13:13:32,536 server.py[line:206] INFO 
+2017-12-01 13:13:32,627 server.py[line:206] INFO 
+2017-12-01 13:14:32,059 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:14:32,059 server.py[line:298] INFO 
+2017-12-01 13:14:32,064 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:14:32,065 server.py[line:298] INFO 
+2017-12-01 13:15:33,496 server.py[line:206] INFO 
+2017-12-01 13:15:33,597 server.py[line:206] INFO 
+2017-12-01 13:15:33,689 server.py[line:206] INFO 
+2017-12-01 13:15:33,747 server.py[line:206] INFO 
+2017-12-01 13:15:33,836 server.py[line:206] INFO 
+2017-12-01 13:15:33,879 server.py[line:206] INFO 
+2017-12-01 13:15:33,966 server.py[line:206] INFO 
+2017-12-01 13:15:34,009 server.py[line:206] INFO 
+2017-12-01 13:16:33,448 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:16:33,448 server.py[line:298] INFO 
+2017-12-01 13:16:33,453 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:16:33,453 server.py[line:298] INFO 
+2017-12-01 13:16:34,188 server.py[line:206] INFO 
+2017-12-01 13:16:34,330 server.py[line:206] INFO 
+2017-12-01 13:16:34,438 server.py[line:206] INFO 
+2017-12-01 13:16:34,527 server.py[line:206] INFO 
+2017-12-01 13:16:34,614 server.py[line:206] INFO 
+2017-12-01 13:16:34,703 server.py[line:206] INFO 
+2017-12-01 13:17:34,926 server.py[line:206] INFO 
+2017-12-01 13:17:34,978 server.py[line:206] INFO 
+2017-12-01 13:17:35,253 server.py[line:206] INFO 
+2017-12-01 13:17:35,356 server.py[line:206] INFO 
+2017-12-01 13:17:35,400 server.py[line:206] INFO 
+2017-12-01 13:17:35,489 server.py[line:206] INFO 
+2017-12-01 13:17:35,530 server.py[line:206] INFO 
+2017-12-01 13:17:35,616 server.py[line:206] INFO 
+2017-12-01 13:18:35,791 server.py[line:206] INFO 
+2017-12-01 13:18:36,071 server.py[line:206] INFO 
+2017-12-01 13:18:36,212 server.py[line:206] INFO 
+2017-12-01 13:18:36,349 server.py[line:206] INFO 
+2017-12-01 13:19:36,525 server.py[line:206] INFO 
+2017-12-01 13:19:36,730 server.py[line:206] INFO 
+2017-12-01 13:19:36,881 server.py[line:206] INFO 
+2017-12-01 13:19:37,016 server.py[line:206] INFO 
+2017-12-01 13:20:36,492 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:20:36,492 server.py[line:298] INFO 
+2017-12-01 13:20:37,333 server.py[line:206] INFO 
+2017-12-01 13:20:37,489 server.py[line:206] INFO 
+2017-12-01 13:20:37,629 server.py[line:206] INFO 
+2017-12-01 13:20:37,764 server.py[line:206] INFO 
+2017-12-01 13:21:37,938 server.py[line:206] INFO 
+2017-12-01 13:21:38,129 server.py[line:206] INFO 
+2017-12-01 13:21:38,279 server.py[line:206] INFO 
+2017-12-01 13:21:38,408 server.py[line:206] INFO 
+2017-12-01 13:22:37,897 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:22:37,898 server.py[line:298] INFO 
+2017-12-01 13:22:38,629 server.py[line:206] INFO 
+2017-12-01 13:22:38,814 server.py[line:206] INFO 
+2017-12-01 13:22:38,965 server.py[line:206] INFO 
+2017-12-01 13:22:39,100 server.py[line:206] INFO 
+2017-12-01 13:23:39,329 server.py[line:206] INFO 
+2017-12-01 13:23:39,515 server.py[line:206] INFO 
+2017-12-01 13:23:39,686 server.py[line:206] INFO 
+2017-12-01 13:23:39,833 server.py[line:206] INFO 
+2017-12-01 13:24:40,148 server.py[line:206] INFO 
+2017-12-01 13:24:40,293 server.py[line:206] INFO 
+2017-12-01 13:24:40,427 server.py[line:206] INFO 
+2017-12-01 13:24:40,573 server.py[line:206] INFO 
+2017-12-01 13:25:40,006 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:25:40,007 server.py[line:298] INFO 
+2017-12-01 13:25:40,761 server.py[line:206] INFO 
+2017-12-01 13:25:40,964 server.py[line:206] INFO 
+2017-12-01 13:25:41,126 server.py[line:206] INFO 
+2017-12-01 13:25:41,277 server.py[line:206] INFO 
+2017-12-01 13:26:41,511 server.py[line:206] INFO 
+2017-12-01 13:26:41,567 server.py[line:206] INFO 
+2017-12-01 13:26:41,622 server.py[line:206] INFO 
+2017-12-01 13:26:41,671 server.py[line:206] INFO 
+2017-12-01 13:26:41,719 server.py[line:206] INFO 
+2017-12-01 13:26:41,791 server.py[line:206] INFO 
+2017-12-01 13:26:42,083 server.py[line:206] INFO 
+2017-12-01 13:26:42,143 server.py[line:206] INFO 
+2017-12-01 13:26:42,189 server.py[line:206] INFO 
+2017-12-01 13:26:42,231 server.py[line:206] INFO 
+2017-12-01 13:26:42,276 server.py[line:206] INFO 
+2017-12-01 13:26:42,324 server.py[line:206] INFO 
+2017-12-01 13:27:42,402 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:27:42,402 server.py[line:298] INFO 
+2017-12-01 13:27:42,403 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:27:42,404 server.py[line:298] INFO 
+2017-12-01 13:27:42,404 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:27:42,405 server.py[line:298] INFO 
+2017-12-01 13:28:43,337 server.py[line:206] INFO 
+2017-12-01 13:28:43,390 server.py[line:206] INFO 
+2017-12-01 13:28:43,437 server.py[line:206] INFO 
+2017-12-01 13:28:43,542 server.py[line:206] INFO 
+2017-12-01 13:28:43,589 server.py[line:206] INFO 
+2017-12-01 13:28:43,681 server.py[line:206] INFO 
+2017-12-01 13:28:43,729 server.py[line:206] INFO 
+2017-12-01 13:28:43,825 server.py[line:206] INFO 
+2017-12-01 13:29:43,247 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:29:43,247 server.py[line:298] INFO 
+2017-12-01 13:29:43,249 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:29:43,249 server.py[line:298] INFO 
+2017-12-01 13:30:44,754 server.py[line:206] INFO 
+2017-12-01 13:30:44,813 server.py[line:206] INFO 
+2017-12-01 13:30:44,865 server.py[line:206] INFO 
+2017-12-01 13:30:44,976 server.py[line:206] INFO 
+2017-12-01 13:30:45,022 server.py[line:206] INFO 
+2017-12-01 13:30:45,131 server.py[line:206] INFO 
+2017-12-01 13:30:45,177 server.py[line:206] INFO 
+2017-12-01 13:30:45,276 server.py[line:206] INFO 
+2017-12-01 13:31:44,665 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:31:44,666 server.py[line:298] INFO 
+2017-12-01 13:31:45,502 server.py[line:206] INFO 
+2017-12-01 13:31:45,561 server.py[line:206] INFO 
+2017-12-01 13:31:45,612 server.py[line:206] INFO 
+2017-12-01 13:31:45,713 server.py[line:206] INFO 
+2017-12-01 13:31:45,761 server.py[line:206] INFO 
+2017-12-01 13:31:45,853 server.py[line:206] INFO 
+2017-12-01 13:31:45,898 server.py[line:206] INFO 
+2017-12-01 13:31:45,986 server.py[line:206] INFO 
+2017-12-01 13:32:45,424 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:32:45,426 server.py[line:298] INFO 
+2017-12-01 13:32:45,427 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:32:45,427 server.py[line:298] INFO 
+2017-12-01 13:32:46,168 server.py[line:206] INFO 
+2017-12-01 13:32:46,355 server.py[line:206] INFO 
+2017-12-01 13:32:46,513 server.py[line:206] INFO 
+2017-12-01 13:32:46,649 server.py[line:206] INFO 
+2017-12-01 13:33:46,893 server.py[line:206] INFO 
+2017-12-01 13:33:46,949 server.py[line:206] INFO 
+2017-12-01 13:33:47,020 server.py[line:206] INFO 
+2017-12-01 13:33:47,068 server.py[line:206] INFO 
+2017-12-01 13:33:47,117 server.py[line:206] INFO 
+2017-12-01 13:33:47,182 server.py[line:206] INFO 
+2017-12-01 13:33:47,239 server.py[line:206] INFO 
+2017-12-01 13:33:47,285 server.py[line:206] INFO 
+2017-12-01 13:33:47,336 server.py[line:206] INFO 
+2017-12-01 13:33:47,377 server.py[line:206] INFO 
+2017-12-01 13:33:47,426 server.py[line:206] INFO 
+2017-12-01 13:33:47,480 server.py[line:206] INFO 
+2017-12-01 13:33:57,251 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-01 13:33:57,251 server.py[line:298] INFO 
+2017-12-01 13:34:00,427 server.py[line:206] INFO 
+2017-12-01 13:34:46,856 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:34:46,857 server.py[line:298] INFO 
+2017-12-01 13:34:46,858 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:34:46,858 server.py[line:298] INFO 
+2017-12-01 13:34:47,709 server.py[line:206] INFO 
+2017-12-01 13:34:47,771 server.py[line:206] INFO 
+2017-12-01 13:34:47,818 server.py[line:206] INFO 
+2017-12-01 13:34:47,866 server.py[line:206] INFO 
+2017-12-01 13:34:47,933 server.py[line:206] INFO 
+2017-12-01 13:34:47,982 server.py[line:206] INFO 
+2017-12-01 13:34:48,032 server.py[line:206] INFO 
+2017-12-01 13:34:48,079 server.py[line:206] INFO 
+2017-12-01 13:34:48,131 server.py[line:206] INFO 
+2017-12-01 13:34:48,177 server.py[line:206] INFO 
+2017-12-01 13:34:48,226 server.py[line:206] INFO 
+2017-12-01 13:35:47,630 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:35:47,631 server.py[line:298] INFO 
+2017-12-01 13:35:48,444 server.py[line:206] INFO 
+2017-12-01 13:35:48,506 server.py[line:206] INFO 
+2017-12-01 13:35:48,550 server.py[line:206] INFO 
+2017-12-01 13:35:48,595 server.py[line:206] INFO 
+2017-12-01 13:35:48,671 server.py[line:206] INFO 
+2017-12-01 13:35:48,723 server.py[line:206] INFO 
+2017-12-01 13:35:48,767 server.py[line:206] INFO 
+2017-12-01 13:35:48,809 server.py[line:206] INFO 
+2017-12-01 13:35:48,852 server.py[line:206] INFO 
+2017-12-01 13:35:48,898 server.py[line:206] INFO 
+2017-12-01 13:35:48,942 server.py[line:206] INFO 
+2017-12-01 13:36:48,365 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:36:48,365 server.py[line:298] INFO 
+2017-12-01 13:37:49,072 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:37:49,073 server.py[line:298] INFO 
+2017-12-01 13:37:49,840 server.py[line:206] INFO 
+2017-12-01 13:37:49,965 server.py[line:206] INFO 
+2017-12-01 13:37:50,013 server.py[line:206] INFO 
+2017-12-01 13:37:50,060 server.py[line:206] INFO 
+2017-12-01 13:37:50,148 server.py[line:206] INFO 
+2017-12-01 13:37:50,195 server.py[line:206] INFO 
+2017-12-01 13:37:50,240 server.py[line:206] INFO 
+2017-12-01 13:37:50,284 server.py[line:206] INFO 
+2017-12-01 13:37:50,336 server.py[line:206] INFO 
+2017-12-01 13:37:50,382 server.py[line:206] INFO 
+2017-12-01 13:37:50,426 server.py[line:206] INFO 
+2017-12-01 13:38:49,806 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:38:49,806 server.py[line:298] INFO 
+2017-12-01 13:38:50,631 server.py[line:206] INFO 
+2017-12-01 13:39:50,596 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:39:50,596 server.py[line:298] INFO 
+2017-12-01 13:39:51,424 server.py[line:206] INFO 
+2017-12-01 13:39:51,479 server.py[line:206] INFO 
+2017-12-01 13:39:51,521 server.py[line:206] INFO 
+2017-12-01 13:39:51,567 server.py[line:206] INFO 
+2017-12-01 13:39:51,635 server.py[line:206] INFO 
+2017-12-01 13:39:51,681 server.py[line:206] INFO 
+2017-12-01 13:39:51,725 server.py[line:206] INFO 
+2017-12-01 13:39:51,771 server.py[line:206] INFO 
+2017-12-01 13:39:51,815 server.py[line:206] INFO 
+2017-12-01 13:39:51,856 server.py[line:206] INFO 
+2017-12-01 13:39:51,901 server.py[line:206] INFO 
+2017-12-01 13:40:51,334 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:40:51,334 server.py[line:298] INFO 
+2017-12-01 13:40:52,258 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 13:40:52,258 server.py[line:298] INFO 
+2017-12-01 13:40:52,640 server.py[line:206] INFO 
+2017-12-01 13:40:52,736 server.py[line:206] INFO 
+2017-12-01 13:40:52,778 server.py[line:206] INFO 
+2017-12-01 13:40:52,825 server.py[line:206] INFO 
+2017-12-01 13:40:52,899 server.py[line:206] INFO 
+2017-12-01 13:40:52,948 server.py[line:206] INFO 
+2017-12-01 13:40:52,993 server.py[line:206] INFO 
+2017-12-01 13:40:53,038 server.py[line:206] INFO 
+2017-12-01 13:40:53,079 server.py[line:206] INFO 
+2017-12-01 13:40:53,122 server.py[line:206] INFO 
+2017-12-01 13:40:53,163 server.py[line:206] INFO 
+2017-12-01 13:41:53,344 server.py[line:206] INFO 
+2017-12-01 13:43:43,543 server.py[line:206] INFO 
+2017-12-01 13:44:02,568 server.py[line:206] INFO 
+2017-12-01 13:44:59,181 server.py[line:206] INFO 
+2017-12-01 13:45:01,989 server.py[line:206] INFO 
+2017-12-01 13:45:37,866 server.py[line:206] INFO 
+2017-12-01 14:34:45,858 server.py[line:206] INFO 
+2017-12-01 14:35:45,855 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 14:35:45,857 server.py[line:298] INFO 
+2017-12-01 14:36:33,125 server.py[line:206] INFO 
+2017-12-01 14:36:45,755 server.py[line:206] INFO 
+2017-12-01 14:50:44,482 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 14:50:44,484 server.py[line:298] INFO 
+2017-12-01 14:51:03,476 server.py[line:206] INFO 
+2017-12-01 14:51:05,739 server.py[line:206] INFO 
+2017-12-01 14:51:05,857 server.py[line:206] INFO 
+2017-12-01 14:51:05,899 server.py[line:206] INFO 
+2017-12-01 14:51:05,941 server.py[line:206] INFO 
+2017-12-01 14:51:06,006 server.py[line:206] INFO 
+2017-12-01 14:51:06,053 server.py[line:206] INFO 
+2017-12-01 14:51:06,095 server.py[line:206] INFO 
+2017-12-01 14:51:06,137 server.py[line:206] INFO 
+2017-12-01 14:51:06,178 server.py[line:206] INFO 
+2017-12-01 14:51:06,220 server.py[line:206] INFO 
+2017-12-01 14:51:06,261 server.py[line:206] INFO 
+2017-12-01 14:51:08,874 server.py[line:206] INFO 
+2017-12-01 14:51:18,610 server.py[line:206] INFO 
+2017-12-01 14:51:18,725 server.py[line:206] INFO 
+2017-12-01 14:51:18,846 server.py[line:206] INFO 
+2017-12-01 14:51:18,890 server.py[line:206] INFO 
+2017-12-01 14:51:18,956 server.py[line:206] INFO 
+2017-12-01 14:51:19,006 server.py[line:206] INFO 
+2017-12-01 14:51:19,055 server.py[line:206] INFO 
+2017-12-01 14:51:19,098 server.py[line:206] INFO 
+2017-12-01 14:51:19,142 server.py[line:206] INFO 
+2017-12-01 14:51:19,187 server.py[line:206] INFO 
+2017-12-01 14:51:19,228 server.py[line:206] INFO 
+2017-12-01 14:51:20,982 server.py[line:206] INFO 
+2017-12-01 14:51:22,684 server.py[line:206] INFO 
+2017-12-01 14:51:27,938 server.py[line:206] INFO 
+2017-12-01 14:51:29,212 server.py[line:206] INFO 
+2017-12-01 14:51:29,406 server.py[line:206] INFO 
+2017-12-01 14:51:29,543 server.py[line:206] INFO 
+2017-12-01 14:51:29,584 server.py[line:206] INFO 
+2017-12-01 14:51:29,644 server.py[line:206] INFO 
+2017-12-01 14:51:29,692 server.py[line:206] INFO 
+2017-12-01 14:51:29,735 server.py[line:206] INFO 
+2017-12-01 14:51:29,775 server.py[line:206] INFO 
+2017-12-01 14:51:29,817 server.py[line:206] INFO 
+2017-12-01 14:51:29,859 server.py[line:206] INFO 
+2017-12-01 14:51:29,902 server.py[line:206] INFO 
+2017-12-01 14:51:30,511 server.py[line:206] INFO 
+2017-12-01 14:51:32,931 server.py[line:206] INFO 
+2017-12-01 14:51:33,012 server.py[line:206] INFO 
+2017-12-01 14:51:33,124 server.py[line:206] INFO 
+2017-12-01 14:51:33,176 server.py[line:206] INFO 
+2017-12-01 14:51:33,236 server.py[line:206] INFO 
+2017-12-01 14:51:33,281 server.py[line:206] INFO 
+2017-12-01 14:51:33,324 server.py[line:206] INFO 
+2017-12-01 14:51:33,365 server.py[line:206] INFO 
+2017-12-01 14:51:33,409 server.py[line:206] INFO 
+2017-12-01 14:51:33,452 server.py[line:206] INFO 
+2017-12-01 14:51:33,493 server.py[line:206] INFO 
+2017-12-01 14:51:33,962 server.py[line:206] INFO 
+2017-12-01 14:51:59,556 server.py[line:206] INFO 
+2017-12-01 14:52:19,871 server.py[line:206] INFO 
+2017-12-01 14:52:19,912 server.py[line:206] INFO 
+2017-12-01 14:52:19,961 server.py[line:206] INFO 
+2017-12-01 14:52:20,019 server.py[line:206] INFO 
+2017-12-01 14:52:20,022 server.py[line:206] INFO 
+2017-12-01 14:52:20,067 server.py[line:206] INFO 
+2017-12-01 14:52:34,431 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 14:52:34,432 server.py[line:298] INFO 
+2017-12-01 14:53:17,004 server.py[line:206] INFO 
+2017-12-01 14:53:17,156 server.py[line:206] INFO 
+2017-12-01 14:53:17,295 server.py[line:206] INFO 
+2017-12-01 14:53:17,432 server.py[line:206] INFO 
+2017-12-01 14:54:17,781 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 14:54:17,782 server.py[line:298] INFO 
+2017-12-01 14:54:59,647 server.py[line:206] INFO 
+2017-12-01 14:54:59,840 server.py[line:206] INFO 
+2017-12-01 14:54:59,996 server.py[line:206] INFO 
+2017-12-01 14:55:00,133 server.py[line:206] INFO 
+2017-12-01 14:56:00,532 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 14:56:00,532 server.py[line:298] INFO 
+2017-12-01 14:56:42,383 server.py[line:206] INFO 
+2017-12-01 14:56:42,579 server.py[line:206] INFO 
+2017-12-01 14:56:42,725 server.py[line:206] INFO 
+2017-12-01 14:56:42,854 server.py[line:206] INFO 
+2017-12-01 15:03:03,289 server.py[line:206] INFO 
+2017-12-01 15:03:06,361 server.py[line:206] INFO 
+2017-12-01 15:03:08,027 server.py[line:206] INFO 
+2017-12-01 15:03:08,088 server.py[line:206] INFO 
+2017-12-01 15:03:08,132 server.py[line:206] INFO 
+2017-12-01 15:03:08,175 server.py[line:206] INFO 
+2017-12-01 15:03:08,245 server.py[line:206] INFO 
+2017-12-01 15:03:08,293 server.py[line:206] INFO 
+2017-12-01 15:03:08,338 server.py[line:206] INFO 
+2017-12-01 15:03:08,381 server.py[line:206] INFO 
+2017-12-01 15:03:08,428 server.py[line:206] INFO 
+2017-12-01 15:03:08,471 server.py[line:206] INFO 
+2017-12-01 15:03:08,514 server.py[line:206] INFO 
+2017-12-01 15:16:21,417 server.py[line:206] INFO 
+2017-12-01 15:16:41,386 server.py[line:206] INFO 
+2017-12-01 15:16:41,426 server.py[line:206] INFO 
+2017-12-01 15:16:41,475 server.py[line:206] INFO 
+2017-12-01 15:16:43,672 server.py[line:206] INFO 
+2017-12-01 15:17:21,376 server.py[line:206] INFO 
+2017-12-01 15:17:30,485 server.py[line:206] INFO 
+2017-12-01 15:17:51,318 server.py[line:206] INFO 
+2017-12-01 15:17:51,358 server.py[line:206] INFO 
+2017-12-01 15:17:51,402 server.py[line:206] INFO 
+2017-12-01 15:17:51,452 server.py[line:206] INFO 
+2017-12-01 15:17:51,458 server.py[line:206] INFO 
+2017-12-01 15:17:51,506 server.py[line:206] INFO 
+2017-12-01 15:17:57,680 server.py[line:206] INFO 
+2017-12-01 15:17:59,512 server.py[line:206] INFO 
+2017-12-01 15:17:59,552 server.py[line:206] INFO 
+2017-12-01 15:17:59,597 server.py[line:206] INFO 
+2017-12-01 15:17:59,662 server.py[line:206] INFO 
+2017-12-01 15:17:59,663 server.py[line:206] INFO 
+2017-12-01 15:17:59,664 server.py[line:206] INFO 
+2017-12-01 15:17:59,709 server.py[line:206] INFO 
+2017-12-01 15:18:01,133 server.py[line:206] INFO 
+2017-12-01 15:18:57,646 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:18:57,646 server.py[line:298] INFO 
+2017-12-01 15:18:58,615 server.py[line:206] INFO 
+2017-12-01 15:18:58,668 server.py[line:206] INFO 
+2017-12-01 15:18:58,720 server.py[line:206] INFO 
+2017-12-01 15:18:58,764 server.py[line:206] INFO 
+2017-12-01 15:18:58,805 server.py[line:206] INFO 
+2017-12-01 15:18:58,864 server.py[line:206] INFO 
+2017-12-01 15:18:58,908 server.py[line:206] INFO 
+2017-12-01 15:18:58,950 server.py[line:206] INFO 
+2017-12-01 15:18:58,993 server.py[line:206] INFO 
+2017-12-01 15:18:59,035 server.py[line:206] INFO 
+2017-12-01 15:18:59,077 server.py[line:206] INFO 
+2017-12-01 15:18:59,121 server.py[line:206] INFO 
+2017-12-01 15:19:58,582 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:19:58,584 server.py[line:298] INFO 
+2017-12-01 15:19:58,585 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:19:58,586 server.py[line:298] INFO 
+2017-12-01 15:19:59,344 server.py[line:206] INFO 
+2017-12-01 15:20:59,244 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:20:59,244 server.py[line:298] INFO 
+2017-12-01 15:20:59,245 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:20:59,245 server.py[line:298] INFO 
+2017-12-01 15:21:00,021 server.py[line:206] INFO 
+2017-12-01 15:21:00,074 server.py[line:206] INFO 
+2017-12-01 15:21:00,117 server.py[line:206] INFO 
+2017-12-01 15:21:00,159 server.py[line:206] INFO 
+2017-12-01 15:21:00,222 server.py[line:206] INFO 
+2017-12-01 15:21:00,277 server.py[line:206] INFO 
+2017-12-01 15:21:00,322 server.py[line:206] INFO 
+2017-12-01 15:21:00,364 server.py[line:206] INFO 
+2017-12-01 15:21:00,406 server.py[line:206] INFO 
+2017-12-01 15:21:00,454 server.py[line:206] INFO 
+2017-12-01 15:21:00,497 server.py[line:206] INFO 
+2017-12-01 15:22:00,703 server.py[line:206] INFO 
+2017-12-01 15:22:00,753 server.py[line:206] INFO 
+2017-12-01 15:23:00,620 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:23:00,620 server.py[line:298] INFO 
+2017-12-01 15:23:00,622 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:23:00,622 server.py[line:298] INFO 
+2017-12-01 15:23:01,439 server.py[line:206] INFO 
+2017-12-01 15:24:01,393 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:24:01,394 server.py[line:298] INFO 
+2017-12-01 15:24:01,396 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:24:01,397 server.py[line:298] INFO 
+2017-12-01 15:24:02,133 server.py[line:206] INFO 
+2017-12-01 15:25:03,039 server.py[line:206] INFO 
+2017-12-01 15:25:03,083 server.py[line:206] INFO 
+2017-12-01 15:25:03,134 server.py[line:206] INFO 
+2017-12-01 15:25:03,178 server.py[line:206] INFO 
+2017-12-01 15:25:03,225 server.py[line:206] INFO 
+2017-12-01 15:25:03,291 server.py[line:206] INFO 
+2017-12-01 15:25:03,341 server.py[line:206] INFO 
+2017-12-01 15:25:03,388 server.py[line:206] INFO 
+2017-12-01 15:25:03,431 server.py[line:206] INFO 
+2017-12-01 15:25:03,477 server.py[line:206] INFO 
+2017-12-01 15:25:03,521 server.py[line:206] INFO 
+2017-12-01 15:25:03,567 server.py[line:206] INFO 
+2017-12-01 15:26:03,003 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:26:03,004 server.py[line:298] INFO 
+2017-12-01 15:26:03,779 server.py[line:206] INFO 
+2017-12-01 15:26:03,833 server.py[line:206] INFO 
+2017-12-01 15:26:03,887 server.py[line:206] INFO 
+2017-12-01 15:26:03,933 server.py[line:206] INFO 
+2017-12-01 15:26:03,993 server.py[line:206] INFO 
+2017-12-01 15:26:04,041 server.py[line:206] INFO 
+2017-12-01 15:26:04,089 server.py[line:206] INFO 
+2017-12-01 15:26:04,134 server.py[line:206] INFO 
+2017-12-01 15:26:04,181 server.py[line:206] INFO 
+2017-12-01 15:26:04,227 server.py[line:206] INFO 
+2017-12-01 15:26:04,278 server.py[line:206] INFO 
+2017-12-01 15:27:03,693 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:27:03,693 server.py[line:298] INFO 
+2017-12-01 15:32:48,173 server.py[line:206] INFO 
+2017-12-01 15:32:54,783 server.py[line:206] INFO 
+2017-12-01 15:32:54,936 server.py[line:206] INFO 
+2017-12-01 15:32:54,989 server.py[line:206] INFO 
+2017-12-01 15:32:55,125 server.py[line:206] INFO 
+2017-12-01 15:32:55,201 server.py[line:206] INFO 
+2017-12-01 15:32:55,246 server.py[line:206] INFO 
+2017-12-01 15:32:55,288 server.py[line:206] INFO 
+2017-12-01 15:32:55,331 server.py[line:206] INFO 
+2017-12-01 15:32:55,374 server.py[line:206] INFO 
+2017-12-01 15:32:55,416 server.py[line:206] INFO 
+2017-12-01 15:32:55,457 server.py[line:206] INFO 
+2017-12-01 15:33:55,076 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:33:55,077 server.py[line:298] INFO 
+2017-12-01 15:34:55,581 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:34:55,582 server.py[line:298] INFO 
+2017-12-01 15:34:56,393 server.py[line:206] INFO 
+2017-12-01 15:35:56,284 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:35:56,285 server.py[line:298] INFO 
+2017-12-01 15:35:57,107 server.py[line:206] INFO 
+2017-12-01 15:36:01,846 server.py[line:206] INFO 
+2017-12-01 15:36:02,623 server.py[line:206] INFO 
+2017-12-01 15:36:02,694 server.py[line:206] INFO 
+2017-12-01 15:36:02,877 server.py[line:206] INFO 
+2017-12-01 15:36:06,823 server.py[line:206] INFO 
+2017-12-01 15:36:06,868 server.py[line:206] INFO 
+2017-12-01 15:36:07,052 server.py[line:206] INFO 
+2017-12-01 15:36:09,875 server.py[line:206] INFO 
+2017-12-01 15:36:19,597 server.py[line:206] INFO 
+2017-12-01 15:36:19,683 server.py[line:206] INFO 
+2017-12-01 15:36:22,853 server.py[line:206] INFO 
+2017-12-01 15:36:22,920 server.py[line:206] INFO 
+2017-12-01 15:36:22,980 server.py[line:206] INFO 
+2017-12-01 15:36:22,983 server.py[line:206] INFO 
+2017-12-01 15:36:22,985 server.py[line:206] INFO 
+2017-12-01 15:36:23,029 server.py[line:206] INFO 
+2017-12-01 15:37:09,938 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:37:09,938 server.py[line:298] INFO 
+2017-12-01 15:37:10,600 server.py[line:206] INFO 
+2017-12-01 15:37:10,794 server.py[line:206] INFO 
+2017-12-01 15:37:10,955 server.py[line:206] INFO 
+2017-12-01 15:37:11,108 server.py[line:206] INFO 
+2017-12-01 15:37:23,566 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:37:23,566 server.py[line:298] INFO 
+2017-12-01 15:37:23,567 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:37:23,568 server.py[line:298] INFO 
+2017-12-01 15:37:23,885 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:37:23,886 server.py[line:298] INFO 
+2017-12-01 15:37:42,586 server.py[line:206] INFO 
+2017-12-01 15:37:42,698 server.py[line:206] INFO 
+2017-12-01 15:37:42,704 server.py[line:206] INFO 
+2017-12-01 15:37:42,732 server.py[line:206] INFO 
+2017-12-01 15:37:42,738 server.py[line:206] INFO 
+2017-12-01 15:37:42,758 server.py[line:206] INFO 
+2017-12-01 15:38:11,323 server.py[line:206] INFO 
+2017-12-01 15:38:11,425 server.py[line:206] INFO 
+2017-12-01 15:38:11,512 server.py[line:206] INFO 
+2017-12-01 15:38:11,573 server.py[line:206] INFO 
+2017-12-01 15:38:11,668 server.py[line:206] INFO 
+2017-12-01 15:38:11,712 server.py[line:206] INFO 
+2017-12-01 15:38:11,800 server.py[line:206] INFO 
+2017-12-01 15:38:11,844 server.py[line:206] INFO 
+2017-12-01 15:38:38,066 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-01 15:38:38,066 server.py[line:298] INFO 
+2017-12-01 15:38:42,675 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:38:42,675 server.py[line:298] INFO 
+2017-12-01 15:38:42,681 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:38:42,682 server.py[line:298] INFO 
+2017-12-01 15:38:42,774 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:38:42,774 server.py[line:298] INFO 
+2017-12-01 15:38:42,954 server.py[line:206] INFO 
+2017-12-01 15:38:43,013 server.py[line:206] INFO 
+2017-12-01 15:38:43,015 server.py[line:206] INFO 
+2017-12-01 15:38:43,016 server.py[line:206] INFO 
+2017-12-01 15:38:43,017 server.py[line:206] INFO 
+2017-12-01 15:38:43,061 server.py[line:206] INFO 
+2017-12-01 15:38:43,063 server.py[line:206] INFO 
+2017-12-01 15:39:11,287 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:39:11,287 server.py[line:298] INFO 
+2017-12-01 15:39:11,290 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:39:11,290 server.py[line:298] INFO 
+2017-12-01 15:39:12,017 server.py[line:206] INFO 
+2017-12-01 15:39:12,200 server.py[line:206] INFO 
+2017-12-01 15:39:12,347 server.py[line:206] INFO 
+2017-12-01 15:39:12,474 server.py[line:206] INFO 
+2017-12-01 15:39:42,867 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:39:42,868 server.py[line:298] INFO 
+2017-12-01 15:39:42,990 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:39:42,990 server.py[line:298] INFO 
+2017-12-01 15:39:42,991 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:39:42,991 server.py[line:298] INFO 
+2017-12-01 15:39:42,994 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:39:42,994 server.py[line:298] INFO 
+2017-12-01 15:40:12,740 server.py[line:206] INFO 
+2017-12-01 15:40:12,791 server.py[line:206] INFO 
+2017-12-01 15:40:12,835 server.py[line:206] INFO 
+2017-12-01 15:40:12,940 server.py[line:206] INFO 
+2017-12-01 15:40:12,987 server.py[line:206] INFO 
+2017-12-01 15:40:13,076 server.py[line:206] INFO 
+2017-12-01 15:40:13,120 server.py[line:206] INFO 
+2017-12-01 15:40:13,207 server.py[line:206] INFO 
+2017-12-01 15:40:59,901 server.py[line:206] INFO 
+2017-12-01 15:40:59,951 server.py[line:206] INFO 
+2017-12-01 15:41:00,005 server.py[line:206] INFO 
+2017-12-01 15:41:12,650 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:41:12,651 server.py[line:298] INFO 
+2017-12-01 15:41:12,661 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:41:12,661 server.py[line:298] INFO 
+2017-12-01 15:41:13,444 server.py[line:206] INFO 
+2017-12-01 15:41:13,549 server.py[line:206] INFO 
+2017-12-01 15:41:13,705 server.py[line:206] INFO 
+2017-12-01 15:41:13,847 server.py[line:206] INFO 
+2017-12-01 15:41:52,744 server.py[line:206] INFO 
+2017-12-01 15:41:52,791 server.py[line:206] INFO 
+2017-12-01 15:42:14,300 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:42:14,300 server.py[line:298] INFO 
+2017-12-01 15:42:52,878 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:42:52,878 server.py[line:298] INFO 
+2017-12-01 15:42:53,050 server.py[line:206] INFO 
+2017-12-01 15:42:53,062 server.py[line:206] INFO 
+2017-12-01 15:42:53,064 server.py[line:206] INFO 
+2017-12-01 15:42:53,098 server.py[line:206] INFO 
+2017-12-01 15:42:53,124 server.py[line:206] INFO 
+2017-12-01 15:42:53,128 server.py[line:206] INFO 
+2017-12-01 15:43:25,049 server.py[line:206] INFO 
+2017-12-01 15:43:25,095 server.py[line:206] INFO 
+2017-12-01 15:43:25,147 server.py[line:206] INFO 
+2017-12-01 15:43:25,190 server.py[line:206] INFO 
+2017-12-01 15:43:25,234 server.py[line:206] INFO 
+2017-12-01 15:43:25,294 server.py[line:206] INFO 
+2017-12-01 15:43:25,353 server.py[line:206] INFO 
+2017-12-01 15:43:25,398 server.py[line:206] INFO 
+2017-12-01 15:43:25,442 server.py[line:206] INFO 
+2017-12-01 15:43:25,485 server.py[line:206] INFO 
+2017-12-01 15:43:25,533 server.py[line:206] INFO 
+2017-12-01 15:43:25,593 server.py[line:206] INFO 
+2017-12-01 15:43:53,022 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:43:53,023 server.py[line:298] INFO 
+2017-12-01 15:43:53,032 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:43:53,032 server.py[line:298] INFO 
+2017-12-01 15:43:53,033 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:43:53,033 server.py[line:298] INFO 
+2017-12-01 15:44:25,016 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:44:25,016 server.py[line:298] INFO 
+2017-12-01 15:44:25,017 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:44:25,017 server.py[line:298] INFO 
+2017-12-01 15:44:25,825 server.py[line:206] INFO 
+2017-12-01 15:44:25,882 server.py[line:206] INFO 
+2017-12-01 15:44:25,932 server.py[line:206] INFO 
+2017-12-01 15:44:25,977 server.py[line:206] INFO 
+2017-12-01 15:44:26,035 server.py[line:206] INFO 
+2017-12-01 15:44:26,090 server.py[line:206] INFO 
+2017-12-01 15:44:26,140 server.py[line:206] INFO 
+2017-12-01 15:44:26,187 server.py[line:206] INFO 
+2017-12-01 15:44:26,230 server.py[line:206] INFO 
+2017-12-01 15:44:26,273 server.py[line:206] INFO 
+2017-12-01 15:44:26,321 server.py[line:206] INFO 
+2017-12-01 15:45:25,713 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:45:25,713 server.py[line:298] INFO 
+2017-12-01 15:45:25,714 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:45:25,714 server.py[line:298] INFO 
+2017-12-01 15:45:26,474 server.py[line:206] INFO 
+2017-12-01 15:46:26,434 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:46:26,434 server.py[line:298] INFO 
+2017-12-01 15:46:27,190 server.py[line:206] INFO 
+2017-12-01 15:46:27,240 server.py[line:206] INFO 
+2017-12-01 15:46:27,281 server.py[line:206] INFO 
+2017-12-01 15:46:27,323 server.py[line:206] INFO 
+2017-12-01 15:46:27,384 server.py[line:206] INFO 
+2017-12-01 15:46:27,431 server.py[line:206] INFO 
+2017-12-01 15:46:27,473 server.py[line:206] INFO 
+2017-12-01 15:46:27,514 server.py[line:206] INFO 
+2017-12-01 15:46:27,556 server.py[line:206] INFO 
+2017-12-01 15:46:27,598 server.py[line:206] INFO 
+2017-12-01 15:46:27,640 server.py[line:206] INFO 
+2017-12-01 15:47:27,105 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:47:27,105 server.py[line:298] INFO 
+2017-12-01 15:47:27,110 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:47:27,110 server.py[line:298] INFO 
+2017-12-01 15:47:59,425 server.py[line:206] INFO 
+2017-12-01 15:48:14,755 server.py[line:206] INFO 
+2017-12-01 15:48:28,477 server.py[line:206] INFO 
+2017-12-01 15:48:28,529 server.py[line:206] INFO 
+2017-12-01 15:48:28,586 server.py[line:206] INFO 
+2017-12-01 15:48:28,632 server.py[line:206] INFO 
+2017-12-01 15:48:28,677 server.py[line:206] INFO 
+2017-12-01 15:48:28,745 server.py[line:206] INFO 
+2017-12-01 15:48:28,798 server.py[line:206] INFO 
+2017-12-01 15:48:28,848 server.py[line:206] INFO 
+2017-12-01 15:48:28,896 server.py[line:206] INFO 
+2017-12-01 15:48:28,956 server.py[line:206] INFO 
+2017-12-01 15:48:29,007 server.py[line:206] INFO 
+2017-12-01 15:48:29,061 server.py[line:206] INFO 
+2017-12-01 15:49:14,119 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:49:14,120 server.py[line:298] INFO 
+2017-12-01 15:49:28,444 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:49:28,445 server.py[line:298] INFO 
+2017-12-01 15:49:29,235 server.py[line:206] INFO 
+2017-12-01 15:50:29,200 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:50:29,201 server.py[line:298] INFO 
+2017-12-01 15:50:29,202 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:50:29,202 server.py[line:298] INFO 
+2017-12-01 15:51:29,896 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:51:29,896 server.py[line:298] INFO 
+2017-12-01 15:51:30,598 server.py[line:206] INFO 
+2017-12-01 15:51:30,642 server.py[line:206] INFO 
+2017-12-01 15:51:30,689 server.py[line:206] INFO 
+2017-12-01 15:51:30,730 server.py[line:206] INFO 
+2017-12-01 15:51:30,771 server.py[line:206] INFO 
+2017-12-01 15:51:30,827 server.py[line:206] INFO 
+2017-12-01 15:51:30,870 server.py[line:206] INFO 
+2017-12-01 15:51:30,913 server.py[line:206] INFO 
+2017-12-01 15:51:30,955 server.py[line:206] INFO 
+2017-12-01 15:51:30,996 server.py[line:206] INFO 
+2017-12-01 15:51:31,037 server.py[line:206] INFO 
+2017-12-01 15:51:31,080 server.py[line:206] INFO 
+2017-12-01 15:52:30,556 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:52:30,558 server.py[line:298] INFO 
+2017-12-01 15:52:30,559 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:52:30,559 server.py[line:298] INFO 
+2017-12-01 15:53:31,201 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:53:31,201 server.py[line:298] INFO 
+2017-12-01 15:53:31,890 server.py[line:206] INFO 
+2017-12-01 15:53:31,935 server.py[line:206] INFO 
+2017-12-01 15:53:31,988 server.py[line:206] INFO 
+2017-12-01 15:53:32,032 server.py[line:206] INFO 
+2017-12-01 15:53:32,075 server.py[line:206] INFO 
+2017-12-01 15:53:32,131 server.py[line:206] INFO 
+2017-12-01 15:53:32,176 server.py[line:206] INFO 
+2017-12-01 15:53:32,220 server.py[line:206] INFO 
+2017-12-01 15:53:32,262 server.py[line:206] INFO 
+2017-12-01 15:53:32,304 server.py[line:206] INFO 
+2017-12-01 15:53:32,347 server.py[line:206] INFO 
+2017-12-01 15:53:32,393 server.py[line:206] INFO 
+2017-12-01 15:54:31,857 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:54:31,858 server.py[line:298] INFO 
+2017-12-01 15:54:31,864 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:54:31,865 server.py[line:298] INFO 
+2017-12-01 15:54:32,646 server.py[line:206] INFO 
+2017-12-01 15:54:32,700 server.py[line:206] INFO 
+2017-12-01 15:54:32,749 server.py[line:206] INFO 
+2017-12-01 15:54:32,795 server.py[line:206] INFO 
+2017-12-01 15:54:32,856 server.py[line:206] INFO 
+2017-12-01 15:54:32,904 server.py[line:206] INFO 
+2017-12-01 15:54:32,949 server.py[line:206] INFO 
+2017-12-01 15:54:33,002 server.py[line:206] INFO 
+2017-12-01 15:54:33,045 server.py[line:206] INFO 
+2017-12-01 15:54:33,090 server.py[line:206] INFO 
+2017-12-01 15:54:33,133 server.py[line:206] INFO 
+2017-12-01 15:55:32,538 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:55:32,539 server.py[line:298] INFO 
+2017-12-01 15:55:33,290 server.py[line:206] INFO 
+2017-12-01 15:55:33,396 server.py[line:206] INFO 
+2017-12-01 15:55:33,437 server.py[line:206] INFO 
+2017-12-01 15:55:33,478 server.py[line:206] INFO 
+2017-12-01 15:55:33,536 server.py[line:206] INFO 
+2017-12-01 15:55:33,581 server.py[line:206] INFO 
+2017-12-01 15:55:33,629 server.py[line:206] INFO 
+2017-12-01 15:55:33,672 server.py[line:206] INFO 
+2017-12-01 15:55:33,713 server.py[line:206] INFO 
+2017-12-01 15:55:33,754 server.py[line:206] INFO 
+2017-12-01 15:55:33,794 server.py[line:206] INFO 
+2017-12-01 15:56:33,963 server.py[line:206] INFO 
+2017-12-01 15:56:34,011 server.py[line:206] INFO 
+2017-12-01 15:56:34,060 server.py[line:206] INFO 
+2017-12-01 15:56:34,106 server.py[line:206] INFO 
+2017-12-01 15:56:34,149 server.py[line:206] INFO 
+2017-12-01 15:56:34,206 server.py[line:206] INFO 
+2017-12-01 15:56:34,257 server.py[line:206] INFO 
+2017-12-01 15:56:34,305 server.py[line:206] INFO 
+2017-12-01 15:56:34,348 server.py[line:206] INFO 
+2017-12-01 15:56:34,405 server.py[line:206] INFO 
+2017-12-01 15:56:34,454 server.py[line:206] INFO 
+2017-12-01 15:56:34,498 server.py[line:206] INFO 
+2017-12-01 15:57:33,927 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:57:33,928 server.py[line:298] INFO 
+2017-12-01 15:58:34,628 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:58:34,628 server.py[line:298] INFO 
+2017-12-01 15:58:35,324 server.py[line:206] INFO 
+2017-12-01 15:59:35,291 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 15:59:35,291 server.py[line:298] INFO 
+2017-12-01 15:59:35,958 server.py[line:206] INFO 
+2017-12-01 16:00:35,925 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:00:35,925 server.py[line:298] INFO 
+2017-12-01 16:00:35,929 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:00:35,929 server.py[line:298] INFO 
+2017-12-01 16:01:36,642 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:01:36,642 server.py[line:298] INFO 
+2017-12-01 16:01:37,485 server.py[line:206] INFO 
+2017-12-01 16:02:02,667 server.py[line:206] INFO 
+2017-12-01 16:02:24,639 server.py[line:206] INFO 
+2017-12-01 16:02:37,445 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:02:37,446 server.py[line:298] INFO 
+2017-12-01 16:02:38,252 server.py[line:206] INFO 
+2017-12-01 16:03:24,454 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:03:24,454 server.py[line:298] INFO 
+2017-12-01 16:03:38,216 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:03:38,217 server.py[line:298] INFO 
+2017-12-01 16:03:38,918 server.py[line:206] INFO 
+2017-12-01 16:03:38,970 server.py[line:206] INFO 
+2017-12-01 16:03:39,021 server.py[line:206] INFO 
+2017-12-01 16:03:39,064 server.py[line:206] INFO 
+2017-12-01 16:03:39,109 server.py[line:206] INFO 
+2017-12-01 16:03:39,166 server.py[line:206] INFO 
+2017-12-01 16:03:39,211 server.py[line:206] INFO 
+2017-12-01 16:03:39,255 server.py[line:206] INFO 
+2017-12-01 16:03:39,308 server.py[line:206] INFO 
+2017-12-01 16:03:39,353 server.py[line:206] INFO 
+2017-12-01 16:03:39,396 server.py[line:206] INFO 
+2017-12-01 16:03:39,441 server.py[line:206] INFO 
+2017-12-01 16:05:40,318 server.py[line:206] INFO 
+2017-12-01 16:05:40,366 server.py[line:206] INFO 
+2017-12-01 16:05:40,414 server.py[line:206] INFO 
+2017-12-01 16:05:40,455 server.py[line:206] INFO 
+2017-12-01 16:05:40,500 server.py[line:206] INFO 
+2017-12-01 16:05:40,568 server.py[line:206] INFO 
+2017-12-01 16:05:40,614 server.py[line:206] INFO 
+2017-12-01 16:05:40,654 server.py[line:206] INFO 
+2017-12-01 16:05:40,703 server.py[line:206] INFO 
+2017-12-01 16:05:40,743 server.py[line:206] INFO 
+2017-12-01 16:05:40,786 server.py[line:206] INFO 
+2017-12-01 16:05:40,826 server.py[line:206] INFO 
+2017-12-01 16:06:40,279 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:06:40,279 server.py[line:298] INFO 
+2017-12-01 16:06:40,281 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:06:40,281 server.py[line:298] INFO 
+2017-12-01 16:06:40,281 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:06:40,282 server.py[line:298] INFO 
+2017-12-01 16:07:41,694 server.py[line:206] INFO 
+2017-12-01 16:07:41,743 server.py[line:206] INFO 
+2017-12-01 16:07:41,793 server.py[line:206] INFO 
+2017-12-01 16:07:41,834 server.py[line:206] INFO 
+2017-12-01 16:07:41,875 server.py[line:206] INFO 
+2017-12-01 16:07:41,930 server.py[line:206] INFO 
+2017-12-01 16:07:41,976 server.py[line:206] INFO 
+2017-12-01 16:07:42,020 server.py[line:206] INFO 
+2017-12-01 16:07:42,063 server.py[line:206] INFO 
+2017-12-01 16:07:42,104 server.py[line:206] INFO 
+2017-12-01 16:07:42,147 server.py[line:206] INFO 
+2017-12-01 16:07:42,188 server.py[line:206] INFO 
+2017-12-01 16:08:41,657 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:08:41,658 server.py[line:298] INFO 
+2017-12-01 16:08:42,389 server.py[line:206] INFO 
+2017-12-01 16:08:42,440 server.py[line:206] INFO 
+2017-12-01 16:08:42,483 server.py[line:206] INFO 
+2017-12-01 16:08:42,528 server.py[line:206] INFO 
+2017-12-01 16:08:42,586 server.py[line:206] INFO 
+2017-12-01 16:08:42,642 server.py[line:206] INFO 
+2017-12-01 16:08:42,685 server.py[line:206] INFO 
+2017-12-01 16:08:42,728 server.py[line:206] INFO 
+2017-12-01 16:08:42,771 server.py[line:206] INFO 
+2017-12-01 16:08:42,823 server.py[line:206] INFO 
+2017-12-01 16:08:42,867 server.py[line:206] INFO 
+2017-12-01 16:09:42,309 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:09:42,309 server.py[line:298] INFO 
+2017-12-01 16:09:42,310 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:09:42,310 server.py[line:298] INFO 
+2017-12-01 16:09:43,072 server.py[line:206] INFO 
+2017-12-01 16:09:43,122 server.py[line:206] INFO 
+2017-12-01 16:09:43,164 server.py[line:206] INFO 
+2017-12-01 16:09:43,207 server.py[line:206] INFO 
+2017-12-01 16:09:43,268 server.py[line:206] INFO 
+2017-12-01 16:09:43,314 server.py[line:206] INFO 
+2017-12-01 16:09:43,356 server.py[line:206] INFO 
+2017-12-01 16:09:43,399 server.py[line:206] INFO 
+2017-12-01 16:09:43,441 server.py[line:206] INFO 
+2017-12-01 16:09:43,484 server.py[line:206] INFO 
+2017-12-01 16:09:43,526 server.py[line:206] INFO 
+2017-12-01 16:10:42,991 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:10:42,991 server.py[line:298] INFO 
+2017-12-01 16:11:43,644 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:11:43,645 server.py[line:298] INFO 
+2017-12-01 16:11:44,399 server.py[line:206] INFO 
+2017-12-01 16:11:44,453 server.py[line:206] INFO 
+2017-12-01 16:11:44,495 server.py[line:206] INFO 
+2017-12-01 16:11:44,539 server.py[line:206] INFO 
+2017-12-01 16:11:44,597 server.py[line:206] INFO 
+2017-12-01 16:11:44,641 server.py[line:206] INFO 
+2017-12-01 16:11:44,690 server.py[line:206] INFO 
+2017-12-01 16:11:44,735 server.py[line:206] INFO 
+2017-12-01 16:11:44,788 server.py[line:206] INFO 
+2017-12-01 16:11:44,837 server.py[line:206] INFO 
+2017-12-01 16:11:44,909 server.py[line:206] INFO 
+2017-12-01 16:12:44,324 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:12:44,324 server.py[line:298] INFO 
+2017-12-01 16:12:45,151 server.py[line:206] INFO 
+2017-12-01 16:13:45,118 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:13:45,118 server.py[line:298] INFO 
+2017-12-01 16:13:45,119 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:13:45,119 server.py[line:298] INFO 
+2017-12-01 16:13:46,230 server.py[line:206] INFO 
+2017-12-01 16:13:46,285 server.py[line:206] INFO 
+2017-12-01 16:13:46,362 server.py[line:206] INFO 
+2017-12-01 16:13:46,425 server.py[line:206] INFO 
+2017-12-01 16:13:46,467 server.py[line:206] INFO 
+2017-12-01 16:13:46,556 server.py[line:206] INFO 
+2017-12-01 16:13:46,611 server.py[line:206] INFO 
+2017-12-01 16:13:46,661 server.py[line:206] INFO 
+2017-12-01 16:13:46,707 server.py[line:206] INFO 
+2017-12-01 16:13:46,750 server.py[line:206] INFO 
+2017-12-01 16:13:46,812 server.py[line:206] INFO 
+2017-12-01 16:13:46,852 server.py[line:206] INFO 
+2017-12-01 16:14:46,195 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:14:46,196 server.py[line:298] INFO 
+2017-12-01 16:14:47,063 server.py[line:206] INFO 
+2017-12-01 16:15:47,027 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:15:47,027 server.py[line:298] INFO 
+2017-12-01 16:15:47,762 server.py[line:206] INFO 
+2017-12-01 16:15:47,813 server.py[line:206] INFO 
+2017-12-01 16:15:47,854 server.py[line:206] INFO 
+2017-12-01 16:15:47,894 server.py[line:206] INFO 
+2017-12-01 16:15:47,951 server.py[line:206] INFO 
+2017-12-01 16:15:47,993 server.py[line:206] INFO 
+2017-12-01 16:15:48,035 server.py[line:206] INFO 
+2017-12-01 16:15:48,076 server.py[line:206] INFO 
+2017-12-01 16:15:48,120 server.py[line:206] INFO 
+2017-12-01 16:15:48,161 server.py[line:206] INFO 
+2017-12-01 16:15:48,203 server.py[line:206] INFO 
+2017-12-01 16:16:48,365 server.py[line:206] INFO 
+2017-12-01 16:17:48,331 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:17:48,332 server.py[line:298] INFO 
+2017-12-01 16:17:48,957 server.py[line:206] INFO 
+2017-12-01 16:18:16,844 server.py[line:206] INFO 
+2017-12-01 16:19:16,293 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:19:16,294 server.py[line:298] INFO 
+2017-12-01 16:19:17,515 server.py[line:206] INFO 
+2017-12-01 16:19:17,565 server.py[line:206] INFO 
+2017-12-01 16:19:17,607 server.py[line:206] INFO 
+2017-12-01 16:19:17,647 server.py[line:206] INFO 
+2017-12-01 16:19:17,711 server.py[line:206] INFO 
+2017-12-01 16:19:17,754 server.py[line:206] INFO 
+2017-12-01 16:19:17,796 server.py[line:206] INFO 
+2017-12-01 16:19:17,837 server.py[line:206] INFO 
+2017-12-01 16:19:17,879 server.py[line:206] INFO 
+2017-12-01 16:19:17,923 server.py[line:206] INFO 
+2017-12-01 16:19:17,968 server.py[line:206] INFO 
+2017-12-01 16:20:09,665 server.py[line:206] INFO 
+2017-12-01 16:20:09,917 server.py[line:206] INFO 
+2017-12-01 16:20:09,921 server.py[line:206] INFO 
+2017-12-01 16:20:09,964 server.py[line:206] INFO 
+2017-12-01 16:20:09,973 server.py[line:206] INFO 
+2017-12-01 16:20:16,514 server.py[line:206] INFO 
+2017-12-01 16:20:16,660 server.py[line:206] INFO 
+2017-12-01 16:20:16,764 server.py[line:206] INFO 
+2017-12-01 16:20:16,812 server.py[line:206] INFO 
+2017-12-01 16:20:16,877 server.py[line:206] INFO 
+2017-12-01 16:20:16,919 server.py[line:206] INFO 
+2017-12-01 16:20:16,961 server.py[line:206] INFO 
+2017-12-01 16:20:17,005 server.py[line:206] INFO 
+2017-12-01 16:20:17,047 server.py[line:206] INFO 
+2017-12-01 16:20:17,088 server.py[line:206] INFO 
+2017-12-01 16:20:17,129 server.py[line:206] INFO 
+2017-12-01 16:20:31,628 server.py[line:206] INFO 
+2017-12-01 16:20:33,949 server.py[line:206] INFO 
+2017-12-01 16:21:08,569 server.py[line:206] INFO 
+2017-12-01 16:21:08,708 server.py[line:206] INFO 
+2017-12-01 16:21:08,774 server.py[line:206] INFO 
+2017-12-01 16:21:08,776 server.py[line:206] INFO 
+2017-12-01 16:21:08,782 server.py[line:206] INFO 
+2017-12-01 16:21:08,787 server.py[line:206] INFO 
+2017-12-01 16:21:09,612 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:21:09,612 server.py[line:298] INFO 
+2017-12-01 16:21:09,900 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:21:09,900 server.py[line:298] INFO 
+2017-12-01 16:21:09,904 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:21:09,905 server.py[line:298] INFO 
+2017-12-01 16:21:09,974 server.py[line:206] INFO 
+2017-12-01 16:21:10,041 server.py[line:206] INFO 
+2017-12-01 16:21:10,183 server.py[line:206] INFO 
+2017-12-01 16:21:10,228 server.py[line:206] INFO 
+2017-12-01 16:21:10,234 server.py[line:206] INFO 
+2017-12-01 16:21:10,235 server.py[line:206] INFO 
+2017-12-01 16:21:10,274 server.py[line:206] INFO 
+2017-12-01 16:21:10,285 server.py[line:206] INFO 
+2017-12-01 16:21:33,387 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:21:33,387 server.py[line:298] INFO 
+2017-12-01 16:21:34,298 server.py[line:206] INFO 
+2017-12-01 16:21:34,355 server.py[line:206] INFO 
+2017-12-01 16:21:34,407 server.py[line:206] INFO 
+2017-12-01 16:21:34,458 server.py[line:206] INFO 
+2017-12-01 16:21:34,536 server.py[line:206] INFO 
+2017-12-01 16:21:34,587 server.py[line:206] INFO 
+2017-12-01 16:21:34,642 server.py[line:206] INFO 
+2017-12-01 16:21:34,701 server.py[line:206] INFO 
+2017-12-01 16:21:34,745 server.py[line:206] INFO 
+2017-12-01 16:21:34,792 server.py[line:206] INFO 
+2017-12-01 16:21:34,836 server.py[line:206] INFO 
+2017-12-01 16:21:45,068 server.py[line:206] INFO 
+2017-12-01 16:21:45,204 server.py[line:206] INFO 
+2017-12-01 16:21:45,273 server.py[line:206] INFO 
+2017-12-01 16:21:45,347 server.py[line:206] INFO 
+2017-12-01 16:21:45,419 server.py[line:206] INFO 
+2017-12-01 16:21:45,466 server.py[line:206] INFO 
+2017-12-01 16:21:45,511 server.py[line:206] INFO 
+2017-12-01 16:21:45,560 server.py[line:206] INFO 
+2017-12-01 16:21:45,604 server.py[line:206] INFO 
+2017-12-01 16:21:45,649 server.py[line:206] INFO 
+2017-12-01 16:21:45,694 server.py[line:206] INFO 
+2017-12-01 16:21:49,854 server.py[line:206] INFO 
+2017-12-01 16:22:08,737 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:22:08,737 server.py[line:298] INFO 
+2017-12-01 16:22:08,746 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:22:08,747 server.py[line:298] INFO 
+2017-12-01 16:22:08,748 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:22:08,748 server.py[line:298] INFO 
+2017-12-01 16:22:08,755 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:22:08,756 server.py[line:298] INFO 
+2017-12-01 16:22:10,214 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:22:10,214 server.py[line:298] INFO 
+2017-12-01 16:22:10,220 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:22:10,221 server.py[line:298] INFO 
+2017-12-01 16:22:10,475 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:22:10,476 server.py[line:298] INFO 
+2017-12-01 16:22:11,018 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:22:11,019 server.py[line:298] INFO 
+2017-12-01 16:22:11,476 server.py[line:206] INFO 
+2017-12-01 16:22:11,478 server.py[line:206] INFO 
+2017-12-01 16:22:11,479 server.py[line:206] INFO 
+2017-12-01 16:22:11,480 server.py[line:206] INFO 
+2017-12-01 16:22:11,521 server.py[line:206] INFO 
+2017-12-01 16:22:12,776 server.py[line:206] INFO 
+2017-12-01 16:22:45,163 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:22:45,163 server.py[line:298] INFO 
+2017-12-01 16:22:45,868 server.py[line:206] INFO 
+2017-12-01 16:22:45,913 server.py[line:206] INFO 
+2017-12-01 16:22:45,969 server.py[line:206] INFO 
+2017-12-01 16:22:46,012 server.py[line:206] INFO 
+2017-12-01 16:22:46,055 server.py[line:206] INFO 
+2017-12-01 16:22:46,113 server.py[line:206] INFO 
+2017-12-01 16:22:46,157 server.py[line:206] INFO 
+2017-12-01 16:22:46,200 server.py[line:206] INFO 
+2017-12-01 16:22:46,242 server.py[line:206] INFO 
+2017-12-01 16:22:46,283 server.py[line:206] INFO 
+2017-12-01 16:22:46,324 server.py[line:206] INFO 
+2017-12-01 16:22:46,366 server.py[line:206] INFO 
+2017-12-01 16:23:45,830 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:23:45,830 server.py[line:298] INFO 
+2017-12-01 16:23:46,569 server.py[line:206] INFO 
+2017-12-01 16:23:46,624 server.py[line:206] INFO 
+2017-12-01 16:23:46,668 server.py[line:206] INFO 
+2017-12-01 16:23:46,711 server.py[line:206] INFO 
+2017-12-01 16:23:46,772 server.py[line:206] INFO 
+2017-12-01 16:23:46,818 server.py[line:206] INFO 
+2017-12-01 16:23:46,862 server.py[line:206] INFO 
+2017-12-01 16:23:46,907 server.py[line:206] INFO 
+2017-12-01 16:23:46,951 server.py[line:206] INFO 
+2017-12-01 16:23:46,996 server.py[line:206] INFO 
+2017-12-01 16:23:47,039 server.py[line:206] INFO 
+2017-12-01 16:24:46,489 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:24:46,489 server.py[line:298] INFO 
+2017-12-01 16:24:46,490 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:24:46,490 server.py[line:298] INFO 
+2017-12-01 16:24:47,249 server.py[line:206] INFO 
+2017-12-01 16:24:47,302 server.py[line:206] INFO 
+2017-12-01 16:24:47,346 server.py[line:206] INFO 
+2017-12-01 16:24:47,391 server.py[line:206] INFO 
+2017-12-01 16:24:47,456 server.py[line:206] INFO 
+2017-12-01 16:24:47,502 server.py[line:206] INFO 
+2017-12-01 16:24:47,548 server.py[line:206] INFO 
+2017-12-01 16:24:47,594 server.py[line:206] INFO 
+2017-12-01 16:24:47,639 server.py[line:206] INFO 
+2017-12-01 16:24:47,683 server.py[line:206] INFO 
+2017-12-01 16:24:47,727 server.py[line:206] INFO 
+2017-12-01 16:25:47,893 server.py[line:206] INFO 
+2017-12-01 16:25:47,937 server.py[line:206] INFO 
+2017-12-01 16:25:47,986 server.py[line:206] INFO 
+2017-12-01 16:25:48,026 server.py[line:206] INFO 
+2017-12-01 16:25:48,065 server.py[line:206] INFO 
+2017-12-01 16:25:48,125 server.py[line:206] INFO 
+2017-12-01 16:25:48,169 server.py[line:206] INFO 
+2017-12-01 16:25:48,211 server.py[line:206] INFO 
+2017-12-01 16:25:48,250 server.py[line:206] INFO 
+2017-12-01 16:25:48,291 server.py[line:206] INFO 
+2017-12-01 16:25:48,331 server.py[line:206] INFO 
+2017-12-01 16:25:48,372 server.py[line:206] INFO 
+2017-12-01 16:26:47,858 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:26:47,859 server.py[line:298] INFO 
+2017-12-01 16:26:48,544 server.py[line:206] INFO 
+2017-12-01 16:26:48,680 server.py[line:206] INFO 
+2017-12-01 16:26:48,769 server.py[line:206] INFO 
+2017-12-01 16:26:48,833 server.py[line:206] INFO 
+2017-12-01 16:26:48,964 server.py[line:206] INFO 
+2017-12-01 16:26:49,020 server.py[line:206] INFO 
+2017-12-01 16:26:49,068 server.py[line:206] INFO 
+2017-12-01 16:26:49,116 server.py[line:206] INFO 
+2017-12-01 16:26:49,165 server.py[line:206] INFO 
+2017-12-01 16:26:49,214 server.py[line:206] INFO 
+2017-12-01 16:26:49,286 server.py[line:206] INFO 
+2017-12-01 16:27:30,228 server.py[line:206] INFO 
+2017-12-01 16:27:30,398 server.py[line:206] INFO 
+2017-12-01 16:27:30,607 server.py[line:206] INFO 
+2017-12-01 16:27:45,072 server.py[line:206] INFO 
+2017-12-01 16:27:45,155 server.py[line:206] INFO 
+2017-12-01 16:27:45,362 server.py[line:206] INFO 
+2017-12-01 16:27:48,508 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:27:48,508 server.py[line:298] INFO 
+2017-12-01 16:28:14,326 server.py[line:206] INFO 
+2017-12-01 16:28:16,999 server.py[line:206] INFO 
+2017-12-01 16:28:17,137 server.py[line:206] INFO 
+2017-12-01 16:28:17,232 server.py[line:206] INFO 
+2017-12-01 16:28:17,335 server.py[line:206] INFO 
+2017-12-01 16:28:17,395 server.py[line:206] INFO 
+2017-12-01 16:28:17,444 server.py[line:206] INFO 
+2017-12-01 16:28:17,493 server.py[line:206] INFO 
+2017-12-01 16:28:17,548 server.py[line:206] INFO 
+2017-12-01 16:28:17,602 server.py[line:206] INFO 
+2017-12-01 16:28:17,670 server.py[line:206] INFO 
+2017-12-01 16:28:36,843 server.py[line:206] INFO 
+2017-12-01 16:28:37,003 server.py[line:206] INFO 
+2017-12-01 16:28:37,314 server.py[line:206] INFO 
+2017-12-01 16:28:45,060 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:28:45,060 server.py[line:298] INFO 
+2017-12-01 16:28:49,436 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:28:49,436 server.py[line:298] INFO 
+2017-12-01 16:28:50,181 server.py[line:206] INFO 
+2017-12-01 16:29:00,580 server.py[line:206] INFO 
+2017-12-01 16:29:00,701 server.py[line:206] INFO 
+2017-12-01 16:29:00,781 server.py[line:206] INFO 
+2017-12-01 16:29:16,204 server.py[line:206] INFO 
+2017-12-01 16:29:16,907 server.py[line:206] INFO 
+2017-12-01 16:29:16,989 server.py[line:206] INFO 
+2017-12-01 16:29:16,993 server.py[line:206] INFO 
+2017-12-01 16:29:17,047 server.py[line:206] INFO 
+2017-12-01 16:29:18,202 server.py[line:206] INFO 
+2017-12-01 16:29:18,496 server.py[line:206] INFO 
+2017-12-01 16:29:20,458 server.py[line:206] INFO 
+2017-12-01 16:29:24,150 server.py[line:206] INFO 
+2017-12-01 16:29:24,451 server.py[line:206] INFO 
+2017-12-01 16:29:37,035 server.py[line:206] INFO 
+2017-12-01 16:29:37,125 server.py[line:206] INFO 
+2017-12-01 16:29:37,225 server.py[line:206] INFO 
+2017-12-01 16:29:37,229 server.py[line:206] INFO 
+2017-12-01 16:29:37,298 server.py[line:206] INFO 
+2017-12-01 16:29:37,673 server.py[line:206] INFO 
+2017-12-01 16:29:50,148 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:29:50,148 server.py[line:298] INFO 
+2017-12-01 16:29:50,934 server.py[line:206] INFO 
+2017-12-01 16:29:50,980 server.py[line:206] INFO 
+2017-12-01 16:29:51,039 server.py[line:206] INFO 
+2017-12-01 16:29:51,087 server.py[line:206] INFO 
+2017-12-01 16:29:51,137 server.py[line:206] INFO 
+2017-12-01 16:29:51,205 server.py[line:206] INFO 
+2017-12-01 16:29:51,253 server.py[line:206] INFO 
+2017-12-01 16:29:51,294 server.py[line:206] INFO 
+2017-12-01 16:29:51,339 server.py[line:206] INFO 
+2017-12-01 16:29:51,379 server.py[line:206] INFO 
+2017-12-01 16:29:51,425 server.py[line:206] INFO 
+2017-12-01 16:29:51,473 server.py[line:206] INFO 
+2017-12-01 16:30:01,297 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:30:01,300 server.py[line:298] INFO 
+2017-12-01 16:30:36,919 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:30:36,920 server.py[line:298] INFO 
+2017-12-01 16:30:36,921 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:30:36,921 server.py[line:298] INFO 
+2017-12-01 16:30:37,593 server.py[line:206] INFO 
+2017-12-01 16:30:38,346 server.py[line:206] INFO 
+2017-12-01 16:30:50,890 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:30:50,891 server.py[line:298] INFO 
+2017-12-01 16:30:50,898 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:30:50,899 server.py[line:298] INFO 
+2017-12-01 16:30:51,640 server.py[line:206] INFO 
+2017-12-01 16:31:38,073 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:31:38,074 server.py[line:298] INFO 
+2017-12-01 16:31:51,605 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:31:51,606 server.py[line:298] INFO 
+2017-12-01 16:31:52,350 server.py[line:206] INFO 
+2017-12-01 16:31:52,402 server.py[line:206] INFO 
+2017-12-01 16:31:52,443 server.py[line:206] INFO 
+2017-12-01 16:31:52,483 server.py[line:206] INFO 
+2017-12-01 16:31:52,538 server.py[line:206] INFO 
+2017-12-01 16:31:52,583 server.py[line:206] INFO 
+2017-12-01 16:31:52,623 server.py[line:206] INFO 
+2017-12-01 16:31:52,666 server.py[line:206] INFO 
+2017-12-01 16:31:52,710 server.py[line:206] INFO 
+2017-12-01 16:31:52,753 server.py[line:206] INFO 
+2017-12-01 16:31:52,794 server.py[line:206] INFO 
+2017-12-01 16:32:40,968 server.py[line:206] INFO 
+2017-12-01 16:32:42,209 server.py[line:206] INFO 
+2017-12-01 16:32:52,268 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:32:52,269 server.py[line:298] INFO 
+2017-12-01 16:32:52,275 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:32:52,275 server.py[line:298] INFO 
+2017-12-01 16:33:29,437 server.py[line:206] INFO 
+2017-12-01 16:33:42,857 server.py[line:206] INFO 
+2017-12-01 16:33:43,463 server.py[line:206] INFO 
+2017-12-01 16:33:47,333 server.py[line:206] INFO 
+2017-12-01 16:33:52,107 server.py[line:206] INFO 
+2017-12-01 16:33:53,738 server.py[line:206] INFO 
+2017-12-01 16:33:56,810 server.py[line:206] INFO 
+2017-12-01 16:33:57,162 server.py[line:206] INFO 
+2017-12-01 16:34:04,374 server.py[line:206] INFO 
+2017-12-01 16:34:53,648 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:34:53,649 server.py[line:298] INFO 
+2017-12-01 16:34:57,148 server.py[line:206] INFO 
+2017-12-01 16:34:57,611 server.py[line:206] INFO 
+2017-12-01 16:35:04,209 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:35:04,209 server.py[line:298] INFO 
+2017-12-01 16:35:55,807 server.py[line:206] INFO 
+2017-12-01 16:35:57,615 server.py[line:206] INFO 
+2017-12-01 16:35:58,030 server.py[line:206] INFO 
+2017-12-01 16:36:55,773 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:36:55,773 server.py[line:298] INFO 
+2017-12-01 16:36:56,934 server.py[line:206] INFO 
+2017-12-01 16:36:56,988 server.py[line:206] INFO 
+2017-12-01 16:36:57,034 server.py[line:206] INFO 
+2017-12-01 16:36:57,080 server.py[line:206] INFO 
+2017-12-01 16:36:57,141 server.py[line:206] INFO 
+2017-12-01 16:36:57,190 server.py[line:206] INFO 
+2017-12-01 16:36:57,236 server.py[line:206] INFO 
+2017-12-01 16:36:57,281 server.py[line:206] INFO 
+2017-12-01 16:36:57,327 server.py[line:206] INFO 
+2017-12-01 16:36:57,375 server.py[line:206] INFO 
+2017-12-01 16:36:57,424 server.py[line:206] INFO 
+2017-12-01 16:36:57,803 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:36:57,804 server.py[line:298] INFO 
+2017-12-01 16:37:56,566 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:37:56,566 server.py[line:298] INFO 
+2017-12-01 16:38:57,578 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:38:57,578 server.py[line:298] INFO 
+2017-12-01 16:38:58,404 server.py[line:206] INFO 
+2017-12-01 16:38:58,723 server.py[line:206] INFO 
+2017-12-01 16:38:58,780 server.py[line:206] INFO 
+2017-12-01 16:38:58,832 server.py[line:206] INFO 
+2017-12-01 16:38:58,892 server.py[line:206] INFO 
+2017-12-01 16:38:58,952 server.py[line:206] INFO 
+2017-12-01 16:38:59,010 server.py[line:206] INFO 
+2017-12-01 16:38:59,066 server.py[line:206] INFO 
+2017-12-01 16:38:59,127 server.py[line:206] INFO 
+2017-12-01 16:38:59,180 server.py[line:206] INFO 
+2017-12-01 16:38:59,238 server.py[line:206] INFO 
+2017-12-01 16:39:25,075 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:39:25,075 server.py[line:298] INFO 
+2017-12-01 16:39:25,077 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:39:25,077 server.py[line:298] INFO 
+2017-12-01 16:39:25,077 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:39:25,078 server.py[line:298] INFO 
+2017-12-01 16:39:25,079 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:39:25,079 server.py[line:298] INFO 
+2017-12-01 16:39:25,080 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:39:25,081 server.py[line:298] INFO 
+2017-12-01 16:39:59,239 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:39:59,240 server.py[line:298] INFO 
+2017-12-01 16:39:59,471 server.py[line:206] INFO 
+2017-12-01 16:39:59,547 server.py[line:206] INFO 
+2017-12-01 16:39:59,592 server.py[line:206] INFO 
+2017-12-01 16:39:59,641 server.py[line:206] INFO 
+2017-12-01 16:39:59,704 server.py[line:206] INFO 
+2017-12-01 16:39:59,757 server.py[line:206] INFO 
+2017-12-01 16:39:59,808 server.py[line:206] INFO 
+2017-12-01 16:39:59,859 server.py[line:206] INFO 
+2017-12-01 16:39:59,907 server.py[line:206] INFO 
+2017-12-01 16:40:00,197 server.py[line:206] INFO 
+2017-12-01 16:40:00,241 server.py[line:206] INFO 
+2017-12-01 16:40:59,389 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:40:59,389 server.py[line:298] INFO 
+2017-12-01 16:41:00,311 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:41:00,311 server.py[line:298] INFO 
+2017-12-01 16:41:00,492 server.py[line:206] INFO 
+2017-12-01 16:41:00,562 server.py[line:206] INFO 
+2017-12-01 16:41:00,607 server.py[line:206] INFO 
+2017-12-01 16:41:00,652 server.py[line:206] INFO 
+2017-12-01 16:41:00,712 server.py[line:206] INFO 
+2017-12-01 16:41:00,758 server.py[line:206] INFO 
+2017-12-01 16:41:00,801 server.py[line:206] INFO 
+2017-12-01 16:41:00,847 server.py[line:206] INFO 
+2017-12-01 16:41:00,891 server.py[line:206] INFO 
+2017-12-01 16:41:00,934 server.py[line:206] INFO 
+2017-12-01 16:41:00,978 server.py[line:206] INFO 
+2017-12-01 16:41:27,951 server.py[line:206] INFO 
+2017-12-01 16:41:28,306 server.py[line:206] INFO 
+2017-12-01 16:42:27,914 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:42:27,914 server.py[line:298] INFO 
+2017-12-01 16:43:01,104 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:43:01,105 server.py[line:298] INFO 
+2017-12-01 16:43:02,071 server.py[line:206] INFO 
+2017-12-01 16:44:02,035 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:44:02,036 server.py[line:298] INFO 
+2017-12-01 16:44:02,786 server.py[line:206] INFO 
+2017-12-01 16:44:30,901 server.py[line:206] INFO 
+2017-12-01 16:44:41,722 server.py[line:206] INFO 
+2017-12-01 16:45:03,703 server.py[line:206] INFO 
+2017-12-01 16:45:40,812 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:45:40,813 server.py[line:298] INFO 
+2017-12-01 16:45:41,900 server.py[line:206] INFO 
+2017-12-01 16:45:42,159 server.py[line:206] INFO 
+2017-12-01 16:46:03,667 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:46:03,668 server.py[line:298] INFO 
+2017-12-01 16:46:04,352 server.py[line:206] INFO 
+2017-12-01 16:46:42,793 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:46:42,795 server.py[line:298] INFO 
+2017-12-01 16:47:04,316 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:47:04,317 server.py[line:298] INFO 
+2017-12-01 16:47:04,318 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:47:04,318 server.py[line:298] INFO 
+2017-12-01 16:47:05,069 server.py[line:206] INFO 
+2017-12-01 16:47:43,948 server.py[line:206] INFO 
+2017-12-01 16:47:44,209 server.py[line:206] INFO 
+2017-12-01 16:48:05,034 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:48:05,034 server.py[line:298] INFO 
+2017-12-01 16:48:05,775 server.py[line:206] INFO 
+2017-12-01 16:48:05,821 server.py[line:206] INFO 
+2017-12-01 16:48:05,877 server.py[line:206] INFO 
+2017-12-01 16:48:05,922 server.py[line:206] INFO 
+2017-12-01 16:48:05,964 server.py[line:206] INFO 
+2017-12-01 16:48:06,030 server.py[line:206] INFO 
+2017-12-01 16:48:06,076 server.py[line:206] INFO 
+2017-12-01 16:48:06,122 server.py[line:206] INFO 
+2017-12-01 16:48:06,173 server.py[line:206] INFO 
+2017-12-01 16:48:06,218 server.py[line:206] INFO 
+2017-12-01 16:48:06,262 server.py[line:206] INFO 
+2017-12-01 16:48:06,311 server.py[line:206] INFO 
+2017-12-01 16:48:44,863 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:48:44,864 server.py[line:298] INFO 
+2017-12-01 16:48:44,865 app.py[line:498] ERROR Exception occured in one of response middleware handlers
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 495, in handle_request
+    response)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 621, in _run_response_middleware
+    _response = await _response
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "main_server.py", line 1181, in save_session
+    await session_interface.save(request, response)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic_session/redis_session_interface.py", line 100, in save
+    await redis_connection.setex(key, self.expiry, val)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 676, in wrapper
+    result = yield from method(protocol_self, _NoTransaction, *a, **kw)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1135, in _query
+    result = yield from self._get_answer(transaction, answer_f, _bypass=_bypass, call=call)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1062, in _get_answer
+    result = yield from answer_f
+  File "/usr/lib/python3.5/asyncio/futures.py", line 361, in __iter__
+    yield self  # This tells Task to wait for completion.
+  File "uvloop/future.pyx", line 434, in uvloop.loop.BaseTask._fast_wakeup (uvloop/loop.c:114015)
+  File "/usr/lib/python3.5/asyncio/futures.py", line 266, in result
+    raise CancelledError
+concurrent.futures._base.CancelledError
+2017-12-01 16:48:44,866 server.py[line:206] INFO 
+2017-12-01 16:49:02,950 server.py[line:206] INFO 
+2017-12-01 16:49:03,097 server.py[line:206] INFO 
+2017-12-01 16:49:03,185 server.py[line:206] INFO 
+2017-12-01 16:49:03,291 server.py[line:206] INFO 
+2017-12-01 16:49:03,333 server.py[line:206] INFO 
+2017-12-01 16:49:03,391 server.py[line:206] INFO 
+2017-12-01 16:49:03,436 server.py[line:206] INFO 
+2017-12-01 16:49:03,481 server.py[line:206] INFO 
+2017-12-01 16:49:03,523 server.py[line:206] INFO 
+2017-12-01 16:49:03,564 server.py[line:206] INFO 
+2017-12-01 16:49:03,607 server.py[line:206] INFO 
+2017-12-01 16:49:03,650 server.py[line:206] INFO 
+2017-12-01 16:49:26,338 server.py[line:206] INFO 
+2017-12-01 16:49:26,383 server.py[line:206] INFO 
+2017-12-01 16:49:26,447 server.py[line:206] INFO 
+2017-12-01 16:49:26,510 server.py[line:206] INFO 
+2017-12-01 16:49:26,553 server.py[line:206] INFO 
+2017-12-01 16:49:26,622 server.py[line:206] INFO 
+2017-12-01 16:49:26,671 server.py[line:206] INFO 
+2017-12-01 16:49:26,722 server.py[line:206] INFO 
+2017-12-01 16:49:26,770 server.py[line:206] INFO 
+2017-12-01 16:49:26,813 server.py[line:206] INFO 
+2017-12-01 16:49:26,856 server.py[line:206] INFO 
+2017-12-01 16:49:26,905 server.py[line:206] INFO 
+2017-12-01 16:50:26,954 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:50:26,955 server.py[line:298] INFO 
+2017-12-01 16:50:26,957 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:50:26,958 server.py[line:298] INFO 
+2017-12-01 16:50:27,119 server.py[line:206] INFO 
+2017-12-01 16:50:27,187 server.py[line:206] INFO 
+2017-12-01 16:50:27,244 server.py[line:206] INFO 
+2017-12-01 16:50:27,300 server.py[line:206] INFO 
+2017-12-01 16:50:27,365 server.py[line:206] INFO 
+2017-12-01 16:50:27,419 server.py[line:206] INFO 
+2017-12-01 16:50:27,470 server.py[line:206] INFO 
+2017-12-01 16:50:27,515 server.py[line:206] INFO 
+2017-12-01 16:50:27,561 server.py[line:206] INFO 
+2017-12-01 16:50:27,608 server.py[line:206] INFO 
+2017-12-01 16:50:27,650 server.py[line:206] INFO 
+2017-12-01 16:50:46,942 server.py[line:206] INFO 
+2017-12-01 16:50:47,460 server.py[line:206] INFO 
+2017-12-01 16:51:27,046 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:51:27,046 server.py[line:298] INFO 
+2017-12-01 16:51:47,830 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:51:47,830 server.py[line:298] INFO 
+2017-12-01 16:52:27,775 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:52:27,775 server.py[line:298] INFO 
+2017-12-01 16:52:49,172 server.py[line:206] INFO 
+2017-12-01 16:52:49,504 server.py[line:206] INFO 
+2017-12-01 16:53:49,873 server.py[line:206] INFO 
+2017-12-01 16:53:50,245 server.py[line:206] INFO 
+2017-12-01 16:53:55,719 server.py[line:206] INFO 
+2017-12-01 16:53:55,780 server.py[line:206] INFO 
+2017-12-01 16:53:55,830 server.py[line:206] INFO 
+2017-12-01 16:53:55,874 server.py[line:206] INFO 
+2017-12-01 16:53:55,942 server.py[line:206] INFO 
+2017-12-01 16:53:55,994 server.py[line:206] INFO 
+2017-12-01 16:53:56,040 server.py[line:206] INFO 
+2017-12-01 16:53:56,085 server.py[line:206] INFO 
+2017-12-01 16:53:56,129 server.py[line:206] INFO 
+2017-12-01 16:53:56,175 server.py[line:206] INFO 
+2017-12-01 16:53:56,218 server.py[line:206] INFO 
+2017-12-01 16:54:50,063 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:54:50,064 server.py[line:298] INFO 
+2017-12-01 16:54:55,626 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:54:55,629 server.py[line:298] INFO 
+2017-12-01 16:54:56,402 server.py[line:206] INFO 
+2017-12-01 16:54:56,455 server.py[line:206] INFO 
+2017-12-01 16:54:56,500 server.py[line:206] INFO 
+2017-12-01 16:54:56,563 server.py[line:206] INFO 
+2017-12-01 16:54:56,627 server.py[line:206] INFO 
+2017-12-01 16:54:56,683 server.py[line:206] INFO 
+2017-12-01 16:54:56,748 server.py[line:206] INFO 
+2017-12-01 16:54:56,801 server.py[line:206] INFO 
+2017-12-01 16:54:56,845 server.py[line:206] INFO 
+2017-12-01 16:54:56,889 server.py[line:206] INFO 
+2017-12-01 16:54:56,932 server.py[line:206] INFO 
+2017-12-01 16:55:47,869 server.py[line:206] INFO 
+2017-12-01 16:55:49,100 server.py[line:206] INFO 
+2017-12-01 16:55:49,909 server.py[line:206] INFO 
+2017-12-01 16:55:51,926 server.py[line:206] INFO 
+2017-12-01 16:55:52,219 server.py[line:206] INFO 
+2017-12-01 16:56:07,480 server.py[line:206] INFO 
+2017-12-01 16:56:24,591 server.py[line:206] INFO 
+2017-12-01 16:56:27,143 server.py[line:206] INFO 
+2017-12-01 16:56:27,221 server.py[line:206] INFO 
+2017-12-01 16:56:42,118 server.py[line:206] INFO 
+2017-12-01 16:56:42,159 server.py[line:206] INFO 
+2017-12-01 16:56:42,203 server.py[line:206] INFO 
+2017-12-01 16:56:42,257 server.py[line:206] INFO 
+2017-12-01 16:56:42,260 server.py[line:206] INFO 
+2017-12-01 16:56:42,308 server.py[line:206] INFO 
+2017-12-01 16:56:42,309 server.py[line:206] INFO 
+2017-12-01 16:56:43,348 server.py[line:206] INFO 
+2017-12-01 16:56:51,892 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:56:51,893 server.py[line:298] INFO 
+2017-12-01 16:57:07,273 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:57:07,274 server.py[line:298] INFO 
+2017-12-01 16:57:12,791 server.py[line:206] INFO 
+2017-12-01 16:57:12,883 server.py[line:206] INFO 
+2017-12-01 16:57:12,935 server.py[line:206] INFO 
+2017-12-01 16:57:12,994 server.py[line:206] INFO 
+2017-12-01 16:57:13,060 server.py[line:206] INFO 
+2017-12-01 16:57:13,126 server.py[line:206] INFO 
+2017-12-01 16:57:13,179 server.py[line:206] INFO 
+2017-12-01 16:57:13,228 server.py[line:206] INFO 
+2017-12-01 16:57:13,274 server.py[line:206] INFO 
+2017-12-01 16:57:13,320 server.py[line:206] INFO 
+2017-12-01 16:57:13,369 server.py[line:206] INFO 
+2017-12-01 16:57:21,293 server.py[line:206] INFO 
+2017-12-01 16:57:21,436 server.py[line:206] INFO 
+2017-12-01 16:57:21,502 server.py[line:206] INFO 
+2017-12-01 16:57:21,577 server.py[line:206] INFO 
+2017-12-01 16:57:21,643 server.py[line:206] INFO 
+2017-12-01 16:57:21,693 server.py[line:206] INFO 
+2017-12-01 16:57:21,747 server.py[line:206] INFO 
+2017-12-01 16:57:21,797 server.py[line:206] INFO 
+2017-12-01 16:57:21,854 server.py[line:206] INFO 
+2017-12-01 16:57:21,901 server.py[line:206] INFO 
+2017-12-01 16:57:21,947 server.py[line:206] INFO 
+2017-12-01 16:57:33,811 server.py[line:206] INFO 
+2017-12-01 16:57:54,920 server.py[line:206] INFO 
+2017-12-01 16:57:55,178 server.py[line:206] INFO 
+2017-12-01 16:57:58,734 server.py[line:206] INFO 
+2017-12-01 16:58:33,783 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:58:33,784 server.py[line:298] INFO 
+2017-12-01 16:58:54,885 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:58:54,886 server.py[line:298] INFO 
+2017-12-01 16:58:59,285 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:58:59,286 server.py[line:298] INFO 
+2017-12-01 16:58:59,615 server.py[line:206] INFO 
+2017-12-01 16:58:59,660 server.py[line:206] INFO 
+2017-12-01 16:58:59,716 server.py[line:206] INFO 
+2017-12-01 16:58:59,761 server.py[line:206] INFO 
+2017-12-01 16:58:59,805 server.py[line:206] INFO 
+2017-12-01 16:58:59,867 server.py[line:206] INFO 
+2017-12-01 16:58:59,916 server.py[line:206] INFO 
+2017-12-01 16:58:59,958 server.py[line:206] INFO 
+2017-12-01 16:59:00,005 server.py[line:206] INFO 
+2017-12-01 16:59:00,047 server.py[line:206] INFO 
+2017-12-01 16:59:00,089 server.py[line:206] INFO 
+2017-12-01 16:59:00,133 server.py[line:206] INFO 
+2017-12-01 16:59:20,326 server.py[line:206] INFO 
+2017-12-01 16:59:20,392 server.py[line:206] INFO 
+2017-12-01 16:59:20,488 server.py[line:206] INFO 
+2017-12-01 16:59:20,533 server.py[line:206] INFO 
+2017-12-01 16:59:20,578 server.py[line:206] INFO 
+2017-12-01 16:59:20,648 server.py[line:206] INFO 
+2017-12-01 16:59:20,707 server.py[line:206] INFO 
+2017-12-01 16:59:20,763 server.py[line:206] INFO 
+2017-12-01 16:59:20,826 server.py[line:206] INFO 
+2017-12-01 16:59:20,889 server.py[line:206] INFO 
+2017-12-01 16:59:20,934 server.py[line:206] INFO 
+2017-12-01 16:59:20,992 server.py[line:206] INFO 
+2017-12-01 16:59:57,160 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:59:57,160 server.py[line:298] INFO 
+2017-12-01 16:59:58,922 server.py[line:206] INFO 
+2017-12-01 16:59:59,281 server.py[line:206] INFO 
+2017-12-01 16:59:59,584 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 16:59:59,585 server.py[line:298] INFO 
+2017-12-01 17:00:20,534 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:00:20,535 server.py[line:298] INFO 
+2017-12-01 17:00:21,229 server.py[line:206] INFO 
+2017-12-01 17:00:21,313 server.py[line:206] INFO 
+2017-12-01 17:00:21,358 server.py[line:206] INFO 
+2017-12-01 17:00:21,404 server.py[line:206] INFO 
+2017-12-01 17:00:21,465 server.py[line:206] INFO 
+2017-12-01 17:00:21,523 server.py[line:206] INFO 
+2017-12-01 17:00:21,565 server.py[line:206] INFO 
+2017-12-01 17:00:21,606 server.py[line:206] INFO 
+2017-12-01 17:00:21,651 server.py[line:206] INFO 
+2017-12-01 17:00:21,693 server.py[line:206] INFO 
+2017-12-01 17:00:21,738 server.py[line:206] INFO 
+2017-12-01 17:00:59,824 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:00:59,827 server.py[line:298] INFO 
+2017-12-01 17:01:21,126 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:01:21,126 server.py[line:298] INFO 
+2017-12-01 17:01:21,128 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:01:21,129 server.py[line:298] INFO 
+2017-12-01 17:02:00,984 server.py[line:206] INFO 
+2017-12-01 17:02:01,236 server.py[line:206] INFO 
+2017-12-01 17:02:21,861 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:02:21,861 server.py[line:298] INFO 
+2017-12-01 17:02:22,553 server.py[line:206] INFO 
+2017-12-01 17:03:01,873 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:03:01,874 server.py[line:298] INFO 
+2017-12-01 17:03:01,877 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 453, in handle_request
+    response = await self._run_request_middleware(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 611, in _run_request_middleware
+    response = await response
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "main_server.py", line 1174, in add_session_to_request
+    await session_interface.open(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic_session/redis_session_interface.py", line 61, in open
+    val = await redis_connection.get(self.prefix + sid)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 676, in wrapper
+    result = yield from method(protocol_self, _NoTransaction, *a, **kw)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1135, in _query
+    result = yield from self._get_answer(transaction, answer_f, _bypass=_bypass, call=call)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1062, in _get_answer
+    result = yield from answer_f
+  File "/usr/lib/python3.5/asyncio/futures.py", line 361, in __iter__
+    yield self  # This tells Task to wait for completion.
+  File "uvloop/future.pyx", line 434, in uvloop.loop.BaseTask._fast_wakeup (uvloop/loop.c:114015)
+  File "/usr/lib/python3.5/asyncio/futures.py", line 266, in result
+    raise CancelledError
+concurrent.futures._base.CancelledError
+
+2017-12-01 17:03:01,878 handlers.py[line:120] ERROR Exception occurred while handling uri: "http://39.108.67.178:5000/company/user"
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 453, in handle_request
+    response = await self._run_request_middleware(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 611, in _run_request_middleware
+    response = await response
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "main_server.py", line 1174, in add_session_to_request
+    await session_interface.open(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic_session/redis_session_interface.py", line 61, in open
+    val = await redis_connection.get(self.prefix + sid)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 676, in wrapper
+    result = yield from method(protocol_self, _NoTransaction, *a, **kw)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1135, in _query
+    result = yield from self._get_answer(transaction, answer_f, _bypass=_bypass, call=call)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1062, in _get_answer
+    result = yield from answer_f
+  File "/usr/lib/python3.5/asyncio/futures.py", line 361, in __iter__
+    yield self  # This tells Task to wait for completion.
+  File "uvloop/future.pyx", line 434, in uvloop.loop.BaseTask._fast_wakeup (uvloop/loop.c:114015)
+  File "/usr/lib/python3.5/asyncio/futures.py", line 266, in result
+    raise CancelledError
+concurrent.futures._base.CancelledError
+
+2017-12-01 17:03:01,881 server.py[line:217] ERROR Connection lost before response written @ ('180.173.40.150', 55489)
+2017-12-01 17:03:04,337 server.py[line:206] INFO 
+2017-12-01 17:03:04,398 server.py[line:206] INFO 
+2017-12-01 17:03:04,445 server.py[line:206] INFO 
+2017-12-01 17:03:04,488 server.py[line:206] INFO 
+2017-12-01 17:03:04,559 server.py[line:206] INFO 
+2017-12-01 17:03:04,604 server.py[line:206] INFO 
+2017-12-01 17:03:04,648 server.py[line:206] INFO 
+2017-12-01 17:03:04,693 server.py[line:206] INFO 
+2017-12-01 17:03:04,734 server.py[line:206] INFO 
+2017-12-01 17:03:04,775 server.py[line:206] INFO 
+2017-12-01 17:03:04,822 server.py[line:206] INFO 
+2017-12-01 17:03:05,457 server.py[line:206] INFO 
+2017-12-01 17:04:05,494 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:04:05,495 server.py[line:298] INFO 
+2017-12-01 17:04:06,219 server.py[line:206] INFO 
+2017-12-01 17:05:06,115 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:05:06,118 server.py[line:298] INFO 
+2017-12-01 17:06:06,833 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:06:06,833 server.py[line:298] INFO 
+2017-12-01 17:06:39,943 server.py[line:206] INFO 
+2017-12-01 17:06:39,995 server.py[line:206] INFO 
+2017-12-01 17:06:40,053 server.py[line:206] INFO 
+2017-12-01 17:06:40,098 server.py[line:206] INFO 
+2017-12-01 17:06:40,141 server.py[line:206] INFO 
+2017-12-01 17:06:40,198 server.py[line:206] INFO 
+2017-12-01 17:06:40,248 server.py[line:206] INFO 
+2017-12-01 17:06:40,291 server.py[line:206] INFO 
+2017-12-01 17:06:40,335 server.py[line:206] INFO 
+2017-12-01 17:06:40,384 server.py[line:206] INFO 
+2017-12-01 17:06:40,428 server.py[line:206] INFO 
+2017-12-01 17:06:40,477 server.py[line:206] INFO 
+2017-12-01 17:07:17,979 server.py[line:206] INFO 
+2017-12-01 17:07:18,251 server.py[line:206] INFO 
+2017-12-01 17:07:41,025 server.py[line:206] INFO 
+2017-12-01 17:07:41,132 server.py[line:206] INFO 
+2017-12-01 17:07:41,285 server.py[line:206] INFO 
+2017-12-01 17:07:41,427 server.py[line:206] INFO 
+2017-12-01 17:08:17,942 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:08:17,943 server.py[line:298] INFO 
+2017-12-01 17:08:41,736 server.py[line:206] INFO 
+2017-12-01 17:08:41,787 server.py[line:206] INFO 
+2017-12-01 17:08:41,880 server.py[line:206] INFO 
+2017-12-01 17:08:41,986 server.py[line:206] INFO 
+2017-12-01 17:08:42,070 server.py[line:206] INFO 
+2017-12-01 17:08:42,161 server.py[line:206] INFO 
+2017-12-01 17:09:41,657 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:09:41,658 server.py[line:298] INFO 
+2017-12-01 17:09:42,379 server.py[line:206] INFO 
+2017-12-01 17:09:42,478 server.py[line:206] INFO 
+2017-12-01 17:09:42,564 server.py[line:206] INFO 
+2017-12-01 17:09:42,624 server.py[line:206] INFO 
+2017-12-01 17:09:42,714 server.py[line:206] INFO 
+2017-12-01 17:09:42,755 server.py[line:206] INFO 
+2017-12-01 17:09:42,838 server.py[line:206] INFO 
+2017-12-01 17:09:42,878 server.py[line:206] INFO 
+2017-12-01 17:10:21,932 server.py[line:206] INFO 
+2017-12-01 17:10:22,222 server.py[line:206] INFO 
+2017-12-01 17:10:43,098 server.py[line:206] INFO 
+2017-12-01 17:10:43,150 server.py[line:206] INFO 
+2017-12-01 17:10:43,192 server.py[line:206] INFO 
+2017-12-01 17:10:43,295 server.py[line:206] INFO 
+2017-12-01 17:10:43,341 server.py[line:206] INFO 
+2017-12-01 17:10:43,429 server.py[line:206] INFO 
+2017-12-01 17:10:43,472 server.py[line:206] INFO 
+2017-12-01 17:10:43,565 server.py[line:206] INFO 
+2017-12-01 17:11:21,896 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:11:21,898 server.py[line:298] INFO 
+2017-12-01 17:11:22,944 server.py[line:206] INFO 
+2017-12-01 17:11:23,237 server.py[line:206] INFO 
+2017-12-01 17:11:43,013 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:11:43,014 server.py[line:298] INFO 
+2017-12-01 17:11:43,019 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:11:43,019 server.py[line:298] INFO 
+2017-12-01 17:12:22,907 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:12:22,907 server.py[line:298] INFO 
+2017-12-01 17:12:23,938 server.py[line:206] INFO 
+2017-12-01 17:12:24,181 server.py[line:206] INFO 
+2017-12-01 17:12:44,431 server.py[line:206] INFO 
+2017-12-01 17:12:44,531 server.py[line:206] INFO 
+2017-12-01 17:12:44,616 server.py[line:206] INFO 
+2017-12-01 17:12:44,673 server.py[line:206] INFO 
+2017-12-01 17:12:44,763 server.py[line:206] INFO 
+2017-12-01 17:12:44,804 server.py[line:206] INFO 
+2017-12-01 17:12:44,891 server.py[line:206] INFO 
+2017-12-01 17:12:44,931 server.py[line:206] INFO 
+2017-12-01 17:13:23,902 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:13:23,903 server.py[line:298] INFO 
+2017-12-01 17:13:27,992 server.py[line:206] INFO 
+2017-12-01 17:13:28,066 server.py[line:206] INFO 
+2017-12-01 17:13:28,127 server.py[line:206] INFO 
+2017-12-01 17:13:28,177 server.py[line:206] INFO 
+2017-12-01 17:13:28,224 server.py[line:206] INFO 
+2017-12-01 17:13:28,291 server.py[line:206] INFO 
+2017-12-01 17:13:28,337 server.py[line:206] INFO 
+2017-12-01 17:13:28,381 server.py[line:206] INFO 
+2017-12-01 17:13:28,446 server.py[line:206] INFO 
+2017-12-01 17:13:28,729 server.py[line:206] INFO 
+2017-12-01 17:13:28,774 server.py[line:206] INFO 
+2017-12-01 17:13:28,818 server.py[line:206] INFO 
+2017-12-01 17:13:55,098 server.py[line:206] INFO 
+2017-12-01 17:13:55,156 server.py[line:206] INFO 
+2017-12-01 17:13:55,284 server.py[line:206] INFO 
+2017-12-01 17:13:55,327 server.py[line:206] INFO 
+2017-12-01 17:13:55,366 server.py[line:206] INFO 
+2017-12-01 17:13:55,428 server.py[line:206] INFO 
+2017-12-01 17:13:55,469 server.py[line:206] INFO 
+2017-12-01 17:13:55,510 server.py[line:206] INFO 
+2017-12-01 17:13:55,550 server.py[line:206] INFO 
+2017-12-01 17:13:55,590 server.py[line:206] INFO 
+2017-12-01 17:13:55,628 server.py[line:206] INFO 
+2017-12-01 17:13:55,669 server.py[line:206] INFO 
+2017-12-01 17:14:25,970 server.py[line:206] INFO 
+2017-12-01 17:14:26,226 server.py[line:206] INFO 
+2017-12-01 17:14:55,331 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:14:55,331 server.py[line:298] INFO 
+2017-12-01 17:14:55,339 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:14:55,339 server.py[line:298] INFO 
+2017-12-01 17:15:25,936 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:15:25,937 server.py[line:298] INFO 
+2017-12-01 17:15:26,956 server.py[line:206] INFO 
+2017-12-01 17:15:27,378 server.py[line:206] INFO 
+2017-12-01 17:15:55,808 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:15:55,808 server.py[line:298] INFO 
+2017-12-01 17:15:56,804 server.py[line:206] INFO 
+2017-12-01 17:15:56,857 server.py[line:206] INFO 
+2017-12-01 17:15:56,909 server.py[line:206] INFO 
+2017-12-01 17:15:56,951 server.py[line:206] INFO 
+2017-12-01 17:15:56,998 server.py[line:206] INFO 
+2017-12-01 17:15:57,063 server.py[line:206] INFO 
+2017-12-01 17:15:57,108 server.py[line:206] INFO 
+2017-12-01 17:15:57,150 server.py[line:206] INFO 
+2017-12-01 17:15:57,193 server.py[line:206] INFO 
+2017-12-01 17:15:57,235 server.py[line:206] INFO 
+2017-12-01 17:15:57,276 server.py[line:206] INFO 
+2017-12-01 17:15:57,325 server.py[line:206] INFO 
+2017-12-01 17:16:04,409 server.py[line:206] INFO 
+2017-12-01 17:16:04,462 server.py[line:206] INFO 
+2017-12-01 17:16:04,525 server.py[line:206] INFO 
+2017-12-01 17:16:04,570 server.py[line:206] INFO 
+2017-12-01 17:16:04,612 server.py[line:206] INFO 
+2017-12-01 17:16:04,672 server.py[line:206] INFO 
+2017-12-01 17:16:04,718 server.py[line:206] INFO 
+2017-12-01 17:16:04,764 server.py[line:206] INFO 
+2017-12-01 17:16:04,806 server.py[line:206] INFO 
+2017-12-01 17:16:04,853 server.py[line:206] INFO 
+2017-12-01 17:16:04,899 server.py[line:206] INFO 
+2017-12-01 17:16:04,945 server.py[line:206] INFO 
+2017-12-01 17:16:27,846 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:16:27,847 server.py[line:298] INFO 
+2017-12-01 17:17:04,705 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:17:04,705 server.py[line:298] INFO 
+2017-12-01 17:17:04,706 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:17:04,707 server.py[line:298] INFO 
+2017-12-01 17:17:29,038 server.py[line:206] INFO 
+2017-12-01 17:17:29,373 server.py[line:206] INFO 
+2017-12-01 17:18:05,075 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:18:05,076 server.py[line:298] INFO 
+2017-12-01 17:18:06,414 server.py[line:206] INFO 
+2017-12-01 17:18:06,460 server.py[line:206] INFO 
+2017-12-01 17:18:06,512 server.py[line:206] INFO 
+2017-12-01 17:18:06,553 server.py[line:206] INFO 
+2017-12-01 17:18:06,594 server.py[line:206] INFO 
+2017-12-01 17:18:06,656 server.py[line:206] INFO 
+2017-12-01 17:18:06,716 server.py[line:206] INFO 
+2017-12-01 17:18:06,756 server.py[line:206] INFO 
+2017-12-01 17:18:06,814 server.py[line:206] INFO 
+2017-12-01 17:18:06,856 server.py[line:206] INFO 
+2017-12-01 17:18:06,898 server.py[line:206] INFO 
+2017-12-01 17:18:06,938 server.py[line:206] INFO 
+2017-12-01 17:18:29,912 server.py[line:206] INFO 
+2017-12-01 17:18:30,711 server.py[line:206] INFO 
+2017-12-01 17:19:06,378 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:19:06,379 server.py[line:298] INFO 
+2017-12-01 17:19:06,381 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:19:06,381 server.py[line:298] INFO 
+2017-12-01 17:19:07,141 server.py[line:206] INFO 
+2017-12-01 17:19:07,191 server.py[line:206] INFO 
+2017-12-01 17:19:07,236 server.py[line:206] INFO 
+2017-12-01 17:19:07,279 server.py[line:206] INFO 
+2017-12-01 17:19:07,339 server.py[line:206] INFO 
+2017-12-01 17:19:07,384 server.py[line:206] INFO 
+2017-12-01 17:19:07,427 server.py[line:206] INFO 
+2017-12-01 17:19:07,471 server.py[line:206] INFO 
+2017-12-01 17:19:07,515 server.py[line:206] INFO 
+2017-12-01 17:19:07,559 server.py[line:206] INFO 
+2017-12-01 17:19:07,601 server.py[line:206] INFO 
+2017-12-01 17:19:30,877 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:19:30,878 server.py[line:298] INFO 
+2017-12-01 17:19:31,084 server.py[line:206] INFO 
+2017-12-01 17:19:31,681 server.py[line:206] INFO 
+2017-12-01 17:20:07,064 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:20:07,065 server.py[line:298] INFO 
+2017-12-01 17:20:07,771 server.py[line:206] INFO 
+2017-12-01 17:20:31,919 server.py[line:206] INFO 
+2017-12-01 17:20:32,294 server.py[line:206] INFO 
+2017-12-01 17:21:07,736 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:21:07,736 server.py[line:298] INFO 
+2017-12-01 17:21:08,707 server.py[line:206] INFO 
+2017-12-01 17:21:08,754 server.py[line:206] INFO 
+2017-12-01 17:21:08,793 server.py[line:206] INFO 
+2017-12-01 17:21:08,834 server.py[line:206] INFO 
+2017-12-01 17:21:08,888 server.py[line:206] INFO 
+2017-12-01 17:21:08,943 server.py[line:206] INFO 
+2017-12-01 17:21:08,981 server.py[line:206] INFO 
+2017-12-01 17:21:09,024 server.py[line:206] INFO 
+2017-12-01 17:21:09,067 server.py[line:206] INFO 
+2017-12-01 17:21:09,107 server.py[line:206] INFO 
+2017-12-01 17:21:09,145 server.py[line:206] INFO 
+2017-12-01 17:21:31,976 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:21:31,977 server.py[line:298] INFO 
+2017-12-01 17:22:08,619 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:22:08,620 server.py[line:298] INFO 
+2017-12-01 17:22:08,628 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:22:08,628 server.py[line:298] INFO 
+2017-12-01 17:22:09,358 server.py[line:206] INFO 
+2017-12-01 17:22:09,413 server.py[line:206] INFO 
+2017-12-01 17:22:09,459 server.py[line:206] INFO 
+2017-12-01 17:22:09,506 server.py[line:206] INFO 
+2017-12-01 17:22:09,566 server.py[line:206] INFO 
+2017-12-01 17:22:09,615 server.py[line:206] INFO 
+2017-12-01 17:22:09,661 server.py[line:206] INFO 
+2017-12-01 17:22:09,706 server.py[line:206] INFO 
+2017-12-01 17:22:09,753 server.py[line:206] INFO 
+2017-12-01 17:22:09,799 server.py[line:206] INFO 
+2017-12-01 17:22:09,844 server.py[line:206] INFO 
+2017-12-01 17:22:28,617 server.py[line:206] INFO 
+2017-12-01 17:22:39,892 server.py[line:206] INFO 
+2017-12-01 17:23:09,281 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:23:09,281 server.py[line:298] INFO 
+2017-12-01 17:23:10,051 server.py[line:206] INFO 
+2017-12-01 17:23:10,104 server.py[line:206] INFO 
+2017-12-01 17:23:10,150 server.py[line:206] INFO 
+2017-12-01 17:23:10,195 server.py[line:206] INFO 
+2017-12-01 17:23:10,253 server.py[line:206] INFO 
+2017-12-01 17:23:10,300 server.py[line:206] INFO 
+2017-12-01 17:23:10,374 server.py[line:206] INFO 
+2017-12-01 17:23:10,430 server.py[line:206] INFO 
+2017-12-01 17:23:10,477 server.py[line:206] INFO 
+2017-12-01 17:23:10,520 server.py[line:206] INFO 
+2017-12-01 17:23:10,570 server.py[line:206] INFO 
+2017-12-01 17:23:40,351 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:23:40,352 server.py[line:298] INFO 
+2017-12-01 17:24:09,971 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:24:09,971 server.py[line:298] INFO 
+2017-12-01 17:24:09,972 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:24:09,973 server.py[line:298] INFO 
+2017-12-01 17:24:10,723 server.py[line:206] INFO 
+2017-12-01 17:24:36,052 server.py[line:206] INFO 
+2017-12-01 17:24:36,383 server.py[line:206] INFO 
+2017-12-01 17:25:10,688 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:25:10,688 server.py[line:298] INFO 
+2017-12-01 17:25:11,738 server.py[line:206] INFO 
+2017-12-01 17:25:11,785 server.py[line:206] INFO 
+2017-12-01 17:25:11,842 server.py[line:206] INFO 
+2017-12-01 17:25:11,898 server.py[line:206] INFO 
+2017-12-01 17:25:11,945 server.py[line:206] INFO 
+2017-12-01 17:25:12,007 server.py[line:206] INFO 
+2017-12-01 17:25:12,054 server.py[line:206] INFO 
+2017-12-01 17:25:12,101 server.py[line:206] INFO 
+2017-12-01 17:25:12,148 server.py[line:206] INFO 
+2017-12-01 17:25:12,193 server.py[line:206] INFO 
+2017-12-01 17:25:12,238 server.py[line:206] INFO 
+2017-12-01 17:25:12,283 server.py[line:206] INFO 
+2017-12-01 17:25:36,018 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:25:36,019 server.py[line:298] INFO 
+2017-12-01 17:26:11,702 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:26:11,703 server.py[line:298] INFO 
+2017-12-01 17:26:12,443 server.py[line:206] INFO 
+2017-12-01 17:27:12,404 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:27:12,405 server.py[line:298] INFO 
+2017-12-01 17:27:13,102 server.py[line:206] INFO 
+2017-12-01 17:27:13,151 server.py[line:206] INFO 
+2017-12-01 17:27:13,200 server.py[line:206] INFO 
+2017-12-01 17:27:13,240 server.py[line:206] INFO 
+2017-12-01 17:27:13,281 server.py[line:206] INFO 
+2017-12-01 17:27:13,340 server.py[line:206] INFO 
+2017-12-01 17:27:13,382 server.py[line:206] INFO 
+2017-12-01 17:27:13,423 server.py[line:206] INFO 
+2017-12-01 17:27:13,461 server.py[line:206] INFO 
+2017-12-01 17:27:13,500 server.py[line:206] INFO 
+2017-12-01 17:27:13,539 server.py[line:206] INFO 
+2017-12-01 17:27:13,578 server.py[line:206] INFO 
+2017-12-01 17:27:38,969 server.py[line:206] INFO 
+2017-12-01 17:27:39,267 server.py[line:206] INFO 
+2017-12-01 17:28:13,067 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:28:13,068 server.py[line:298] INFO 
+2017-12-01 17:28:13,069 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:28:13,069 server.py[line:298] INFO 
+2017-12-01 17:28:13,793 server.py[line:206] INFO 
+2017-12-01 17:28:13,849 server.py[line:206] INFO 
+2017-12-01 17:28:13,898 server.py[line:206] INFO 
+2017-12-01 17:28:13,950 server.py[line:206] INFO 
+2017-12-01 17:28:14,017 server.py[line:206] INFO 
+2017-12-01 17:28:14,065 server.py[line:206] INFO 
+2017-12-01 17:28:14,114 server.py[line:206] INFO 
+2017-12-01 17:28:14,160 server.py[line:206] INFO 
+2017-12-01 17:28:14,209 server.py[line:206] INFO 
+2017-12-01 17:28:14,257 server.py[line:206] INFO 
+2017-12-01 17:28:14,304 server.py[line:206] INFO 
+2017-12-01 17:28:39,859 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:28:39,862 server.py[line:298] INFO 
+2017-12-01 17:29:13,704 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:29:13,704 server.py[line:298] INFO 
+2017-12-01 17:29:14,495 server.py[line:206] INFO 
+2017-12-01 17:29:41,075 server.py[line:206] INFO 
+2017-12-01 17:29:42,176 server.py[line:206] INFO 
+2017-12-01 17:30:14,460 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:30:14,461 server.py[line:298] INFO 
+2017-12-01 17:30:15,304 server.py[line:206] INFO 
+2017-12-01 17:30:15,354 server.py[line:206] INFO 
+2017-12-01 17:30:15,398 server.py[line:206] INFO 
+2017-12-01 17:30:15,445 server.py[line:206] INFO 
+2017-12-01 17:30:15,499 server.py[line:206] INFO 
+2017-12-01 17:30:15,541 server.py[line:206] INFO 
+2017-12-01 17:30:15,582 server.py[line:206] INFO 
+2017-12-01 17:30:15,621 server.py[line:206] INFO 
+2017-12-01 17:30:15,661 server.py[line:206] INFO 
+2017-12-01 17:30:15,701 server.py[line:206] INFO 
+2017-12-01 17:30:15,742 server.py[line:206] INFO 
+2017-12-01 17:30:42,925 server.py[line:206] INFO 
+2017-12-01 17:30:43,482 server.py[line:206] INFO 
+2017-12-01 17:31:15,896 server.py[line:206] INFO 
+2017-12-01 17:31:19,807 server.py[line:206] INFO 
+2017-12-01 17:31:20,940 server.py[line:206] INFO 
+2017-12-01 17:32:15,861 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:32:15,861 server.py[line:298] INFO 
+2017-12-01 17:32:16,743 server.py[line:206] INFO 
+2017-12-01 17:32:16,791 server.py[line:206] INFO 
+2017-12-01 17:32:16,833 server.py[line:206] INFO 
+2017-12-01 17:32:16,877 server.py[line:206] INFO 
+2017-12-01 17:32:16,941 server.py[line:206] INFO 
+2017-12-01 17:32:16,986 server.py[line:206] INFO 
+2017-12-01 17:32:17,028 server.py[line:206] INFO 
+2017-12-01 17:32:17,071 server.py[line:206] INFO 
+2017-12-01 17:32:17,115 server.py[line:206] INFO 
+2017-12-01 17:32:17,164 server.py[line:206] INFO 
+2017-12-01 17:32:17,224 server.py[line:206] INFO 
+2017-12-01 17:32:20,953 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:32:20,955 server.py[line:298] INFO 
+2017-12-01 17:32:20,957 app.py[line:498] ERROR Exception occured in one of response middleware handlers
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 495, in handle_request
+    response)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 621, in _run_response_middleware
+    _response = await _response
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "main_server.py", line 1181, in save_session
+    await session_interface.save(request, response)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic_session/redis_session_interface.py", line 100, in save
+    await redis_connection.setex(key, self.expiry, val)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 676, in wrapper
+    result = yield from method(protocol_self, _NoTransaction, *a, **kw)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1135, in _query
+    result = yield from self._get_answer(transaction, answer_f, _bypass=_bypass, call=call)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1062, in _get_answer
+    result = yield from answer_f
+  File "/usr/lib/python3.5/asyncio/futures.py", line 361, in __iter__
+    yield self  # This tells Task to wait for completion.
+  File "uvloop/future.pyx", line 434, in uvloop.loop.BaseTask._fast_wakeup (uvloop/loop.c:114015)
+  File "/usr/lib/python3.5/asyncio/futures.py", line 266, in result
+    raise CancelledError
+concurrent.futures._base.CancelledError
+2017-12-01 17:32:20,957 server.py[line:206] INFO 
+2017-12-01 17:33:00,700 server.py[line:206] INFO 
+2017-12-01 17:33:16,624 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:33:16,624 server.py[line:298] INFO 
+2017-12-01 17:34:00,599 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:34:00,599 server.py[line:298] INFO 
+2017-12-01 17:34:01,465 server.py[line:206] INFO 
+2017-12-01 17:34:01,513 server.py[line:206] INFO 
+2017-12-01 17:34:01,567 server.py[line:206] INFO 
+2017-12-01 17:34:01,615 server.py[line:206] INFO 
+2017-12-01 17:34:01,658 server.py[line:206] INFO 
+2017-12-01 17:34:01,718 server.py[line:206] INFO 
+2017-12-01 17:34:01,765 server.py[line:206] INFO 
+2017-12-01 17:34:01,808 server.py[line:206] INFO 
+2017-12-01 17:34:01,852 server.py[line:206] INFO 
+2017-12-01 17:34:01,897 server.py[line:206] INFO 
+2017-12-01 17:34:01,940 server.py[line:206] INFO 
+2017-12-01 17:34:01,983 server.py[line:206] INFO 
+2017-12-01 17:34:37,583 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:34:37,583 server.py[line:298] INFO 
+2017-12-01 17:34:37,586 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:34:37,587 server.py[line:298] INFO 
+2017-12-01 17:34:37,615 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:34:37,615 server.py[line:298] INFO 
+2017-12-01 17:35:02,155 server.py[line:206] INFO 
+2017-12-01 17:36:02,120 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:36:02,121 server.py[line:298] INFO 
+2017-12-01 17:36:02,872 server.py[line:206] INFO 
+2017-12-01 17:37:02,837 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:37:02,838 server.py[line:298] INFO 
+2017-12-01 17:37:03,536 server.py[line:206] INFO 
+2017-12-01 17:37:03,581 server.py[line:206] INFO 
+2017-12-01 17:37:03,629 server.py[line:206] INFO 
+2017-12-01 17:37:03,678 server.py[line:206] INFO 
+2017-12-01 17:37:03,718 server.py[line:206] INFO 
+2017-12-01 17:37:03,781 server.py[line:206] INFO 
+2017-12-01 17:37:03,824 server.py[line:206] INFO 
+2017-12-01 17:37:03,865 server.py[line:206] INFO 
+2017-12-01 17:37:03,906 server.py[line:206] INFO 
+2017-12-01 17:37:04,178 server.py[line:206] INFO 
+2017-12-01 17:37:04,220 server.py[line:206] INFO 
+2017-12-01 17:37:04,259 server.py[line:206] INFO 
+2017-12-01 17:37:39,265 server.py[line:206] INFO 
+2017-12-01 17:37:39,715 server.py[line:206] INFO 
+2017-12-01 17:38:03,501 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:38:03,501 server.py[line:298] INFO 
+2017-12-01 17:38:04,460 server.py[line:206] INFO 
+2017-12-01 17:38:04,512 server.py[line:206] INFO 
+2017-12-01 17:38:04,554 server.py[line:206] INFO 
+2017-12-01 17:38:04,596 server.py[line:206] INFO 
+2017-12-01 17:38:04,654 server.py[line:206] INFO 
+2017-12-01 17:38:04,701 server.py[line:206] INFO 
+2017-12-01 17:38:04,744 server.py[line:206] INFO 
+2017-12-01 17:38:04,787 server.py[line:206] INFO 
+2017-12-01 17:38:04,829 server.py[line:206] INFO 
+2017-12-01 17:38:04,871 server.py[line:206] INFO 
+2017-12-01 17:38:04,914 server.py[line:206] INFO 
+2017-12-01 17:38:39,700 server.py[line:206] INFO 
+2017-12-01 17:38:40,090 server.py[line:206] INFO 
+2017-12-01 17:39:05,075 server.py[line:206] INFO 
+2017-12-01 17:39:40,072 server.py[line:206] INFO 
+2017-12-01 17:39:40,499 server.py[line:206] INFO 
+2017-12-01 17:40:05,038 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:40:05,039 server.py[line:298] INFO 
+2017-12-01 17:40:05,733 server.py[line:206] INFO 
+2017-12-01 17:40:05,780 server.py[line:206] INFO 
+2017-12-01 17:40:05,836 server.py[line:206] INFO 
+2017-12-01 17:40:05,879 server.py[line:206] INFO 
+2017-12-01 17:40:05,921 server.py[line:206] INFO 
+2017-12-01 17:40:05,980 server.py[line:206] INFO 
+2017-12-01 17:40:06,025 server.py[line:206] INFO 
+2017-12-01 17:40:06,080 server.py[line:206] INFO 
+2017-12-01 17:40:06,124 server.py[line:206] INFO 
+2017-12-01 17:40:06,169 server.py[line:206] INFO 
+2017-12-01 17:40:06,211 server.py[line:206] INFO 
+2017-12-01 17:40:06,271 server.py[line:206] INFO 
+2017-12-01 17:40:40,162 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:40:40,162 server.py[line:298] INFO 
+2017-12-01 17:41:05,698 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:41:05,698 server.py[line:298] INFO 
+2017-12-01 17:41:06,454 server.py[line:206] INFO 
+2017-12-01 17:42:06,423 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:42:06,423 server.py[line:298] INFO 
+2017-12-01 17:42:07,155 server.py[line:206] INFO 
+2017-12-01 17:42:07,205 server.py[line:206] INFO 
+2017-12-01 17:42:07,250 server.py[line:206] INFO 
+2017-12-01 17:42:07,294 server.py[line:206] INFO 
+2017-12-01 17:42:07,355 server.py[line:206] INFO 
+2017-12-01 17:42:07,400 server.py[line:206] INFO 
+2017-12-01 17:42:07,444 server.py[line:206] INFO 
+2017-12-01 17:42:07,488 server.py[line:206] INFO 
+2017-12-01 17:42:07,531 server.py[line:206] INFO 
+2017-12-01 17:42:07,573 server.py[line:206] INFO 
+2017-12-01 17:42:07,618 server.py[line:206] INFO 
+2017-12-01 17:43:07,779 server.py[line:206] INFO 
+2017-12-01 17:43:41,743 server.py[line:206] INFO 
+2017-12-01 17:43:42,131 server.py[line:206] INFO 
+2017-12-01 17:44:07,741 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:44:07,741 server.py[line:298] INFO 
+2017-12-01 17:44:08,434 server.py[line:206] INFO 
+2017-12-01 17:44:08,481 server.py[line:206] INFO 
+2017-12-01 17:44:08,534 server.py[line:206] INFO 
+2017-12-01 17:44:08,575 server.py[line:206] INFO 
+2017-12-01 17:44:08,618 server.py[line:206] INFO 
+2017-12-01 17:44:08,678 server.py[line:206] INFO 
+2017-12-01 17:44:08,722 server.py[line:206] INFO 
+2017-12-01 17:44:08,765 server.py[line:206] INFO 
+2017-12-01 17:44:08,806 server.py[line:206] INFO 
+2017-12-01 17:44:08,849 server.py[line:206] INFO 
+2017-12-01 17:44:08,891 server.py[line:206] INFO 
+2017-12-01 17:44:08,939 server.py[line:206] INFO 
+2017-12-01 17:44:42,184 server.py[line:206] INFO 
+2017-12-01 17:44:42,591 server.py[line:206] INFO 
+2017-12-01 17:45:08,395 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:45:08,396 server.py[line:298] INFO 
+2017-12-01 17:45:08,398 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:45:08,399 server.py[line:298] INFO 
+2017-12-01 17:45:09,097 server.py[line:206] INFO 
+2017-12-01 17:45:42,639 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:45:42,641 server.py[line:298] INFO 
+2017-12-01 17:46:09,062 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:46:09,062 server.py[line:298] INFO 
+2017-12-01 17:46:09,757 server.py[line:206] INFO 
+2017-12-01 17:46:09,801 server.py[line:206] INFO 
+2017-12-01 17:46:09,853 server.py[line:206] INFO 
+2017-12-01 17:46:09,894 server.py[line:206] INFO 
+2017-12-01 17:46:09,934 server.py[line:206] INFO 
+2017-12-01 17:46:09,989 server.py[line:206] INFO 
+2017-12-01 17:46:10,033 server.py[line:206] INFO 
+2017-12-01 17:46:10,075 server.py[line:206] INFO 
+2017-12-01 17:46:10,116 server.py[line:206] INFO 
+2017-12-01 17:46:10,158 server.py[line:206] INFO 
+2017-12-01 17:46:10,200 server.py[line:206] INFO 
+2017-12-01 17:46:10,241 server.py[line:206] INFO 
+2017-12-01 17:46:44,110 server.py[line:206] INFO 
+2017-12-01 17:46:44,586 server.py[line:206] INFO 
+2017-12-01 17:47:09,718 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:47:09,719 server.py[line:298] INFO 
+2017-12-01 17:47:09,721 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:47:09,721 server.py[line:298] INFO 
+2017-12-01 17:47:09,723 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:47:09,724 server.py[line:298] INFO 
+2017-12-01 17:47:44,880 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:47:44,881 server.py[line:298] INFO 
+2017-12-01 17:48:10,753 server.py[line:206] INFO 
+2017-12-01 17:48:10,825 server.py[line:206] INFO 
+2017-12-01 17:48:10,879 server.py[line:206] INFO 
+2017-12-01 17:48:10,923 server.py[line:206] INFO 
+2017-12-01 17:48:10,965 server.py[line:206] INFO 
+2017-12-01 17:48:11,027 server.py[line:206] INFO 
+2017-12-01 17:48:11,080 server.py[line:206] INFO 
+2017-12-01 17:48:11,123 server.py[line:206] INFO 
+2017-12-01 17:48:11,181 server.py[line:206] INFO 
+2017-12-01 17:48:11,224 server.py[line:206] INFO 
+2017-12-01 17:48:11,276 server.py[line:206] INFO 
+2017-12-01 17:48:11,318 server.py[line:206] INFO 
+2017-12-01 17:48:46,304 server.py[line:206] INFO 
+2017-12-01 17:48:47,646 server.py[line:206] INFO 
+2017-12-01 17:49:10,717 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:49:10,718 server.py[line:298] INFO 
+2017-12-01 17:49:10,719 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:49:10,720 server.py[line:298] INFO 
+2017-12-01 17:49:10,721 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:49:10,721 server.py[line:298] INFO 
+2017-12-01 17:49:47,164 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:49:47,467 server.py[line:298] INFO 
+2017-12-01 17:50:16,357 server.py[line:206] INFO 
+2017-12-01 17:50:18,348 server.py[line:206] INFO 
+2017-12-01 17:50:18,587 server.py[line:206] INFO 
+2017-12-01 17:50:18,649 server.py[line:206] INFO 
+2017-12-01 17:50:19,050 server.py[line:206] INFO 
+2017-12-01 17:50:21,050 server.py[line:206] INFO 
+2017-12-01 17:50:22,051 server.py[line:206] INFO 
+2017-12-01 17:50:22,754 server.py[line:206] INFO 
+2017-12-01 17:50:24,450 server.py[line:206] INFO 
+2017-12-01 17:50:25,447 server.py[line:206] INFO 
+2017-12-01 17:50:26,852 server.py[line:206] INFO 
+2017-12-01 17:50:54,874 server.py[line:206] INFO 
+2017-12-01 17:50:56,866 server.py[line:206] INFO 
+2017-12-01 17:51:13,604 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:51:13,779 server.py[line:298] INFO 
+2017-12-01 17:51:30,640 server.py[line:206] INFO 
+2017-12-01 17:51:32,142 server.py[line:206] INFO 
+2017-12-01 17:51:32,444 server.py[line:206] INFO 
+2017-12-01 17:51:32,536 server.py[line:206] INFO 
+2017-12-01 17:51:32,847 server.py[line:206] INFO 
+2017-12-01 17:51:33,734 server.py[line:206] INFO 
+2017-12-01 17:51:35,143 server.py[line:206] INFO 
+2017-12-01 17:51:36,138 server.py[line:206] INFO 
+2017-12-01 17:51:37,347 server.py[line:206] INFO 
+2017-12-01 17:51:37,640 server.py[line:206] INFO 
+2017-12-01 17:51:37,735 server.py[line:206] INFO 
+2017-12-01 17:51:56,829 server.py[line:206] INFO 
+2017-12-01 17:51:57,739 server.py[line:206] INFO 
+2017-12-01 17:52:26,987 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:52:26,990 server.py[line:298] INFO 
+2017-12-01 17:52:39,934 server.py[line:206] INFO 
+2017-12-01 17:53:04,442 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:53:04,740 server.py[line:298] INFO 
+2017-12-01 17:53:04,741 app.py[line:498] ERROR Exception occured in one of response middleware handlers
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 495, in handle_request
+    response)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 621, in _run_response_middleware
+    _response = await _response
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "main_server.py", line 1181, in save_session
+    await session_interface.save(request, response)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic_session/redis_session_interface.py", line 100, in save
+    await redis_connection.setex(key, self.expiry, val)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 676, in wrapper
+    result = yield from method(protocol_self, _NoTransaction, *a, **kw)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1135, in _query
+    result = yield from self._get_answer(transaction, answer_f, _bypass=_bypass, call=call)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1062, in _get_answer
+    result = yield from answer_f
+  File "/usr/lib/python3.5/asyncio/futures.py", line 361, in __iter__
+    yield self  # This tells Task to wait for completion.
+  File "uvloop/future.pyx", line 434, in uvloop.loop.BaseTask._fast_wakeup (uvloop/loop.c:114015)
+  File "/usr/lib/python3.5/asyncio/futures.py", line 266, in result
+    raise CancelledError
+concurrent.futures._base.CancelledError
+2017-12-01 17:53:04,742 server.py[line:206] INFO 
+2017-12-01 17:53:13,944 server.py[line:206] INFO 
+2017-12-01 17:53:15,243 server.py[line:206] INFO 
+2017-12-01 17:53:40,016 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:53:40,019 server.py[line:298] INFO 
+2017-12-01 17:54:17,111 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:54:17,407 server.py[line:298] INFO 
+2017-12-01 17:54:18,103 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 453, in handle_request
+    response = await self._run_request_middleware(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 611, in _run_request_middleware
+    response = await response
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "main_server.py", line 1174, in add_session_to_request
+    await session_interface.open(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic_session/redis_session_interface.py", line 61, in open
+    val = await redis_connection.get(self.prefix + sid)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 676, in wrapper
+    result = yield from method(protocol_self, _NoTransaction, *a, **kw)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1135, in _query
+    result = yield from self._get_answer(transaction, answer_f, _bypass=_bypass, call=call)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1062, in _get_answer
+    result = yield from answer_f
+  File "/usr/lib/python3.5/asyncio/futures.py", line 361, in __iter__
+    yield self  # This tells Task to wait for completion.
+  File "uvloop/future.pyx", line 434, in uvloop.loop.BaseTask._fast_wakeup (uvloop/loop.c:114015)
+  File "/usr/lib/python3.5/asyncio/futures.py", line 266, in result
+    raise CancelledError
+concurrent.futures._base.CancelledError
+
+2017-12-01 17:54:18,308 handlers.py[line:120] ERROR Exception occurred while handling uri: "http://39.108.67.178:5000/company/user"
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 453, in handle_request
+    response = await self._run_request_middleware(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 611, in _run_request_middleware
+    response = await response
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "main_server.py", line 1174, in add_session_to_request
+    await session_interface.open(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic_session/redis_session_interface.py", line 61, in open
+    val = await redis_connection.get(self.prefix + sid)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 676, in wrapper
+    result = yield from method(protocol_self, _NoTransaction, *a, **kw)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1135, in _query
+    result = yield from self._get_answer(transaction, answer_f, _bypass=_bypass, call=call)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1062, in _get_answer
+    result = yield from answer_f
+  File "/usr/lib/python3.5/asyncio/futures.py", line 361, in __iter__
+    yield self  # This tells Task to wait for completion.
+  File "uvloop/future.pyx", line 434, in uvloop.loop.BaseTask._fast_wakeup (uvloop/loop.c:114015)
+  File "/usr/lib/python3.5/asyncio/futures.py", line 266, in result
+    raise CancelledError
+concurrent.futures._base.CancelledError
+
+2017-12-01 17:54:18,608 server.py[line:217] ERROR Connection lost before response written @ ('180.173.40.150', 56446)
+2017-12-01 17:54:18,807 server.py[line:206] INFO 
+2017-12-01 17:54:19,404 server.py[line:206] INFO 
+2017-12-01 17:54:21,809 server.py[line:206] INFO 
+2017-12-01 17:54:23,805 server.py[line:206] INFO 
+2017-12-01 17:54:26,504 server.py[line:206] INFO 
+2017-12-01 17:54:30,001 server.py[line:206] INFO 
+2017-12-01 17:54:32,505 server.py[line:206] INFO 
+2017-12-01 17:54:33,206 server.py[line:206] INFO 
+2017-12-01 17:54:35,207 server.py[line:206] INFO 
+2017-12-01 17:54:36,102 server.py[line:206] INFO 
+2017-12-01 17:54:37,909 server.py[line:206] INFO 
+2017-12-01 17:55:10,859 handlers.py[line:104] ERROR NoneType
+
+2017-12-01 17:55:10,862 server.py[line:298] INFO 
+2017-12-01 17:55:39,814 server.py[line:206] INFO 

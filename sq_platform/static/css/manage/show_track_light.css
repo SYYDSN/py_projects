@@ -1,0 +1,6 @@
+#right_bar{
+  width: 8em;
+}
+#main_zone{
+  width:calc(100% - 8em);
+}

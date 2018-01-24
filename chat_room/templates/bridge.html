@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
+    <script src="../static/js/jquery.md5.js"></script>
+    <title></title>
+</head>
+<body>
+<div  id="login_div" style="margin:50px 50px;text-align:center">
+<div >用户：<input id="username" type="text"></div>
+<div  >密码：<input id="password" type="password"></div>
+<div ><input id="submit" type="submit" value="登录"></div>
+</div>
+</body>
+<script>
+    $(function(){
+
+     var host="91dashi.cn";   //上传时修改
+
+
+    //检测用户名和密码的方法
+    function check_login(account,password){
+        $.post("http://"+host+":9000/check_bridge_login",{"teacher_account":account,"password_md5":password},function(data){
+            console.log(data);
+            if(data["message"]=="success"){
+                alert("登录成功");
+                location.href="http://"+host+":9000/teacher";
+            }
+            else{
+                alert(data["message"]);
+            }
+        });
+    }
+
+    $("#submit").click(function(){
+        check_login($.trim($("#username").val()), $.md5($.trim($("#password").val())));
+    });
+
+//end
+    });
+</script>
+</html>

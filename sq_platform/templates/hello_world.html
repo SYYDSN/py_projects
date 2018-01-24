@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>{{ pid }}</h1>
+<form action="/manage/hello" method="post">
+    <input id="csrf_token" name="csrf_token" type="text" value="{{ csrf_token() }}">
+    <input type="submit" value="Click Me">
+</form>
+
+</body>
+</html>

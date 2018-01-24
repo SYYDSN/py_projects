@@ -1,0 +1,41 @@
+2017-10-15 16:55:52,680 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-10-15 16:55:52,681 server.py[line:298] INFO 
+2017-10-15 22:33:59,271 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-10-15 22:33:59,272 server.py[line:298] INFO 
+2017-10-16 03:55:18,576 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-10-16 03:55:18,577 server.py[line:298] INFO 
+2017-10-16 09:14:24,918 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-10-16 09:14:24,919 server.py[line:298] INFO 
+2017-10-16 09:14:53,413 server.py[line:206] INFO 
+2017-10-16 09:15:34,287 server.py[line:206] INFO 
+2017-10-16 09:15:36,108 server.py[line:206] INFO 
+2017-10-16 09:15:54,332 handlers.py[line:104] ERROR NoneType
+
+2017-10-16 09:15:54,332 server.py[line:298] INFO 
+2017-10-16 09:15:59,200 server.py[line:206] INFO 
+2017-10-16 09:15:59,244 server.py[line:206] INFO 
+2017-10-16 09:19:16,312 server.py[line:206] INFO 
+2017-10-16 09:19:16,351 server.py[line:206] INFO 
+2017-10-16 09:19:16,394 server.py[line:206] INFO 
+2017-10-16 09:19:16,436 server.py[line:206] INFO 
+2017-10-16 09:19:16,479 server.py[line:206] INFO 

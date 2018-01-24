@@ -1,0 +1,82 @@
+{% extends "admin_template_employee.html" %}
+{% block extend_js %}
+<script src="../static/js/admin_user_employee.js"></script>
+{% endblock %}
+{% block extend_css %}
+<link rel="stylesheet" href="../static/css/admin_user.css">
+{% endblock %}
+{% block main %}
+<div class="col-lg-12 col-md-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 middle_info">
+            共计：{{ customer_count }} 名客户。
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <table id="user_table" class="table table-hover">
+                <tr>
+                    <th>序号</th>
+                    <th>是否分配</th>
+                    <th>用户名</th>
+                    <th>手机</th>
+                    <th>注册页面</th>
+                    <th>备注</th>
+                    <th>注册日期</th>
+                    <!--<th>操作</th>-->
+                </tr>
+                {% for customer in customer_data %}
+                <tr id="{{ customer.user_sn }}">
+                    <td>{{ loop.index }}</td>
+                    <td data-type="item"  class="allotted">
+
+                            <div class="dropdown">
+                                <button class="btn btn-default btn-xs dropdown-toggle current_text" type="button" id="dropdownMenu1"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    {{ member_dict.get(customer.team_sn) if member_dict.get(customer.team_sn) else member_dict.get(customer.employee_sn) }}
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    {% for k, v in member_dict.items() %}
+                                        <li><a data-customer-val="{{ customer.user_sn }}" data-employee-val="{{ k }}" href="javascript:;" onclick="change_employee_sn($(this))">{{ v }}</a></li>
+                                    {% endfor %}
+                                    <li role="separator" class="divider"></li>
+                                    <li><a data-customer-val="{{ customer.user_sn }}" data-employee-val="0" href="javascript:;" onclick="change_employee_sn($(this))">未分配</a></li>
+                                </ul>
+                            </div>
+
+                    </td>
+                    <td data-type="item"  class="user_name">{{ customer.user_name }}</td>
+                    <td data-type="item"  class="user_phone">{{ customer.user_phone }}</td>
+                    <td data-type="item"  class="page_url">{{ customer.page_url }}</td>
+                    <td data-type="item"  class="customer_description" data-description="{{ customer.customer_description }}"><a  onclick="alert_self($(this))" href="javascript:;">查看</a></td>
+                    <td data-type="item"  class="create_date">{{ customer.create_date }}</td>
+                    <!--
+                    <td>
+                    <div class="btn-group btn-group-xs" role="group">
+                        <div class="btn-group btn btn-default drop_user" role="group"  data-id="{{ customer.user_sn }}" onclick="drop_user($(this))">删除</div>
+                    </div>
+                    </td>
+                    -->
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <!-- 底部分页 -->
+    <div class="row text-center">
+        <nav aria-label>
+            <ul id="page_list" class="pagination">
+                <li class="{{ 'disabled' if index_range[0] == 1 else '' }}"><a  href="/employee/user?index={{ prev_index }}"  aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                {% for index in index_range %}
+                <li class="{{ 'active' if index == current_index else '' }}">
+                    <a href="/employee/user?index={{ index }}">{{ index }}</a>
+                </li>
+                {% endfor %}
+                <li  class="{{ 'disabled' if index_range[-1] == max_index else '' }}"><a  href="/employee/user?index={{ next_index }}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+{% endblock %}

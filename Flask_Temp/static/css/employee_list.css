@@ -1,0 +1,190 @@
+ul,li{
+    list-style: none;
+    padding : 0;
+    margin: 0;
+}
+p{
+    margin:0;
+}
+.content-wrapper{
+    padding: 20px;
+}
+.driver-list{
+    position:relative;
+    background-color: white;
+    width: 100%;
+    height: 812px;
+}
+.driver-list-header{
+    position: relative;
+    color:#999;
+    font-size: 12px;
+}
+.driver-list-header span:first-child{
+    font-size: 16px;
+}
+.driver-list-header span:nth-child(2) i{
+    vertical-align: middle;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #999;
+}
+.header-left{
+   display: inline-block;
+   padding-left:2rem;
+   height: 80px;
+   line-height: 80px;
+}
+.header-left span:nth-child(3) i{
+    color : #fd6262;
+    font-size :16px;
+}
+.header-left span:last-child {
+    float: right;
+    margin-right : 20px;
+}
+.header-left span:last-child:hover{
+  cursor: pointer;
+}
+.header-right{
+    display: inline-block;
+    float: right;
+    height: 80px;
+    position:relative;
+}
+.header-right input{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+}
+.header-right input:first-child{
+    width: 70%;
+	  height: 37px;
+	  background-image: linear-gradient(
+	  	#eaedf2,
+	  	#eaedf2),
+	  linear-gradient(
+	  	#fefefc,
+	  	#fefefc);
+	  background-blend-mode: normal,
+	  	normal;
+	  border-radius: 10px;
+	  border : none;
+	  outline: none;
+	  text-indent: 20px;
+    left:5%;
+}
+.header-right input:last-child{
+    left: 71%;
+    width: 20%;
+	  height: 37px;
+    right:5%;
+	  background-image: linear-gradient(
+	  	#21b3f9,
+	  	#21b3f9),
+	  linear-gradient(
+	  	#f5f5f5,
+	  	#f5f5f5);
+	  background-blend-mode: normal,
+	  	normal;
+	  border-radius: 8px;
+	  border : none;
+	  color: #fff;
+	  outline: none;
+}
+.driver-list-content{
+    position: relative;
+    width: 90%;
+    margin: 0 auto;
+    overflow-y: scroll;
+    background-color : white;
+    height:80%;
+    border: 1px solid #dddddd;
+    border-radius: 0.7rem;
+}
+.driver-list-content .content{
+  position: absolute;
+  left: 1.3rem;
+  top:1.3rem;
+  color: #999;
+  font-size: 16px;
+  display: none;
+}
+.driver-list-content ul{
+    padding: 1.3rem;
+
+}
+.driver-list-content ul li{
+    float: left;
+    position:relative;
+	height: 10.7rem;
+	background-image: linear-gradient(
+		#ffffff,
+		#ffffff),
+	linear-gradient(
+		#ffffff,
+		#ffffff);
+	background-blend-mode: normal,
+		normal;
+	border-radius: 0.7rem;
+	border: solid 0.1rem #dddddd;
+}
+.driver-list-content ul li:hover{
+  cursor: pointer;
+}
+.driver-list-content ul li .image{
+    height: 100%;
+    width : 30%;
+    position: absolute;
+    left: 0;
+}
+.driver-list-content ul li .image img{
+    position : absolute;
+    left:50%;
+    top : 50%;
+    transform: translateY(-50%) translateX(-50%);
+    -webkit-transform: translateY(-50%) translateX(-50%);
+    -moz-transform: translateY(-50%) translateX(-50%);
+    -o-transform: translateY(-50%) translateX(-50%);
+    -ms-transform: translateY(-50%) translateX(-50%);
+    width: 60% ;
+    border-radius: 50% ;
+    vertical-align : middle;
+}
+.driver-list-content ul li .info{
+    position: absolute;
+    width: 70%;
+    top :50%;
+    right:0;
+    transform : translateY(-50%);
+    -webkit-transform : translateY(-50%);
+    -moz-transform : translateY(-50%);
+    -o-transform : translateY(-50%);
+    -ms-transform : translateY(-50%);
+    padding-right : 1.7rem;
+    color: #565656;
+}
+.driver-list-content ul li p{
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}
+.driver-list-content ul li p i{
+    margin-right : 5px;
+}
+.driver-list-content ul li .info p:first-child{
+    margin-bottom : 5px;
+}
+.driver-list-content ul li .info p:first-child span:first-child{
+    color: #21b3f9;
+}
+.driver-list-content ul li .info p:first-child span:last-child{
+    float:right;
+    color: #999999;
+}

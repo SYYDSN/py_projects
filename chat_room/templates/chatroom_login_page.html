@@ -1,0 +1,696 @@
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+		<title>石油直播室</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta content="edge" http-equiv="X-UA-Compatible">
+		<meta name="keywords" content="现货原油直播室,原油直播室,日晖石油直播室   "/>
+		<meta name="description" content="日晖石油直播室同时在线2000人，专业分析师22小时全方位、不间断的实时讲盘、在线指导、风控指导等，让投资者更好的洞察石油投资先机。"/>
+		<meta content="all" name="robots">
+		<link rel="shortcut icon" href="/favicon.ico" />
+        <link type="text/css" href="../static/css/base.css" rel="stylesheet" />
+      <link type="text/css" href="../static/css/liger.css" rel="stylesheet" />
+        <script src="../static/js/jquery-1.11.3.min.js" type="text/javascript"></script>
+      <script src="../static/js/jquery.base64.js"></script>
+      <script src="../static/js/jquery.cookie.js"></script>
+      <script type="text/javascript" src="../static/js/tools.js"></script>
+
+		
+		 <!--幻灯片js/css-->
+		<style>
+				/*********图片切换 css定义***********/
+			.sub_box{width:276px; height:207px; float:left; position: fixed; bottom:100px; z-index:1000; overflow:hidden; border:1px solid #cccccc; background: url("../static/images/mesbg.png") repeat scroll 0 0 transparent; margin:8px auto;}
+			.sub_box img{border:none; width:276px; height:207px;}
+			#bd1lfimg{position:relative; width:276px; height:207px; overflow:hidden;}
+			#bd1lfimg div{width:100000px; margin-left:-4px;}
+			#bd1lfimg dl{width:276px; height:207px; position:relative; overflow:hidden; float:left;}
+			#bd1lfimg dt{width:276px; height:207px; position:absolute; left:0px; top:0px;}
+			#bd1lfimg dd{width:276px; height:80px; background:#000000; filter:alpha(Opacity=70); Opacity:0.7; position:absolute; left:0px; bottom:0px; padding:0 20px;}
+			#bd1lfimg dd h2{height:25px; padding:8px 0 4px 0; line-height:25px; overflow:hidden;}
+			#bd1lfimg dd h2 a{font-size:14px; font-weight:bold; color:#ffffff;}
+			#bd1lfimg dd a{color:#ffffff; text-decoration:none;}
+			#bd1lfimg dd a:hover{text-decoration:none; color:#cccccc;}
+			#bd1lfimg dd tt{color:#dddddd; line-height:1.2em;}
+			#bd1lfimg dd tt a:hover{text-decoration:underline;}
+
+			.sub_nav{width:276px; height:25px; bottom:0px; position:absolute; color:#999999; z-index:200;}
+			.sub_no{height:25px; float:right;}
+			.sub_no li{display:block; width:25px; height:25px; float:left; overflow:hidden; line-height:25px; vertical-align:middle; text-align:center; background:#000000; filter:alpha(Opacity=70); Opacity:0.7; font-family:Arial; font-size:11px; color:#999999; cursor:pointer;}
+			.sub_no li.show{background:#ffffff; color:#000000;}
+			.sub_more{float:right; width:50px; height:25px; background:#000000; filter:alpha(Opacity=70); Opacity:0.7; color:#999999; text-align:center; line-height:25px;}
+			.sub_more a{color:#999999;}
+			.sub_more a:hover{color:#cccccc; text-decoration:none;}
+
+			#enlarge_images{position:absolute;display:none;z-index:200;}
+			/*********图片切换 css定义***********/
+			/* Let's get this party started */
+			::-webkit-scrollbar {
+				width:6px;
+			}		
+			/* Track */
+			::-webkit-scrollbar-track {
+				-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+				-webkit-border-radius: 10px;
+				border-radius: 10px;
+			}			
+			/* Handle */
+			::-webkit-scrollbar-thumb {
+				-webkit-border-radius: 10px;
+				border-radius: 10px;
+				background:rgba(203, 196, 196, 0.58); 
+				-webkit-box-shadow: inset 0 0 6px rgba(81, 79, 79, 0.5); 
+						  
+			}
+			::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(81, 75, 75,0.4); 		  
+			}
+
+			.FloatBox {
+				background-color: #FFF;
+				position: fixed;
+				left: 50%;
+				top: 50%;
+				margin-left:-500px;
+				margin-top:-260px;
+				height: 520px;
+				width: 1000px;
+				display: none;
+				z-index: 9999;
+				-moz-border-radius: 2px;
+				-khtml-border-radius: 2px;
+				-webkit-border-radius: 2px;
+				border-radius: 2px;
+				_position: absolute;
+				_top: expression(eval(document.documentElement.scrollTop+document.documentElement.clientHeight-this.offsetHeight-(parseInt(this.currentStyle.marginTop,10)||0)-(parseInt(this.currentStyle.marginBottom,10)||0)));
+			}
+			#fxts {
+				border: 5px #b11e2a solid;
+			}
+			#fxts h4 {
+				background-color: #b11e2a;
+				color: #FFF;
+				text-align: center;
+				font-size: 15px;
+				height: 30px;
+				line-height: 30px;
+			}
+			.fxtsCon {
+				height: 420px;
+				padding: 10px;
+				text-align: left;
+				line-height: 180%;
+				overflow: scroll;
+				overflow-x: hidden;
+			}
+			#fxts p {
+				text-indent: 2em;
+				margin: 10px 0;
+			}
+		</style>
+
+    <!--幻灯片js/css.\end-->
+   
+	   
+
+
+
+
+<body   style="background:url(../static/images/body_bg.png) !important;background-position:center;background-repeat:no-repeat;
+background-attachment:fixed;">
+
+<!--header-->
+	<div id="sound">
+</div>
+<div class="topnav" style="margin-top:-18px;">
+	<div class="topnav-area">
+		<div class="logined" id="logined">
+			<span class="link-split"><!-- 分隔线 --></span>
+			
+			<div class="select">
+				<a href="/handle/login/Logout.asp?t=/7000" class="selected js_helpitem"><span class="">退出</span></a>
+			</div>
+			
+			<span class="link-split"><!-- 分隔线 --></span>
+			
+			<div class="select">
+				<!--<a href="/Help/" class="selected js_helpitem" target="_blank"><span class="">客服</span><span class="ico"></span></a>-->
+			</div>
+			
+			<div id="CompanyZone" style="display:none">
+				<span class="link-split"><!-- 分隔线 --></span>
+			</div>
+			
+			<span class="link-split"><!-- 分隔线 --></span>
+			
+			<div class="select">
+				<!--<a href="/Account/" class="selected js_helpitem"  target="_blank"><span class="">个人中心</span><span class="ico"></span></a>-->
+			</div>
+			
+			<span class="link-split"><!-- 分隔线 --></span>
+						
+			<div class="walletmsg walletmsg-exist" id="msg_zone" style="display:none">
+				<span class="msglabel">
+					<a href="#none" class="msgnum" id="layer_msg" title="您有5条未读消息">
+						<span class="js-wallet-msg" id="breadcrumb_msgcount" title="您有5条未读消息">5</span>
+						<span class="radius-l"><!-- 圆角 --></span>
+						<span class="radius-r"><!-- 圆角 --></span>
+					</a>
+				</span>
+			</div>
+			
+			<div class="miniaccount" id="userinfo_zone">
+				<span class="userlabel member-dark-bg" target="_blank"  id="layer_userinfo">
+				<!--<a class="userlabel member-dark-bg" target="_blank" href="/Account/" id="layer_userinfo">-->
+					<img width="22" height="22" onerror="this.src='../static/images/DefaultFace.png';this.onerror=null;" src="" class="minihead">
+					<span class="username"><span class="js-breadcrumb-name" id="i_Uname">用户</span></span>
+				</span>
+			</div>
+		</div>
+		<!--./logined-->
+        		
+		<div class="unlogin" id="unlogin" style="display:none;">
+			
+		<div class="select">
+				<a href="register.php?fid=1001" class="selected js_helpitem" style="background-color:#0a0;" target="_blank"><span class="" style="color:#fff">注册</span><span class="ico"></span></a>
+				<script>
+					//$('#loginBt')[0].href = $('#loginBt')[0].href + '?' + location.href;
+					$('#regBt').click(function(){
+						alert("请联系在线客服！");
+					});
+				</script>
+			</div>
+			
+			<div class="select">
+				<a  href="login.php" class="selected js_helpitem" style="background-color:#f00;" target="_blank"><span class="" style="color:#fff">登录</span><span class="ico"></span></a>
+				<script>
+					//$('#loginBt')[0].href = $('#loginBt')[0].href + '?' + location.href;
+					$('#loginBt').click(function(){
+						$("#loginForm").show();
+					});
+				</script>
+			</div>
+			
+		</div>
+              		<!--./unlogin-->
+		<!--
+		<script>
+			if(iInfo.IsLogin)
+			{
+				$('#logined').show();
+				$('#unlogin').hide();
+			}
+			else
+			{
+				$('#logined').hide();
+				$('#unlogin').show();
+			}
+			if(iInfo.UserType==0)
+			{
+				$('#CompanyZone').show();
+			}
+		</script>
+		-->
+		<div id="qqkf" style="margin-right: 15px;">  
+  
+﻿      <div style="margin-right:10px;height:35px;margin-top:10px;" class="select js_help_zone kefu">
+
+<a href="javascript:void(0)" id="qqlinks_more" onclick="$('#TipForm2').show()">更多</a>
+</div>
+  
+  
+  <!--qq链接-->
+<div style="margin-right:10px;height:35px;margin-top:27px;" class="select js_help_zone kefu">
+
+<a href="tencent://message/?Menu=yes&uin=938028062&Service=58&SigT=A7F6FEA02730C988C496891D0BBAEC16277537DA7CDB857CB64941468D24091C778FEFC50FEF0B42E68DA8967ACBCB9F4F5E9DBCB9E60C70D45574FD8C0087B3366038A703FFFA5F44935C1AC2EDB49D591B902B9B11A0345777C7217DB1AD02BFA5DEF1BF85EA7E4AA0C5B4D0BCF3D9792B90BFCEDA029D&SigU=30E5D5233A443AB2A9BE8DB524ACA4E8BD8B6BD02BE85CC704B7DA40E12F3444A42A160C07017C2F4C59037E520158B3D0EC39A91DCF1741155EAA88E62EDDB2CC9D679A3188B37D" target="_blank"><img border="0" title="请加QQ：4006267158" alt="" src="../static/images/chatroom_01_online.gif"></a>
+
+</div>
+    
+ <!--qq链接-->
+<div style="margin-right:10px;height:35px;margin-top:27px;" class="select js_help_zone kefu">
+
+<a href="tencent://message/?Menu=yes&uin=938028062&Service=58&SigT=A7F6FEA02730C988C496891D0BBAEC16277537DA7CDB857CB64941468D24091C778FEFC50FEF0B42E68DA8967ACBCB9F4F5E9DBCB9E60C70D45574FD8C0087B3366038A703FFFA5F44935C1AC2EDB49D591B902B9B11A0345777C7217DB1AD02BFA5DEF1BF85EA7E4AA0C5B4D0BCF3D9792B90BFCEDA029D&SigU=30E5D5233A443AB2A9BE8DB524ACA4E8BD8B6BD02BE85CC704B7DA40E12F3444A42A160C07017C2F4C59037E520158B3D0EC39A91DCF1741155EAA88E62EDDB2CC9D679A3188B37D" target="_blank"><img border="0" title="请加QQ：4006267158" alt="" src="../static/images/chatroom_01_online.gif"></a>
+
+</div>
+    
+ <!--qq链接-->
+<div style="margin-right:10px;height:35px;margin-top:27px;" class="select js_help_zone kefu">
+
+<a href="tencent://message/?Menu=yes&uin=938028062&Service=58&SigT=A7F6FEA02730C988C496891D0BBAEC16277537DA7CDB857CB64941468D24091C778FEFC50FEF0B42E68DA8967ACBCB9F4F5E9DBCB9E60C70D45574FD8C0087B3366038A703FFFA5F44935C1AC2EDB49D591B902B9B11A0345777C7217DB1AD02BFA5DEF1BF85EA7E4AA0C5B4D0BCF3D9792B90BFCEDA029D&SigU=30E5D5233A443AB2A9BE8DB524ACA4E8BD8B6BD02BE85CC704B7DA40E12F3444A42A160C07017C2F4C59037E520158B3D0EC39A91DCF1741155EAA88E62EDDB2CC9D679A3188B37D" target="_blank"><img border="0" title="请加QQ：4006267158" alt="" src="../static/images/chatroom_01_online.gif"></a>
+
+</div>
+    
+ <!--qq链接-->
+<div style="margin-right:10px;height:35px;margin-top:27px;" class="select js_help_zone kefu">
+
+<a href="tencent://message/?Menu=yes&uin=938028062&Service=58&SigT=A7F6FEA02730C988C496891D0BBAEC16277537DA7CDB857CB64941468D24091C778FEFC50FEF0B42E68DA8967ACBCB9F4F5E9DBCB9E60C70D45574FD8C0087B3366038A703FFFA5F44935C1AC2EDB49D591B902B9B11A0345777C7217DB1AD02BFA5DEF1BF85EA7E4AA0C5B4D0BCF3D9792B90BFCEDA029D&SigU=30E5D5233A443AB2A9BE8DB524ACA4E8BD8B6BD02BE85CC704B7DA40E12F3444A42A160C07017C2F4C59037E520158B3D0EC39A91DCF1741155EAA88E62EDDB2CC9D679A3188B37D" target="_blank"><img border="0" title="请加QQ：4006267158" alt="" src="../static/images/chatroom_01_online.gif"></a>
+
+</div>
+    
+   
+  
+</div>
+<div style="margin-right:10px;height:35px;margin-top:11px;" class="select js_help_zone  kefu"><span id="kflabel" style="font-size:14px;color:#ccc;font-weight:bold;">免费点击咨询:</span></div>
+
+		<div style="margin-right:10px;height:45px" class="select js_help_zone  kefu">
+		<a id="RoomPicA" style="padding: 5px; font-size: 14px; color: rgb(252, 252, 252); font-weight: bold; background-color: rgb(69, 63, 63);display: block;margin-top: 6px;" href="durl.php" >保存桌面</a>
+		</div>
+	</div>
+</div>
+
+<!--.header-->
+  	
+		<div class="loginForm" id="loginForm" style="display:none;">
+					
+				<form class="user_login" action="action.php?type=updateuser&mid=1" method="post" id="cardform" name="cardform">
+		<img src="../static/images/close.gif" style="width: 20px;height: 20px; float:right; cursor:pointer;" id="formclose">
+		<script>
+					//$('#loginBt')[0].href = $('#loginBt')[0].href + '?' + location.href;
+					$('#formclose').click(function(){
+						$("#loginForm").hide();
+					});
+				</script>
+						
+				</form>
+				<p style='margin: 0px 20px;'><font color='red'>推广有礼：</font> http://live.touzb.com/?_=</p>
+					</div>
+                    
+                    <style>
+		.header{display:none}
+		.topnav-area{width:98%;}
+		#qtip-growl-container{
+			position: fixed;
+			z-index:9999;
+			left:50%;
+			margin-left:-250px;
+		}
+		#qtip-growl-container .qtip{
+			position: static;
+			min-height: 0;
+			overflow: hidden;
+			margin: 0 0 5px 0;
+		}
+		</style>
+
+<style type="text/css">
+        body
+        {
+            background-color: transparent;
+            font-family: 'Microsoft YaHei';
+            overflow: hidden;
+        }
+
+        *
+        {
+            font-family: 'Microsoft YaHei';
+        }
+        ul
+        {
+            list-style-type:none; margin:0; padding:0;
+        }
+        .log-container
+        {	
+			position:relative;
+        }
+
+            .log-container .inbox
+            {
+                border: 1px solid #cecece;
+                border-radius: 2px;
+                font-size: 18px;
+                  width: 236px;
+				  height: 40px;
+            }
+
+        .inbox-title i, .qq, .sina-weibo
+        {
+            background-image: url(../static/images/icon3.png);
+            display: block;
+            width: 23px;
+            height: 23px;
+        }
+
+        .inbox-title i
+        {
+            position: absolute;
+        }
+
+        .inbox-title
+        {
+            padding: 15px 0 3px;
+            font-size: 16px;
+            position: relative;
+            width: 100%;
+            height: 25px;
+            overflow: hidden;
+        }
+
+            .inbox-title .icon-name
+            {
+                background-position: -132px -94px;
+            }
+
+            .inbox-title .icon-pwd
+            {
+                background-position: -172px -94px;
+            }
+
+            .inbox-title span
+            {
+                display: block;
+                width: 100px;
+                position: absolute;
+                left: 29px;
+                padding: 0px 0 0;
+                font-size: 16px;
+                color: #8d8d8d;
+            }
+
+        .inbox-wrap
+        {
+            position: relative;
+			margin-top: 28px;
+			margin-bottom: 10px;
+        }
+
+            .inbox-wrap label
+            {
+                width: 160px;
+                height: 25px;
+                display: block;
+                position: absolute;
+                font-size: 16px;
+                color: #9c9c9d;
+                top: 9px;
+                left: 8px;
+            }
+
+        .log-container section
+        {
+
+            float: left;
+        }
+
+        #loginform
+        {
+            width: 352px;
+			height:216px;
+            float: left;
+            overflow: hidden;
+			  padding-left: 75px;
+        }
+
+        .forget-pwd a
+        {
+            color: #4c81b3;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .login-button-wrap
+        {
+            width: 145px;
+			float: right;
+            margin: 20px 0 0;
+        }
+        .submit-wrap
+        {
+            display:block; float:left; width:100px; margin:0 8px 0 0;
+        }
+
+        .reg-wrap
+        {
+            width: 260px;
+            float: left;
+            padding: 32px 0 0;
+            color: #6c6c6c;
+        }
+
+            .reg-wrap a
+            {
+                color: #4c81b3;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 14px;
+            }
+
+        .social
+        {
+            width: 137px;
+            overflow: hidden;
+        }
+
+            .social h4
+            {
+                color: #717171;
+                margin: 16px 0 0 30px;
+            }
+
+        .social-accounts
+        {
+			position:absolute;
+			top:30px;
+			right:60px;
+        }
+
+            .social-accounts a
+            {
+                display: block;
+                width: 137px;
+                height: 35px;
+            }
+
+        .qq
+        {
+            background-position: -186px -138px;
+        }
+
+        .sina-weibo
+        {
+            background-position: -186px -185px;
+        }
+
+        .log-setting
+        {
+            margin: 25px 0 0;
+            color: #6c6c6c;
+        }
+
+        .button-red
+        {
+            background:url(../static/images/chatroom_btn_2.jpg) no-repeat;
+			width:156px !important;
+			height:42px !important;
+			border:0 !important;
+        }
+
+		.sub-wrap {
+			position:absolute;
+			width:150px;
+			height:34px;
+			  left: 328px;
+			bottom: 97px;
+		}
+        .button-y {
+            float:left;
+            color: #000 !important;
+            border-color: #C2C2C2 !important;
+            border-style: solid;
+            border-width: 1px;            
+            text-align: center;
+            background: #E0E0E0 !important;
+            background: -moz-linear-gradient(top, #c60f0e 0%, #990f0b 100%);
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c60f0e), color-stop(100%,#990f0b));
+            background: -webkit-linear-gradient(top, #c60f0e 0%,#990f0b 100%);
+            background: -o-linear-gradient(top, #c60f0e 0%,#990f0b 100%);
+            background: -ms-linear-gradient(top, #c60f0e 0%,#990f0b 100%);
+            background: linear-gradient(to bottom, #c60f0e 0%,#990f0b 100%);
+            /*-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            -o-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);*/
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 3px;
+            outline: none;
+            width: 100px !important;
+            height: 37px;
+            line-height:37px;
+            font-size: 16px !important;
+            letter-spacing: 1px;
+            display:block;text-decoration:none;margin-left:5px;
+
+}
+        .button-y-hover{
+            background: #F0F0F0 !important;
+             }
+
+        .button-red-hover {
+            
+        }
+        .login-button-wrap a {
+            color:#fff;
+        }
+        .timeout-wrap
+        {
+            width: 160px;
+            text-align: center;
+            margin: 6px auto;
+            top: 6px;
+            left: 120px;
+            display: none;
+        }
+        .browser-wrap
+        {
+            width: 100%;
+            overflow: hidden;
+            height: 100px;
+            margin: 15px 0 0 16px; display:none;
+        }
+            .browser-wrap .info
+            {
+                font-size:14px; color:#0c99f6; padding:5px 0 13px 13px; width:100%; overflow:hidden;
+            }
+            .browser-wrap .browser-name
+            {
+                padding:3px 0 0;
+            }
+            .browser-wrap li
+            {
+                float: left;
+                width: 40px;
+                margin: 0 12px;  
+            }
+
+            .browser-wrap a
+            {
+                text-decoration: none;
+                color: #484848;
+                text-align: center;  padding:0;
+            }
+            .browser-wrap a:hover
+            {
+                color: #f00;
+            }
+            .browser-wrap .browser-icon
+            {
+                width: 40px;
+                height: 42px;
+                background-image: url(http://img3.jiaoyi18.com/browser/browser_01.png);
+                background-repeat: no-repeat;
+            }
+
+        .ie8
+        {
+            background-position: -34px -9px;
+        }
+
+        .ie9
+        {
+            background-position: -121px -9px;
+        }
+
+        .chrome
+        {
+            background-position: -122px -9px;
+        }
+
+        .firefox
+        {
+            background-position: -179px -9px;
+        }
+
+        .s360
+        {
+            background-position: -238px -7px;
+        }
+
+        .sougou
+        {
+            background-position: -297px -9px;
+        }
+
+        .liebao
+        {
+            background-position: -355px -9px;
+        }
+</style>
+
+<div class="l-dialog l-dialog-win" id="l-logon" style="top: 50%; left: 50%; margin-left:-400px; margin-top:-300px; display: block; z-index: 9200;" ligeruiid="l-logon"> 
+         <div style="background:url('../static/images/chatroom_login_bg.png') no-repeat;width: 800px;height: 600px;">
+				  <div  style="width:550px;height:300px;position:absolute;bottom: 0px;right: 30px;">
+						<div class="log-container">
+							<div id="timeout-wrap" class="timeout-wrap l-verify-tip-content">您登录超时，请重新登录！</div>
+							<div id="loginform">
+								<form id="registerform">
+									<div class="inbox-wrap">
+										<span>
+											<input type="text" name="username" id="username" class="inbox" maxlength="18" />
+										</span>
+									</div>
+									<div>
+										<span>
+											<input type="password" name="password" id="password" class="inbox" maxlength="18" /></span>
+									</div>
+									<div class="log-setting" style="display:none;">
+										<input type="checkbox" id="remember" name="remember" value="1" />
+										<label for="remember">记住我</label>
+										&nbsp;&nbsp;
+									<input type="checkbox" id="autolog" name="autolog" value="2" style="display: none;" />
+										<label for="autolog" style="display: none;">下次自动登录</label><br />
+									</div>
+									
+									<div class="sub-wrap">
+										<input type="button" id="submit_button"  class="button-red" value="" />
+									</div>
+									<input type="hidden" id="sid" name="sid" />
+								</form>
+							</div>
+						<div class="social" >
+						   <div class="social-accounts" style="display:none;">
+								<a href="register.php"  target="_blank" style="background:url(../static/images/login/btn_1.jpg) no-repeat;width:156px; height:42px; "></a>
+						   </div>
+					   </div>
+						</div>
+						<div style="clear:both"></div>
+						<div style="position:absolute;width:100%;height:40px;text-align:center;color:#ffffff;font-size:15px;bottom: 90px;  right: 16px;">
+								石油精准投资从直播体验开始，注册即享金牌分析师在线指导服务。
+								<br/>关于直播室帐号注册，可以咨询客服QQ或联系您的专属投资顾问
+						</div>
+				  </div>
+				  <iframe id="tmp_downloadhelper_iframe" style="display: none;"></iframe>
+         </div>
+</div> 
+<div class="l-window-mask" style="display: block; "></div>
+</body>
+<script>
+$(function(){
+
+//提交按钮事件
+$("#submit_button").click(function(){
+	var username=$.trim($("#username").val());
+	var password=$.trim($("#password").val());
+	if(username=='' || password==''){
+		alert("用户名或密码不能为空");
+	}
+	else{
+		var a_data={"user_name":username,"user_password":password}
+		$.post("/user_login",a_data,function(data){
+			if(data["message"]=="success"){
+                var the_url="/";
+                console.log(the_url);
+                alert("登录成功")
+                location.href=the_url;
+            }else{
+                alert(data["message"]);
+            }
+		});
+	}
+});
+//输入框的回车事件
+bind_enter_event($("#username"),$("#password"),false);
+bind_enter_event($("#password"),$("#submit_button"),true);
+//end!
+});
+</script>
+</html>

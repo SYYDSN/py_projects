@@ -1,0 +1,37 @@
+{% extends "manage/base_template.html" %}
+{% block extend_css %}
+    <link rel="stylesheet" href="../static/css/employee_list.css">
+{% endblock %}
+
+{% block extend_script %}
+    <script src="../static/js/manage/employee_list.js"></script>
+{% endblock %}
+
+{% block content_wrapper %}
+<div class="content-wrapper" style="height:100%;margin-top: 50px">
+    <div class="container">
+        <div class="row">
+            <div class="driver-list">
+                <div class="driver-list-header">
+                    <div class="header-left hidden-xs col-sm-6">
+                        <span>司机列表</span>
+                        <span>司机列表 <i></i></span>
+                        <span>共 <i class="num"></i> 位司机</span>
+                        <span class="all">全部</span>
+                    </div>
+                    <div class="header-right col-xs-12 col-sm-6">
+                        <input  id="inp" type="text" placeholder="精确搜索">
+                        <input  id="btn" type="submit" value="立即搜索">
+                    </div>
+                </div>
+                <div class="driver-list-content">
+                    <ul>
+
+                    </ul>
+                    <div class="content">未找到对应的用户</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

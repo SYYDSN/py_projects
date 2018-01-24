@@ -1,0 +1,24 @@
+﻿var int = setInterval(function(){
+          var img_list=$("img[alt^='重要']");
+          var info_list=[];
+          img_list.each(function(){
+            var $this=$(this);
+            var temp_time = $this.parent().parent().next().text();
+            var temp_str=$this.parent().parent().next().next().text();
+            if(temp_str.indexOf("金十")!=-1 && temp_str.indexOf("金十报道")==-1){
+              //nothing...
+              //console.log(temp_str)
+            }
+            else if($this.attr("alt")=="重要数据"){
+                var tds = $this.parent().parent().next().next().find("table").find("td:gt(1)");
+                var temp_str = '';
+                temp_str = $.trim(tds.eq(0).text().replace(/\s/g, "")) + $.trim(tds.eq(4).text().replace(/\s/g, "")) +
+                          " "+$.trim(tds.eq(2).text().replace(/\s/g, "")) +" "+ $.trim(tds.eq(3).text().replace(/\s/g, ""));
+                info_list.push({"time":temp_time,"message":temp_str});
+            }
+            else{
+                info_list.push({"time":temp_time,"message":temp_str})
+            }
+          });
+           $.post("http://127.0.0.1:9009/jin10_index",{"info_list":JSON.stringify(info_list)},function(data){});
+      },5000);

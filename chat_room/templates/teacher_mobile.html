@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="renderer" content="webkit" />
+<meta name="description"  content="不超过150个字符" />
+<meta name="keywords"  content="" />
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />    
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="format-detection" content="telephone=yes"/>
+<meta name="msapplication-tap-highlight" content="no" />
+<meta http-equiv="Cache-Control" content="no-transform " />
+<title></title>
+<link type="text/css" rel="stylesheet" href="../static/css/teacher_mobile_style.css" />
+<script src="../static/js/jquery-1.11.3.min.js"></script>
+<script src="../static/js/teacher_style.js"></script>
+<script src="../static/js/jquery.mousewheel.min.js"></script>
+<script src="../static/js/reconnecting-websocket.min.js"></script>
+<script src="../static/js/jquery.cookie.js"></script>
+<style>
+    .my_hide{
+        display: None;
+    }
+    .online{
+        color:mediumvioletred;
+    }
+</style>
+</head>
+
+<body>
+
+<!---用户信息---->
+<div class="topuser"><span id="video_manage">视频管理</span><span id="login_out">注销</span><span id="teacher_account">{{ teacher_account }}</span><span style="display: none" id="teacher_id">{{ teacher_id }}</span></div>
+
+<!--大师排行榜  开始-->
+<div class="ranklist">
+    <div class="ranklist_bt">
+        <ul>
+            <li>名称</li><li class="kh">客户</li><li class="cp">产&nbsp;&nbsp;品</li><li>操&nbsp;&nbsp;作</li>
+        </ul>
+    </div>
+    <div class="ranklist_nr" id="ranklist_nr">
+        <ul>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p></p><p></p></div>
+                <div class="liwt kh"></div>
+                <div class="liwt cp">
+
+                </div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="1">建仓</a></div>
+                <!--信息标记-->
+                <div class="info_marker" data-No="1">
+                    <div class="info_marker_icon">
+                        <img src="images/tan.png"/>
+                        <div class="info_marker_cont">
+                            <p class="year">2016年1月12日</p>
+                            <p class="time">18:00</p>
+                            <p>止赢：200.35</p>
+                            <p>止损：200.14</p>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>苍鹰嘉措</p><p>80.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp"></div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="2">建仓</a></div>
+                <!--信息标记-->
+                <div class="info_marker" data-No="2">
+                    <div class="info_marker_icon">
+                        <img src="images/tan.png"/>
+                        <div class="info_marker_cont">
+                            <p class="year">2016年1月12日</p>
+                            <p class="time">18:00</p>
+                            <p>止赢：200.35</p>
+                            <p>止损：200.14</p>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>丁大师</p><p>250.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp"></div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="3">建仓</a></div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>苍鹰嘉措</p><p>80.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp"></div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="4">建仓</a></div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>丁大师</p><p>250.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp"></div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="5">建仓</a></div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>丁大师</p><p>250.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp">
+
+                </div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="6">建仓</a></div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>苍鹰嘉措</p><p>80.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp"></div>
+                <div class="liwt niu"><a href="#"  class="jiancang" data-No="7">建仓</a></div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>丁大师</p><p>250.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp"></div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="8">建仓</a></div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>苍鹰嘉措</p><p>80.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp"></div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="9">建仓</a></div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>丁大师</p><p>250.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp"></div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="10">建仓</a></div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>丁大师</p><p>250.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp">
+
+                </div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="11">建仓</a></div>
+            </li>
+            <li>
+                <div class="teacher_id my_hide"></div>
+                <div class="product_id my_hide"></div>
+                <div class="call_id my_hide"></div>
+                <div class="liwt name"><p>丁大师</p><p>250.22%</p></div>
+                <div class="liwt kh">65/114</div>
+                <div class="liwt cp">
+
+                </div>
+                <div class="liwt niu"><a href="#" class="jiancang" data-No="12">建仓</a></div>
+            </li>
+
+        </ul>
+    </div>
+</div><!--大师排行榜  结束-->
+
+<!--弹窗-->
+<div class="popcont">
+
+    <!--点击建仓按钮弹窗-->
+    <div class="popcont_cont bulidcang">
+        <div class="close"><img src="../static/images/close.png"/></div>
+        <div class="popselect">
+            <div class="jypinzhong">
+                <div class="select_bt">交易品种：</div>
+                <div  class="select_nr">
+                    <select class="select_style" id="product_select" >
+                        <option selected="selected">现货原油</option>
+                        <option>现货白银</option>
+                        <option>现货铜</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="jyzhiling">
+                <div class="select_bt">交易指令：</div>
+                <div   class="select_nr">
+                    <select id="process_type" class="select_style">
+                        <option selected="selected" name="buy">买入</option>
+                        <option name="sell">卖出</option>
+                        <option name="guadan" id="guaduo">挂多</option>
+                        <option name="guadan" id="guakong">挂空</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="nowvalue">
+                <div class="select_bt">商品现价：</div>
+                <div class="select_nr">
+                    <div  id="jiage" class="jiage">198.42</div>
+                    <div class="shurukuang"><input  id="ahead_price" type="text" class="xuanze"></div>
+                </div>
+            </div>
+
+            <div class="zy">
+                <div class="select_bt">止赢价格：</div>
+                <div class="select_nr">
+                   <input  id="stop_win" type="text" class="xuanze">
+                </div>
+            </div>
+
+            <div class="zs">
+                <div class="select_bt">止损价格：</div>
+                <div class="select_nr jianju">
+                    <input id="stop_lost" type="text" class="xuanze">
+                </div>
+            </div>
+
+            <input type="submit" id="submit_call" value="确定" class="true determine" /><span id="prev_button_text" class="my_hide"></span><span id="td_info" class="my_hide"></span>
+
+        </div>
+    </div>
+
+    <!--是否确定平仓？-->
+    <div class="popcont_cont ifping">
+        <div class="close"><img src="images/close.png"/></div>
+        <div  id="ping_pop" class="popselect">
+            <p>是否确定把<span class="yonghu">丁大师</span>平仓？</p>
+            <p>这波行情获利<span class="red">397</span>点<span class="red">32%</span></p>
+        </div>
+        <input  id="submit_ping" type="submit" value="确定平仓" class="true qdping"/>
+    </div>
+
+    <!--是否确定取消用户挂单？-->
+    <div class="popcont_cont ifguadan">
+        <div class="close"><img src="images/close.png"/></div>
+        <div class="popselect">
+            <p>是否确定把<span class="yonghu">丁大师</span>取消挂单？</p>
+        </div>
+        <input type="submit" value="取消挂单" class="true qdquxiao"/>
+    </div>
+
+</div>
+
+
+<script>
+$(document).ready(function(){
+    //测试账户，
+    //sessionStorage.setItem("teacher_account","080010");
+    // sessionStorage.setItem("teacher_id",30);
+    //测试账户完毕
+    var teacher_account=$("#teacher_account").text();  //当前登录用户名
+    var teacher_id_login=$("#teacher_id").text();  //当前登录用户id
+
+    var ranking=[];  //排行榜数据
+    //var teacher_account=$("#teacher_account").text(); //当前登录用户名
+    var teacher_account="080002";
+    var teacher_ids=[];  //当前登录的老师所拥有的所有可操作账户的id的数组
+    var product_list=[]; //当前所有可操作产品的id和名称的字典组成的数组{"p_id":x[0],"p_name":x[1]}
+    var product_price_list_global={};  //定义一个价格字典，由ws实时赋值。
+    var host="91dashi.cn";   //上传时修改
+        if(location.hostname.indexOf(".")==-1){
+            host="127.0.0.1";
+        }
+        else if(isNaN(location.hostname.split(".")[0])){
+            host="91dashi.cn"
+        }
+        else{}
+    var ws_id="";
+    var add_call_url="http://91dashi.cn:9000/single_call_ahead/add"; //增加挂单的url
+
+    //注销按钮事件。
+    $("#login_out").hover(function(){$(this).css("cursor","pointer");},function(){});
+    $("#login_out").click(function(){
+        var r=confirm("你确实想注销当前用户吗?");
+        if(r){
+            $.removeCookie("teacher_account");
+            $.removeCookie("password_md5");
+            location.href="/bridge_m";
+        }else{}
+    });
+
+    //这是一个页面载入时，加载老师排行榜数据的函数，此函数在页面载入时，每次提交和编辑动作时被反复调用。
+    function load_teacher_ranking(){
+        $.post("http://"+host+":7000/teacher_ranking?uid="+Math.random(),{"teacher_account":teacher_account},function(data){
+            var mydata=JSON.parse(data);
+            ranking=mydata["ranking"]; // 这是排行榜数据
+            //排行榜是一个包含数组的数组，其中每一个元素都是一个包含字典的数组。具体的列顺序如下：
+            //【0"排位", 1"老师ID", 2"老师名称", 3"总收益率", 4"总胜率", 5"客户", 6"喊/挂单"{"id":喊单/挂单号,"teacher_id":老师id,"product_id":产品id,"product_name":产品名称,"direction":方向,"incoming_price":建仓/进场价,"stop_win":止赢,"stop_lost":止损}, 7"持仓"】
+            //如果此用户没有喊/挂单信息，那么第6个元素就是一个空字符。
+            ranking.shift();//删除后台发送来的数据的标题
+            //console.log(ranking);
+            teacher_ids=mydata["teacher_ids"]; //当前登录的老师所拥有的所有可操作账户的id的数组
+            product_list=mydata["product_list"];  //可操作产品列表{"p_id":x[0],"p_name":x[1]}
+            var ranking_divs=$("#ranklist_nr>ul>li"); //老师排行榜的jq对象
+            //给产品选择元素赋值。
+            $("#product_select").empty();
+            for(var i=0;i<product_list.length;i++){
+                var str='';
+                if(product_list[i]["p_name"].indexOf("油")!=-1){
+                    str +="<option value='"+product_list[i]['p_id']+"'selected='selected'>"+product_list[i]['p_name']+"</option>";
+                }
+                else{
+                    str ="<option value='"+product_list[i]['p_id']+"'>"+product_list[i]['p_name']+"</option>";
+                }
+                $("#product_select").append(str);
+            }
+            //给排行榜jq对象赋值
+            $.each(ranking_divs,function(i,n){
+                var temp_obj=ranking[i];
+                var $div=$(n);
+                $div.find(".teacher_id").text(temp_obj[1]);
+                $div.find(".name p:first").text(temp_obj[2]);
+                $div.find(".name p:last").text(temp_obj[3] + "%");
+                $div.find(".liwt").eq(1).text(temp_obj[5]);
+                //$div.find(".liwt").eq(2).text(temp_obj[5]);
+                //检测并决定是否隐藏操作按钮。
+                var current_teacher_id=$div.find(".teacher_id").text();
+                if(inArray(current_teacher_id,teacher_ids) || current_teacher_id==41){
+                    $div.find(".liwt>.jiancang").show();
+                }
+                else{
+                    $div.find(".liwt>.jiancang").hide();
+                }
+                //检测并操作喊单信息
+                if(temp_obj[6]==""){
+                    //没有喊单时
+                    $div.find(".product_id").text('');
+                    $div.find(".call_id").text('');
+                    $div.find(".cp").html('');
+                    $div.find(".liwt>.jiancang").text("建仓");
+                }
+                else{
+                    $div.find(".product_id").text(temp_obj[6]["product_id"]);
+                    $div.find(".call_id").text(temp_obj[6]["id"]);
+                    $div.find(".liwt>.jiancang").text(temp_obj[6]['direction'].indexOf('挂')==-1?'平仓':'编辑');
+                    var html_str="<div class='cpdate'><span>"+temp_obj[6]['product_name']+"</span><span class='gd'>"+temp_obj[6]['direction']+"</span><p>"+(temp_obj[6]['direction'].indexOf('挂')==-1?'建仓':'进场')+"价："+temp_obj[6]['incoming_price']+"</p></div>";
+                    //console.log(html_str);
+                    $div.find(".cp").html('').html(html_str);
+                }
+            });
+
+
+        });
+    }
+    load_teacher_ranking();
+    //创建一个ws客户端用于实时获取产品报价
+    var ws_client_price=new ReconnectingWebSocket("ws://"+host+":9000/ws");
+    ws_client_price.onopen = function (evt) {
+    };
+    ws_client_price.onmessage = function (evt) {
+        //console.log(evt.type);
+
+        var obj = JSON.parse(evt.data);
+        //console.log(obj);
+        if (obj["ws_id"] != undefined) {
+            ws_id= obj["ws_id"];   //全局变量
+            console.log("ws_id is " + ws_id);
+            ws_client_price.send(JSON.stringify({"type":"start_hangqing_row","ws_id":ws_id}));
+        }
+        else
+        {
+            var data=JSON.parse(evt.data);
+            var product_price_list=data["data"];
+            //console.log(product_price_list);
+            product_price_list.shift();//弹出标题栏
+            //检查选择了哪个交易产品？
+            var product_name= $("#product_select>option:selected").text();
+            for(var i=0;i<product_price_list.length;i++){
+                //给全局价格字典赋值
+                product_price_list_global[product_price_list[i][0]]=product_price_list[i][1];
+                if(product_price_list[i][0]==product_name){
+                    var temp_price=product_price_list[i][1];
+                    $("#jiage").text(temp_price);//给产品报价动态赋值。
+                }else{}
+            }
+
+        }
+    };
+    ws_client_price.onerror = function (evt) {console.log("ws客户端连接出错");};
+    //ws_client定义结束
+    //定义一个给进场价格赋值的函数，此函数将由选择产品和交易类型的select元素共同调用。
+    function set_price_ahead(){
+        var type=$("#process_type>option:selected").text();
+        var p_name=$("#product_select>option:selected").text();
+        console.log(product_price_list_global)
+        if(type.indexOf("挂")!=-1){
+            $("#ahead_price").val(product_price_list_global[p_name]);
+        }else{}
+    }
+    $("#process_type,#product_select").each(function(){
+        $(this).change(function(){set_price_ahead();});
+    });
+    //如果弹出的窗口是挂单的修改页面，那么按下del键会提示是否取消挂单
+    var del_key=false;  //定义一个变量，用来标识是否可删除挂单
+    $("#submit_call").parent().parent().hover(function(){
+        del_key=true;
+    },function(){del_key=false;});
+    $("body").keydown(function(evt){
+        if(evt.keyCode==46 && del_key){
+            //keyCode==46 代表按下了delete键
+            if($("#process_type").text().indexOf("挂")!=-1 && $("#prev_button_text").text()=="编辑"){
+                var current_ahead_price= $.trim($("#ahead_price").val());
+                var current_prduct_name=$("#product_select>option:selected").text();
+                var call_id=$("#td_info").text().split(" ")[1].split(":")[1];
+                var temp_str="你确实想取消当前这个入场价为"+current_ahead_price+"的"+current_prduct_name+"的挂单吗？";
+                var r=confirm(temp_str);
+                if(r){
+                    //发送取消挂单的ajax请求
+                    console.log("yes")
+                    $.post("http://"+host+":7000/query_call",{"call_type":1,"is_query":2,"call_id":call_id},function(data){
+                        var data=JSON.parse(data);
+                        if(data["message"]=="success"){
+                            alert("挂单删除成功");
+                        }
+                        else{
+                            alert("挂单删除失败");
+                            console.log(data);
+                        }
+                        $(".close").click(); //关闭弹出框
+                        load_teacher_ranking();//重新加载排行榜
+                    });
+                }else{
+                    $(".close").click(); //关闭弹出框
+                }
+            }else{}
+        }
+        else{
+            //nothing
+        }
+    });
+    //定义排行榜建仓按钮事件，在点击建仓按钮的时候，把此行的老师id，产品id等数据添加到弹出框中，方面在操作喊单或者挂单的时候获取额外的信息。
+    $(".jiancang").each(function(){
+        var $this=$(this);
+        $this.mousedown(function(){
+            $("#prev_button_text").text($this.text()); //上级按钮的文本，用于区分是挂单，平仓，喊单，修改挂单还是取消挂单。
+            var divs=$this.parent().parent();//获取此行的所有div父元素，，子元素一共9个
+            var teacher_id=divs.find(".teacher_id").text(); //当前这一行的数据所属的老师id
+            var call_id=divs.find(".call_id").text(); //喊/挂单id
+            $("#td_info").text("teacher_id:"+teacher_id+" call_id:"+call_id);
+            if($this.text()=="编辑"){
+                $.post("http://"+host+":7000/query_call",{"call_id":call_id,"call_type":1,"is_query":0},function(data){
+                    var data=JSON.parse(data);
+                    data=data["data"];
+                    var price_ahead=data[2];
+                    var product_id=data[0];
+                    var direction=data[1];
+                    var stop_win=data[3]==0?"":data[3];
+                    var stop_lost=data[4]==0?"":data[4];
+                    $("#ahead_price").val(price_ahead);
+                    $("#product_select").val(product_id);
+                    $("#process_type").val(direction=="挂多"?3:4);
+                    $(".jyzhiling select").change();
+                    $("#stop_win").val(stop_win);
+                    $("#stop_lost").val(stop_lost);
+                });
+            }
+            else if($this.text()=="平仓"){
+                $("#ping_pop>p:first>span").text(divs.find(".liwt:first").text());
+                $("#product_name").remove();//置空
+                $("#product_id").remove();//置空
+                $("#ping_pop").append("<span id='product_name'>"+$this.parent().prev().prev().find(".cpdate>span:first").text()+"</span>");//把平仓产品的名字加进去
+                $("#ping_pop").append("<span class='my_hide' id='product_id'>"+$this.parent().parent().find(".product_id").text()+"</span>");//把平仓产品的id加进去
+            }
+            else{
+                $("#process_type").val(1);
+                $(".jyzhiling select").change();
+            }
+        });
+    });
+    //定义喊单提交按钮动作
+    $("#submit_call").click(function(){
+        //var current_teacher_id=;     //获取当前操作喊单的老师的id(不要和老师工号混淆了)
+        var url_call="http://91dashi.cn/HandlerAjax/daily_call_list.ashx";//定义一个喊单的url
+        /*此url的用法如下。
+         *空单：{ go: "SellOutConfirm", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(), zy: zhiying, zs: zhisun, tName: TeacherName, p_id: $(this).attr("p_id"), p_Price: $(this).attr("p_Price"), p_Name: $(this).attr("p_Name") }
+         *多单：{ go: "PurchaseConfirm", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(), zy: zhiying, zs: zhisun, p_id: $(this).attr("p_id"), p_Price: $(this).attr("p_Price"), p_Name: $(this).attr("p_Name") }
+         * 两者只有一个参数不同：SellOutConfirm卖出（空单）PurchaseConfirm买入（多单）
+         * */
+        var url_call_ahead="http://91dashi.cn:9000/single_call_ahead/add";  //定义一个挂单的url
+        /*此url的用法如下：
+         / { "owner_id": _teacher, "product_id": _p_id, "direction": "挂多", "jin_price": _jin_price, "stop_win": zhiying, "stop_lost": zhisun };
+         */
+        //根据是做单还是挂单来决定用哪个url
+        var call_type=$("#process_type>option:selected").text(); //卖出，买入，挂空，挂多。
+        if(call_type.indexOf("挂")!=-1){
+            var price_ahead= $.trim($("#ahead_price").val()); //进场价
+            var stop_win= $.trim($("#stop_win").val());
+            var stop_lost= $.trim($("#stop_lost").val());
+            var teacher_id=$("#td_info").text().split(" ")[0].split(":")[1];
+            var call_id=$("#td_info").text().split(" ")[1].split(":")[1];
+
+            if(price_ahead=='' || price_ahead<=0){
+                alert("进场价格不正确");
+            }
+            else if(isNaN(stop_win) || isNaN(stop_lost)){
+                alert("止赢/止损设置不正确");
+            }
+            else {
+                var adata = {
+                    "owner_id": teacher_id,
+                    "call_id":call_id,
+                    "product_id": $("#product_select").val(),
+                    "product_name": $("#product_select>option:selected").text(),
+                    "direction": $("#process_type>option:selected").text(),
+                    "jin_price": price_ahead,
+                    "stop_win":stop_win,
+                    "stop_lost": stop_lost,
+                    "current_price":product_price_list_global[ $("#product_select>option:selected").text()]
+                };
+                console.log("当前价格"+product_price_list_global[ $("#product_select>option:selected").text()])
+                if($("#prev_button_text").text()=="编辑"){
+                    //修改挂单的情况
+                    adata["call_type"]=1;
+                    adata["is_query"]=1;
+                    var r=confirm("确认修改挂单？");
+                    if(r){
+                        $.post("http://"+host+":7000/query_call",adata,function(data){
+                            var data=JSON.parse(data);
+                            if(data["message"]=="success"){
+                                alert("挂单修改成功");
+                            }
+                            else{
+                                alert("挂单修改失败");
+                                console.log(data);
+                            }
+                            $(".close").click(); //关闭弹出框
+                            load_teacher_ranking();//重新加载排行榜
+                        });
+                    }else{$(".close").click();}
+
+                }
+                else{
+                    //增加挂单的情况
+                    var r=confirm("确认"+$("#process_type>option:selected").text()+"？");
+                    if(r){
+                        $.post(url_call_ahead, adata, function (data) {
+                            if(data["message"]=="success"){
+                                alert("挂单成功");
+                            }
+                            else{
+                                alert("挂单失败");
+                                console.log(data);
+                            }
+                            $(".close").click(); //关闭弹出框
+                            load_teacher_ranking();//重新加载排行榜
+                        });
+                    }else{$(".close").click();}
+
+                }
+
+            }
+        }
+        else{
+            //如果是建仓的情况
+            var price= $.trim($("#jiage").text()); //建仓价
+            var stop_win= $.trim($("#stop_win").val());
+            var stop_lost= $.trim($("#stop_lost").val());
+            var teacher_id=$("#td_info").text().split(" ")[0].split(":")[1];
+            var call_id=$("#td_info").text().split(" ")[1].split(":")[1];
+            var product_id=$("#product_select").val();
+            var product_name=$("#product_select>option:selected").text();
+            var direction= $("#process_type>option:selected").text();
+
+            /*建仓的url的用法如下。
+             *空单：{ go: "SellOutConfirm", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(), zy: zhiying, zs: zhisun, tName: TeacherName, p_id: $(this).attr("p_id"), p_Price: $(this).attr("p_Price"), p_Name: $(this).attr("p_Name") }
+             *多单：{ go: "PurchaseConfirm", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(), zy: zhiying, zs: zhisun, p_id: $(this).attr("p_id"), p_Price: $(this).attr("p_Price"), p_Name: $(this).attr("p_Name") }
+             * 两者只有一个参数不同：SellOutConfirm卖出（空单）PurchaseConfirm买入（多单）
+             * */
+            if($("#prev_button_text").text()=="建仓"){
+                var r=confirm("确认建立"+(direction=="买入"?"多单？":"空单？"));
+                if(r){
+                    var adata = {
+                        "go":(direction=="买入"?"PurchaseConfirm":"SellOutConfirm"),
+                        "UserId": teacher_id,
+                        "SingleCallId":call_id,
+                        "p_id": product_id,
+                        "tName":"",
+                        "p_Name": product_name,
+                        "direction": direction,
+                        "zy":stop_win,
+                        "zs": stop_lost,
+                        "p_Price":price
+                    };
+                    $.post(url_call,adata,function(data){
+                        console.log(data);
+                        console.log(data=="True")
+                        if(data=="True"){
+                            alert("建仓成功");
+                        }
+                        else{
+                            alert("建仓失败");
+                            console.log(data);
+                        }
+                        $(".close").click(); //关闭弹出框
+                        load_teacher_ranking();//重新加载排行榜
+                    });
+                }else{$(".close").click();}
+            }
+            else if($("#prev_button_text").text()=="平仓"){
+                //nothing
+            }else{}
+        }
+
+    });
+    //平仓按钮。
+    $("#submit_ping").click(function(){
+        var url_call="http://91dashi.cn/HandlerAjax/daily_call_list.ashx";//定义一个平单的url
+        //var price=product_price_list_global[$("#product_name").text()];  //平仓是的价格
+        var stop_win= $.trim($("#stop_win").val());
+        var stop_lost= $.trim($("#stop_lost").val());
+        var teacher_id=$("#td_info").text().split(" ")[0].split(":")[1];
+        var call_id=$("#td_info").text().split(" ")[1].split(":")[1];
+        var product_id=$("#product_id").text();
+        var product_name=$("#product_name").text();
+        var direction= $("#process_type>option:selected").text();
+        /*平仓 var _datas = {
+         go: "PingCang", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(),
+         Product: ProductName, tName: TeacherName, p_id: $("#productId").val(),
+         Direction: _Direction, JianCang: _JianCang
+         }
+         */
+        var adata = {
+            "go":"PingCang",
+            "UserId": teacher_id,
+            "SingleCallId":call_id,
+            "p_id": product_id,
+            "tName":"",
+            "Product": product_name,
+            "Direction": direction,
+            "zy":stop_win,
+            "zs": stop_lost
+        };
+        $.post(url_call,adata,function(data){
+            if(data=="true"){
+                alert("平仓成功");
+                load_teacher_ranking();//重新加载排行榜
+            }
+            else{
+                alert("平仓失败");
+                load_teacher_ranking();//重新加载排行榜
+            }
+        });
+
+    });
+//end!
+//一个测试元素是否存在于数组的函数
+    function inArray(item,array){
+        for(var i=0;i<array.length;i++){
+            if(item==array[i]){
+                return true;
+                break;
+            }else{}
+        }
+        return false;
+    }
+});
+</script>
+</body>
+</html>

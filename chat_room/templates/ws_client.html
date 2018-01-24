@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head lang="zh-cn">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<h1>hello</h1>
+</body>
+<script>
+    function requestInventory() {
+        var host = 'ws://localhost:9000/ws';
+
+        var websocket = new WebSocket(host);
+
+        websocket.onopen = function (evt) {
+            console.log(evt);
+        };
+        websocket.onmessage = function(evt) {
+            $('#count').html($.parseJSON(evt.data)['inventoryCount']);
+        };
+        websocket.onerror = function (evt) { };
+    }
+</script>
+</html>

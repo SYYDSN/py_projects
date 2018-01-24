@@ -1,0 +1,64 @@
+2017-10-10 10:56:04,196 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-10-10 14:30:38,985 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 14:30:38,992 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 14:30:39,902 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 14:31:27,325 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 14:31:27,617 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 14:50:37,884 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 14:50:38,776 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 14:50:38,776 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 15:00:41,326 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 15:26:13,263 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 15:39:28,944 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 15:39:28,957 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 15:39:33,958 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 17:14:44,849 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 17:14:45,768 handlers.py[line:104] ERROR NoneType
+
+2017-10-10 20:37:41,948 handlers.py[line:104] ERROR NoneType
+
+2017-10-11 03:38:52,991 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-10-11 09:09:12,197 handlers.py[line:104] ERROR NoneType
+
+2017-10-11 09:10:25,260 handlers.py[line:104] ERROR NoneType
+
+2017-10-11 09:10:26,443 handlers.py[line:104] ERROR NoneType
+
+2017-10-11 09:10:42,470 handlers.py[line:104] ERROR NoneType
+
+2017-10-11 09:49:40,373 handlers.py[line:104] ERROR NoneType
+
+2017-10-11 09:49:40,375 handlers.py[line:104] ERROR NoneType
+
+2017-10-11 09:49:40,474 handlers.py[line:104] ERROR NoneType
+
+2017-10-11 10:25:12,347 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+

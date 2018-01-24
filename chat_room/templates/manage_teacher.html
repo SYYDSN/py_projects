@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0;">
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
+    <script src="../static/js/jquery.cookie.js"></script>
+	<script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.md5.js"></script>
+    <title></title>
+    <script>
+    //启动的时候检测cookie内容判断是否登录,如果没有登录就跳转回登录页面，防止使用浏览器后退功能钻身份验证的空子。
+    if($.cookie("username")==undefined){
+
+        location.href="/admin_login_page";
+    }else{}
+</script>
+    <style>
+        .padding_left{ padding-left:30px;}
+        .padding_right{ margin-right:20px;}
+        #user_table{width:100%; margin-bottom:20px;border-left: 1px solid #ddd;border-bottom: 1px solid #ddd;}
+        #user_table tr th,#user_table tr td{ width:25%; text-align: center;border-right: 1px solid #ddd;}
+        #table_tanchu tr td{ text-align: center; border-top:none; }
+        .clear{ clear: both;}
+    </style>
+</head>
+<body>
+<div class="row">
+
+    <div  class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_left"><a href="/class_table" target="_blank">老师和课程表</a></div>
+    <div  class="col-xs-2 col-sm-2 col-md-2 col-lg-2 padding_left"><a href="/show_user" target="_blank">查看注册用户</a></div>
+    <div  class="col-xs-2 col-sm-2 col-md-2 col-lg-2 padding_left">当前在线<span id="counter"></span>人</div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4"><button id="change_password" class="pull-right padding_right">修改密码</button><button id="login_out" class="pull-right">注销</button><span id="current_user" class="pull-right">{{current_user}}</span><div class="clear"></div></div>
+
+
+</div>
+<!---用户管理的弹出页--->
+<div id="pop_manage_user">
+    <div id="manage_user_inner"  class="container-fluid"  style="width:60%;margin:20px auto auto auto;background-color: hsla(6, 100%, 100%, 1);">
+        <h4 class="row text-center">后台账户管理</h4>
+        <table id="user_table" class="table">
+            <tr>
+                <th>用户名</th><th>密码</th><th>状态</th><th>状态</th>
+            </tr>
+            <tr>
+                <td>大夫</td><td>123456</td><td>正常</td><td>正常</td>
+            </tr>
+            <tr>
+                <td>大夫</td><td>123456</td><td>正常</td><td>正常</td>
+            </tr>
+            <tr>
+                <td>大夫</td><td>123456</td><td>正常</td><td>正常</td>
+            </tr>
+        </table>
+        <!--用户管理弹出窗-->
+        <div class="row" id="edit_user">
+            <div  class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <table class="table" id="table_tanchu">
+                    <tr>
+                        <td>
+                            用户名<input class="" type="text" id="input_username" placeholder="请输入帐户名"/>
+                        </td>
+                        <td>
+                            密码<input class="" type="password" id="password1" placeholder="请输入密码"/>
+                        </td>
+                        <td>
+                            再次输入密码<input class=""  type="password" id="password2" placeholder="请再次输入密码"/>
+                        </td>
+                    </tr>
+                </table>
+                <!--<p class="row">
+                <input class="col-xs-8 col-xs-offset-1  col-sm-4 col-md-2  col-lg-2 col-lg-offset-1" type="text" id="input_username" placeholder="请输入帐户名"/>
+                <input class="col-xs-8 col-xs-offset-1 col-sm-4 col-md-2 col-lg-2 " type="password" id="password1" placeholder="请输入密码"/>
+                <input class="col-xs-8  col-xs-offset-1 col-sm-4  col-md-2 col-lg-2 "  type="password" id="password2" placeholder="请再次输入密码"/>
+
+            </p>-->
+            </div>
+        <p class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="row">
+            <button class="col-xs-5 col-sm-4 col-md-2 col-lg-1 col-lg-offset-5  col-xs-offset-1 col-sm-offset-1" id="add_user">确认</button>
+            <button class="col-xs-5 col-sm-4 col-md-2 col-lg-1" id="clear_input">清除</button>
+
+        </div>
+        </p>
+        </div>
+
+    </div>
+</div>
+</body>
+<script>
+$(function(){
+    //定义变量
+    host="/";
+    //初始化输入框
+    setTimeout(function(){$("#input_username,#password1,#password2").each(function(){$(this).val("");});},600);
+
+    //修改密码的方法。
+        $("#change_password").click(
+                function(){
+                    var new_password=prompt("请输入新密码");
+                    if(new_password!=null && new_password!=''){
+                        var objname=$("#current_user").text();
+                        var password= $.md5($.trim(new_password));
+                        $.post(host+"edit_teacher_user/change_password",{"objname":objname,"password":password},function(data){
+                            if(data["message"]=="success"){
+                                alert("密码修改成功");
+                            }
+                            else{
+                                alert("密码修改失败，请稍后再试");
+                            }
+                        });
+                    }
+                    else{
+                        alert("密码不能为空");
+                    }
+                }
+        );
+    //注销的方法,删除cookie
+        function login_out(){
+            $.removeCookie("username");
+            $.removeCookie("password");
+            $.removeCookie("teacher_id");
+             $.removeCookie("teacher_name");
+            $.removeCookie("teacher_password");
+            //console.log(document.cookie);
+        }
+    $("#login_out").click(function(){login_out();location.href="/admin_login_page";});
+    //阻止内部框的click事件冒泡。
+        $("#pop_add_inner,#manage_user_inner").click(function(){return false;});
+    //获取聊天室在线人数的方法。
+        function count_online(){
+            $.get("/count_online?gid="+Math.random(),function(data){$("#counter").text(data);});
+        }
+        count_online(); //启动时获取聊天室在线人数
+        setInterval(function(){count_online();},10000);
+        //获取用户列表的方法。
+        function get_teachers(){
+            $.post("/get_teacher_user?uid="+Math.random(),function(data){
+                //console.log(data);
+                var obj=JSON.parse(data);
+                //清空除标题外的其他行。
+                $("#user_table").html('<tr class="row"><th class="col-xs-3 col-sm-3 col-md-3 col-lg-3">用户名</th><th class="col-xs-3 col-sm-3 col-md-3 col-lg-3">密码</th><th class="col-xs-3 col-sm-3 col-md-3 col-lg-3">状态</th><th class="col-xs-3 col-sm-3 col-md-3 col-lg-3">操作</th></tr>');
+                for(var i=0;i<obj.length;i++){
+                    //alert(obj[i][0])
+                    var str="<tr class='row'><td  class='col-xs-3 col-sm-3 col-md-3 col-lg-3'>"+obj[i][0]+"</td><td class='stop_click col-xs-3 col-sm-3 col-md-3 col-lg-3'><button class='reset_password'>重置密码</button></td><td class='col-xs-3 col-sm-3 col-md-3 col-lg-3'><button class='can_login'>"+(obj[i][3]==1?"正常":"停用")+"</button></td><td class='stop_click col-xs-3 col-sm-3 col-md-3 col-lg-3'><button "+(obj[i][0]=="robots" || obj[i][0]=="manager"?"disabled='disabled'":"")+" class='delete_user'>删除</button></td></tr>"
+                    $("#user_table").append($(str));
+                }
+                //重置用户密码的方法。
+                $(".reset_password").each(function(){
+                    var $this=$(this);
+                    $this.click(function(){
+                        var objname= $.trim($this.parent().prev().text());
+                        var r=confirm("你确实想重置"+objname+"的密码吗？");
+                        if(r){
+                            $.post(host+"edit_teacher_user/reset_password?uid="+Math.random()+"&objname="+objname,function(data){
+                            if(data["message"]=="success"){
+                                alert("重置成功！默认密码为123456");
+                            }
+                            else{}
+                        });
+                        }
+                        else
+                        {}
+
+                    });
+                });
+                //停用账户的方法
+                $(".can_login").each(function(){
+                    var $this=$(this);
+                    $this.click(function(){
+                        var objname= $.trim($this.parent().prev().prev().text());
+                        var r=confirm("你确实想停用"+objname+"的账户吗？");
+                        if(r){
+                            $.post(host+"edit_teacher_user/stop_login?uid="+Math.random()+"&objname="+objname,function(data){
+                                if(data["message"]=="success"){
+                                    alert("停用成功！");
+                                    get_teachers(); //重新加载
+                                }
+                                else{}
+                            });
+                        }
+                        else{}
+
+                    });
+                });
+                //删除账户的方法
+                $(".delete_user").each(function(){
+                    var $this=$(this);
+                    $this.click(function(){
+                        var objname= $.trim($this.parent().prev().prev().prev().text());
+                        var r=confirm("你确实想删除"+objname+"的账户吗？");
+                        if(r){
+                             $.post(host+"edit_teacher_user/delete?uid="+Math.random()+"&objname="+objname,function(data){
+                                if(data["message"]=="success"){
+                                    alert("删除成功！");
+                                    get_teachers(); //重新加载
+                                }
+                                else{}
+                            });
+                        }
+                        else{
+
+                        }
+
+                    });
+                });
+                //
+
+            });
+        }
+        get_teachers();//运行此方法。
+        //添加用户名时，用户名输入框的失焦事件。
+        $("#input_username").focus(function(){$(this).css("background","white");});
+        $("#input_username").blur(function(){
+            var objname= $.trim($(this).val());
+            if(objname.length>0){
+                $.post(host+"edit_teacher_user/check_objname?uid="+Math.random()+"&objname="+objname,function(data){
+                    if(data["message"]=="find!"){
+                        alert("用户名："+objname+" 已存在！");
+                        $("#input_username").css("background","hsla(320, 90%, 80%, 1)");
+                    }
+                    else{
+                        console.log(data);
+                    }
+                });
+            }
+            else{
+                //nothing
+            }
+
+        });
+        //添加用户动作事件
+        $("#add_user").click(function(){
+            var objname= $.trim($("#input_username").val()); //添加的用户名
+            var password1= $.trim($("#password1").val());   //输入的密码
+            var password2= $.trim($("#password2").val());   //重复的密码
+            var bcolor=$("#input_username").css("background-color");  //用户名输入框的背景色
+            if(bcolor!="rgb(255, 255, 255)"){
+                alert("用户名已存在");  //如果用户名的输入框不是白色，说明用户还没纠正用户名重复的问题。
+            }
+            else if(objname.length==0){
+                alert("用户名不能为空");
+            }
+            else if(password1.length==0 || password2.length==0){
+                alert("密码不能为空");
+            }
+            else if(password1!=password2){
+                alert("两次密码输入的不一致");
+            }
+            else{
+                var password= $.md5(password1);  //加密密码
+                $.post(host+"edit_teacher_user/add_user",{"objname":objname,"password":password},function(data){
+                    if(data["message"]=="success"){
+                        alert("用户添加成功");
+                        get_teachers();//运行此方法重新加载用户列表。
+                        $("#input_username,#password1,#password2").val("");  //清空输入框
+                    }
+                    else{
+                        alert(data["message"]);
+                    }
+                });
+            }
+        });
+//end
+});
+</script>
+</html>

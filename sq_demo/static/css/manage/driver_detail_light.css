@@ -1,0 +1,476 @@
+/*基本样式*/
+
+.main {
+    border-top-left-radius: 0px !important;
+}
+
+#main_zone {
+    background-color: #e3e3e4;
+    padding: 1rem 2.2rem;
+    color: #666666;
+}
+
+
+/*右边栏样式*/
+
+#right_bar {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+#right_bar img {
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid #cfcdcd;
+    margin-right: 1rem;
+}
+
+#right_bar>.nav_item {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 1.6rem 1rem;
+}
+
+.nav_item>.driver_name {
+    font-size: 1.0rem;
+    color: #7c8ff3;
+    line-height: 3rem;
+    word-break: keep-all;
+    word-wrap: normal;
+}
+
+.nav_item img,
+.driver_name:hover {
+    cursor: pointer;
+}
+
+#truck_info_img,
+#dept_info_img:hover {
+    cursor: pointer;
+}
+
+
+/*中间区域上部的基本信息区*/
+#base_info_row,#chart_zone_01,#chart_zone_02,#chart_zone_03 {
+    margin: 0 -1.2rem 1rem -1.2rem;
+    /*灰色外框*/
+    padding: 2rem 4rem;
+    background-color: #ffffff;
+}
+
+
+/* .row_01{
+    border-bottom:1px solid #ddd;
+} */
+
+.sep_01 {
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-bottom: 1px solid #ddd;
+}
+
+.row_02 {
+    padding-top: 1.8rem;
+}
+
+.page_title>span {
+    padding: 0;
+    margin: 0;
+    color: #333;
+    font-family: "Microsoft YaHei";
+    font-size: 2rem;
+    display: block;
+    width: 8rem;
+    padding-bottom: 1.8rem;
+    border-bottom: 2px solid #0b27b4;
+}
+
+.user_inner {
+    max-width: 17rem;
+    padding: 1rem;
+}
+
+#user_img_div img {
+    width: 100%;
+    height: 100%;
+    /*max-height: 10rem;*/
+    /*max-width: 10rem;*/
+    border: 2px solid #7c8ff3;
+    margin-bottom: 1rem;
+}
+
+#violation_div,
+#rank_div {
+    text-align: center;
+    height: 2rem;
+}
+
+#user_img_div {
+    display: flex;
+    flex-direction: column;
+}
+
+#rank_div {
+    background-color: #7c8ff3;
+    border-radius: 0.8rem;
+    padding: 0.5rem 1rem;
+    color: white;
+    height: 2.4rem;
+    font-size: 1.4rem;
+    line-height: 1.4rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #ddd;
+}
+
+#user_info_div {
+    padding-top: 1rem;
+    font-size: 1.4rem;
+    color: #666666;
+}
+
+#user_info_div>.row {
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+}
+
+#user_info_div>.row>div {
+    white-space: nowrap;
+}
+
+#user_info_div span {
+    white-space: nowrap;
+}
+/*部门信息和车辆信息*/
+#show_dept_info_btn, #show_truck_info_btn:hover{
+    cursor: pointer;
+}
+#tow_pic_div {
+    padding-top: 2rem;
+}
+
+#tow_pic_div .part {
+    text-align: center;
+}
+
+#tow_pic_div span {
+    margin-top: 1.5rem;
+    font-size: 2.4rem;
+    color: #666666;
+    text-align: center;
+    display: inline-block;
+}
+.big_icon {
+    width: 3em;
+    height: 3em;
+    padding: 0.2em;
+    border-radius: 0.75em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+    color: #7C8FF3;
+    /*color: white;*/
+    background-color: white;
+    /*background-color: #7C8FF3;*/
+}
+/*部门详情和车辆信息的popover样式*/
+.my_over{
+    top:1rem;
+    display:none;
+    min-width:35em;
+    width:auto;
+    left:auto;
+    white-space: nowrap;
+    word-wrap: normal;
+    word-break: keep-all;
+}
+#popover_info_dept{
+    right:-14em;
+}
+#popover_info_truck{
+    right:0em;
+}
+.my_over .popover-title{
+    font-weight:700;
+    font-size:1.8rem;
+    color:#999999;
+    padding-top:1.8em;
+    background-color: white;
+    border:none !important;
+}
+.my_table_outer{
+    padding-bottom:1.5rem;
+}
+.my_over table{
+    background-color: #f7f7f7;
+    border:none;
+    width:94% !important;
+    max-width:94% !important;
+    margin: 0% 3% 5%;
+}
+.my_over table th, td{
+    text-align: center;
+    border:none !important;
+    width:20%;
+}
+.my_over table th{
+    font-size:1.6rem;
+    margin-top:1em;
+}
+.my_over table td{
+    font-size:1.2rem;
+    margin-bottom: 2em;
+}
+/*日期选择器*/
+
+.datepicker_group{
+    max-width:15em;
+}
+/*仪表样式开始*/
+
+.GaugeMeter {
+    Position: Relative;
+    Text-Align: Center;
+    Overflow: Hidden;
+    Cursor: Default;
+    margin: 0 auto;
+}
+
+.GaugeMeter SPAN {
+    font-weight: 700 !important;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    -o-transform: translateX(-50%);
+    line-height: 250px !important;
+    font-size: 63px !important;
+    color: #565656 !important;
+}
+
+.GaugeMeter SPAN,
+.GaugeMeter B {
+    width: 100%;
+    Position: Absolute;
+    Text-align: Center;
+    Display: Inline-Block;
+    Color: RGBa(0, 0, 0, .8);
+    Font-Weight: 200;
+    Font-Family: "Open Sans", Arial;
+    Overflow: Hidden;
+    White-Space: NoWrap;
+    Text-Overflow: Ellipsis;
+}
+
+.GaugeMeter[data-style="Semi"] B {
+    Margin: 0 10%;
+    Width: 80%;
+}
+
+.GaugeMeter S,
+.GaugeMeter U {
+    Text-Decoration: None;
+    Font-Size: .49em;
+    Opacity: .5;
+}
+
+.GaugeMeter B {
+    position: absolute;
+    color: #565656 !important;
+    Font-Weight: 300;
+    Opacity: .8;
+    font-size: 25px !important;
+    line-height: 365px !important;
+    font-weight: 700;
+}
+
+
+/*仪表样式结束*/
+
+.avg_and_top_speed {
+    margin-bottom: 3rem;
+}
+
+.small_title {
+    font-size: 1.2rem;
+    text-align: left;
+}
+
+.padding_left_1rem {
+    padding-left: 1.4rem;
+    font-size: 1.4rem;
+}
+
+.margin_bottom_5rem {
+    margin-bottom: 5rem;
+}
+
+.size_2rem {
+    font-size: 2.0rem;
+    font-weight: 700;
+}
+
+.progress-bar {
+    background-color: #7C8FF3;
+}
+
+
+/*折线*/
+
+.my_point {
+    display: inline-block;
+    width: 0.4em;
+    height: 0.4em;
+    background-color: #7C8FF3;
+    border-radius: 0.2em;
+    line-height: 1em;
+    margin-bottom: 0.1em;
+    margin-right: 1em;
+}
+
+#chart_zone_01 .small_title,#chart_zone_02 .small_title,#chart_zone_03 .small_title {
+    margin-top: 2rem;
+    margin-left: 6rem;
+}
+
+#heart_rate_chart {
+    height: 300px;
+    width: 100%;
+}
+
+
+/*心跳表格*/
+
+.table_title {
+    margin-left: 6rem;
+}
+
+.table_title span:nth-of-type(even) {
+    font-weight: 700;
+    margin-right: 2rem;
+}
+
+.table_title span:nth-of-type(odd) {
+    margin-right: 1rem;
+}
+
+.table-responsive {
+    padding: 2rem 9rem 2rem 6rem;
+}
+
+#heart_rate_table td {
+    font-size: 1.4rem;
+    padding-top: 1em;
+    text-align: center;
+    background-color: #fbfdfe;
+}
+
+
+/*睡眠和情绪*/
+#mood_chart{
+    width:100%;
+    height:19rem;
+}
+#mood_chart, #mood_table{
+        margin-left: 4rem;
+}
+.mood_and_sleep .small_title{
+    margin-bottom:3rem;
+}
+#nao_zhong {
+    width: 19rem;
+    height: 19rem;
+    margin:auto;
+}
+
+#nao_zhong img {
+    width: 100%;
+    height: 100%;
+}
+
+#nao_zhong .text_div {
+    position: absolute;
+    top: 6rem;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #666666;
+    font-size: 1.4rem;
+}
+
+#nao_zhong .text_div span {
+    display: block;
+    width: 19rem;
+    text-align: center;
+    align-self: center;
+    font-weight: 700;
+}
+
+#sleep_time,
+#sleep_time2 {
+    color: #87aafb;
+}
+
+#sleep_time {
+    font-size: 1.5em;
+}
+.three_pic{
+    text-align: center;
+}
+.three_pic .big_icon{
+
+}
+.three_pic .text_div{
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #666666;
+    font-size: 1.4rem;
+}
+.three_pic .text_div span{
+    display: block;
+    text-align: center;
+    align-self: center;
+    white-space: nowrap;
+    font-size: 1.2rem;
+}
+.three_pic .text_div .bold{
+    font-weight: 900;
+    font-size: 2rem;
+    color: #87aafb;
+}
+.mood_item{
+    display: inline-block;
+}
+.mood_item .time,.status{
+    display: block;
+    text-align: center;
+    height: 1.2em;
+}
+#mood_table{
+    width:100%;
+    max-width: 100%;
+    height:auto;
+}
+#mood_table td{
+    font-size: 1.2rem;
+    padding-top: 1em;
+    display: inline-block;
+    width:8.1%;
+    text-align: center;
+}
+/*不良驾驶行为*/
+#bad_action_chart{
+    width:auto;
+    height:28rem;
+}

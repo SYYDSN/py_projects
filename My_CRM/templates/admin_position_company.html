@@ -1,0 +1,133 @@
+{% extends "admin_template_company.html" %}
+{% block extend_js %}
+    <script src="../static/js/admin_position_company.js"></script>
+{% endblock %}
+{% block extend_css %}
+    <link rel="stylesheet" href="../static/css/admin_user.css">
+{% endblock %}
+{% block main %}
+    <div class="col-lg-12 col-md-12">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 middle_info">
+                {{ position_count }} 个职务。
+                <button id="add_btn" onclick="add_position()" class="btn btn-primary btn-xs">添加职务</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <table id="user_table" class="table table-hover">
+                    <tr>
+                        <th>序号</th>
+                        <th>职务名称</th>
+                        <th>上级管理</th>
+                        <th>操作</th>
+                    </tr>
+                    {% for position in position_data %}
+                        <tr id="{{ position.sn }}" style="background-color: {{ position.color }}">
+                            <td>{{ loop.index }}</td>
+                            <td data-type="item" style="display:none" class="sn"
+                                data-val="{{ position.sn }}">{{ position.sn }}</td>
+                            <td data-type="item" class="position_name"
+                                data-val="{{ position.position_name }}">{{ position.position_name }}</td>
+                            <td data-type="item" class="parent_sn"
+                                data-val="{{ position.parent_sn }}">{{ k_v[position.parent_sn] }}</td>
+                            <td data-type="item" style="display:none" class="company_sn"
+                                data-val="{{ position.company_sn }}">{{ position.company_sn }}
+                            </td>
+                            <td data-type="item" style="display:none" class="has_team"
+                                data-val="{{ position.has_team }}">{{ position.has_team }}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-xs" role="group">
+                                    <div class="btn-group btn btn-default drop_user" role="group"
+                                         data-id="{{ position.sn }}" onclick="drop_position($(this))">删除
+                                    </div>
+                                    <div class="btn-group btn btn-default drop_user" role="group"
+                                         data-id="{{ position.sn }}" onclick="edit_position($(this))">编辑
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        <!-- 底部分页 -->
+        <div class="row text-center">
+            <nav aria-label>
+                <ul id="page_list" class="pagination">
+                    <li class="{{ 'disabled' if index_range[0] == 1 else '' }}"><a
+                            href="/company/position?index={{ prev_index }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                    </li>
+                    {% for index in index_range %}
+                        <li class="{{ 'active' if index == current_index else '' }}">
+                            <a href="/company/position?index={{ index }}">{{ index }}</a>
+                        </li>
+                    {% endfor %}
+                    <li class="{{ 'disabled' if index_range[-1] == max_index else '' }}"><a
+                            href="/company/position?index={{ next_index }}" aria-label="Next"><span
+                            aria-hidden="true">»</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <!--模态框-->
+    <button id="pop_modal" style="display: none" type="button" class="btn btn-primary btn-lg" data-toggle="modal"
+            data-target="#myModal">
+        Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="height: auto">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" style="text-align: center" id="myModalLabel">编辑职务信息</h4>
+                </div>
+                <div class="modal-body">
+                    <style>
+                        .modal-body > .row {
+                            margin-top: 10px;
+                            margin-bottom: 10px;
+                        }
+                    </style>
+
+                    <div class="row">
+                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                            <label>职位名称：</label>
+                            <input type="text" id="position_name" style="width:80px" placeholder="请输入职位名称">
+                            <input type="hidden" id="sn">
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <label>选择上级：</label>
+                            <select id="parent_sn">
+                                <option></option>
+                                {% for k,v in k_v.items() %}
+                                <option value="{{ k }}">{{ v }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <label>团队管理：</label>
+                            <input type="checkbox" id="has_team">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span style="padding-left:50px;color:gray;font-size:0.9em">提示：勾选了团队管理复选项的职位拥有团队的管理权</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="save_position" type="button" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--模态框结束-->
+
+{% endblock %}

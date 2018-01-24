@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="renderer" content="webkit" />
+<meta name="description"  content="不超过150个字符" />
+<meta name="keywords"  content="" />
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />    
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="format-detection" content="telephone=yes"/>
+<meta name="msapplication-tap-highlight" content="no" />
+<meta http-equiv="Cache-Control" content="no-transform " />
+
+<link type="text/css" rel="stylesheet" href="../static/css/teacher_style.css" />
+<script src="../static/js/jquery-1.11.3.min.js"></script>
+<script src="../static/js/teacher_style.js"></script>
+<script src="../static/js/jquery.scrollbox.js"></script>
+<script src="../static/js/jquery.mousewheel.min.js"></script>
+<script src="../static/js/reconnecting-websocket.min.js"></script>
+<script src="../static/js/jquery.cookie.js"></script>
+<style>
+    .my_hide{
+        display: None;
+    }
+    .online{
+        color:mediumvioletred;
+    }
+</style>
+<title></title>
+</head>
+
+<body>
+<!--tab标题-->
+<div class="tab_header" id="tab_header">
+    <div class="tab_header_toper">
+		<div class="left"><span id="video_manage">视频管理</span><span id="root_manage">机器人管理</span></div>
+		<div class="right"><span id="login_out">注销</span><span id="teacher_account">{{ teacher_account }}</span><span style="display: none" id="teacher_id">{{ teacher_id }}</span></div>
+		<div class="clear"></div>
+	</div>
+   <div class="tab_header_title">
+       <ul>
+           <li class="active" >大师排行榜</li>
+           <li>直播室管理</li>
+           <li>新闻数据</li>
+       </ul>
+       <div class="clear"></div>
+   </div>
+</div>
+
+<!--tab内容--->
+<div class="tab_content" id="tab_content">
+    <div class="tab_cont_list">
+        <!--大师排行榜  开始-->
+        <div   class="list ranklist show">
+            <div class="ranklist_bt">
+                <ul>
+                    <li>大师名称</li><li>总收益</li><li class="kh">客户</li><li class="cp">产&nbsp;&nbsp;品</li><li>浮&nbsp;&nbsp;动</li><li>操&nbsp;&nbsp;作</li>
+                </ul>
+            </div>
+            <div class="ranklist_nr" id="ranklist_nr">
+                <ul>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">丁大师</div>
+                        <div class="liwt">250.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp">
+                            <!--
+                            <div class="cpdate">
+                                <span>原油</span><span class="gd">挂多</span>
+                                <p>建仓价：220.2</p>
+                            </div>
+                            -->
+                        </div>
+                        <div class="liwt red"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="1">建仓</a></div>
+                        <!--信息标记-->
+                        <div class="info_marker" data-No="1">
+                            <div class="info_marker_icon">
+                                <img src="../static/images/tan.png"/>
+                                <div class="info_marker_cont">
+                                    <p class="year">2016年1月12日</p>
+                                    <p class="time">18:00</p>
+                                    <p>止赢：200.35</p>
+                                    <p>止损：200.14</p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">苍鹰嘉措</div>
+                        <div class="liwt">80.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp"></div>
+                        <div class="liwt"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="2">建仓</a></div>
+                        <!--信息标记-->
+                        <div class="info_marker" data-No="2">
+                            <div class="info_marker_icon">
+                                <img src="../static/images/tan.png"/>
+                                <div class="info_marker_cont">
+                                    <p class="year">2016年1月12日</p>
+                                    <p class="time">18:00</p>
+                                    <p>止赢：200.35</p>
+                                    <p>止损：200.14</p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">丁大师</div>
+                        <div class="liwt">250.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp"></div>
+                        <div class="liwt"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="3">建仓</a></div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">苍鹰嘉措</div>
+                        <div class="liwt">80.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp"></div>
+                        <div class="liwt"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="4">建仓</a></div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">丁大师</div>
+                        <div class="liwt">250.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp"></div>
+                        <div class="liwt"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="5">建仓</a></div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">丁大师</div>
+                        <div class="liwt">250.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp">
+                            <!--
+                            <div class="cpdate">
+                                <span>原油</span><span class="gd">空</span>
+                                <p>建仓价：220.2</p>
+                            </div>
+                            -->
+                        </div>
+                        <div class="liwt green"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="6">建仓</a></div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">苍鹰嘉措</div>
+                        <div class="liwt">80.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp"></div>
+                        <div class="liwt"></div>
+                        <div class="liwt niu"><a href="#"  class="jiancang" data-No="7">建仓</a></div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">丁大师</div>
+                        <div class="liwt">250.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp"></div>
+                        <div class="liwt"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="8">建仓</a></div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">苍鹰嘉措</div>
+                        <div class="liwt">80.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp"></div>
+                        <div class="liwt"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="9">建仓</a></div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">丁大师</div>
+                        <div class="liwt">250.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp"></div>
+                        <div class="liwt"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="10">建仓</a></div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">丁大师</div>
+                        <div class="liwt">250.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp">
+                            <!--
+                            <div class="cpdate">
+                                <span>原油</span><span class="gd">空</span>
+                                <p>建仓价：220.2</p>
+                            </div>
+                            -->
+                        </div>
+                        <div class="liwt red"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="11">建仓</a></div>
+                    </li>
+                    <li>
+                        <div class="teacher_id my_hide"></div>
+                        <div class="product_id my_hide"></div>
+                        <div class="call_id my_hide"></div>
+                        <div class="liwt">丁大师</div>
+                        <div class="liwt">250.22%</div>
+                        <div class="liwt kh">65/114</div>
+                        <div class="liwt cp">
+                            <!--
+                            <div class="cpdate">
+                                <span>原油</span><span class="gd">空</span>
+                                <p>建仓价：220.2</p>
+                            </div>
+                            -->
+                        </div>
+                        <div class="liwt green"></div>
+                        <div class="liwt niu"><a href="#" class="jiancang" data-No="12">建仓</a></div>
+                    </li>
+
+                </ul>
+            </div>
+        </div><!--大师排行榜  结束-->
+
+        <!--直播室管理 开始-->
+        <div class="list liveroom">
+            <!--聊天管理和实时聊天切换按钮-->
+            <div class="chat_manage" id="chat_manage"><div class="change_but">聊天管理</div><i></i></div>
+            <div class="chat_realtime" id="chat_realtime"><div class="change_but change_realtime">实时聊天</div><i></i></div>
+            <!--实时聊天会话 开始--->
+            <div class="nowtime_chat" id="chatnowtime">
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了单了？是多单还是空单啊？</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming"> 有宝宝: </span>
+                        <span class="huihua">老师，刚才喊单了？是单啊？老师，刚才喊单了？是多单还是空单啊？单啊？老师，刚才喊单了？是多单还</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师影响原油价格走势的因素有哪些啊 能讲讲吗</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">转不停 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">油菜花: </span>
+                        <span class="huihua">老师帮我看一下601689这只股票18.8进的，本来想抢一把大反弹的结果给套的死死怎么办啊</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ifrobot">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+            </div> <!--实时聊天会话 结束--->
+            <!--聊天管理会话 开始--->
+            <div class="nowtime_chat" id="chatmanage">
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了单了？是多单还是空单啊？</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming"> 有宝宝: </span>
+                        <span class="huihua">老师，刚才喊单了？是单啊？老师，刚才喊单了？是多单还是空单啊？单啊？老师，刚才喊单了？是多单还</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师影响原油价格走势的因素有哪些啊 能讲讲吗</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat ">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">转不停 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">油菜花: </span>
+                        <span class="huihua">老师帮我看一下601689这只股票18.8进的，本来想抢一把大反弹的结果给套的死死怎么办啊</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师，刚才喊单了？是多单还是空单啊？</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="everychat">
+                    <div class="time">15:00:00</div>
+                    <div class="chat_list">
+                        <span class="ming">游客28825 : </span>
+                        <span class="huihua">老师今天的原油是不是逢高空的思路啊</span>
+                        <span class="fobid1"></span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+            </div> <!--聊天管理会话 结束--->
+
+            <!--全部开启全部关闭设置--->
+            <div class="setting_all" id="setting_all">
+                <!--<button class="allbut">欢迎模式</button><button class="allbut">跟单模式</button><button class="allbut">赞扬模式</button><button class="allbut">正常模式</button><button class="allbut">欢迎模式</button><button class="allbut">欢迎模式</button><button class="allbut">欢迎模式</button>-->
+                <div class="kaiguan">
+                    <span class="allbut stop" id="stop">全部停止</span>
+                </div>
+            </div>
+            <!--向上箭头-->
+            <div class="setting_uparrow"><div class="arrow_up" id="arrow_up"></div></div>
+
+            <!--所有设置选项-->
+            <div class="setting_robot" id="setting_robot">
+                <div class="arrow_down" id="arrow_down"></div>
+                <div class="setting_cont">
+                    <span>机器人模式修改：</span>
+                    <select id="robot_model_select" class="select_style">
+                                <option></option>
+                                <option>章程模式</option>
+                    </select>
+                    <input type="text" placeholder="" class="setting_cont_txt"/>
+                    <button id="save_model" class="combut setbut">保存模式</button>
+                    <button id="delete_model" class="combut setbut">删除模式</button>
+                </div>
+                <table  id="robot_table" cellpadding="0" cellspacing="0" border="0">
+
+                    <tr>
+                        <td></td>
+                        <!--
+                        <td class="robot">
+                            土&nbsp;&nbsp;&nbsp;豪:
+                            <select class="select_style">
+                                <option>低频</option>
+                                <option>中频</option>
+                                <option>高频</option>
+                                <option>禁止</option>
+                            </select>
+                            <button class="delate">删除</button>
+                        </td>
+                        -->
+                        <td>
+
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+
+                <div class="setting_cont">
+                    <span>选择机器人：</span>
+                    <!--<button id="run_model_test" class="allbut">全部开启</button><button class="allbut">全部关闭</button>-->
+                    <select id="select_canuse_robots" class="select_style">
+                                <option></option>
+                                <option>章程模式</option>
+                    </select>
+                    <button id="add_robot_config" class="combut setbut">添加</button>
+                </div>
+            </div>
+
+            <!--底部发送消息 开始--->
+            <div class="bottom_send">
+               <div class="bottom_send_cont" id="bottom_send_cont">
+                    <div class="send_select" >
+                        <select id="teacher_alias" class="select_style">
+                            <option selected="selected">分析师助理</option>
+                            <option>巡管</option>
+                            <option>值班老师</option>
+                            <option>自定义</option>
+                        </select>
+                    </div>
+                    <input type="text" id="teacher_message" class="send_info">
+                    <input type="submit" id="submit_message" class="send_but buttn" value="发送">
+                   <div class="clear"></div>
+
+               </div>
+            </div><!--底部发送消息 结束--->
+        </div><!--直播室管理 结束-->
+
+        <!--新闻数据 开始-->
+        <div class="list newdata" >
+            <!--滚动新闻 开始-->
+            <div class="div2">
+                <div id="demo5" class="scroll-img">
+                    <ul>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>16:40</span></p><p class="imporant">重要性：<img src="../static/images/sanxing.png"/></p></div>
+                                <div class="master_data_nr"><p>111111111111111111111111111111111111111</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">-567.84</span></p>
+                                    <p class="yc">预测值：<span class="huang">---</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">1671.84</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>07:00</span></p><p class="imporant">重要性：<img src="../static/images/erxing.png"/></p></div>
+                                <div class="master_data_nr"><p>2222222222222222222222222222222222222222222222</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">1%</span></p>
+                                    <p class="yc">预测值：<span class="huang">1%</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">1%</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>16:40</span></p><p class="imporant">重要性：<img src="../static/images/yixing.png"/></p></div>
+                                <div class="master_data_nr"><p>3333333333333333333333333333333333333333333333</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">10.2%</span></p>
+                                    <p class="yc">预测值：<span class="huang">---</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">10.2%</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>16:40</span></p><p class="imporant">重要性：<img src="../static/images/yixing.png"/></p></div>
+                                <div class="master_data_nr"><p>444444444444444444444444444444444444444444444</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">10.2%</span></p>
+                                    <p class="yc">预测值：<span class="huang">---</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">10.2%</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>16:40</span></p><p class="imporant">重要性：<img src="../static/images/sanxing.png"/></p></div>
+                                <div class="master_data_nr"><p>55555555555555555555555555555555555555</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">-567.84</span></p>
+                                    <p class="yc">预测值：<span class="huang">---</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">1671.84</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>07:00</span></p><p class="imporant">重要性：<img src="../static/images/erxing.png"/></p></div>
+                                <div class="master_data_nr"><p>66666666666666666666666666666666666666666666</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">1%</span></p>
+                                    <p class="yc">预测值：<span class="huang">1%</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">1%</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>16:40</span></p><p class="imporant">重要性：<img src="../static/images/yixing.png"/></p></div>
+                                <div class="master_data_nr"><p>77777777777777777777777777777777777777777</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">10.2%</span></p>
+                                    <p class="yc">预测值：<span class="huang">---</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">10.2%</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>16:40</span></p><p class="imporant">重要性：<img src="../static/images/yixing.png"/></p></div>
+                                <div class="master_data_nr"><p>8888888888888888888888888888888888888888</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">10.2%</span></p>
+                                    <p class="yc">预测值：<span class="huang">---</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">10.2%</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>16:40</span></p><p class="imporant">重要性：<img src="../static/images/sanxing.png"/></p></div>
+                                <div class="master_data_nr"><p>99999999999999999999999999999999999999999</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">-567.84</span></p>
+                                    <p class="yc">预测值：<span class="huang">---</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">1671.84</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>07:00</span></p><p class="imporant">重要性：<img src="../static/images/erxing.png"/></p></div>
+                                <div class="master_data_nr"><p>1010101010101010101010101010</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">1%</span></p>
+                                    <p class="yc">预测值：<span class="huang">1%</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">1%</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>16:40</span></p><p class="imporant">重要性：<img src="../static/images/yixing.png"/></p></div>
+                                <div class="master_data_nr"><p>11 1 1 1 1 1 1 1 1 1 1 1 1  1 1 1 1</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">10.2%</span></p>
+                                    <p class="yc">预测值：<span class="huang">---</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">10.2%</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="master_data">
+                                <div class="master_data_bt"><p class="shijian"><span>16:40</span></p><p class="imporant">重要性：<img src="../static/images/yixing.png"/></p></div>
+                                <div class="master_data_nr"><p>12121212121212121212121212121</p></div>
+                                <div class="master_data_qz">
+                                    <p class="qz">前值：<span class="lv">10.2%</span></p>
+                                    <p class="yc">预测值：<span class="huang">---</span></p>
+                                    <div class="gbz"><p class="gb">公布值：<span class="hong">10.2%</span></p></div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+                </div>
+                <div id="demo5-btn" class="text-center">
+                    <div class="btn" id="demo5-backward"></div>
+                    <div class="btn" id="demo5-forward"></div>
+                </div>
+            </div><!--滚动新闻 结束--->
+
+            <!--更多新闻列表--->
+            <div class="morenew" id="morenew">
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+                <div class="everynew">
+                    <span class="time">15:00</span>
+                    <span class="nr">加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。加拿大评级公司DBRS：确认瑞士主权评级为AAA，前景展望稳定。</span>
+                </div>
+            </div>
+        </div><!--新闻数据 结束-->
+
+        <!--弹窗-->
+        <div class="popcont">
+
+            <!--点击建仓按钮弹窗-->
+            <div class="popcont_cont bulidcang">
+                <div class="close"><img src="../static/images/close.png"/></div>
+                <div class="popselect">
+                    <div class="jypinzhong">
+                        <div class="select_bt">交易品种：</div>
+                        <div class="select_nr">
+                            <select id="product_select" class="select_style">
+                                <option  selected="selected">现货原油</option>
+                                <option>现货白银</option>
+                                <option>现货铜</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="jyzhiling">
+                        <div class="select_bt">交易指令：</div>
+                        <div class="select_nr">
+                            <select id="process_type" class="select_style">
+                                <option value="1" selected="selected" name="buy">买入</option>
+                                <option value="2" name="sell">卖出</option>
+                                <option value="3" name="guadan" id="guaduo">挂多</option>
+                                <option value="4" name="guadan" id="guakong">挂空</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="nowvalue">
+                        <div class="select_bt">商品现价：</div>
+                        <div class="select_nr">
+                            <div id="jiage" class="jiage">198.42</div>
+                            <div class="shurukuang"><input id="ahead_price" type="text" class="xuanze"> </div>
+                        </div>
+
+                    </div>
+
+                    <div class="zy">
+                        <div class="select_bt">止赢价格：</div>
+                        <div class="select_nr">
+                           <input id="stop_win" type="text" class="xuanze">
+                        </div>
+                    </div>
+
+                    <div class="zs">
+                        <div class="select_bt">止损价格：</div>
+                        <div class="select_nr jianju">
+                            <input id="stop_lost" type="text" class="xuanze">
+                        </div>
+                    </div>
+                    <input type="submit" id="submit_call" value="确定" class="true determine" /><span id="prev_button_text" class="my_hide"></span><span id="td_info" class="my_hide"></span>
+
+                </div>
+            </div>
+
+            <!--是否确定平仓？-->
+            <div class="popcont_cont ifping">
+                <div class="close"><img src="../static/images/close.png"/></div>
+                <div id="ping_pop" class="popselect">
+                    <p>是否确定把<span class="yonghu">丁大师</span>平仓？</p>
+                    <!--<p>这波行情获利<span class="red">397</span>点<span class="red">32%</span></p>-->
+                </div>
+                <input id="submit_ping" type="submit" value="确定平仓" class="true qdping"/>
+            </div>
+
+            <!--是否确定取消用户挂单？-->
+            <div class="popcont_cont ifguadan">
+                <div class="close"><img src="../static/images/close.png"/></div>
+                <div class="popselect">
+                    <p>是否确定把<span class="yonghu">丁大师</span>取消挂单？</p>
+                </div>
+                <input type="submit" value="取消挂单" class="true qdquxiao"/>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+$(function(){
+    //测试账户，
+    //sessionStorage.setItem("teacher_account","080010");
+   // sessionStorage.setItem("teacher_id",30);
+    //测试账户完毕
+    var teacher_account=$("#teacher_account").text();  //当前登录用户名
+    var teacher_id_login=$("#teacher_id").text();  //当前登录用户id
+
+    var ranking=[];  //排行榜数据
+    var teacher_ids=[];  //当前登录的老师所拥有的所有可操作账户的id的数组
+    var product_list=[]; //当前所有可操作产品的id和名称的字典组成的数组{"p_id":x[0],"p_name":x[1]}
+    var product_price_list_global={};  //定义一个价格字典，由ws实时赋值。
+    var host="91dashi.cn";  //定义host的ip
+
+    var ws_id="";
+    var add_call_url="http://91dashi.cn:9000/single_call_ahead/add"; //增加挂单的url
+
+    //注销按钮事件。
+    $("#login_out").hover(function(){$(this).css("cursor","pointer");},function(){});
+    $("#login_out").click(function(){
+        var r=confirm("你确实想注销当前用户吗?");
+        if(r){
+            $.removeCookie("teacher_account");
+            $.removeCookie("password_md5");
+            location.href="/bridge";
+        }else{}
+    });
+
+    //这是一个页面载入时，加载老师排行榜数据的函数，此函数在页面载入时，每次提交和编辑动作时被反复调用。
+    function load_teacher_ranking(){
+        $.post("http://"+host+":7000/teacher_ranking?uid="+Math.random(),{"teacher_account":teacher_account},function(data){
+            var mydata=JSON.parse(data);
+            ranking=mydata["ranking"]; // 这是排行榜数据
+            //排行榜是一个包含数组的数组，其中每一个元素都是一个包含字典的数组。具体的列顺序如下：
+            //【0"排位", 1"老师ID", 2"老师名称", 3"总收益率", 4"总胜率", 5"客户", 6"喊/挂单"{"id":喊单/挂单号,"teacher_id":老师id,"product_id":产品id,"product_name":产品名称,"direction":方向,"incoming_price":建仓/进场价,"stop_win":止赢,"stop_lost":止损}, 7"持仓"】
+            //如果此用户没有喊/挂单信息，那么第6个元素就是一个空字符。
+            ranking.shift();//删除后台发送来的数据的标题
+            //console.log(ranking);
+            teacher_ids=mydata["teacher_ids"]; //当前登录的老师所拥有的所有可操作账户的id的数组
+            product_list=mydata["product_list"];  //可操作产品列表{"p_id":x[0],"p_name":x[1]}
+            var ranking_divs=$("#ranklist_nr>ul>li"); //老师排行榜的jq对象
+            //给产品选择元素赋值。
+            $("#product_select").empty();
+            for(var i=0;i<product_list.length;i++){
+                var str='';
+                if(product_list[i]["p_name"].indexOf("油")!=-1){
+                     str="<option value='"+product_list[i]['p_id']+"'selected='selected'>"+product_list[i]['p_name']+"</option>";
+                 }
+                else{
+                    str="<option value='"+product_list[i]['p_id']+"'>"+product_list[i]['p_name']+"</option>";
+                }
+                 $("#product_select").append(str);
+            }
+            //给排行榜jq对象赋值
+            $.each(ranking_divs,function(i,n){
+                var temp_obj=ranking[i];
+                var $div=$(n);
+                $div.find(".teacher_id").text(temp_obj[1]);
+                $div.find(".liwt:first").text(temp_obj[2]);
+                $div.find(".liwt").eq(1).text(temp_obj[3]);
+                $div.find(".liwt").eq(2).text(temp_obj[5]);
+                //检测并决定是否隐藏操作按钮。
+                var current_teacher_id=$div.find(".teacher_id").text();
+                if(inArray(current_teacher_id,teacher_ids) || current_teacher_id==41){
+                    $div.find(".liwt>.jiancang").show();
+                }
+                else{
+                    $div.find(".liwt>.jiancang").hide();
+                }
+                //检测并操作喊单信息
+                if(temp_obj[6]==""){
+                    //没有喊单时
+                    $div.find(".product_id").text('');
+                    $div.find(".call_id").text('');
+                    $div.find(".cp").html('');
+                    $div.find(".liwt>.jiancang").text("建仓");
+                }
+                else{
+                    $div.find(".product_id").text(temp_obj[6]["product_id"]);
+                    $div.find(".call_id").text(temp_obj[6]["id"]);
+                    $div.find(".liwt>.jiancang").text(temp_obj[6]['direction'].indexOf('挂')==-1?'平仓':'编辑');
+                    var html_str="<div class='cpdate'><span>"+temp_obj[6]['product_name']+"</span><span class='gd'>"+temp_obj[6]['direction']+"</span><p>"+(temp_obj[6]['direction'].indexOf('挂')==-1?'建仓':'进场')+"价："+temp_obj[6]['incoming_price']+"</p></div>";
+                    //console.log(html_str);
+                    $div.find(".cp").html('').html(html_str);
+                }
+            });
+
+
+        });
+    }
+    load_teacher_ranking();
+    //创建一个ws客户端用于实时获取产品报价
+    var ws_client_price=new ReconnectingWebSocket("ws://"+host+":9000/ws");
+    ws_client_price.onopen = function (evt) {
+    };
+    ws_client_price.onmessage = function (evt) {
+				//console.log(evt.type);
+
+				var obj = JSON.parse(evt.data);
+				//console.log(obj);
+				if (obj["ws_id"] != undefined) {
+					ws_id= obj["ws_id"];   //全局变量
+					console.log("ws_id is " + ws_id);
+                    ws_client_price.send(JSON.stringify({"type":"start_hangqing_row","ws_id":ws_id}));
+				}
+				else
+                {
+				    var data=JSON.parse(evt.data);
+                    var product_price_list=data["data"];
+                    product_price_list.shift();//弹出标题栏
+                    //检查选择了哪个交易产品？
+                    var product_name= $("#product_select>option:selected").text();
+                    for(var i=0;i<product_price_list.length;i++){
+                        //给全局价格字典赋值
+                        product_price_list_global[product_price_list[i][0]]=product_price_list[i][1];
+                        if(product_price_list[i][0]==product_name){
+                            var temp_price=product_price_list[i][1];
+                            $("#jiage").text(temp_price);//给产品报价动态赋值。
+                        }else{}
+                    }
+
+				}
+			};
+    ws_client_price.onerror = function (evt) {console.log("ws客户端连接出错");};
+    //ws_client定义结束
+    //定义一个给进场价格赋值的函数，此函数将由选择产品和交易类型的select元素共同调用。
+    function set_price_ahead(){
+        var type=$("#process_type>option:selected").text();
+        var p_name=$("#product_select>option:selected").text();
+        if(type.indexOf("挂")!=-1){
+            $("#ahead_price").val(product_price_list_global[p_name]);
+        }else{}
+    }
+    $("#process_type,#product_select").each(function(){
+        $(this).change(function(){set_price_ahead();});
+    });
+    //如果弹出的窗口是挂单的修改页面，那么按下del键会提示是否取消挂单
+    var del_key=false;  //定义一个变量，用来标识是否可删除挂单
+    $("#submit_call").parent().parent().hover(function(){
+        del_key=true;
+    },function(){del_key=false;});
+    $("body").keydown(function(evt){
+        if(evt.keyCode==46 && del_key){
+            //keyCode==46 代表按下了delete键
+            if($("#process_type").text().indexOf("挂")!=-1 && $("#prev_button_text").text()=="编辑"){
+                var current_ahead_price= $.trim($("#ahead_price").val());
+                var current_prduct_name=$("#product_select>option:selected").text();
+                var call_id=$("#td_info").text().split(" ")[1].split(":")[1];
+                var temp_str="你确实想取消当前这个入场价为"+current_ahead_price+"的"+current_prduct_name+"的挂单吗？";
+                var r=confirm(temp_str);
+                if(r){
+                    //发送取消挂单的ajax请求
+                    console.log("yes")
+                    $.post("http://"+host+":7000/query_call",{"call_type":1,"is_query":2,"call_id":call_id},function(data){
+                        var data=JSON.parse(data);
+                        if(data["message"]=="success"){
+                            alert("挂单删除成功");
+                        }
+                        else{
+                             alert("挂单删除失败");
+                            console.log(data);
+                        }
+                        $(".close").click(); //关闭弹出框
+                        load_teacher_ranking();//重新加载排行榜
+                    });
+                }else{
+                    $(".close").click(); //关闭弹出框
+                }
+            }else{}
+        }
+        else{
+            //nothing
+        }
+    });
+    //定义排行榜建仓按钮事件，在点击建仓按钮的时候，把此行的老师id，产品id等数据添加到弹出框中，方面在操作喊单或者挂单的时候获取额外的信息。
+    $(".jiancang").each(function(){
+        var $this=$(this);
+        $this.mousedown(function(){
+            $("#prev_button_text").text($this.text()); //上级按钮的文本，用于区分是挂单，平仓，喊单，修改挂单还是取消挂单。
+            var divs=$this.parent().parent();//获取此行的所有div父元素，，子元素一共9个
+            var teacher_id=divs.find(".teacher_id").text(); //当前这一行的数据所属的老师id
+            var call_id=divs.find(".call_id").text(); //喊/挂单id
+            $("#td_info").text("teacher_id:"+teacher_id+" call_id:"+call_id);
+            if($this.text()=="编辑"){
+                $.post("http://"+host+":7000/query_call",{"call_id":call_id,"call_type":1,"is_query":0},function(data){
+                    var data=JSON.parse(data);
+                    data=data["data"];
+                    var price_ahead=data[2];
+                    var product_id=data[0];
+                    var direction=data[1];
+                    var stop_win=data[3]==0?"":data[3];
+                    var stop_lost=data[4]==0?"":data[4];
+                    $("#ahead_price").val(price_ahead);
+                    $("#product_select").val(product_id);
+                    $("#process_type").val(direction=="挂多"?3:4);
+                     $(".jyzhiling select").change();
+                    $("#stop_win").val(stop_win);
+                    $("#stop_lost").val(stop_lost);
+                });
+            }
+            else if($this.text()=="平仓"){
+                $("#ping_pop>p:first>span").text(divs.find(".liwt:first").text());
+                $("#product_name").remove();//置空
+                 $("#product_id").remove();//置空
+                $("#ping_pop").append("<span id='product_name'>"+$this.parent().prev().prev().find(".cpdate>span:first").text()+"</span>");//把平仓产品的名字加进去
+                $("#ping_pop").append("<span class='my_hide' id='product_id'>"+$this.parent().parent().find(".product_id").text()+"</span>");//把平仓产品的id加进去
+            }
+            else{
+                $("#process_type").val(1);
+                $(".jyzhiling select").change();
+            }
+        });
+    });
+    //定义喊单提交按钮动作
+    $("#submit_call").click(function(){
+        //var current_teacher_id=;     //获取当前操作喊单的老师的id(不要和老师工号混淆了)
+        var url_call="http://91dashi.cn/HandlerAjax/daily_call_list.ashx";//定义一个喊单的url
+        /*此url的用法如下。
+        *空单：{ go: "SellOutConfirm", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(), zy: zhiying, zs: zhisun, tName: TeacherName, p_id: $(this).attr("p_id"), p_Price: $(this).attr("p_Price"), p_Name: $(this).attr("p_Name") }
+        *多单：{ go: "PurchaseConfirm", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(), zy: zhiying, zs: zhisun, p_id: $(this).attr("p_id"), p_Price: $(this).attr("p_Price"), p_Name: $(this).attr("p_Name") }
+        * 两者只有一个参数不同：SellOutConfirm卖出（空单）PurchaseConfirm买入（多单）
+        * */
+        var url_call_ahead="http://91dashi.cn:9000/single_call_ahead/add";  //定义一个挂单的url
+        /*此url的用法如下：
+        / { "owner_id": _teacher, "product_id": _p_id, "direction": "挂多", "jin_price": _jin_price, "stop_win": zhiying, "stop_lost": zhisun };
+         */
+        //根据是做单还是挂单来决定用哪个url
+        var call_type=$("#process_type>option:selected").text(); //卖出，买入，挂空，挂多。
+        if(call_type.indexOf("挂")!=-1){
+            var price_ahead= $.trim($("#ahead_price").val()); //进场价
+            var stop_win= $.trim($("#stop_win").val());
+            var stop_lost= $.trim($("#stop_lost").val());
+            var teacher_id=$("#td_info").text().split(" ")[0].split(":")[1];
+            var call_id=$("#td_info").text().split(" ")[1].split(":")[1];
+
+            if(price_ahead=='' || price_ahead<=0){
+                alert("进场价格不正确");
+            }
+            else if(isNaN(stop_win) || isNaN(stop_lost)){
+                alert("止赢/止损设置不正确");
+            }
+            else {
+                var adata = {
+                    "owner_id": teacher_id,
+                    "call_id":call_id,
+                    "product_id": $("#product_select").val(),
+                    "product_name": $("#product_select>option:selected").text(),
+                    "direction": $("#process_type>option:selected").text(),
+                    "jin_price": price_ahead,
+                    "stop_win":stop_win,
+                    "stop_lost": stop_lost,
+                    "current_price":product_price_list_global[ $("#product_select>option:selected").text()]
+                };
+                console.log("当前价格"+product_price_list_global[ $("#product_select>option:selected").text()])
+                if($("#prev_button_text").text()=="编辑"){
+                    //修改挂单的情况
+                    adata["call_type"]=1;
+                    adata["is_query"]=1;
+                    var r=confirm("确认修改挂单？");
+                    if(r){
+                        $.post("http://"+host+":7000/query_call",adata,function(data){
+                            var data=JSON.parse(data);
+                            if(data["message"]=="success"){
+                                 alert("挂单修改成功");
+                             }
+                            else{
+                                alert("挂单修改失败");
+                                console.log(data);
+                            }
+                            $(".close").click(); //关闭弹出框
+                            load_teacher_ranking();//重新加载排行榜
+                        });
+                    }else{$(".close").click();}
+
+                }
+                else{
+                    //增加挂单的情况
+                    var r=confirm("确认"+$("#process_type>option:selected").text()+"？");
+                    if(r){
+                        $.post(url_call_ahead, adata, function (data) {
+                        if(data["message"]=="success"){
+                                alert("挂单成功");
+                            }
+                            else{
+                                alert("挂单失败");
+                                console.log(data);
+                            }
+                            $(".close").click(); //关闭弹出框
+                            load_teacher_ranking();//重新加载排行榜
+                        });
+                    }else{$(".close").click();}
+
+                }
+
+            }
+        }
+        else{
+            //如果是建仓的情况
+            var price= $.trim($("#jiage").text()); //建仓价
+            var stop_win= $.trim($("#stop_win").val());
+            var stop_lost= $.trim($("#stop_lost").val());
+            var teacher_id=$("#td_info").text().split(" ")[0].split(":")[1];
+            var call_id=$("#td_info").text().split(" ")[1].split(":")[1];
+            var product_id=$("#product_select").val();
+            var product_name=$("#product_select>option:selected").text();
+            var direction= $("#process_type>option:selected").text();
+
+             /*建仓的url的用法如下。
+        *空单：{ go: "SellOutConfirm", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(), zy: zhiying, zs: zhisun, tName: TeacherName, p_id: $(this).attr("p_id"), p_Price: $(this).attr("p_Price"), p_Name: $(this).attr("p_Name") }
+        *多单：{ go: "PurchaseConfirm", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(), zy: zhiying, zs: zhisun, p_id: $(this).attr("p_id"), p_Price: $(this).attr("p_Price"), p_Name: $(this).attr("p_Name") }
+        * 两者只有一个参数不同：SellOutConfirm卖出（空单）PurchaseConfirm买入（多单）
+        * */
+            if($("#prev_button_text").text()=="建仓"){
+                var r=confirm("确认建立"+(direction=="买入"?"多单？":"空单？"));
+            if(r){
+                var adata = {
+                    "go":(direction=="买入"?"PurchaseConfirm":"SellOutConfirm"),
+                    "UserId": teacher_id,
+                    "SingleCallId":call_id,
+                    "p_id": product_id,
+                    "tName":"",
+                    "p_Name": product_name,
+                    "direction": direction,
+                    "zy":stop_win,
+                    "zs": stop_lost,
+                    "p_Price":price
+                };
+                $.post(url_call,adata,function(data){
+                        console.log(data);
+                        console.log(data=="True")
+                        if(data=="True"){
+                            alert("建仓成功");
+                        }
+                        else{
+                            alert("建仓失败");
+                            console.log(data);
+                        }
+                        $(".close").click(); //关闭弹出框
+                        load_teacher_ranking();//重新加载排行榜
+                    });
+                }else{$(".close").click();}
+            }
+            else if($("#prev_button_text").text()=="平仓"){
+                //nothing
+            }else{}
+        }
+
+    });
+//平仓按钮。
+    $("#submit_ping").click(function(){
+            var url_call="http://91dashi.cn/HandlerAjax/daily_call_list.ashx";//定义一个平单的url
+            //var price=product_price_list_global[$("#product_name").text()];  //平仓是的价格
+            var stop_win= $.trim($("#stop_win").val());
+            var stop_lost= $.trim($("#stop_lost").val());
+            var teacher_id=$("#td_info").text().split(" ")[0].split(":")[1];
+            var call_id=$("#td_info").text().split(" ")[1].split(":")[1];
+            var product_id=$("#product_id").text();
+            var product_name=$("#product_name").text();
+            var direction= $("#process_type>option:selected").text();
+    /*平仓 var _datas = {
+                            go: "PingCang", UserId: $("#TeacherUserId").val(), SingleCallId: $("#hiddenSingleCallId").val(),
+                            Product: ProductName, tName: TeacherName, p_id: $("#productId").val(),
+                            Direction: _Direction, JianCang: _JianCang
+                        }
+                */
+                var adata = {
+                    "go":"PingCang",
+                    "UserId": teacher_id,
+                    "SingleCallId":call_id,
+                    "p_id": product_id,
+                    "tName":"",
+                    "Product": product_name,
+                    "Direction": direction,
+                    "zy":stop_win,
+                    "zs": stop_lost
+                };
+        $.post(url_call,adata,function(data){
+            if(data=="true"){
+                alert("平仓成功");
+                load_teacher_ranking();//重新加载排行榜
+            }
+            else{
+                alert("平仓失败");
+                load_teacher_ranking();//重新加载排行榜
+            }
+        });
+
+    });
+ //实时聊天信息部分
+        var prev_message=[];  //一个容器，用来保存上一次获取的聊天记录
+        var prev_question=[];  //一个容器，用来保存上一次获取的提问记录。
+        var ws_id_char=0;
+        //var teacher_id=0;  //脚本开头已声明过teacher_id_login
+        console.log("begin");
+        var websocket = new ReconnectingWebSocket("ws://"+host+":9000/char");  //聊天室信息的ws客户端
+        websocket.onmessage = function (evt) {
+            var obj = JSON.parse(evt.data)
+            //console.log(obj);
+             if (obj["ws_id"] != undefined) {
+                 ws_id_char = obj["ws_id"];//赋值ws_id
+                 //teacher_id=$("#login_in_teacher_id").text();
+                 console.log("ws_id is " + ws_id_char);
+                 websocket.send(JSON.stringify({"type": "start_char", "ws_id":ws_id_char,"guest_id":"0","page_url":location.href,"teacher_id":teacher_id_login}));
+             }
+            else{
+                //老师的后台只需要获取聊天大厅内容即可。
+                 console.log(JSON.parse(evt.data));
+                 var message = JSON.parse(evt.data)["data"];  //获取聊天室消息集合
+                 var question = JSON.parse(evt.data)["question"]?JSON.parse(evt.data)["question"]:["没有消息"];  //获取聊天室消息集合
+                 //var video = JSON.parse(evt.data)["video"];  //视频列表数据
+                 //var dialog=JSON.parse(evt.data)["dialog"];  //私聊对话列表
+                 var data_calendar=JSON.parse(evt.data)["data_calendar"];  //数据日历列表
+                 var news=JSON.parse(evt.data)["news"]; //新闻列表
+                 //console.log(data_calendar);
+                 if(data_calendar.length>0){
+                        update_data_calendar(data_calendar);//更新数据日历
+                    }
+                 //console.log(news);
+                 if(news.length>0){
+                     update_news(news);
+                 }
+                 //开始填充聊天室信息
+                //console.log(prev_message[prev_message.length-1]);
+                 if(prev_message.length==0?true:(prev_message[prev_message.length-1]["time"]!=message[message.length-1]["time"] || prev_message[prev_message.length-1]["message"]!=message[message.length-1]["message"])){
+                       var str = '';
+                       for (var i = 0; i < message.length; i++) {
+                           str += '<div class="'+(message[i]['come_from']=="ifrobot"?robot_class:"")+' everychat"><div class="time">' + message[i]["time"] + '</div><div class="chat_list"><span class="ming">' + message[i]["name"] + '&nbsp;:</span><span class="huihua">' + message[i]["message"] + '</span></div><div class="clear"></div>';
+
+                      }
+
+                     $("#chatnowtime").html(str);
+                     //var div = document.getElementById('ChatLog');
+                     //div.scrollTop = div.scrollHeight;
+                     $('#chatnowtime').scrollTop( $('#chatnowtime')[0].scrollHeight );
+                     prev_message=message;
+                     console.log("chatnowtime is ok");
+                 }else{}
+
+                 //开始填充客户提问信息
+                 //console.log(question);//打印提问列表
+                 //console.log(prev_question.length==0?"":prev_question[prev_question.length-1][6]);
+                 //console.log(question[question.length-1]);
+                 //console.log((prev_question.length==0?"":prev_question[prev_question.length-1][6])!=question[question.length-1][6])
+                 //console.log("-----------------------")
+                 //if((prev_question.length==0?"":prev_question[prev_question.length-1][6])!=question[question.length-1][6])
+                 console.log(prev_question);
+                 console.log(question);
+                 if(question.length==0){
+                     //nothing..
+                 }
+                 else if((prev_question.length==0?"":prev_question[prev_question.length-1][6])!=question[question.length-1][6]){
+                     var str2 = '';
+                   for (var i = 0; i < question.length; i++) {
+                       // 0。客户匿名id，1.注册用户id 2.用户昵称/名字  3.员工id ，4消息内容 5.消息类型。6.消息日期。7.聊天室地址 8.ip地址
+                       //console.log(question[i])
+                       str2 +="<div class='everychat'><div class='time'>"+question[i][6].split(" ")[1]+"</div><div class='chat_list'><span class='ming'>"+(question[i][2]==''?"匿名用户"+question[i][0]:question[i][2])+"</span><span class='huihua'>"+question[i][4]+"</span><span class='change_status fobid1"+(question[i][5]=="allow"?"":" fobid2")+"' alt='"+(question[i][5]=="allow"?"已放行":"已禁止")+"' style='display:inline-block;'></span><span class='my_hide guest_id'>"+question[i][0]+"</span><span class='my_hide dialog_time'>"+question[i][6]+"</span></div><div class='clear'></div></div>";
+
+                  }
+                     //console.log(str2);
+                 $("#chatmanage").html(str2);
+                  //放行或者禁止客户的发言
+                    $(".change_status").each(function(){
+                        var $this=$(this);
+                        $this.click(function(){
+                            var text=$this.attr("alt");
+                            var dialog_time=$(this).parent().find(".dialog_time").text();
+                            var guest_id=$(this).parent().find(".guest_id").text();
+
+                                $.post("http://"+host+":9000/change_question_status",{"guest_id":guest_id,"dialog_date":dialog_time,"status":(text=="已禁止"?"allow":"ban")},function(data){
+                                    if(data["message"]=="success"){
+                                        if(text=="已禁止"){
+                                            $this.attr("alt","已放行");
+                                            $this.toggleClass ("fobid2");
+                                            console.log("已放行")
+                                        }
+                                        else if(text=="已放行"){
+                                            $this.attr("alt","已禁止");
+                                            $this.toggleClass ("fobid2");
+                                            console.log("已禁止");
+                                        }
+                                        else{
+                                            console.log("发言管理系统出错");
+                                        }
+                                    }else{
+                                        alert(data["message"]);
+                                    }
+                                });
+
+                        });
+                    });
+                 //console.log(str2)
+                 $('#chatmanage').scrollTop( $('#chatmanage')[0].scrollHeight );
+                     prev_question=question;
+                     console.log("chatmanage is ok");
+                 }else{}
+
+             }
+        };
+/***************************************************机器人工作模式模块开始*******************************************************************/
+//定义一个加载机器人模式和配置的方法，此方法在启动页面的时候会被调用。
+var model_list=[]; //全局变量，用于存放机器人模式配置信息，   【【"模式id","模式名称"】。。。。。】
+var robot_dict={}; //全局变量，用于存放模式中机器人的配置    {"模式id":{"所属模式名称"：模式名称，“s所属机器人集合”:[{"机器人id"：机器人id，"机器人名称"：机器人名称，"间隔倍率":间隔倍率,"机器人状态“：机器人状态},{}...]},......]}
+var all_robot_list=[]; //全局变量，存放所有机器人的信息
+    function get_robot_and_model(){
+        console.log("get_robot_and_model fuction is running....");
+        $.post("http://"+host+":9000/robot_model/query_model",function(data){
+           console.log(data);
+            $(".setting_cont_txt").val("");//清除输入框内容
+            model_list=data["model_list"]==undefined?[]:data["model_list"];//【【"模式id","模式名称"】。。。。。】
+            robot_dict=data["robot_dict"]==undefined?{}:data["robot_dict"]; // {"模式id":{"所属模式名称"：模式名称，“s所属机器人集合”:[{"机器人id"：机器人id，"机器人名称"：机器人名称，"间隔倍率":间隔倍率,"机器人状态“：机器人状态},{}...]},......]}
+            var robot_model_select=$("#robot_model_select"); //机器人模式下拉框
+            var setting_all= $("#setting_all");   //机器人模式名陈列块
+            var run_model_list=data["run_model_list"];
+            robot_model_select.empty();
+            robot_model_select.append("<option></option>");
+            //console.log(setting_all.find("button[class='allbut']").length);
+            setting_all.find("button[class*='model_button']").remove();
+            //加载模式名称陈列块内容 加载模式选择select的option
+            for(var i=0;i<model_list.length;i++){
+                setting_all.append("<button id='model_"+model_list[i]["id"]+"' class='allbut model_button "+(run_model_list.indexOf(model_list[i]["id"].toString())==-1?"":"online")+"'>"+model_list[i]["name"]+"</button>");  //加载模式名称列表。
+                robot_model_select.append("<option value='"+model_list[i]["id"]+"'>"+model_list[i]["name"]+"</option>")
+            }
+         //给模式按钮追加启动和停止模式的事件。
+         $(".model_button").each(function(){
+             var $this=$(this);
+             $this.unbind("click").click(function(){
+                 var the_id=$this.attr("id").split("_")[1];
+                 var the_type=($this.attr("class").indexOf("online")!=-1)?"stop":"run";
+                 control_model($this,the_type,the_id);
+
+             });
+         });
+        //加载备选的机器人配置信息
+            get_canuse_robots([]);
+        });
+    }
+
+    get_robot_and_model();
+
+//定义一个启动或者停止模式运作的方法。
+    function control_model($obj,type,id){
+        //$obj代表按钮本身，type参数有两种值：run代表启动模块，stop代表停止模块。id就是模式对应的模式id，locked是个标志位，代表的是直接启动还是要先停止已启动的模块再启动本模块，简单的说就是互锁。
+        var a_url="http://"+host+":9000/robot_model/run_model"+"?uid="+Math.random();
+        console.log(robot_dict);
+        console.log(id);
+        var robot_list=robot_dict[id]["robots"];  //返回的是一个数组
+        console.log(robot_list);
+        var ids_times={};  //定义一个id和间隔倍率的字典。
+        for(var i=0;i<robot_list.length;i++){
+            ids_times[robot_list[i]["robot_id"]]=robot_list[i]["robot_times"];
+        }
+        var adata={"ids_times":JSON.stringify(ids_times),"model_action":type,"model_id":id};
+        $.post(a_url,adata,function(data){
+            console.log(data);
+            if(data['message']=='success'){
+                 var astr="模块"+(type=="run"?"启动":"停止")+"成功";
+                alert(astr);
+                $("#setting_all .online").removeClass("online");
+                if(type=="run"){
+                    $obj.addClass("online");
+                }else{}
+            }
+            else{
+                var astr="模块"+(type=="run"?"启动":"停止")+"失败";
+                alert(astr);
+            }
+
+        });
+    }
+//停止所有机器人/模式运行的方法
+    $("#stop").click(function(){
+        $.post("http://"+host+":9000/robot_model/stop_all_robot",function(data){
+            if(data["message"]=="success"){
+                alert("停止成功");
+                $(".online").removeClass("online");
+            }
+            else{
+                alert(data["message"]);
+            }
+        });
+    });
+//定义一个加载备选的机器人配置信息的方法,remove_list是需要排除的数组,是机器人id组成的【1，2，3，。。。。。】
+    function get_canuse_robots(remove_list){
+        var $select_canuse_robots=$("#select_canuse_robots");
+        $select_canuse_robots.find("option").remove();
+        $.post("http://"+host+":9000/robot_model/all_robot",function(data){
+            var adata=data;//[[id,name]........]
+            for(var i=0;i<adata.length;i++){
+                if(remove_list.indexOf(adata[i][0].toString())==-1){
+                    var temp_str="<option value='"+adata[i][0]+"'>"+adata[i][1]+"</option>";
+                    $select_canuse_robots.append(temp_str);
+                }else{}
+            }
+        });
+    }
+
+//模式select的事件。
+    $("#robot_model_select").change(function(){
+        var temp_val=$(this).val();
+        if(temp_val!=""){
+            $(".setting_cont_txt").val($("#robot_model_select>option:selected").text());
+            //也有可能有没有机器人信息的模式，那样的话，会报undefind的错误。
+            var robots=[];
+            try{
+                robots=(robot_dict[temp_val]["robots"]);
+            }
+            catch (e){
+
+            }
+            if(robots.length==0){
+                 $("#robot_table").html("<tbody><tr><td></td><td></td><td></td></tr></tbody>");//没有机器人信息的模式
+            }else{
+                //console.log(robots);
+                var temp_all='';
+                var l=robots.length;
+                for(var i=0;i<l;i++){
+                    var temp_str='';
+                    if((i+1)%3==1){
+                        temp_str+="<tr>";
+                    }else{}
+                    var a_id=robots[i]['robot_id'];
+                    var a_name=robots[i]['robot_name'];
+                    var a_times=robots[i]['robot_times'];
+                    temp_str+="<td class='robot' alt='"+a_id+"'>"+a_name+
+                            ":<select class='select_style'><option "+(a_times==0.5?"selected='selected'":"")+" value='0.5'>低频</option>" +
+                    "<option "+(a_times==1?"selected='selected'":"")+"  value='1'>中频</option>" +
+                    "<option  "+(a_times==2?"selected='selected'":"")+" value='2'>高频</option>" +
+                    "</select><button class='delate'>删除</button></td>";
+                    if((i+1)%3==0){
+                        temp_str+="</tr>";
+                    }else{}
+                   temp_all+=temp_str;
+                }
+                var t_flag=3-l%3;
+                if(t_flag==3){
+                    //nothing
+                }
+                else if(t_flag==2){
+                    temp_all+="<td></td><td></td></tr>";
+                }
+                else if(t_flag==1){
+                    temp_all+="<td></td></tr>";
+                }else{}
+
+                $("#robot_table").empty().append(temp_all); //加载机器人的配置文件到显示区域
+
+                //删除按钮的方法 ,注意，删除按钮在两处有定义，
+                $(".delate").click(function(){
+                    var $this=$(this).parent();
+                    if($this.parent().find(".robot").size()==0){
+                        $(this).parent().remove();
+                    }
+                    else{
+                        $this.removeClass("robot").empty();
+                    }
+                    //需要检测这一行tr是否都为空了。
+                    var robot_class_length=$("#robot_table .robot").length;
+                    if(robot_class_length>0){
+                        $("#robot_table tr").each(function(){
+                            var $this=$(this);
+                            console.log($.trim($this.text()));
+                            if($.trim($this.text())==""){
+                                $this.remove();
+                            }else{}
+                        });
+                    }else{}
+                });
+            }
+
+        }
+        else{
+            $("#robot_table").html("<tr><td></td><td></td><td></td></tr>");
+        }
+    });
+//删除现有机器人模式配置。
+    $("#delete_model").click(function(){
+        var model_name= $.trim($(".setting_cont_txt").val());  //配置名称。
+        var current_name_id='';
+        var aflag=false;
+        $("#robot_model_select>option").each(function(){
+            if(model_name==$(this).text()){
+                aflag=true;
+                current_name_id=$(this).val();
+            }else{}
+        });
+        if(!aflag){
+            alert(model_name+"还未保存");
+        }
+        else{
+            $.post("http://"+host+":9000/robot_model/delete_model",{"model_id":current_name_id},function(data){
+                if(data["message"]=="success"){
+                    alert("模式删除成功");
+                }else{alert(data["message"]);}
+                get_robot_and_model();//重新加载配置
+                 $("#robot_table").html("<tr><td></td><td></td><td></td></tr>");//重置机器人陈列区
+            });
+        }
+    });
+//添加机器人到现有配置的方法
+    $("#add_robot_config").click(function(){
+        var model_name= $.trim($(".setting_cont_txt").val());
+        var options=$("#robot_model_select>option");
+        var name_list=[];
+        options.each(function(){name_list.push($(this).text());});
+        if(model_name==''){
+            alert("请先定义机器人模式的名称");
+        }
+        /*
+        else if(name_list.indexOf(model_name)!=-1){
+            alert("模式名称重复");
+        }*/
+        else if($("#select_canuse_robots>option:selected").text()==''){
+            alert("亲，你点的太快了");
+        }
+        else{
+            var items_length=$("#robot_table .robot").length;
+            var temp_str='';
+            if(items_length==0){
+                var the_td=$("#robot_table td:first");
+                var temp_str=$("#select_canuse_robots>option:selected").text()+
+                        ":<select class='select_style'><option value='0.5'>低频</option><option value='1'>中频</option><option value='2'>高频</option></select><button class='delate'>删除</button>";
+                the_td.empty().html(temp_str).attr("class","robot").attr("alt",$("#select_canuse_robots>option:selected").val());
+            }
+            else if(items_length%3==0){
+                temp_str="<tr><td class='robot' alt='"+$("#select_canuse_robots>option:selected").val()+"'>"+
+                        $("#select_canuse_robots>option:selected").text()+
+                        ":<select class='select_style'><option value='0.5'>低频</option><option value='1'>中频</option><option value='2'>高频</option></select><button class='delate'>删除</button></td><td></td><td></td></tr>";
+                $("#robot_table").append(temp_str);
+            }
+            else{
+                var the_td=$("#robot_table td[class!='robot']:first");
+                var temp_str=$("#select_canuse_robots>option:selected").text()+
+                        ":<select class='select_style'><option value='0.5'>低频</option><option value='1'>中频</option><option value='2'>高频</option></select><button class='delate'>删除</button>";
+                the_td.empty().html(temp_str).attr("class","robot").attr("alt",$("#select_canuse_robots>option:selected").val());
+            }
+        }
+        robot_delete();//给删除按钮增加方法
+        var robot_items=$("#robot_table .robot");
+        var id_list=[];
+        robot_items.each(function(){id_list.push($(this).attr("alt"));console.log($(this).attr("alt"));});
+        get_canuse_robots(id_list);//重新整理备选的机器人的option
+    });
+ //保存配置按钮事件
+    $("#save_model").click(function(){
+        var model_name= $.trim($(".setting_cont_txt").val());
+        var model_id=$("#robot_model_select>option:selected").val();
+        var robot_list=[];
+        $("#robot_table .robot").each(function(){
+            var $this=$(this);
+            var robot_id=$this.attr("alt");
+            var times=$this.find("select>option:selected").val();
+            robot_list.push({"model_id":"","robot_id":robot_id,"times":times});
+        });
+        if(model_name.length==0){
+            alert("请给机器人模式起个名字吧");
+        }
+        else{
+            var adata={"model_name":model_name,"model_id":model_id,"robot_list":JSON.stringify(robot_list)};  //复杂数据一定要先转换，不然后台取不出来
+            $.post("http://"+host+":9000/robot_model/add_model",adata,function(data){
+                console.log(adata);
+                console.log(data);
+                alert(data["message"]);
+                $(".setting_cont_txt").val('');
+                $("#robot_table").html("<tr><td></td><td></td><td></td></tr>");
+            });
+        }
+    get_robot_and_model();//重新加载
+    });
+ //机器人item删除按钮的方法,注意，加载页面的时候也定义了一个机器人按钮删除的方法。
+    function robot_delete(){
+        $(".delate:last").click(function(){
+            alert("删除成功");
+            var $this=$(this).parent();
+            if($this.parent().find(".robot").size()==0){
+                $(this).parent().remove();
+            }
+            else{
+                $this.removeClass("robot").empty();
+            }
+            //需要检测这一行tr是否都为空了。
+            var robot_class_length=$("#robot_table .robot").length;
+            if(robot_class_length>0){
+                $("#robot_table tr").each(function(){
+                    var $this=$(this);
+                    console.log($.trim($this.text()));
+                    if($.trim($this.text())==""){
+                        $this.remove();
+                    }else{}
+                });
+            }else{}
+        });
+
+    }
+//老师发言的方法:
+    $("#submit_message").click(function(){
+        var alias= $.trim($("#teacher_alias>option:selected").text());
+        var message= $.trim($("#teacher_message").val());
+        if(alias=="自定义"){
+            alert("请选择一个化名");
+        }
+        else if(message==""){
+            alert("发言内容不能为空");
+        }
+        else{
+            $.post("http://"+host+":9000/dialog_listen",{"guest_id":0,"user_id":0,"teacher_id":teacher_id_login,"user_name":alias,"dialog_message":message,"dialog_type":"teacher","page_url":document.location.href},function(data){
+                if(data["message"]=="success"){
+                    $("#teacher_message").val("");
+                }else{}
+            });
+        }
+    });
+/***************************************************机器人工作模式模块结束*******************************************************************/
+
+
+/***********************************************实时新闻和数据日历****************************************************/
+    //定义一个把金10新闻数据插入聊天室的新闻模块的方法,参数data是json解析后的数据数组
+    // 获取金10网站的数据日历。使用ws来传输此数据。
+        function update_data_calendar(data) {
+            var result = data;
+            data_calendar(result);  //把数据插入聊天室的数据日历。
+
+    }
+/*
+//获取金10网站的数据日历。测试方法，工作环境使用ws来传输此数据。
+
+    function update_data_calendar() {
+        $.post("http://" + host + "/get_caijing_data/calendar", function (data) {
+            var result = data;
+            data_calendar(result);  //把数据插入聊天室的数据日历。
+        });
+    }
+   // update_data_calendar();//测试使用，实际中以ws方式传输数据。
+*/
+ //定义一个插入新闻的方法。
+ function update_news(data_list){
+     var news1=$("#news_scroll");
+     var news2=$("#morenew");
+    if(data_list.length==30){
+        //第一次获取新闻数据
+        //对新闻滚动面板的操作
+        /*
+        news1.append("<a><span class='dete'>"+data_list[2]["time"]+"</span>"+data_list[2]["message"]+"</a>");
+        news1.append("<a><span class='dete'>"+data_list[1]["time"]+"</span>"+data_list[1]["message"]+"</a>");
+        news1.append("<a><span class='dete'>"+data_list[0]["time"]+"</span>"+data_list[0]["message"]+"</a>");
+        */
+        //反转数组
+        data_list.reverse();
+        news2.empty();
+        var l=data_list.length;
+        for(var i=0;i<l;i++){
+            var temp=data_list[i];
+            var temp_str="<div class='everynew'><span class='time'>"+temp["time"]+"</span><span class='nr'>"+temp["message"]+"<span></div>";
+            news2.append(temp_str);
+        }
+    }
+    else{
+        //如果是追加信息的情况
+        var add_list=data_list.reverse();//反转
+        var l=add_list.length;
+        for(var i= 0;i<l;i++){
+            var temp=data_list[i];
+            var temp_str="<li><div class='dete'>"+temp["time"]+"</div><div class='news'><a>"+temp["message"]+"</a></div></li>";
+            news2.append(temp_str);
+            news2.children().first().remove();
+            if(i>=(l-3)){
+                var temp=data_list[i];
+                var temp_str="<a><span class='dete'>"+temp["time"]+"</span>"+temp["message"]+"</a>"
+                news1.append(temp_str);
+                news1.children().first().remove();
+            }else{}
+        }
+    }
+ }//function update_news over
+//定义一个把金10日历数据插入聊天室的数据日历的方法,参数data是json解析后的数据数组。0.时间 1.信息（包含国家） 2.重要等级 3.前值 4.预测值 5.公布值
+ function data_calendar(data) {
+
+     var rlength = data.length;
+     var already_list = [];  //已发布的最后的数据日历
+     var not_yet_list = [];   //还未发布的最早的数据日历
+     var more_calendar = $("#demo5>ul");   //更多的数据日历
+     var img_name = ['', 'yixing', 'erxing', 'sanxing', 'sixing', 'wuxing'];
+     more_calendar.empty();
+     for (var i = 0; i < rlength; i++) {
+         var temp = data[i];
+         var calendar_li_str = "<li><div class='master_data'><div class='master_data_bt'><p class='shijian'><span>" + temp[0] + "</span></p><p class='imporant'>重要性：<img src='../static/images/" + img_name[temp[2]] + ".png'/></p></div><div class='master_data_nr'><p>" + temp[1] + "</p></div><div class='master_data_qz'><p class='qz'>前值：<span class='lv'>" + temp[3] + "</span></p><p class='yc'>预测值：<span class='huang'>" + temp[4] + "</span></p><div class='gbz'><p class='gb'>公布值：<span class='hong'>" + temp[5] + "</span></p></div> </div></div></li>";
+         more_calendar.append($(calendar_li_str));
+         if (temp[5] != "待公布") {
+             //获取最后一批已发布的数据日期
+             var current_info_time = temp[0];
+             if (already_list.length == 0) {
+                 already_list.push(temp);
+             }
+             else {
+                 var last_time = already_list[already_list.length - 1][0];
+                 if (last_time == current_info_time) {
+                     already_list.push(temp);
+                 }
+                 else {
+                     already_list = [];
+                     already_list.push(temp);
+                 }
+             }
+         }
+         else {
+             //获取第一批未发布的数据日历
+             var current_info_time = temp[0];
+             if (not_yet_list.length == 0) {
+                 not_yet_list.push(temp);
+             }
+             else {
+                 var first_time = not_yet_list[0][0];
+                 if (first_time == current_info_time) {
+                     not_yet_list.push(temp);
+                 }
+                 else {
+                 }
+             }
+         }
+     }
+ } //function  data_calendar over
+
+//一个测试元素是否存在于数组的函数
+    function inArray(item,array){
+        for(var i=0;i<array.length;i++){
+            if(item==array[i]){
+                return true;
+                break;
+            }else{}
+        }
+        return false;
+    }
+//end!
+});
+</script>
+</body>
+</html>
