@@ -17,16 +17,13 @@ $(function() {
         pop_tip_div_plus("hide");
     };
 
-    // 主区域最小高度
-    console.log($(window).height(), $("#main_zone").css("top"));
-    $("#main_zone, #right_bar").css("min-height", $(window).height() - $("#main_zone").offset().top);
+
 
     function set_window() {
         /*计算并重设右侧边栏高度*/
-        $("#right_bar").css("height", $("#main_zone").height());
+        $("#right_bar").css("height", $(".main_row").height());
     }
 
-    set_window();
     window.onresize = function() {
         // 修改窗口大小事件
         set_window();
@@ -300,6 +297,7 @@ $(function() {
                         change_datepicker_val(data['report_datetime']);
                     }
                 }
+            set_window();
             });
         }
     };
