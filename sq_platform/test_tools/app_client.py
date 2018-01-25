@@ -146,6 +146,32 @@ def test_gps_push():
     print(res.json())
 
 
+def test_add_alert_message():
+    """测试发送推送消息"""
+    auth_token = "a129da33b21a4bb6800847d6627b2f4f"  # app段登录标识 me
+    auth_token = "58d68686f12247c092c0d9f075f65a60"  # app段登录标识
+    headers = {"auth_token": auth_token}
+    url = "http://127.0.0.1:5000/api/add_alert_message"
+    data = {
+        "ticker": "这是一条测试消息",
+        "title": "this is a title",
+        "detail": "我是正文",
+        "url": ""
+    }
+    r = requests.post(url, data=data, headers=headers)
+    print(r.json())
+
+
+def test_get_alert_message():
+    """测试接收推送消息"""
+    auth_token = "a129da33b21a4bb6800847d6627b2f4f"  # app段登录标识 me
+    auth_token = "58d68686f12247c092c0d9f075f65a60"  # app段登录标识
+    headers = {"auth_token": auth_token}
+    url = "http://safego.org:5000/api/get_alert_message"
+    r = requests.post(url, headers=headers)
+    print(r.json())
+
+
 if __name__ == "__main__":
     # args = {
     #     "url": "http://127.0.0.1:5000/api/get_daily_info",
@@ -167,6 +193,5 @@ if __name__ == "__main__":
     # test_get_user_driving_license()
     # """测试用户安全指数排名接口"""
     # test_get_security_rank_list()
-    """测试实时上传gps"""
-    test_gps_push()
+    test_get_alert_message()
     pass

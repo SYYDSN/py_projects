@@ -33,7 +33,7 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 
 """配置信息"""
 mongodb_setting = {
-    "host": "safego.org:27017",   # 数据库服务器地址
+    "host": "safego.org:20000",   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.

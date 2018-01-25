@@ -107,33 +107,6 @@ $(function() {
         location.href = "/manage/driver_detail?user_id=" + user_id;
     };
 
-    // 填充右侧边栏部分 移动到common.js文件中
-    // let fill_right_bar = function() {
-    //     $.post(`${server}/manage/get_driver_list`, function(json) {
-    //         let resp = JSON.parse(json);
-    //         if (resp['message'] !== "success") {
-    //             alert(resp['message']);
-    //         } else {
-    //             let data = resp['data'];
-    //             console.log(data);
-    //             let l = data.length;
-    //             if (l > 0) {
-    //                 let bar = $("#right_bar");
-    //                 bar.empty();
-    //                 for (let i = 0; i < l; i++) {
-    //                     let driver = data[i];
-    //                     let real_name = driver['real_name'] ? driver['real_name'] : driver['user_name']; // 真实姓名
-    //                     let head_img_url = driver['head_img_url'] ? driver['head_img_url'] : "static/image/head_img/default_01.png"; // 头像地址
-    //                     let html = `<div onclick="redirect_driver_detail($(this))" data-id="${driver._id}" class="nav_item">
-    //                                     <img src="../${head_img_url}" class="img-sm img-circle">
-    //                                     <div class="driver_name">${real_name}</div>
-    //                                 </div>`;
-    //                     bar.append(html);
-    //                 }
-    //             } else {}
-    //         }
-    //     });
-    // };
     fill_right_bar(redirect_driver_detail);  // 初始化右侧边栏
 
     // 获取司机信息并填充页面中部的部分,启动页面时调用
@@ -1098,6 +1071,7 @@ $(function() {
 
     // 初始化日期选择器
     (function (last_date_str) {
+        // 日期插件文档 http://www.bootcss.com/p/bootstrap-datetimepicker/
         // 参数last_date_str是最后一个可用的日期
         $("#date_picker").datetimepicker({
             language: "zh-CN",

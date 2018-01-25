@@ -776,3 +776,50 @@ def get_daily_info_func(user_id) -> str:
         message = pack_message(message, 3010, user_id=user_id)
     finally:
         return json.dumps(message)
+
+
+@api_user_blueprint.route("/<key>_alert_message", methods=['post', 'get'])
+@login_required_app
+def process_alert_message_func(user_id, key):
+    """app端查询推送的消息,示范接口,具体细节未落实"""
+    mes = dict({"message": "success"})
+    if key == "get":
+        """
+        查询推送的消息
+        data = {
+            "ticker": "demo滚动消息",                                # 收到消息的时候,通知栏的一次滚动消息
+            "title": "推动消息demo标题",                              # 标题
+            "detail": "推送消息demo的详细内容",                        # 内容
+            "url": "http://pltf.safeogo.rg/api/alert_message"       # 详情页面
+        }
+        """
+        now = datetime.datetime.now()
+        filter_dict = {
+            "effective_time": {"$gte": now}
+        }
+        alert = Message.find_one_plus(filter_dict=filter_dict, instance=True)
+        if isinstance(alert, Message):
+            mes_id = alert.get_id()
+            data = alert.to_flat_dict()
+            """标记已读"""
+            filter_dict = {"_id": mes_id}
+            update_dict = {"$set": {"effective_time": datetime.datetime.now()}}
+            Message.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+        else:
+            data = dict()
+        mes['data'] = data
+    elif key == "add":
+        args = get_args(request)
+        if "title" in args and "detail" in args:
+            try:
+                alert = Message(**args)
+                alert.save()
+            except Exception as e:
+                print(e)
+                logger.exception("process_alert_message_func Error:", exc_info=True, stack_info=True)
+                mes = pack_message(mes, 6001, **args)
+            finally:
+                pass
+    else:
+        mes = pack_message(mes, 3003, key=key)
+    return json.dumps(mes)

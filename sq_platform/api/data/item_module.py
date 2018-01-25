@@ -1685,6 +1685,28 @@ class PhoneDevice(mongo_db.BaseDoc):
         return list(d.keys())
 
 
+class Message(mongo_db.BaseDoc):
+    """
+    推送给客户的消息,目前不完善,仅仅满足app端调试
+    """
+    _table_name = "message_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId                      # id，是一个ObjectId对象，唯一
+    type_dict['ticker'] = str                        # 收到消息的时候,通知栏的一次滚动消息
+    type_dict['title'] = str                         # 标题
+    type_dict['detail'] = str                        # 内容
+    type_dict['url'] = str                           # 详情页面地址
+    type_dict['effective_time'] = datetime.datetime  # 最后有效时间  默认15分钟. 用户收到后会重置这个变量
+
+
+    def __init__(self, **kwargs):
+        if "title" not in kwargs or "detail" not in kwargs:
+            raise ValueError("title和detail参数必须")
+        if "effective_time" not in kwargs:
+            kwargs['effective_time'] = datetime.datetime.now() + datetime.timedelta(minutes=15)
+        super(Message, self).__init__(**kwargs)
+
+
 def clear_phone() -> None:
     """清除多余的设备"""
     # 先修正用户的手机设备列表。

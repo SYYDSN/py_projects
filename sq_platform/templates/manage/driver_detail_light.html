@@ -1,9 +1,8 @@
 {% extends "manage/base_template_light.html" %}
 {% block extend_css %}
-<!--日期选择器样式-->
-<link rel="stylesheet" href="../static/css/bootstrap-datetimepicker.min.css">
 <link rel="stylesheet" href="../static/css/manage/driver_detail_light.css">
-{% endblock %} {% block main %}
+{% endblock %}
+{% block main %}
 
 <div id="main_zone" class="main_zone">
     <div id="base_info_row" class="row">
@@ -230,12 +229,14 @@
             </div>
             <div class="row">
                 <div class="col-lg-6 col-md-6  col-sm-6 col-xs-12">
+
                     <div class="input-group datepicker_group">
                       <input type="text" class="form-control" data-date-format="yyyy-mm-dd" id="date_picker">
                       <span class="input-group-btn">
                         <button class="btn btn-default" id="date_picker_submit_btn" type="button">选择日期</button>
                       </span>
                     </div>
+
                 </div>
             </div>
             <div class="row">
@@ -487,6 +488,8 @@
 <script src="../../static/js/jquery.AshAlom.gaugeMeter-2.0.0.min.js"></script>
 <!--百度图表-->
 <script src="../../static/js/echarts.min.js"></script>
+<!--日期选择器样式-->
+<link rel="stylesheet" href="../static/css/bootstrap-datetimepicker.min.css">
 <!--日期选择器-->
 <script src="../../static/js/bootstrap-datetimepicker.min.js"></script>
 <!--日期选择器本地化语言-->
