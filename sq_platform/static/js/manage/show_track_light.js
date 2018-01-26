@@ -148,10 +148,10 @@ let listen_click = function($obj){
     $("#right_bar .nav_item").each(function(){
         let $this = $(this);
         if(selected_drivers.indexOf($.trim($this.attr("data-id"))) === -1){
-            $this.find(".driver_name").css("color", "#7c8ff3");
+            $this.removeClass("selected_driver");
         }
         else{
-            $this.find(".driver_name").css("color", "orange");
+            $this.addClass("selected_driver");
         }
     });
 };
@@ -162,6 +162,9 @@ fill_right_bar(listen_click);  // 初始化右侧边栏
 // 点击日期输入栏的时候,关闭日期选择器的day的默认点击事件.
 $("#my_datetime_picker").click(function(){
     $(".day").unbind("click");
+    if($(".day:visible").length === 0){
+        $("#my_datetime_picker").focus();  // 显示日期选择器
+    }
 });
 
 // 日期选择器改变日期的函数
@@ -177,13 +180,31 @@ function change_date(){
         if(selected_dates.length === 0){
             selected_dates.push(first_date);           // 添加日期
         }
-        else{
+        else if(selected_dates.length === 1)
+        {
             let old = selected_dates[0];
             let day = parseInt(old.split("-")[2]);
             let old_date = new Date(old);
-            let new_date = new Date(first_date);
+            let new_date_0 = new Date(first_date);
 
-            if((old_date.setDate(day - 1) - new_date) === 0 || (old_date.setDate(day + 1) - new_date) === 0){
+            if((old_date.setDate(day - 1) - new_date_0) === 0 || (old_date.setDate(day + 1) - new_date_0) === 0){
+                selected_dates.push(first_date);           // 添加日期
+            }
+            else{
+                selected_dates = [first_date];
+            }
+        }
+        else
+        {
+            let old_0 = selected_dates[0];
+            let day_0 = parseInt(old_0.split("-")[2]);
+            let old_date_0 = new Date(old_0);
+            let old_1 = selected_dates[1];
+            let day_1 = parseInt(old_1.split("-")[2]);
+            let old_date_1 = new Date(old_1);
+            let new_date_0 = new Date(first_date);
+
+            if((old_date_0.setDate(day_0 - 1) - new_date_0) === 0 || (old_date_1.setDate(day_1 + 1) - new_date_0) === 0){
                 selected_dates.push(first_date);           // 添加日期
             }
             else{
@@ -193,12 +214,21 @@ function change_date(){
 
     }
     else{
-        selected_dates.splice(in_selected, 1);  // 删除这个日期
+        selected_dates = [first_date];  // 只选择这个日期
     }
+
+    selected_dates.sort();  // 排序
 
     if(selected_dates.length > 2){
         // 数组长度大于2就截断
-        selected_dates = selected_dates.slice(selected_dates.length - 2);  // 最多2个日期
+        if(selected_dates.indexOf(first_date) === 0){
+            // 判断新加的数组是在头部还是在尾部?
+            selected_dates = selected_dates.slice(0, 2);  // 截取头部 最多2个日期
+        }
+        else{
+            selected_dates = selected_dates.slice(selected_dates.length - 2);  // 截取尾部 最多2个日期
+        }
+
     }
     let date_str = selected_dates.join("~");
     $("#my_datetime_picker").val(date_str);
@@ -214,16 +244,31 @@ function change_date(){
         minView: 2,  // 不显示小时和分
         startView: 2,
         autoclose: false,  // 选定日期后是否立即关闭选择器
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
     }).on("show", function(ev){
         // 当选择器显示时被触发
         console.log(ev);
         console.log("选择器面板被打开");
-        $('#my_datetime_picker').datetimepicker('setStartDate', selected_dates[0]);
-    }).on("hide", function(ev){
-        // 当选择器隐藏时被触发 示范,无实际意义
-        console.log(ev);
-        console.log("选择器面板被隐藏");
+        let begin_date = null;
+        if(selected_dates.length > 1){
+            begin_date = selected_dates[0];
+            /*防止浏览器之间的差异,这里必须做手动转换,以保证时间字符串格式的一致性*/
+            let list = begin_date.split("-");
+            let y = list[0];
+            let m = list[1];
+            let d = parseInt(list[2]);
+            begin_date = `${y}-${m}-01`;
+            $('#my_datetime_picker').datetimepicker('setStartDate', begin_date);
+            // 选中2个日期?因为和删除日期有逻辑矛盾,搁置.
+            // let index_1 = d - 1;
+            // let index_2 = parseInt(selected_dates[1].split("-")[2]) - 1;
+            // let days = $(".day:not(.old):not(.new)");
+            // $(days[index_1]).addClass("active");
+            // $(days[index_2]).addClass("active");
+        }
+        else{
+            // 默认行为即可
+        }
     }).on("changeDate", function(ev){
         // 当日期被改变时被触发
         console.log(ev);
@@ -241,13 +286,37 @@ function change_date(){
 // 查询提交按钮的事件
 $("#submit_query").click(function(){
     let date_str = $.trim($("#my_datetime_picker").val());
-    let date_list = date_str.split("-");
-    let year = date_list[0];
-    /*防止浏览器之间的差异,这里必须做手动转换,以保证时间字符串格式的一致性*/
-    let month = String(date_list[1]).length < 1? "0" + date_list[1]:date_list[1];
-    let day = String(date_list[2]).length < 1? "0" + date_list[2]:date_list[2];
-    let query_date = `${year}-${month}-${day}`;  // 查询日期
+    let date_list = date_str.split("~");  // 拆分成开始和结束时间
+    let result_dates = [];    // 起终点日期容器
+    let result_drivers = [];   // 选择的司机的容器
+    for(let i=0;i<date_list.length;i++){
+        let cur = date_list[i];
+        /*防止浏览器之间的差异,这里必须做手动转换,以保证时间字符串格式的一致性*/
+        let char_list = cur.split("-");
+        let year = char_list[0];
+        let month = String(char_list[1]).length < 1? "0" + char_list[1]:char_list[1];
+        let day = String(char_list[2]).length < 1? "0" + char_list[2]:char_list[2];
+        let query_date = `${year}-${month}-${day}`;  // 查询日期
+        result_dates.push(query_date);
+    }
     // 取选择的用户
+    $("#right_bar .selected_driver").each(function(){
+        let cur = $(this);
+        let user_id = $.trim(cur.attr("data-id"));
+        result_drivers.push(user_id);
 
+    });
+    if(result_drivers.length === 0){
+        alert("至少选择一名司机");
+        return false;
+    }
+    else if(result_dates.length === 0){
+        alert("必须选择日期");
+        return false;
+    }
+    else{
+        let to_url = `/manage/show_track?ids=${JSON.stringify(result_drivers)}&date=${JSON.stringify(result_dates)}`;
+    location.href = to_url;
+    }
 });
 

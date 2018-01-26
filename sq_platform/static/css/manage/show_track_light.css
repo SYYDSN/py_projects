@@ -31,4 +31,7 @@
     margin-left:0.5em;
     margin-right:0.5em;
 }
+.selected_driver .driver_name{
+    color: orange;
+}
 
