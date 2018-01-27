@@ -1,0 +1,55 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+HOST	../sftp上传下载.py	/^HOST = "safego.org"$/;"	kind:variable	line:7
+PORT	../sftp上传下载.py	/^PORT = 22$/;"	kind:variable	line:8
+USER	../sftp上传下载.py	/^USER = "lijie.xu"$/;"	kind:variable	line:9
+_startswith_list	../拷贝文件到指定目录.py	/^def _startswith_list(a_str: str, a_list) -> bool:$/;"	kind:function	line:43
+app	../flask_main.py	/^app = Flask(__name__)$/;"	kind:variable	line:5
+app	../工具箱.py	/^app = Flask(__name__)$/;"	kind:variable	line:3
+compare_dir	../全面比较文件夹.py	/^def compare_dir(dir1, dir2):$/;"	kind:function	line:47
+compare_dir	../比较文件夹.py	/^def compare_dir(dir1, dir2):$/;"	kind:function	line:46
+copy_dir	../拷贝文件到指定目录.py	/^def copy_dir(source: str = None, destination: str = None, filter_suffix: list = None, ignore_dir: list = None)->None:$/;"	kind:function	line:69
+data	../解压文件.py	/^    data = file.read(name)$/;"	kind:variable	line:13
+data_dir_path	../flask_main.py	/^data_dir_path = os.path.split(__file__)[0]$/;"	kind:variable	line:7
+default_destination_path	../拷贝文件到指定目录.py	/^default_destination_path = "\/home\/walle\/tmp\/pltf2\/pltf2\/sq_platform"$/;"	kind:variable	line:19
+default_filter_suffix	../拷贝文件到指定目录.py	/^default_filter_suffix = ['pyc', 'log', 'bson', 'zip', 'apk', 'txt', 'pkl']$/;"	kind:variable	line:11
+default_ignore_dir_name	../拷贝文件到指定目录.py	/^default_ignore_dir_name = ['__pycache__', 'data_dump', '.idea', 'logs', 'static\/thumb\/track', 'static\/data_file',$/;"	kind:variable	line:13
+default_source_path	../拷贝文件到指定目录.py	/^default_source_path = "\/home\/walle\/work\/projects\/sq_platform"$/;"	kind:variable	line:16
+file	../解压文件.py	/^file = zipfile.ZipFile(sys.argv[1], "r")$/;"	kind:variable	line:6
+flask_main.py	../flask_main.py	1;"	kind:file	line:1
+fo	../解压文件.py	/^        fo = open(utf8name, "w")$/;"	kind:variable	line:15
+generator_password	../随机密码.py	/^def generator_password(pw_length: int = 12, upper_count: int = 1, symbol_count: int = 1, num_count: int = 3)->str:$/;"	kind:function	line:21
+get_file_path	../拷贝文件到指定目录.py	/^def get_file_path(dir_path: str)->list:$/;"	kind:function	line:25
+get_files	../全面比较文件夹.py	/^def get_files(dir_path, file_type=['py','html','js','css']):$/;"	kind:function	line:6
+get_files	../比较文件夹.py	/^def get_files(dir_path, file_type=['py','html','js','css']):$/;"	kind:function	line:6
+get_letter	../随机密码.py	/^def get_letter(seq: list = None)->str:$/;"	kind:function	line:13
+get_sftp	../sftp上传下载.py	/^def get_sftp(host: str = "safego.org", port: int = 22, user_name: str = "lijie.xu", password="-=[]_+{}"):$/;"	kind:function	line:13
+get_suffix_name	../拷贝文件到指定目录.py	/^def get_suffix_name(file_name, lower: bool = True) -> str:$/;"	kind:function	line:58
+hello_world	../工具箱.py	/^def hello_world():$/;"	kind:function	line:7
+host	../scan_port.py	/^    host = "git.safego.org"$/;"	kind:variable	line:32
+keys	../比较文件夹.py	/^keys = list(res.keys())$/;"	kind:variable	line:70
+lower_seq	../随机密码.py	/^lower_seq = list(range(97, 124))  # 小写字母对应的ASCII码的范围，97-123$/;"	kind:variable	line:9
+md5_dict	../全面比较文件夹.py	/^def md5_dict(dir_list):$/;"	kind:function	line:37
+md5_dict	../比较文件夹.py	/^def md5_dict(dir_list):$/;"	kind:function	line:36
+pathname	../解压文件.py	/^    pathname = os.path.dirname(utf8name)$/;"	kind:variable	line:10
+ports	../scan_port.py	/^    ports = list(range(7171, 7176))$/;"	kind:variable	line:33
+process_driving_data	../flask_main.py	/^def process_driving_data():$/;"	kind:function	line:11
+res	../scan_port.py	/^    res = scan_server(host=host, ports=ports)$/;"	kind:variable	line:35
+res	../比较文件夹.py	/^res = compare_dir("\/home\/walle\/work\/projects\/My_CRM", "\/media\/walle\/disk\/my_files\/My_CRM")$/;"	kind:variable	line:66
+scan_port.py	../scan_port.py	1;"	kind:file	line:1
+scan_server	../scan_port.py	/^def scan_server(host: str, ports: (list, tuple)) -> list:$/;"	kind:function	line:8
+sftp上传下载.py	../sftp上传下载.py	1;"	kind:file	line:1
+symbol_seq	../随机密码.py	/^symbol_seq = "~!@#$%^&*()-=_+[]{}\\|\/?"[:]  # 特殊符号的序列$/;"	kind:variable	line:10
+upper_seq	../随机密码.py	/^upper_seq = list(range(65, 92))  # 大写字母对应的ASCII码的范围，65-91$/;"	kind:variable	line:8
+utf8name	../解压文件.py	/^    utf8name = name.decode('gbk')$/;"	kind:variable	line:8
+xx	../flask_main.py	/^def xx():$/;"	kind:function	line:24
+全面比较文件夹.py	../全面比较文件夹.py	1;"	kind:file	line:1
+工具箱.py	../工具箱.py	1;"	kind:file	line:1
+拷贝文件到指定目录.py	../拷贝文件到指定目录.py	1;"	kind:file	line:1
+比较文件夹.py	../比较文件夹.py	1;"	kind:file	line:1
+解压文件.py	../解压文件.py	1;"	kind:file	line:1
+随机密码.py	../随机密码.py	1;"	kind:file	line:1

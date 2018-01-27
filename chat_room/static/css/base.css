@@ -1,0 +1,184 @@
+/* CSS Document */
+
+/* CSS Document */
+*{font: 12px/18px "Microsoft Yahei",Simsun,Arial,Helvetica,sans-serif;margin:0;padding:0;}
+html, body, div, p, h1, h2, h3, h4, blockquote, pre, form, fieldset, ol, ul, li, dl, dd, dt, table, tbody, thead, tfoot, tr, th, td {margin: 0;padding: 0;}
+body {background: none repeat scroll 0 0 transparent;color: #424542;font: 12px/18px Tahoma,"Microsoft Yahei",Simsun,Arial,Helvetica,sans-serif;}
+img {border: 0 none;vertical-align:top;}
+button {cursor: pointer;vertical-align: middle;}
+input {vertical-align: middle;}
+input, textarea {font-size: inherit;outline: 0;}
+textarea {background: none no-repeat scroll 0 0 transparent;border: 0px solid #D1D1D1;padding: 4px 4px 2px;resize: none;}
+ul, ol {list-style: none;}
+table {border-collapse: collapse;}
+table th a {color: #000000;}
+table th a.on {font-weight: 700;text-decoration: none;}
+a {color: #ffffff;outline: 0 none;text-decoration: none;}
+a:hover {text-decoration: none;}
+em {font-style: normal;}
+fieldset {border: 0 none;}
+legend {display: none;}
+h1, h2, h3, h4, h5, h6 {font-size: 14px;}
+.clear {clear: both;}
+.fix {}
+.fix:after {clear: both;content: ".";display: block;font-size: 0;height: 0;visibility: hidden;}
+.red {color: #FF0099;}
+.none{display:none;}
+
+.Page {margin:0 auto;}
+.NoSelect{-moz-user-focus:ignore;  -moz-user-input:disabled;  -moz-user-select:none; }
+
+html {background: none repeat scroll 0 0 #D7D8DA;}
+.clearfix:after {clear: both;content: " ";display: block;}
+.wrap {margin: 0 auto;width: 990px;}
+a{color:#333;}
+a:hover{text-decoration: underline;}
+.input {background: none repeat scroll 0 0 #FFFFFF;border: 1px solid #CECECE;height: 18px;line-height: 18px;padding: 6px 5px;width: 240px;}
+.baseheader{background: none repeat scroll 0 0 #FFFFFF;padding: 14px 0 10px;position: relative;z-index: 600;border-bottom: 7px solid #AABDD5;}
+.basetop{margin: 0 auto;width: 990px;position: relative;}
+.basetop span{padding-top: 10px; display: inline-block;vertical-align: top;}
+.fr{float: right;}
+.fl{float: left;}
+.basetop span a{color: #333333 !important;font: 16px/44px "寰蒋闆呴粦";margin-left: 20px;}
+.basetop span a:hover{text-decoration: underline;}
+.basetop .logo{background: url("../images/logo.png-20121028.png")/*tpa=http://www.handan678.com/images/logo.png?20121028*/ no-repeat scroll 0 0 transparent;display: inline-block;height: 44px;width: 243px;}
+.basemain {background: none repeat scroll 0 0 #FFFFFF;height: 507px;position: relative;}
+#baseFoot {color: #969696;margin: 0 auto;padding: 15px 0 20px;text-align: center;width: 990px;}
+#baseFoot a {color: #969696;margin-left: 10px;}
+
+.header{background: none repeat scroll 0 0 #FFFFFF;padding: 14px 0 10px;position: relative;z-index: 600;border-bottom: 7px solid #AABDD5;}
+.top{margin: 0 auto;width: 990px;position: relative;}
+.top span{padding-top: 10px; display: inline-block;vertical-align: top;}
+.fr{float: right;}
+.top span a{color: #333333 !important;font: 12px/60px "寰蒋闆呴粦";margin-left: 20px;}
+.top span a:hover{text-decoration: underline;}
+.top .logo{background: url("../images/vlogo_large.png-20121028.png")/*tpa=http://www.handan678.com/images/vlogo_large.png?20121028*/ no-repeat scroll 0 0 transparent;display: inline-block;height: 60px;width: 243px;}
+.foot{color: #838383;font-size: 12px;margin: 0 auto;padding: 20px 0;text-align: center;width: 990px;background: url("../images/footerBg.png")/*tpa=http://www.handan678.com/images/footerBg.png*//*tpa=http://www.handan678.com/images/footerBg.png*/ no-repeat scroll center top transparent;}
+.foot  a {color: #969696;margin-left: 10px;}
+.topnav {background: #2C2C2C;background-position: 0 -226px;background-repeat: repeat-x;display: block;/*min-width: 996px;*/overflow: hidden;}
+.miniaccount {float: right;}
+.miniaccount .userlabel, .miniaccount .userlabel .minihead, .miniaccount .userlabel .username, .miniaccount .userlabel .ico {float: left;}
+.miniaccount .userlabel {color: #B5B5B5;cursor: pointer;height: 45px;line-height: 45px;margin: 0 1px;padding: 0 9px 0 10px;position: relative;}
+.miniaccount .userlabel:hover {background-color: #343434;text-decoration: none;color:#99e000;}
+.miniaccount .userlabel .minihead {border-radius: 3px 3px 3px 3px;margin: 13px 10px 0 0;}
+.miniaccount .userlabel .ico {background-position: 0 -100px;height: 5px;margin: 12px 0 0 6px;overflow: hidden;width: 7px;}
+.miniaccount .userlabel .ico:not(tid) {}
+.miniaccount .userlayer {background-color: #FFFFFF;border: 1px solid #BEBEBE;display: none;margin-top: 28px;min-width: 261px;padding: 15px 0;position: absolute;z-index: 997;}
+.miniaccount .userlayer .head {margin-left: 15px;position: absolute;}
+.miniaccount .userlayer .head-bg {background-position: -432px -88px;height: 46px;position: absolute;width: 46px;}
+.miniaccount .userlayer .userinfo {color: #999999;line-height: 1.5;margin-top: -3px;}
+.miniaccount .userlayer .userinfo .username-wrap {padding-left: 69px;}
+.miniaccount .userlayer .userinfo .line-username {padding: 3px 8px 8px 0;white-space: nowrap;}
+.miniaccount .userlayer .userinfo .username {color: #666666;font-weight: 400;}
+.miniaccount .userlayer .userinfo .balance-wrap {border-top: 1px solid #E6E6E6;margin-top: 16px;padding: 6px 0 0 18px;}
+.miniaccount .userlayer .userinfo .line-money {padding-bottom: 13px;}
+.miniaccount .userlayer .userinfo .uid-wrap {margin-left: 6px;}
+.miniaccount .userlayer .userinfo .money {color: #FE8B00;font-size: 22px;font-weight: 400;margin: 0 7px 0 5px;vertical-align: -2px;}
+.miniaccount .userlayer .userinfo .line-btn {border-left: 1px solid #E3E3E3;margin-top: -7px;overflow: hidden;}
+.miniaccount .userlayer .userinfo .btn {background-color: #F2F2F2;background-position: 0 -163px;color: #666666;float: left;height: 26px;line-height: 26px;margin-left: -1px;text-align: center;text-decoration: none;width: 77px;}
+.miniaccount .userlayer .userinfo .btn-miniaccount-charge {margin-left: -2px;}
+.miniaccount .userlayer .userinfo .btn:hover {background-position: -78px -163px;}
+.miniaccount .userlayer .vip-info-line {position: relative;}
+.miniaccount .userlayer .vip-info-line .member-dot {margin-left: 5px;}
+.miniaccount .userlayer .vip-info-line .layer-tips {left: -60px;margin: 0;top: 17px;width: 235px;}
+.miniaccount .userlayer .vip-info-line .layer-tips-main {padding: 2px 8px;}
+.miniaccount .userlayer .vip-info-line .ico-direction-t {height: 7px;left: 62px;margin: 0;top: 1px;}
+.miniaccount .userlayer .vip-info-line .vip-ico {cursor: pointer;}
+.show-miniaccount .userlabel {-moz-border-bottom-colors: none;-moz-border-left-colors: none;-moz-border-right-colors: none;-moz-border-top-colors: none;background-color: #FFFFFF;border-color: #BEBEBE #BEBEBE ;border-image: none;border-style: solid solid none;border-width: 1px 1px 0;margin: -1px 0;padding-bottom: 1px;position: relative;z-index: 998;}
+.show-miniaccount .userlabel:hover {background-color: #FFFFFF;}
+.show-miniaccount .userlabel .ico {background-position: -8px -100px;}
+.show-miniaccount .userlayer {display: block;}
+.topnav {background:   repeat scroll 0 0 #2C2C2C;display: block;/*min-width: 996px;*/overflow: hidden;}
+.topnav-wrap {height: 29px;line-height: 29px;margin: 0 auto;}
+.topnav .link-split {background-color: #272727;border-right: 1px solid #3A3A3A;float: right;height: 45px;overflow: hidden;width: 1px;}
+.topnav .linkwrap:after {clear: both;content: ".";display: block;height: 0;visibility: hidden;}
+.topnav .linkwrap {color: #B5B5B5;float:right;}
+.topnav .linkwrap li {float:right;}
+.topnav .linkwrap .link, .topnav .linkwrap .word {color: #B5B5B5;float: left;height: 29px;overflow: hidden;padding: 0 8px 0 9px;line-height:29px;position: relative;}
+.topnav .linkwrap .link:hover {background-color: #3E3E3E;color: #CECECE;text-decoration: none;}
+.topnav .linkwrap .link-last {position: static;line-height: 29px;}
+.topnav .linkwrap .tenpay-wb {padding-left: 35px;}
+.topnav .linkwrap .tenpay-wb .ico-wb {background-position: -86px -68px;height: 18px;left: 9px;position: absolute;top: 8px;width: 22px;}
+.toplogin {float: right;}
+.toplogin .unlogin, .toplogin .logined, .toplogin .inactive {display: none;}
+.toplogin .linkwrap {float: left;margin-left: 0;}
+.toplogin .linkwrap .link-active, .toplogin .linkwrap .link-active:hover {background-color: #FF7D0B;color: #FFFFFF;}
+.toplogin .linkwrap .link-active {margin: 0 1px 0 0;}
+.toplogin .inactive .layer-tips {left: auto;margin: 27px 0 0 -35px;top: auto;width: 169px;z-index: 997;}
+.toplogin .inactive .layer-tips-main {line-height: 1.5;overflow: hidden;padding: 8px 12px;width: 145px;}
+.topnav .show-unlogin .unlogin {display: block;}
+.topnav .show-logined .logined {display: block;}
+.topnav .show-inactive .inactive {display: block;}
+.topnav .ico-vip {float: left;margin: 7px 0 0 7px;}
+.topnav .select {float: right;height: 45px;position: static;}
+.topnav .select .selected {background: none repeat scroll 0 0 transparent;color: #B5B5B5;cursor: pointer;float: left;height: 100%;margin: 0 1px;padding-right: 8px;text-decoration: none;}
+.topnav .select .selected:hover {background-color: #343434;}
+.topnav .select .selected span {background-position: 0 9999px;cursor: pointer;line-height: 45px;padding-left: 9px;}
+.topnav .select .selected:hover span {color:#99e000;}
+.topnav .select .selected .ico {background-position: 0 -100px;cursor: pointer;height: 5px;overflow: hidden;padding: 0;position: absolute;right: 10px;top: 12px;width: 7px;}
+.topnav .select .selected .ico:not(tid) {}
+.topnav .select .selected:hover .ico {}
+.topnav .select ul {border-color: #BEBEBE;left: auto;margin: 28px 0 0 -32px;top: auto;width: 85px;z-index: 997;}
+.topnav .select li {float: none;line-height: 27px;}
+.topnav .select li a {height: 27px;line-height: 27px;padding-right: 18px;text-align: right;}
+.topnav .select li a:hover {background-color: #EEEEEE;}
+.topnav .select-on .selected {-moz-border-bottom-colors: none;-moz-border-left-colors: none;-moz-border-right-colors: none;-moz-border-top-colors: none;background-color: #FFFFFF;border-color: #BEBEBE #BEBEBE;border-image: none;border-style: solid solid none;border-width: 1px 1px 0;color: #B5B5B5;margin: -1px 0;padding-bottom: 1px;position: relative;z-index: 998;}
+.topnav .select-on .selected:hover {background-color: #FFFFFF;}
+.topnav .select-on .selected .ico {background-position: -8px -100px;}
+.topnav .select-on .selected:hover .ico {}
+.js-breadcrumb-name{line-height:45px;}
+.logined{float: right; width: 400px;display:none;}
+.unlogin{float:right; width: 400px;display:none;}
+.topnav-area{margin:0 auto;width:996px;}
+#i_Uname{display: block;height: 45px;overflow: hidden;white-space: nowrap;max-width: 100px;_width:100px;text-overflow: ellipsis;}
+
+.loginForm {z-index:9999;background:#fff;background: none repeat scroll 0 0 rgba(255, 255, 255, 1);height: 345px; width:305px;
+position: fixed;_position: absolute;top: 40%;left: 50%;margin: -110px 0 0 -150px;}
+.loginForm .formList {height: 280px;padding: 15px 25px;}
+.loginForm .formList li {color: #333333;font-size: 14px;padding-top: 12px;}
+.loginForm input {font-size: 14px;}
+.loginForm a {color: #2478A7;font-size: 12px;}
+.loginForm a:hover {text-decoration: underline;}
+.loginForm .formTit {display: inline-block;font-size: 14px;text-align: right;vertical-align: middle;width: 82px;}
+.loginTit {display: block;font-size: 14px;font-weight: bold;}
+.loginErrBox {background: url("") no-repeat scroll 5px center transparent;border: 1px solid #BF2531;color: #BF2531;display: none;font-size: 12px;padding: 2px 5px 2px 27px;position: relative;top: 7px;width: 218px;}
+.topLink, .hasMore {color: #333333 !important;font: 16px/44px "寰蒋闆呴粦";margin-left: 20px;position: relative;}
+.loginTop .hasMore {display: inline-block;height: 44px;line-height: 44px;padding: 0 5px;text-align: center;width: 90px;}
+.loginTop .hover {-moz-border-bottom-colors: none;-moz-border-left-colors: none;-moz-border-right-colors: none;-moz-border-top-colors: none;background: none repeat scroll 0 0 #FFFFFF;border-color: #DCDCDC #DCDCDC;border-image: none;border-style: solid solid none;border-width: 1px 1px 0;margin-top: -1px;padding: 0 4px;}
+.loginTop .hasMore ul {-moz-border-bottom-colors: none;-moz-border-left-colors: none;-moz-border-right-colors: none;-moz-border-top-colors: none;border-image: none;border-right: 1px solid #DCDCDC;border-style: none solid solid;border-width: 0 1px 1px;box-shadow: none;right: -1px;top: 40px;width: 98px;}
+.dsOther a {color: #666666;display: block;font-size: 12px;height: 30px;line-height: 30px;margin: 1px;padding-left: 12px;text-align: left;}
+.dsOther a:hover {background: none repeat scroll 0 0 #ECF2F3;color: #000000;text-decoration: none;}
+.loginTop .arrow {border-color: #333333 #FFFFFF #FFFFFF;}
+.appLinks {background: none repeat scroll 0 0 #E2E3E7;height: 131px;}
+.loginDl {float: left;padding: 25px 10px 35px 0;width: 320px;}
+.loginDl dt {color: #555555;font-family: "Microsoft YaHei";font-size: 20px;padding-bottom: 10px;}
+.loginDl a {color: #828282;font-size: 14px;}
+.loginDl a:hover {color: #333333;}
+#docFoot {color: #969696;margin: 0 auto;padding: 15px 0 20px;text-align: center;width: 990px;}
+#docFoot a {color: #969696;margin-left: 10px;}
+.hasLogin {height: 230px;overflow: hidden;}
+.hasLogin .redLoginBtn, .hasLogin .orangeLoginBtn {font-size: 14px;width: 200px;}
+.hasLogin .redLoginBtn:hover {text-decoration: none;}
+.authSuc {background: url("") no-repeat scroll right -334px #FFFFFF;}
+.authErr {background: url("") no-repeat scroll right -360px #FFFFFF;}
+.inputDiv {background: none repeat scroll 0 0 #FFFFFF;border: 1px solid #CECECE;color: #B2B2B2;width: 280px;}
+.inputDiv .inputTit {display: inline-block;height: 30px;line-height: 30px;padding-left: 5px;vertical-align: top;width: 72px;font-size:14px;font-family: "瀹嬩綋";}
+.inputDiv .input {background: none repeat scroll 0 0 #FFFFFF;border: 0 none;outline: medium none;width: 185px;}
+.suggest_box {color: #010101;display: inline-block;font-size: 12px;line-height: 16px;position: relative;z-index: 500;}
+.suggest_box .suggest_list {background-color: #FFFFFF;border: 1px solid #CCCCCC;display: none;font-family: Arial;left: -51px;min-width: 250px;position: absolute;top: 30px;width: auto !important;}
+.suggest_box h6 {background: none repeat scroll 0 0 #E9E9E9;font-size: 14px;font-weight: normal;margin: 0;padding: 7px 0 7px 5px;width: auto !important;}
+.suggest_box .suggest_list li {cursor: pointer;font-size: 12px;margin: 0;padding: 6px 10px 6px 8px;}
+.suggest_box .suggest_list .list_focus {background: none repeat scroll 0 0 #208DB8;color: #FFFFFF;}
+.suggest_box .iframe {border: medium none;display: none;height: 100%;left: -50px;position: absolute;top: 28px;width: 100%;z-index: -1;}
+.bgfff {background: none repeat scroll 0 0 #F0F1F2;}
+#loginBgCtr {height: 30px;left: 0;position: absolute;text-align: center;top: 473px;width: 100%;z-index: 3;}
+#loginBgCtr a {color: #FFFFFF;display: inline-block;font-size: 16px;height: 20px;margin-left: 10px;opacity: 0.3;text-decoration: none;width: 20px;}
+#loginBgCtr .active {opacity: 1;}
+.loginForm .redLoginBtn, .loginForm .orangeLoginBtn {width: 250px;}
+.loginForm input {font-size: 14px;}
+.redLoginBtn, .orangeLoginBtn {background: none repeat-x scroll 0 0 #6fa7fd;background: none repeat scroll 0 0 rgba(0, 100, 255, 0.6);border: 0 none;color: #FFFFFF !important;cursor: pointer;display: inline-block;font-size: 14px;font-weight: 900;height: 40px;line-height: 40px;outline: medium none;padding: 0 30px;text-align: center;}
+.redLoginBtn:hover{background: none repeat scroll 0 0 rgba(0, 150, 255, 0.6);}
+.dire_login label{color:#333}
+.loginForm a.QQLogin{color:#333;}
+
+

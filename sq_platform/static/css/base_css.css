@@ -1,0 +1,79 @@
+/*常用的样式*/
+html{
+    width:100%;
+    height:100%;
+    font-size: 14px;
+}
+body {
+    width:100%;
+    height:100%;
+}
+
+.clear {
+    clear: both;
+}
+ul,li{
+    list-style: none;
+}
+/*字体图标样式*/
+.icon {
+    width: 2.6em;
+    height: 2.6em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+}
+
+/*字体图标样式*/
+.xs_icon {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    overflow: hidden;
+}
+
+/*字体图标的辅助类，用于修改图标的颜色，样式等*/
+.normal_status {
+    /*字体图标的一般/安全状态*/
+    color: rgba(110, 183, 62, 1);
+}
+
+.icon_mouse_leave {
+    /*awe字体图标，鼠标离开的状态*/
+    color: rgba(60, 141, 188, 0.8);
+    margin-left:1rem;
+}
+
+.icon_mouse_leave:hover {
+    /*awe字体图标，鼠标hover的状态*/
+    color: rgba(110, 183, 62, 1);
+    cursor: pointer;
+}
+
+.normal_status_an {
+    /*动画类，应该定义三个，现在只定义了一个*/
+    animation: flash_once_normal 3s;
+    animation-iteration-count: 3;
+}
+
+.warning_status {
+    color: rgba(224, 63, 0, 1);
+}
+
+.danger_status {
+    color: rgba(226, 80, 80, 1);
+}
+
+/*自定义图标闪动一下,应该定义三个，现在只定义了一个*/
+@keyframes flash_once_normal {
+    0% {
+        color: rgba(110, 183, 62, 1)
+    }
+    50% {
+        color: rgba(148, 0, 211, 1)
+    }
+    100% {
+        color: rgba(110, 183, 62, 1)
+    }
+}
+

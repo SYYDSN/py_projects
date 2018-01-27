@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0;">
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
+    <script src="../static/js/jquery.cookie.js"></script>
+	<script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.md5.js"></script>
+</head>
+<style>
+      table{
+            border:1px solid black;
+            margin: 10px;
+        }
+        table tr:nth-child(2n+1){ background-color:#eee}
+    td{
+        padding:5px 10px;
+
+    }
+
+    tr>th{
+        text-align: center;
+        padding:5px 10px;
+    }
+
+</style>
+<body style="text-align: center" class="container-fluid">
+<h2>聊天室视频源管理</h2>
+<div class="row">
+    <div class="hidden-xs hidden-sm  col-md-2 col-lg-2"><button id="add_video" class="">添加新的视频源地址</button></div>
+    <div  class="col-xs-4 col-sm-4 col-md-2 col-lg-2">当前在线<span id="counter"></span>人</div>
+    <div class="hidden-xs hidden-sm col-md-2 col-lg-2"><button id="manage_user" class="">用户管理</button></div>
+    <div class="col-xs-4 col-sm-4 col-md-2 col-md-offset-2 col-lg-2 col-lg-offset-3"><span id="current_user">{{current_user}}</span><button id="login_out">注销</button></div>
+    <div class="col-xs-4 col-sm-4  col-md-2 col-lg-1"><button id="change_password" class="">修改密码</button></div>
+
+
+</div>
+<div class="row">
+    <div class="col-xs-2 col-sm-2  col-md-2 col-lg-1"><button id="change_name" class="">修改名字</button></div>
+    <a class="col-xs-2 col-sm-2  col-md-2 col-lg-1" target="_blank" href="/dialog_page">聊天管理</a>
+    <a class="col-xs-2 col-sm-2  col-md-2 col-lg-1" target="_blank" href="/robots">机器人管理</a>
+</div>
+
+<hr>
+<table id="main" class="row" style="margin: auto">
+    <!--主数据窗口-->
+</table>
+<!---视频管理弹出框--->
+<div id="pop_add_window" style="display:none;background-color:hsla(244, 63%, 96%, 0.90)">
+    <div id="pop_add_inner" style="width:40em;margin:10% auto auto auto;background-color: hsla(6, 100%, 100%, 1);padding:1em 1em 2em 1em">
+        <h4 id="my_title" title="add_video_url">添加视频源</h4>
+        <p><label>聊天室名称：</label><input style="width:20em" type="text" id="input_name" placeholder="请输入视频源名称"/></p>
+        <p><label>聊天室备注：</label><input style="width:20em" type="text" id="input_description" placeholder="备注(非必填)"/></p>
+        <p><label>聊天室地址：</label><input style="width:20em"  type="text" id="room_url" placeholder="请粘贴聊天室地址(保存后不可更改)"/></p>
+        <p><label>视频源地址：</label><input style="width:20em"  type="text" id="input_url" placeholder="请粘贴视频源地址"/></p>
+        <p>
+            <button id="add_submit">确认</button>
+            <button id="add_cancel">放弃</button>
+        </p>
+    </div>
+</div>
+<!---用户管理的弹出页--->
+<div id="pop_manage_user"style="display:none;background-color:hsla(244, 63%, 96%, 0.90)">
+    <div id="manage_user_inner"  class="container-fluid"  style="width:60%;margin:20% auto auto auto;background-color: hsla(6, 100%, 100%, 1);">
+        <h4 class="row">后台账户管理</h4>
+        <table id="user_table" class="row">
+            <tr class="row">
+                <th class="col-xs-4 col-sm-4 col-md-4 col-lg-4">用户名</th><th class="col-xs-4 col-sm-4 col-md-4 col-lg-4">密码</th><th class="col-xs-4 col-sm-4 col-md-4 col-lg-4">状态</th>
+            </tr>
+        </table>
+        <!--用户管理弹出窗-->
+        <div class="row" id="edit_user">
+            <div  class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <p class="row">
+
+                <input class="col-xs-8 col-xs-offset-2  col-sm-4 col-md-2  col-lg-2 col-lg-offset-1" type="text" id="input_username" placeholder="请输入帐户名"/>
+
+                <input class="col-xs-8 col-xs-offset-2 col-sm-4 col-md-2 col-lg-2 " type="password" id="password1" placeholder="请输入密码"/>
+
+                <input class="col-xs-8  col-xs-offset-2 col-sm-4  col-md-2 col-lg-2 "  type="password" id="password2" placeholder="请再次输入密码"/>
+
+            </p>
+            </div>
+        <p class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="row">
+            <button class="col-xs-5 col-sm-4 col-md-2 col-lg-1 col-lg-offset-5  col-xs-offset-1 col-sm-offset-1" id="add_user">确认</button>
+            <button class="col-xs-5 col-sm-4 col-md-2 col-lg-1" id="clear_input">清除</button>
+
+        </div>
+        </p>
+        </div>
+
+    </div>
+</div>
+</body>
+<script>
+    $(function(){
+        //如果不是超级管理员，就要隐藏用户管理页面。
+        if($("#current_user").text()!="admin_user"){
+            $("#manage_user").hide(0);
+        }
+        else{
+            $("#manage_user").show(0);
+        }
+        //修改密码的方法。
+        $("#change_password").click(
+                function(){
+                    var new_password=prompt("请输入新密码");
+                    if(new_password!=null && new_password!=''){
+                        var objname=$("#current_user").text();
+                        var password= $.md5($.trim(new_password));
+                        $.post(host+"edit_teacher_user/change_password",{"objname":objname,"password":password},function(data){
+                            if(data["message"]=="success"){
+                                alert("密码修改成功");
+                            }
+                            else{
+                                alert("密码修改失败，请稍后再试");
+                            }
+                        });
+                    }
+                    else{
+                        alert("密码不能为空");
+                    }
+                }
+        );
+        //修改老师名称的方法。
+        $("#change_name").click(
+                function(){
+                    var new_name=prompt("请输入你在聊天室的称呼");
+                    if(new_name!=null && new_name!=''){
+                        var objname=$("#current_user").text();
+                        var name_str= $.trim(new_name);
+                        $.post(host+"edit_teacher_user/change_name",{"objname":objname,"password":name_str},function(data){
+                            if(data["message"]=="success"){
+                                alert("称呼修改成功");
+                            }
+                            else{
+                                alert("称呼修改失败，请稍后再试");
+                            }
+                        });
+                    }
+                    else{
+                        alert("称呼不能为空");
+                    }
+                }
+        );
+       //注销的方法,删除cookie
+        function login_out(){
+            $.removeCookie("username");
+            $.removeCookie("password");
+            $.removeCookie("teacher_id");
+            $.removeCookie("teacher_password");
+            //console.log(document.cookie);
+        }
+        $("#login_out").click(function(){login_out();location.href="/91dashicnlogin";});
+
+        var host="/";   //设置主机
+        //var width=window.screen.availWidth;
+        //var height=window.screen.availHeight;
+        var width=$(window).width();
+        var height=$(window).height();
+        var $pop_window=$("#pop_add_window");
+        var $user_window=$("#pop_manage_user");
+        //console.log(width,height);
+        $("#pop_add_window,#pop_manage_user").css({"position":"absolute","float":"left","top":0,"left":0,"width":width,"height":height,"z-index":1000});  //手工模态框调整
+        //添加用户模态框弹出按钮
+        $("#manage_user").click(function(){$user_window.css("display","block");});
+        //添加视频模态框弹出按钮.
+        $("#add_video").click(function(){$pop_window.css("display","block");$("#my_title").attr("title","add_video_url").text("添加视频源");$("#room_url").attr("readonly",false).css("background","white");});
+        //模态框主体的留白处点击隐藏模态框
+        $pop_window.click(function(){$(this).css("display","none");});
+        $user_window.click(function(){$(this).css("display","none");});
+        //阻止内部框的click事件冒泡。
+        $("#pop_add_inner,#manage_user_inner").click(function(){return false;});
+
+        //获取聊天室在线人数的方法。
+        function count_online(){
+            $.get("/count_online?gid="+Math.random(),function(data){$("#counter").text(data);});
+        }
+        count_online(); //启动时获取聊天室在线人数
+        setInterval(function(){count_online();},10000);
+        //获取用户列表的方法。
+        function get_teachers(){
+            $.get("/get_teacher_user?uid="+Math.random(),function(data){
+                //console.log(data);
+                var obj=JSON.parse(data);
+                //清空除标题外的其他行。
+                $("#user_table").html('<tr class="row"><th class="col-xs-3 col-sm-3 col-md-3 col-lg-3">用户名</th><th class="col-xs-3 col-sm-3 col-md-3 col-lg-3">密码</th><th class="col-xs-3 col-sm-3 col-md-3 col-lg-3">状态</th><th class="col-xs-3 col-sm-3 col-md-3 col-lg-3">操作</th></tr>');
+                for(var i=0;i<obj.length;i++){
+                    //alert(obj[i][2])
+                    var str="<tr class='row'><td  class='col-xs-3 col-sm-3 col-md-3 col-lg-3'>"+obj[i][0]+"</td><td class='stop_click col-xs-3 col-sm-3 col-md-3 col-lg-3'><button class='reset_password'>重置密码</button></td><td class='col-xs-3 col-sm-3 col-md-3 col-lg-3'><button class='can_login'>"+(obj[i][3]==1?"正常":"停用")+"</button></td><td class='stop_click col-xs-3 col-sm-3 col-md-3 col-lg-3'><button class='delete_user'>删除</button></td></tr>"
+                    $("#user_table").append($(str));
+                }
+                //重置用户密码的方法。
+                $(".reset_password").each(function(){
+                    var $this=$(this);
+                    $this.click(function(){
+                        var objname= $.trim($this.parent().prev().text());
+                        var r=confirm("你确实想重置"+objname+"的密码吗？");
+                        if(r){
+                            $.get(host+"edit_teacher_user/reset_password?uid="+Math.random()+"&objname="+objname,function(data){
+                            if(data["message"]=="success"){
+                                alert("重置成功！默认密码为123456");
+                            }
+                            else{}
+                        });
+                        }
+                        else
+                        {}
+
+                    });
+                });
+                //停用账户的方法
+                $(".can_login").each(function(){
+                    var $this=$(this);
+                    $this.click(function(){
+                        var objname= $.trim($this.parent().prev().prev().text());
+                        var r=confirm("你确实想停用"+objname+"的账户吗？");
+                        if(r){
+                            $.get(host+"edit_teacher_user/stop_login?uid="+Math.random()+"&objname="+objname,function(data){
+                                if(data["message"]=="success"){
+                                    alert("停用成功！");
+                                    get_teachers(); //重新加载
+                                }
+                                else{}
+                            });
+                        }
+                        else{}
+
+                    });
+                });
+                //删除账户的方法
+                $(".delete_user").each(function(){
+                    var $this=$(this);
+                    $this.click(function(){
+                        var objname= $.trim($this.parent().prev().prev().prev().text());
+                        var r=confirm("你确实想删除"+objname+"的账户吗？");
+                        if(r){
+                             $.get(host+"edit_teacher_user/delete?uid="+Math.random()+"&objname="+objname,function(data){
+                                if(data["message"]=="success"){
+                                    alert("删除成功！");
+                                    get_teachers(); //重新加载
+                                }
+                                else{}
+                            });
+                        }
+                        else{
+
+                        }
+
+                    });
+                });
+                //
+
+            });
+        }
+        get_teachers();//运行此方法。
+        //添加用户名时，用户名输入框的失焦事件。
+        $("#input_username").focus(function(){$(this).css("background","white");});
+        $("#input_username").blur(function(){
+            var objname= $.trim($(this).val());
+            if(objname.length>0){
+                $.get(host+"edit_teacher_user/check_objname?uid="+Math.random()+"&objname="+objname,function(data){
+                    if(data["message"]=="find!"){
+                        alert("用户名："+objname+" 已存在！");
+                        $("#input_username").css("background","hsla(320, 90%, 80%, 1)");
+                    }
+                    else{
+                        console.log(data);
+                    }
+                });
+            }
+            else{
+                //nothing
+            }
+
+        });
+        //添加用户动作事件
+        $("#add_user").click(function(){
+            var objname= $.trim($("#input_username").val()); //添加的用户名
+            var password1= $.trim($("#password1").val());   //输入的密码
+            var password2= $.trim($("#password2").val());   //重复的密码
+            var bcolor=$("#input_username").css("background-color");  //用户名输入框的背景色
+            if(bcolor!="rgb(255, 255, 255)"){
+                alert("用户名已存在");  //如果用户名的输入框不是白色，说明用户还没纠正用户名重复的问题。
+            }
+            else if(objname.length==0){
+                alert("用户名不能为空");
+            }
+            else if(password1.length==0 || password2.length==0){
+                alert("密码不能为空");
+            }
+            else if(password1!=password2){
+                alert("两次密码输入的不一致");
+            }
+            else{
+                var password= $.md5(password1);  //加密密码
+                $.post(host+"edit_teacher_user/add_user",{"objname":objname,"password":password},function(data){
+                    if(data["message"]=="success"){
+                        alert("用户添加成功");
+                        get_teachers();//运行此方法重新加载用户列表。
+                        $("#input_username,#password1,#password2").val("");  //清空输入框
+                    }
+                    else{
+                        alert(data["message"]);
+                    }
+                });
+            }
+        });
+        //获取聊天室视频列表的方法
+        function get_table(){
+            console.log("开始获取视频源数据...");
+            $.get(host+"get_video_url_list?uid="+Math.random(),function(data){
+                //console.log(data);
+                var alist=data;
+                var $table=$("#main"); //主表
+                //console.log(alist[0]);
+                var astr="<tr class='row'> <th class='col-xs-4 col-sm-4 col-md-3 col-lg-1'>"+alist[0][0]+"</th><th  class='hidden-xs hidden-sm hidden-md col-lg-3'>"+alist[0][1]+"</th><th class='hidden-xs  hidden-sm hidden-md col-lg-3'>"+alist[0][2]+"</th><th class='col-xs-4  col-sm-4 col-md-3 col-lg-2'>"+alist[0][3]+"</th><th class='col-xs-4  col-sm-4 col-md-3 col-lg-2'>"+alist[0][4]+"</th><th class='hidden-xs hidden-sm col-md-3 col-lg-1'>操作</th></tr>";      //准备插入主表th
+                $table.empty();
+                $table.append($(astr));
+
+                for(var i=1;i<alist.length;i++){
+                    var temp=alist[i];
+                    var vstr=''
+                    //console.log(temp)
+                    vstr="<tr class='row'><td class='col-xs-4 col-sm-4 col-md-3 col-lg-1'>"+temp[0]+"</td><td class='stop_click hidden-xs hidden-sm hidden-md col-lg-3'><a target='_blank' href="+temp[1]+">"+temp[1]+"</a></td><td class='hidden-xs  hidden-sm hidden-md col-lg-3'>"+temp[2]+"</td><td class='col-xs-4  col-sm-4 col-md-3 col-lg-2'>"+temp[3]+"</td><td class='stop_click col-xs-4  col-sm-4 col-md-3 col-lg-2'>"+(temp[4]==1?"<span>默认</span>":"<button class='set_default'>设为默认</button>")+"</td><td class=' hidden-xs hidden-sm col-md-3 col-lg-1'><button class='edit'>编辑</button><button class='delete'>删除</button></td></tr>";
+                    $table.append($(vstr));
+                }
+
+                //”设为默认“按钮的事件
+                    $(".set_default").each(function(){
+                        var $this=$(this);
+                        var $parent=$(this).parent().parent();
+                        $this.click(function() {
+                            var r=confirm("你确认要把"+$(this).parent().parent().children().first().text()+"的视频源设为默认吗?");
+                            if(r){
+                                $.post(host + "edit_video_url/set_default", {"url":$parent.children().eq(2).text(),"name":$parent.children().eq(0).text(),"room":$parent.children().eq(1).text(),"description": $parent.children().eq(3).text(),"is_default":1}, function (data) {
+                                    get_table();  //刷新列表
+                                });
+                            }
+                            else{
+                                return false;
+                            }
+                        });
+                    });
+                //让stop_click阻止事件冒泡
+                $(".stop_click").each(function(){$(this).click(function(){return false;});});
+
+
+                $table.find("tr:gt(0)").each(function(){
+                    var $this=$(this);
+                    $(this).hover(function(){$(this).css("color","red");},function(){$(this).css("color","black");});
+                    });
+                //删除按钮事件
+                $(".delete").click(function(){
+                        var r=confirm("你确认要删除 "+$(this).parent().parent().children().first().text()+" 聊天室吗？");
+                        if(r){
+                            $.post(host+"edit_video_url/delete",{"url":$(this).parent().parent().children().eq(2).text()},function(data){
+                                if(data["message"]=="ok"){
+                                    alert("删除成功");
+                                    get_table()
+                                }
+                                else{
+                                    alert(data["message"]);
+
+                                }
+                            });
+                        }
+                        else{
+                            return false;
+                        }
+                    });
+
+                //编辑按钮动作
+                $(".edit").each(function(){
+                    var $this=$(this);
+                    $this.click(function(){
+                        $pop_window.css("display","block");
+                        $("#my_title").attr("title","edit_video_url/edit").text("添加视频源");
+                        $("#room_url").attr("readonly",true).css("background","lightgray");
+                        var farther=$this.parent().parent();
+                        var room_name=farther.children().eq(0).text();
+                        var room_url=farther.children().eq(1).text();
+                        var video_url=farther.children().eq(2).text();
+                        var description=farther.children().eq(3).text();
+                        console.log(room_name);
+                        console.log(room_url);
+                        console.log(video_url);
+                        console.log(description);
+                        $("#input_name").val(room_name);
+                        $("#room_url").val(room_url);
+                        $("#input_url").val(video_url);
+                        $("#input_description").val(description);
+                    });
+                });
+
+               });//get事件结束
+        }
+        get_table();  //启动时加载数据。
+        //提交/编辑添加视频按钮
+        var $add_button=$("#add_submit");
+        $add_button.click(function(){
+            var name= $.trim($("#input_name").val()); //聊天室名称
+            var video_url= $.trim($("#input_url").val());  //视频地址
+            var room_url= $.trim($("#room_url").val());  //聊天室地址
+            var description= $.trim($("#input_description").val());   //备注
+            if(name=='' || video_url=='' || room_url==''){
+                alert("数据不全");
+                return false;
+            }
+            else{
+                var url_arg=$("#my_title").attr("title");  //提取psot的路径后缀
+                $.post(host+url_arg,{"name":name,"url":video_url,"room":room_url,"description":description},function(data){
+                    var mes=data["message"];
+                    if(mes=="ok"){
+                        //如果 插入成功。
+                        $("#input_name").val("");
+                        $("#input_url").val("");
+                        $("#input_description").val("");
+                        $("#room_url").val("");
+                        $pop_window.css("display","none");
+                        var prefix=url_arg=="add_video_url"?"添加":"修改";
+                        alert(prefix+"成功");
+                        get_table();
+                    }
+                    else{
+                        alert(mes);
+                    }
+                });
+            }
+        });
+        //添加框放弃按钮
+        $("#add_cancel").click(function(){
+            $("#input_name").val("");
+            $("#input_url").val("");
+            $("#input_description").val("");
+            $("#room_url").val();
+            $pop_window.css("display","none");
+        });
+
+
+        //end
+    });
+</script>
+</html>

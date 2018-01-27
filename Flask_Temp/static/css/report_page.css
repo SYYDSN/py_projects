@@ -1,0 +1,286 @@
+
+ul,p,h5{
+    padding : 0;
+    margin : 0;
+}
+.clearfix:after{
+    display : block;
+    content : '.';
+    height : 0;
+    line-height : 0;
+    clear : both;
+}
+.content-wrapper{
+    padding : 20px;
+}
+.report-data{
+    width : 100%;
+    height : 100px;
+    margin-bottom : 10px;
+}
+.report-data li{
+    width : 24.25%;
+    background-color : white;
+    color : #ff881d;
+    font-size : 1rem;
+    float: left;
+    border-radius : 8px;
+    margin-right : 1% ;
+    text-align : center;
+    padding : 30px 0;
+}
+.report-data li:last-child {
+    margin  : 0;
+}
+.report-data li h5{
+    font-size : 20px;
+    font-weight : 700;
+    color : #565656;
+}
+.report-table{
+    height : 320px;
+    width : 100%;
+    background-color : white;
+    border-radius : 8px;
+}
+.Pbar {
+    position: relative;
+    width : 40%;
+    height : 100%;
+    float: left;
+}
+.Pbar p {
+    height : 74px;
+    line-height : 74px;
+    color : #999999;
+    margin-left:29px;
+}
+.Pbar ul{
+    position: absolute;
+    bottom: 55px;
+    right:10%;
+}
+.Pbar li{
+    color : #999;
+    font-size : 1rem;
+    height : 2.5rem;
+    line-height : 2.5rem;
+}
+.Pbar li i{
+    display : inline-block;
+    width : 3px;
+    height : 3px;
+    border-radius : 50%;
+    background-color : #96e4ff;
+    margin-right : 10px;
+}
+.Pbar li span:last-child{
+    float: right;
+    margin-left : 50px;
+}
+.Pbar li:nth-child(1) span:last-child{
+    color : #ff881d;
+}
+.histogram{
+    position : relative;
+    width : 60%;
+    height :100%;
+    float :left;
+}
+.histogram>p{
+  height:75px;
+  line-height:75px;
+  color: #999;
+}
+.histogram #histogram{
+    position: absolute;
+    width : 60%;
+    height : 90%;
+    top: 10px;
+}
+.histogram .histogram-list{
+    position : absolute;
+    width  : 30%;
+    height : 226px;
+    background-color : #edeef2;
+    right : 1%;
+    top : 60px;
+    padding:8px 0;
+}
+.histogram .histogram-list>i {
+    display : inline-block;
+    position : absolute;
+    right : 97%;
+    top: 50%;
+    transform : translateY(-50%) rotate(90deg);
+    -webkit-transform : translateY(-50%) rotate(90deg);
+    -moz-transform : translateY(-50%) rotate(90deg);
+    -ms-transform : translateY(-50%) rotate(90deg);
+    -o-transform : translateY(-50%) rotate(90deg);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #edeef2;
+}
+.histogram .histogram-list ul li{
+    height : 35px;
+    line-height : 35px;
+    color: #a1a1a1;
+    font-size : 1rem;
+    padding : 0 15px;
+}
+.histogram .histogram-list ul li i{
+    display : inline-block;
+    width : 3px;
+    height : 3px;
+    background-color : #999;
+    border-radius : 50%;
+    margin-right : 3px;
+}
+.histogram .histogram-list ul li span:last-child {
+    float : right;
+}
+.report-datatu{
+    margin-top : 1rem;
+    height : 337px;
+    width : 100%;
+}
+.line_chart{
+    height: 100%;
+    width : 54%;
+    background-color : white;
+    border-radius : 8px;
+    float : left;
+}
+.line_chart p{
+    height  : 75px;
+    line-height : 75px;
+    margin-left: 30px;
+    color : #999;
+}
+#line_chart {
+    width : 100%;
+    height : 100%;
+}
+#line_chart canvas {
+    left: -29px !important;
+    top: -40px !important;
+}
+.pie {
+    position : relative;
+    width : 45%;
+    height : 100%;
+    background-color : white;
+    float : left;
+    border-radius : 8px;
+    margin-left : 1%;
+}
+.pie p{
+    height : 75px;
+    line-height : 75px;
+    margin-left: 60px;
+    color : #999;
+}
+#pie {
+    height : 80%;
+    width : 80%;
+}
+#pie canvas {
+    left : -90px !important;
+}
+.pie-list {
+    position : absolute;
+    right : 2%;
+    bottom : 45px;
+}
+.pie-list li {
+    width : 20rem;
+    height : 2rem;
+    line-height :2rem;
+}
+.pie-list li span:last-child {
+    float : right;
+}
+.pie-list li span:nth-child(1) {
+    display : inline-block;
+    width : 2rem;
+    height : 1rem;
+    margin-right : 5px;
+}
+.pie-list li:nth-child(1) span:nth-child(1){
+
+ background-color : #53d3ff;
+}
+.pie-list li:nth-child(2) span:nth-child(1){
+
+    background-color : #7cc58e;
+
+}
+.pie-list li:nth-child(3) span:nth-child(1){
+
+
+        background-color : #e9dd55;
+}
+.pie-list li:nth-child(4) span:nth-child(1){
+
+
+    background-color : #ff7fa8;
+}
+.pie-list li:nth-child(5) span:nth-child(1){
+
+
+    background-color : #a989de;
+}
+.report-wrapper{
+    background-color: #f6f6f6;
+    padding:13px;
+}
+
+
+.GaugeMeter{
+      Position:        Relative;
+      Text-Align:      Center;
+      Overflow:        Hidden;
+      Cursor:          Default;
+      float  : left;
+      margin: 15px 0 0 30px;
+    }
+    .GaugeMeter SPAN{
+      line-height : 165px !important;
+      color : #565656 !important;
+      font-weight: 700 !important;
+      font-size : 40px !important;
+    }
+    .GaugeMeter B{
+        line-height : 230px !important;
+        font-size: 23px !important;
+    }
+    .GaugeMeter SPAN,
+    .GaugeMeter B{
+      width: 100%;
+      Position:        Absolute;
+      Text-align:      Center;
+      Display:         Inline-Block;
+      Color:           RGBa(0,0,0,.8);
+      Font-Weight:     200;
+      Font-Family:     "Open Sans", Arial;
+      Overflow:        Hidden;
+      White-Space:     NoWrap;
+      Text-Overflow:   Ellipsis;
+    }
+    .GaugeMeter[data-style="Semi"] B{
+      Margin:          0 10%;
+      Width:           80%;
+    }
+
+    .GaugeMeter S,
+    .GaugeMeter U{
+      Text-Decoration: None;
+      Font-Size:       .49em;
+      Opacity:         .5;
+    }
+
+    .GaugeMeter B{
+      Color:           Black;
+      Font-Weight:     300;
+      Opacity:         .8;
+    }

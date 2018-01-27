@@ -1,0 +1,666 @@
+$(function() {
+    let normal_color = "#a1a1a1";
+    let good_color = "#87aafb";
+    let bad_color = "#f8b767";
+    let cur_user_id = get_url_arg("user_id"); // 待查询用户的id
+    $("#cur_user_id").text(cur_user_id);  // 给隐藏元素赋值,用于传递变量
+
+
+    // 显示loading动画
+    show_loading_animation = function(){
+        let html = `<div style="font-size:1.4rem;padding-right:1.0em"><img style="width:1.5em;height:1.5em;margin-right:1em" src="../static/image/icon/gif3.gif">正在努力查询中,请稍后...</div>`;
+        pop_tip_div_plus("show", html);
+    };
+
+    // 关闭loading动画
+    close_loading_animation = function(){
+        pop_tip_div_plus("hide");
+    };
+
+    // 主区域最小高度
+    console.log($(window).height(), $("#main_zone").css("top"));
+    $("#main_zone, #right_bar").css("min-height", $(window).height() - $("#main_zone").offset().top);
+
+    function set_window() {
+        /*计算并重设右侧边栏高度*/
+        $("#right_bar").css("height", $("#main_zone").height());
+    }
+
+    set_window();
+    window.onresize = function() {
+        // 修改窗口大小事件
+        set_window();
+    };
+
+    // 导航栏点击跳转事件.
+    redirect_driver_detail = function($obj) {
+        let user_id = $.trim($obj.attr("data-id"));
+        location.href = "/manage/driver_detail?user_id=" + user_id;
+    };
+
+    // 填充右侧边栏部分
+    let fill_right_bar = function() {
+        $.post(`${server}/manage/get_driver_list`, function(json) {
+            let resp = JSON.parse(json);
+            if (resp['message'] !== "success") {
+                alert(resp['message']);
+            } else {
+                let data = resp['data'];
+                console.log(data);
+                let l = data.length;
+                if (l > 0) {
+                    let bar = $("#right_bar");
+                    bar.empty();
+                    for (let i = 0; i < l; i++) {
+                        let driver = data[i];
+                        let real_name = driver['real_name'] ? driver['real_name'] : driver['user_name']; // 真实姓名
+                        let head_img_url = driver['head_img_url'] ? driver['head_img_url'] : "static/image/head_img/default_01.png"; // 头像地址
+                        let html = `<div onclick="redirect_driver_detail($(this))" data-id="${driver._id}" class="nav_item">
+                                        <img src="../${head_img_url}" class="img-sm img-circle">
+                                        <div class="driver_name">${real_name}</div>
+                                    </div>`;
+                        bar.append(html);
+                    }
+                } else {}
+            }
+        });
+    };
+    fill_right_bar();
+
+    // 获取司机信息并填充页面中部的部分,启动页面时调用
+    let get_driver_detail = function(args) {
+        if(typeof(args) === "undefined"){
+            console.log("user_id is " + cur_user_id);
+            args = { 'user_id': cur_user_id };
+        }else{}
+        if (args['user_id'] === null) {
+            // pass
+        } else {
+            console.log("开始向服务器查询安全报告....");
+            show_loading_animation(); // 开启查询动画
+            $.post(`${server}/manage/driver_detail`, args, function(json) {
+                close_loading_animation(); // 关闭查询动画
+                let resp = JSON.parse(json);
+                if (resp['message'] !== "success") {
+                    alert(resp['message']);
+                } else {
+                    let data = resp['data'];
+                    console.log(data);
+                    if(typeof(data['drive_score']) === "undefined"){
+                        // 没有获取对应的安全报告.
+                        let ms = typeof(args['date'])==="undefined"?"用户暂无安全报告记录": `没有查询到${args["date"]}的安全报告`;
+                        pop_tip_div(ms);
+                    }
+                    else{
+                        // 查询到安全报告了,要进行页面的填充工作
+                        /* 由于数据字典的key的名称和元素的id约定的是一致的,所以这里有一个简化的方法来给dom赋值*/
+                        let keys = Object.keys(data);
+                        let l = keys.length;
+                        for (let i = 0; i < l; i++) {
+                            let key = keys[i];
+                            let value = data[key];
+                            if (key === "password") {
+                                // pass 密码忽略
+                            }
+                            else if(key === "bad_drive_action"){
+                                // 处理不良驾驶行为的数据.
+                                init_bad_action_chart(value);
+                            }
+                            else if (key === "health") {
+                                // 拆分健康相关数据
+                                let mood_dict = value['mood']['value']; // 情绪字典
+                                let heart_rate_dict = value['heart_rate']['value']; // 心跳字典
+                                let sleep_time = value['sleep_time']['value']; // 休息小时数
+
+                                // 处理心跳数据
+                                let heart_rate_data = []; // 初始化折线图的心跳数据容器
+                                let heart_rate_index = Object.keys(heart_rate_dict); // 初始化折线图的心跳索引容器
+                                heart_rate_index.sort(compare_hour_and_minute_str); // 排序
+                                let l_1 = heart_rate_index.length;
+                                for(let i=0;i<l_1;i++){
+                                    let key = heart_rate_index[i];
+                                    let val = heart_rate_dict[key];
+                                    heart_rate_data.push(val);
+                                }
+
+                                init_heart_chart(heart_rate_index, heart_rate_data); // 初始化心跳折线图和表格
+
+                                // 处理情绪数据
+                                let mood_data = []; // 初始化折线图的情绪数据容器
+                                let mood_index = Object.keys(mood_dict); // 初始化折线图的情绪索引容器
+                                mood_index.sort(compare_hour_and_minute_str);
+                                let l_2 = mood_index.length;
+                                for(let i=0;i<l_1;i++){
+                                    let key = mood_index[i];
+                                    let val = mood_dict[key];
+                                    mood_data.push(val);
+                                }
+                                init_mood_chart(mood_index, mood_data);
+
+                                // 开始处理睡眠数据
+                                let sleep_time2 = sleep_time < 7 ? "差" : (sleep_time < 8 ? "良" : "优");
+                                $("#sleep_time").text(sleep_time + "小时");
+                                $("#sleep_time2").text(sleep_time2);
+                            } else if (key === "driving_hours_sum") {
+                                $("#progress_02").css("width", "54%").text(Math.round(value) + "小时"); // 驾驶总时长
+                            } else if (key === "total_mileage") {
+                                $("#progress_01").css("width", "67%").text(Math.round(value) + "公里"); // 总里程
+                            } else if (key === "drive_score") {
+                                init_security_score(value); // 初始化安全得分/驾驶得分
+                            } else if (key === "head_img_url") {
+                                $(`#${key}`).attr("src", `../${value}`); // 头像
+                            } else {
+                                $(`#${key}`).text(value);
+                            }
+                        }
+                        // 原始输出里面没有平均速度.
+                        let total_mileage = data['total_mileage'];
+                        let driving_hours_sum = data['driving_hours_sum'];
+                        let avg_speed = isNaN(total_mileage) ? 0 : (parseInt(total_mileage) / parseInt(driving_hours_sum));
+                        $("#avg_speed").text(Math.round(avg_speed)); // 平均时速赋值
+                        // 调整日期选择器的值为安全报告的生成日期
+                        change_datepicker_val(data['report_datetime']);
+                    }
+                }
+            });
+        }
+    };
+    get_driver_detail();
+
+    // 初始化安全得分仪表盘
+    init_security_score = function(score) {
+        $("#GaugeMeter_1").remove();
+        var g = $("<div class='GaugeMeter' id='GaugeMeter_1'></div>");
+        $("#dash_board_outer").append(g);
+        g.attr({
+            "data-percent": score,
+            "data-size": 300,
+            "data-label": "综合指数",
+            "data-color": "#7C8FF3",
+            "data-back": "#96e4ff",
+            "data-width": "20",
+            "data-label-color": "#565656"
+        }).gaugeMeter();
+    };
+
+    // 初始心跳化折线图表
+    init_heart_chart = function(index, data) {
+
+        let option = {
+            tooltip: {
+                trigger: 'axis',
+                position: function(pt) {
+                    return [pt[0], '10%'];
+                }
+            },
+            title: {
+                left: 'center',
+                text: '24小时心率折线图',
+            },
+            toolbox: {
+                feature: {
+                    dataZoom: {
+                        yAxisIndex: 'none'
+                    },
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: index
+            },
+            yAxis: {
+                type: 'value',
+                min: 30,
+                boundaryGap: [0, '100%'],
+                splitLine: {
+                    show: false    // 不显示分割线
+                }
+            },
+            series: [{
+                name: '心率',
+                type: 'line',
+                // symbol: "rect",  // 标记点形状
+                showSymbol: false, // 不显示拐点,设置为false时,上面的symbol选项就无效了.
+                smooth: true, // 平滑折线
+                data: data, // 数据,数组,或者数组的数组
+                itemStyle: {
+                    normal: {
+                        lineStyle: {
+                            color: "#7C8FF3", // 折线颜色
+                        }
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: "#7C8FF3"
+                        }, {
+                            offset: 1,
+                            color: 'white'
+                        }])
+                    }
+                },
+                markLine: { // 水平/垂直的标志线
+                    symbol:['none', 'none'],  // 标志线两端无形状
+
+                    data:[
+                        {
+                            name: '心率下限标志线',
+                            yAxis: 60,                  // 一根平行x轴的标志线
+                            lineStyle: { // 标志线的样式
+                                normal: { // 一般样式
+                                    color: bad_color, // 线颜色
+                                    width: 0.5, // 线宽度
+                                    type: "solid" // 线类型
+                                }
+                            },
+                            label:{
+                                normal:{
+                                    formatter:function(){return "心率下限";}
+                                }
+                            }
+                        },
+                        {
+                            name: '心率上限标志线',
+                            yAxis: 100,                  // 一根平行x轴的标志线
+                            lineStyle: { // 标志线的样式
+                                normal: { // 一般样式
+                                    color: bad_color, // 线颜色
+                                    width: 0.5, // 线宽度
+                                    type: "solid" // 线类型
+                                }
+                            },
+                            label:{
+                                normal:{
+                                    formatter:function(){return "心率上限";}
+                                }
+                            }
+                        }
+                    ]
+                }
+            }]
+        };
+
+        var charts = echarts.init(document.getElementById("heart_rate_chart"));
+        charts.setOption(option);
+        // 填充心跳数据表格
+        let table = $("#heart_rate_table");
+        let heart_rate_max = 0;
+        let heart_rate_min = 999;
+        let sum_val = 0;
+        let html_0 = '<tr>';
+        let html_1 = '<tr>';
+        let html_2 = '<tr>';
+        let html_3 = '<tr>';
+        let html_4 = '<tr>';
+        let html_5 = '<tr>';
+        let html = [];
+        html.push(html_0);
+        html.push(html_1);
+        html.push(html_2);
+        html.push(html_3);
+        html.push(html_4);
+        html.push(html_5);
+        let date = new Date();
+        let day = date.getDate();
+        date.setDate(day - 1);
+        let date_str = (date.getMonth() + 1) + "月" + date.getDate() + "日";
+        for (let i = 0; i < index.length; i++) {
+            let cur = data[i];
+            let key = index[i];
+            if (cur > heart_rate_max) {
+                heart_rate_max = cur;
+            }
+            if (cur < heart_rate_min) {
+                heart_rate_min = cur;
+            }
+            sum_val += cur;
+            let time_str = key;
+            let cur_color = cur > 90 ? bad_color : (cur < 70 ? normal_color : good_color);
+            let cur_html = `<td style="color:${cur_color};font-size:1.4rem;">
+                                <span class="date_str">${date_str}</span>
+                                <span class="time_str">${time_str}</span>
+                                <span class="heart_rate">${cur}次/分</span>
+                           </td>`;
+            let temp = html[i % 6];
+            temp += cur_html;
+            html[i % 6] = temp;
+        }
+        let html_str = '';
+        for (let i = 0; i < html.length; i++) {
+            let temp = html[i];
+            temp += "</tr>";
+            html_str += temp;
+        }
+        table.empty().append(html_str);
+        let avg_heart_rate = Math.round(sum_val / index.length);
+        let avg_heart_rate2 = (avg_heart_rate >= 60 && avg_heart_rate <= 100) ? "好" : "注意";
+        $("#avg_heart_rate").text(avg_heart_rate).css("color", (avg_heart_rate < 70 || avg_heart_rate > 90) ? bad_color : good_color);
+        $("#avg_heart_rate2").text(avg_heart_rate2).css("color", (avg_heart_rate2 === "注意") ? bad_color : good_color);
+        $("#heart_rate_max").text(heart_rate_max).css("color", (heart_rate_max < 70 || heart_rate_max > 90) ? bad_color : good_color);
+        $("#heart_rate_min").text(heart_rate_min).css("color", (heart_rate_min < 70 || heart_rate_min > 90) ? bad_color : good_color);
+    };
+
+    // 初始情绪化折线图表
+    init_mood_chart = function(index, data) {
+        // 先计算平均值,提前计算的原因是接下来的并接要用计算情绪的函数.
+        let sum_val = 0;
+        let index_l = index.length;
+        for (let i = 0; i < index_l; i++) {
+            let cur = data[i];
+            sum_val += cur;
+        }
+        let avg_mood = Math.round(sum_val / index_l);
+        function mood(num){
+            // 根据情绪值判断情绪状态,和平均值相差大于15可以认为是出现了情绪的波动.
+            let delta = parseInt(num) - avg_mood;
+            let mood = '平稳';
+            if(delta <= -15){
+                mood = "低落"
+            }
+            else if(delta >= 15){
+                mood = "焦躁"
+            }
+            else{
+                // pass
+            }
+            return mood;
+        }
+        // 图的配置
+        let option = {
+            grid:{
+                top:"5%",
+                left:"12%",
+                right:"0%",
+                bottom:60
+            },
+            title: {
+                show:false
+            },
+            toolbox: {
+                show:false
+            },
+            tooltip: {
+                trigger: 'axis',
+                position: function(pt) {
+                    return [pt[0], '10%'];
+                },
+                formatter: function (param) {
+                    return mood(param[0]['data']);
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                axisLine:{
+                    show:true,
+                    lineStyle:{
+                        color:"#666666"
+                    }
+                },
+                data: index
+            },
+            yAxis: {
+                axisLine:{
+                    show:true,
+                    lineStyle:{
+                        color:"#ddd"
+                    }
+                },
+                axisLabel:{
+                    formatter: function(){    // 不显示刻度的值
+                        return "";
+                    }
+                },
+                axisTick:{
+                    show:false
+                },
+                splitLine: {
+                    show: false    // 不显示分割线
+                }
+            },
+            series: [{
+                name: '情绪',
+                type: 'line',
+                // symbol: "rect",  // 标记点形状
+                showSymbol: false, // 不显示拐点,设置为false时,上面的symbol选项就无效了.
+                smooth: true, // 平滑折线
+                data: data, // 数据,数组,或者数组的数组
+                itemStyle: {
+                    normal: {
+                        lineStyle: {
+                            color: "#7C8FF3", // 折线颜色
+                        }
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: "#7C8FF3"
+                        }, {
+                            offset: 1,
+                            color: 'white'
+                        }])
+                    }
+                },
+                markLine: { // 水平/垂直的标志线
+                    silent:true,
+                    symbol:['none', 'none'],  // 标志线两端无形状
+                    label:{
+                        normal:{
+                            show:false    // 不显示标志线的标签
+                        }
+                    },
+                    data:[
+                        {
+                            name: '',
+                            yAxis: avg_mood,                  // 一根平行x轴的标志线
+                            lineStyle: { // 标志线的样式
+                                normal: { // 一般样式
+                                    color: good_color, // 线颜色
+                                    width: 0.5, // 线宽度
+                                    type: "solid" // 线类型
+                                }
+                            }
+                        }
+                    ]
+                }
+            }]
+        };
+
+        var charts = echarts.init(document.getElementById("mood_chart"));
+        charts.setOption(option);
+        // 填充情绪数据表格
+        let table = $("#mood_table");
+        let mood_max = 0;
+        let mood_min = 999;
+        let html = '';
+
+        // 循环拼接html
+        for (let i = 0; i < index_l; i++) {
+            if(i % 12 === 0){
+                html += "<tr>";
+            }
+            let cur = data[i];
+            let key = index[i];
+            if (cur > mood_max) {
+                mood_max = cur;
+            }
+            if (cur < mood_min) {
+                mood_min = cur;
+            }
+
+            cur = mood(cur);
+            let cur_color = cur != "平稳" ? bad_color : normal_color;
+            let cur_html = `<td class="mood_item" style="color:${cur_color}">
+                                <span class="time">${key.split(":")[0]}时</span>
+                                <span class="status">${cur}</span>
+                           </td>`;
+            html += cur_html;
+            if(i % 12 === 11){
+                html += "</tr>";
+            }
+        }
+        table.empty().append(html);
+        // $("#avg_heart_rate").text(avg_heart_rate).css("color", (avg_heart_rate < 70 || avg_heart_rate > 90) ? bad_color : good_color);
+        // $("#avg_heart_rate2").text(avg_heart_rate2).css("color", (avg_heart_rate2 === "注意") ? bad_color : good_color);
+        // $("#heart_rate_max").text(heart_rate_max).css("color", (heart_rate_max < 70 || heart_rate_max > 90) ? bad_color : good_color);
+        // $("#heart_rate_min").text(heart_rate_min).css("color", (heart_rate_min < 70 || heart_rate_min > 90) ? bad_color : good_color);
+    };
+
+    // 初始化不良行为柱装图
+    init_bad_action_chart = function(data_list) {
+        /*需要先拆分数据*/
+        let key_name_dict = {
+            'speeding drive': '超速行驶',
+            'speeding left turn': '急左转',
+            'speeding right turn': '急右转',
+            'smoking drive': '抽烟',
+            'calling drive': '打电话',
+            'fatigue drive': '疲劳驾驶',
+            'play phone drive': '玩手机',
+            'quick lane': '急变道'
+        };
+        let l = data_list.length;
+        if (l === 0){
+            // pass
+        }
+        else{
+            let dict = {};
+            let keys = Object.keys(key_name_dict);
+            let d_k = keys.length;
+            for(let i=0;i<d_k;i++){
+                let name = key_name_dict[keys[i]];
+                dict[name] = 0;
+            }
+            let max_count = 0;
+            for(let i=0;i<l;i++){
+                let item = data_list[i];
+                let key = item['type'];
+                let name = key_name_dict[key];
+                if(typeof(name) !== "undefined"){
+                    let count = dict[name];
+                    if(typeof(count) === "undefined"){
+                        // 新的类型.
+                        count = 1;
+                    }
+                    else{
+                        count = parseInt(count) + 1;
+                    }
+                    dict[name] = count;
+                    if(count > max_count){
+                        max_count = count;
+                    }
+                }
+            }
+            let index = Object.keys(dict);
+            let data = new Array();
+            let l2 = index.length;
+            for(let i=0;i<l2;i++){
+                data.push(dict[index[i]]);
+            }
+
+            let option2 = {
+                itemStyle:{
+                    normal:{
+                        color:new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: "#7C8FF3"
+                        }, {
+                            offset: 1,
+                            color: '#9DAAF3'
+                        }])
+                    }
+                },
+                tooltip : {
+                    trigger: 'axis',
+                    axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                        type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : index,
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value',
+                        interval:1,
+                        max: max_count < 3? 3: max_count + 2
+                    }
+                ],
+                series : [
+                    {
+                        name:'统计',
+                        type:'bar',
+                        barWidth: '60%',
+                        data:data
+                    }
+                ]
+            };
+
+            let charts = echarts.init(document.getElementById("bad_action_chart"));
+            charts.setOption(option2);
+        }
+    };
+
+    // 初始化日期选择器
+    (function (last_date_str) {
+        // 参数last_date_str是最后一个可用的日期
+        $("#date_picker").datetimepicker({
+            language: "zh-CN",
+            weekStart:1,  // 星期一作为一周的开始
+            minView: 2,  // 不显示小时和分
+            autoclose: true,  // 选定日期后理解关闭选择器
+            format: "yyyy-mm-dd"
+        }).on("show", function(ev){
+            // 当选择器显示时被触发.示范,无实际意义.
+            console.log(ev);
+            console.log("选择器面板被打开");
+        }).on("hide", function(ev){
+            // 当选择器隐藏时被触发 示范,无实际意义
+            console.log(ev);
+            console.log("选择器面板被隐藏");
+        }).on("changeDate", function(ev){
+            // 当日期被改变时被触发
+            console.log(ev);
+            console.log("选择器日期被改变");
+            let selected_date = ev.date;
+            let the_str = `${selected_date.getFullYear()}-${selected_date.getMonth() + 1}-${selected_date.getDate()}`;
+            console.log(the_str);
+            get_driver_detail({"date": the_str, "user_id": cur_user_id});  // 查询司机安全报告
+        });
+    })();
+
+    // 日期选择器提交按钮的事件
+    $("#date_picker_submit_btn").click(function(){
+        let date = $.trim($("#date_picker").val());
+        let user_id = $.trim($("#cur_user_id").text());
+        let arg_dict = {"user_id": user_id, 'date': date};
+        get_driver_detail(arg_dict);
+
+    });
+
+    // 改变日期选择器的日期为最后一次成功获取数据的日期
+    change_datepicker_val = function(date_str){
+        $("#date_picker").val(date_str);
+    };
+
+    // end!
+});

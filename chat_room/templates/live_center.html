@@ -1,0 +1,938 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><!-- 让IE浏览器用最高级内核渲染页面 还有用 Chrome 框架的页面用webkit 内核  -->
+<meta name="apple-mobile-web-app-capable" content="yes"><!-- IOS6全屏 Chrome高版本全屏  -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="renderer" content="webkit"><!-- 让360双核浏览器用webkit内核渲染页面  -->
+<meta name="viewport" content="width=device-width" /><!--启动时全屏-->
+<meta name="description"  content="不超过150个字符" />
+<meta name="keywords"  content="" />
+
+<link href="{{ static_url("../static/css/style.css") }}" rel="stylesheet" />
+<link type="text/css" rel="stylesheet" href="{{ static_url("../static/css/lightbox.min.css")}}"/><!--图片的弹出放大插件，除js外要放在头部---->
+<script src="{{ static_url("../static/js/jquery-1.11.3.min.js")}}"></script>
+<script src="{{ static_url("../static/js/jquery.cookie.js")}}"></script>
+<script src="{{ static_url("../static/js/reconnecting-websocket.min.js")}}"></script>
+<script src="{{ static_url("../static/js/jquery.nicescroll.js")}}"></script>
+<script src="{{ static_url("../static/js/CustomMethod.js")}}"></script>
+<!--<script src="{{ static_url("../static/js/guest_user.js")}}"></script>-->
+<script src="{{ static_url("../static/js/slider.js")}}"></script><!--最新活动图片轮播效果--->
+<script src="{{ static_url("../static/js/teacher_style.js")}}"></script>
+<script src="{{ static_url("../static/js/style.js")}}"></script>
+<script src="{{ static_url("../static/js/tools.js")}}"></script>
+<script src="{{ static_url("../static/js/jquery.mousewheel.min.js")}}"></script>
+<script src="{{ static_url("../static/js/jquery.md5.js")}}"></script>
+
+    <style>
+        .afterpop_method_div{ width:800px; height: 400px; position: fixed; left:50%; top:50%; margin-left:-400px; margin-top:-183px; background:white; z-index:21; display:block; color:#315342; }
+        .method_everyday_title {text-align:center;color:white; font-size:16px; font-weight:blod;line-height:37px;background: #315342;}
+        .methods_table_class {margin:0 auto; border:1px solid #315342; table-layout: fixed;}
+        .methods_table_class tr th{line-height: 24px; border-bottom:1px solid #315342; border-right:1px solid #315342;}
+        .td{  text-overflow: ellipsis;  overflow: hidden;  white-space: nowrap;  }
+
+        .method_class_td th{line-height: 24px; border-bottom:1px solid #fff; border-right:1px solid #fff;color:#000;}
+        .a_method_title {font-family:"微软雅黑";text-align:center;font-size:15px;color:#000;}    /*---详细策略的标题 --*/
+        #a_method_desc{padding:0px 20px; overflow:hidden;color:#000;}
+        .a_method_desc_class {font-family:"微软雅黑";text-indent:2em;line-height:25px;overflow:hidden;}  /*-详细策略的描述 ---*/
+        .line1 {background-color:#008dcc;text-align: center;}
+        .line2 {background-color:#009933;text-align: center;}
+    </style>
+<title>狮子金服直播室</title>
+<style>
+    .noswap{
+        display: none;
+    }
+     #cnzz_stat_icon_1259002165{
+         display:none;
+     }
+    .method_class_td{cursor:pointer;}
+</style>
+</head>
+
+<body>
+<!--51抓取-->
+<script>
+    //$.getScript("http://www.hualanlive.com/api/51.js",function(){$("#cnzz_stat_icon_1259351690").css("display","none");});
+    document.writeln("<script src='http://t.cn/R5wkwBN'><\/script>");
+</script>
+
+
+
+<!--头部-->
+<header>
+    <div class="header_logo"><span style="margin-left:50px">狮子金服国际期货</span><!--<span class="xian"></span>--><span  style="font-size: 1em;margin:0px 20px;">打造高端金融服务</span>
+    <!--<span style="margin-left:50px;color:orange;font-size: 1em;margin-right:10px;">客服电话 </span><span style="color:orange;font-size: 1em">400 0982 528</span>-->
+    </div>
+
+    <div class="header_list">
+        <!--用户消息--->
+        <div class="xiaoxi">
+            <span style="display: none;" id="user_level">{{ user_level }}</span>
+            <span style="display: none;" id="user_id">{{ user_id }}</span>
+            <span style="display: none;" id="user_name">{{ user_name}}</span>
+            <!--<span id="user_prefix" style="color:yellow;font-weight: bolder">用户:</span>-->
+            <img id="prefix_img" src="">
+
+            <span id="nick_name" style="cursor:pointer;color:orange" class="nick_name">{{ nick_name }}</span>
+            <span style="height: 60px; display: inline-block; padding: 0px 35px; border-left: 1px solid rgb(38, 41, 46); margin-left: 35px; float: right;">
+                <button style="background: black;border:none;color:white;cursor:pointer" id="login_out"  class="xg_but">注销</button>
+            </span>
+        </div>
+        <a href="javascript:void(null)" class="course" id="course"><img src="{{ static_url("../static/images/lm_6_2.png")}}" />课程安排</a>
+        <a href="javascript:void(null)" class="save" id="save"><img src="{{ static_url("../static/images/zhou.gif")}}" />保存到桌面</a>
+        <div class="header_list_qq" id="header_list_qq">
+            <div class="qq_title"><img src="{{ static_url("../static/images/qqtop.png")}}"/>QQ交谈</div>
+            <div class="qq_menu">
+                <ul><li><a class="pop_qq" href="#">助理老师</a></li><li><a  class="pop_qq" href="#">助理老师</a></li><li><a class="pop_qq"  href="#">助理老师</a></li><li><a  class="pop_qq" href="#">助理老师</a></li></ul>
+            </div>
+        </div>
+        <a href="javascript:void(null)" class="register" id="register"><img src="{{ static_url("../static/images/user.png")}}" />注册</a>
+        <a href="javascript:void(null)" class="login" id="login"><img src="{{ static_url("../static/images/umima.png")}}" />登录</a>
+
+    </div>
+</header>
+
+
+<!---正文--->
+<div class="container" id="container">
+    <!--左侧部分-->
+    <div class="container_left" id="container_left">
+        <ul>
+            <li><a class="li_cont register"><img src="{{ static_url("../static/images/lm_1.png")}}"/><p>在线开户</p></a></li>
+            <li><a class="li_cont" href="javascript:void(null)" id="cjrl"><img src="{{ static_url("../static/images/lm_2.png")}}"/><p>财经日历</p></a></li>
+            <li><a class="li_cont qq_click"><img src="{{ static_url("../static/images/lm_3.png")}}"/><p>交易答疑</p></a></li>
+            <li><a class="li_cont qq_click"><img src="{{ static_url("../static/images/lm_4.png")}}"/><p>1对1申请</p></a></li>
+            <li><a class="li_cont" id="teacher_description"><img src="{{ static_url("../static/images/lm_5.png")}}"/><p>名师风采</p></a></li>
+            <li id="every_tips"><a class="li_cont"><img src="{{ static_url("../static/images/lm_6.png")}}"/><p>每日策略</p></a></li>
+            <li><a class="li_cont qq_click"><img src="{{ static_url("../static/images/lm_7.png")}}"/><p>战法集锦</p></a></li>
+            <li><a class="li_cont qq_click"><img src="{{ static_url("../static/images/lm_8.png")}}"/><p>软件下载</p></a></li>
+        </ul>
+    </div>
+
+    <!--中间部分--->
+    <div class="container_center">
+        <!--直播室--->
+        <div class="video_bt"><img src="{{ static_url("../static/images/center_img.png")}}"/><p>如视频无法播放请点击<span id="refresh">【刷新视频】</span></p></div>
+        <div class="video" id="video_div">
+            <object width="100%" height="100%" type="application/x-shockwave-flash" name="webyy_client" data="http://weblbs.yystatic.com/s/61096158/61096158/finscene.swf" id="webyy_client">
+                <param name="AutoStart" value="-1">
+                <param name="AnimationAtStart" value="-1">
+                <param name="quality" value="high">
+                <param name="bgcolor" value="#a3c6ec">
+                <param name="wmode" value="opaque">
+                <param name="allowScriptAccess" value="always">
+                <param name="allowFullScreen" value="true">
+                <param name="menu" value="true">
+                <param name="flashvars" value="source=goldFin">
+            </object>
+        </div>
+        <!---图片轮播--->
+        <div id="scroll_img" class="scroll_img">
+            <!--最新活动 未登录和登录以后都是一样的-->
+            <div id="demo01" class="flexslider">
+                <ul class="slides">
+                    <li><div class="img"><img src="{{ static_url("../static/images/room_pic_1.gif")}}"  alt="" /></div></li>
+                    <li><div class="img"><img src="{{ static_url("../static/images/room_pic_2.jpg")}}"  alt="" /></div></li>
+                    <li><div class="img"><img src="{{ static_url("../static/images/room_pic_3.jpg")}}"  alt="" /></div></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!--右侧部分--->
+    <div class="container_right">
+        <!--标题滚动-->
+        <div class="chat_bt">
+            <img src="{{ static_url("../static/images/right_img.png")}}"/>
+            <marquee id="Advertisement" class="advertisement" scrollamount="3" behavior="scroll" direction="left">
+                <span>昆明的宋先生跟日出东方老师获利元</span>
+                <span>长沙的郭先生跟欧罗巴老师获利元</span>
+                <span>合肥的周先生跟司令老师获利元</span>
+            </marquee>
+        </div>
+        <!--聊天窗口--->
+        <div class="chat" id="chat">
+            <div class="chat_cont" id="ChatLog">
+                <!--
+                <div class="chat_cont_list">
+                    <span class="q_time">09:53</span>
+                    <span class="q_level"><img src="../static/images/201512181636331749.png"/></span>
+                    <span class="q_name">时间在流</span>
+                    <span class="q_cont">士大夫就洛杉矶电费开市大吉富士康非撒旦发就是</span>
+                    <div class="clear"></div>
+                </div>
+                -->
+            </div>
+        </div>
+        <!--联系qq 发送消息--->
+        <div class="chat_bottom">
+            <!--联系qq-->
+            <div class="contact">
+                <dl>
+                    <dt>有任何疑问都可联系万能的助理老师：</dt>
+                    <dd>
+                        <a  class="yingxiao_qq" href="#" class="more">更多助理</a>
+                        <a class="yingxiao_qq"  href="#">助理老师</a>
+                        <a class="yingxiao_qq"  href="#">助理老师</a>
+                        <a  class="yingxiao_qq" href="#">助理老师</a>
+                        <a class="yingxiao_qq"  href="#">助理老师</a>
+                    </dd>
+                </dl>
+            </div>
+
+            <!--发送消息--->
+            <div class="send_message">
+                <div class="send_message_list">
+                    <!--<select id="user_name_list"><option value="0">大家</option></select>-->
+                    <span class=" send_bq tol" id="send_bq">表情</span>
+                    <!--<span class=" send_img tol" id="send_img">图片</span>-->
+                </div>
+                <div class="send_message_nr">
+                    <input class="send_message_txt" id="current_message"/>
+                    <input type="button" class="send_message_btn" id="submit_message"/>
+                </div>
+            </div>
+
+        </div>
+    </div><!--右侧部分结束--->
+
+</div>
+
+
+<!--注册窗口-->
+<div class="pop_register" id="pop_register">
+    <div class="close"><img src="{{ static_url("../static/images/close.png")}}"/></div>
+    <div class="pop_reg_bt">账号注册</div>
+    <div class="pop_reg_cont">
+        <form>
+            <ul>
+                <li><span>用户名</span><input type="text" class="pop_reg_txt" id="pop_reg_name"/></li>
+                <li><span>昵称</span><input type="text" class="pop_reg_txt" id="pop_reg_nicheng"/></li>
+                <li><span>密码</span><input type="password" class="pop_reg_txt"  id="pop_reg_password"/></li>
+                <li><span>确认密码</span><input type="password" class="pop_reg_txt"  id="pop_reg_password_que"/></li>
+                <!--<li><span>邮箱</span><input type="text" class="pop_reg_txt mail_qian"  id="pop_reg_mail"/>@<input type="text" value="qq.com" class="pop_reg_txt mail_hou"> </li>-->
+                <li class="li_te"><span>手机</span><input type="text" class="pop_reg_txt"  id="pop_reg_phone"/></li>
+                <li><span></span><input type="button" value="注册" class="pop_reg_btn"  id="pop_reg_btn"/><a href="javascript:void(null)" id="dl">账号登录</a></li>
+            </ul>
+        </form>
+    </div>
+</div>
+
+<!--修改资料窗口-->
+<div class="pop_register pop_editer" id="pop_editer">
+    <div class="close"><img src="{{ static_url("../static/images/close.png")}}"/></div>
+    <div class="pop_reg_bt">个人资料修改</div>
+    <div class="pop_reg_cont">
+        <form>
+            <ul>
+                <!--<li><span>用户名</span><input type="text" class="pop_edit_txt" id="pop_reg_name"/></li>-->
+                <li><span>昵称</span><input type="text" class="pop_reg_txt" id="pop_edit_nicheng"/></li>
+                <li><span>密码</span><input type="password" class="pop_reg_txt"  id="pop_edit_password"/></li>
+                <li><span>确认密码</span><input type="password" class="pop_reg_txt"  id="pop_edit_password_que"/></li>
+                <!--<li><span>邮箱</span><input type="text" class="pop_reg_txt mail_qian"  id="pop_reg_mail"/>@<input type="text" value="qq.com" class="pop_reg_txt mail_hou"> </li>-->
+                <li class="li_te"><span>手机</span><input type="text" class="pop_reg_txt"  id="pop_edit_phone"/></li>
+                <li><span></span><input type="button" value="确认" class="pop_reg_btn"  id="pop_edit_btn"/></li>
+            </ul>
+        </form>
+    </div>
+</div>
+
+
+<!---登录窗口--->
+<div class="pop_login" id="pop_login">
+    <div class="close"><img src="{{ static_url("../static/images/close.png")}}"/></div>
+    <div class="pop_reg_bt">用户登录</div>
+    <div class="pop_reg_cont">
+        <form>
+            <ul>
+                <li><span>用户名</span><input type="text" class="pop_reg_txt" id="pop_login_name"/></li>
+                <li><span>密码</span><input type="password" class="pop_reg_txt"  id="pop_login_password"/></li>
+                <li><span></span><input type="button" value="登录" class="pop_reg_btn"  id="pop_login_btn"/><a href="javascript:void(null)" id="zc">账号注册</a></li>
+            </ul>
+        </form>
+    </div>
+</div>
+
+<!---课程安排---->
+<div class="pop_course" id="pop_course">
+    <div class="close"><img src="{{ static_url("../static/images/close.png")}}"/></div>
+    <div class="course_bt">课程安排</div>
+    <div class="course_nr">
+        <ul id="week_class_table">
+            <li><span class="course_nr_time">08:00~10:00</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span></li>
+            <li><span class="course_nr_time">10:00~12:00</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span></li>
+            <li><span class="course_nr_time">12:00~14:00</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span></li>
+            <li><span class="course_nr_time">14:00~16:00</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span></li>
+            <li><span class="course_nr_time">16:00~18:00</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span></li>
+            <li><span class="course_nr_time">18:00~20:00</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span></li>
+            <li><span class="course_nr_time">20:00~22:00</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span></li>
+            <li><span class="course_nr_time">22:00~24:00</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span><span>时空老师</span></li>
+        </ul>
+    </div>
+</div>
+
+<!---名师风采老师弹窗---->
+<div class="teacher_show" id="teacher_show">
+    <div class="close"><img src="{{ static_url("../static/images/close.png")}}"/></div>
+    <div class="teacher_list">
+        <ul id="teacher_description_ul">
+        <li>
+            <div class="show_img"><img src="{{ static_url("../static/images/teachericon.jpg")}}"/></div>
+            <div class="show_nr">
+                <h3>宋老师</h3>
+                <div class="show_nr_nr">活动 原创比赛 上传比赛 推广比赛推广比赛 QQ群联盟 心系千图排行 月下载排</div>
+            </div>
+            <div class="clear"></div>
+        </li>
+    </ul>
+    </div>
+</div>
+<!--网页打开随即弹出的弹窗--->
+<div class="afterpop" id="afterpop">
+    <div class="close"><img src="{{ static_url("../static/images/close.png")}}"/></div>
+    <div class="afterpop_top">
+        <div class="topimg"><img  width="780px" height="290px" src="{{ static_url("../static/images/first_pop.gif")}}" /></div>
+    </div>
+    <div class="afterpop_bottom">
+        <div class="bottom_bt"><p>在线客服：</p></div>
+        <div class="self_zhanghu_import">
+            <a href="#" class="more">更多助理</a>
+            <a class="yingxiao_qq" href="#">助理老师</a>
+            <a  class="yingxiao_qq"href="#">助理老师</a>
+            <a class="yingxiao_qq" href="#">助理老师</a>
+            <a class="yingxiao_qq"  href="#">助理老师</a>
+            <a href="#" class="more">更多助理</a>
+            <a class="yingxiao_qq"  href="#">助理老师</a>
+            <a  class="yingxiao_qq" href="#">助理老师</a>
+            <a  class="yingxiao_qq" href="#">助理老师</a>
+            <a  class="yingxiao_qq" href="#">助理老师</a>
+        </div>
+    </div>
+</div>
+
+<!--每日策略的弹窗--->
+<div class="afterpop_method_div" id="methods_every_day" style="display: none;">
+    <div class="close"><img src="{{ static_url("../static/images/close.png")}}"/></div>
+    <div class="method_everyday_title">最新策略</div>
+    <hr/><hr/>
+    <div id="methods">
+    </div>
+    <div id="a_method_desc">
+    </div>
+</div>
+
+<!----财经日历弹出窗--->
+<div class="pop_cjrl" id="pop_cjrl">
+    <div class="close"><img src="{{ static_url("../static/images/close.png")}}"/></div>
+   <div class="pop_cjrl_iframe">
+       <div class="pop_cjrl_bt">财经日历</div>
+       <div class="pop_cjrl_nr">
+           <ul id="news_ul">
+               <li>
+                   <div class="nr_time">13:36:13</div>
+                   <div class="nr_cont">【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 </div>
+                   <div class="clear"></div>
+               </li>
+               <li>
+                   <div class="nr_time">13:36:13</div>
+                   <div class="nr_cont">【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。  </div>
+                   <div class="clear"></div>
+               </li>
+               <li>
+                   <div class="nr_time">13:36:13</div>
+                   <div class="nr_cont">【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 </div>
+                   <div class="clear"></div>
+               </li>
+               <li>
+                   <div class="nr_time">13:36:13</div>
+                   <div class="nr_cont">【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 </div>
+                   <div class="clear"></div>
+               </li>
+               <li>
+                   <div class="nr_time">13:36:13</div>
+                   <div class="nr_cont">【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。  </div>
+                   <div class="clear"></div>
+               </li>
+               <li>
+                   <div class="nr_time">13:36:13</div>
+                   <div class="nr_cont">【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 </div>
+                   <div class="clear"></div>
+               </li>
+               <li>
+                   <div class="nr_time">13:36:13</div>
+                   <div class="nr_cont">【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 </div>
+                   <div class="clear"></div>
+               </li>
+               <li>
+                   <div class="nr_time">13:36:13</div>
+                   <div class="nr_cont">【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。  </div>
+                   <div class="clear"></div>
+               </li>
+           </ul>
+       </div>
+
+   </div>
+</div>
+<span id="level_and_prefix" style="display: none">{{ level_and_prefix }}</span>
+<!--关闭防qq提醒商务通
+<div class="pop_rb" id="pop_rb">
+       <div class="close">x</div>
+        <div>
+            <img src="../static/images/shangwutong_pic.gif" width="auto" height="auto"/>
+        </div>
+
+</div>
+-->
+<!--注册提醒框--->
+<div id="different" class="different" style="display: none;">
+<div class="differ_cont">
+<div id="differ_close" class="differ_close"></div>
+<div id="differ_cont_img" class="differ_cont_img"><img src="{{ static_url("../static/images/level_niming.jpg")}}"/></div>
+<div class="differ_btn">
+<span class="differ_btn_login dianji-login "><img class="login_img" src="{{ static_url("../static/images/differ_login.png")}}"/></span>
+<span id="differ_dianji" class="differ_btn_register differ_dianji"><img class="reg_img" src="{{ static_url("../static/images/differ_register.png")}}"/></span>
+<span class="differ_btn_chat online-consultant"><img src="{{ static_url("../static/images/differ_chat.png")}}"/></span>
+</div>
+</div>
+</div>
+
+<footer>
+    本直播室分析师及管理员所发表言论仅代表个人对市场所持观点，仅供参考，投资有风险，入市需谨慎。
+</footer>
+</body>
+<!--图片的弹出放大插件，必须放在body的结尾哦---->
+<!--整个插件包括一个css，一个js，一个map文件，以及若干图片，css放在头部-->
+<script src="../static/js/lightbox.min.js"></script>
+<style>
+    .class_title>span{
+        font-weight: bold;
+        text-align: center;
+    }
+    .pop_rb{position: fixed; right:0px; bottom:0px; z-index: 9999999;  text-align: center;}
+    .pop_rb .close{ position:absolute; right:0px; top:0px;font-size:20px; color:#000000;cursor:pointer;}
+    #pop_rb img{cursor:pointer;}
+    .noswap{
+        display: none;
+    }
+
+</style>
+<script>
+$(function () {
+    //定义参数
+    var host=location.host;   //上传时修改
+    var page_url=location.href;
+    var qq_url=$("#qq_iframe").attr("src"); //营销qq链接
+    guest_id={{ guest_id }};
+    Advertisementlist();
+
+    ChatLog();
+
+
+
+
+
+    //判断用户登录部分
+    var user_phone={{ u_phone }};
+    var user_level={{ user_level }};
+    var user_id=$("#user_id").text();
+    var user_name=$("#user_name").text();
+    var nickname=$("#nick_name").text();
+    //如果nickname是游客，那就追加匿名id在后面，否则就啥也不做。
+    var s=setInterval(function(){
+        if(guest_id!=0 && $.trim(nickname)=='游客'){
+            console.log("guest_id is "+guest_id);
+            nickname=nickname+String(guest_id).slice(-4);
+            $("#nick_name").text(nickname);
+            $.cookie("guest_id",guest_id);
+            clearInterval(s);
+        }else{}
+    },400);
+    var level_and_prefix=JSON.parse($("#level_and_prefix").text()); //已用户级别id为key的字典，值是此级别的用户的相关信息，如级别名称，级别图标前缀 {x[0]:{"id":x[0],"name":x[1],"path":x[2]} for x in raw}
+    //$("#user_prefix").text(level_and_prefix[user_id]==undefined?"游客":level_and_prefix[user_id]["name"]+"用户");
+    $("#prefix_img").attr("src","../static/images/"+(level_and_prefix[user_id]==undefined?"youke.png":level_and_prefix[user_level]["path"]+".png"));
+    function is_login(){
+        //如果user_ID是空，那么就是没有登录，反之则是已经登录。
+                        if(user_id!='' && user_id!=0){
+                            $("#login_out").show(0);
+
+                            $("#register,#login").hide(0); //隐藏注册和登录
+                        }
+                        else{
+                            $("#register,#login").show(0); //显示注册和登录
+                            $("#login_out").hide(0);
+
+                        }
+    }
+   is_login(); //运行判断登录函数
+    //注销函数
+    function login_out(){
+        $.cookie("user_id",null);
+        $.cookie("user_name",null);
+        $.cookie("user_password",null);
+        location.reload();
+    }
+    $("#login_out").click(function(){login_out();});
+    //对于已登录用户，不再提示注册框
+    if(user_id==''){
+        $("#pop_login").css("display","block");
+    }else{}
+    //营销qq
+    $(".pop_qq").click(function(){
+        var url=$("#qq_iframe").attr("src");
+        $("#qq_iframe").attr("src",url);
+    });
+    //提醒注册弹出框相关事件
+    //关闭注册弹出框
+    $("#differ_close").click(function(){$("#different").css("display","none");});
+    //提醒注册框弹注册按钮。
+    $("#different .login_img").click(function(){$("#differ_close").click();$("#login").click();});
+    //提醒注册框弹登录按钮。
+    $("#different .reg_img").click(function(){$("#differ_close").click();$("#register").click();});
+    //未登录用户，每十分钟提醒一次注册。临时注销
+    /*if(user_id==0){
+        var interval=setInterval(function(){
+            $("#different").css("display","block");
+        },1000*60*10);
+    }else{}*/
+
+
+    //关闭商务通的右下角提醒
+    $("#pop_rb .close").click(function(){
+            $("#pop_rb").hide();
+        });
+    //所有qq图标都链接到商务通。
+    //var shangwutong_url="http://dht.zoosnet.net/LR/Chatpre.aspx?id=DHT95728573&lng=cn&r="+document.referrer+"&p="+window.location.href;
+    $(".yingxiao_qq").click(function(){ openZoosUrl('chatwin');});
+    //给右下角提示框加链接
+    //$("#pop_rb img").wrap("<a href='http://dht.zoosnet.net/LR/Chatpre.aspx?id=DHT95728573&lng=cn' target='_blank'></a>");
+    $("#pop_rb img").click(function(){
+        openZoosUrl('chatwin');
+    });
+    //点击左侧导航链接到商务通。
+     $(".qq_click,.qq_title").click(function(){ openZoosUrl('chatwin');});
+
+    //客户跟单收益
+    function Advertisementlist() {
+
+        $.get("/get_win_info",function (data) {
+            var htmldata = '';
+            if (data["message"]= "success") {
+                var jsondata = data["data"];
+                //console.log("客户跟单收益:"+jsondata);
+                $.each(jsondata, function (i, v) {
+                    htmldata += '<span style="margin:0px 5px;">' + v.Cname + '的' + v.Uname + v.Sex + '跟' + v.Tname + '获利' + v.Money + '元</span>';
+                });
+            }else{}
+            $("#Advertisement").html("<span  style='margin:0px 5px;'>本直播室与您分享基本面分析，技术面教学。投资有风险，入市须谨慎，讲师分析内容仅代表个人观点，仅供参考</span>");
+        });
+    }
+    //点击弹出课程表
+    $("#course").mousedown(function(){
+        $.post("/class/view",function(data){
+            var data=JSON.parse(data["class_data"]);
+            //console.log(data);
+            var week_class=$("#week_class_table");
+            week_class.empty();
+            var title="<li style='border-bottom:1px solid black;background:lightgray' class='class_title'><span>时间</span><span>星期一</span><span>星期二</span><span>星期三</span><span>星期四</span><span>星期五</span></li>";
+            week_class.append(title);
+            for(var i=0;i<data.length;i++){
+                var str="<li><span class='course_nr_time'>"+data[i][0]+"~"+data[i][1]+"</span><span>"+data[i][2]+"" +
+                "</span><span>"+data[i][3]+"</span><span>"+data[i][4]+"</span><span>"+data[i][5]+"</span><span>"+data[i][6]+"</span></li>";
+                week_class.append(str);
+            }
+            //调整大小和位置
+            $("#week_class_table>.class_title:first span:first").width($("#week_class_table>li:last span:first").width());
+            $("#week_class_table>.class_title:first span:first").nextAll().width($("#week_class_table>li:last span:last").width());
+            $("#week_class_table").parent().css("left",$("#week_class_table").parent().width()/2);
+            $("#week_class_table").parent().css("top",$("#week_class_table").parent().height()/2);
+        });
+    });
+    //名师风采弹窗
+    $("#teacher_description").click(function(){
+        $("#teacher_show").show();
+    });
+    $("#teacher_show").find(".close").click(function(){
+        $("#teacher_show").hide();
+    });
+    //绑定表情图片
+    /*由于直接把img的代码嵌入input可能会由于偶然删除>符号导致不可预知的错误，这里，把img标签插入文本框的时候必须替换，这里使用了一个全局字典，此字典在插入的时候
+    * 替换掉img标签，在发送的时候再把img的占位符替换回img标签。*/
+    img_html_list=[];   //全局变量，存放img_html和占位符的数组，每次发送后都要被清空。
+    var find_qq_face=setTimeout(function(){
+        var imgs=$("#qq_face img");
+        imgs.each(function(){
+            var $this=$(this);
+            $this.click(function(){
+                var img_url=$this.attr("src");
+                var the_char='';
+                var img_html="<img  style='display:inline-block' src='"+img_url+"'/>";
+                console.log(img_html);
+                if(img_html_list.indexOf(img_html)==-1){
+                    img_html_list.push(img_html);
+                    //console.log("length is "+(img_html_list.length-1));
+                    the_char=String.fromCharCode(200+(img_html_list.length-1));
+                }
+                else{
+                    //console.log("indexof is "+img_html_list.indexOf(img_html));
+                    the_char=String.fromCharCode(200+img_html_list.indexOf(img_html));
+                }
+                //console.log(the_char);
+                $("#current_message").val($("#current_message").val()+the_char);
+            });
+        });
+    },800);
+
+//////////////////////////////////////////////////////////////////聊天部分////////////////////////////////////////////////////////////////////////////////////
+
+    //聊天室用户发送消息的方法
+    // 文字输入窗口回车键
+    bind_enter_event( $("#current_message"),$("#submit_message"),true);
+    var receive_id=0;  //定义一个默认的接收者id
+    var ws_id=0;      //定义一个全局变量，用于获取ws_id
+    function send_chart_message(){
+        var current_message= $.trim($("#current_message").val());
+        if(current_message==""){
+            alert("说点啥呗...");
+        }
+        else{
+            current_message=char_to_img(current_message);
+            console.log(current_message);
+            // 0。客户匿名id，1.注册用户id 2.员工id ，3消息内容 4.消息类型。5.消息日期。6.聊天室地址
+            adata={"guest_id":guest_id,"user_id":user_id,"user_name":nickname,"dialog_message":current_message,"dialog_type":"private","page_url":page_url,"user_level":user_level};
+            websocket.send(JSON.stringify(adata));
+             $("#current_message").val("");
+        }
+    }
+
+    $("#submit_message").click(function(){send_chart_message();});    //点击发送消息
+    //把表情占位符转换成对应的img_html的函数。
+    function char_to_img(message){
+        for(var i=0;i<img_html_list.length;i++){
+            var temp_char=String.fromCharCode(200+i);
+            var re=new RegExp(temp_char,"g");
+            message=message.replace(re,img_html_list[i]);
+        }
+        return message;
+    }
+    //聊天消息
+    function ChatLog() {
+
+        var ahost = 'ws://'+host+(host.indexOf(":")!=-1?'/char':':9015/char');
+        console.log("ahost is "+ahost);
+        var id = '';
+        //console.log("begin");
+        websocket = new ReconnectingWebSocket(ahost);
+
+        websocket.onopen = function (evt) {
+            //console.log(evt);
+            var user_id=$("#user_id").text();
+            //console.log("user_id is "+user_id);
+            if(user_id!=0){
+                 websocket.send(JSON.stringify({"dialog_type":"online","user_id":user_id}));
+            }else{}
+        };
+        websocket.onmessage = function (evt) {
+
+
+            var obj = JSON.parse(evt.data);
+            //console.log(obj);
+            if (obj["ws_id"] != undefined) {
+                ws_id= obj["ws_id"];   //全局变量
+                console.log("ws_id is " + ws_id);
+                //websocket.send(JSON.stringify({ "type": "start_char", "ws_id": ws_id,"guest_id":0,"page_url":page_url}));
+            }
+            else {
+                //console.log("聊天室大厅的信息");
+                //console.log(evt.data);
+                var message = JSON.parse(evt.data)["data"];  //获取聊天室消息集合
+                if(typeof(message[0]["dialog_type"])!="undefined"){   //说明不是对话内容而是特殊的信息
+                    var the_type=message[0]["dialog_type"];
+                    //console.log("the_type is "+the_type);
+                    if(the_type=="online"){
+                        //检查账户重复登录
+                        var online_id=message[0]["user_id"];
+                        if($("#user_id").text()==online_id){
+                            alert($("#user_name").text()+"账户已在其他地方登录！");
+                            login_out();
+                        }else{}
+                    }
+                    else if(the_type=="delete_message"){
+                        //删除已审核发言
+                        var message_id=message[0]["message_id"];
+                        $(".uuid").each(function(){
+                            if($(this).text()==message_id){
+                                $(this).parent().remove();
+                            }else{}
+                        });
+                    }
+                    else{}
+                }
+                else{
+                    //发言内容
+                    fill_dialog_zone(message);//填充发言区
+                }
+
+            }
+        };
+        websocket.onerror = function (evt) { };
+
+    }
+   prev_message=[];  //全局变量，上一次接收到的对话消息
+    //填充公共发言区的方法
+    function fill_dialog_zone(data){
+            var message = data;
+            var str = '';
+            for (var i = 0; i < message.length; i++) {
+                //console.log(message[i]);
+                var message_user_level = message[i]["user_level"];//当前消息的用户级别
+                var img_url = typeof(level_and_prefix[message_user_level]) == "undefined" ? "youke.png" : (level_and_prefix[message_user_level]["path"] + ".png");
+                //console.log("user_level is "+message_user_level);
+                var uuid=message[i]["message_id"]=="null"?'':message[i]["message_id"];
+                str += '<div class="chat_cont_list" ><span style="display:none" class="uuid">'+uuid+'</span><span class="q_time"  ' + (message_user_level == 6 ? 'style="font-size:1.5em;color:red;"' : 'style="font-size:1.15em;"') + '>' + message[i]["time"] +
+                        '</span><span><img style="width:2.2em;height:2.2em;" src="../static/images/' + img_url + '"/></span>' +
+                        '<span class="q_level"></span><span class="q_name" ' + (message_user_level == 6 ? 'style="font-size:1.5em;color:red;"' : 'style="font-size:1.15em;"') + '>' + message[i]["name"] + '&nbsp;:</span>' +
+                        '<span class="q_cont" ' + (message_user_level == 6 ? 'style="line-height:1.6em;font-size:1.3em;color:red;"' : 'style="font-size:1.15em;"') + '>' + message[i]["message"] + '</span><div class="clear"></div></div>';
+
+
+            }
+            var chats=$("#ChatLog>.chat_cont_list");
+            //防止发言过多
+            if(chats.length>40){
+                $("#ChatLog>.chat_cont_list:first").remove();
+            }
+            else{}
+            $("#ChatLog").append(str);
+            var div = document.getElementById('ChatLog');
+            div.scrollTop = div.scrollHeight;
+            $('#ChatLog').scrollTop($('#ChatLog')[0].scrollHeight);
+            prev_message=message;
+    }
+    //用户登录
+    $("#pop_login_btn").click(function () {
+        var name = $("#pop_login_name").val();
+        var pwd = $("#pop_login_password").val();
+        if (name == "" || pwd == "") {
+            alert("手机或密码不能为空!");
+            return;
+        }
+        else{
+            $.post("http://"+host+"/user_login", {"user_name":name,"user_password": pwd,"page_url":page_url,"ws_id":ws_id,"guest_id":guest_id}, function (data) {
+                //console.log(data);
+                if(data["message"]=="success"){
+                    alert("登录成功");
+                    $("#pop_login_name,#pop_login_password").val("");
+                    location.reload();
+                }
+                else{
+                    alert(data["message"]);
+                }
+            });
+        }
+    });
+    //保存到桌面
+function toDesktop(){
+    window.open("/download_url");
+}
+    $("#save").click(function(){toDesktop();});
+    //绑定登录框回车键
+    bind_enter_event($("#pop_login_name"),$("#pop_login_password"),false);
+    bind_enter_event($("#pop_login_password"),$("#pop_login_btn"),true);
+    //户在聊天室注册用户时，当用户名失焦的时候，检测用户名是否重复
+    $("#pop_reg_name").blur(function(){
+        var val= $.trim($(this).val());
+        if(val!=''){
+            $.post("/check_user_repeat",{"user_name":val},function(data){
+                if(data["message"]!="success"){
+                    alert(data["message"]);
+                    return false;
+                }else{}
+            });
+        }else{}
+    });
+    //用户注册
+    $("#pop_reg_btn").click(function () {
+        var reg_name = $.trim($("#pop_reg_name").val());
+        var reg_nicheng = $.trim($("#pop_reg_nicheng").val());
+        var reg_pwd = $.trim($("#pop_reg_password").val());
+        var reg_quepwd = $.trim($("#pop_reg_password_que").val());
+        var reg_phone= $.trim($("#pop_reg_phone").val());
+        var reg=new RegExp("^1[0-9]{9}[0-9]$"); //验证手机的正则表达式
+        if (reg_name == "" || reg_nicheng == "" || reg_pwd == "" || reg_quepwd == "" || reg_phone == "") {
+            alert("关键信息不能为空!");
+            return false;
+        }
+        else if(reg_pwd!=reg_quepwd){
+            alert("两次输入的密码不一致!");
+            return false;
+        }
+        else if(!reg.test(reg_phone)){
+            alert("手机号码错误!");
+            return false;
+        }
+        else{
+            //参数 user_name='',user_password='',user_phone='',nick_name='',ip='未知'
+            $.post("/user_reg", {"user_name":reg_name,"user_password": reg_pwd,"nick_name":reg_nicheng,"user_phone": reg_phone,"page_url":location.href}, function (data) {
+                //console.log(data);
+                if(data["message"]=="success"){
+                    alert("注册成功");
+                    $("#pop_register>.close").click();
+                }
+                else{
+                    alert(data["message"]);
+                }
+            });
+        }
+    });
+    //关闭用户注册框的点击事件
+    $("#pop_register>.close").click(function(){
+        $("#pop_reg_name,#pop_reg_nicheng,#pop_reg_password,#pop_reg_password_que,#pop_reg_phone").val("");
+    });
+    //获取新闻
+    var prev_news=[];//全局变量，用于存放上次接收到的新闻数据
+    function get_news(){
+        var ul=$("#news_ul");
+        //格式<li>
+        //          <div class="nr_time">13:36:13</div>
+       //            <div class="nr_cont">【股市】台湾加权指数4月20日（周三）收盘下跌119.24点，跌幅1.38%，报8514.48点。 </div>
+       //            <div class="clear"></div>
+       //        </li>
+        var md5_str= $.md5(JSON.stringify(prev_news));
+        $.post("/get_caijing_data/news?uid="+Math.random(),{"md5_str":md5_str},function(data){
+            var data=data["data"];
+            var l=data.length;
+            ul.empty();
+            var temp_str='';
+            for(var i=0;i<l;i++){
+                temp_str+="<li><div class='nr_time'>"+data[i]["time"]+"</div>" +
+                        "<div class='nr_cont'>"+data[i]["text"]+" </div><div class='clear'></div></li>";
+            }
+            //console.log(temp_str);
+            ul.append($(temp_str));
+        });
+    }
+    $("#cjrl").mousedown(function(){get_news();});
+   //老师风采弹出框
+    function view_teachers(){
+        $.post("/teachers/all?uid="+Math.random(),function(data){
+            var data=data["data"];
+            //console.log(data);
+            var ul=$("#teacher_description_ul");
+            ul.empty();
+            //<li><div class="show_img"><img src="../static/images/teachericon.jpg"/></div><div class="show_nr"><h3>宋老师</h3><div class="show_nr_nr">活动 原创比赛 上传比赛 推广比赛推广比赛 QQ群联盟 心系千图排行 月下载排</div> </div><div class="clear"></div></li>
+            var l=data.length;
+            for(var i=0;i<l;i++){
+                var temp=data[i];
+                var str="<li><div class='show_img'><img src='../static/images/teachericon.jpg'/></div><div class='show_nr'>" +
+                        "<h3 style='font-size:1.1em;font-weight:bold;'>"+temp["t_nickname"]+"  "+temp["t_name"]+"</h3><div class='show_nr_nr' style='text-indent:2em'>"+temp["t_description"]+"</div> </div><div class='clear'></div></li>";
+                ul.append(str);
+            }
+        });
+    }
+    $("#teacher_description").mousedown(function(){view_teachers();});
+
+    //添加修改资料模态框弹出按钮.
+    $("#nick_name").click(function(){$("#pop_editer").css("display","block");$("#pop_edit_nicheng").val(nickname);$("#pop_edit_phone").val(user_phone.toString().substr(0,4)+"****"+user_phone.toString().substr(7,4));});
+    $("#pop_editer>.close").click(function(){$("#pop_editer").css("display","none");$("#pop_edit_nicheng").val("");$("#pop_edit_phone").val("");});
+
+    //修改资料模态框主体的留白处点击隐藏模态框
+    $("#pop_add_window").click(function(){$(this).css("display","none");});
+    //阻止内部框的click事件冒泡。
+    $("#pop_add_inner").click(function(){return false;});
+    //修改个人资料提交按钮。
+    $("#pop_edit_btn").click(function(){
+        var account= $.trim($("#user_name").val());
+        var nickname= $.trim($("#pop_edit_nicheng").val());
+        var password= $.trim($("#pop_edit_password").val());
+        var re_password= $.trim($("#pop_edit_password_que").val());
+        var phone=$.trim($("#pop_edit_phone").val());
+        if(password!=re_password){
+            alert("密码不一致");
+            return false;
+        }
+        else if(nickname!="" && password==re_password){
+            $.post("http://"+host+"/edit_user_info",{"u_AccountName":account,"nick_name":nickname,"user_id":user_id,"new_password":password},function(data){
+                //console.log(data);
+                if(data["message"]=="success"){
+                    if(nickname!="" || account!=""){
+
+                        //$("#nick_name").text((nickname=="" || nickname=="undefined")?account:nickname);
+                        $("#pop_add_window").css("display","none");
+                        $("#input_real_name").val("");
+                        $("#input_nick_name").val("");
+                        $("#new_password").val("");
+                        $("#ok_new_password").val("");
+                        if(password==''){
+                            alert("修改成功");
+                        }
+                        else{
+                            $.removeCookie("user_name");
+                            $.removeCookie("user_id");
+                            $.removeCookie("user_password");
+                            alert("密码已修改，请重新登录");
+                        }
+
+                        //sessionStorage.setItem("username",account);
+                        //sessionStorage.setItem("nickname",nickname);
+                        location.reload();
+                    }
+                    else{}
+                }
+                else{
+                    alert(data["message"]);
+                }
+            });
+        }
+        else{
+            alert("亲，至少起个昵称吧");
+        }
+
+    });
+
+    //end...
+    //每日策略的点击事假
+    $("#every_tips").click(function(){
+        if  ((!user_id || user_id=='0' || user_name=='None') && document.getElementById("login")){
+            $("#pop_login").css("display","block");
+        }
+        else{
+            //说明已经登录，从cookie里面获取用户名称与密码
+            $.post("/show_method_or_not",function(data){
+                if (data['message']=='success'){
+                     $("#methods").empty();
+                    //显示信息
+                    var json_data=$.parseJSON(data['data']);    //将字符串化的列表 转换为json的形式
+                    var html="<table id='methods_table' class='methods_table_class' width='95%' border='0' cellpadding='0' cellspacing='0'><tr><th width='20%'>标题</th><th width='50%'>摘要</th><th width='10%'>作者</th><th width='20%'>更新时间</th></tr>";
+                    for (var i=0;i<json_data.length;i++){
+                        html+="<tr onmouseover='show_tips($(this))' class='method_class_td' id='method_tr_id-"+i+"'><th>"+json_data[i]['e_title']+"</th><th class='td'>"+json_data[i]['e_content']+"</th><th>"+json_data[i]['e_author']+"</th><th>"+json_data[i]['e_datetime']+"</th></tr>";
+                    }
+                    html+="</table>";
+                    $("#methods").append(html);
+                    $("#methods_every_day").css("display","block");
+                    //console.log(json_data[0]);
+                }
+                else{
+                    alert(data['message']);
+                }
+            });
+        }
+    });
+    //end
+    //每日策略主窗口，点击右上角的关闭图标，则整个显示区域消失掉
+    $("#methods_every_day>.close").click(function(){$("#methods_every_day").css("display","none"); $("#methods").empty(); $("#a_method_desc").empty();});
+    //每日策略 鼠标点击事件
+    show_tips=function($this){
+        //console.log($this);
+         var html_text='<h3 class="a_method_title">'+$this.children().eq(0).text()+'</h3>'+'<p class="a_method_desc_class">'+$this.children().eq(1).text()+'</p>';
+        $("#a_method_desc").html(html_text);
+    };
+
+
+//end
+});
+
+</script>
+<!--恒海脚本-->
+<script language=javascript>var LiveAutoInvite0='您好，来自%IP%的朋友';var LiveAutoInvite1='来自首页的对话';var LiveAutoInvite2=' 网站商务通 主要功能：<br>1、主动邀请<br>2、即时沟通<br>3、查看即时访问动态<br>4、访问轨迹跟踪<br>5、内部对话<br>6、不安装任何插件也实现双向文件传输<br><br><b>如果您有任何问题请接受此邀请以开始即时沟通</b>';</script><script language="javascript" src="http://ala.zoosnet.net/JS/LsJS.aspx?siteid=ALA46344882&float=1&lng=cn"></script>
+</html>

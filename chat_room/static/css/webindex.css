@@ -1,0 +1,496 @@
+﻿@charset "utf-8";
+/* CSS Document */
+*{margin: 0;padding: 0;}
+li{ list-style:none;}
+body{font-family:microsoft yahei,simsun,serif;color:#606060;font-size: 14px;min-width: 1200px}
+a{color:#606060;text-decoration: none;cursor: pointer;}
+a:hover{color:red;}
+img,input{ vertical-align: middle;border: none;font-family:microsoft yahei}
+input:focus,button:focus{outline:none;}
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder{font-size: 12px;}
+button{border: none;font-family:microsoft yahei;background: none}
+input{font-size: 13px;}
+/* index */
+.header{clear: both;}
+.header-top{background: #454E5D;overflow: hidden;zoom: 1;line-height: 35px;font-size: 14px;font-weight: 100}
+.header-top h6{font-size: 14px;font-weight: 100;color: #fff}
+.header-top h6, .header-logo, nav>ul, .contenter-teacher-three, .mitchell-holland-details, .foot-bg-content{width:1200px;margin: 0 auto;clear: both;font-size: 14px;overflow: hidden;zoom:1}
+.header-top h6 span:first-child, .header-logo h6 span:first-child{float: left;display: block;}
+.header-top h6 .float-right, .header-logo  h6 .float-right{float: right;display: block;}
+.header-logo{color: #ff6d00;}
+.header-logo span{font-size: 18px;line-height: 125px}
+.header-logo span:last-child img{margin-right: 10px;}
+nav{clear: both;background: #454E5D;border: 1px solid #2b323b;box-shadow:0 0 4px 4px #eee;min-width: 1200px;display: block}
+nav>ul{ position: relative; overflow: visible; height: 50px;background: #454E5D;}
+nav .kehu{border-top:1px solid #000;position: relative;z-index:100000;display: block}
+nav .kehu li{background:#434c5a;display:block;position: absolute;left: 0;top:0;width:100%}
+nav>ul>li{float: left;text-align: center;width:19.8%;border-right:1px solid #fff;}
+nav>ul>li:first-child{border-left:1px solid #fff}
+nav>ul>li a{color: #fff;line-height: 50px;text-align: center;font-size:18px; display: block;}
+nav>ul>li a:hover{background:url("../img/hover_03.jpg") repeat-x left center;color:#fff;display:block;text-align: center;text-decoration: none}
+nav>ul>li .active{background:url("../img/hover_03.jpg") repeat-x left center;display:block;}
+.online-consultant{width: 187px;position:fixed;right:0px;top:20px;z-index:100}
+.online-consultant>div{background: #f72c2f;}
+.online-consultant h4{font-size: 22px;color:#fff;text-align: center;font-weight:100;padding-top:15px}
+.online-consultant>div p{font-size: 12px;color: #fff;text-align: center;margin-bottom: 15px;}
+.online-consultant ul{ background: #f7f7f7;width: 174px;margin: 0 auto;padding: 0 5px}
+.online-consultant li a{color: #2b3138;font-size: 20px;line-height: 63px;display: block;border-bottom: 1px solid #2b3138}
+.online-consultant li a img{margin:0 15px}
+.online-consultant li:last-child a{border-bottom: none;margin-bottom: 20px;background:url("../img/piao_17.jpg") no-repeat center bottom}
+.online-consultant h6{color: #fff;font-size: 15px;text-align: center;font-weight: 100;}
+.online-consultant h6:last-child{padding-bottom:15px}
+.online-liao{position: relative;left:-36px;top:-310px;background: #f72c2f;width: 36px;text-align: center}
+.online-liao a{font-size:15px;text-align: center;color: #fff;display: block;width: 20px;margin:0 auto;padding:10px 0}
+/*banner*/
+article{background: #efefef}
+.flexslider{width: 100%;height: 100%;position:relative;overflow:hidden;background:url(../img/loading.gif) 50% no-repeat;}
+.flexslider ul li>img{max-width: 100%; display: block;min-width:1200px;position: relative}
+.flexslider ul div{position: absolute;right:26%;top:40%}
+.flexslider ul div p:first-child{margin-top: 30px}
+.flexslider ul div p{margin-top: 10px;cursor: pointer}
+.slides{position:relative;z-index:1;}
+.flex-control-nav{position:absolute;bottom:10px;z-index:2;width:100%;text-align:center;}
+.flex-control-nav li{display:inline-block;width:14px;height:14px;margin:0 5px;*display:inline;zoom:1;}
+.flex-control-nav a{display:inline-block;width:14px;height:14px;line-height:40px;overflow:hidden;background:url(../img/dot.png) right 0 no-repeat;cursor:pointer;}
+.flex-control-nav .flex-active{background-position:0 0;}
+.flex-direction-nav{position:absolute;z-index:3;width:100%;top:45%;}
+.flex-direction-nav li a{display:block;width:50px;height:50px;overflow:hidden;cursor:pointer;position:absolute;}
+.flex-direction-nav li a.flex-prev{left:40px;background:url(../img/prev.png) center center no-repeat;}
+.flex-direction-nav li a.flex-next{right:40px;background:url(../img/next.png) center center no-repeat;}
+.banner-member{background: #fff;width:300px;position: absolute;top:51px; right:5px;min-width: 230px;height: auto;z-index: 100;overflow: hidden;}
+.banner-member ul{margin-top: 20px;border-bottom: 1px solid #eee;overflow: hidden;zoom:1;padding-bottom:15px}
+.banner-member ul li{float: left;font-size: 16px;width:50%;text-align: center}
+.banner-member ul li a{border-bottom: 3px solid #BABABA;z-index: 10;padding: 0 8px;padding-bottom: 12px;}
+.banner-member ul a:hover{text-decoration: none;border-bottom: 3px solid #FB8C00;color: #666}
+.banner-member-content div:not(:first-child){display: none}
+.banner-member ul .activelogin a{border-bottom: 3px solid #FB8C00;}
+.banner-member-content{width: 100%;overflow: hidden}
+.banner-member-content div p , .banner-member-content div p *{ margin: 0 auto;}
+.banner-member-content div{margin: 8px;margin-top: 25px}
+.security-code{color: #666;width: 93%}
+.banner-member .banner-member-content .security-code:nth-child(1) input:nth-child(1){background: url("../img/ipon.png") no-repeat 2px center;padding-left:25px}
+.banner-member .banner-member-content .security-code:nth-child(2) input:nth-child(1){background: url("../img/password.png") no-repeat 2px center;padding-left:25px}
+.banner-member .banner-member-content .security-code:nth-child(3) input:nth-child(1){background: url("../img/pensal.png") no-repeat 2px center;padding-left:25px}
+.banner-member-content div>input:nth-child(1), .banner-member-content div>input:nth-child(2){width:88%;height: 28px;margin-bottom: 10px;padding-left: 10px;border: 1px solid #eee}
+.banner-member-content div .security-code{border: 1px solid #eee;height: 28px;margin-bottom: 10px;width: 93%;}
+.banner-member-content div .security-code input{border: none; width:44%;float: left;line-height:28px;padding-left: 10px;height: 28px}
+.banner-member-content div .security-code .huoqu{border: none; width:40%;text-align: center;color:#fff;line-height: 28px;white-space: nowrap;text-overflow: ellipsis;float: right;background: #fb8c00;cursor: pointer}
+.banner-member-content div input{background: #fff}
+.banner-member-content .banner-read{margin: 0 auto;width: 92%;margin-top:20px;margin-bottom: 20px;font-size: 12px}
+.banner-member-content .banner-read span{color:#FB8C00}
+.banner-member-content .banner-read input{width:16px;height:16px;color:#f00;cursor:pointer;margin-right: 10px}
+.banner-member-content  .user-login{border: none;background: #FB8C00;color: #fff;font-size: 18px;width:100%;padding:4px 0;}
+.banner-member-content .User-Login .user-login{width: 93%;margin-left:10px}
+.banner-member-content .User-Login p:nth-child(1), .banner-member-content.User-Login p:nth-child(2){margin-bottom: 10px}
+.banner-member-content .banner-thinkchange img{border: 1px solid #ccc;margin-top:20px;display: block;max-width: 100%;height:auto;}
+.contenter-teacher{border-top:3px solid #ff6d00;z-index: 10;}
+.contenter-teacher-bg{background: url("../img/bg1.png") repeat center center;width: 100%;height: 252px;padding:20px 0}
+.cont-teacher-left{background: #EEE;width:312px;border: 1px solid #a4a4a4;float: left;margin-left:17px;padding: 12px 3%}
+.cont-teacher-left:first-child{margin-left: 0}
+.cont-teacher-left h2{color: #e7142b;font-size: 30px}
+.cont-teacher-left h3{font-size: 18px;font-weight:100;margin: 10px 0}
+.cont-teacher-left a{text-decoration: none;color: #666}
+.cont-teacher-left a:first-child p span{line-height:47px}
+.cont-teacher-left a:first-child p span{margin-left: 4%;}
+.cont-teacher-left a:first-child p span:first-child{margin-left: 0}
+.cont-teacher-left a:first-child p span:last-child{margin-left:5%;color: #fc6a42;font-size: 22px;vertical-align:middle}
+.cont-teacher-left .experts-city{width:320px;margin-top:12px}
+.cont-teacher-left .experts-city div{float: left;font-size: 18px;width:140px;line-height:35px}
+.cont-teacher-left .experts-city .fangda{float:left;width:179px;margin-top:26px}
+.cont-teacher-left .experts-city .iphone6{color: #fc6a42;font-size: 20px;width: 180px}
+.cont-teacher-left .experts-city .iphone6 span{margin-left: 15px}
+.cont-teacher-left .experts-city h4{background: #44D6E3;width:60px;color: #fff;float: left;text-align: center;font-weight:100;margin-left:90px;margin-top: 50px;font-size: 14px;margin-bottom: 10px}
+.gas-card{clear: both;margin-left:104px}
+.complimentary{font-size: 20px;}
+.mitchell-holland{background:url("../img/bg2.png") repeat left center;height:744px;padding: 30px 0}
+.mitchell-holland-left{width: 384px;float: left}
+.mitchell-holland-leftTop, .mitchell-holland-leftdown{background:#fff;border: 1px solid #a4a4a4;padding-bottom:10px}
+.mitchell-holland-leftTop h1{background: url("../img/index_06.jpg") no-repeat left center;color: #fff;font-size: 30px;padding-left:36px;height: 71px;line-height: 71px}
+.mitchell-holland-leftdown h1{background: url("../img/bgyellow.jpg") no-repeat left center;color: #fff;font-size: 30px;padding-left:36px;height: 71px;line-height: 71px}
+/* .mitchell-leftTop-cont{padding: 32px}
+.mitchell-leftTop-cont p{line-height: 25px;font-size: 13px;text-indent:2em}
+.mitchell-leftTop-cont p:first-child{overflow: hidden;min-height: 220px;max-height: 260px;font-size: 15px}*/
+.mitchell-leftTop-blue{float: right;color: #fff;background: #0697DA;padding:0 5px;margin-top: 4px;text-indent: 0}
+.mitchell-leftTop-blue:hover{color: #fff;text-decoration: none}
+.mitchell-holland-leftdown{margin-top:40px;}
+.mitchell-holland-leftdown ul, .mitchell-leftTop-cont ul{padding-right:2px;cursor: pointer;margin-top: 30px;margin-bottom: 20px}
+.mitchell-holland .mitchell-leftTop-cont ul li a, .mitchell-holland .mitchell-leftTop-cont .fllow span{background: #13beea}
+.mitchell-holland-leftdown ul li, .mitchell-leftTop-cont ul li{padding-left: 36px;position:relative;color: #fff;height: 53px;margin-top:7px;overflow: hidden;}
+.mitchell-holland-leftdown ul li a, .mitchell-leftTop-cont ul li a{color:#fff;font-size: 18px;text-decoration: none;position:absolute;left:0px;top:0px; z-index:2;overflow:hidden;background: #07d3c6;display:block;line-height: 53px;border:1px solid #ccc;width:93%;padding-left: 25px;box-shadow: 3px 3px 3px #ccc;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+.mitchell-holland-leftdown  .fllow span, .mitchell-leftTop-cont .fllow span{ position:absolute;left:0px; top:38px;z-index:1;font-size:18px;color:#FFF; background:#07d3c6; line-height:53px;display:none;border:1px solid #ccc;width:93%;;padding-left: 25px;box-shadow: 3px 3px 3px #ccc;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+.mitchell-holland-right{float: left;width:790px;border: 1px solid #a4a4a4;margin-left: 17px;background: #d6d6d6;padding-top:46px;cursor: pointer;position: relative;height: 664px}
+.mitchell-holland-right .red{color: #e61f2a;font-size: 38px;text-align: center}
+.mitchell-holland-right  .black{color:#000;font-size: 26px;text-align: center;font-weight: 100;}
+.mitchell-holland-right .to-test-trading{width:650px;margin: 35px auto;margin-bottom: 20px}
+#main{border: 1px solid #0faee3;background: #fff}
+.to-test-trading .buying{margin:14px 0;cursor: pointer}
+.to-test-trading .buying button:first-child{color: #fff;background: #4C7EDD;padding:10px 0;font-size: 24px;width: 300px;border: 1px solid #fff}
+.to-test-trading .buying .buy-chu{background: #F13035;margin-left:46px;padding:10px 0;font-size: 24px;width: 297px;color: #fff;border: 1px solid #fff}
+.to-test-trading .close-out{width: 100%;background:#63BA49;padding: 10px 0;font-size: 24px;color: #fff;border: 1px solid #fff}
+.foot-top-bg{background: url("../img/bg1.png") repeat center center;width: 100%;height: 160px;}
+.foot-bg-content dl{border-left: 1px solid #a4a4a4;float: left;margin:40px 0;width: 285px;padding:0 56px;}
+.foot-bg-content dl:last-child{border-right: 1px solid #a4a4a4}
+.foot-bg-content dt{float: left;width: 80px;margin-top:10px}
+.foot-bg-content dl .foot-blue{color:#29a7e1;font-size: 24px;line-height: 50px}
+.foot-bg-content dd{float: left;width: 182px;margin-left:20px;}
+.foot-bg-content dd span{color: #fc8026;font-size:16px;}
+.footer-down{background:url("../img/webindex_02.jpg") repeat center center;width: 100%;height: 350px}
+.footer-down-bank{margin:0 auto;width: 900px}
+.footer-down-bank h1, .footer-down-right h1{color: #888990;text-align: center;margin-bottom:30px}
+.foot-bank-cont{width: 460px;float: left;margin-top:20px;}
+.foot-bank-cont ul{width:110px;float: left;margin-left:40px;}
+.foot-bank-cont ul li{list-style:inside;list-style: square;line-height:24px;color: #888990}
+.foot-bank-cont ul li a{color: #888990;font-size:14px}
+.footer-down-right{float: left;padding: 0 54px;border-left: 1px solid #888990;margin-top:20px;margin-left:40px;margin-bottom: 40px;}
+.foot-link{clear: both;text-align: center}
+.foot-link p a{color:#888990;border-right: 1px solid #888990;padding:0 8px}
+.foot-link p{color:#888990;font-size: 12px}
+.foot-link p:last-child{padding-bottom: 10px;font-size: 12px;margin-top:5px}
+.foot-link p a:last-child{border-right: none}
+.foot-link p a:hover{color: #f00;text-decoration:underline}
+.foot-link p img{margin-right: 30px;margin-top: 20px;margin-bottom: 20px}
+.contenter-fixed{position: fixed;top:60px;left:80px;z-index:10;}
+/*-------index--------/*/
+/*-------老师排行榜--------/*/
+.intermediate-largebox .teacher-top-right{margin-left:15px;}
+.contenter-teacher .mitchell-holland1{background:url("../img/webimage_39.jpg") repeat left center;height:880px;}
+.contenter-teacher .mitchell-holland1 .maximumtextbox{margin: -50px auto}
+.intermediate-largebox .teacher-top-left{width: 845px;border: 1px solid #a4a4a4;background: #fff;overflow: hidden;min-height: 850px;max-height: 850px}
+.intermediate-largebox .teacher-top-left .headline-firstbox{margin-bottom: 55px}
+.chakan{background: url("../img/chakan_07.jpg") no-repeat 50% center;margin-top:53px;margin-bottom:49px}
+.chakan a{color: #fff;font-size: 24px;padding: 10px;padding-left:38.5%;display:block;font-weight:100}
+.second-box{width:1200px;background:#fff;margin: 87px auto;border: 1px solid #a4a4a4;padding-bottom:100px}
+.second-box p{text-align: center;line-height: 35px}
+.second-box h1{text-align: center;font-size: 44px;color: #e50101;margin: 30px 0;}
+.sixth-boxes{width: 846px;margin:0 auto;margin-top:40px;box-shadow:0px 3px 3px #b8b8b8;overflow: hidden;cursor: pointer;background: #fff}
+.sixth-boxes:nth-child(3){margin-bottom: 0px}
+.sixth-boxes dl{width:22.3%;float: left;box-shadow:0px 3px 8px #666;padding: 6px 0;border-top:1px solid #eee;overflow:hidden;}
+.sixth-boxes dt{float: left;margin-left: 10px;width:40%;margin-bottom: 3px}
+.sixth-boxes dd{float: left;width:44%;margin-left:20px;line-height:52px;text-overflow: ellipsis;overflow: hidden;white-space: nowrap}
+.sixth-boxes dd a:hover{color: #666}
+.sixth-boxes dl .six-teacher{font-size: 23px;}
+.sixth-boxes dl .shot-teacher{font-size: 16px;}
+.teacher-top-right .mitchell-holland-leftdown ul li a, .teacher-top-right .mitchell-holland-leftdown  .fllow span{width: 92%}
+.teacher-top-right .mitchell-holland-leftdown ul{padding-right:2px;cursor: pointer;margin-top: 20px;margin-bottom:10px}
+.eight-boxes{width:64.8%;float: left;}
+.eight-boxes h2{width: 100%;background: #5591d6;padding: 13px 0}
+.eight-boxes h2 span{text-align: center;color:#fff;border-right: 1px solid #fff;width:19.8%;display:inline-block;font-weight: 100;}
+.eight-boxes h2 span:last-child{border-right: none}
+.eight-boxes h3 span{text-align: center;color:#5591d6;font-size: 22px;width:19.8%;display:inline-block;line-height:70px;font-weight: 100}
+.eight-boxes h3 .red{color: #E96000;font-weight: bold;font-size: 24px}
+.intermediate-largebox .button{width:12.6%;border: 1px solid #6b6b6b;float: left;text-align: center;padding:24px 0}
+.intermediate-largebox .button .button-first a{background: #EB6001;padding:5px 10px;color: #fff;font-size: 14px;display: block;text-align:center;width:55%;margin: 0 auto;margin-bottom: 8px}
+.intermediate-largebox .button .small-box a{font-size: 17px;color:#5490D6;display: block}
+.expertd-city-bg{background:url("../img/webimage_39.jpg") repeat left center;height:1570px;padding: 30px 0}
+.maximumtextbox{width:1200px;margin:0 auto; }
+.teacher-top-right .mitchell-holland-leftdown{margin-top: 0;margin-bottom: 29px}
+/*.headline{box-shadow:2px 2px  5px #9a9a9a;border: 1px solid #a4a4a4;background: #fff;padding: 30px 0 45px 0;}*/
+.headline-firstbox{text-align: center;}
+.headline h1{text-align: center;font-size: 44px;color: #e50101;}
+.intermediate-largebox{padding-bottom: 40px;margin-top:35px;width: 1200px}
+.expertd-city-content{width: 847px;float: left;}
+.intermediate-large-box{box-shadow: 3px 3px  3px #9a9a9a;background: #fff;border: 1px solid #a4a4a4;margin-bottom: 18px;max-height:253px}
+.intermediate-large-box dl{padding: 20px 0;overflow: hidden}
+.intermediate-large-box dl dt{float: left;margin-left:4.5%}
+.intermediate-large-box dl dd{padding:0 1.4em;width:460px;float: left;color: #a4a4a4;}
+.intermediate-large-box dl dd a{color: #a4a4a4}
+.intermediate-large-box .todays-date{color:#008dcc;float:right;font-size: 14px;}
+.intermediate-large-box .todays-date1{float: left;}
+.intermediate-large-box .todays-date1 img{margin-right: 10px;vertical-align: middle;margin-left: -10px;margin-top:-2px}
+.intermediate-large-box .look-histroy{font-size: 20px;font-weight: 100;text-indent:-0.5em;margin-bottom:8px}
+.intermediate-large-box .look-histroy a{color: #666}
+.intermediate-large-box dd{line-height: 25px;}
+.intermediate-large-box .thumb-up{text-align: right;padding-right: 20px;margin-bottom: 7px}
+.intermediate-large-box .thumb-up span{margin-left: 10px}
+.expertd-city-right{float: left;width:333px;margin-left:18px;}
+.expertd-city-right-box{width: 290px;float: right;border:1px solid #ccc;box-shadow:3px 3px  3px  #a5a5a5;background: #fff;padding:0px 18px 23px 20px;margin-bottom: 26px}
+.expertd-city-right-box h3{font-size: 18px;font-weight: 100;border-bottom: 1px solid #eee;margin-top:10px;line-height:50px;}
+.expertd-city-right-box h6{margin-top: 15px;}
+.expertd-city-right-box h6 img{margin: 0 auto}
+.hot-discussion{margin-top:35px;overflow: hidden;margin-bottom: 20px}
+.hot-discussion dt{float: left;width: 120px}
+.hot-discussion dd{float: left;width:150px;line-height: 25px;margin-left:10px;font-size: 12px;max-height:120px;overflow:hidden}
+.hot-discussion dd a{color: #a4a4a4;}
+.largebox-thirdbox-footer{clear: both;font-size: 12px;width: 250px;overflow: hidden;margin: 0 auto}
+.largebox-thirdbox-footer p{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;width: 250px;}
+.largebox-thirdbox-footer p:first-child{color: #ccc;}
+.largebox-thirdbox-footer p:first-child span{margin-left: 10px;font-size: 12px}
+.largebox-thirdbox-footer .renwu{text-indent: 2.7em}
+.largebox-thirdbox-footer .huifu{text-align:right;border-bottom:1px solid #eee; margin-bottom: 5px;text-decoration: underline;color: #ccc}
+.largebox-thirdbox-footer .huifu a{margin-left: 10px}
+.largebox-thirdbox-footer:last-child .huifu{border-bottom: none;}
+.minheight {max-height:120px;min-height:120px;overflow:hidden;}
+/*-------营销页面/--------/*/
+.successful-profit{background: url("../img/shop_03.jpg") no-repeat left center;background-size: 100% 100%;height: 679px;position: relative;overflow: hidden}
+.aprofit-one{background: url("../img/shop_04.jpg") no-repeat left center;background-size: 100% 100%;height: 974px;position: relative}
+.successful-profit h2{position: absolute;display: block;width:100%;bottom:5%;left:55%;background: url("../img/join_03.png") no-repeat left center;height: 82px}
+.successful-profit i{color: #fff;font-size:44px;font-weight: bold;display: block;cursor: pointer;padding-left: 73px;;line-height: 82px}
+.aprofit-one>div{position: absolute;left:35%;bottom: 25.6%;}
+.aprofit-one h2:nth-child(1){float: left;margin-top: 40px}
+.aprofit-one h2:nth-child(2){float: left;margin-top: 12px}
+.aprofit-one span{color: #fff;font-size:24px;cursor: pointer}
+.aprofit-one .mian span{background: #ee1313;border-radius: 10px;padding:20px 40px;}
+.banner-member1{background: #fff;width:300px;position: absolute;top:51px; right:5px;min-width: 230px;height: auto;z-index: 100;}
+.banner-member1 ul li{text-align: center;margin-top: 10px;border-bottom: 1px solid #ccc}
+.banner-member1 ul li a{color:#e7142b;font-size: 19px;line-height: 30px}
+.banner-member1 .banner-member-content .security-code{background: #66ccf1;margin-bottom: 20px}
+.banner-member1 .banner-member-content .security-code input:-ms-input-placeholder{color: #fff;line-height: 30px}
+.banner-member1 .banner-member-content .security-code:nth-child(1) input:nth-child(1){background: #66ccf1;background:url("../img/ipo.png") no-repeat 10px center;color: #fff;padding-left:30px;}
+.banner-member1 .banner-member-content .security-code1 input:nth-child(1){ background:url("../img/pen.png") no-repeat 6px center;padding-left: 30px;color: #fff}
+.banner-member1 .banner-member-content .security-code1 input:-ms-input-placeholder{color: #fff;}
+.banner-member1 .banner-member-content div .security-code button{color: #f00}
+.banner-member1 .banner-member-content div{margin:15px}
+.banner-member1 .banner-member-content input::-webkit-input-placeholder{color: #fff}
+.banner-member1 .banner-member-content .user-login{margin-bottom:8px;display: block;text-align: center}
+.background-1{width: 100%;height: 100%;background: #ccc;opacity: 0.8;border: 1px solid; overflow: hidden;}
+.pop-up-box,.pop-up-box1{width: 900px;background:#fff;overflow: hidden;margin: 0 auto;border: 1px solid #eee;display: none}
+.pop-up-box-box1{float: left;width: 350px;}
+.pop-up-box-box1-img{margin: 35px 0}
+.pop-up-box-box1 p{border: 1px solid #ccc;margin-bottom: 20px;}
+.pop-up-box-box1 p input{height: 35px;line-height: 30px}
+.pop-up-box-box1 .searchbox{background: url("../img/jiaoyidashi02_07.jpg") no-repeat 3px center;padding-left: 35px}
+.pop-up-box-box1 .searchbox1{background: url("../img/jiaoyidashi04_03.jpg") no-repeat 3px center;padding-left: 35px}
+.pop-up-box-box1 .searchbox2{background: url("../img/jiaoyidashi05_03.jpg") no-repeat 3px center;padding-left: 35px;}
+.pop-up-box-box1 .border-none{border: none;height: 35px}
+.pop-up-box-box1 .border-none input{width: 80px;border: 1px solid #ccc;height: 35px}
+.pop-up-box-box1 .border-none input:nth-child(2){margin-left: 10px;width: 120px;color: #fff;background: #fb8c00;border: none}
+.pop-up-box-box1 .pop-middle{width:250px;margin:0 auto;}
+.pop-up-box-box2{float:left}
+.pop-up-box-box1 .banner-read input{width: 15px;height:15px;margin-right:10px;}
+.pop-up-box-box1 .banner-read span{color: #4280d3;}
+.pop-up-box-box1 .banner-read{font-weight: 100;border: none;padding-top:10px;font-size: 12px}
+.pop-up-box-box1 .pop-middle  h4{background: #e10303;border: 1px solid #a4a4a4;color: #fff;text-align: center;padding: 7px 0;margin:30px 0}
+.pop-up-box-box1 .pop-middle  h4 a{color: #fff;font-weight: 100;display:block;font-size:18px}
+/*-------个人中心/--------*/
+.person-content{width:1200px;margin:0 auto;overflow: hidden;padding-bottom:70px}
+.person-content h5{line-height:77px;font-size: 14px;font-weight: 100}
+.person-content-box{border: 1px solid #a4a4a4;width: 1198px;overflow: hidden}
+.person-box-left{width: 260px;float: left;padding:25px;}
+.person-box-left h2{text-align: center;font-size: 28px;color: #ffae00;font-weight: 100;margin-top:15px;margin-bottom: 25px}
+.person-box-left h2 img{margin-right: 20px;}
+.person-box-left ul li{border-top: 1px solid #a4a4a4;padding: 3px 0}
+.person-box-left ul li:last-child{border-bottom: 1px solid #a4a4a4;}
+.person-box-left ul li .person-active{background: #ffae00;color: #fff;}
+.person-box-left ul li a{display: block;padding:14px 0;text-align: center;font-size: 18px;color: #666}
+.person-box-right{width: 886px;float: left;background: #fff;border-left: 1px solid #a4a4a4;padding-bottom:150px;min-height:400px}
+.person-right-one>h6{border-bottom: 1px solid #a4a4a4;font-size: 16px;font-weight:100;margin-top: 70px;clear: both}
+.person-right-one>h6 span{border-bottom:2px solid #ffae00;margin-left:56px;line-height: 40px;padding-bottom: 10px}
+.person-one-content{width: 770px;margin: 0 auto;margin-left:67px;margin-top: 30px;min-height:340px}
+.person-one-content h6{font-size: 18px;font-weight: 100;color: #ccc;line-height: 60px}
+.person-one-content h6 span{font-size: 30px;color:#ffae00;margin-left: 15px}
+.person-one-content p{font-size: 16px;line-height: 30px;clear: both}
+.person-one-content .filling-card{width: 330px;float: left}
+.person-one-content .filling-card>a, .person-one-content .filling-card-right p:nth-child(1)>a{color: #ffae00;text-decoration: underline;line-height: 50px;font-size: 18px}
+.filling-card .song{margin-top: 25px;margin-bottom: 20px}
+.filling-card p span, .filling-card  .convertible-m a{margin-left: 40px}
+.filling-card  .convertible-m a{text-align: center;width:78px;display: inline-block;text-decoration:underline;}
+.filling-card p span:first-child, .filling-card  .convertible-m a:first-child{margin-left: 0}
+.filling-card p .convertible{color: #e7142b;text-decoration:underline;}
+.filling-card  .convertible-m, .filling-card-right .convertible-m{font-size: 14px;line-height: 60px}
+.filling-card  .convertible-m a:hover, .filling-card-right .convertible-m a:hover{color: #666}
+.filling-card-right{float: left;width: 300px;margin-left:100px}
+.filling-card-right  p:nth-child(1) span{padding-left:60px;font-size: 14px;text-decoration:none;color: #ffae00}
+.filling-card-right .convertible-m a{text-align: center;width:167px;display: inline-block;text-decoration:underline;}
+.person-one-content .convertible-shuo{float: right;font-size: 14px;margin-right:50px}
+.person-one-content .my-integral{margin-top: 10px}
+.person-one-content .my-integral>p{font-size: 14px;line-height:35px}
+.person-one-content .my-integral>p span:first-child, .teacher-message>span{background: #ffae00;padding: 3px 15px;color: #fff;margin-right: 10px;font-size: 16px}
+.person-one-content .my-integral>p span{color: #ffae00;font-weight: bold;font-size: 18px}
+.person-one-content .integral-table{border: 1px solid #a4a4a4;width: 430px;margin-top: 30px;margin-bottom: 50px}
+.person-one-content .integral-table p{border-bottom: 1px solid #a4a4a4}
+.person-one-content .integral-table p:first-child, .person-one-content .integral-table p span:first-child{background: #ffae00;color: #fff;font-size: 16px;}
+.person-one-content .integral-table p:first-child span{font-size: 16px;}
+.person-one-content .integral-table p:last-child{border-bottom: none}
+.person-one-content .integral-table p span{border-right: 1px solid #a4a4a4;display: inline-block;width: 20%;text-align: center;vertical-align: middle;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;line-height: 33px;font-size: 14px}
+.person-one-content .integral-table p span:last-child{border-right: none;width: 39%;text-align: center;white-space: nowrap;text-overflow: ellipsis;overflow: hidden}
+.person-one-content .sixth-boxes{width:770px;box-shadow: 3px 3px 3px #ccc;border:1px solid #a4a4a4;margin-left: 0}
+.person-one-content .sixth-boxes dl{width:21.5%;float: left;box-shadow:0px 3px 8px #666;padding: 7px 7px;}
+.person-one-content .sixth-boxes dl dt{width: 77px;float: left;border-radius: 0;margin-left: 0}
+.person-one-content .sixth-boxes dl .six-teacher{font-size: 18px}
+.person-one-content .sixth-boxes dl .shot-teacher{font-size: 13px}
+.person-one-content .sixth-boxes .bian-teacher{font-size: 14px;color: #ffae00}
+.person-one-content .sixth-boxes dl dd{line-height:25px;float: left;width:77px;margin-left:7px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden}
+.person-one-content .sixth-boxes .he{margin-top: 13px}
+.person-one-content .eight-boxes{width: 76%;float:left;margin-left:0.65%}
+.person-one-content .eight-boxes h2, .person-one-content1 h2{padding:10px 0;font-size: 18px;background: #ffae00}
+.person-one-content .eight-boxes h2 span{display: inline-block;width:24.5%;white-space: nowrap;text-overflow: ellipsis;overflow: hidden}
+.person-one-content .eight-boxes h3 span{text-align:center;width:24.5%;;line-height:64px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;color: #ffae00;font-size: 20px}
+.person-one-content .eight-boxes h3 .red, .person-one-content div .red{color:#e7142b;font-size: 18px}
+.person-one-content .teacher-message{margin-top: 25px;width: 770px}
+.person-one-content .teacher-message p{font-size: 14px;margin-top:20px;line-height: 22px}
+.person-right-one .none{border: none;margin-left:25px}
+.person-one-content1{margin: 0 auto;width: 770px;border: 1px solid #a4a4a4;margin-top: 30px;box-shadow: 3px 3px 3px #ccc}
+.person-one-content1 h2 span{display: inline-block;width:18%;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;text-align: center;color: #fff;border-right: 1px solid #fff;font-weight: 100}
+.person-one-content1 h2 span:last-child{border-right: none;}
+.person-one-content1 h3{border-bottom: 1px solid #a4a4a4;line-height:27px;margin-top: 10px;font-size: 18px}
+.person-one-content1 h3 span:last-child{width:28%}
+.person-one-content1 h3 span{line-height:40px;display: inline-block;width:18%;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;text-align: center;font-weight: 100}
+.person-one-content1 h3 span .have1{font-size:18px;color: #e7142b;font-weight: bold;padding-left: 10px}
+.person-one-content1 h3 button{font-size: 14px;padding-left:26px;text-decoration: underline;color: #666}
+.person-one-content1 .red, .person-one-content div dd a{color:#ffae00 }
+.person-one-content1 h1{text-align: center;line-height: 109px}
+.person-one-content1 h1 a{color: #ffae00;font-size: 28px;text-align: center;font-weight: 100;text-decoration: underline}
+.person-one-content .jibie{clear: both}
+.person-one-content .jibie dl{width: 84px;float: left;margin-top: 20px;margin-bottom: 30px;margin-left: 30px}
+.person-one-content .jibie dl:first-child{margin-left:0}
+.person-one-content .jibie dd{text-align: center;font-size: 18px;margin-top: 10px}
+.person-one-content > dl {width: 320px; margin-bottom: 40px; overflow: hidden;}
+.person-one-content > dl dt{ float: left; width: 100px;	}
+.person-one-content > dl dt a{ margin:5px auto; display: block; width: 57px; }
+.person-one-content > dl dd{ float: left; width: 200px;	 margin-left: 20px;}
+.person-info-box{ clear: both; width: 700px;margin-left: 30px}
+.person-info div{ float: left;height: 40px; line-height: 40px; width: 400px;}
+.person-info div span{ float: left; text-align:justify; width:65px; display: block;text-align-last:justify; font-size: 16px;}
+.person-info label{ width: 200px; float: right; height: 40px; line-height: 40px; color:#999; text-decoration: underline;}
+#test_result{min-height: 38px}
+.none-attention{margin:80px auto;width:30%}
+.none-attention h1{color: #FFAE00;font-weight: 100;}
+.none-attention p a{color: #E7142B;text-decoration: underline;font-size: 30px;margin-top: 50px;display:inline-block;margin-left: 15px}
+/*-----------------专属服务-------------------*/
+.contenter-servicebg{background:url("../img/service3_38.jpg") repeat left center;height:996px;padding: 30px 0;position: relative}
+.contenter-service{width: 1200px;margin: 0 auto}
+.jifen{font-size: 20px;background: #229ad1;width:15.3%;color: #fff;padding-left:15px}
+.jifen img{margin-left:22px}
+.contenter-service ul{border-top:3px solid #18b0fb;background: #f3f3f3;height: 176px}
+.contenter-service ul li{float: left;text-align: center;position:relative}
+.contenter-service ul li a{display: block;width:200px;}
+.contenter-service ul a:hover{width: 200px;color: #fff;font-weight: bold;background: #18b0fb}
+.service-background ul li i{background:url("../img/jiantou_03.png") no-repeat 0 0;width:32px;height: 12px;display: block;position:absolute;left:86px;bottom: -12px;display: none}
+.service-background{background: #fff;overflow: hidden;max-height: 820px;min-height: 820px}
+.service-background .zhuce{display: block;}
+.contenter-service ul li a span img{padding-top: 30px}
+.jinbi-wen{margin-top: 70px}
+.contenter-service ul li a span{line-height: 42px;display: block;}
+.service-box h6{font-size: 24px;font-weight: 100;color:#949494;margin-top:20px;margin-bottom:30px;}
+.service-box h6>span{border-bottom: 1px solid #eee;padding-bottom:10px;}
+.service-contents{width: 83.3%;margin: 0 auto}
+.service-box h6 .three{font-size: 45px;color:#ff6d00;font-weight: bold}
+.ding-bg{background: url("../img/server_07.jpg") no-repeat left center;width: 313px;height: 232px;position: relative;float: left;margin-left: 30px;display: block}
+.service-contents .one{margin-left:0}
+.service-contents .five-jifen{font-weight: bold;color: #ffd800;font-size: 24px}
+.service-contents .jingxione{position: absolute;right: 24px;top:17px;color: #fff;font-size: 22px;font-weight: bold;transform:rotate(-9deg); -ms-transform:rotate(-9deg);-moz-transform:rotate(-9deg);-webkit-transform:rotate(-9deg); -o-transform:rotate(-9deg);}
+.service-contents .jifen-buzhou{position: absolute;left: 30px ;top:90px;color: #fff;width: 73%;font-size: 16px;line-height: 35px;}
+.service-contents .integral-table{clear: both;padding:50px 0;width: 97%}
+.service-contents p{font-size: 18px}
+.service-contents .integral-table p{border: 1px solid #fff;line-height: 37px}
+.service-contents .integral-table p:first-child, .service-contents .integral-table p span:first-child, .service-contents .jinbi-huan h4{background: #18b0fb;color: #fff;font-size: 20px;line-height: 45px;}
+.service-contents .integral-table p:nth-child(2){background: #eee;color: #ff6d00;font-size: 16px}
+.service-contents .integral-table p:nth-child(3){background: #beeaff;font-size: 16px}
+.service-contents .integral-table p span:last-child{border: none}
+.service-contents .integral-table p span{border-right: 2px solid #fff;display: inline-block;width: 24.78%;text-align: center;vertical-align: middle;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;line-height: 45px;}
+.white{color: #fff;width: 1200px;position: absolute;left:18.5%;bottom:20px;font-size: 15px}
+.service-contents .yellow{font-size: 24px;color:#ff6d00;font-weight: bold;margin-left: 5px}
+.service-contents .blue{color: #18b0fb;text-decoration: underline}
+.service-contents .jinbi-huan{width: 80%;margin: 0 auto}
+.service-contents .jinbi-huan p span:first-child, .jinbi-huan h4 span{width:40%;display: inline-block;text-align: center}
+.service-contents .jinbi-huan p span:nth-child(2), .jinbi-huan h4 span:nth-child(2){width: 56%;display: inline-block;text-align: center}
+.service-contents .jinbi-huan h4 span:first-child{border-right: 2px solid #fff}
+.service-contents .jinbi-huan p span:first-child, .service-contents .jinbi-huan p span:nth-child(2){background: none;color: #949494;}
+.service-contents .jinbi-huan .more{color: #ff6d00;text-align: center}
+.service-contents  .float-right, .service-contents  .float-right2{float: right;padding-bottom: 50px}
+.service-box  .jifen-top{margin-top: 60px;}
+.service-contents  .float-right2{margin-top: -100px}
+.service-contents  .jifen-use{line-height: 45px;font-size: 18px;margin-top: 70px}
+.service-contents  .float-right1{float: right;padding-bottom: 50px;}
+.service-contents .font-size p{border-bottom: 1px solid #18b0fb;padding-bottom: 15px;margin-bottom: 15px}
+.service-contents .font-size p span:first-child, .service-contents .yellow-yuan p span:first-child{background: #18b0fb;color: #fff;;width: 25px;height: 25px;border-radius: 50px;display: inline-block;text-align: center;margin-right: 15px;line-height: 23px}
+.service-contents .font-size .bg-blue{background: #18b0fb;color: #fff;padding-top: 0; padding-bottom: 0;line-height: 35px;text-indent: 2em}
+.service-box .join{margin-top: 40px;}
+.service-box .join1{margin-top: 40px;}
+.service-contents p{font-size:16px}
+.service-contents .zhanghu{margin-top: 20px;margin-bottom:80px}
+.service-contents .example{display: block;margin-top:10px}
+.service-contents .example b{position: absolute}
+.service-contents .example span{background: url("../img/exple_03.png") no-repeat 30px center;width: 530px;height: 65px;font-size: 15px;display: inline-block;color: #fff;padding:0 65px;line-height: 30px}
+.service-contents .yellow-yuan p span:first-child{background: #ff6d00;margin: 15px 0;margin-right: 15px}
+.jibi-table{width: 97%;font-size: 18px;margin:40px 0}
+.jibi-table th{background: #18b0fb;color: #fff;font-size: 20px;line-height: 45px;text-align: center}
+.jibi-table td{text-align: center;line-height: 40px;vertical-align: middle;}
+.jibi-table th:nth-child(1), .jibi-table th:nth-child(2){width:16%;text-overflow: ellipsis;overflow: hidden;white-space:nowrap}
+.jibi-table th:nth-child(3){width:32%}
+.jibi-table th:nth-child(4){width:39%}
+.jibi-table tbody tr:nth-child(1) td:nth-child(1){background: #beeaff}
+.jibi-table tbody tr:nth-child(1) td:nth-child(4) p{font-size: 14px;text-align: left;padding: 0 13px;line-height: 23px}
+.service-contents .huoqu-fangshi{width: 100%;;padding-top:0;}
+.service-contents .huoqu-fangshi p span{border-right: 2px solid #fff;display: inline-block;width: 19.78%;text-align: center;vertical-align: middle;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;}
+.service-contents .huoqu-fangshi p:first-child{line-height: 70px;font-size: 24px}
+.service-contents .huoqu-fangshi p:first-child span{line-height:65px;}
+.service-contents .huoqu-fangshi p:nth-child(2), .service-contents .huoqu-fangshi p:nth-child(3){line-height: 20px}
+.service-contents .huoqu-fangshi p:nth-child(2) span:first-child, .service-contents .huoqu-fangshi p:nth-child(3) span:first-child{line-height: 45px}
+.service-contents .huoqu-fangshi .shuoming{background: #eee}
+.service-contents .huoqu-fangshi .shuoming span:first-child{line-height: 77px;display: inline-block}
+.service-contents .huoqu-fangshi .shuoming span:not(:first-child){font-size: 14px;white-space: normal;padding:0 13px;text-align: left;width: 17.2%;line-height:90px;height: 77px;line-height: 25px;vertical-align: middle}
+/*--------------------游戏------------------*/
+.star-youxi{position:absolute;top:0px;left:0px;cursor: pointer}
+#button0{z-index: 100}
+.star-youxi2, .star-youxi3{position:absolute;top:0px;left:0px;display: none;}
+.deFen{position: absolute;left:52%;top:25.5%;font-size:41px;color: #fff;font-weight: bold}
+.pingjia{position: absolute;left:55%;top:25.5%;font-size:45px;color: #fff;font-weight: bold}
+.huoli{position: absolute;left:25%;top:26.5%;font-size:28px;color: #fff;font-weight: 400}
+.wechat-mid{background: url("../img/wechat03.png") no-repeat left center;background-size:100% 100%;height: 519px;position: relative}
+.wechat-mid1{width: 1100px;margin: 0 auto;padding-top:60px;}
+.wechat-mid1 dl{background: url("../img/wechat.png") no-repeat left center;height: 98px;width: 20%;float: left;margin-left: 5%;cursor: pointer}
+.wechat-mid1 dt{float: left;line-height: 104px;text-align: center;margin-left:5%}
+.wechat-mid1 dd{float: left;font-size: 30px;font-weight: bold;line-height: 98px;text-align: center;margin-left:5%;color: #fff}
+.wechat-mid p{position: absolute;bottom:5%;left: 55%;background: url("../img/wechat01.png") no-repeat left center;height:58px;width:228px;clear: both;color: #fff;font-size: 32px;font-weight:600;padding-left:30px;line-height: 52px;cursor: pointer}
+.wechat-foot{background:url("../img/wechat02.png") no-repeat left center;height:49.5em;background-size:100% 100%;position: relative;}
+.wechat-foot h2{background: #ffd800;padding: 20px 50px;position: absolute;bottom:5.5%;left: 37%;color: #e7142b;font-size: 46px;border-radius: 10px;cursor: pointer}
+.load-foot{position: fixed;top:0;right: 0;z-index: 100;height: 533px;width:225px}
+.xieyi{width:50%;height: 528px;border: 1px solid #a4a4a4;background: #fff;margin: 0 auto;display: none}
+.xieyi h3{text-align: center;color: #f72c2f;height:40px;line-height: 40px;border-bottom: 1px solid #ff9208}
+.xieyi div{height: 440px;overflow-y:scroll;border-bottom: 1px solid #ff9208;}
+.xieyi button{background: #f72c2f;padding:6px 20px;color: #fff;font-size: 20px;margin-top: 5px;margin-left:39%}
+.xieyi p, .xieyi h6{text-indent: 2em;width: 97%;margin: 0 auto;font-size: 14px}
+.xieyi h6{color: #000;margin:7px 0;font-size: 15px}
+.xieyi p:first-child{margin-top: 10px}
+.xieyi p:last-child{margin-bottom: 15px}
+.load-user{width:100%;height: 530px;position: fixed;top:30px;left: 0;display: none}
+.close1{position: absolute;right:1%;top:1%}
+/*--------------------直播中心------------------*/
+.live-bg{background: url("../img/live_bg.png") no-repeat left center;height:66.9em;background-size:100% 100%}
+.live-topbg{background: url("../img/live_bg1.png") no-repeat left center;height:3em;width: 100%}
+.live-topbg h6{color: #fff; margin-left:2%;font-weight: 100;}
+.live-topbg h6 img{margin-right:.5em}
+.live-topbg h6>span:first-child{font-size:2.6em;line-height: 37px;margin-right:2%;font-weight: bold;}
+.live-topbg h6>span:nth-child(2){font-size:1.6em;line-height: 30px}
+.live-topbg h6 .yello{color: #ffcc00;font-size: 16px}
+.live-topbg .float{float: left;width: 57%}
+.live-topbg .right{float: right;width:40%;}
+.live-topbg .right>span{margin-left: 3%;line-height: 37px}
+.live-login{background: #f46d09;display: inline-block;padding:0px 30px;}
+.live-join{background: #e7142b;display: inline-block;padding:0px 30px;margin-left: 0}
+.live-topbg .right a{color: #fff;font-size: 17px}
+.live-contenter{width: 1847px;margin: 2% auto;overflow: hidden;height:61em}
+.live-left{width:15%;overflow: hidden;float: left;min-width: 283px}
+.live-left-top{background:url(../img/livedashi.png) no-repeat left center;height: 21.1em;position: relative;margin-bottom: 30px}
+.live-left-top p a{background: #ffa401;padding: 3px 5px;font-size: 20px;color: #fff;border-radius: 4px;border: 1px solid #ffcc00;margin-left: 2%}
+.live-left-top p{padding: 8px 5px;background: #ffa401;width: 35%;border: 1px solid #fff;border-radius: 5px;position:absolute;bottom:5%;left: 28%}
+.live-left .mitchell-holland-leftTop,.live-left .mitchell-holland-leftdown {background: none;border: none;width: 74%}
+.live-left .mitchell-holland-leftdown ul li a, .live-left .mitchell-leftTop-cont ul li a, .live-left .mitchell-holland-leftdown .fllow span, .live-left .mitchell-leftTop-cont .fllow span{box-shadow:3px 3px 3px #000;font-size: 14px}
+.live-left .mitchell-holland-leftdown ul li, .live-left .mitchell-leftTop-cont ul li{height: 40px}
+.live-left .mitchell-holland-leftdown .fllow span, .live-left .mitchell-leftTop-cont .fllow span,.live-left .mitchell-holland-leftdown ul li a, .live-left .mitchell-leftTop-cont ul li a{line-height: 40px}
+.live-left .mitchell-leftTop-cont ul li a, .live-left .mitchell-leftTop-cont .fllow span{background: #13beea}
+.live-left .mitchell-holland-leftTop h1,.live-left .mitchell-holland-leftdown h1{height: 54px;line-height: 54px;font-size: 22px;}
+.live-left .mitchell-holland-leftdown ul, .live-left .mitchell-leftTop-cont ul{margin-top: 15px;}
+.live-left .mitchell-holland-leftdown{margin-top:0;}
+.live-middle{float: left;margin-left: 17px;width: 35.4%;}
+.live-middle h3{margin:25px 0;}
+.live-middle h3 span{margin-right: 6%;}
+.live-middle h4 input{width:500px;height: 56px;margin-top:-6px;}
+.live-middle .send-idea{background: #e7142b;color: #fff;padding:0 5%;display: inline-block;margin-left:8px;font-size:1.4em;font-weight: 400;line-height: 56px;}
+.live-right{float: left;margin-left:17px;width:47%;}
+.live-right-down{margin-top:30px;}
+.live-right-down ul li{float: left;background:rgba(255,255,255,0.2)}
+.live-right-down ul li a{text-align:center;float: left;color:#fff;font-size: 1.3em;padding: 5px 107.8px;}
+.live-right-down ul li a:hover{background: rgba(255,255,255,0.4);}
+.live-my .live-one{background: url(../img/live1.png) no-repeat left center;height:3.6em;position: relative;left:76%;bottom: 56px;width:19%;}
+.live-my .live-one a,.live-my .live-one1 a,.live-my .live-one2 a{color: #ea0e47;font-size: 1.4em;font-weight: bold;line-height: 2.4em;padding-left: 15px}
+.live-my .live-one1{background: #fff33f;width: 15%;position: relative;left:76%;bottom: 56px;border-radius: 7px}
+.live-my .live-one1 a{padding-left: 25px;color: #5d2200}
+.live-my .live-one2{background: #fad65b;width: 16%;position: relative;left:76%;bottom: 56px;box-shadow: 3px 3px 3px #9a1a27}
+.live-my .live-one2 a{padding-left: 27px;color: #540307;line-height: 2em}
+.foot{clear: both;background: url("../img/live_bg1.png") no-repeat left center;height:2.4em;width: 100%;margin-top:-70px;}
+.foot p{text-align:center;line-height: 2.4em;color: #fff}
+.live-right-down .live-active{background: rgba(255,255,255,0.4);text-align:center;float: left;color:#fff;font-size: 1.3em;padding: 5px 107.8px;}
+
+.live-content{background: url("../img/liaobg_03.png") no-repeat left center;height: 48em;box-shadow: 0 0 8px #e6e4e4}

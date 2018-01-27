@@ -1,0 +1,40 @@
+/* CSS Document */
+@media screen and (max-width:1680px){
+	.toper_cont .toper_cont_logo .ershisi { display:none;}
+	.logtop .logtop_list .news{ width:80%;}
+	.left_cont .paihang_title p{ font-size:15px;}
+	.master_data{ font-size:12px;}
+	
+	.master_data .master_data_bt p.imporant {font-size:12px;}
+	.master_data .master_data_nr { font-size:12px;}
+	.master_data .master_data_bt p.imporant img{ max-width:50%;}
+	.left_cont .paihang_list li.ct { width:50%; font-size:13px;}
+	.left_cont .paihang_list li .rg { font-size:14px;}
+	.left_cont .paihang_list li.ct span.yijin { font-size:13px;}
+}
+@media screen and (max-width:1400px){
+	.toper_cont .toper_cont_logo .ershisi { display:none;}
+	.logtop .logtop_list .news{ width:77%;}
+	.left_cont .paihang_title p{ font-size:14px;}
+	.master_data{ font-size:12px;}
+	
+	.master_data .master_data_bt p.imporant {font-size:12px;}
+	.master_data .master_data_nr { font-size:12px;}
+	.master_data .master_data_bt p.imporant img{ max-width:50%;}
+	.left_cont .paihang_list li.ct { font-size:13px;}
+	.left_cont .paihang_list li .rg { font-size:13px;}
+	.left_cont .paihang_list li.ct span.yijin { font-size:13px;}
+}
+@media screen and (max-width:1000px){
+	.toper_cont .toper_cont_logo .ershisi { display:none;}
+	.logtop .logtop_list .news{ width:70%;}
+	.left_cont .paihang_title p{ font-size:14px;}
+	.master_data{ font-size:12px;}
+	.master_data .master_data_bt p.imporant {font-size:12px;}
+	.master_data .master_data_nr { font-size:12px;}
+	.master_data .master_data_bt p.imporant img{ max-width:50%;}
+	.left_cont .paihang_list li.ct { font-size:13px;}
+	.left_cont .paihang_list li .rg { font-size:13px;}
+	.left_cont .paihang_list li.ct span.yijin { font-size:13px;}
+}
+

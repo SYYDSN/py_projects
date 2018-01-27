@@ -1,0 +1,562 @@
+2017-11-24 19:11:54,438 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:15:00,906 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:16:04,833 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:17:08,837 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:20:29,161 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:20:29,162 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:23:32,553 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:24:32,933 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:25:34,962 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:26:43,982 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:26:43,984 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:26:43,985 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:27:44,366 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:27:44,370 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:28:38,509 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:31:43,496 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:32:45,900 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:33:46,492 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:35:49,793 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:37:54,020 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:37:54,606 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:38:53,641 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:38:54,573 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:39:55,617 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:41:59,620 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:43:01,604 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:43:02,523 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:44:04,546 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:45:05,643 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:46:08,545 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:46:26,453 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:46:26,454 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:47:23,361 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:48:03,774 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:48:03,776 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:48:23,617 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:49:04,409 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:49:04,410 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:49:04,414 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:49:26,540 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:49:33,551 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:51:02,623 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:53:05,612 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:54:17,829 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:54:37,628 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:55:18,224 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:55:18,226 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:56:31,607 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 19:57:52,278 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-11-24 19:58:23,775 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:03:26,713 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:04:29,545 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:05:30,613 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:06:04,416 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:06:04,416 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:06:32,607 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:07:34,618 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:07:43,319 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:08:43,639 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:08:43,773 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:09:36,912 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:11:43,545 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:11:43,548 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:11:44,389 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:11:44,391 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:12:43,811 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:12:43,923 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:12:45,582 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:13:53,144 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:14:47,614 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:14:47,621 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:15:56,430 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:15:56,432 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:18:46,078 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:20:49,312 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:22:51,633 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:23:52,630 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:24:53,631 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:26:19,613 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:27:20,632 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:27:20,632 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:29:39,416 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:30:51,975 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:32:54,458 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:33:55,541 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:35:57,538 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:36:58,618 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:39:00,757 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:40:01,819 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:41:03,121 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:43:05,949 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:45:08,389 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:45:08,390 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:47:12,399 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:50:20,448 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:51:12,996 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:51:12,999 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:52:13,664 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:52:13,670 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:52:13,671 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:52:13,999 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:52:21,607 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:52:22,530 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:53:14,924 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:53:14,926 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:53:14,926 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:53:14,927 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:54:14,842 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:54:15,262 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:56:07,788 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:56:07,925 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:56:07,928 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:56:24,327 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:57:08,877 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:57:08,883 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:57:09,778 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:57:25,598 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:59:08,643 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:59:10,265 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 20:59:10,266 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:00:10,168 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:00:10,823 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:00:10,824 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:00:10,829 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:01:33,620 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:02:34,627 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:02:35,547 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:03:35,647 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:04:11,899 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:04:11,949 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:04:11,957 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:04:11,958 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:04:36,618 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:04:37,540 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:05:12,208 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:05:12,215 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:06:12,540 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:06:12,542 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:06:12,543 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:06:39,644 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:07:12,856 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:07:12,873 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:07:41,558 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:07:41,558 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:08:13,152 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:08:13,306 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:08:43,564 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:09:13,871 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:09:13,874 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:10:01,025 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:10:14,870 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:10:14,871 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:10:15,721 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:11:02,669 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:11:03,599 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:11:16,829 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:11:16,834 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:11:16,835 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:12:05,591 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:12:17,044 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:12:17,047 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:12:17,765 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:12:17,767 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 453, in handle_request
+    response = await self._run_request_middleware(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 611, in _run_request_middleware
+    response = await response
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "main_server.py", line 1174, in add_session_to_request
+    await session_interface.open(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic_session/redis_session_interface.py", line 61, in open
+    val = await redis_connection.get(self.prefix + sid)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 676, in wrapper
+    result = yield from method(protocol_self, _NoTransaction, *a, **kw)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1135, in _query
+    result = yield from self._get_answer(transaction, answer_f, _bypass=_bypass, call=call)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1062, in _get_answer
+    result = yield from answer_f
+  File "/usr/lib/python3.5/asyncio/futures.py", line 361, in __iter__
+    yield self  # This tells Task to wait for completion.
+  File "uvloop/future.pyx", line 434, in uvloop.loop.BaseTask._fast_wakeup (uvloop/loop.c:114015)
+  File "/usr/lib/python3.5/asyncio/futures.py", line 266, in result
+    raise CancelledError
+concurrent.futures._base.CancelledError
+
+2017-11-24 21:12:17,767 handlers.py[line:120] ERROR Exception occurred while handling uri: "http://39.108.67.178:5000/company/user"
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 453, in handle_request
+    response = await self._run_request_middleware(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic/app.py", line 611, in _run_request_middleware
+    response = await response
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "main_server.py", line 1174, in add_session_to_request
+    await session_interface.open(request)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 124, in throw
+    return self.gen.throw(exc)
+  File "/usr/local/lib/python3.5/dist-packages/sanic_session/redis_session_interface.py", line 61, in open
+    val = await redis_connection.get(self.prefix + sid)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 676, in wrapper
+    result = yield from method(protocol_self, _NoTransaction, *a, **kw)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1135, in _query
+    result = yield from self._get_answer(transaction, answer_f, _bypass=_bypass, call=call)
+  File "/usr/local/lib/python3.5/dist-packages/asyncio_redis/protocol.py", line 1062, in _get_answer
+    result = yield from answer_f
+  File "/usr/lib/python3.5/asyncio/futures.py", line 361, in __iter__
+    yield self  # This tells Task to wait for completion.
+  File "uvloop/future.pyx", line 434, in uvloop.loop.BaseTask._fast_wakeup (uvloop/loop.c:114015)
+  File "/usr/lib/python3.5/asyncio/futures.py", line 266, in result
+    raise CancelledError
+concurrent.futures._base.CancelledError
+
+2017-11-24 21:12:17,769 server.py[line:217] ERROR Connection lost before response written @ ('61.171.145.198', 50720)
+2017-11-24 21:13:07,809 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:13:18,090 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:14:09,572 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:15:19,871 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:15:20,006 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:16:13,384 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:16:20,914 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:16:20,948 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:17:21,978 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:17:21,979 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:17:21,979 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:17:26,629 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:17:27,550 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:18:30,221 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:18:37,158 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:19:23,913 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:19:23,942 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:20:24,956 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:20:24,957 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:20:24,970 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:21:25,963 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:21:25,977 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:22:25,809 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:23:26,863 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:23:26,867 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:24:27,303 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:24:27,304 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:25:27,609 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:25:27,755 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:25:27,757 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:26:28,153 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:26:28,156 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:27:47,827 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:27:48,003 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:28:49,048 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:28:49,049 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:29:50,015 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:29:50,027 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:30:51,089 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:30:51,094 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:31:52,082 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:31:52,083 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:32:53,007 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:32:53,011 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:32:53,011 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:32:53,012 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:33:53,936 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:33:53,996 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:33:53,997 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:33:54,000 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:35:56,841 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:36:57,983 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:36:57,984 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:36:57,986 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:36:57,987 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:37:59,831 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:40:01,783 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:40:01,830 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:41:01,976 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:41:01,977 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:41:02,744 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:42:03,028 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:42:03,028 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:42:03,029 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:42:03,030 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:43:03,952 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:44:04,958 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:44:04,959 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:45:05,881 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:46:06,907 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:46:06,908 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:47:07,980 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:47:07,982 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:47:07,987 handlers.py[line:104] ERROR NoneType
+
+2017-11-24 21:47:45,956 handlers.py[line:104] ERROR NoneType
+
+2017-11-25 03:31:23,232 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-11-25 11:52:25,271 handlers.py[line:104] ERROR NoneType
+
+2017-11-25 11:52:25,327 handlers.py[line:104] ERROR NoneType
+
+2017-11-25 11:52:25,328 handlers.py[line:104] ERROR NoneType
+
+2017-11-25 11:54:27,440 handlers.py[line:104] ERROR NoneType
+
+2017-11-25 11:54:27,441 handlers.py[line:104] ERROR NoneType
+
+2017-11-25 11:59:36,581 handlers.py[line:104] ERROR NoneType
+
+2017-11-25 17:12:23,614 handlers.py[line:104] ERROR NoneType
+
+2017-11-25 18:45:19,544 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+

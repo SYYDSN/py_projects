@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-zn">
+<head>
+    <meta charset="utf-8">
+    <title>保驾犬</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!--<link rel="stylesheet" href="{{ url_for('static', filename='../static/css/skins/iconfont.css') }}"-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/responsive-nav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/ionicons.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/skins/iconfont.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='../static/image/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/manage/base_template_light.css') }}">
+    {% block extend_css %}
+        <!--扩展的css写在这里-->
+    {% endblock %}
+    <script src="{{ url_for('static', filename='../static/js/responsive-nav.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='../static/js/jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='../static/js/bootstrap.min.js') }}"></script>
+    <!--自定义字体图标-->
+    <script src="../static/js/icon/iconfont.js"></script>
+    <!--自定义预警灯字体图脚本-->
+    <script src="{{ url_for('static', filename='../static/js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='../static/js/manage/base_template_light.js') }}"></script>
+</head>
+<body>
+<div role="navigation" id="left_main_nav" class="nav-collapse">
+    <ul>
+        <li class="active"><a href="index">
+            <svg class="nav_icon" aria-hidden="true">
+              <use xlink:href="#icon-icon_shouye"></use>
+            </svg>
+            <span>首页</span>
+        </a></li>
+        <li><a href="driver_list">
+            <svg class="nav_icon" aria-hidden="true">
+              <use xlink:href="#icon-icon_liebiao"></use>
+            </svg>
+            <span>司机列表</span>
+        </a></li>
+        <!--<li><a href="report_page"><i class="iconfont icon-tongjifenxi"></i> <span>报表</span></a></li>-->
+        <!--未完成,需要ai模块支持-->
+        <li><a href="#">
+            <i class="iconfont icon-tongjifenxi"></i>
+            <span>报表</span>
+        </a></li>
+        <li><a href="show_track"><i class="iconfont icon-guiji"></i> <span>轨迹回放</span></a></li>
+        <li><a href="#">
+            <svg class="nav_icon" aria-hidden="true">
+              <use xlink:href="#icon-icon_yujing"></use>
+            </svg>
+            <span>预警记录</span>
+        </a></li>
+        <li><a href="javascript:;"><i class="fa fa-power-off" aria-hidden="true"></i><span id="logout_btn">注销</span></a></li>
+    </ul>
+</div>
+
+<div role="main" class="main">
+    <a href="#nav" class="nav-toggle">Menu</a>
+    <div class="container-fluid height_100">
+        <div class="main_row">
+            <!--<div class="title_info_row"></div>-->
+            {% block main %}
+                <div id="main_zone" class="main_zone col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                </div>
+            {% endblock %}
+        </div>
+
+        <!-- 注销Modal -->
+        <button type="button" style="display: none" id="logout_trigger" class="btn btn-primary btn-lg"
+                data-toggle="modal" data-target="#logout_modal"></button>
+
+        <div class="modal fade modal-sm" id="logout_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">注销登录</h4>
+                </div>
+                <div class="modal-body">
+                    正在注销登录状态......
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">放弃</button>
+                    <button type="button" class="btn btn-default logout">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 注销Modal -->
+    <!--消息提醒弹窗-->
+    <div class="cue_info">
+        <p>没有找到对应的轨迹数据</p>
+    </div>
+    <!--消息提醒弹窗-->
+    </div>
+
+</div>
+
+<script>
+    let navigation = responsiveNav("left_main_nav", {customToggle: ".nav-toggle"});
+</script>
+</body>
+{% block extend_js %}
+    <!--扩展的js写在这里-->
+{% endblock %}
+</html>

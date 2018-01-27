@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="renderer" content="webkit" />
+<meta name="description"  content="不超过150个字符" />
+<meta name="keywords"  content="" />
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />    
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="format-detection" content="telephone=yes"/>
+<meta name="msapplication-tap-highlight" content="no" />
+<meta http-equiv="Cache-Control" content="no-transform " />
+
+<link type="text/css" rel="stylesheet" href="../static/css/bootstrap.min.css" />
+<script src="../static/js/jquery-1.11.3.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+
+<title></title>
+<style>
+    .tabcont_bt{width:450px; margin:0px auto;}
+    .tabcont_bt ul li{width:200px;text-align:center; float:left; font-weight: bold; font-size:24px; list-style-type: none; cursor:pointer; line-height: 82px;}
+    .tabcont_bt ul li.hover{ color:red;}
+    .tabcont_cont .tabcont_contlist{ display: none; }
+    .tabcont_cont .tabcont_contlist .table{margin:0px auto; border:1px solid #cccccc; }
+    .tabcont_cont .tabcont_contlist .table th{ text-align: center; background: #F0741A;border-right:1px solid #7c7c7c; color:#FFFFFF;}
+    .tabcont_cont .tabcont_contlist .table th.shijian{ background: #FAAF3A;}
+    .tabcont_cont .tabcont_contlist .table td{ text-align: center;border-right:1px solid #cccccc;}
+    .tabcont_cont .tabcont_contlist .anniu_btn{ text-align: right; margin-bottom:10px;}
+    .tabcont_cont .tabcont_contlist .anniu_btn input{ margin-left:10px;}
+    .pop_news{ display: none; text-align:center;box-sizing:border-box; padding:15px; width:500px; height: auto; position:fixed; left:50%; top:50%; margin-top:-179px; margin-left:-250px; background: #EDEDED; border-radius:5px; -webkit-border-radius:5px; -moz-border-radius:5px; -ms-border-radius:5px; -o-border-radius:5px;}
+    .pop_news h3{ font-size:17px;}
+    .pop_news .pop_news_bt input,.pop_news .pop_news_nr textarea{width:100%; resize:none; padding:5px; box-sizing:border-box;}
+    .pop_news .pop_news_bt span{ display: none;}
+    .pop_news .pop_btn input{ width:inherit; margin:15px 10px;}
+    #news_table tr td:nth-child(1),#news_table tr th:nth-child(1){ width:0%; display: none;}
+    #news_table tr td:nth-child(2){ width:13%;}
+    #news_table tr td:nth-child(3){ width:62%; text-align: left;}
+    #news_table tr td:nth-child(4){ width:10%;}
+    #news_table tr td:nth-child(5){ width:15%;}
+    .news_ids{ display: none;}
+    .clear{clear:both;}
+    .my_time{
+        width:3em;
+    }
+</style>
+</head>
+
+<body class="body">
+<!--最顶部-->
+<div class="tabcont_bt" id="tabcont_bt">
+    <ul>
+        <li class="hover">课程表</li><li>讲师列表</li>
+    </ul>
+    <div class="clear"></div>
+</div>
+
+<div class="tabcont_cont" id="tabcont_cont">
+    <div class="tabcont_contlist show">
+        <!--课程表--->
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="anniu_btn"><input type="button" id="add_class_tr" value="增加一个时间段"/><input type="button" id="save_class" value="保存"> </div>
+                    <table id="class_table" class="table text-center table-hover" >
+                        <tr>
+                            <th class="shijian">时间</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th><th>操作</th>
+                        </tr>
+                        <!--
+                        <tr class="class_info">
+                            <td><input type="number" class="begin_hour my_time"/>:<input type="number" class="begin_min  my_time"/><span style="margin: 0px 20px">至</span><input type="number" class="end_hour  my_time"/>:<input type="number" class="end_min  my_time"/> </td>
+                            <td><select><option>宋老师</option><option>王老师</option><option>钱老师</option></select></td>
+                            <td><select><option>宋老师</option><option>王老师</option><option>钱老师</option></select></td>
+                            <td><select><option>宋老师</option><option>王老师</option><option>钱老师</option></select></td>
+                            <td><select><option>宋老师</option><option>王老师</option><option>钱老师</option></select></td>
+                            <td><select><option>宋老师</option><option>王老师</option><option>钱老师</option></select></td>
+                            <td><input type="button" class="delete_tr" value="删除"></td>
+                        </tr>
+                        -->
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="tabcont_contlist">
+        <!--讲师列表--->
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="anniu_btn"><input type="button" value="添加" id="addnewsa_btn"><input type="button" value="注销"></div>
+                    <table class="table text-center table-hover" id="teachers_table">
+                        <tr class="table_th">
+                            <th>账户</th><th>名字</th><th>昵称</th><th>头衔</th><th>介绍</th><th>操作</th>
+                        </tr>
+                        <!--
+                        <tr>
+                            <td>1</td>
+                            <td class="bt_1">你好吗1</td>
+                            <td class="nr_1">宋老师宋老师宋老师宋老师宋老师宋老师宋老师宋老师宋老师111111</td>
+                            <td>2015.9.5</td>
+                            <td><input type="button" value="编辑" id="1" class="bianji_btn"><input type="button" value="删除" class="delate_btn"> </td>
+                        </tr>
+                        <tr>
+                            <td >2</td>
+                            <td class="bt_2">你好吗2</td>
+                            <td class="nr_2">宋老师宋老师宋老师宋老师宋老师宋老师宋老师宋老师宋老师2222222222</td>
+                            <td>2015.9.15</td>
+                            <td><input type="button" value="编辑" id="2" class="bianji_btn"><input type="button" value="删除" class="delate_btn"></td>
+                        </tr>
+                        -->
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!---添加新闻列表的弹窗--->
+<div class="pop_news" id="pop_news">
+    <div class="pop_news_bt">
+        <!--<h3>标题</h3>-->
+        <input id="t_id" class="news_ids">
+        <div><label style="width:20%;float:left">姓 名：</label><input  style="width:70%;float:left" type="text"  id="t_name" placeholder="老师名字" class="pop_news_txt" ><div style="clear: both"></div></div>
+         <div><label style="width:20%;float:left">昵 称：</label><input style="width:70%;float:left"  type="text" id="t_nickname" placeholder="昵称" class="pop_news_txt" ><div style="clear: both"></div></div>
+        <div><label style="width:20%;float:left">头 衔：</label><input  style="width:70%;float:left"  type="text" id="t_title" placeholder="输入老师头衔(比如：宏赟分析师)" value="宏赟分析师"/><div style="clear: both"></div></div>
+        <div><label style="width:20%;float:left">账 户：</label><input  style="width:70%;float:left;background: lightgray"  type="text" id="t_account" placeholder="系统自动生成"  readonly="readonly"  /><div style="clear: both"></div></div>
+        <div><label style="width:20%;float:left">密 码：</label><input style="width:70%;float:left" type="password" id="t_password" placeholder="输入密码" value="123456"><button style="width:10%;float:left" id="view_password_btn">查看</button><div style="clear: both"></div></div>
+    </div>
+    <div class="pop_news_nr">
+        <h3>介绍</h3>
+        <textarea id="t_description" rows="6" placeholder="输入老师介绍" class="pop_news_area"></textarea>
+    </div>
+    <div class="pop_btn"><input type="button" value="添加" id="tianjia_btn"><input type="button" value="保存" id="save_btn"><input type="button" value="放弃" id="fangqi_btn"/></div>
+</div>
+<span id="teacher_list" style="display: none">{{ teacher_list }}</span>
+</body>
+<script>
+
+  $(function(){
+
+     var teacher_list=JSON.parse($("#teacher_list").text());
+      /*tab切换*/
+      $("#tabcont_bt ul li").click(function(){
+         var tablige = $(this).index();
+          $(this).addClass("hover").siblings().removeClass("hover");
+         $("#tabcont_cont .tabcont_contlist").eq(tablige).addClass("show").siblings().removeClass("show");
+      });
+      //获取当前时间
+      function gettime(){
+          var mydate = new Date();
+          var str = "" + mydate.getFullYear() + "." + (mydate.getMonth()+1) + "." + mydate.getDate() + "";
+          return str;
+      }
+      /*弹出弹窗*/
+      $("#addnewsa_btn").click(function(){
+          $("#pop_news").show();
+          $("#tianjia_btn").css({display:"inline-block"});
+          $("#save_btn").css({display:"none"});
+          $("#t_id,#t_name,#t_nickname,#t_description,#t_title,#t_password,#t_account").val("");
+      });
+      /*关闭弹窗*/
+      $("#fangqi_btn").click(function(){
+          $("#pop_news").hide();
+      });
+      $("#bj_fangqibtn").click(function(){
+          $("#pop_news22").hide();
+      });
+      //获取一个老师的select的str
+      function get_teacher_select_str(){
+          var str='<select>';
+          for(var i=0;i<teacher_list.length;i++){
+              str+="<option value='"+teacher_list[i]+"'>"+teacher_list[i]+"</option>";
+          }
+          str+="</select>";
+          return str
+      }
+      //加载一行空的老师课程表的tr
+      function add_class_tr(){
+          var select_str=get_teacher_select_str();
+          var str="<tr class='class_info'> <td><input type='number' class='begin_hour my_time'/>:<input type='number' class='begin_min  my_time'/> <span style='margin: 0px 20px'>至</span>" +
+                  "<input type='number' class='end_hour  my_time'/>:<input type='number' class='end_min  my_time'/> </td>" +
+                  "<td class='class_teacher'>"+select_str+"</td><td class='class_teacher'>"+select_str+"</td><td class='class_teacher'>"+select_str+"</td>" +
+                  "<td class='class_teacher'>"+select_str+"</td><td class='class_teacher'>"+select_str+"</td><td><input type='button' onclick='delete_tr($(this))' class='delete_tr' value='删除'></td></tr>";
+          $("#class_table").append(str);
+      }
+      //删除按钮事件
+      delete_tr=function ($obj){
+              $obj.parent().parent().remove();
+      };
+
+      //增加时间段事件
+      $("#add_class_tr").click(function(){
+            add_class_tr();
+      });
+
+
+      //查看密码的按钮事件，按下查看密码，放开隐藏密码
+      $("#view_password_btn").mousedown(function(){
+          $("#t_password").attr("type","text");
+      }).mouseup(function(){
+           $("#t_password").attr("type","password");
+      }).mouseout(function(){
+           $("#t_password").attr("type","password");
+      });
+      //加载老师的信息。
+      function get_teachers_info(){
+          $.post("/teachers/all",function(data){
+              //console.log(data);
+              var data=data["data"];
+              var the_table=$("#teachers_table");
+              var tds=$("#teachers_table .teacher_td");
+              tds.remove();
+              var a_str='';
+              for(var i=0;i<data.length;i++){
+                  var temp=data[i];
+                  a_str+="<tr class='teacher_td'><td class='t_id' style='display:none'>"+temp["t_id"]+"</td><td class='t_account'>"+temp["t_account"]+"</td><td class='t_name'>"+temp["t_name"]+"</td><td class='t_nickname'>"+temp["t_nickname"]+"</td><td class='t_title'>"+temp["t_title"]+"</td><td class='t_description'>"+temp["t_description"]+"</td><td class='td_button'><button class='edit_btn'>编辑</button><button class='delete_btn'>删除</button></td></tr>";
+              }
+              the_table.append(a_str);
+              //追加按钮事件
+              $("#teachers_table .teacher_td>.td_button>.edit_btn").each(function(){
+                  bianji_news($(this));
+              });
+              $("#teachers_table .teacher_td>.td_button>.delete_btn").each(function(){
+                  delate_teacher($(this));
+              });
+
+          });
+      }
+      get_teachers_info();
+      /*添加老师风采*/
+      $("#tianjia_btn").click(function(){
+          var t_name= $.trim($('#t_name').val());
+          var t_nickname= $.trim($('#t_nickname').val());
+          var t_title= $.trim($('#t_title').val());
+          var t_password= $.trim($('#t_password').val());
+          var t_description= $.trim($('#t_description').val());
+          if(t_name=="" ||  t_nickname=="" ||  t_description==""){
+              alert("缺少必要的信息");
+              return false;
+          }
+          else{
+              var adata={"t_name":t_name,"t_nickname":t_nickname,"t_description":t_description,"t_title":t_title,"t_password":t_password};
+              $.post("/teachers/add",adata,function(data){
+                  if(data["message"]=="success"){
+                      alert("添加成功");
+                      $("#pop_news").hide();
+                      get_teachers_info();
+                  }
+                  else{
+                      alert(data["message"]);
+                      return false;
+                  }
+              });
+          }
+      });
+
+
+      /*删除老师*/
+      function delate_teacher($obj){
+          $obj.click(function(){
+              var teacher_name=$obj.parent().parent().find(".t_name").text();
+              if(confirm("你确实要删除"+teacher_name+"的资料吗？")){
+                  var t_id = $obj.parent().parent().find(".t_id").text();
+                  $.post("/teachers/delete",{"t_id":t_id},function(data){
+                      if(data["message"]=="success"){
+                          alert("删除成功");
+                          get_teachers_info();
+                      }
+                      else{
+                          alert(data["message"]);
+                          return false;
+                      }
+                  });
+              }else{}
+          });
+      }
+
+
+
+      /*弹出编辑老师按钮*/
+      function bianji_news($obj){
+
+              $obj.click(function () {
+                  var t_id = $(this).parent().parent().find(".t_id").text();
+                  console.log(t_id);
+                  var t_name = $(this).parent().parent().find(".t_name").text();
+                  var t_account= $(this).parent().parent().find(".t_account").text();
+                  var t_title= $(this).parent().parent().find(".t_title").text();
+                  var t_nickname = $(this).parent().parent().find(".t_nickname").text();
+                  var t_description = $(this).parent().parent().find(".t_description").text();
+                  $('#t_id').val(t_id);
+                  $('#t_name').val(t_name);
+                  $('#t_nickname').val(t_nickname);
+                  $('#t_account').val(t_account);
+                  $('#t_title').val(t_title);
+                  $('#t_description').val(t_description);
+                  $("#pop_news").show();
+                  $("#tianjia_btn").css({display: "none"});
+                  $("#save_btn").css({display: "inline-block"});
+
+              });
+      }
+
+      /*保存修改后的老师信息*/
+      $("#save_btn").click(function () {
+          var t_id = $.trim($('#t_id').val());
+          var t_name = $.trim($("#t_name").val());
+          var t_title = $.trim($("#t_title").val());
+          var t_nickname = $.trim($("#t_nickname").val());
+          var t_password = $.trim($("#t_password").val());
+          var t_description = $.trim($("#t_description").val());
+          if(t_name=="" ||  t_nickname=="" ||  t_description=="" ||  t_id==""){
+              alert("缺少必要的信息");
+              return false;
+          }
+          else{
+              var adata={"t_id":t_id,"t_name":t_name,"t_nickname":t_nickname,"t_description":t_description,"t_title":t_title,"t_password":t_password};
+              $.post("/teachers/edit",adata,function(data){
+                  if(data["message"]=="success"){
+                      alert("修改成功");
+                      get_teachers_info();
+                  }
+                  else{
+                      alert(data["message"]);
+                      return false;
+                  }
+              });
+          }
+          $("#pop_news").hide();
+      });
+  //保存课程表
+  $("#save_class").click(function(){
+      //检查时间设置
+      var flag=true;
+      $("#class_table .my_time").each(function(){
+          var $this=$(this);
+
+          if($.trim($this.val())=="" || ($this.attr("class").indexOf("hour")!=-1 && (parseInt($.trim($this.val()))<0|| parseInt($.trim($this.val()))>23)) || ($this.attr("class").indexOf("min")!=-1 && (parseInt($.trim($this.val()))<0|| parseInt($.trim($this.val()))>59))){
+              alert("时间设置错误");
+              $this.css("background","red");
+              $this.click(function(){$this.css("background","white").val("");});
+              flag=false;
+              return false;
+          }
+          else
+          {
+              //nothing...
+          }
+      });
+      if(flag){
+              var class_list=[];
+              $("#class_table .class_info").each(function(){
+                  var $this=$(this);
+                  var temp_list=[];
+                  var begin_time= $.trim($this.find(".begin_hour").val())+":"+$.trim($this.find(".begin_min").val());
+                  var end_time= $.trim($this.find(".end_hour").val())+":"+$.trim($this.find(".end_min").val());
+                  temp_list.push(begin_time);
+                  temp_list.push(end_time);
+
+                  $this.find(".class_teacher>select>option:selected").each(function(){
+                      temp_list.push($(this).text());
+                  });
+                  class_list.push(temp_list);
+              });
+
+              $.post("/class/save",{"class_data":JSON.stringify(class_list)},function(data){
+                  console.log(data);
+                  alert(data["message"]);
+                  location.reload();
+              });
+
+      }else{}
+  });
+//启动时从数据库加载课程表
+   function get_class_list(){
+       $.post("/class/view",function(data){
+           var data=JSON.parse(data["class_data"]);
+           console.log(data);
+           for(var i=0;i<data.length;i++){
+               add_class_tr();//加一行
+               var last_tr=$("#class_table .class_info:last");
+               console.log(data[i]);
+               last_tr.find(".begin_hour").val(data[i][0].split(":")[0]);
+               last_tr.find(".begin_min").val(data[i][0].split(":")[1]);
+               last_tr.find(".end_hour").val(data[i][1].split(":")[0]);
+               last_tr.find(".end_min").val(data[i][1].split(":")[1]);
+               var teachers=data[i].slice(2);
+               console.log(teachers);
+               var weekdays=last_tr.find("select");
+               $.each(weekdays,function(i,n){
+                   $(n).val(teachers[i]);
+               });
+           }
+       });
+
+   }
+   get_class_list();
+
+
+  //end
+  })
+</script>
+
+</html>

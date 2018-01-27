@@ -1,0 +1,190 @@
+2017-11-20 01:54:42,667 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-11-20 01:59:37,080 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-11-20 08:52:47,407 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:13:53,504 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:13:53,505 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:13:53,675 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:16:55,315 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:16:55,318 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:17:56,028 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:17:56,028 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:18:56,641 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:20:58,025 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:20:58,026 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:22:59,301 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:22:59,303 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:26:01,391 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:27:02,103 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:27:06,022 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:29:07,562 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 09:29:08,487 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 10:16:07,390 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-11-20 11:00:52,614 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:01:52,917 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:03:54,822 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:04:55,510 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:05:56,212 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:06:56,900 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:06:56,901 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:06:56,902 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:08:58,318 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:09:59,887 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:10:59,935 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:12:00,595 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:12:00,602 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:13:01,266 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:14:02,087 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:14:02,089 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:15:02,762 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:16:03,457 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:17:04,185 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:19:05,589 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:19:05,591 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:19:05,592 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:20:06,280 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:21:06,936 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:23:08,338 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:24:09,277 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:26:10,611 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:27:11,345 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:28:12,073 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:29:12,753 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:30:13,415 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:30:13,418 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:31:14,026 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:32:14,685 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:33:15,321 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:34:15,973 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:37:18,016 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:37:18,016 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:38:18,680 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:39:19,284 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:40:20,180 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:41:20,852 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:41:20,853 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:42:22,015 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:43:22,651 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:45:24,009 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:46:24,646 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:47:25,295 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:47:25,296 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:49:26,640 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:50:27,337 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:51:27,954 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:51:27,961 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:51:27,965 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:52:28,724 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:55:30,804 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:56:31,451 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:57:32,158 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:58:32,898 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:59:33,627 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 11:59:33,631 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 12:00:34,262 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 12:01:35,006 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 13:37:48,707 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 13:58:14,329 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 14:00:52,952 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 14:11:53,126 handlers.py[line:104] ERROR NoneType
+
+2017-11-20 14:13:11,231 handlers.py[line:104] ERROR NoneType
+

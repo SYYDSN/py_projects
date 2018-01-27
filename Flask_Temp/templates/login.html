@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>跨域用户web-socket连接示范</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <script src="../static/js/jquery-3.2.1.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.md5.js"></script>
+    <script src="../static/js/reconnecting-websocket.min.js"></script>
+    <script src="../static/js/web_socket_stand_client.js"></script>
+</head>
+<body>
+<div style="border:1px solid black">
+    <input type="text" id="user_name" placeholder="输入手机号码">
+    <input type="password" id="user_password" placeholder="输入密码">
+    <input id="login_btn" type="button" value="提交">
+    <hr>
+    登录状态:<span id="login_session"></span>
+</div>
+<a href="http://127.0.0.1:5000/manage/get_error_code?sid=">测试</a>
+</body>
+<script>
+$(function(){
+    $("#login_btn").click(function(){
+        let user_name = $.trim($("#user_name").val());
+        let user_password = $.trim($("#user_password").val());
+        let args = {"user_name": user_name, "user_password": $.md5(user_password), "cors": "cors"};
+        $.post("http://127.0.0.1:5000/manage/login", args, function(json){
+            let resp = JSON.parse(json);
+            console.log(resp);
+            if(resp['message'] === "success"){
+                var sid = resp['sid'];  // 赋值全局变量
+                sessionStorage['sid'] = sid;
+            }
+        });
+    });
+//end!
+});
+</script>
+</html>

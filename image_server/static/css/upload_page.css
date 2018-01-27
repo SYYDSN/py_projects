@@ -1,0 +1,12 @@
+.logout_btn_right{
+    float:right;
+    margin-right:1rem;
+}
+.top_title{
+    margin-top: 2rem;
+}
+.image_url span{
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow: auto;
+}

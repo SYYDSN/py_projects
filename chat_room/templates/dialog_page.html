@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
+    <script src="../static/js/reconnecting-websocket.min.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0;">
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="../static/css/lightbox.min.css"/><!--图片的弹出放大插件，除js外要放在头部---->
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
+    <script src="../static/js/jquery.cookie.js"></script>
+	<script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/guest_user.js"></script>
+    <script src="../static/js/jquery.md5.js"></script>
+    <script src="../static/js/tools.js"></script>
+<style>
+    .ss span{ display:inline-block; }
+	.ssbt{ font-weight:bold;margin-right:5px;}
+	.ssnr{ margin-right:30px;}
+	.dialog_time{ color:#009933;}
+	.ssbt_nr1{ background:#FF9999; color:#ffffff; padding:0px 7px; border-radius:3px;-webkit-border-radius:3px;-moz-border-radius:3px;-ms-border-radius:3px;-o-border-radius:3px;}
+	.ssbt_nr2{ background:#CCCC99; color:#ffffff; padding:0px 7px; border-radius:3px;-webkit-border-radius:3px;-moz-border-radius:3px;-ms-border-radius:3px;-o-border-radius:3px;}
+    .user_ip{
+    background: lightgreen none repeat scroll 0 0;
+    border: 1px solid black;
+    cursor: pointer;
+    margin-left: 10px;
+    }
+    .user_ip_stop{
+    background: red none repeat scroll 0 0;
+    border: 1px solid black;
+    cursor: pointer;
+    margin-left: 10px;
+    }
+</style>
+<script>
+    //启动的时候检测cookie内容判断是否登录,如果没有登录就跳转回登录页面，防止使用浏览器后退功能钻身份验证的空子。
+    //console.log($.cookie("username"));
+    if($.cookie("username")==undefined){
+        location.href="/admin_login_page";
+    }else{}
+</script>
+    <style>
+    .robot{display:block;}
+    .hide_robot{display: none;}
+</style>
+</head>
+<body class="container-fluid">
+<div class="row">
+<input type="text" class="col-xs-12 clo-sm-6 col-md-2 col-lg-1" placeholder="工号" id="teacher_job_id">
+<input type="text" class="col-xs-12 clo-sm-6 col-md-2 col-lg-1"  placeholder="密码" id="teacher_password">
+<button class="col-xs-12 clo-sm-6 col-md-2 col-lg-1"  id="login_in_btn">登录</button>
+<span  class="col-xs-12 clo-sm-6 col-md-2 col-lg-1"  id="login_in_teacher_id">{{teacher_id}}</span><span  class="col-xs-12 clo-sm-6 col-md-2 col-lg-1"  id="login_in_teacher_name">{{teacher_name}}</span>
+<button class="col-xs-12 clo-sm-6 col-md-2 col-lg-1"  id="_login_out_btn">注销</button>
+<div  class="col-xs-4 col-sm-4 col-md-2 col-lg-2">当前在线<span id="counter"></span>人<span id="pop_ip_div" style="margin-left: 50px;cursor: pointer">查看IP黑名单</span></div>
+<span id="my_ip">{{ current_ip }}</span>
+<a class="hidden-xs hidden-sm col-md-2 col-lg-1" target="_blank" href="/tips_page">每日策略</a>
+
+
+</div>
+<hr>
+<div id="No1" class="row">
+<div id="chartroom_message" class="dialog_div col-xs-12 clo-sm-12 col-md-6 col-lg-6"></div>
+<div id="question_message" class="dialog_div col-xs-12 clo-sm-12 col-md-6 col-lg-6"></div>
+</div>
+<div class="row">
+    <div id="rule_buttons" class="col-xs-12 clo-sm-12 col-md-6 col-lg-6">
+        <!--
+        <button id="default_rule">手动放行/默认</button>
+        <button id="allow_all">允许所有</button>
+        <button>转交客户/手动</button>
+        <button>自动转交/默认</button>
+        -->
+        <button id="hide_robot">隐藏机器人发言</button>
+    </div>
+    <div id="inputs" class=" col-xs-12 clo-sm-12 col-md-6 col-lg-6">
+    选择当前发言者身份<select id="speaker_identity">
+        <option value="巡管">巡管</option>
+        <option value="值班老师">值班老师</option>
+        <option value="分析师助理">分析师助理</option>
+        <option value="自定义">自定义</option>
+        <option id="random_user" value="游客">游客</option>
+    </select>
+    <!---附加功能区--->
+     <div style="display: inline-block;border-radius: 2px;margin: 0px 10px;padding: 2px 10px;background: lightblue none repeat scroll;">
+        <button id="update_img_btn" onclick="$('#my_file').click();">上传图片</button>
+    </div>
+    <!--上传图片html部分开始-->
+        <!--下面这个from是用来发送图片的，注意target属性指向了下面那个iframe-->
+        <form style="display: none" enctype="multipart/form-data" method="post" target="exec_target" action="/upload_image">
+            <input id="my_file" type="file" name="myfile"/>
+            <input id="submit_img_button" type="submit" value="提交"/>
+        </form>
+        <!--这个iframe是用来接收返回的信息的，-->
+        <iframe style="display: none" id="exec_target" name="exec_target"></iframe>    <!-- 提交表单处理iframe框架 -->
+    <!--上传图片html部分结束-->
+    <hr>
+    <input id="my_message" type="text" size="50"  placeholder="" style="height:80px"/>
+    <input type="submit" id="submit_message" value="发送消息"/>
+    </div>
+</div>
+<div class="black_ip_outer">
+    <div><span class="my_close">X</span></div>
+    <div class="black_ip_inner">
+        <table id="ip_table">
+            <tr class="table_title"><th>IP</th><th>操作</th></tr>
+        </table>
+    </div>
+    <div style="text-align: center" id="no_ip_tips">当前没有任何被封禁的IP。</div>
+</div>
+<style>
+        /*ip黑名单弹窗样式*/
+    .black_ip_outer{z-index:10; display:none;border:1px solid grey;background:lightgrey;border-radius:4px;position: fixed; left:50%; top:25%;width:400px; height:auto; margin-left:-200px;/*margin-left的值取决于width的宽度的一半*/ margin-top:-50px;/*margin-top的值取决于height的高度的一半*/ background:white;padding:20px }
+    .my_close{position: absolute;right:2px;top:2px;cursor:pointer}
+    #ip_table{width:100%;min-height: 400px;}
+    #ip_table:nth-child(odd){background: lightblue;}
+    #ip_table th{width:50%;text-align: center}
+    #ip_table td{width:50%;text-align: center}
+    /*上传图片等待过程弹窗样式*/
+    #wait_update_outer{z-index:20; display:none;background: #f2f2f2;position: fixed; left:0px; top:0px;width:100%; height:100%;opacity: 0.9}
+    #wait_update_inner{position:absolute;width:200px;min-height: 20px;left: 50%;margin-left: -100px;background-color: white;top:50%;margin-top: 10px}
+</style>
+<div id="wait_update_outer">
+    <div id="wait_update_inner">正在上传图片，请稍候 <span>...</span></div>
+</div>
+<span id="level_and_prefix" style="display: none">{{ level_and_prefix }}</span>
+</body>
+<!--图片的弹出放大插件，必须放在body的结尾哦---->
+<!--整个插件包括一个css，一个js，一个map文件，以及若干图片，css放在头部-->
+<script src="../static/js/lightbox.min.js"></script>
+<script>
+    $(function(){
+
+        //测试账户完毕
+        var teacher_account=$("#teacher_account").text();  //当前登录用户名
+        var teacher_id_login=$("#teacher_id").text();  //当前登录用户id
+
+        var ranking=[];  //排行榜数据
+        var teacher_ids=[];  //当前登录的老师所拥有的所有可操作账户的id的数组
+        var product_list=[]; //当前所有可操作产品的id和名称的字典组成的数组{"p_id":x[0],"p_name":x[1]}
+        var product_price_list_global={};  //定义一个价格字典，由ws实时赋值。
+        var host=location.hostname;  //定义host的ip
+        //var host="live.shiyou888.com";  //定义host的ip
+        level_and_prefix=JSON.parse($("#level_and_prefix").text());//用户级别和级别图片的对应关系。
+        //测量屏幕尺寸
+        var aheight=$(document).height()-$("#No1").offset().top;
+        //alert($("#No1").offset().top)
+        $(".dialog_div").css({"height":600,"overflow-y":"scroll"});
+        //载入时检测是否登录。
+        function check_login(){
+            if($("#login_in_teacher_id").text()!="None"){
+                $("#login_in_btn,#teacher_job_id,#teacher_password").hide();
+                $("#login_in_teacher_id,#_login_out_btn").show();
+            }
+            else{
+                $("#login_in_btn,#teacher_job_id,#teacher_password").show();
+                $("#login_in_teacher_id,#_login_out_btn").hide();
+            }
+        }
+        check_login();
+        //根据老师id和老师名字是否都存在决定显示哪一个。
+        var teacher_name= $.trim($("#login_in_teacher_name").text());
+        if(teacher_name==0){
+            $("#login_in_teacher_name").hide();
+            $("#login_in_teacher_id").show();
+        }
+        else{
+            $("#login_in_teacher_name").show();
+            $("#login_in_teacher_id").hide();
+        }
+        //载入页面的时候，给随机游客化名赋值
+        var random_int=(Math.random()*1000000).toString().substr(0,3);  //随机三位数
+        $("#random_user").val("游客"+random_int).text("游客"+random_int);
+        //隐藏/显示机器人的发言
+        robot_class="robot";  //定义全局变量以便在插入的时候决定显示/隐藏机器人的发言。
+        $("#hide_robot").click(function(){
+            var text=$(this).text();
+            if(text=="隐藏机器人发言"){
+                $(".robot").toggleClass("robot").toggleClass("hide_robot");
+                $(this).text("显示机器人发言");
+                robot_class="hide_robot";
+            }
+            else{
+                $(".hide_robot").toggleClass("hide_robot").toggleClass("robot");
+                $(this).text("隐藏机器人发言");
+                robot_class="robot";
+            }
+        });
+        //绑定输入框回车事件
+        bind_enter_event($("#my_message"),$("#submit_message"),true);
+
+        //从数据库加载ip黑名单的函数
+        function get_black_ip(){
+            $.post("/get_black_ip?uid="+Math.random(),function(data){
+                var ip_list=data["data"];
+                var tds=$("#ip_table").find("td[class!='table_title']");
+                tds.remove();
+                var $table=$("#ip_table");
+                var l=ip_list.length;
+                if(l>0){
+                    $("#no_ip_tips").hide();
+                    for(var i=0;i<l;i++){
+                        var temp="<tr><td>"+ip_list[i]+"</td><td><button style='width:30%'  onclick='table_allow_ip($(this))'>恢复</button></td></tr>";
+                        $table.append(temp);
+                    }
+                }else{
+                     $("#no_ip_tips").show();
+                }
+            });
+        }
+        //ip黑名单弹窗事件
+        $("#pop_ip_div").click(function(){
+            get_black_ip();
+            $(".black_ip_outer").css("display","block");
+        });
+        //ip黑名单关闭事件
+        $(".black_ip_outer .my_close").click(function(){
+            $(".black_ip_outer").hide();
+        });
+        //ip黑名单恢复ip的事件
+        table_allow_ip=function($this){
+            var ip=$this.parent().prev().text();
+            websocket2.send(JSON.stringify({"the_type":"allow_ip","message_id":0,"message":ip}));
+            setTimeout(function(){get_black_ip();},300);
+        };
+/////////////////////////////////////////////WS部分开始///////////////////////////////////////////////////////
+        var ws_id=0;
+        var teacher_id=0;
+        console.log("begin");
+        websocket = new ReconnectingWebSocket("ws://"+host+":9015/char");
+        websocket.onmessage = function (evt) {
+            var obj = JSON.parse(evt.data);
+            //console.log(obj);
+             if (obj["ws_id"] != undefined) {
+                 id = obj["ws_id"];
+                 ws_id=id;  //赋值ws_id
+                 teacher_id=$("#login_in_teacher_id").text();
+                 console.log("ws_id is " + ws_id);
+                 //websocket.send(JSON.stringify({"dialog_type": "start_char", "ws_id":ws_id,"guest_id":guest_id,"page_url":page_url,"teacher_id":teacher_id}));
+             }
+            else{
+                //老师的后台只需要获取聊天大厅内容即可。
+                 console.log("聊天室大厅的信息");
+                 console.log(JSON.parse(evt.data));
+                 var message = JSON.parse(evt.data)["data"];  //获取聊天室消息集合
+                 console.log("message is ");
+                 console.log(message);
+                if(typeof(message[0]["dialog_type"])!="undefined"){   //说明不是对话内容而是特殊的信息
+                    //nothing....
+                }
+                else{
+                    //发言内容
+                    fill_dialog_zone(message);//填充发言区
+                }
+                 //开始填充聊天室信息
+
+             }
+
+        };
+//填充聊天室发言区
+ function fill_dialog_zone(message){
+     var str = '';
+     for (var i = 0; i < message.length; i++) {
+         console.log("正在填充的聊天室消息");
+         console.log(message[i]);
+         str += '<div class="'+(message[i]['come_from']=="robot"?robot_class:"")+' chatlist"><span style="display:none" class="uuid">'+message[i]["message_id"]+'</span><span class="shishi">' + message[i]["time"] +
+                 '</span><span class="bp"></span><img style="width:1.2em;height:1.2em;margin:0px 3px 0px 5px" class="come_from" src="../static/images/'+(message[i]['come_from']=='dialog'?'lb':'jqr')+'.jpg"/><span class="username">'
+                 + message[i]["name"] + '&nbsp;:</span><span class="userchatnr">' + message[i]["message"] + '</span><span onmouseleave="leave_ip_item($(this))" onmouseenter="user_ip_info($(this))" onclick="control_ip($(this))" class="user_ip">'+message[i]["ip"]+'</span>' +
+                 '<button '+(message[i]['message_id']==null?'style="display:none;"':'')+' onclick="delete_message($(this))">删除</button></div>';
+
+     }
+     var chats=$("#chartroom_message>.chatlist");
+            //防止发言过多
+     if(chats.length>40){
+         $("#chartroom_message>.chatlist:first").remove();
+     }
+     else{}
+     $("#chartroom_message").append(str);
+     $('#chartroom_message').scrollTop( $('#chartroom_message')[0].scrollHeight );
+ }
+ //删除发言的函数
+ delete_message=function($this){
+     var name=$this.parent().find(".ssbt_nr1").text()==""? $.trim($this.parent().find(".username").text().split(":")):$this.parent().find(".ssbt_nr1").text();
+     if(confirm("你确实要删除"+name+"的这条发言吗？")){
+         var ip=$this.parent().find(".user_ip:first").text();
+         var message_id=$this.parent().find(".uuid:first").text();
+         console.log(message_id);
+         $this.parent().remove();
+         websocket2.send(JSON.stringify({"the_type":"delete_message","message_id":message_id,"message":ip}));
+         websocket.send(JSON.stringify({"dialog_type":"delete_message","message_id":message_id,"message":ip}));
+     }else{}
+ };
+ //放行发言的函数
+  allow_message=function ($obj){
+    $obj.attr("disabled","disabled");
+    var message_id=$obj.parent().find(".uuid:first").text();
+      $.post("/change_question_status",{"the_type":"allow_message","message_id":message_id},function(data){
+    if(data["message"]=="success"){
+        $obj.text("已放行");
+        $obj.parent().fadeTo(300,0,function(){ $obj.parent().remove();});
+    }else{}
+    });
+
+ };
+//封/放行ip的函数
+control_ip=function($obj){
+    var ip=$obj.text();
+    var flag=$obj.css("background-color");
+    var the_type=(flag=="rgb(144, 238, 144)")?"stop_ip":"allow_ip";  //背景是浅绿就是封ip，否则就是放行ip
+    var astr="你确实要"+(the_type=="stop_ip"?"断开":"恢复")+"IP："+ip+"的连接吗？";
+    if(confirm(astr)){
+        console.log({"the_type":the_type,"message_id":0,"message":ip});
+        websocket2.send(JSON.stringify({"the_type":the_type,"message_id":0,"message":ip}));
+        $obj.toggleClass("user_ip");
+        $obj.toggleClass("user_ip_stop");
+    }else{}
+};
+//启动时，查询ip黑名单的函数，仅仅用于初始化。
+function init_black_ip_list(){
+    $.post("/get_black_ip?uid="+Math.random(),function(data) {
+        var ip_list = data["data"];
+        console.log("ip黑名单："+ip_list);
+        var user_ips=$(".user_ip");
+        user_ips.each(function(){
+            var $this=$(this);
+            if(ip_list.indexOf($this.text())!=-1 && $this.attr("class")=="user_ip"){
+                $this.toggleClass("user_ip");
+                $this.toggleClass("user_ip_stop");
+            }else{}
+        });
+    });
+}
+ //接受一条需要审核的发言，填充到审核区域
+  function fill_question_zone(amessage){
+            console.log("fill_question_zone function :");
+            console.log(amessage);
+            var temp=amessage;
+            var uuid=temp["message_id"];
+                 var guest_id=temp["guest_id"];
+                 var user_level=temp["user_level"];
+                 var user_name=temp["name"];
+                 var type=temp["dialog_type"];
+                 var message=temp["message"];
+                console.log("user_level is :"+user_level);
+                 var img_url=typeof(level_and_prefix[user_level])=="undefined"?"youke.png":(level_and_prefix[user_level]["path"]+".png");
+                 var time=temp["time"];
+                 var ip=temp["ip"];
+                var str2="<div class='chatlist ss' ><span style='display:none' class='uuid'>"+uuid+"</span><span  onclick='control_ip($(this))'>IP:</span>" +
+                        "<span  onmouseleave='leave_ip_item($(this))' onmouseenter='user_ip_info($(this))' onclick='control_ip($(this))'  class='user_ip'>" +ip+
+                               "</span><span class='guest_id' style='display:none'>"+guest_id+"</span>" +
+                               "<span >" +"<img src='../static/images/"+img_url+"'/>"+"</span>" +
+                               "<span class='ssnr ssbt_nr1'>"+user_name+"</span>" +
+                               "<span class='ssnr ssbt_nr2'>"+message+"</span>" +
+                               "<span class='ssbt'> 时间:</span><span class='dialog_time ssnr'>"+time+"</span>" +
+                               "<span class='ssbt'> 状态:</span>" +
+                               "<button onclick='allow_message($(this))' class='change_status'>"+"放行"+"</button><button onclick='delete_message($(this))'>删除</button></div>";
+                var question_div=$("#question_message");
+                question_div.append(str2);
+        }
+    //审核发言相关的ws连接
+    websocket2 = new ReconnectingWebSocket("ws://"+host+":9015/questions");
+
+    websocket2.onopen=function(evt){
+        console.log("ws2 is open");
+        websocket2.send(JSON.stringify({
+                "the_type": "all_message"
+            }));
+    };
+    websocket2.onmessage = function (evt) {
+        var obj = JSON.parse(evt.data);
+
+        console.log(obj);
+        if (obj["ws_id"] != undefined) {
+            //nothing....
+        }
+        else {
+            //填充需要审核的发言。
+            console.log("填充需要审核的发言");
+            console.log(evt);
+
+            var data=JSON.parse(evt.data);
+            var type=data["the_type"];
+            console.log("the_type is "+type);
+            if(type=="all_message"){
+                var messages=data["message_list"];
+                console.log("all_message");
+                console.log(messages);
+                for(var i=0;i<messages.length;i++){
+                    fill_question_zone(messages[i]);
+                }
+                //加载ip黑名单函数
+                init_black_ip_list();
+            }
+            else if(type=="add_message"){   //加一条需要审核的发言
+                var message=data["message"];
+                var id=data["message_id"];
+                message["message_id"]=id;
+                console.log("id is "+id);
+                console.log(data);
+                console.log("add_message");
+                console.log(message);
+                fill_question_zone(message);
+
+            }
+            else if(type=="allow_message"){    //放行发言
+                var id=data["message_id"];
+                var divs=$("#question_message>.chatlist");
+                divs.each(function(){
+                    var $this=$(this);
+                    if($this.find(".uuid:first").text()==id && $this.find(".change_status:first").attr("disabled")!="disabled"){
+                        $this.find(".change_status:first").attr("disabled","disabled");
+                        $this.fadeTo(600,0,function(){ $this.remove();});
+                    }else{}
+                });
+            }
+            else if(type=="stop_ip"){  //封ip
+                var ip=data["message"];
+                console.log("封禁的ip是："+ip);
+                var user_ips=$(".user_ip");
+                user_ips.each(function(){
+                    var $this=$(this);
+                    if($this.text()==ip && $this.attr("class")=="user_ip"){
+                        $this.toggleClass("user_ip");
+                        $this.toggleClass("user_ip_stop");
+                    }else{}
+                });
+            }
+            else if(type=="allow_ip"){  //解除封ip
+                var ip=data["message"];
+                console.log("解除封禁的ip是："+ip);
+                var user_ips=$(".user_ip_stop");
+                user_ips.each(function(){
+                    var $this=$(this);
+                    if($this.text()==ip && $this.attr("class")=="user_ip_stop"){
+                        $this.toggleClass("user_ip");
+                        $this.toggleClass("user_ip_stop");
+                    }else{}
+                });
+            }
+            else if(type=="delete_message"){ //删除待审核发言
+                var message_id=data["message_id"];
+                console.log("删除的发言的UUID是："+message_id);
+                var uuids=$(".uuid");
+                uuids.each(function(){
+                    var $this=$(this);
+                    if($this.text()==message_id){
+                        $this.parent().remove();
+                    }else{}
+                });
+            }
+            else{}
+        }
+    };
+    //员工登录
+    $("#login_in_btn").click(function(){
+        var teacher_id= $.trim($("#teacher_job_id").val());
+        var teacher_password=$.trim($("#teacher_password").val());
+        if(ws_id==0){
+            alert("请稍后，等待服务器连接完成...")
+        }
+        else if(teacher_id.length!=0 && teacher_password.length!=0){
+            $.post("http://"+host+"/teacher_login",{"teacher_id":teacher_id,"teacher_password": $.md5(teacher_password),"ws_id":ws_id},function(data){
+                if(data["message"]=="success"){
+                    alert("登录成功");
+                    location.reload();
+                }
+                else{
+                    alert(data["message"]);
+                }
+            });
+        }
+    });
+    //注销
+    $("#_login_out_btn").click(function(){
+        var r=confirm("你确实想注销吗?");
+        if(r){
+            $.removeCookie("username");
+            $.removeCookie("password");
+            location.href="/admin_login_page";
+        }else{}
+    });
+
+     //获取聊天室在线人数的方法。
+        function count_online(){
+            $.get("/count_online?gid="+Math.random(),function(data){$("#counter").text(data);});
+        }
+        count_online(); //启动时获取聊天室在线人数
+        setInterval(function(){count_online();},5000);
+
+    ////////////////////////////右下选择当前发言身份/////////////////////////////////////////
+    var current_alias= $("#inputs select>option:selected").text();  //定义一个全局变量用于给发发送图片时确认发送者别名
+    $.cookie("current_alias",current_alias);  //写入cookie以方便后端获取
+    $.cookie("page_url",document.location.href);     //写入cookie以方便后端获取
+    //选中自定义，弹窗输入自定义命名
+    $("#inputs select").change(function(){
+        if($(this).find("option:selected").text() == "自定义") {
+            var selfdefind = prompt("输入自定义名称:", "");
+            if(selfdefind!=null && selfdefind!=""){
+                var opt = "<option selected>" + selfdefind  + "</option>";
+                $("#inputs select").append(opt);
+            }else{}
+        }else{}
+        current_alias= $("#inputs select>option:selected").text();  //定义一个全局变量用于给发发送图片时确认发送者别名
+        $.cookie("current_alias",current_alias);  //写入cookie以方便后端获取
+    });
+
+    //老师发言的方法:
+    $("#submit_message").click(function(){
+        var alias= $.trim($("#speaker_identity>option:selected").text());
+        var message= $.trim($("#my_message").val());
+        if(alias=="自定义"){
+            alert("请选择一个化名");
+        }
+        else if(message==""){
+            alert("发言内容不能为空");
+        }
+        else{
+            //user_id=6代表是管理员发言
+            // 0。客户匿名id，1.注册用户id 2.员工id ，3消息内容 4.消息类型。5.消息日期。6.聊天室地址
+            var adata={"guest_id":guest_id,"user_id":0,"user_name":alias,"dialog_message":message,"dialog_type":"teacher","page_url":document.location.href,"user_level":6};
+            websocket.send(JSON.stringify(adata));
+            $("#my_message").val("");
+        }
+    });
+/***********************上传图片相关部分**********************************/
+   //启动是清空文件的值
+    $("#my_file").val("");
+  //上传图片的文件按钮事件
+  $("#my_file").change(function(){
+        if($("#my_file").val()!=='' && $("#my_file").val()!=undefined){
+            var file_name=$("#my_file").val();
+            var l=file_name.length;
+            var prex=file_name.substring(l-4);
+            prex.toLowerCase();
+            if(prex==".png" || prex==".gif" || prex==".jpg"){
+                send_image();//上传图片函数
+            }else{
+                alert("只能上传图片类型的文件");
+            }
+        $("#my_file").val('');
+        }else{}
+    });
+  //发送图片函数。
+    var wait_update_interval=null;  //修改省略号长度的循环
+    function send_image(){
+        $("#submit_img_button").click();
+        $("#wait_update_outer").show();
+        wait_update_interval=setInterval(function(){
+            var wait=$("#wait_update_inner>span");
+            if(wait.text().length<7){
+                var s=wait.text();
+                wait.text(s+".");
+            }
+            else{
+                wait.text("...");
+            }
+        },300);
+    }
+  //图片上传成功的回调
+    $("#exec_target").load(function(){
+        var data=$(window.frames['exec_target'].document.body).html();  //上传文件返回的数据
+        clearInterval(wait_update_interval);
+         $("#wait_update_outer").hide();
+    });
+/****************IP信息查询*************************/
+ user_ip_info=function($obj){
+     $obj.attr("data-status","enter");
+     //ip查询的辅助函数，用于定义显示ip信息的事件
+      function show_ip(ip_info){
+          var span=$("<span class='ip_info' style='display:none;margin-left:10px;font-size:0.8em;color:green;padding:1px;5px'>"+ip_info+"<span>");
+          setTimeout(function(){
+              //延时800毫秒，以忽略鼠标意外划过ip的span的情况。
+              if($obj.parent().find(".ip_info").size()==0 && $obj.attr("data-status")=="enter"){
+                  //如果这一行信息后面没有被加上查询到的ip清晰，并且鼠标一直没离开过此元素的话，触发事件。
+                  $obj.parent().append(span);
+                  span.fadeIn(600);//淡入
+              }else{}
+          },800);
+      }
+     var ip=$obj.parent().find(".user_ip:first").text();//需要查询的ip
+     var my_ip=$("#my_ip").text();//我自己的ip
+     if(ip=="127.0.0.1"){
+         show_ip("<code style='font-size:0.9em'>本机</code>");
+     }
+     else if(ip.indexOf("192.168.")!=-1){
+         show_ip("<code style='font-size:0.9em'>本地局域网</code>");
+     }
+     else if(ip==my_ip){
+         show_ip("<code style='font-size:0.9em'>自己人</code>");
+     }
+     else if(typeof(ip_query_result[ip])!="undefined"){
+         //ip_query_result是全局变量，位于tools.js内部，用于存放ip地址和查询结果，
+         show_ip(ip_query_result[ip]);
+     }
+     else{
+         //从百度api查询ip信息，注意回调函数的用法。
+         jquery_ip(ip,show_ip);
+     }
+
+ };
+//鼠标离开ip信息的事件，用于配合user_ip_info函数
+ leave_ip_item=function($obj){
+     $obj.attr("data-status","leave");
+     setTimeout(function(){
+         if($obj.parent().find(".ip_info").size()>0 && $obj.attr("data-status")=="leave"){
+            var item= $obj.parent().find(".ip_info");
+            item.fadeOut(600,function(){item.remove();});
+         }else{}
+     },800);
+ };
+//end
+});
+</script>
+</html>

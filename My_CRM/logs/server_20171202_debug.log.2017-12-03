@@ -1,0 +1,2 @@
+2017-12-04 09:26:34,388 server.py[line:497] INFO Received signal SIGTERM. Shutting down.
+2017-12-04 09:26:34,434 app.py[line:568] INFO Server Stopped

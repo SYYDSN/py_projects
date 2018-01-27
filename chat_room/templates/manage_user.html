@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0;">
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
+    <script src="../static/js/jquery.cookie.js"></script>
+	<script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.md5.js"></script>
+    <title></title>
+     <script>
+    //启动的时候检测cookie内容判断是否登录,如果没有登录就跳转回登录页面，防止使用浏览器后退功能钻身份验证的空子。
+    if($.cookie("username")==undefined){
+        location.href="/admin_login_page";
+    }else{}
+</script>
+    <style>
+        .padding_left{ padding-left:30px;}
+        .padding_right{ margin-right:20px;}
+        #user_table{width:100%; margin-bottom:20px;border-left: 1px solid #ddd;border-bottom: 1px solid #ddd;}
+        #user_table tr th,#user_table tr td{ width:20%; text-align: center;border-right: 1px solid #ddd;}
+        #table_tanchu tr td{ text-align: center; border-top:none; }
+        .clear{ clear: both;}
+
+        /*编辑资料*/
+        .pop_window{width:100%; height:100%;display:none; background:rgba(0,0,0,0.6); position: fixed; left:0px; top:0px;}
+        .tccont{width:340px;margin:10% auto auto auto;background-color: rgba(236, 235, 233, 1);padding:2em 1em 2.5em 1em; border-radius:5px;}
+        .tccont h4{ width:100%; text-align:center; color:#FF9900; font-size:18px; font-weight:bold; margin-bottom:25px;}
+        .tccont p.zsxm{ display:block; margin-bottom:10px;}
+        .tccont p.zsxm label{ width:95px; font-size:15px; color:#666666; margin-right:5px; text-align:right; display:inline-block;}
+        .tccont p.zsxm input.srxm_txt{ width:200px; border: 1px solid #C2C2C2; height:30px; line-height:30px; padding-left:10px; color:#C2C2C2; background:rgba(255,255,255,0.95)}
+        .tccont p.tcbut{ text-align:center;}
+        .tccont p.tcbut .btt{ display:inline-block; margin:0px 2px; border:none; padding:3px 10px; background:#FFAE00; text-align:center; border-radius:2px; color:#FFFFFF; cursor:pointer; margin-top:25px;}
+        .tccont p.tcbut .btt:hover{ text-decoration:underline;}
+    </style>
+</head>
+<body>
+<div class="row">
+    <p id="user_level_list" style="display:none">{{ user_level_list }}</p>
+    <div  class="col-xs-6 col-sm-6 col-md-6 col-lg-6 padding_left">当前在线<span id="counter"></span>人</div>
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6"><button id="change_password" class="pull-right padding_right">修改密码</button><button id="login_out" class="pull-right">注销</button><span id="current_user" class="pull-right">{{current_user}}</span><div class="clear"></div></div>
+
+
+</div>
+<!----编辑用户名/交易账号/级别---->
+<div id="pop_add_window22" style="z-index:1000" class="pop_window">
+    <div id="pop_add_inner22" class="tccont">
+        <h4>编辑资料</h4>
+        <span id="input_user_id" style="display: none"></span>
+        <p class="zsxm"><label>用户名：</label><input type="text"  id="input_real_name" class="srxm_txt" placeholder="请输入修改的用户名"/></p>
+        <p class="zsxm"><label>手机号码：</label><input type="text" id="jiaoyi_hao" class="srxm_txt"/></p>
+        <p class="zsxm"><label>级别：</label><select id="edit_level" class="srxm_txt"></select></p>
+        <p class="tcbut">
+            <button id="add_submit" class="btt">确认</button>
+            <button id="add_cancel" class="btt">放弃</button>
+        </p>
+    </div>
+</div>
+<!---用户管理的 页--->
+<div id="pop_manage_user">
+    <div id="manage_user_inner"  class="container-fluid"  style="width:60%;margin:20px auto auto auto;background-color: hsla(6, 100%, 100%, 1);">
+        <h4 class="row text-center">后台账户管理</h4>
+        <!--用户管理弹出窗-->
+        <div class="row" id="edit_user">
+            <div  class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <table class="table" id="table_tanchu">
+                    <tr>
+                        <td>
+                            用户名<input class="" type="text" id="input_username" placeholder="请输入帐户名"/>
+                        </td>
+                        <td>
+                            手机号码<input class="" type="text" id="phone" placeholder="请输入手机号码"/>
+                        </td>
+                        <td>
+                            <select id="user_level">
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <!--<p class="row">
+                <input class="col-xs-8 col-xs-offset-1  col-sm-4 col-md-2  col-lg-2 col-lg-offset-1" type="text" id="input_username" placeholder="请输入帐户名"/>
+                <input class="col-xs-8 col-xs-offset-1 col-sm-4 col-md-2 col-lg-2 " type="password" id="password1" placeholder="请输入密码"/>
+                <input class="col-xs-8  col-xs-offset-1 col-sm-4  col-md-2 col-lg-2 "  type="password" id="password2" placeholder="请再次输入密码"/>
+
+            </p>-->
+            </div>
+        <p class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="row">
+            <button class="col-xs-5 col-sm-4 col-md-2 col-lg-1 col-lg-offset-5  col-xs-offset-1 col-sm-offset-1" id="add_user">确认</button>
+            <button class="col-xs-5 col-sm-4 col-md-2 col-lg-1" id="clear_input">清除</button>
+
+        </div>
+        </p>
+        </div>
+        <table id="user_table" class="table">
+            <tr>
+                <th>用户名</th><th>密码</th><th>状态</th><th>状态</th>
+            </tr>
+            <tr>
+                <td>大夫</td><td>123456</td><td>正常</td><td>正常</td>
+            </tr>
+            <tr>
+                <td>大夫</td><td>123456</td><td>正常</td><td>正常</td>
+            </tr>
+            <tr>
+                <td>大夫</td><td>123456</td><td>正常</td><td>正常</td>
+            </tr>
+        </table>
+
+
+    </div>
+</div>
+
+
+
+</body>
+<script>
+$(function(){
+
+    host="/";
+    var user_level_list=[];  //定义一个全局变量，代表用户级别的信息。给select元素使用，方便排序
+    var user_level_dict={};  //定义一个全局变量，代表用户级别的信息。给一般元素使用，方便取值
+    function get_user_level(){
+        user_level_list=JSON.parse($("#user_level_list").text())["data"];  //获取分级信息
+        var l=user_level_list.length;
+        for(var i=0;i<l;i++){
+            user_level_dict[user_level_list[i][0]]=user_level_list[i][2]+"用户";
+        }
+    }
+    get_user_level();
+    /////////////////////////////////////
+    //修改密码的方法。
+        $("#change_password").click(
+                function(){
+                    var new_password=prompt("请输入新密码");
+                    if(new_password!=null && new_password!=''){
+                        var objname=$("#current_user").text();
+                        var password= $.md5($.trim(new_password));
+                        $.post(host+"edit_teacher_user/change_password",{"objname":objname,"password":password},function(data){
+                            if(data["message"]=="success"){
+                                alert("密码修改成功");
+                            }
+                            else{
+                                alert("密码修改失败，请稍后再试");
+                            }
+                        });
+                    }
+                    else{
+                        alert("密码不能为空");
+                    }
+                }
+        );
+    //注销的方法,删除cookie
+        function login_out(){
+            $.removeCookie("username");
+            $.removeCookie("password");
+            //console.log(document.cookie);
+        }
+    $("#login_out").click(function(){login_out();location.href="/admin_page";});
+    //阻止内部框的click事件冒泡。
+        $("#pop_add_inner,#manage_user_inner").click(function(){return false;});
+    //获取聊天室在线人数的方法。
+        function count_online(){
+            $.get("/count_online?gid="+Math.random(),function(data){$("#counter").text(data);});
+        }
+        count_online(); //启动时获取聊天室在线人数
+        setInterval(function(){count_online();},10000);
+        //获取用户列表的方法。
+        function get_users(){
+            $.post("/edit_chatroom_user/view_all?uid="+Math.random(),function(data){
+                //console.log(data);
+                var obj=data["data"];
+                console.log(obj)
+                //清空除标题外的其他行。
+                $("#user_table").html('<tr><th >用户名</th><th>密码</th><th>交易账号</th><th>级别</th><th>操作</th></tr>');
+                for(var i=0;i<obj.length;i++){
+                    //alert(obj[i][0])
+                    //.列顺序 0.id 1.帐户名 2密码，3.真实名字 4.交易账号 5.级别 6，性别 7 创建时间
+                    var str="<tr><td class='user_id' style='display:none'>"+obj[i][0]+"</td><td class='user_account'>"+obj[i][1]+"</td><td class='stop_click'>" +
+                            "<button class='reset_password'>重置密码</button></td><td><span class='business_account'>"+obj[i][4]+"</span></td>" +
+                            "<td><span class='user_level' title='"+obj[i][5]+"'>"+user_level_dict[obj[i][5]]+"</span></td>" +
+                            "<td><button class='edit_user'>编辑</button><button style='margin-left:20px' class='delete_user'>删除</button></td></tr>";
+                    $("#user_table").append($(str));
+                }
+                //重置用户密码的方法。
+                $(".reset_password").each(function(){
+                    var $this=$(this);
+                    $this.click(function(){
+                        var objname= $.trim($this.parent().prev().text());
+                        var id= $.trim($this.parent().parent().find("td").first().text());
+                        var r=confirm("你确实想重置"+objname+"的密码吗？");
+                        if(r){
+                            $.post(host+"edit_chatroom_user/reset_password?uid="+Math.random(),{"data":JSON.stringify({"u_id":id})},function(data){
+                            if(data["message"]=="success"){
+                                alert("重置成功！默认密码为888888");
+                            }
+                            else{
+                                alert(data["message"]);
+                            }
+                        });
+                        }
+                        else
+                        {}
+
+                    });
+                });
+               //加载客户级别的方法。
+               $("#user_level>option").remove();
+                 $("#edit_level>option").remove();
+                var levels=$("#user_level");
+                var edit_level=$("#edit_level");
+                for(var i=0;i<user_level_list.length;i++){
+                    var temp="<option value='"+user_level_list[i][0]+"'>"+user_level_list[i][2]+"用户</option>";
+                    levels.append(temp);
+                    edit_level.append(temp);
+                }
+
+                //删除账户的方法
+                $(".delete_user").each(function(){
+                    var $this=$(this);
+                    $this.click(function(){
+                        var objname= $.trim($this.parent().parent().find("td").eq(1).text());
+                        var u_id=$.trim($this.parent().parent().find("td").eq(0).text());
+                        var r=confirm("你确实想删除"+objname+"的账户吗？");
+                        if(r){
+                            $.post("/edit_chatroom_user/delete?uid="+Math.random(),{"data":JSON.stringify({"u_id":u_id})},function(data){
+                                if(data["message"]=="success"){
+                                    alert("删除成功！");
+                                    get_users(); //重新加载
+                                }
+                                else{}
+                            });
+                        }
+                        else{}
+
+                    });
+                });
+                //弹出修改账户的界面
+                $(".edit_user").each(function(){
+                    var $this=$(this);
+
+                    $this.click(function(){
+                        var tr=$this.parent().parent();
+                        var the_id=tr.find(".user_id").text();
+                        var the_account=tr.find(".user_account").text();
+                        var the_business_account=tr.find(".business_account").text();
+                        var user_level=tr.find(".user_level").attr("title");
+                        $("#input_user_id").text(the_id);
+                        $("#input_real_name").val(the_account);
+                        $("#jiaoyi_hao").val(the_business_account);
+                        $("#edit_level").val(user_level);
+                        $("#pop_add_window22").show();//显示编辑弹窗
+
+
+                        //var id= $.trim($this.parent().parent().find("td").first().text());
+                        //alert(id)
+                       // var r=prompt("请输入新的交易账号");
+
+
+                    });
+                });
+                //
+
+            });
+        }
+// 提交修改用户信息按钮事件
+    $("#add_submit").click(function(){
+         var the_id=$("#input_user_id").text();
+         var input_real_name = $("#input_real_name").val();//用户名
+        var jiaoyi_hao = $("#jiaoyi_hao").val();//交易账号
+        var level = $("#edit_level").val(); //级别
+         if(the_id!=''){
+          $.post(host+"edit_chatroom_user/edit?uid="+Math.random(),{"data":JSON.stringify({"u_id":the_id,"phone":jiaoyi_hao,"level":level,"account_name":input_real_name})},function(data){
+           if(data["message"]=="success"){
+           alert("修改成功！");
+            $("#input_user_id").text('');
+            $("#input_real_name").val('');
+             $("#jiaoyi_hao").val('');
+             $("#edit_level").val('');
+             $("#pop_add_window22").hide();
+           get_users(); //重新加载
+           }
+           else{}
+           });
+         }
+         else{
+
+         }
+    });
+        //关闭编辑弹窗
+        $("#add_cancel").click(function(){
+           $("#pop_add_window22").hide();
+        });
+
+        get_users();//运行此方法。
+        //添加用户名时，用户名输入框的失焦事件。
+        $("#input_username").focus(function(){$(this).css("background","white");});
+        $("#input_username").blur(function(){
+            var objname= $.trim($(this).val());
+            if(objname.length>0){
+                $.post(host+"edit_chatroom_user/check_username?uid="+Math.random(),{"data":JSON.stringify({"account_name":objname})},function(data){
+                    if(data["message"]=="find!"){
+                        alert("用户名："+objname+" 已存在！");
+                        $("#input_username").css("background","hsla(320, 90%, 80%, 1)");
+                        return false;
+                    }
+                    else{
+                        console.log(data);
+                    }
+                });
+            }
+            else{
+                //nothing
+            }
+
+        });
+        //添加用户动作事件
+        $("#add_user").click(function(){
+            var account_name= $.trim($("#input_username").val()); //添加的用户名
+            var phone= $.trim($("#phone").val());   //输入的手机
+            var level= $.trim($("#user_level").val());   //用户级别
+            var bcolor=$("#input_username").css("background-color");  //用户名输入框的背景色
+            var reg=new RegExp("^1[0-9]{9}[0-9]$"); //验证手机的正则表达式
+            if(bcolor!="rgb(255, 255, 255)"){
+                alert("用户名已存在");  //如果用户名的输入框不是白色，说明用户还没纠正用户名重复的问题。
+                return false;
+            }
+            else if(account_name.length==0){
+                alert("用户名不能为空");
+                return false;
+            }
+            else if(phone.length==0){
+                alert("手机不能为空");
+                return false;
+            }
+            else if( isNaN(parseInt(level))){
+                alert("级别不能为空");
+                return false;
+            }
+            else if(!reg.test(phone)){
+            alert("手机号码错误!");
+            return false;
+            }
+            else{
+                console.log("开始添加用户")
+                $.post(host+"edit_chatroom_user/add",{"data":JSON.stringify({"account_name":account_name,"account_password":888888,"phone":phone,"level":level})},function(data){
+                    if(data["message"]=="success"){
+                        alert("用户添加成功");
+                        get_users();//运行此方法重新加载用户列表。
+                        $("#input_username,#phone,#user_level").val("");  //清空输入框
+                    }
+                    else{
+                        alert(data["message"]);
+                    }
+                });
+            }
+        });
+//end
+});
+</script>
+</html>

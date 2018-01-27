@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" src="../static/css/bootstrap.min.css">
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+<div>
+    <button id="submit">提交</button>
+</div>
+</body>
+<script>
+
+    $(function(){
+        //挂单的请求
+        $.post("http://127.0.0.1:9000/single_call_ahead/add",{"owner_id":21,"product_id":5,"direction":"挂空","jin_price":30417,"stop_win":30417,"stop_lost":0},function(data){
+            alert(data["message"]);
+        });
+
+        //end...
+    });
+</script>
+</html>

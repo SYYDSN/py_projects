@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
+    <script src="../static/js/jquery.cookie.js"></script>
+    <title></title>
+</head>
+<style>
+    #pop_outer{
+        background: rgba(124,175,220,0.5);
+        opacity: 0.9;
+        z-index: 1000;
+        padding-top: 100px;
+        position: fixed;
+    }
+    #pop_inner{
+        background: white;
+        width:400px;
+        height:auto;
+        margin:auto;
+        padding: 15px;
+        text-align:center;
+    }
+    #pop_inner  input {
+        width:100%;
+        margin:10px 0px;
+
+    }
+    #pop_inner  textarea{
+        width:100%;
+        margin:10px 0px;
+    }
+    #pop_inner button{
+        width:25%;
+        margin:10px;
+    }
+    .main{
+        text-align: center;
+    }
+    #info_col{
+        text-align: right;
+    }
+    #table_div{
+        text-align: center;
+    }
+    #table_div div{
+        text-align: center;
+        margin: auto;
+    }
+    table tr:nth-child(odd){
+        background: lightgrey;
+    }
+</style>
+<script>
+$(function(){
+    $("#pop_outer").height($(window).height()-20).width($(window).width());
+//end!
+});
+</script>
+<body>
+<!--页眉--->
+<header>
+</header>
+<!--正文--->
+<div class="main">
+    <div id="pop_outer" style="display: none">
+        <div id="pop_inner">
+            <h3>添加每日策略</h3>
+            <span id="e_id" style="display: none"></span>
+            <div><input type="text" id="e_title" placeholder="请输入标题"/></div>
+            <div><input type="text" id="e_author" placeholder="作者"/></div>
+            <div><textarea row="5" id="e_content" placeholder="输入内容"></textarea></div>
+            <div><button id="e_submit">添加</button><button id="e_cancel">放弃</button></div>
+        </div>
+    </div>
+    <div style="clear:both"></div>
+    <h1 style="text-align: center">策略管理</h1>
+    <div id="info_col">
+        <lable>当前用户：</lable><span id="current_user">{{ current_user }}</span><input type="button" value="注销" style="margin-right: 30px"/>
+    </div>
+    <hr>
+    <div id="table_div">
+        <div><input id="pop_window" type="button" value="添加策略"/> </div>
+        <div style="text-align: center;">
+            <table id="table_tips" style="display: inline-block">
+                <tr>
+                    <th>发布日期</th>
+                    <th>标题</th>
+                    <th>内容</th>
+                    <th>作者</th>
+                    <th>操作</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!--页脚-->
+<footer>
+
+</footer>
+</body>
+<script>
+$(function(){
+    //启动时候初始化输入框
+    function clear_pop_inner(){
+        $("#e_id").text('');
+        $("#e_title").val('');
+        $("#e_author").val('');
+        $("#e_content").val('');
+    }
+    clear_pop_inner();
+    //弹出添加策略编辑框
+    $("#pop_window").click(function(){$("#pop_outer").show();$("#pop_inner>h3").text("添加每日策略");$("#e_submit").text("添加");});
+    //关闭弹出框
+    $("#e_cancel").click(function(){$("#pop_outer").hide();});
+    //添加今日策略
+    $("#e_submit").click(function(){
+        var e_id=$("#e_id").text();
+        var e_title= $.trim($("#e_title").val());
+        var e_author= $.trim($("#e_author").val());
+        var e_content= $.trim($("#e_content").val());
+        var the_type=e_id==""?"add":"edit";
+        var adata={};
+
+        if(the_type=="add"){
+            if(e_author=="" || e_title=="" || e_content==""){
+                alert("缺少必要信息");
+                return false;
+            }
+            else{
+                adata={"e_title":e_title,"e_author":e_author,"e_content":e_content}
+            }
+
+        }
+        else{
+            if(e_author=="" || e_title=="" || e_content=="" || e_id==""){
+                alert("缺少必要信息");
+                return false;
+            }
+            else {
+                adata = {"e_id": e_id, "e_title": e_title, "e_author": e_author, "e_content": e_content}
+            }
+        }
+        $.post("/tips/"+the_type,adata,function(data){
+            if(data["message"]=="success"){
+                alert("操作成功");
+                clear_pop_inner();
+                $("#pop_outer").hide();
+                get_tips();
+            }
+            else{
+                alert(data["message"]);
+            }
+        });
+    });
+    //删除策略的函数
+    delete_tips=function($this){
+        var e_id=$this.parent().parent().find("td:first").text();
+        if(e_id==""){
+            alert("页面异常，请联系管理员");
+            return false;
+        }else{}
+        if(confirm("你确实要删除《"+$this.parent().parent().find("td").eq(2).text()+"》这条记录吗？")){
+            $.post("/tips/delete",{"e_id":e_id},function(data){
+                if(data["message"]=="success"){
+                    alert("删除成功");
+                    get_tips();
+                }
+                else{
+                    alert(data["message"]);
+                }
+            });
+        }else{}
+    };
+    //弹出编辑策略窗口
+    edit_tips=function($this){
+        console.log($this.attr("class"));
+        $("#pop_inner>h3").text("编辑每日策略");
+        var tds=$this.parent().parent().find("td");
+        console.log(tds);
+        $("#e_id").text(tds.eq(0).text());
+        $("#e_title").val(tds.eq(2).text());
+        $("#e_content").val(tds.eq(3).text());
+        $("#e_author").val(tds.eq(4).text());
+        $("#e_submit").text("编辑");
+         $("#pop_outer").show();
+    };
+    //启动时加载策略信息的函数。
+    function get_tips(){
+        $.post("/tips/view_all",function(data){
+            var data=data["data"];
+            // message["data"]={"e_id":raw[0],"e_title":raw[1],"e_content":raw[2],"e_author":raw[3],"e_datetime":raw[4].strftime("%Y-%m-%d %H:%M:%S")}
+            var table=$("#table_tips");
+            table.empty();
+            table.append('<tr><th>发布日期</th><th>标题</th><th>内容</th><th>作者</th><th>操作</th></tr>');
+            var l=data.length;
+            for(var i=0;i<l;i++){
+                var temp=data[i];
+                var e_datetime=temp["e_datetime"];
+                var e_id=temp["e_id"];
+                var e_title=temp["e_title"];
+                var e_author=temp["e_author"];
+                var e_content=temp["e_content"];
+                var temp_str="<tr class='tips'><td style='display:none'>"+e_id+"</td><td>"+e_datetime+"</td><td>"+e_title+"</td><td>"+e_content+"</td><td>"+e_author+"</td><td><button onclick='edit_tips($(this))'>编辑</button><button onclick='delete_tips($(this))'>删除</button></td></tr>";
+                table.append(temp_str);
+            }
+
+        });
+    }
+    get_tips();
+
+
+//end!
+});
+</script>
+</html>

@@ -1,0 +1,177 @@
+{% extends "admin_template_company.html" %}
+{% block extend_js %}
+    <script src="../static/js/admin_employee_company.js"></script>
+{% endblock %}
+{% block extend_css %}
+    <link rel="stylesheet" href="../static/css/admin_user.css">
+{% endblock %}
+{% block main %}
+    <div class="col-lg-12 col-md-12">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 middle_info">
+                {{ employee_count }} 名员工。
+                <button id="add_btn" onclick="add_employee()" class="btn btn-primary btn-xs">添加员工</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <table id="user_table" class="table table-hover">
+                    <tr>
+                        <th>工号</th>
+                        <th>姓名</th>
+                        <th>手机</th>
+                        <th>团队</th>
+                        <th>职务</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    {% for employee in employee_data %}
+                        <tr id="{{ employee.sn }}">
+                            <td data-type="item" class="sn"
+                                data-val="{{ employee.sn }}">{{ employee.sn }}</td>
+                            <td data-type="item" class="real_name"
+                                data-val="{{ employee.real_name }}">{{ employee.real_name }}</td>
+                            <td data-type="item" class="user_phone"
+                                data-val="{{ employee.user_phone }}">{{ employee.user_phone }}</td>
+                            <td data-type="item" style="display:none" class="user_password"
+                                data-val="{{ employee.user_password }}">{{ employee.user_password }}
+                            </td>
+                            <td data-type="item" style="display:none" class="sex"
+                                data-val="{{ employee.sex }}">{{ employee.sex }}
+                            </td>
+                            <td data-type="item" style="display:none" class="user_mail"
+                                data-val="{{ employee.user_mail }}">{{ employee.user_mail }}
+                            </td>
+                            <td data-type="item" style="display:none" class="born_date"
+                                data-val="{{ employee.born_date }}">{{ employee.born_date }}
+                            </td>
+                            <td data-type="item" class="team_sn"
+                                data-val="{{ employee.team_sn }}">{{ '' if not k_v.get(employee.team_sn) else k_v.get(employee.team_sn) }}
+                            </td>
+                            <td data-type="item"  class="position_sn"
+                                data-val="{{ employee.position_sn }}">{{ '' if not k_v2.get(employee.position_sn) else k_v2.get(employee.position_sn) }}
+                            </td>
+                            <td data-type="item"  class="user_status"
+                                data-val="{{ employee.user_status }}"><a href="javascript:;" onclick="change_status($(this))">{{ '正常' if employee.user_status == 1 else '停用'}}</a>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-xs" role="group">
+                                    <div class="btn-group btn btn-default drop_user" role="group"
+                                         data-id="{{ employee.sn }}" onclick="drop_employee($(this))">删除
+                                    </div>
+                                    <div class="btn-group btn btn-default drop_user" role="group"
+                                         data-id="{{ employee.sn }}" onclick="edit_employee($(this))">编辑
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        <!-- 底部分页 -->
+        <div class="row text-center">
+            <nav aria-label>
+                <ul id="page_list" class="pagination">
+                    <li class="{{ 'disabled' if index_range[0] == 1 else '' }}"><a
+                            href="/company/employee?index={{ prev_index }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                    </li>
+                    {% for index in index_range %}
+                        <li class="{{ 'active' if index == current_index else '' }}">
+                            <a href="/company/employee?index={{ index }}">{{ index }}</a>
+                        </li>
+                    {% endfor %}
+                    <li class="{{ 'disabled' if index_range[-1] == max_index else '' }}"><a
+                            href="/company/employee?index={{ next_index }}" aria-label="Next"><span
+                            aria-hidden="true">»</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <!--模态框-->
+    <button id="pop_modal" style="display: none" type="button" class="btn btn-primary btn-lg" data-toggle="modal"
+            data-target="#myModal">
+        Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="height: auto">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" style="text-align: center" id="myModalLabel">编辑员工信息</h4>
+                </div>
+                <div class="modal-body">
+                    <style>
+                        .modal-body > .row {
+                            margin-top: 10px;
+                            margin-bottom: 10px;
+                        }
+                    </style>
+
+                    <div class="row">
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                            <label>真实姓名：</label>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <input type="text" id="real_name" style="width:100px" placeholder="">
+                            <input type="hidden" id="sn">
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <label>手机号码：</label>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <input type="text" id="user_phone" style="width:120px" placeholder="必填">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                            <label>选择团队：</label>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <select id="team_sn" style="float:left;">
+                                <option></option>
+                                {% for k,v in k_v.items() %}
+                                <option value="{{ k }}">{{ v }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <label>选择职务：</label>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <select id="position_sn" style="float:left;">
+                                {% for k,v in k_v2.items() %}
+                                <option value="{{ k }}">{{ v }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                            <label>email：</label>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <input type="email" id="user_mail" style="width:100px" placeholder="">
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <label>出生日期：</label>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <input type="date" id="born_date" placeholder="">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="save_employee" type="button" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--模态框结束-->
+
+{% endblock %}

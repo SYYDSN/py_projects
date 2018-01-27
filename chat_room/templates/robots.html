@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <script src="../static/js/jquery-1.11.3.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <title></title>
+</head>
+<style type="text/css">
+.show{display: block;}
+.hide{display: none;}
+.hide_dialog{display: none;}
+table {
+	font-family: verdana,arial,sans-serif;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+    text-align: center;
+}
+table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+    text-align: center;
+}
+</style>
+
+<body>
+<div class="container">
+    <div class="row">
+    <span>当前用户id</span><span id="job_id">06010101</span><button id="login_out">注销</button>
+    </div>
+    <hr>
+    <table id="robot_table">
+        <!--#robot_id,robot_name,begin_day,begin_weekday,begin_week,begin_month,begin_time,end_time,step,robot_owner,robot_status-->
+       <tr class="tr_th"><th>ID</th><th>名字</th><th>begin_day</th><th>begin_weekday</th><th>begin_week</th><th>begin_month</th><th>begin_time</th><th>持续时长</th><th>发言间隔</th><th>所有人ID</th><th>机器人状态</th><td>操作</td></tr>
+    </table>
+    <hr>
+    <div class="row">
+    <div class="col-lg-4 row" style="border:1px solid gray;border-radius:4px">
+        <h4 class="col-lg-12" style="text-align:center;margin-top:1em">机器人配置信息</h4>
+        <div class="col-lg-12"><labe>ID:</labe><span id="input_robot_id"></span><label> 名字:</label><input type="text" style="width:15em" placeholder="请输入机器人名称（不可重复）" id="input_robot_name"/> </div>
+        <hr class="col-lg-10">
+        <div class="col-lg-12">
+            <label>每月 </label><input id="every_month" type="checkbox" style="margin-right:5em"><label>指定月份 </label><input id="specify_month" type="checkbox"  style="margin-right:1em"><select id="month">
+            <option value=""></option>
+            <option value="1">1月</option>
+            <option value="2">2月</option>
+            <option value="3">3月</option>
+            <option value="4">4月</option>
+            <option value="5">5月</option>
+            <option value="6">6月</option>
+            <option value="7">7月</option>
+            <option value="8">8月</option>
+            <option value="9">9月</option>
+            <option value="10">10月</option>
+            <option value="11">11月</option>
+            <option value="12">12月</option></select><hr>
+            <label>每月的每天</label><input id="every_day" type="checkbox"  style="margin-right:2em"><label>指定几号</label><input id="specify_day" type="checkbox"  style="margin-right:1em">请输入日期<input type="text" style="width:2em" id="day"/><hr>
+            <label>每个周</label><input id="every_week" type="checkbox"  style="margin-right:4em"><label>指定第几周</label><input id="specify_week" type="checkbox"  style="margin-right:1em">请输入第几周<input type="text" style="width:2em" id="week"/><hr>
+            <label>每周的每天</label><input id="every_weekday" type="checkbox"  style="margin-right:2em"><label>指定周几</label><input id="specify_weekday" type="checkbox"  style="margin-right:1em">请输入星期几<input type="text" style="width:2em" id="weekday"/><hr>
+            <label>总计时长:</label><input id="end_time" style="width:2em"  type="text"  style="margin-right:3em"/><labe>小时</labe><hr>
+            <label>发言间隔:</label><input id="step" style="width:6em"  type="text"  style="margin-right:3em"/><labe>秒</labe><span style="display:none" id="robot_status"></span><hr>
+            <label>开始时间:</label><input type="text" style="width:2em" placeholder="09" id="hour"/>:<input type="text" placeholder="30" style="width:2em" id="minute"/>:<input type="text" placeholder="00" style="width:2em" id="second"/><br><span id="time-tips" style="color:lightblue">请按照格式输入开始时间 </span>
+            <hr>
+            <button id="new_robot">新建机器人</button> <button id="save_config">保存配置</button>
+        </div>
+
+    </div>
+    <div class="col-lg-8 row">
+        <div class="col-lg-10" >
+            <h4 class="col-lg-6 text-center btn-success my_title">我的发言库</h4><h4 class="my_title col-lg-6 text-center btn-default">我的化名库</h4>
+            <div id="dialog_div"  class="col-lg-12">
+            <hr class="col-lg-12">
+            <input class="col-lg-9 col-lg-offset-1" placeholder="请输入关键字" id="search_word" type="text"/><input  class="col-lg-2" type="button" id="begin_search" value="搜索"/>
+            <hr class="col-lg-12">
+            <div id="my_robot_dialog" class="col-lg-12" style="height:30em;max-height:30em;overflow: scroll;overflow-x: hidden">
+
+            </div>
+            <input id="submit_my_robot_dialog" class="col-lg-12" type="submit" value="保存发言到数据库"/>
+            <div class="col-lg-12">
+                <textarea class="col-lg-12" style="display: block" id="input_str"></textarea>
+                <input id="submit_input_str" class="col-lg-12" type="submit" value="添加发言"/>
+            </div>
+            </div>
+            <div style="display: none" id="alias_div" class="col-lg-12">
+            <hr class="col-lg-12">
+            <input class="col-lg-9 col-lg-offset-1" placeholder="请输入要搜索的名字" id="search_alias" type="text"/><input  class="col-lg-2" type="button" id="begin_search_alias" value="搜索化名"/>
+            <hr class="col-lg-12">
+            <div id="my_robot_alias" class="col-lg-12" style="height:30em;max-height:30em;overflow: scroll;overflow-x: hidden">
+
+            </div>
+            <input id="submit_my_robot_alias" class="col-lg-12" type="submit" value="保存化名到数据库"/>
+            <div class="col-lg-12">
+                <textarea class="col-lg-12" style="display: block" id="input_alias"></textarea>
+                <input id="submit_input_alias" class="col-lg-12" type="submit" value="添加化名"/>
+            </div>
+            </div>
+        </div>
+        <!--
+        <div class="col-lg-5">
+            <h4 class="col-lg-12">备选发言库</h4>
+            <div class="col-lg-12"><input type="button" class="change_page" value="前一页"/>当前第<input type="text" id="page_number" style="width:2em"/>页<input class="change_page" type="button" value="后一页"/></div>
+            <ul id="old_dialog" class="col-lg-12">
+
+            </ul>
+            </div>
+        -->
+        </div>
+    </div>
+    </div>
+</div>
+
+</body>
+<script>
+    $(function(){
+     //定义变量
+        var job_id=$("#job_id").text();  //取工号
+        var max_page_number=0;         //定义最大页码
+        var not_find=[];    //搜索找到的未匹配的发言
+    //切换发言区和化名区
+    $(".my_title").hover(function(){$(this).css("cursor","pointer");},function(){}).each(function(){
+        $(this).click(function(){
+            var $this=$(this);
+            if($this.text().indexOf("发言")!=-1){
+                $("#dialog_div").css("display","block");
+                $("#alias_div").css("display","none");
+                $(".my_title").removeClass("btn-success");
+                $(".my_title").addClass("btn-default");
+                $this.addClass("btn-success");
+            }
+            else
+            {
+                $("#dialog_div").css("display","none");
+                $("#alias_div").css("display","block");
+                $(".my_title").removeClass("btn-success");
+                $(".my_title").addClass("btn-default");
+                $this.addClass("btn-success");
+                get_robot_alias_old();  //加载数据库的化名
+            }
+        });
+
+    });
+    //新建机器人配置文件事件
+    $("#new_robot").click(function(){
+        $("#input_robot_id").text("");
+        $("#input_robot_name").val("");
+    });
+    //定义一个读取发言库记录的方法。
+        function get_robot_dialog(job_id,page_number){
+            $.post("/query_dialog",{"job_id":job_id,"page_number":page_number},function(data){
+                var adata=data;
+                if(adata["message"]!="success"){
+                    alert(adata["message"]);
+                }
+                else{
+                     $("#old_dialog").empty();
+                    if(adata["page_count"]!=0){
+                        max_page_number=adata["page_count"];
+                        $("#page_number").val(1);
+                    }
+                    else{
+                        max_page_number=adata["page_count"];
+                        $("#page_number").val(0);
+                    }
+                    var temp_list=adata["data"];
+
+                    for(var i=0;i<temp_list.length;i++){
+                        //0.发言id 1，发言 2.机器人id 3.工号
+                        //console.log(temp_list[i])
+                        $("#old_dialog").append("<li>"+temp_list[i][1]+"</li>");
+                    }
+
+                }
+            });
+        }
+    //载入页面时，读取发言库里的第一页的查询
+        get_robot_dialog(job_id,0);
+    //给所有的移除按钮加上事件的方法
+    function remove_btn(){
+        $(".remove_my_str").each(function(){
+              var $this=$(this);
+              $this.click(function(){
+                  var parent=$this.parent();
+                  parent.attr("class","hide");
+              });
+        });
+    }
+    //前一页和后一页的方法
+    $(".change_page").click(function(){
+        var flag=$(this).val();      //当前按钮
+        var current_page=$("#page_number").val();  //当前页码
+        if(flag=="前一页" && current_page==1){
+            alert("已经是第一页了");
+        }
+        else if(flag=="前一页" && current_page>1 && current_page<=max_page_number){
+            get_robot_dialog(job_id,parseInt(current_page)-1);
+            $("#page_number").val(parseInt(current_page)-1);
+        }
+        else if(flag=="后一页" && current_page==max_page_number){
+            alert("已经是最后一页了");
+        }
+        else if(flag=="后一页" && current_page<max_page_number && current_page>=1){
+            get_robot_dialog(job_id,parseInt(current_page)+1);
+            $("#page_number").val(parseInt(current_page)+1);
+        }
+        else{
+            alert("something is error..");
+        }
+    });
+    //机器人配置区域事件
+        //月份
+    $("#every_month,#specify_month").click(function(){
+        var $this=$(this);
+        var the_id=$this.attr("id");
+        if(the_id=="specify_month"){
+            if($this.prop("checked")){
+                $("#month").attr("disabled",false);
+                $("#every_month").prop("checked",false);
+            }
+            else{
+                 $("#month").val('').attr("disabled",true);
+            }
+        }
+        else{
+            if($this.prop("checked")){
+                $("#month").val('').attr("disabled",true);
+                $("#specify_month").prop("checked",false);
+            }
+            else{
+                 //nothing...
+            }
+        }
+    });
+    //默认是每月
+    if($("#every_month").prop("checked")){
+        //nothing....
+        }
+    else{
+        $("#every_month").click();
+    }
+    //每月的天
+     $("#every_day,#specify_day").click(function(){
+         var $this=$(this);
+         var the_id=$this.attr("id");
+         if(the_id=='every_day'){
+             if($this.prop("checked")){
+                 $("#specify_day").prop("checked",false);
+                 $("#day").val('').attr("disabled",true);
+                 $("#every_week,#specify_week,#every_weekday,#specify_weekday").prop("checked",false).attr("disabled",true);
+                 $("#week,#weekday").val('').attr("disabled",true);
+             }
+             else{
+                 $("#every_week,#specify_week,#every_weekday,#specify_weekday").attr("disabled",false);
+                 $("#every_week,#every_weekday").prop("checked",true);
+             }
+         }
+         else{
+             if($this.prop("checked")){
+                 $("#day").attr("disabled",false);
+                 $("#every_day").prop("checked",false);
+             }
+             else{
+                 $("#day").attr("disabled",true);
+             }
+         }
+     });
+     //默认是每月的每天
+    if($("#every_day").prop("checked")){
+        //nothing....
+        }
+    else{
+        $("#every_day").click();
+    }
+    //每个周
+    $("#every_week,#specify_week").click(function(){
+        var $this=$(this);
+        var the_id=$this.attr("id");
+        if(the_id=="every_week"){
+            if($this.prop("checked")){
+                $("#specify_week").prop("checked",false);
+                $("#week").val("").attr("disabled",true);
+            }
+            else{
+                //nothing
+            }
+        }
+        else{
+            if($this.prop("checked")){
+                $("#every_week").prop("checked",false);
+                $("#week").attr("disabled",false);
+            }
+            else{
+                 $("#week").val('').attr("disabled",true);
+            }
+        }
+    });
+    //每周的每天
+    $("#every_weekday,#specify_weekday").click(function(){
+        var $this=$(this);
+        var the_id=$this.attr("id");
+        if(the_id=="every_weekday"){
+            if($this.prop("checked")){
+                $("#specify_weekday").prop("checked",false);
+                $("#weekday").val("").attr("disabled",true);
+            }
+            else{
+                //nothing.
+            }
+        }
+        else{
+            if($this.prop("checked")){
+                $("#every_weekday").prop("checked",false);
+                $("#weekday").attr("disabled",false);
+            }
+            else{
+                $("#weekday").val("").attr("disabled",true);
+            }
+        }
+    });
+    //机器人配置区域事件结束
+    //检查机器人配置是否合法的函数。
+    function check_config(){
+        if($.trim($("#input_robot_name").val())==""){
+            return "名字不能为空";
+        }
+        else{
+            if($("#every_month").prop("checked")==false && $("#month").val()==''){
+                if($("#every_week").prop("checked")==false && $("#week").val()==""){
+                    return "你还没设定日期";
+                }
+                else{
+                    if($("#every_weekday").prop("checked")==false && $("#weekday").val()==""){
+                        return "你还没有指定周几"
+                    }
+                    else{
+                        return true;
+                    }
+                }
+            }
+            else{
+                    if($("#every_day").prop("checked") || $("#day").val()!=""){
+                        return true;
+                    }
+                    else{
+                        if($("#every_week").prop("checked")==false && $("#week").val()==""){
+                        alert(1)
+                        return "你还没设定日期";
+                    }
+                    else{
+                        if($("#every_weekday").prop("checked")==false && $("#weekday").val()==""){
+                            return "你还没有指定周几"
+                        }
+                        else{
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //检查机器人配置是否合法的函数结束
+
+    //保存配置按钮事件
+    $("#save_config").click(function(){
+        var flag=check_config();
+        if(flag==true){
+            var url='';
+            var robot_id=0;
+            var robot_name= $.trim($("#input_robot_name").val());
+            var month=$("#every_month").prop("checked")?0:parseInt($("#month").val());
+            var weekday=($("#every_day").prop("checked") || $("#specify_day").prop("checked"))?0:1;
+            var week=($("#every_week").prop("checked") || $("#every_day").prop("checked") || $("#specify_day").prop("checked"))?0: parseInt($("#week").val());
+            var day=($("#every_day").prop("checked") || $("#specify_day").prop("checked"))?($("#every_day").prop("checked")?0:$("#day").val()):($("#every_weekday").prop("checked")?0:$("#weekday").val());
+             //开始时间的默认值
+            var  begin_time= (isNaN(parseInt($.trim($("#hour").val())))?"00":parseInt($.trim($("#hour").val())))+":"+(isNaN(parseInt($.trim($("#minute").val())))?"00":parseInt($.trim($("#minute").val())))+":"+(isNaN(parseInt($.trim($("#second").val())))?"00":parseInt($.trim($("#second").val())));
+            var end_time= isNaN(parseFloat($.trim($("#end_time").val())))?24:parseFloat($.trim($("#end_time").val()));  //默认发言总时长，单位小时
+            var step=parseInt($.trim($("#step").val()))<1?1:$.trim($("#step").val());     //默认发言间隔，单位秒
+            var robot_owner=$("#job_id").text();  //所有者id，也就是工号，字符串类型
+            var robot_status=$("#robot_status").text()==""?"stop":$("#robot_status").text();    //机器人状态。
+            //判断是添加新机器人还是修改旧机器人的配置
+            if($("#input_robot_id").text()==""){
+                //说明是新机器人
+                url="/operate_robot/add";
+            }
+            else{
+                url="/operate_robot/edit";
+                robot_id=parseInt($("#input_robot_id").text());
+            }
+            //(robot_id,robot_name,begin_day,begin_weekday,begin_week,begin_month,begin_time,end_time,step,robot_owner,robot_status
+            var post_data={"robot_id":robot_id,"robot_name":robot_name,"begin_day":day,"begin_weekday":weekday,"begin_week":week,"begin_month":month,"begin_time":begin_time,"end_time":end_time,"step":step,"robot_owner":robot_owner,"robot_status":robot_status};
+            $.post(url,post_data,function(data){
+                if(data["message"].indexOf("添加成功")!=-1){
+                    robot_id=parseInt(data["robot_id"]);
+                    alert(data["message"]);
+                }
+                else if(data["message"].indexOf("修改成功")!=-1){
+                    alert(data["message"]);
+                }
+                else{
+                    alert(data["message"]);
+                }
+                get_robot_list();//重新加载机器人列表
+            });
+        }
+        else{
+            alert(flag);
+        }
+    });
+    //定义点击tr时获取该机器人发言库并加载到my_robot_dialog容器的方法，此方法在提交发言库成功后也要被执行
+         function get_robot_dialog_old(robot_id){
+             $.post("/get_robot_dialog_list",{"robot_id":robot_id},function(data){
+                 var robot_dialog_list=data['data'];
+                 //console.log(robot_dialog_list);
+                 var obj=$("#my_robot_dialog");
+                 obj.empty();
+                 for(var i=0;i<robot_dialog_list.length;i++){
+                     //0.对话id 1.对话内容
+                     var temp_str="<p class='show'><span style='margin-right:2em' class='str_id'>"+robot_dialog_list[i][0]+"</span><span>"+robot_dialog_list[i][1]+"</span><button class='remove_my_str'>移除</button></p>";
+                     obj.append(temp_str);
+                 }
+                 remove_btn(); //给移除按钮加上事件
+             });
+         }
+    //定义加载页面时查询所有化名并加载到my_robot_alias容器的方法，此方法在提交发言库成功后也要被执行
+        function get_robot_alias_old(){
+            $.post("/robot_alias/view",function(data){
+                var robot_alias_list=data['data']?data['data']:[];
+                console.log(robot_alias_list);
+                var obj=$("#my_robot_alias");
+                obj.empty();
+                if(robot_alias_list.length>0){
+                    for(var i=0;i<robot_alias_list.length;i++){
+                    //0.对话id 1.对话内容
+                        var temp_str="<p class='show'><span style='margin-right:2em' class='alias_id'>"+robot_alias_list[i][0]+"</span><span>"+robot_alias_list[i][1]+"</span><button class='remove_my_str'>移除</button></p>";
+                        obj.append(temp_str);
+                    }
+                    remove_btn(); //给移除按钮加上事件
+                }
+                else{console.log("还没有任何化名");}
+            });
+        }
+        //加载机器人列表的函数，加载页面或者重载页面时应运行此函数
+    function get_robot_list(){
+        $.post("/operate_robot/view_robots",function(data){
+            var robots=data["data"];
+            var $table=$("#robot_table");
+            $table.find("tr:gt(0)").remove();
+            //console.log(robots);
+            for(var i=1;i<robots.length;i++){
+                var str="<tr>";
+                var temp=robots[i];
+                for(var j=0;j<temp.length;j++){
+                    var temp_str='';
+                    if(j==0){
+                        temp_str=("<td><span class='r_id'>"+temp[j]+"</span><input type='checkbox' style='margin-left:1em' class='sn'/></td>");
+                    }
+                    else{
+                        temp_str=("<td>"+temp[j]+"</td>");
+                    }
+                    str+=temp_str;
+                }
+                var but_str="<td class='stop_click'><button class='operate'>启动</button></td>";
+                str+=but_str;
+                str+="</tr>";
+                $table.append(str);
+            }
+            //操作按钮事件
+            $(".operate").each(function(){
+                var $this=$(this);
+                if($this.parent().prev().text()=='run'){
+                    $this.text("停止");
+                }
+                else{
+                    $this.text("启动");
+                }
+                $this.click(function(){
+                    var post_url="";
+                    //参数  robot_id,robot_name,begin_day,begin_weekday,begin_week,begin_month,begin_time,end_time,step
+                    var post_data={"robot_id":$this.parent().parent().children().eq(0).text(),"robot_name":$this.parent().parent().children().eq(1).text(),"begin_day":$this.parent().parent().children().eq(2).text(),
+                            "begin_weekday":$this.parent().parent().children().eq(3).text(),"begin_week":$this.parent().parent().children().eq(4).text(),"begin_month":$this.parent().parent().children().eq(5).text(),
+                            "begin_time":$this.parent().parent().children().eq(6).text(),"end_time":$this.parent().parent().children().eq(7).text(),"step":$this.parent().parent().children().eq(8).text()};
+                    if($this.text()=='启动'){
+                        post_url="/operate_robot/run";
+                        $.post(post_url,post_data,function(data){alert(data["message"]);});
+                        get_robot_list();  //运行此方法加载机器人列表
+                    }
+                    else{
+                        post_url="/operate_robot/stop";
+                        $.post(post_url,post_data,function(data){alert(data["message"]);});
+                        get_robot_list();  //运行此方法加载机器人列表
+                    }
+                });
+            });
+
+        //阻止操作按钮的click事件传播
+            $(".stop_click").click(function(){return false;});
+        //给tr加上事件，
+        $("table tr:first").nextAll().each(function() {
+            var $this = $(this);
+            $this.hover(function () {
+                $this.css("cursor", "pointer");
+            }, function () {
+            }).click(function(){
+                var robot_id=$(this).find("td").eq(0).text();
+                //console.log("robot_id is"+robot_id);
+                get_robot_dialog_old(robot_id);  //加载此机器人的发言列表
+                $("#input_robot_id").text($this.children().eq(0).text());
+                $("#input_robot_name").val($this.children().eq(1).text());
+                var weekday=$this.children().eq(3).text();
+                var week=$this.children().eq(4).text();
+                var day=$this.children().eq(2).text();
+                if(weekday==0){
+                    $("#every_week").prop("checked",false);
+                    $("#specify_week").prop("checked",false);
+                    $("#week").val("").attr("disabled",true);
+                    $("#every_weekday").prop("checked",false);
+                    $("#specify_weekday").prop("checked",false);
+                    $("#weekday").val("").attr("disabled",true);
+                    if(day==0){
+                        $("#every_day").prop("checked",false);
+                        $("#every_day").click();
+                    }
+                    else{
+                        $("#specify_day").prop("checked",false);
+                        $("#specify_day").click();
+                        $("#day").val(day);
+                    }
+                }
+                else{
+                    $("#every_day").prop("checked",false);
+                    $("#specify_day").prop("checked",false);
+                    $("#day").val('').attr("disabled",true);
+                    if(day==0){
+                        $("#every_weekday").prop("checked",false);
+                        $("#every_weekday").click();
+                    }
+                    else{
+                        $("#specify_weekday").prop("checked",false);
+                        $("#specify_weekday").click();
+                        $("#weekday").val(day);
+                    }
+                    if(week==0){
+                        $("#every_day").prop("checked",false);
+                        $("#every_day").click();
+                    }
+                    else{
+                        $("#specify_week").prop("checked",false);
+                        $("#specify_week").click();
+                        $("#week").val(week);
+                    }
+                }
+                $("#end_time").val($this.children().eq(7).text());
+                $("#step").val($this.children().eq(8).text());
+                $("#robot_status").text($this.children().eq(10).text());
+                var begin_time_list=$this.children().eq(6).text().split(":");
+                $("#hour").val(begin_time_list[0]);
+                $("#minute").val(begin_time_list[1]);
+                $("#second").val(begin_time_list[2]);
+            });
+        });
+        //get_robot_list方法的post   结束
+        });
+
+    }
+    get_robot_list();  //启动的时候运行此方法加载机器人列表
+    //点击输入框输入发言的时候，检测是否选定了机器人
+    ($("#input_str").focus(function(){
+        if($("#input_robot_id").text()==""){
+            alert("你还没选择/保存机器人配置");
+        }
+        else{}
+    }));
+    //把自定义的发言内容追加进去。
+     $("#submit_input_str").click(function(){
+         if($.trim($("#input_str").val())!=""){
+             var my_str_list_raw= $.trim($("#input_str").val()).split("\n");
+             var my_str_list=[];
+             for(var i=0;i<my_str_list_raw.length;i++){
+                 if($.trim(my_str_list_raw[i])!=""){
+                     my_str_list.push(my_str_list_raw[i]);
+                 }else{}
+             }
+             var my_str_obj=$("#my_robot_dialog");
+             var my_str_list_old=[];
+             var my_str_dict_old={};
+             for(var i=0;i<my_str_obj.find("p").length;i++){
+                 var temp_str=$(my_str_obj.find("p")[i]).find("span").eq(1).text();  //取发言的字符串
+                 my_str_list_old.push(temp_str);
+                 my_str_dict_old[temp_str]=my_str_obj.find("p")[i];
+             }
+             //console.log(my_str_list_old)
+             for(var i=0;i<my_str_list.length;i++){
+                 if(my_str_list_old.indexOf(my_str_list[i])!=-1){
+                     var temp_obj=my_str_dict_old[my_str_list[i]];
+                     //console.log(temp_obj);
+                     $(temp_obj).attr("class","show");
+                 }
+                 else{
+                     var temp_str="<p class='show'><span  style='margin-right:2em' class='str_id'></span><span>"+my_str_list[i]+"</span><button class='remove_my_str'>移除</button></p>";
+                     //console.log(temp_str);
+                     my_str_obj.append($(temp_str));
+                 }
+
+             }
+             $("#input_str").val("");
+
+             remove_btn();  //给所有的移除按钮加上事件
+
+         }
+         else{
+             alert("打个字吧");
+         }
+
+     });
+    //把自定义的别名内容追加进去。
+     $("#submit_input_alias").click(function(){
+         if($.trim($("#input_alias").val())!=""){
+             var my_alias_list_raw= $.trim($("#input_alias").val()).split("\n");
+             var my_alias_list=[];
+             for(var i=0;i<my_alias_list_raw.length;i++){
+                 if($.trim(my_alias_list_raw[i])!="" && $.trim(my_alias_list_raw[i]).length<=8){
+                     my_alias_list.push(my_alias_list_raw[i]);
+                 }else
+                 {
+                     alert("'"+$.trim(my_alias_list_raw[i])+" '的长度"+($.trim(my_alias_list_raw[i]).length>8?"过长":"过短")+",不能做化名使用");
+                     return false;
+                 }
+             }
+             var my_alias_obj=$("#my_robot_alias");
+             var my_alias_list_old=[];
+             var my_alias_dict_old={};
+             console.log(my_alias_obj.find("p").length)
+             for(var i=0;i<my_alias_obj.find("p").length;i++){
+                 var temp_str=$(my_alias_obj.find("p")[i]).find("span").eq(1).text();  //取别名的字符串
+                 my_alias_list_old.push(temp_str);
+                 my_alias_dict_old[temp_str]=my_alias_obj.find("p")[i];
+             }
+             //console.log(my_alias_list_old);
+             for(var i=0;i<my_alias_list.length;i++){
+                 if(my_alias_list_old.indexOf(my_alias_list[i])!=-1){
+                     var temp_obj=my_alias_dict_old[my_alias_list[i]];
+                     //console.log(temp_obj);
+                     $(temp_obj).attr("class","show");
+                 }
+                 else{
+                     var temp_str="<p class='show'><span  style='margin-right:2em' class='alias_id'></span><span>"+my_alias_list[i]+"</span><button class='remove_my_str'>移除</button></p>";
+                     //console.log(temp_str);
+                     my_alias_obj.append($(temp_str));
+                 }
+
+             }
+             $("#input_alias").val("");
+
+             remove_btn();  //给所有的移除按钮加上事件
+
+         }
+         else{
+             alert("化名不能为空");
+         }
+
+     });
+     //保存机器人的发言库到后台
+     $("#submit_my_robot_dialog").click(function(){
+         if($("#my_robot_dialog").children().size()==0){
+             alert("发言库为空，无需保存");
+         }
+         else{
+             var dialog_list_p=$("#my_robot_dialog").find("p");
+             //console.log(dialog_list_p.length);
+             var my_dialog_list=[];  //追加的化名
+             var delete_list=[];    //被删除的化名的id
+             for(var i=0;i<dialog_list_p.length;i++){
+                 var temp_obj=$(dialog_list_p[i]);
+                 if(temp_obj.attr("class")=="hide" && temp_obj.find(".str_id").text()!=""){
+                     delete_list.push(temp_obj.find(".str_id").text());
+                 }
+                 else if(temp_obj.attr("class")=="show" && temp_obj.find(".str_id").text()==""){
+                     my_dialog_list.push(temp_obj.find(".str_id").next().text());
+                 }
+                 else{}
+             }
+             var owner_id=$("#job_id").text();
+             var robot_id=$("#input_robot_id").text();
+             if(owner_id==""){
+                 alert("你还没有登录");
+             }
+             else if(robot_id==""){
+                 alert("你还没选定机器人");
+             }
+             else{
+                 //console.log(my_dialog_list);
+                 $.post("/update_robot_dialog",{"robot_id":robot_id,"owner_id":owner_id,"str_list":JSON.stringify(my_dialog_list),"delete_list":JSON.stringify(delete_list)},function(data){
+                     alert(data["message"]);
+                     get_robot_dialog_old(robot_id);  //重新加载此机器人的别名列表
+                 });
+             }
+         }
+     });
+     //保存机器人的别名库到后台
+     $("#submit_my_robot_alias").click(function(){
+         if($("#my_robot_alias").children().size()==0){
+             alert("化名库为空，无需保存");
+         }
+         else{
+             var alias_list_p=$("#my_robot_alias").find("p");
+             var my_alias_list=[];  //追加的化名
+             var delete_list=[];    //被删除的化名的id
+             for(var i=0;i<alias_list_p.length;i++){
+                 var temp_obj=$(alias_list_p[i]);
+                 console.log(temp_obj)
+                 if(temp_obj.attr("class")=="hide" && temp_obj.find(".alias_id").text()!=""){
+                     delete_list.push(temp_obj.find(".alias_id").text());
+                 }
+                 else if(temp_obj.attr("class")=="show" && temp_obj.find(".alias_id").text()==""){
+                     my_alias_list.push(temp_obj.find(".alias_id").next().text());
+                 }
+                 else{}
+             }
+             var owner_id=$("#job_id").text();
+             if(owner_id==""){
+                 alert("你还没有登录");
+             }
+             else{
+                 //console.log(my_alias_list);
+                 $.post("/robot_alias/update",{"alias_list":JSON.stringify(my_alias_list),"delete_list":JSON.stringify(delete_list)},function(data){
+                     alert(data["message"]);
+                     get_robot_alias_old();  //重新加载化名列表
+                 });
+             }
+         }
+     });
+    //发言搜索按钮的事件
+     $("#begin_search").click(function(){
+         var key_word= $.trim($("#search_word").val());
+         if(key_word==""){
+             alert("搜索关键字不能为空");
+         }
+         else{
+             reset_dialog();//重置化名的显示状态。
+             var $p=$("#my_robot_dialog>p");
+             $p.each(function(){
+                 var $this=$(this);
+                 if($this.children().eq(1).text().toLowerCase().indexOf(key_word.toLowerCase())==-1 && $this.attr("class")=="show"){
+                     $this.attr("class","hide");
+                     not_find.push($this);
+                 }
+                 else
+                 {
+                     //nothing
+                 }
+             });
+         }
+     });
+     //发言搜索关键字输入框回车事件
+     $("#search_word").keydown(function(eve){
+         if(eve.key=="Enter"){
+             $("#begin_search").click();
+         }else{}
+     });
+     //化名搜索按钮的事件
+     var not_find_alias=[];
+     $("#begin_search_alias").click(function(){
+         var key_alias= $.trim($("#search_alias").val());
+         if(key_alias==""){
+             alert("搜索关键字不能为空");
+         }
+         else{
+             reset_alias();//重置化名的显示状态。
+             var $p=$("#my_robot_alias>p");
+             $p.each(function(){
+                 var $this=$(this);
+                 if($this.children().eq(1).text().toLowerCase().indexOf(key_alias.toLowerCase())==-1 && $this.attr("class")=="show"){
+                     $this.attr("class","hide");
+                     not_find_alias.push($this);
+
+                 }
+                 else
+                 {
+                     //nothing
+                 }
+             });
+         }
+     });
+     //化名搜索关键字输入框回车事件
+     $("#search_alias").keydown(function(eve){
+         if(eve.key=="Enter"){
+             $("#begin_search_alias").click();
+         }else{}
+     });
+     //释放搜索时被隐藏的发言的函数
+     function reset_dialog(){
+         $(not_find).each(function(){$(this).attr("class","show");});
+     }
+     //监听搜索关键字的变化
+     $("#search_word").keyup(function(){
+         if($.trim($(this).val()).length==0){
+             reset_dialog();
+         }else{}
+     });
+     //释放搜索时被隐藏的化名的函数
+     function reset_alias(){
+         $(not_find_alias).each(function(){$(this).attr("class","show");});
+     }
+     //监听搜索别名的变化
+     $("#search_alias").keyup(function(){
+         if($.trim($(this).val()).length==0){
+             reset_alias();
+         }else{}
+     });
+        //end.....
+    });
+</script>
+</html>

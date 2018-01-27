@@ -1,0 +1,102 @@
+2017-12-03 12:40:21,696 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-03 12:40:21,766 server.py[line:298] INFO 
+2017-12-03 13:46:48,238 server.py[line:206] INFO 
+2017-12-03 13:46:48,239 server.py[line:206] INFO 
+2017-12-03 13:46:48,239 server.py[line:206] INFO 
+2017-12-03 13:46:48,240 server.py[line:206] INFO 
+2017-12-03 13:47:47,604 handlers.py[line:104] ERROR NoneType
+
+2017-12-03 13:47:47,645 server.py[line:298] INFO 
+2017-12-03 13:47:47,646 handlers.py[line:104] ERROR NoneType
+
+2017-12-03 13:47:47,647 server.py[line:298] INFO 
+2017-12-03 13:47:47,648 handlers.py[line:104] ERROR NoneType
+
+2017-12-03 13:47:47,649 server.py[line:298] INFO 
+2017-12-03 13:47:47,649 handlers.py[line:104] ERROR NoneType
+
+2017-12-03 13:47:47,650 server.py[line:298] INFO 
+2017-12-03 13:51:14,270 server.py[line:206] INFO 
+2017-12-03 13:51:14,272 server.py[line:206] INFO 
+2017-12-03 13:51:14,314 server.py[line:206] INFO 
+2017-12-03 13:51:14,442 server.py[line:206] INFO 
+2017-12-03 13:51:40,847 server.py[line:206] INFO 
+2017-12-03 13:51:42,698 server.py[line:206] INFO 
+2017-12-03 13:51:42,856 server.py[line:206] INFO 
+2017-12-03 13:52:14,253 handlers.py[line:104] ERROR NoneType
+
+2017-12-03 13:52:14,255 server.py[line:298] INFO 
+2017-12-03 13:52:43,216 handlers.py[line:104] ERROR NoneType
+
+2017-12-03 13:52:43,217 server.py[line:298] INFO 
+2017-12-03 13:55:02,695 server.py[line:206] INFO 
+2017-12-03 13:55:04,424 server.py[line:206] INFO 
+2017-12-03 13:55:04,484 server.py[line:206] INFO 
+2017-12-03 13:55:05,620 server.py[line:206] INFO 
+2017-12-03 13:55:05,674 server.py[line:206] INFO 
+2017-12-03 13:55:05,749 server.py[line:206] INFO 
+2017-12-03 13:55:10,981 server.py[line:206] INFO 
+2017-12-03 13:55:11,090 server.py[line:206] INFO 
+2017-12-03 13:55:11,137 server.py[line:206] INFO 
+2017-12-03 13:56:11,309 handlers.py[line:104] ERROR NoneType
+
+2017-12-03 13:56:11,309 server.py[line:298] INFO 
+2017-12-03 17:25:56,195 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-03 17:25:56,265 server.py[line:298] INFO 
+2017-12-03 18:14:52,417 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-03 18:14:52,430 server.py[line:298] INFO 
+2017-12-03 19:09:05,145 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-03 19:09:05,190 server.py[line:298] INFO 
+2017-12-04 01:04:46,631 server.py[line:206] INFO 
+2017-12-04 02:17:17,137 server.py[line:206] INFO 
+2017-12-04 02:42:40,023 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-04 02:42:40,036 server.py[line:298] INFO 
+2017-12-04 03:07:07,349 server.py[line:206] INFO 
+2017-12-04 03:07:10,032 server.py[line:206] INFO 
+2017-12-04 05:57:53,166 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-04 05:57:53,166 server.py[line:298] INFO 
+2017-12-04 06:29:35,815 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-04 06:29:35,817 server.py[line:298] INFO 
+2017-12-04 09:01:58,296 handlers.py[line:104] ERROR Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/sanic/server.py", line 151, in data_received
+    self.parser.feed_data(data)
+  File "httptools/parser/parser.pyx", line 171, in httptools.parser.parser.HttpParser.feed_data (httptools/parser/parser.c:2721)
+httptools.parser.errors.HttpParserInvalidMethodError: invalid HTTP method
+
+2017-12-04 09:01:58,318 server.py[line:298] INFO 
+2017-12-04 09:26:34,424 server.py[line:452] INFO Stopping worker [1150]
