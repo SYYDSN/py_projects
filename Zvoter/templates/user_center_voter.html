@@ -1,0 +1,284 @@
+{% extends "standard_template.html" %}
+{% block extend_css %}
+    <link rel="stylesheet" href="../static/css/user_center_voter.css">
+{% endblock %}
+{% block extend_js %}
+    <script src="../static/js/laydate.js"></script>
+    <script src="../static/js/jquery.md5.js"></script>
+    <script src="../static/js/user_center_voter.js"></script>
+{% endblock %}
+{% block main %}
+
+    <div class="row">
+        <div class="main_content col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12">
+            <!--mini导航部分开始-->
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse"
+                                data-target="#example-navbar-collapse">
+                            <span class="sr-only">切换导航</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">个人中心</a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="example-navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="/user_center_info">个人资料</a></li>
+                            <li class="active"><a href="/user_center_voter">投票动态</a></li>
+                            <li><a href="/user_center_notification">消息中心</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <!--mini导航部分结束-->
+            <div class="row">
+                <!--左侧信息开始-->
+                <div class="left_area col-lg-4 col-md-4 col-sm-4 hidden-xs">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <img class="img img-circle" id="user_img" src="{{ user_img_url }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="base_info col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="base_info_label">昵称：</div>
+                                    <div >{{user_info.user_nickname}}</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="base_info_label">登录名：</div>
+                                    <div >{{user_info.user_phone}}</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="base_info_label">性别：</div>
+                                    <div >{{user_info.user_sex if user_info.user_sex != '' else '保密'}}</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="base_info_label">等级：</div>
+                                    <div >LV {{user_level}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--最新投票结束-->
+                    <div class="row">
+                        <div class="my_list col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="list_title">最新投票</div>
+                            <div class="list_more"><a>更多 >></a></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <hr class="channel_line">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <ul class="my_ul">
+                                <li class="list_li">我是标是标题我是标题</li>
+                                <li class="list_li">我是标题我是标题题我是标题</li>
+                                <li class="list_li">我是标题我是标题我是标题我是标题</li>
+                                <li class="list_li">我是标题我是标题我是标题是标题</li>
+                                <li class="list_li">我是标是标题我是标题我是标题</li>
+                                <li class="list_li">我是标题我是标题我是标题</li>
+                                <li class="list_li">我是标题我是标题我是标题我是标题</li>
+                                <li class="list_li">w#######</li>
+                                <li class="list_li">我是标题我是标题题我是标题</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!--最新投票结束-->
+
+                    <!--扫码投票开始-->
+                    <div class="row">
+                        <div class="my_scan margin_top_60 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <img src="../static/image/scan_me.png"> 扫一扫 手机投票还能抽奖！
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="my_scan col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <img class="img img-responsive" src="../static/image/weixin_pic.png">
+                        </div>
+                    </div>
+                    <!--扫码投票结束-->
+
+                </div>
+                <!--左侧信息结束-->
+
+                <!--中间主区域开始-->
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                    <!--主区域小导航开始-->
+                    <div class="row">
+                        <div class="receive_line1 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div id="joined" class="item">我参与的 ({{ count_of_joined_topics }})</div>
+                            <div class="grey_sep">灰色分割</div>
+                            <div id="created" class="item">我发布的 ({{ count_of_created_topics }})</div>
+                        </div>
+                    </div>
+                    <!--主区域小导航结束-->
+                    <hr class="row_sep">
+
+                    <!--我参与的-->
+                    <div id="joined_panel" class="row">
+                        {% for topic in joined_topics %}
+                        {% if loop.index0 == 0 or loop.index0 == loop.length / 2 %}
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        {% endif %}
+                            <div class="row">
+                                <div class="topic col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <img src="../static/image/icon_hot_red.png">
+                                    {{topic.top_title}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="row">
+                                        <div class="topic_main col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <img class="img_a img" src=
+                                                    "{{topic.img_url_a if topic.img_url_a!='' else '../static/image/topic_img_a.png'}}">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="point_str col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            A.{{topic.viewpoint_a}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="row">
+                                        <div class="topic_main col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <img class="img_b img" src=
+                                                    "{{topic.img_url_b if topic.img_url_b!='' else '../static/image/topic_img_b.png'}}">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="point_str col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            B.{{topic.viewpoint_b}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <hr class="my_sep">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="about_data col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <img src="../static/image/icon_message.png">
+                                    <div class="about_num">
+                                        1574
+                                    </div>
+                                    <img src="../static/image/icon_hot.png">
+                                    <div class="about_num">
+                                        824
+                                    </div>
+                                    <div class="about_num about_right">
+                                        争议指数：
+                                        <img src="../static/image/icon_dispute.png">
+                                        <img src="../static/image/icon_dispute.png">
+                                        <img src="../static/image/icon_dispute.png">
+                                    </div>
+                                </div>
+                            </div>
+                        {% if loop.index0 == loop.length / 2 - 1 or loop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <!--我参与的-->
+
+
+                    <!--我发布的-->
+                    <div id="created_panel" class="row">
+                        {% for topic in created_topics %}
+                        {% if loop.index0 == 0 or loop.index0 == loop.length / 2 %}
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            {% endif %}
+                            <div class="row">
+                                <div class="topic col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <img src="../static/image/icon_hot_red.png">
+                                    {{topic.top_title}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="row">
+                                        <div class="topic_main col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <img class="img_a img" src=
+                                                    "{{topic.img_url_a if topic.img_url_a!='' else '../static/image/topic_img_a.png'}}">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="point_str col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            A.{{topic.viewpoint_a}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="row">
+                                        <div class="topic_main col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <img class="img_b img" src=
+                                                    "{{topic.img_url_b if topic.img_url_b!='' else '../static/image/topic_img_b.png'}}">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="point_str col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            B.{{topic.viewpoint_b}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <hr class="my_sep">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="about_data col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <img src="../static/image/icon_message.png">
+                                    <div class="about_num">
+                                        1574
+                                    </div>
+                                    <img src="../static/image/icon_hot.png">
+                                    <div class="about_num">
+                                        824
+                                    </div>
+                                    <div class="about_num about_right">
+                                        争议指数：
+                                        <img src="../static/image/icon_dispute.png">
+                                        <img src="../static/image/icon_dispute.png">
+                                        <img src="../static/image/icon_dispute.png">
+                                    </div>
+                                </div>
+                            </div>
+                            {% if loop.index0 == loop.length / 2 - 1 or loop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <!--我发布的-->
+
+
+                </div>
+                <!--中间主区域开始-->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block bottom %}
+    <!--瀑布流，不需要底部-->
+{% endblock %}
