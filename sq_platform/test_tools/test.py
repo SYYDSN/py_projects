@@ -1,27 +1,26 @@
-import datetime
-import random
+#  -*- coding: utf-8 -*-
+import mongo_db
 from uuid import uuid4
+import datetime
 
 
-d1 = {"key": "value"}
-d11 = {"value": "key"}
-d2 = {}
-d22 = {}
-for x in range(10 * 10):
-    key = uuid4().hex
-    val = uuid4().hex
-    d2[key] = val
-    d2[val] = key
-d2.update(d1)
-d22.update(d11)
-b = datetime.datetime.now()
-x = d2['key']
+class X(mongo_db.BaseDoc):
+    _table_name = "test2"
+    type_dict = dict()
+    type_dict["_id"] = mongo_db.ObjectId
+    type_dict['uuid'] = uuid4()
+    type_dict['create_date'] = datetime.datetime
+
+    def __init__(self, **kwargs):
+        if "create_date"not in kwargs:
+            kwargs['create_date'] = datetime.datetime.now()
+        super(X, self).__init__(**kwargs)
+
+
+# for i in range(10):
+#     xs = [X().to_flat_dict() for x in range(10000)]
+#     X.insert_many(xs)
+#     print(i)
+
+x = X.find_one()
 print(x)
-e = datetime.datetime.now()
-print((e - b).total_seconds())
-b = datetime.datetime.now()
-k = d22["value"]
-x = d2[k]
-print(x)
-e = datetime.datetime.now()
-print((e - b).total_seconds())
