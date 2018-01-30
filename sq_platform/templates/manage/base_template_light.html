@@ -20,7 +20,7 @@
     <script src="{{ url_for('static', filename='../static/js/bootstrap.min.js') }}"></script>
     <!--自定义字体图标-->
     <script src="../static/js/icon/iconfont.js"></script>
-    <!--自定义预警灯字体图脚本-->
+    <!--自定义通用脚本-->
     <script src="{{ url_for('static', filename='../static/js/common.js') }}"></script>
     <script src="{{ url_for('static', filename='../static/js/manage/base_template_light.js') }}"></script>
 </head>
@@ -33,25 +33,65 @@
             </svg>
             <span>首页</span>
         </a></li>
-        <li><a href="driver_list">
+        <li>
+            <a href="driver_list">
             <svg class="nav_icon" aria-hidden="true">
               <use xlink:href="#icon-icon_liebiao"></use>
             </svg>
             <span>司机列表</span>
-        </a></li>
-        <!--<li><a href="report_page"><i class="iconfont icon-tongjifenxi"></i> <span>报表</span></a></li>-->
-        <!--未完成,需要ai模块支持-->
-        <li><a href="#">
-            <i class="iconfont icon-tongjifenxi"></i>
-            <span>报表</span>
-        </a></li>
-        <li><a href="show_track"><i class="iconfont icon-guiji"></i> <span>轨迹回放</span></a></li>
-        <li><a href="#">
+            </a>
+        </li>
+        <li>
+            <a href="data_chart">
+            <svg class="nav_icon" aria-hidden="true">
+              <use xlink:href="#icon-icon_baobiao"></use>
+            </svg>
+            <span>数据报表</span>
+            </a>
+        </li>
+        <li>
+            <a href="show_track">
+            <svg class="nav_icon" aria-hidden="true">
+              <use xlink:href="#icon-icon_guiji"></use>
+            </svg>
+            <span>行驶轨迹</span>
+            </a>
+        </li>
+        <li>
+            <a href="warning">
             <svg class="nav_icon" aria-hidden="true">
               <use xlink:href="#icon-icon_yujing"></use>
             </svg>
-            <span>预警记录</span>
-        </a></li>
+            <span>行驶轨迹</span>
+            </a>
+        </li>
+        <li>
+            <a href="accident">
+            <svg class="nav_icon" aria-hidden="true">
+              <use xlink:href="#icon-icon_shangbao"></use>
+            </svg>
+            <span>事故上报</span>
+            </a>
+        </li>
+        <li>
+            <a href="violation">
+            <svg class="nav_icon" aria-hidden="true">
+              <use xlink:href="#icon-icon_weizhang"></use>
+            </svg>
+            <span>违章记录</span>
+            </a>
+        </li>
+        <li>
+            <a href="organization">
+            <svg class="nav_icon" aria-hidden="true">
+              <use xlink:href="#icon-icon_zuzhijiagou"></use>
+            </svg>
+            <span>违章记录</span>
+            </a>
+        </li>
+
+
+
         <li><a href="javascript:;"><i class="fa fa-power-off" aria-hidden="true"></i><span id="logout_btn">注销</span></a></li>
     </ul>
 </div>

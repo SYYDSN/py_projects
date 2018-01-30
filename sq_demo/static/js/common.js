@@ -150,7 +150,7 @@ compare_hour_and_minute_str = function (a, b) {
 };
 
 /*扩展字符串的方法,增加startsWith和endsWith两个方法(并非所有的浏览器都有这两个方法) */
-    if (typeof(String.prototype.startsWith !== "functin")) {
+    if (typeof(String.prototype.startsWith !== "function")) {
         String.prototype.startsWith = function(key_str) {
             console.log("extend function");
             var l2 = key_str.length;
@@ -163,7 +163,7 @@ compare_hour_and_minute_str = function (a, b) {
         };
     }
 
-    if (typeof(String.prototype.endsWith !== "functin")) {
+    if (typeof(String.prototype.endsWith !== "function")) {
         String.prototype.endsWith = function(key_str) {
             console.log("extend function");
             var l = this.length;
