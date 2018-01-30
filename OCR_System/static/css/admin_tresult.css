@@ -1,0 +1,17 @@
+.inline{
+    display: inline-block;
+}
+#ticket_count{
+    display: inline-block;
+    float:right;
+}
+.small_nav{
+    padding-top:5px;
+    padding-bottom:5px;
+}
+.small_nav span{
+    color: gray;
+}
+.search_bar{
+    padding:5px;
+}

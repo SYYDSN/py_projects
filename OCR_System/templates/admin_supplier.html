@@ -1,0 +1,210 @@
+{% extends "admin_template.html" %}
+{% block extend_js %}
+<script src="../static/js/admin_supplier.js"></script>
+{% endblock %}
+{% block extend_css %}
+<link rel="stylesheet" href="../static/css/admin_supplier.css">
+{% endblock %}
+{% block main %}
+<div class="col-lg-12 col-md-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div style="display:none" id="user_count">{{ user_count }}</div><button id="add_btn" onclick="add_user()" class="btn btn-primary btn-xs">添加</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <table id="user_table" class="table table-hover">
+                <tr>
+                    <th>用户名</th>
+                    <th>公司</th>
+                    <th>联系人</th>
+                    <th>联系方式</th>
+                    <th>mail</th>
+                    <th>结算日</th>
+                    <th>结算时效</th>
+                    <th>SFTP</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                {% for user in user_data %}
+                <tr id="group_{{ user.group_sn }}">
+                    <td data-type="item"  class="user_name">{{ user.user_name }}</td>
+                    <td data-type="item"  style="display:none" class="company_name">{{ user.company_name }}</td>
+                    <td data-type="item"  style="display:none" class="user_password">{{ user.user_password }}</td>
+                    <td data-type="item"  class="company_alias">{{ user.company_alias }}</td>
+                    <td data-type="item"  class="contacts">{{ user.contacts }}</td>
+                    <td data-type="item"  class="contacts_phone">{{ user.contacts_phone }}</td>
+                    <td data-type="item"  class="contacts_email">{{ user.contacts_email }}</td>
+                    <td data-type="item"  style="display:none" class="info_email">{{ user.info_email }}</td>
+                    <td data-type="item"  class="calc_date">{{ user.calc_date }}</td>
+                    <td data-type="item"  class="data_delay">{{ user.data_delay }}</td>
+                    <td data-type="item"  class="sftp"><a onclick="show_sftp({{ user.group_sn }})" href="#">查看</a></td>
+                    <td>{{ "正常" if user.group_status else "禁用" }}</td>
+                    <td>
+                    <div class="btn-group btn-group-xs" role="group">
+                        {% if not user.group_status %}
+                            <div class="btn-group btn btn-default up_user" role="group" data-id="{{ user.group_sn }}" onclick="up_user($(this))">启用</div>
+                        {% else %}
+                            <div class="btn-group btn btn-default down_user" role="group"  data-id="{{ user.group_sn }}" onclick="down_user($(this))">禁用</div>
+                        {% endif %}
+                        <div class="btn-group btn btn-default drop_user" role="group"  data-id="{{ user.group_sn }}" onclick="drop_user($(this))">删除</div>
+                        <div class="btn-group btn btn-default drop_user" role="group"  data-id="{{ user.group_sn }}" onclick="edit_user($(this))">编辑</div>
+                    </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <!-- 底部分页 -->
+    <div class="row text-center">
+        <nav aria-label>
+            <ul id="page_list" class="pagination">
+                <li class="{{ 'disabled' if index_range[0] == 1 else '' }}"><a  href="/manage_users?index={{ prev_index }}"  aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                {% for index in index_range %}
+                <li class="{{ 'active' if index == current_index else '' }}">
+                    <a href="/manage_users?index={{ index }}">{{ index }}</a>
+                </li>
+                {% endfor %}
+                <li  class="{{ 'disabled' if index_range[-1] == max_index else '' }}"><a  href="/manage_users?index={{ next_index }}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+    <!--模态框-->
+    <button id="pop_modal" style="display: none" type="button" class="btn btn-primary btn-lg" data-toggle="modal"
+            data-target="#myModal">
+        Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" style="text-align: center" id="myModalLabel">编辑供应商信息</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+
+                        <tr>
+                            <td>
+                               <label for="company_name">公司名</label>
+                            </td>
+                            <td>
+                                <input type="text"  id="company_name" placeholder="请输入公司全称">
+                                <input type="hidden"  id="group_sn">
+                            </td>
+                            <td>
+                                <label for="company_alias">简称</label>
+                            </td>
+                            <td>
+                                <input type="text" id="company_alias" placeholder="公司简称">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                               <label for="user_name">用户名</label>
+                            </td>
+                            <td>
+                                <input type="text"  id="user_name" placeholder="不可重复">
+                            </td>
+                            <td>
+                                <label for="user_password">用户密码</label>
+                            </td>
+                            <td>
+                                <input type="text" id="user_password" placeholder="请设置用户密码">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                               <label for="contacts">联系人</label>
+                            </td>
+                            <td>
+                                <input type="text"  id="contacts" placeholder="请输入联系人姓名">
+                            </td>
+                            <td>
+                                <label for="contacts_phone">电话</label>
+                            </td>
+                            <td>
+                                <input type="text" id="contacts_phone" placeholder="联系人电话">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                               <label for="contacts_email">联系邮箱</label>
+                            </td>
+                            <td>
+                                <input type="text"  id="contacts_email" placeholder="联系人邮箱">
+                            </td>
+                            <td>
+                                <label for="info_email">通知邮箱</label>
+                            </td>
+                            <td>
+                                <input type="text" id="info_email" placeholder="用于接收消息的邮箱">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                               <label for="calc_date">结算日</label>
+                            </td>
+                            <td>
+                                <input type="text"  id="calc_date" placeholder="每月几号结算？">
+                            </td>
+                            <td>
+                                <label for="data_delay">时效</label>
+                            </td>
+                            <td>
+                                <input type="text" id="data_delay" placeholder="T+6？">
+                            </td>
+                        </tr>
+
+                    </table>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button id="close_user" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="save_user" type="button" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--模态框结束-->
+    <!--SFTP信息弹出框-->
+    <div class="sftp-outer">
+        <div class="sftp-inner">
+            <h4 class="h4 blue">
+                SFTP 相关信息
+            </h4>
+            <table class="table table-striped">
+                <tr>
+                    <td class="blue">SFT地址</td>
+                    <td id="ip"></td>
+                </tr>
+                 <tr>
+                    <td class="blue">SFTP端口</td>
+                    <td id="port"></td>
+                </tr>
+                <tr>
+                    <td class="blue">SFTP账户</td>
+                    <td id="account_name"></td>
+                </tr>
+                 <tr>
+                    <td class="blue">SFTP密码</td>
+                    <td id="account_password"></td>
+                </tr>
+                 <tr>
+                    <td class="blue">Token</td>
+                    <td id="token"></td>
+                </tr>
+            </table>
+            <button class="btn btn-primary btn-md" id="close_sftp_div">关闭</button>
+        </div>
+    </div>
+    <!--SFTP信息弹出框结束-->
+{% endblock %}

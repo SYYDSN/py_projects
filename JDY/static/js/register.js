@@ -259,7 +259,7 @@ init_reg = function(seconds, style_class){
                 console.log("register...");
                 // 尝试提取查询的关键词比如交易所名称,关键词的类都是 search_keyword
                 var search_keyword = '';
-                $("search_keyword").each(function(){
+                $(".search_keyword").each(function(){
                     var $this = $(this);
                     search_keyword += $.trim($this[0].tagName.toUpperCase() === "INPUT"?$this.val(): $this.text());
                 });

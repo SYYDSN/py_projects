@@ -1,0 +1,27 @@
+{% extends "standard_template.html" %}
+{% block main %}
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset1 col-md-10 col-md-offset-1">
+            <image class="img img-responsive" src="{{ url }}">
+            <table style="width:100%;text-align: center" class="table table-hover">
+
+                {% for k, v in data.items() %}
+                    <tr>
+                        <td style="min-width: 150px">{{ key_dict[k] }}</td>
+                        {% if k in ("p_class", "p_detail") %}
+                            {% for x in v %}
+                                {% for k1, v2 in x.items() %}
+                                    {{ key_dict[k1] }}: {{ v2 }}
+                                {% endfor %}
+                                <br>
+                            {% endfor %}
+                        {% else %}
+                        <td>{{ v }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
