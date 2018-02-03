@@ -27,6 +27,7 @@ def to_jiandao_cloud(**kwargs) -> dict:
     display.start()   # 开启虚拟显示器
 
     """
+    注意，pyvirtualdisplay需要xvfb支持。安装方法：sudo apt-get install xvfb
     下载火狐的geckodriver驱动。地址是：
     https://github.com/mozilla/geckodriver/releases
     下载后解压是一个geckodriver 文件。拷贝到/usr/local/bin目录下，然后加上可执行的权限
