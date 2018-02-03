@@ -45,16 +45,23 @@ func_dict = {}; //  全局函数字典
 var reg_url = "http://39.108.67.178:9000/register";  // 注册链接
 // var reg_url = "http://127.0.0.1:9000/register";  // 注册链接
 var sms_url = "http://39.108.67.178:9000/send_sms";   // 短信链接
-// var sms_url = "/send_sms";   // 短信链接
+// var sms_url = "http://127.0.0.1:9000/send_sms";   // 短信链接
 // console.log(csrf_token);                         // csrf_token有flask-wtf生成
 
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
-        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrf_token);  // 设置标准请求头
+        console.log(settings);
+        console.log(this);
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
+        // if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-Auth-Token", csrf_token);  // 设置标准请求头
+            console.log("请求头设置完毕")
+        }
+        else{
+             console.log("无法设置请求头")
         }
     }
-})
+});
 
 // 注册一个函数
 add_func = function (func_name, func) {

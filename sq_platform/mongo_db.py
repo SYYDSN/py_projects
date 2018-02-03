@@ -35,11 +35,12 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 mongodb_setting = {
     "host": "safego.org:20000",   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
-    "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
+    "maxPoolSize": 800,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
-    "waitQueueTimeoutMS": 50,  #
+    "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
+    "readPreference": "secondaryPreferred",  # 读偏好,优先从盘
     "username": user,       # 用户名
     "password": password    # 密码
 }
@@ -49,8 +50,8 @@ mongodb_setting = {
 replica_hosts = [
     {"host": "safego.org", "port": 27017},
     {"host": "safego.org", "port": 20000},
-    {"host": "git.safego.org", "port": 7174},
-    {"host": "git.safego.org", "port": 8184}
+    {"host": "pltf.safego.org", "port": 7174},
+    {"host": "pltf.safego.org", "port": 8184}
     ]
 
 
@@ -1246,6 +1247,7 @@ class BaseDoc:
             return list()
         else:
             is_instance = isinstance(doc_list[0], cls)
+            """如果是实例的数组,那就转成"""
             doc_list = doc_list if is_instance else [cls(**doc).__dict__ for doc in doc_list]  # 可以把实例的数组转成doc/dict的数组.
             success_doc_list = cls.insert_many_and_return_doc(input_list=doc_list)
             return success_doc_list

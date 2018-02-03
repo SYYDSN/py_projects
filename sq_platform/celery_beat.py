@@ -31,10 +31,10 @@ app.conf.CELERYBEAT_SCHEDULE = {
         'schedule': crontab(minute="*/5", hour="*"),  # 每5分钟检查一次
         'args': (2, 3)
     },
-    """每5分钟检查一下内网的shard服务器是否可以从外网访问"""
+    """每20秒检查以下是否有实时的gps信息需要保存?"""
     'every_file_minutes_batch_insert_gps': {
         'task': 'celery_module.batch_insert_gps',
-        'schedule': crontab(minute="*", hour="*"),  # 每分钟检查一次
+        'schedule': datetime.timedelta(seconds=20),  # 每20秒一次
         'args': (2, 3)
     }
 }

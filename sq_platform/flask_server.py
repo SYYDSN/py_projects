@@ -41,11 +41,17 @@ port = 5000
 
 
 @app.route('/index', methods=['get', 'post'])
-def hello_world():
+def hello_world_1():
     if request.method.lower() == "get":
         return "{} pid:{}".format(request.method, os.getppid())
     else:
         return "{} pid:{}".format(request.method, os.getppid())
+
+
+@app.route("/hello", methods=['get', 'post'])
+@csrf.exempt
+def hello_world_2():
+    return "ok"
 
 
 @app.route("/favicon.ico")
@@ -70,4 +76,5 @@ if __name__ == '__main__':
     # print(app.url_map)  # 打印视图路由
     cache.set("flask_server_port", port)
     app.run(host="0.0.0.0", port=port, debug=True, threaded=True)
+    # app.run(host="0.0.0.0", port=port, threaded=True)
     # app.run(host="0.0.0.0", port=port, debug=True, threaded=True, ssl_context="adhoc")

@@ -30,7 +30,7 @@ def query_error_code():
     return json.dumps(message)
 
 
-@api_data_blueprint.route("/gps_push", methods=['get', 'post'])
+@api_data_blueprint.route("/gps_push", methods=['post'])
 @login_required_app
 def gps_push(user_id):
     """接收设备发来的gps信息"""
@@ -43,7 +43,6 @@ def gps_push(user_id):
         token = args.pop('auth_token')
     except KeyError as e:
         pass
-        print(e)
     finally:
         pass
     # calculated_user_id = AppLoginToken.get_id_by_token(token)
@@ -93,7 +92,6 @@ def gps_push_async(user_id):
             token = args.pop('auth_token')
         except KeyError as e:
             pass
-            print(e)
         finally:
             pass
         # calculated_user_id = AppLoginToken.get_id_by_token(token)
@@ -124,7 +122,6 @@ def sensor_push(user_id):
         token = args.pop('auth_token')
     except KeyError as e:
         pass
-        print(e)
     finally:
         pass
     # calculated_user_id = AppLoginToken.get_id_by_token(token)

@@ -33,7 +33,7 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 
 """配置信息"""
 mongodb_setting = {
-    "host": "safego.org:27017",   # 数据库服务器地址
+    "host": "safego.org:20000",   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
@@ -49,8 +49,8 @@ mongodb_setting = {
 replica_hosts = [
     {"host": "safego.org", "port": 27017},
     {"host": "safego.org", "port": 20000},
-    {"host": "git.safego.org", "port": 7174},
-    {"host": "git.safego.org", "port": 8184}
+    {"host": "pltf.safego.org", "port": 7174},
+    {"host": "pltf.safego.org", "port": 8184}
     ]
 
 
@@ -255,11 +255,13 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
         elif pattern_0.match(date_str):
             return datetime.datetime.strptime(date_str, "%Y-%m-%d")
         else:
-            print("get_datetime_from_str() 参数 {} 时间字符串格式不符合要求 2017-01-01或者2917-01-01 12:00:00".format(date_str))
-            return None
+            ms = "get_datetime_from_str() 参数 {} 时间字符串格式不符合要求 2017-01-01或者2917-01-01 12:00:00".format(date_str)
+            print(ms)
+            logger.info(ms, exc_info=True, stack_info=True)
     else:
-        print("get_datetime_from_str() 参数 {} 格式错误，期待str，得到一个 {}".format(date_str, type(date_str)))
-        return None
+        ms = "get_datetime_from_str() 参数 {} 格式错误，期待str，得到一个 {}".format(date_str, type(date_str))
+        print(ms)
+        logger.info(ms, exc_info=True, stack_info=True)
 
 
 def round_datetime(the_datetime: datetime.datetime) -> datetime.datetime:
@@ -723,7 +725,7 @@ class BaseDoc:
                         if type_name.__name__ == "datetime":
                             temp = None
                             try:
-                                get_datetime_from_str
+                                temp = get_datetime_from_str(v)
                             except ValueError as e:
                                 print(e)
                                 try:
@@ -1229,7 +1231,7 @@ class BaseDoc:
     @classmethod
     def insert_many(cls, doc_list: list)->list:
         """
-        批量插入，如果插入失败，就会变成save，如果save，会抛出异常。
+        批量插入，如果插入失败，就会变成save，如果save失败，会抛出异常。
         :param doc_list: mongodb的doc组成的数组，也是dict的list
         :return: 插入成功的doc组成的list,插入失败，将返回[]
         """

@@ -172,6 +172,16 @@ def test_get_alert_message():
     print(r.json())
 
 
+def test_get_report_detail():
+    """测试获取安全报告详情"""
+    auth_token = "a129da33b21a4bb6800847d6627b2f4f"  # app段登录标识 me
+    auth_token = "58d68686f12247c092c0d9f075f65a60"  # app段登录标识
+    headers = {"auth_token": auth_token}
+    url = "http://127.0.0.1:5000/api/get_report_detail"
+    r = requests.post(url, headers=headers)
+    print(r.json())
+
+
 if __name__ == "__main__":
     # args = {
     #     "url": "http://127.0.0.1:5000/api/get_daily_info",
@@ -193,5 +203,5 @@ if __name__ == "__main__":
     # test_get_user_driving_license()
     # """测试用户安全指数排名接口"""
     # test_get_security_rank_list()
-    test_get_alert_message()
+    test_get_report_detail()
     pass

@@ -5,7 +5,7 @@ __project_dir__ = os.path.dirname(os.path.realpath(__file__))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import mongo_db
-import browser_module
+import firefox_module
 from log_module import get_logger
 from celery_module import to_jiandao_cloud_and_send_mail
 import datetime
@@ -43,6 +43,47 @@ class SpreadKeyword(mongo_db.BaseDoc):
 
 class SpreadChannel(mongo_db.BaseDoc):
     """宣传/推广渠道"""
+
+
+class AllowOrigin(mongo_db.BaseDoc):
+    """允许跨域注册的域名，域名要待http的"""
+    _table_name = "customer_info"
+    type_dict = dict()
+    type_dict["_id"] = mongo_db.ObjectId  # id 唯一
+    type_dict["origin"] = mongo_db.ObjectId  # 域名，理论上唯一
+    type_dict['valid'] = bool   # 域名是否有效？
+
+    @classmethod
+    def list(cls, only_valid: bool = True) -> list:
+        """
+        获取允许跨域注册的域名的列表
+        :param only_valid:  只包含有效域名？无效的域名也列出？
+        :return: 域名列表
+        """
+        if only_valid:
+            filter_dict = {"only_valid": True}
+        else:
+            filter_dict = {}
+
+        result = cls.find_plus(filter_dict=filter_dict, projection=['origin'])
+        return result
+
+    @classmethod
+    def allow(cls, origin: str, loosely: bool = True, only_valid: bool = True) -> bool:
+        """
+        验证一个域名是否允许访问？
+        :param origin: 域名
+        :param loosely: 宽松模式？如果是宽松模式的，空列表就是全部放行
+        :param only_valid: 只包含有效域名？无效的域名也列出？
+        :return:
+        """
+        origins = cls.list(only_valid=only_valid)
+        if len(origins) == 0 and loosely:
+            return True
+        elif origin in origins:
+            return True
+        else:
+            return False
 
 
 class Customer(mongo_db.BaseDoc):
@@ -123,7 +164,7 @@ class Customer(mongo_db.BaseDoc):
                     if isinstance(save, mongo_db.ObjectId):
                         message['user_id'] = str(save)
                         """转发到简道云"""
-                        to_jiandao_cloud_and_send_mail.delay(reg_dict)
+                        to_jiandao_cloud_and_send_mail.delay(**reg_dict)
                     else:
                         pass
             else:
@@ -132,11 +173,5 @@ class Customer(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    s1 = "sg	360	bd	pc	yd	MT4	chanpin	ziguan	zengjin	jianguan	hengzhi	jskh	hungjin"
-    s2 = "搜狗	360	百度	PC端	移动端	MT4	产品	资金管理	赠金	监管	恒指	急速开户	黄金"
-    l1 = [x.strip() for x in s1.split("\t")]
-    l2 = [x.strip() for x in s2.split("\t")]
-    d = dict(zip(l1, l2))
-    for k, v in d.items():
-        s = SpreadKeyword(english=k, chinese=v)
-        s.save()
+    AllowOrigin.list()
+    pass

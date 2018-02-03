@@ -20,6 +20,7 @@ import amap_module
 from error_module import RepeatError, pack_message
 from amap_module import *
 import mail_module
+import threading
 
 
 """为防止循环引用,不要引用tools_module模块"""
@@ -31,6 +32,7 @@ MyDBRef = mongo_db.MyDBRef
 DBRef = mongo_db.DBRef
 cache = mongo_db.cache
 GeoJSON = mongo_db.GeoJSON
+insert_queue_lock = threading.Lock()
 
 """定义用户的模型及相关方法"""
 
@@ -1016,7 +1018,8 @@ class Track(mongo_db.BaseDoc):
 
             inserted_results = cls.insert_many(res)  # 批量插入位置信息
             if len(inserted_results) > 0:
-                last_inserted = inserted_results[-1]
+                last_inserted = inserted_results[-1]  # 返回最后的位置
+                last_position = last_inserted
             else:
                 last_position = None
             return last_position
@@ -1409,11 +1412,16 @@ class GPS(mongo_db.BaseDoc):
         """
         cache = mongo_db.cache
         key = "gps_realtime_queue"
+        global insert_queue_lock
+        lock = insert_queue_lock
+        lock.acquire()
         val = cache.get(key)
         if val is None:
             val = list()
         val.append(obj)
         cache.set(key=key, value=val, timeout=300)  # 最长5分钟
+        lock.release()
+        # cls.async_insert_many()  # 测试用,正式要注销
         return True
 
     @staticmethod
@@ -1447,13 +1455,15 @@ class GPS(mongo_db.BaseDoc):
         """
         res = "async_insert_many function: "
         gps_list = cls.get_queue()
-        if len(gps_list) == 0:
-            res += "队列长度:0"
+        l = len(gps_list)
+        mes = "队列长度:{}".format(l)
+        print(mes)
+        if l == 0:
+            pass
         else:
             reserted_list = cls.insert_many(gps_list)
             Track.batch_create_item_from_gps(reserted_list)
             cls.clear_queue()
-            res += "队列长度:{}".format(len(reserted_list))
         return res
 
     @classmethod
