@@ -209,7 +209,7 @@ AMapUI.loadUI(['overlay/AwesomeMarker'], function (AwesomeMarker) {
         let num = parseInt(Math.random() * imgs.length);
         let content=[];
         content.push(`<ul id='marker_table_${cur_user_id}'><li><span>姓名</span>
-                      <span>${arg_dict.real_name}</span></li><li><span>部门</span>
+                      <span>${real_name}</span></li><li><span>部门</span>
                       <span>华新分拨公司</span></li><li><span>电话</span>
                       <span>${arg_dict.phone_num}</span></li></ul>
                       <img src="${imgs[num]}">`);

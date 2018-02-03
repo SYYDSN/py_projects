@@ -2,6 +2,7 @@
 from flask import Flask, request, render_template, send_from_directory
 from flask import session
 from flask_session import Session
+from flask import redirect
 from api.user.user_view import api_user_blueprint
 from api.data.data_view import api_data_blueprint
 from manage.manage_module import manage_blueprint
@@ -40,12 +41,9 @@ csrf.exempt(m_module.subordinates_base_info_func)             # 此视图不做c
 port = 5000
 
 
-@app.route('/index', methods=['get', 'post'])
-def hello_world_1():
-    if request.method.lower() == "get":
-        return "{} pid:{}".format(request.method, os.getppid())
-    else:
-        return "{} pid:{}".format(request.method, os.getppid())
+@app.route('/', methods=['get'])
+def index_func():
+    return redirect("/manage/")
 
 
 @app.route("/hello", methods=['get', 'post'])
