@@ -4,3 +4,4 @@ webui/*
 static/data_file/*
 static/thumbs/*
 *.apk
+.idea/
