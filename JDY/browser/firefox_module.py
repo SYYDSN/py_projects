@@ -1,6 +1,7 @@
 #  -*- coding: utf-8 -*-
 import os
 import sys
+
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
@@ -17,9 +18,7 @@ import os
 from log_module import get_logger
 import threading
 
-
 """简道云对接模块,火狐版，没有问题"""
-
 
 logger = get_logger()
 
@@ -31,7 +30,7 @@ def to_jiandao_cloud(**kwargs) -> bool:
     :return:
     """
     display = Display(visible=0, size=(800, 600))
-    display.start()   # 开启虚拟显示器
+    display.start()  # 开启虚拟显示器
 
     """
     注意，pyvirtualdisplay需要xvfb支持。安装方法：sudo apt-get install xvfb
@@ -48,7 +47,8 @@ def to_jiandao_cloud(**kwargs) -> bool:
     browser.get(url=url_1)  # 打开页面
 
     # 密码输入按钮
-    input_password = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-layout-table input[type='password']")))
+    input_password = wait.until(
+        ec.presence_of_element_located((By.CSS_SELECTOR, ".x-layout-table input[type='password']")))
     # 提交按钮
     submit_password = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".x-layout-table .x-btn span")))
 
@@ -115,17 +115,18 @@ def to_jiandao_cloud(**kwargs) -> bool:
 
     search_keyword = kwargs['search_keyword']
     description = kwargs['description']
-    desc7 = description if search_keyword == "" else search_keyword
+    desc7 = description if description != "" else search_keyword
     js_desc_7 = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(desc7)
+    print(js_desc_7)
     browser.execute_script(js_desc_7)  # 页面内容
-
 
     """
     如果查找器没有定位到dom元素或者页面尚未载入,会报如下的错误.
     selenium.common.exceptions.WebDriverException: Message: unknown error: cannot focus element
     """
     """ec.presence_of_all_elements_located方法可以取一组输入框,然后循环操作"""
-    input_list = wait.until(ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".widget-wrapper>ul>li input")))  #输入组
+    input_list = wait.until(
+        ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".widget-wrapper>ul>li input")))  # 输入组
     submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
     submit_info.click()  # 提交信息
 
@@ -146,13 +147,13 @@ def x(**kwargs):
 
 if __name__ == "__main__":
     args = {
-        'phone': '15611224444',
-        'user_agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0',
-        'description': '页面标题:注册示范',
-        'referrer': 'http://127.0.0.1:9000/register_demo.html', 'search_keyword': '',
-        'user_name': 'test',
-        'page_url': 'http://127.0.0.1:9000/register',
-        'time': datetime.datetime(2018, 2, 3, 17, 18, 27, 743466)
+        "description": "搜索内容: 长江是有交易所↵预算: 0↵营销: 营销3↵水果: 梨子李子↵项目描述: 测试项目",
+        "page_url": "http://localhost:63342/projects/index.html?_ijt=22a6gi3e6no6e4dkrnrqsp6q8o",
+        "referrer": "",
+        "search_keyword": "长江是有交易所",
+        "sms_code": "6659",
+        "user_name": "测试人员",
+        "phone": "15618317376"
     }
     to_jiandao_cloud(**args)
     # send_info(name="jadf", age=12)

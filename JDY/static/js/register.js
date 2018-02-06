@@ -277,8 +277,8 @@ init_reg = function(seconds, style_class){
                 var user_name = $.trim(user_name_item.val());
                 var user_phone = $.trim(user_phone_item.val());
                 var sms_code = $.trim(sms_code_item.val());
-                var customer_description = $.trim(customer_description_item.val()) === '' ? "页面标题:" +
-                    $("title").text() : $.trim(customer_description_item.val()) === '';
+                var customer_description = $.trim(customer_description_item.text()) === '' ? "页面标题:" +
+                    $("title").text() : $.trim(customer_description_item.text());
                 var mes = '';
 
                 // 检查并提取回调函数.
@@ -316,3 +316,4 @@ init_reg = function(seconds, style_class){
         }
     });
 };
+init_reg();  // 初始化
