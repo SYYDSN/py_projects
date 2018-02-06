@@ -6,6 +6,7 @@ import bjoern
 import cherrypy
 from cherrypy import _cpwsgi_server
 from meinheld import server
+from gevent.wsgi import WSGIServer
 
 
 # tornado方式部署,异步模式.
@@ -38,3 +39,8 @@ from meinheld import patch
 patch.patch_all()
 server.listen(("0.0.0.0", 5000))
 server.run(app)
+
+
+# gevent 部署方式
+# server = WSGIServer(('0.0.0.0', port), app)
+# server.serve_forever()

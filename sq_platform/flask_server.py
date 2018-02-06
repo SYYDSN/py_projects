@@ -8,6 +8,7 @@ from api.data.data_view import api_data_blueprint
 from manage.manage_module import manage_blueprint
 import manage.manage_module as m_module
 from flask_wtf.csrf import CSRFProtect
+import json
 import os
 from mongo_db import cache
 
@@ -50,6 +51,14 @@ def index_func():
 @csrf.exempt
 def hello_world_2():
     return "ok"
+
+
+@app.route("/token", methods=['post', 'get'])
+@csrf.exempt
+def test_token():
+    token = request.headers.get("auth-token")
+    result = {"token": token}
+    return json.dumps(result)
 
 
 @app.route("/favicon.ico")

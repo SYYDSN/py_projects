@@ -22,6 +22,14 @@ ALLOWED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'gif')  # 运行上传的文件的�
 logger = get_logger()
 
 
+@api_data_blueprint.route("/token", methods=['post', 'get'])
+def test_token():
+    """toke测试"""
+    token = request.headers.get("auth-token")
+    result = {"token": token}
+    return json.dumps(result)
+
+
 @api_data_blueprint.route("/query_error_code", methods=['post', 'get'])
 def query_error_code():
     """查询错误代码"""
