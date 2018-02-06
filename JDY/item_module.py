@@ -5,13 +5,12 @@ __project_dir__ = os.path.dirname(os.path.realpath(__file__))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import mongo_db
-import firefox_module
 from log_module import get_logger
 from celery_module import to_jiandao_cloud_and_send_mail
 import datetime
 
 
-"""模型模块"""
+"""基本模型模块"""
 
 
 logger = get_logger()
@@ -30,60 +29,6 @@ class CsrfError(mongo_db.BaseDoc):
     type_dict['client_ip'] = str  # 客户端ip
     type_dict['reason'] = str  # 错误原因
     type_dict['time'] = datetime.datetime  # 时间
-
-
-class SpreadKeyword(mongo_db.BaseDoc):
-    """推广频道的关键词"""
-    _table_name = "spread_keyword"
-    type_dict = dict()             # 属性字典
-    type_dict['_id'] = mongo_db.ObjectId     # id,唯一
-    type_dict['english'] = str     # 英文词汇,唯一
-    type_dict['chinese'] = str     # 中文词汇
-
-
-class SpreadChannel(mongo_db.BaseDoc):
-    """宣传/推广渠道"""
-
-
-class AllowOrigin(mongo_db.BaseDoc):
-    """允许跨域注册的域名，域名要待http的"""
-    _table_name = "customer_info"
-    type_dict = dict()
-    type_dict["_id"] = mongo_db.ObjectId  # id 唯一
-    type_dict["origin"] = mongo_db.ObjectId  # 域名，理论上唯一
-    type_dict['valid'] = bool   # 域名是否有效？
-
-    @classmethod
-    def list(cls, only_valid: bool = True) -> list:
-        """
-        获取允许跨域注册的域名的列表
-        :param only_valid:  只包含有效域名？无效的域名也列出？
-        :return: 域名列表
-        """
-        if only_valid:
-            filter_dict = {"only_valid": True}
-        else:
-            filter_dict = {}
-
-        result = cls.find_plus(filter_dict=filter_dict, projection=['origin'])
-        return result
-
-    @classmethod
-    def allow(cls, origin: str, loosely: bool = True, only_valid: bool = True) -> bool:
-        """
-        验证一个域名是否允许访问？
-        :param origin: 域名
-        :param loosely: 宽松模式？如果是宽松模式的，空列表就是全部放行
-        :param only_valid: 只包含有效域名？无效的域名也列出？
-        :return:
-        """
-        origins = cls.list(only_valid=only_valid)
-        if len(origins) == 0 and loosely:
-            return True
-        elif origin in origins:
-            return True
-        else:
-            return False
 
 
 class Customer(mongo_db.BaseDoc):
@@ -119,7 +64,9 @@ class Customer(mongo_db.BaseDoc):
                 phone = kwargs.pop('phone')
                 filter_dict = {"phone": {"$all": [phone]}}
                 if cls.find_one_plus(filter_dict=filter_dict):
-                    raise ValueError("重复的手机号码:{}".format(phone))
+                    # raise ValueError("重复的手机号码:{}".format(phone))
+                    # 注意.数据库去重索引关闭了
+                    kwargs['phone'] = [phone]
                 else:
                     kwargs['phone'] = [phone]
             if "qq" in kwargs:
@@ -173,5 +120,4 @@ class Customer(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    AllowOrigin.list()
     pass

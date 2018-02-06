@@ -120,7 +120,7 @@ def except_handler(*args, **kwargs) -> None:
     :param kwargs:
     :return:
     """
-    # print(args, kwargs)
+    print(args, kwargs)
     pass
 
 
@@ -174,14 +174,15 @@ def test_gps_push_async(length: int = 10) -> bool:
     for i in range(length):
         key = uuid4().hex
         records[key] = {"begin": datetime.datetime.now()}
-        url = "http://5k.safego.org/api/gps_push".format(key)
+        # url = "http://5k.safego.org/api/gps_push".format(key)
         # url = "http://5k.safego.org/hello".format(key)
         # url = "http://127.0.0.1:5000/api/gps_push".format(key)
         # url = "http://192.168.0.112:5000/api/gps_push".format(key)
-        # url = "http://192.168.0.112:5000/hello".format(key)
+        url = "http://127.0.0.1:5000/hello?uuid={}".format(key)
+        # url = "http://192.168.0.112:5000/hello?uuid={}".format(key)
         # url = "http://39.108.67.178:5000/register".format(key)
         # url = "http://safego.org/app/".format(key)
-        req = grequests.AsyncRequest(method='post', url=url,
+        req = grequests.AsyncRequest(method='get', url=url,
                                      headers=headers, data=generator_gps_dict(), callback=async_callback)
         tasks.append(req)
     G_DICT['records'] = records
@@ -249,7 +250,7 @@ def test_gps_push_always(stop_time: datetime.datetime):
     # url = "http://5k.safego.org/hello"
     # url = "http://127.0.0.1:5000/api/gps_push"
     # url = "http://192.168.0.112:5000/api/gps_push"
-    url = "http://192.168.0.112:5000/hello"
+    url = "http://127.0.0.1:5000/hello"
     # url = "http://192.168.0.112:9999"
     ses = requests.Session()
     ses.headers = headers
@@ -295,7 +296,7 @@ def batch_test_thread(minute: (float, int) = 1, length: int = 100):
 
 if __name__ == "__main__":
     """异步方法测试并发gps接口并发能力"""
-    # batch_test_async(10, 500)
+    batch_test_async(1, 1200)
     """多线程方法测试并发gps接口并发能力"""
-    batch_test_thread(2, 1000)
+    # batch_test_thread(1, 500)
     pass

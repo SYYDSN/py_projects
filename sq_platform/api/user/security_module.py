@@ -294,45 +294,47 @@ class SecurityReport(mongo_db.BaseDoc):
     安全报告,此报告是从安全模块查询而来
     :param date_obj: date_obj 报告日期,现阶段的报告都是按天切分的.
     安全报告字典说明如下：
-    report_id: 报告id，字符串，24位长度，可转为ObjectId，唯一。
-    ###############以下是安全报告列表里的简要信息################
-    time:   报告涉及的驾驶行为的开始时间。 字符串， 2017-12-12 00：00：00 格式。 如果涉及多个驾驶行为，那就是最早的那一个。
-    start:  起点城市名称，字符串。
-    end:    终点城市名称，字符串。
-    total_mileage:  总里程，int, 这和详细里的 sum_mile 是同一个东西。
-    ###############以下是详细安全报告提供的内容##################
-    scr_synt： 综合分数, 对用户安全等级的综合评分。int
-    idx_atte： 专注指数，也称注意力指数。是对驾驶员行车时是否专心的一个评估指数，int
-    idx_driv： 驾驶指数。是对驾驶员驾驶行为的综合评估指数。int
-    idx_emot： 情绪指数。是对驾驶员驾车时情绪的好坏进行量化评估的一个指数。int
-    sum_time:  本次报告所涉及的驾驶时长的累计。单位分钟，int。可能是一次/多次/一天/一周/一月/任意一个时间区间的累计。
-    sum_mile:  被次报告所涉及的驾驶里程的累计。单位公里，int，计算方式同sum_time
-    cnt_rapi_acce： 急加速统计，int，单位次。
-    cnt_shar_turn： 急转弯统计，int，单位次，包含左转和右转。
-    cnt_sudd_brak： 急刹车统计，int，单位次。
-    cnt_over_sped： 超速统计，int，单位次。
-    traj_id：  本次报告所涉及的行车轨迹的id，暂时不提供。
+    begin_date': '2017-11-12',                  # 报告的开始日期,
+    'end_date': '2017-11-12',                    # 报告的结束日期,
+    'create_date': '2017-11-13 12:00:05.340',  # 报告的生成日期,
+    'sum_mile': 7406.0,                          # 行驶里程, float类型.单位:公里.
+    'sum_time': 688,                             # 行驶时间, float类型.单位:分钟.
+    'scr_synt': 72,                              # 综合分数, float类型,百分制
+    'idx_slep': 0,                               # 睡眠 0好 1坏
+    'idx_mood': 0,                               # 情绪 0好 1坏
+    'idx_heal': 0,                               # 健康 0好 1坏
+
+
+
+    'cnt_make_call': 1,                          # 打电话次数
+    'cnt_play_phon': 3,                          # 看手机
+    'cnt_fati_driv': 1,                          # 疲劳驾驶次数
+    'cnt_shar_turn': 1,                          # 急转弯次数. int类型.
+    'cnt_rapi_acce': 0,                          # 急加速次数. int类型.
+    'cnt_over_sped': 6,                          # 超速次数. int类型.
+    'cnt_sudd_brak': 6,                          # 急刹车次数. int类型.
     :return:一个安全报告(dict字典)
     """
     _table_name = "security_report_info"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
     type_dict["user_id"] = DBRef  # 用户id，指向user_info表                user_id, begin_date和end_ate构成联合唯一主键
-    type_dict['report_name'] = str  # report_name 虚拟阶段假设12位字符串 字符串,
     type_dict['driving_event'] = list()  # 驾驶事件列表,指向DrivingEvent类, DBRef的list
     type_dict["sum_mile"] = float  # 总里程
     type_dict["scr_synt"] = int  # 综合分数, 对用户安全等级的综合评分。百分制
-    type_dict["idx_atte"] = int  # 专注指数，也称注意力指数。是对驾驶员行车时是否专心的一个评估指数
-    type_dict["idx_driv"] = int  # 驾驶指数。是对驾驶员驾驶行为的综合评估指数。
-    type_dict["idx_emot"] = int  # 情绪指数。是对驾驶员驾车时情绪的好坏进行量化评估的一个指数。
+    type_dict["idx_slep"] = int  # 睡眠 0好 1坏
+    type_dict["idx_heal"] = int  # 健康 0好 1坏
+    type_dict["idx_mood"] = int  # 情绪 0好 1坏
     type_dict["sum_time"] = int  # 本次报告所涉及的驾驶时长的累计。单位分钟
+    type_dict["cnt_make_call"] = int  # 打电话次数
+    type_dict["cnt_play_phon"] = int  # 看手机
+    type_dict["cnt_fati_driv"] = int  # 疲劳驾驶次数
     type_dict["cnt_rapi_acce"] = int  # 急加速统计，int，单位次。
     type_dict["cnt_shar_turn"] = int  # 急转弯统计，int，单位次，包含左转和右转。
     type_dict["cnt_sudd_brak"] = int  # 急刹车统计，int，单位次。
     type_dict["cnt_over_sped"] = int  # 超速统计，int，单位次。
     type_dict["begin_date"] = datetime.datetime  # 安全报告统计的开始日期  user_id, begin_date和end_ate构成联合唯一主键
     type_dict["end_date"] = datetime.datetime  # 安全报告统计的结束日期    user_id, begin_date和end_ate构成联合唯一主键
-    type_dict["report_time"] = datetime.datetime  # 按天生成报告时，这个时间就是一天的最后一秒（过往报告）或者当前时间（本日的报告）。
     type_dict["create_date"] = datetime.datetime  # 安全报告的生成日期/查询日期
     type_dict['url_polyline'] = str  # 相关轨迹缩略图 图片以文件形式保存在磁盘上，这里只是一个url
     type_dict['engine_version'] = str  # 引擎版本号
@@ -353,24 +355,33 @@ class SecurityReport(mongo_db.BaseDoc):
             kwargs['create_date'] = datetime.datetime.now()
 
             fictitious_values.append("total_mileage")
-        if "sum_mile" not in kwargs:  # 总里程,单位 公里/小时
-            kwargs['sum_mile'] = kwargs['total_mileage'] = random.choice(mongo_db.normal_distribution_range(5000, 9000, value_type=int))
+        if "sum_mile" not in kwargs:  # 报告涉及周期的总里程,单位 公里
+            kwargs['sum_mile'] = kwargs['total_mileage'] = random.choice(mongo_db.normal_distribution_range(100, 600, value_type=int))
             fictitious_values.append("sum_mile")
         if "scr_synt" not in kwargs:  # 综合分数
             kwargs['scr_synt'] = random.choice(score_pool)
             fictitious_values.append("scr_synt")
-        if "idx_atte" not in kwargs:  # 专注指数
-            kwargs['idx_atte'] = random.choice(score_pool)
-            fictitious_values.append("idx_atte")
-        if "idx_driv" not in kwargs:  # 驾驶指数
-            kwargs['idx_driv'] = random.choice(score_pool)
-            fictitious_values.append("idx_driv")
-        if "idx_emot" not in kwargs:  # 情绪指数
-            kwargs['idx_emot'] = random.choice(score_pool)
-            fictitious_values.append("idx_emot")
+        if "idx_slep" not in kwargs:  # 睡眠
+            kwargs['idx_slep'] = random.choice([0, 1])
+            fictitious_values.append("idx_slep")
+        if "idx_mood" not in kwargs:  # 情绪
+            kwargs['idx_mood'] = random.choice([0, 1])
+            fictitious_values.append("idx_mood")
+        if "idx_heal" not in kwargs:  # 健康
+            kwargs['idx_heal'] = random.choice([0, 1])
+            fictitious_values.append("idx_heal")
         if "sum_time" not in kwargs:  # 本次报告所涉及的驾驶时长的累计。单位分钟
             kwargs['sum_time'] = random.randint(70, 90) * factor
             fictitious_values.append("sum_time")
+        if "cnt_make_call" not in kwargs:  # 打电话次数
+            kwargs['cnt_make_call'] = random.randint(0, factor * 2)
+            fictitious_values.append("cnt_make_call")
+        if "cnt_play_phon" not in kwargs:  # 看手机
+            kwargs['cnt_play_phon'] = random.randint(0, factor * 2)
+            fictitious_values.append("cnt_play_phon")
+        if "cnt_fati_driv" not in kwargs:  # 疲劳驾驶次数
+            kwargs['cnt_fati_driv'] = random.choice([0, 0, 0, 0, 1, 1, 2])
+            fictitious_values.append("cnt_fati_driv")
         if "cnt_rapi_acce" not in kwargs:  # 急加速统计
             kwargs['cnt_rapi_acce'] = random.randint(0, factor * 2)
             fictitious_values.append("cnt_rapi_acce")

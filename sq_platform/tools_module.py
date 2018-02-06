@@ -22,12 +22,15 @@ import os
 from uuid import uuid4
 from api.data.item_module import AppLoginToken, User
 from werkzeug.contrib.cache import RedisCache
+from log_module import get_logger
+from log_module import recode
 
 
 """公用的函数和装饰器"""
 ALLOWED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'gif', 'tif')  # 允许上传的图片后缀
 cache = RedisCache()
 cors_session_timeout = 600  # 跨域用户的会话信息的最大生命间隔
+logger = get_logger()
 
 
 def allowed_file(filename):
@@ -201,17 +204,26 @@ def login_required_app(f):
     """检测管app用户是否登录的装饰器"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        token = request.headers.get("auth_token", None)
-        if token is None:
-            token = get_arg(request, "token")
-        if token == "":  # 会话检测失败
+        req_args = get_args(request)
+        headers = request.headers
+        api_url = request.path
+        auth_token = request.headers.get("auth_token", None)
+        token = request.headers.get("token", None)
+        check = token if auth_token is None or auth_token == "" else auth_token
+        ms = "api={}, args={}, auth_token={}, token={}, headers={}".format(api_url, req_args, auth_token, token, headers)
+        recode(ms)
+        if check is None or check == "":
+            # 会话检测失败
+            logger.exception("app token 获取失败: {}".format(ms))
             message = pack_message({"message": "success"}, 3009, token=token)
             return json.dumps(message)
         else:
-            obj = AppLoginToken.get_id_by_token(token=token)
+            obj = AppLoginToken.get_id_by_token(token=check)
             if obj['message'] == "success":
                 kwargs['user_id'] = obj['user_id']  # 把user_id作为地一个参数传递给视图函数
             else:
+                # token验证失败
+                logger.exception("app token验证失败: {}".format(ms))
                 message = pack_message({"message": "success"}, 3008, token=token)
                 return json.dumps(message)
         return f(*args, **kwargs)

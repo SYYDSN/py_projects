@@ -73,11 +73,11 @@ def recode(mes: str)->None:
     :param mes: 需要被记录的内容
     :return:
     """
-    if 1:
+    if 0:
         pass
     else:
         recode_path_str = os.path.join(dir_path, "logs", "recode")
-        recode_file_path = "{}.txt".format(datetime.datetime.now().strftime("%Y-%m-%d-%H"))
+        recode_file_path = "{}.log".format(datetime.datetime.now().strftime("%Y-%m-%d-%H"))
         if not os.path.exists(recode_path_str):
             os.makedirs(recode_path_str)
         recode_file_path = os.path.join(recode_path_str, recode_file_path)

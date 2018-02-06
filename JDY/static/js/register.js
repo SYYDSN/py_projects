@@ -47,6 +47,9 @@ var reg_url = "http://39.108.67.178:9000/register";  // 注册链接
 var sms_url = "http://39.108.67.178:9000/send_sms";   // 短信链接
 // var sms_url = "http://127.0.0.1:9000/send_sms";   // 短信链接
 // console.log(csrf_token);                         // csrf_token有flask-wtf生成
+var page_url = location.href;
+var referrer = document.referrer;
+
 
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
@@ -291,6 +294,8 @@ init_reg = function(seconds, style_class){
                 }
                 if (mes === '') {
                     var args = {
+                        "page_url": page_url,
+                        "referrer": referrer,
                         "user_name": user_name,
                         "user_phone": user_phone,
                         "sms_code": sms_code,

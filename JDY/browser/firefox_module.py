@@ -1,23 +1,30 @@
 #  -*- coding: utf-8 -*-
+import os
+import sys
+__project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+if __project_dir__ not in sys.path:
+    sys.path.append(__project_dir__)
 from selenium import webdriver
 from pyvirtualdisplay import Display
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.select import By
-
+from module.spread_module import SpreadChannel
+import re
 import datetime
 import time
 import os
+from log_module import get_logger
 import threading
 
 
 """简道云对接模块,火狐版，没有问题"""
 
 
-cur_dir = os.path.dirname(os.path.realpath(__file__))
+logger = get_logger()
 
 
-def to_jiandao_cloud(**kwargs) -> dict:
+def to_jiandao_cloud(**kwargs) -> bool:
     """
     传送数据到简道云
     :param kwargs:
@@ -28,15 +35,12 @@ def to_jiandao_cloud(**kwargs) -> dict:
 
     """
     注意，pyvirtualdisplay需要xvfb支持。安装方法：sudo apt-get install xvfb
-    下载火狐的geckodriver驱动。地址是：
+    下载火狐的geckodriver驱动。(当前文件夹下已经有一个了)地址是：
     https://github.com/mozilla/geckodriver/releases
     下载后解压是一个geckodriver 文件。拷贝到/usr/local/bin目录下，然后加上可执行的权限
     sudo chmod +x /usr/local/bin/geckodriver
-    一般ubuntu下面,chrome的目录是/opt/google/chrome/
     """
 
-    # firefox_driver = os.path.join(cur_dir, "geckodriver")  #必须配置,否则会在execute_script的时候报错.
-    # os.environ["geckodriver"] = firefox_driver  # 必须配置,否则会在execute_script的时候报错.
     browser = webdriver.Firefox()
     wait = WebDriverWait(browser, 10)
 
@@ -53,13 +57,12 @@ def to_jiandao_cloud(**kwargs) -> dict:
     submit_password.click()  # 提交密码
 
     time.sleep(3)  # 等待是为了给页面时间载入
-    # 修改时间选择器输入框脚本
-    js_datepicker = """let d = $(".widget-wrapper>ul>li:first input"); d.val("{}");""".\
-        format(datetime.datetime.now().strftime("%F"))
-    browser.execute_script(js_datepicker)  # 输入时间
-
-    print(type(kwargs))
-    print(kwargs)
+    # 时间选择器必须手动
+    click_date = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datetime .icon-widget-datetime")))
+    click_date.click()  # 弹出日期选择器
+    # 修改时间
+    click_today = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".dt .today")))
+    click_today.click()  # 选今天
 
     user_name = kwargs.get('user_name')
     print(user_name)
@@ -69,20 +72,51 @@ def to_jiandao_cloud(**kwargs) -> dict:
     js_phone = """let d = $(".widget-wrapper>ul>li:eq(2) input"); d.val("{}");""".format(kwargs['phone'])
     browser.execute_script(js_phone)  # 输入电话
 
-    js_desc_1 = """let d = $(".widget-wrapper>ul>li:eq(3) input"); d.val("{}");""".format(kwargs['search_keyword'])
-    browser.execute_script(js_desc_1)  # 备注1 填入用户搜索过的关键词
+    spread_keywords = SpreadChannel.analysis_url(kwargs['page_url'])
+    desc1 = ''
+    try:
+        desc1 = spread_keywords[0]
+    except IndexError as e:
+        logger.exception("to_jiandao_cloud error!")
+    except Exception as e:
+        logger.exception("to_jiandao_cloud error!")
+        raise e
+    finally:
+        js_desc_1 = """let d = $(".widget-wrapper>ul>li:eq(3) input"); d.val("{}");""".format(desc1)
+        browser.execute_script(js_desc_1)  # 备注1
 
-    js_desc_2 = """let d = $(".widget-wrapper>ul>li:eq(4) input"); d.val("{}");""".format(kwargs['referrer'])
-    browser.execute_script(js_desc_2)  # 备注2 填入用户跳转之前的页面
+    desc2 = ''
+    try:
+        desc2 = spread_keywords[1]
+    except IndexError as e:
+        logger.exception("to_jiandao_cloud error!")
+    except Exception as e:
+        logger.exception("to_jiandao_cloud error!")
+        raise e
+    finally:
+        js_desc_2 = """let d = $(".widget-wrapper>ul>li:eq(4) input"); d.val("{}");""".format(desc2)
+        browser.execute_script(js_desc_2)  # 备注2
 
-    js_desc_2 = """let d = $(".widget-wrapper>ul>li:eq(5) input"); d.val("{}  自动注册");""".format(datetime.datetime.now().
-                                                                                          strftime("%Y-%m-%d %H:%M:%S"))
-    browser.execute_script(js_desc_2)  # 备注3 填入用户注册的原始时间,用以比较时间的大差
+    desc3 = ''
+    try:
+        desc3 = spread_keywords[2]
+    except IndexError as e:
+        logger.exception("to_jiandao_cloud error!")
+    except Exception as e:
+        logger.exception("to_jiandao_cloud error!")
+        raise e
+    finally:
+        js_desc_3 = """let d = $(".widget-wrapper>ul>li:eq(5) input"); d.val("{}");""".format(desc3)
+        browser.execute_script(js_desc_3)  # 备注3
 
-    js_desc_6 = """let d = $(".widget-wrapper>ul>li:eq(6) input"); d.val("{}");""".format(kwargs['base_url'])
+    desc6 = kwargs['page_url']
+    js_desc_6 = """let d = $(".widget-wrapper>ul>li:eq(6) input"); d.val("{}");""".format(desc6)
     browser.execute_script(js_desc_6)  # 页面链接
 
-    js_desc_7 = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(kwargs['description'])
+    search_keyword = kwargs['search_keyword']
+    description = kwargs['description']
+    desc7 = description if search_keyword == "" else search_keyword
+    js_desc_7 = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(desc7)
     browser.execute_script(js_desc_7)  # 页面内容
 
 
@@ -109,14 +143,6 @@ def x(**kwargs):
     print(kwargs['name'])
     print(kwargs['age'])
 
-import time
-def send_info(**kwargs):
-    """多线程发送信息到简道云"""
-    kwarg = kwargs
-    t = threading.Thread(target=x, kwargs=kwarg, daemon=0)
-    time.sleep(3)
-    t.start()
-
 
 if __name__ == "__main__":
     args = {
@@ -124,9 +150,8 @@ if __name__ == "__main__":
         'user_agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0',
         'description': '页面标题:注册示范',
         'referrer': 'http://127.0.0.1:9000/register_demo.html', 'search_keyword': '',
-        'user_name': '344444444444444445',
-        'host_url': 'http://127.0.0.1:9000/',
-        'base_url': 'http://127.0.0.1:9000/register',
+        'user_name': 'test',
+        'page_url': 'http://127.0.0.1:9000/register',
         'time': datetime.datetime(2018, 2, 3, 17, 18, 27, 743466)
     }
     to_jiandao_cloud(**args)

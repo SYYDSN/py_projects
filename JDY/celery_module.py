@@ -1,11 +1,11 @@
 # -*- coding:utf-8 -*-
-from log_module import get_logger
-from celery import Celery
-from firefox_module import to_jiandao_cloud
-from bson.objectid import ObjectId
 import datetime
-from mail_module import send_mail
 
+from celery import Celery
+
+from browser.firefox_module import to_jiandao_cloud
+from log_module import get_logger
+from mail_module import send_mail
 
 logger = get_logger("celery")
 

@@ -13,6 +13,7 @@ import json
 from werkzeug.contrib.cache import RedisCache
 from tools_module import *
 import item_module
+from module.spread_module import AllowOrigin
 from uuid import uuid4
 import os
 
@@ -117,7 +118,7 @@ def send_sms_func():
         这个是和js脚本中 setRequestHeader("X-Auth-Token", csrf_token);  verify_token函数的验证方法都是对应的。
         """
         origin = request.headers.get("origin")
-        if item_module.AllowOrigin.allow(origin) :
+        if AllowOrigin.allow(origin):
             resp = make_response()
         else:
             abort(404)
@@ -150,16 +151,15 @@ def my_register():
         sms_code = get_arg(request, "sms_code")
         user_name = get_arg(request, "user_name", "")
         phone = get_arg(request, "user_phone")
+        page_url = get_arg(request, "page_url")
+        referrer = get_arg(request, "referrer")
         search_keyword = get_arg(request, "search_keyword")
         customer_description = get_arg(request, "customer_description", '')
-        referrer = request.referrer
         user_agent = request.user_agent
-        host_url = request.host_url
-        base_url = request.base_url
         args = {
             "user_name": user_name, "phone": phone, "referrer": referrer,
             "description": customer_description, "search_keyword": search_keyword,
-            "user_agent": user_agent.string, "host_url": host_url, "base_url": base_url,
+            "user_agent": user_agent.string, "page_url": page_url,
             "time": datetime.datetime.now()
         }
         print(args)

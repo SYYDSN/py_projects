@@ -159,13 +159,23 @@ let listen_click = function($obj){
 // 填充人员选择select
 fill_right_bar(listen_click);  // 初始化右侧边栏
 
-// 点击日期输入栏的时候,关闭日期选择器的day的默认点击事件.
-$("#my_datetime_picker").click(function(){
-    $(".day").unbind("click");
-    if($(".day:visible").length === 0){
-        $("#my_datetime_picker").focus();  // 显示日期选择器
-    }
-});
+// 这个日期插件有少许问题,必须要点击右侧空白的地方才有效.弹出和隐藏日期选择区域的功能暂时搁置.
+// // 点击日期输入栏的时候,关闭日期选择器的day的默认点击事件.
+// $("#my_datetime_picker").click(function(){
+//     $(".day").unbind("click");
+//     if($(".day:visible").length === 0){
+//         $("#my_datetime_picker").focus();  // 显示日期选择器
+//     }
+// });
+//
+// // 输入框失焦事件
+// $("#main_zone").click(function(){
+//     console.log(1);
+//     if($("#my_datetime_picker:visible").length > 0){
+//         console.log("click");
+//         $("#right_bar").click();  // 隐藏日期选择区域
+//     }
+// });
 
 // 日期选择器改变日期的函数
 let selected_dates = [];  // 日期最多可以选相邻的2天

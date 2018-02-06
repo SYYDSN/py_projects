@@ -58,6 +58,12 @@ def favicon():
                                mimetype="image/vnd.microsoft.icon")
 
 
+@app.before_request
+def show_request_before():
+    print(request)
+    pass
+
+
 @app.after_request
 def allow_cross_domain(response):
     """允许跨域资源访问管理"""

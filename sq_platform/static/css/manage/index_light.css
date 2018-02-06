@@ -12,7 +12,6 @@ ul {
   margin: 0;
   padding: 0;
 }
-
 .clearfix:after {
   content: '';
   height: 0;
@@ -20,7 +19,14 @@ ul {
   clear: both;
   display: block;
 }
-
+/*去掉地图内边距*/
+.main .container-fluid{
+    padding:0;
+}
+/*修正地图的填充*/
+.main_row{
+    margin:0;
+}
 /*定义高德地图自定义标记点样式*/
 .marker_info {
   border: none;

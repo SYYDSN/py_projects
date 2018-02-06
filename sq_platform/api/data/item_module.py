@@ -580,7 +580,7 @@ class User(mongo_db.BaseDoc):
         """删除token"""
         if result is not None:
             ses.delete_one({"_id": result.get("_id")})
-            mongo_db.cache.delete(result.token)
+            mongo_db.cache.delete(result['token'])
         else:
             raise ValueError("{} 没有对应的登录记录".format(user_id))
 
@@ -809,7 +809,27 @@ def rebuild_car_license() -> None:
         car_license.save()
 
 
-"""定义gps和传感器数据模型及相关方法"""
+class UserCar(mongo_db.BaseDoc):
+    """用户和行车证的关系类,一对多关系.但这里表现的是一对一,因为要考虑公司换车和同时开多个车的问题."""
+    _table_name = "user_car_relation"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
+    type_dict['user_id'] = DBRef              # 用户id,
+    type_dict['car_id'] = DBRef              # 行驶证id,
+    type_dict['begin_date'] = datetime.datetime              # 关系建立的开始时间
+    type_dict['end_date'] = datetime.datetime              # 关系建立的结束时间,可以为空
+
+    @classmethod
+    def check_can_use(cls, doc: (dict, list), date_range: list = list()) -> (bool, list):
+        """
+        检查用户和行车证的对应关系, 看这些行车证是否在指定的时间点/区间有效?
+        :param doc:
+        :param date_range: 时间的范围,如果为空,表示是检测截至到当前是否有效?如果只有一个,那就计算截至到
+        这个时间是否有效?如果有2个时间,那就看看是否和这2个时间形成的区间部分
+        :return:
+        """
+
+
 
 
 class TrafficRoute(mongo_db.BaseDoc):

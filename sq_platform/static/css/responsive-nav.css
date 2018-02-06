@@ -92,7 +92,7 @@ a:hover {
   overflow: hidden;
   overflow-y: scroll;
   border-top-left-radius: 5px;
-  box-shadow: 0 0 15px rgba(0,0,0, .6);
+  /*box-shadow: 0 0 15px rgba(0,0,0, .6);  !*2018-2-5 注销*!*/
   top: 0.8em;  /*主区域距离顶部的距离,默认值0.8em.nav-collapse有个对应的top值**/
   top: 4rem;  /*主区域距离顶部的距离,默认值0.8em.nav-collapse有个对应的top值**/
   right: 0;
@@ -136,7 +136,9 @@ a:hover {
 
 .nav-collapse a {
   color: #aaa;
-  font-weight: bold;
+  font-family: "Microsoft YaHei";
+  color: rgb(135, 170, 250);
+  font-weight: 400;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -144,15 +146,15 @@ a:hover {
   -moz-transition: background .3s ease;
   transition: background .3s ease;
   text-shadow: 0 -1px rgba(0,0,0, .5);
-  border-bottom: 1px solid rgba(0,0,0, .2);
-  border-top: 1px solid rgba(255,255,255, .1);
+  /*border-bottom: 1px solid rgba(0,0,0, .2);   !*2018-2-5 注销*!*/
+  /*border-top: 1px solid rgba(255,255,255, .1);   !*2018-2-5 注销*!*/
   display: block;
-  padding: .6em 2em;
+  padding: .7em 2em;
   width: 100%;
 }
 
 .nav-collapse a:hover { background: rgba(255,255,255, .1) }
-.nav-collapse .active a { color: #fff; background: rgba(0,0,0, .3) }
+/*.nav-collapse .active a { color: #fff; background: rgba(0,0,0, .3) }*/  /*2018-2-5 影响.active背景色.注销*/
 .nav-collapse li:first-child a { border-top: 0 }
 .nav-collapse li:last-child a { border-bottom: 0 }
 .nav-toggle { display: none }
