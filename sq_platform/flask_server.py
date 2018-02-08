@@ -39,6 +39,8 @@ csrf.exempt(m_module.block_employee_list_func)                # 此视图不做c
 csrf.exempt(m_module.user_info_func)                          # 此视图不做csrf保护
 csrf.exempt(m_module.last_positions_func)                     # 此视图不做csrf保护
 csrf.exempt(m_module.subordinates_base_info_func)             # 此视图不做csrf保护
+csrf.exempt(m_module.violation_func)                          # 此视图不做csrf保护
+csrf.exempt(m_module.warning_func)                            # 此视图不做csrf保护
 port = 5000
 
 

@@ -1,0 +1,133 @@
+/*第一行违章统计*/
+html{
+    font-size:12px;
+}
+body{
+    font-size: 1.1667rem;
+}
+.title_row, .middle_zone{
+    width:100%;
+    padding: 0 5rem;
+    margin-left: 0;
+    margin-right: 0;
+    border:1px solid #ddd;
+    background-color: white;
+    font-family: "Microsoft YaHei";
+    color: #666;
+}
+.title_row{
+    border-bottom: none;
+}
+.middle_zone{
+    height: auto;
+}
+.title_row>.my_col{
+    width:100%;
+    font-size:1.34rem;
+    margin-left:-2em;
+    line-height: 3.4em;
+}
+.middle_zone>.my_col{
+    display: flex;
+    justify-content: space-between;
+    padding: 3em 0;
+}
+.middle_zone>.my_col>.my_left{
+    display: flex;
+    flex-direction:row;
+    flex-wrap: wrap;
+    justify-content:flex-start;
+}
+.middle_zone>.my_col>.my_left input[type='text']{
+    width:6em;
+    border: 1px solid #ddd;
+    margin-right:1em;
+    border-radius: 3px;
+}
+.middle_zone>.my_col>.my_left select{
+    width:5em;
+    border: 1px solid #ddd;
+    margin-right:1em;
+    border-radius: 3px;
+}
+.middle_zone>.my_col>.my_right{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    word-break: keep-all;
+    word-wrap: normal;
+}
+.middle_zone>.my_col>.my_right #clear_condition{
+    cursor:pointer;
+}
+.middle_zone>.my_col>.my_right button{
+    background-color: #87aafb;
+    color: white;
+    border:none;
+    padding: 0.4em 2.2em;
+    border-radius:0.4em;
+    margin-left:1em;
+}
+.table_col{
+    padding:1em 0 !important;  /*修正.my_col类padding上下太大带来的问题*/
+    width:100%;
+}
+#show_table{
+    font-size: 12px;
+    width:100%;
+    border: 1px solid #ddd;
+}
+#show_table td{
+    padding: 30px 6px 30px 6px;
+}
+#show_table th{
+    padding: 45px 6px 43px 6px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 400;
+}
+#show_table>tbody>tr:nth-child(odd){
+    text-align: center;
+    background-color: #fbfcfe;
+
+}
+#show_table>tbody>tr:nth-child(even){
+    text-align: center;
+    background-color: #ffffff;
+}
+#show_table .blue{
+    color:#7388f3;
+}
+#show_table select{
+    border:none;
+ }
+#show_table .fix_width{
+    max-width: 15em;
+}
+#show_table .driver_name>.span{
+
+}
+#show_table .driver_name>.select{
+
+}
+#show_table .my_btn_group span{
+    word-wrap: normal;
+    word-break: keep-all;
+}
+#show_table .my_btn_group span:hover{
+    cursor:pointer;
+}
+/*底部*/
+.bottom_col{
+    padding: 2em 0 !important;
+}
+.bottom_col .my_right a{
+    color: #666 !important;
+    padding: 0 0.4em;
+    border:1px solid #ddd;
+    border-radius: 0.3em;
+    margin: 0 0.2em;
+}
+.bottom_col .my_right #prev_page, #next_page{
+    padding:0 0.4em;
+}

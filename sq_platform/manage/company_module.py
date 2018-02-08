@@ -323,6 +323,7 @@ class Employee(User):
     def __init__(self, **kwargs):
         self.type_dict['company_id'] = DBRef  # 所属公司id  Company
         self.type_dict['post_id'] = DBRef  # 岗位信息 Post
+        self.type_dict['employee_number'] = int  # 工号
         self.type_dict['dept_path'] = list  # 所属团队DBRef组成的list，Dept
         self.type_dict['block_list'] = list  # 不想显示的用户的DBRef组成的list，Employee
         self.type_dict['scheduling'] = list   # 排班的DBRef的list,对应于员工的排班,默认早9点到晚17点.（考虑加班和替班的情况）

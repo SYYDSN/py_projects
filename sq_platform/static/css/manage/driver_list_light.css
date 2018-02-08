@@ -1,11 +1,3 @@
-.main{
-    border-top-left-radius: 0px !important;
-}
-#main_zone{
-    background-color: #eaedf2;
-    padding: 1rem 2.2rem;
-}
-
 ul,li{
     list-style: none;
     padding : 0;

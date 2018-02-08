@@ -1,0 +1,139 @@
+{% extends "manage/base_template_light.html" %}
+{% block extend_css %}
+<link rel="stylesheet" href="../static/css/manage/violation_light.css">
+{% endblock %}
+{% block main %}
+    <div id="main_zone" class="main_zone col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <!--顶部区域开始-->
+        <div class="row title_row">
+            <div class="my_col">
+                违章统计
+            </div>
+        </div>
+        <!--顶部区域结束-->
+        <!--中间区域开始-->
+        <div class="middle_zone row">
+            <div class="my_col">
+                <div class="my_left">
+                    <!--靠左对齐部分-->
+                    <div class="my_item">
+                        <span>选择时间</span>
+                        <input id="begin_date" type="text">--
+                        <input id="end_date" type="text">
+                    </div>
+                    <div class="my_item">
+                        <span>城市</span>
+                        <input id="select_city" type="text">
+                    </div>
+                    <div class="my_item">
+                        <span>司机</span>
+                        <select id="select_driver">
+                            <option value=""></option>
+                            {% for user_id, item in drivers.items() %}
+                                <option value="{{ user_id }}">{{ item['real_name'] }}</option>
+                            {%  endfor %}
+                        </select>
+                    </div>
+                    <div class="my_item">
+                        <span>车牌</span>
+                        <input id="select_car" type="text">
+                    </div>
+                    <div class="my_item">
+                        <span>处理状态</span>
+                        <input type="checkbox" {{'checked' if vio_status is none or vio_statis == 1 else ''}}  id="check_processed">
+                        <span class="check_name">
+                            已处理
+                        </span>
+                        <input type="checkbox" {{'checked' if vio_status is none or vio_statis == 3 else ''}}  id="check_unprocessed">
+                        <span class="check_name">
+                            未处理
+                        </span>
+                    </div>
+                </div>
+
+                <div class="my_right">
+                    <!--靠右对齐部分-->
+                    <span id="clear_condition">清空筛选</span>
+                    <button id="redirect_btn" class="my_btn">确定</button>
+                </div>
+            </div>
+
+            <div class="my_col table_col">
+                <!--列表显示区域-->
+                <table class="" id="show_table">
+                    <tr class="title">
+                        <th>违章编号</th>
+                        <th>车牌</th>
+                        <th>违章地点</th>
+                        <th>违章时间</th>
+                        <th>违章原因</th>
+                        <th>城市</th>
+                        <th>驾驶员</th>
+                        <th>工号</th>
+                        <th>扣分</th>
+                        <th>罚金</th>
+                        <th>处理状态</th>
+                        <th></th>
+                    </tr>
+                    {% for vio in vio_list %}
+                        <tr id="{{ vio._id }}">
+                            <td>{{ vio.code }}</td>
+                            <td>{{ vio.plate_number }}</td>
+                            <td>{{ vio.address }}</td>
+                            <td>{{ vio.time.split(" ")[0] }}</td>
+                            <td class="blue fix_width">{{ vio.reason }}</td>
+                            <td>{{ vio.city }}</td>
+                            <td class="driver_name">
+                                <span class="span show" data-id="{{ vio.user_id }}">
+                                    {{ '' if drivers.get(vio.user_id) is none else drivers[vio.user_id].real_name }}
+                                </span>
+                                <select class="select hide">
+                                    {% for k, v in drivers.items() %}
+                                        <option value="{{ k }}">{{ v.real_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>{{ '' if drivers.get(vio.user_id) is none else drivers.get(vio.user_id)['employee_number'] }}</td>
+                            <td>{{ vio.point }}</td>
+                            <td class="blue">{{ vio.fine }}</td>
+                            <td>{{ vio_dict[vio.process_status] }}</td>
+                            <td class="blue">
+                                <div class="my_btn_group">
+                                    <span class="edit" data-id="{{ vio._id }}">修改</span>
+                                    <span class="save" data-id="{{ vio._id }}">保存</span>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="my_col bottom_col">
+                   <div class="my_left">
+                       当前违章记录共计<span id="vio_count">{{ vio_count }}</span>
+                       条, 共<span id="page_count">{{ page_count }}</span>页
+                   </div>
+                   <div class="my_right">
+                       <a id="prev_page" href="{{ prev_page_url }}">上一页</a>
+                       {% for page in pages %}
+                           <a class="page_index" style="{{'color:#ddd !important;' if page.page_url == cur_page_url else ''}}" href="{{ page.page_url }}">{{ page.page_num }}</a>
+                       {% endfor %}
+                       <a id="next_page" href="{{ next_page_url }}">下一页</a>
+                   </div>
+            </div>
+
+        </div>
+        <!--中间区域结束-->
+
+    </div>
+{% endblock %}
+{% block extend_js %}
+    <!--日期选择器样式-->
+    <link rel="stylesheet" href="../static/css/bootstrap-datetimepicker.min.css">
+    <!--日期选择器-->
+    <script src="../../static/js/bootstrap-datetimepicker.min.js"></script>
+    <!--日期选择器本地化语言-->
+    <script src="../../static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+    <script src="../static/js/manage/violation_light.js"></script>
+{% endblock %}

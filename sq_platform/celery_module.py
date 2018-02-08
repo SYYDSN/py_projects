@@ -3,7 +3,6 @@ from log_module import get_logger
 from celery import Celery
 from api.data import item_module
 from bson.objectid import ObjectId
-from amap_module import get_position_by_address
 from api.data.item_module import *
 from api.user.security_module import *
 from api.data.file_module import when_upload_success
@@ -128,36 +127,6 @@ def save_sensor(*args, **kwargs):
         logger.exception("Error: ")
     finally:
         return message
-
-
-@app.task(bind=True)
-def query_position(*arg, **kwargs):
-    """查询经纬度信息，此方法为类的内部方法调用"""
-    city = kwargs['city']
-    address = kwargs['address']
-    object_id = get_obj_id(kwargs['object_id'])
-    """先检查数据库是否有？"""
-    in_db = Position.find_one(city=city, address=address)
-    if in_db is None:
-        """数据库没有对应的信息"""
-        key = "query_geo_coordinate_{}_{}".format(city, address)  # 缓存标识
-        cache.set(key, 1, timeout=5)
-        position_data, real = get_position_by_address(city=city, address_str=address)
-        cache.delete(key)
-        args = {"address": address, "city": city, "real_value": real,
-                "longitude": position_data[0], "latitude": position_data[1]}
-        pos = Position(**args)
-        filter_dict = {"city": city, "address": address}
-        update = {k: v for k, v in pos.to_flat_dict().items() if k not in ("_id", "city", "address")}
-        pos = pos.find_one_and_update(filter_dict=filter_dict, update=update)
-        position_id = get_obj_id(pos['_id'])
-    else:
-        position_id = in_db.get_id()
-    filter_dict = {"_id": object_id}
-    update = {"$set": {"position_id": position_id}}
-    ses = get_conn("violation_info")
-    ses.find_one_and_update(filter=filter_dict, update=update)
-    return str(position_id)
 
 
 @app.task

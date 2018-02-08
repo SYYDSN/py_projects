@@ -1118,48 +1118,5 @@ $(function() {
         $("#date_picker").val(date_str);
     };
 
-    // 检查某个日期是不是今天?
-    function is_today(date){
-        let now1 = new Date();
-        let now2 = date;
-        if(date.getHours){
-            // 是Date对象.
-        }
-        else{
-            now2 = new Date(date);
-        }
-        if(now2 === "Invalid Date"){
-            return false;
-        }
-        else{
-            let y1 = now1.getFullYear();
-            let y2 = now2.getFullYear();
-            let month1 = now1.getMonth();
-            let month2 = now2.getMonth();
-            let day1 = now1.getDate();
-            let day2 = now2.getDate();
-            if(y1 === y2 && month1 === month2 && day1 === day2){
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-    }
-
-    function float_to_string(hour){
-        // 把浮点制的小时换算成xx小时xx分
-        let l = String(hour);
-        let ls = l.split(".");
-        if(ls.length === 1){
-            return `${ls[0]}小时`
-        }
-        else{
-            let h = ls[0];
-            let m = Math.round(parseFloat(`0.${ls[1]}`) * 60);
-            return `${h}小时${m}分钟`;
-        }
-    }
-
     // end!
 });

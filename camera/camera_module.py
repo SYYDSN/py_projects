@@ -2,8 +2,6 @@
 import cv2
 
 
-cap = cv2.VideoCapture(0)
-cap.set(3,640)
-cap.set(4,480)
-cap.set(1, 10.0)
+cap = cv2.VideoCapture('/home/walle/视频/VID_20170213_141915.mp4')
+cv2.waitKey(0)
 print(cap.isOpened())

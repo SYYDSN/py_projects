@@ -267,26 +267,119 @@ class DrivingEvent(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
     type_dict["user_id"] = DBRef  # 用户id，指向user_info表
-    type_dict["loc"] = GeoJSON  # 事件发生坐标 [经度, 纬度]
-    type_dict["begin_date"] = datetime.datetime  # 事件开始时间
-    type_dict["end_date"] = datetime.datetime  # 事件结束时间
+    type_dict["real_name"] = str  # 用户真实姓名
+    type_dict["user_phone"] = str  # 用户联系方式
+    type_dict["loc"] = list  # 事件发生坐标 [经度, 纬度]
+    type_dict["address"] = str  # 事件发生地址
+    type_dict["event_time"] = datetime.datetime  # 事件发生时间
     type_dict['event_type'] = str  # 事件类型，比如超速，急刹，急加速，打手机等
+    type_dict['event_info'] = dict  # 事件信息字典
+    type_dict['tip_status'] = int  # 提醒状态  0 表示刚生成,1 表示已提醒.
     type_dict['engine_version'] = str  # 引擎版本号
 
     def __init__(self, **kwargs):
         if "user_id" not in kwargs:
             ms = "user_id不能为空"
             raise ValueError(ms)
-        if "loc" not in kwargs:
-            ms = "loc不能为空"
-            raise ValueError(ms)
         if "event_type" not in kwargs:
             ms = "event_type"
             raise ValueError(ms)
-        if "begin_date" not in kwargs:
-            ms = "begin_date"
+        if "loc" not in kwargs:
+            ms = "loc不能为空"
+            raise ValueError(ms)
+        if "event_time" not in kwargs:
+            ms = "event_time"
             raise ValueError(ms)
         super(DrivingEvent, self).__init__(**kwargs)
+
+    @classmethod
+    def random_event(cls, user__ids: list = list()) -> None:
+        """
+        随机生成行车事件
+        :param user__ids:
+        :return:
+        """
+        type_list = ["疲劳驾驶", "看手机", "打手机", "超速", "急刹车", "急转弯", "急加速", "睡眠", "健康", "情绪"]
+        user__ids = [
+            ObjectId("59cda886ad01be237680e28e"),
+            ObjectId("59cda964ad01be237680e29d"),
+            ObjectId("59cda57bad01be0912b352da")] if len(user__ids) == 0 else user__ids
+        raw_b = mongo_db.get_datetime_from_str("2018-1-9 0:0:0")
+        raw_e = mongo_db.get_datetime_from_str("2018-1-9 23:59:59")
+
+        for user_id in user__ids:
+            user = User.find_by_id(user_id)
+            user_phone = user.get_attr("phone_num")
+            real_name = user.get_attr("real_name")
+            user_dbref = user.get_dbref()
+            for i in range(60):
+                delta = datetime.timedelta(days=i)
+                b = raw_b - delta
+                e = raw_e - delta
+
+                event_args = {
+                    "user_phone": user_phone,
+                    "user_id": user_dbref,
+                    "real_name": real_name,
+                    "tip_status": 0
+                }
+                filter_dict = {
+                    "user_id": user_dbref,
+                    "time": {"$gte": b, "$lte": e}
+                }
+                print(filter_dict)
+                track_list = Track.find_plus(filter_dict, to_dict=True)
+                print(b.strftime("%F"), real_name, len(track_list))
+                if len(track_list) < 10:
+                    """轨迹太少,不生成事件"""
+                    pass
+                else:
+                    print(real_name, )
+                    range_num = random.randint(1, 8)
+                    print(range_num)
+                    event_list = list()
+                    for i in range(range_num):
+                        """选择range_num个点"""
+                        track = random.choice(track_list)
+                        event_args['event_time'] = track['time']
+                        event_args['loc'] = track['loc']['coordinates']
+                        event_args['event_type'] = random.choice(type_list)
+                        event_list.append(event_args)
+                    cls.insert_many(event_list)
+
+    @classmethod
+    def page(cls, user_id: str = None, tip_status: int = None, event_type: list = None,
+             begin_date: datetime.datetime = None, end_date: datetime.datetime = None,
+             index: int = 1, num: int = 20, can_json: bool = True, reverse: bool = True) -> dict:
+        """
+        分页查询行车记录
+        :param user_id: 用户id,为空表示所有司机
+        :param tip_status: int 提醒状态 未提醒0 ,已提醒1
+        :param event_type: list 事件类型数组,None表示包含所有事件
+        :param begin_date:   开始时间
+        :param end_date:   截至时间
+        :param index:  页码
+        :param can_json:   是否进行can json转换
+        :param num:   每页多少条记录
+        :param reverse:   是否倒序排列?
+        :return: 事件记录的列表和统计组成的dict
+        """
+        filter_dict = dict()
+        if user_id is not None:
+            filter_dict['user_id'] = DBRef(collection="user_info", id=user_id, database="platform_db")
+        if tip_status is not None:
+            filter_dict['tip_status'] = tip_status
+        if event_type is not None:
+            filter_dict['event_type'] = {"$in": event_type}
+        filter_dict['time'] = {"$lte": end_date, "$gte": begin_date}
+        skip = (index - 1) * num
+        sort_dict = {"time": -1 if reverse else 1}
+        count = cls.count(filter_dict=filter_dict)
+        res = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, skip=skip, limit=num, to_dict=True)
+        if can_json:
+            res = [mongo_db.to_flat_dict(x) for x in res]
+        data = {"count": count, "data": res}
+        return data
 
 
 class SecurityReport(mongo_db.BaseDoc):
@@ -1177,6 +1270,8 @@ if __name__ == "__main__":
     # '59cda57bad01be0912b352da 59cda886ad01be237680e28e 59cda964ad01be237680e29d'
     # print(SecurityReport.query_report("sf", "59cda964ad01be237680e29d", "2017-12-21"))
     # print(SecurityReport.query_report("sf", "59cda964ad01be237680e29d", "2018-01-02"))
-    print(SecurityReport.query_report("sf", "59cda964ad01be237680e29d", "2018-01-03 2018-01-11"))
+    # print(SecurityReport.query_report("sf", "59cda964ad01be237680e29d", "2018-01-03 2018-01-11"))
     # print(HealthReport.get_instance(ObjectId("59cda964ad01be237680e29d"), "2017-12-25").to_flat_dict())
+    # print(DrivingEvent.random_event())
+    print(DrivingEvent.page())
     pass

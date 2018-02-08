@@ -172,7 +172,6 @@ def test_get_report_detail():
     auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     url = "http://127.0.0.1:5000/api/get_report_detail"
-    url = "http://127.0.0.1:5000/token"
     # url = "http://safego.org:5000/api/get_report_detail"
     r = requests.post(url, headers=headers, data={"hello": "world"})
     j = r.json()

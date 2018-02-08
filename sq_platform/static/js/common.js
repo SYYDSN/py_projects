@@ -249,3 +249,87 @@ fill_right_bar = function (func_name) {
     });
 };
 
+// 检查某个日期是不是今天?
+function is_today(date){
+    let now1 = new Date();
+    let now2 = date;
+    if(date.getHours){
+        // 是Date对象.
+    }
+    else{
+        now2 = new Date(date);
+    }
+    if(now2 === "Invalid Date"){
+        return false;
+    }
+    else{
+        let y1 = now1.getFullYear();
+        let y2 = now2.getFullYear();
+        let month1 = now1.getMonth();
+        let month2 = now2.getMonth();
+        let day1 = now1.getDate();
+        let day2 = now2.getDate();
+        if(y1 === y2 && month1 === month2 && day1 === day2){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+}
+
+function float_to_string(hour){
+    // 把浮点制的小时换算成xx小时xx分
+    let l = String(hour);
+    let ls = l.split(".");
+    if(ls.length === 1){
+        return `${ls[0]}小时`
+    }
+    else{
+        let h = ls[0];
+        let m = Math.round(parseFloat(`0.${ls[1]}`) * 60);
+        return `${h}小时${m}分钟`;
+    }
+}
+
+function get_picker_date($obj){
+    // 按照统一格式取时间,避免浏览器的差异,$obj是时间选择器绑定的input的jq对象.返回2018-01-01格式的日期
+    let date_str = $.trim($obj.val());
+    if(date_str.indexOf("-") !== -1){
+        let date_list = date_str.split("-");
+        let year = date_list[0];
+        /*防止浏览器之间的差异,这里必须做手动转换,以保证时间字符串格式的一致性*/
+        let month = String(date_list[1]).length < 1? "0" + date_list[1]:date_list[1];
+        let day = String(date_list[2]).length < 1? "0" + date_list[2]:date_list[2];
+        return `${year}-${month}-${day}`;
+    }
+    else{
+        return null;
+    }
+
+}
+
+function get_url_arg(arg_url){
+    // 从url分析参数,
+    let args = {};
+    let url = typeof(arg_url) === "undefined"? location.href: arg_url;
+    if(url.indexOf("?") !== -1){
+        let arg_str = url.split("?")[1];
+        arg_str = decodeURIComponent(arg_str);
+        console.log(arg_str);
+        let a_list = arg_str.split("&");
+        for(var item of a_list){
+            if(item.indexOf("=") !== -1){
+                let temp = item.split("=");
+                let k = temp[0];
+                let v = temp[1];
+                args[k] = v;
+
+            }else{}
+        }
+    }
+    else{
+        // pass
+    }
+    return args;
+}

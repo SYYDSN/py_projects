@@ -40,7 +40,8 @@ mongodb_setting = {
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
-    "readPreference": "secondaryPreferred",  # 读偏好,优先从盘
+    # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
+    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
     "username": user,       # 用户名
     "password": password    # 密码
 }
@@ -206,6 +207,28 @@ def get_conn(table_name):
         mongodb_conn = get_db()
         conn = mongodb_conn[table_name]
         return conn
+
+
+def other_can_json(obj):
+    """把其他对象转换成可json"""
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    elif isinstance(obj, (DBRef, MyDBRef)):
+        return obj.as_doc()
+    elif isinstance(obj, datetime.datetime):
+        return obj.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        return obj
+
+
+def to_flat_dict(a_dict) -> dict:
+    """
+    转换成可以json的字典,这是一个独立的方法
+    :param a_dict:
+    :return:
+    """
+    return {other_can_json(k): other_can_json(v) for k, v in a_dict.items()}
+
 
 
 def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
@@ -1292,6 +1315,18 @@ class BaseDoc:
         return result
 
     @classmethod
+    def count(cls, filter_dict: dict, session = None, **kwargs):
+        """统计
+        :param filter_dict: 过滤器字典
+        :param session: pymongo.client_session.ClientSession 实例
+        :return:
+        """
+        table_name = cls.get_table_name()
+        ses = get_conn(table_name)
+        result = ses.count(filter=filter_dict, session=session, **kwargs)
+        return result
+
+    @classmethod
     def distinct(cls, filter_dict: dict = None, key: str = None):
         """
         去重查找
@@ -1514,7 +1549,13 @@ class BaseDoc:
 
         }
         args = {k: v for k, v in args.items() if v is not None}
-        result = ses.find_one_and_update(**args)
+        result = None
+        try:
+            result = ses.find_one_and_update(**args)
+        except Exception as e:
+            ms = "args: {}".format(args)
+            logger.exception(ms)
+            raise e
         return result
 
     @classmethod

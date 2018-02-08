@@ -752,7 +752,7 @@ class CarLicense(mongo_db.BaseDoc):
     """
     type_dict["user_id"] = ObjectId  # 关联
     type_dict["permit_image_url"] = str  # 车辆照片url
-    type_dict["plate_number"] = str  # 车辆号牌
+    type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
     type_dict["car_type"] = str  # 车辆类型  比如 重型箱式货车
     type_dict["owner_name"] = str  # 车主姓名/不一定是驾驶员
     type_dict["address"] = str  # 地址
@@ -766,10 +766,9 @@ class CarLicense(mongo_db.BaseDoc):
     type_dict["create_date"] = datetime.datetime  # 创建日期
 
     def __init__(self, **kwargs):
-        keys = kwargs.keys()
-        if "create_date" not in keys:
+        if "create_date" not in kwargs:
             kwargs['create_date'] = datetime.datetime.now()
-        if "plate_number" in keys:
+        if "plate_number" in kwargs:
             """plate_number为空是在仅仅上传了行车证照片，还没有输入车牌信息的情况。一个用户只允许一条这样的记录"""
             kwargs['plate_number'] = kwargs['plate_number'].upper()
         if "user_id" not in kwargs:
@@ -1757,5 +1756,9 @@ if __name__ == "__main__":
     # User.app_version_list()
     # User.app_version_list()
     # User.set_driving_license()
-    GPS.async_insert_many()
+    # GPS.async_insert_many()
+    filter_dict = {"time": {"$lte": mongo_db.get_datetime_from_str("2017-1-1 0:0:0")}}
+    gps_list = GPS.find_plus(filter_dict=filter_dict)
+    for gps in gps_list:
+        print(gps)
     pass

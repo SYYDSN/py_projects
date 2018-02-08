@@ -35,9 +35,7 @@ from gevent.wsgi import WSGIServer
 
 
 # meinheld 方式,部分c的py.
-from meinheld import patch
-patch.patch_all()
-server.listen(("0.0.0.0", 5000))
+server.listen(("0.0.0.0", port))
 server.run(app)
 
 

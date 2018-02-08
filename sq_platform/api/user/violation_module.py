@@ -10,6 +10,7 @@ import requests
 import datetime
 from log_module import get_logger
 import json
+from bson import regex
 from api.data.item_module import User
 from bson.objectid import ObjectId
 from bson.dbref import DBRef
@@ -18,14 +19,15 @@ from error_module import RepeatError
 from error_module import MongoDeleteError
 from api.data.item_module import CarLicense
 from api.data.item_module import Position
-from celery_module import query_position
+from amap_module import get_position_by_address
 
 
 """违章查询模块"""
 
 
 logger = get_logger()
-interval_seconds = 56400
+interval_seconds = 56400  # 一天的秒
+cache = mongo_db.cache
 
 
 def query(**kwargs):
@@ -199,12 +201,42 @@ def query(**kwargs):
 #         return message
 
 
+def query_position(*arg, **kwargs):
+    """查询经纬度信息，此方法为类的内部方法调用"""
+    city = kwargs['city']
+    address = kwargs['address']
+    object_id = mongo_db.get_obj_id(kwargs['object_id'])
+    """先检查数据库是否有？"""
+    in_db = Position.find_one(city=city, address=address)
+    if in_db is None:
+        """数据库没有对应的信息"""
+        key = "query_geo_coordinate_{}_{}".format(city, address)  # 缓存标识
+        cache.set(key, 1, timeout=5)
+        position_data, real = get_position_by_address(city=city, address_str=address)
+        cache.delete(key)
+        args = {"address": address, "city": city, "real_value": real,
+                "longitude": position_data[0], "latitude": position_data[1]}
+        pos = Position(**args)
+        filter_dict = {"city": city, "address": address}
+        update = {k: v for k, v in pos.to_flat_dict().items() if k not in ("_id", "city", "address")}
+        pos = pos.find_one_and_update(filter_dict=filter_dict, update=update)
+        position_id = mongo_db.get_obj_id(pos['_id'])
+    else:
+        position_id = in_db.get_id()
+    filter_dict = {"_id": object_id}
+    update = {"$set": {"position_id": position_id}}
+    ses = mongo_db.get_conn("violation_info")
+    ses.find_one_and_update(filter=filter_dict, update=update)
+    return str(position_id)
+
+
 class ViolationRecode(mongo_db.BaseDoc):
     """违章记录"""
     _table_name = "violation_info"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
     type_dict['user_id'] = ObjectId  # 关联用户的id
+    type_dict['plate_number'] = str  # 违章时的车牌号
     type_dict["code"] = str  # 违章编码,唯一，非违章条例码
     type_dict["time"] = datetime.datetime  # 违章时间
     type_dict["update_time"] = datetime.datetime  # 记录变更时间
@@ -301,8 +333,48 @@ class ViolationRecode(mongo_db.BaseDoc):
         return dbref
 
     @classmethod
+    def page(cls, user_id: str = None, city: str = None, plate_number: str = None, vio_status: str = None,
+             fine: float = None, begin_date: datetime.datetime = None, end_date: datetime.datetime = None,
+             index: int = 1, num: int = 20, can_json: bool = True, reverse: bool = True) -> dict:
+        """
+        分页查询违章记录
+        :param user_id: 用户id,为空表示所有司机
+        :param city:   城市
+        :param plate_number:   车牌
+        :param vio_status:  违章状态? 已/未处理
+        :param fine:   罚金数目
+        :param begin_date:   开始时间
+        :param end_date:   截至时间
+        :param index:  页码
+        :param can_json:   是否进行can json转换
+        :param num:   每页多少条记录
+        :param reverse:   是否倒序排列?
+        :return: 违章记录的列表和统计组成的dict
+        """
+        filter_dict = dict()
+        if user_id is not None:
+            filter_dict['user_id'] = mongo_db.get_obj_id(user_id)
+        if city is not None:
+            filter_dict['city'] = regex.Regex('.*{}.*'.format(city))  # 正则表达式,匹配city中包含city字符串的
+        if plate_number is not None:
+            filter_dict['plate_number'] = regex.Regex('.*{}.*'.format(plate_number))  # 正则表达式
+        if vio_status is not None:
+            s_d = {"未处理": 1, "处理中": 2, "已处理": 3}
+            filter_dict['process_status'] = s_d.get(vio_status, 4)  # 4是不支持的状态
+        if fine is not None:
+            filter_dict['fine'] = float(fine)
+        filter_dict['time'] = {"$lte": end_date, "$gte": begin_date}
+        skip = (index - 1) * num
+        sort_dict = {"time": -1 if reverse else 1}
+        count = cls.count(filter_dict=filter_dict)
+        res = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, skip=skip, limit=num, to_dict=True)
+        if can_json:
+            res = [mongo_db.to_flat_dict(x) for x in res]
+        data = {"count": count, "data": res}
+        return data
+
+    @classmethod
     def all_vio(cls, user_id):
-        """查询某用户的全部的违章记录"""
         user_id = mongo_db.get_obj_id(user_id)
         result = cls.find(user_id=user_id)
         return result
@@ -704,6 +776,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         # args = {"plateNumber": "赣EG2681", "engineNo": "091697", "vin": "010012",
         #         "carType": "02", "city": "上海市"}
         args = kwargs
+        plateNumber = kwargs['plateNumber']
         ms = "raw查询违章参数:{}".format(args)
         logger.info(ms)
         json_str = json.dumps(args)  # 此接口的参数必须是json_str格式
@@ -735,6 +808,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                             new_vio_list = list()
                             for vio in vio_list:
                                 new_vio = dict()
+                                new_vio['plateNumber'] = plateNumber
                                 for k2, v2 in vio.items():
                                     if k2 in transform_dict:
                                         new_vio[transform_dict[k2]] = v2
@@ -972,22 +1046,28 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         return message
 
 
+def add_plate_number():
+    """把所有的违章记录都加上车牌号,这是一个调试专用函数"""
+    rr = ViolationQueryResult.find()
+    for r in rr:
+        generator = VioQueryGenerator.find_by_id(r.get_attr('generator_id'))
+        if generator is None:
+            car = None
+        else:
+            car = CarLicense.find_by_id(generator.get_attr("car_license").id)
+        if car is None:
+            num = "沪A12345"
+        else:
+            num = car.get_attr("plate_number")
+        vios = [x.id for x in r.get_attr("violations")]
+        for v_id in vios:
+            vio = ViolationRecode.find_by_id(v_id)
+            vio.set_attr("plate_number", num)
+            vio.save()
+
+
 if __name__ == "__main__":
-    args = {"plateNumber": "赣EG2681", "engineNo": "091697", "vin": "010012",
-            "carType": "02", "city": "上海市"}
-    # args = {'carType': '02', 'vin': '118936', 'plateNumber': '苏ER52Y5', 'city': '上海市', 'engineNo': 'x74922'}
-    args = {"plate_number": "赣EG2681", "engine_id": "091697", "vin_id": "010012",
-            "car_type": "02", "city": "上海市"}
-    args = {'city': '苏州市', 'vin': '118936', 'engineNo': 'x74922', 'plateNumber': '苏ER52Y5', 'carType': '02'}
-    # query(**args)
-    # user_id = {"user_id": ObjectId("59895177de713e304a67d30c")}
-    # vio = VioQueryGenerator.find_by_id(ObjectId("598951e7de713e304a67d31f"))
-    # obj = vio.my_car_license()
-    history = VioQueryGenerator.get_input_history("59895177de713e304a67d30c")
-    print(history)
-    # query(**{"plate_number": "苏ER52Y5", "engine_id": "x74922", "vin_id": "118936",
-    #         "car_type": "02", "city": "苏州市"})
-    # res = VioQueryGenerator.get_prev_query_result(ObjectId("598d6ac2de713e32dfc74796"), ObjectId("59df38c3ad01be642b5d9074"))
-    # print(res)
+    args = {"user_id": "59895177de713e304a67d30c", "city": "上海市"}
+    add_plate_number()
     pass
 
