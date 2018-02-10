@@ -34,4 +34,13 @@
 .selected_driver .driver_name{
     color: orange;
 }
-
+/*悬浮标题区域*/
+#title_container{
+    position: absolute;
+    z-index: 200;
+    top: 2rem;
+    left:4rem;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    display:flex; md
+}

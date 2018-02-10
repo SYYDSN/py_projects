@@ -171,14 +171,31 @@ def test_get_report_detail():
     """测试获取安全报告详情"""
     auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
-    url = "http://127.0.0.1:5000/api/get_report_detail"
-    # url = "http://safego.org:5000/api/get_report_detail"
+    # url = "http://127.0.0.1:5000/api/get_report_detail"
+    url = "http://safego.org:5000/api/get_report_detail"
     r = requests.post(url, headers=headers, data={"hello": "world"})
     j = r.json()
     if 'data' in j:
         rs = j['data']
         for k, v in rs.items():
             print(k, v)
+    else:
+        print(j)
+
+
+def test_get_safety_report_history():
+    """测试获取安全报告历史"""
+    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    headers = {"auth_token": auth_token}
+    # url = "http://127.0.0.1:5000/api/get_safety_report_history"
+    url = "http://safego.org:5000/api/get_safety_report_history"
+    r = requests.post(url, headers=headers, data={"hello": "world"})
+    j = r.json()
+    if 'data' in j:
+        rs = j['data']
+        for item in rs:
+            for k, v in item.items():
+                print(k, v)
     else:
         print(j)
 
@@ -204,6 +221,6 @@ if __name__ == "__main__":
     # test_get_user_driving_license()
     # """测试用户安全指数排名接口"""
     # test_get_security_rank_list()
-    test_get_report_detail()
+    test_get_safety_report_history()
     # test_gps_push()
     pass

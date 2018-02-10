@@ -104,11 +104,21 @@ body{
 #show_table .fix_width{
     max-width: 15em;
 }
-#show_table .driver_name>.span{
-
+/*状态相关*/
+#show_table  status_0,status_1{
+    word-wrap: normal;
+    word-break: keep-all;
 }
-#show_table .driver_name>.select{
-
+#show_table .my_status{
+    padding: 0.5em 0.8em;
+    border-radius: 0.3em;
+    color:white;
+}
+#show_table  .status_0{
+    background-color: #ff7772;
+}
+#show_table  .status_1{
+    background-color: #ddd;
 }
 #show_table .my_btn_group span{
     word-wrap: normal;

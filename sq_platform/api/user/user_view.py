@@ -669,6 +669,10 @@ def get_report_detail_func(user_id) -> str:
     if report_id is None:
         pass
     data = security_module.SecurityReport.get_report_detail(report_id, user_id)
+    url_root = request.url_root
+    url_poly = data['url_poly']
+    url_poly = "{}static/image/poly_image/{}".format(url_root, url_poly)
+    data['url_poly'] = url_poly
     ms = "get_report_detail func is running args: user_id={}, report_id={}".format(user_id, report_id)
     logger.info(ms)
     poly = Track.get_tracks_list(user_id=user_id, for_app=True)
@@ -705,10 +709,11 @@ def get_safety_report_history_func(user_id) -> str:
         message['message'] = error_info
         print(e)
     finally:
+        url_root = request.url_root
         for x in report_history:
-            key = 'url_polyline'
-            url_polyline = x[key]
-            x[key] = host_url + url_polyline
+            url_poly = x['url_poly']
+            url_poly = "{}static/image/poly_image/{}".format(url_root, url_poly)
+            x['url_poly'] = url_poly
         message['data'] = report_history
         return json.dumps(message)
 

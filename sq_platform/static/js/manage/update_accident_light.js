@@ -1,6 +1,6 @@
 $(function(){
     // 初始化日期选择器
-    $("#begin_date, #end_date").datetimepicker({
+    $("#accident_time").datetimepicker({
         language: "zh-CN",
         weekStart:1,  // 星期一作为一周的开始
         minView: 2,  // 不显示小时和分
@@ -27,12 +27,11 @@ $(function(){
         let main_zone_height = $("#main_zone").height();
         let first_height = $(".first_row").height();
         let second_height = $(".second_row").height();
-        let third_height = $(".third_row").height();
-        if((main_zone_height - first_height - second_height - third_height) > 10){
+        if((main_zone_height - first_height - second_height) > 10){
             let w_h = $("html").height();
-            let b_t = $(".third_row").offset().top + $(".third_row").height();
+            let b_t = $(".second_row").offset().top + $(".second_row").height();
             let h = w_h - b_t;
-            let table_col = $(".third_row>.my_col:first");
+            let table_col = $(".second_row>.my_col:eq(0)");
             let x = parseInt(table_col.css("height").split("px")[0]);
             table_col.css("height", x + h - 35);
         }else{}
@@ -41,37 +40,7 @@ $(function(){
     $(window).resize(function(){resize();});
     resize();
 
-    // 提醒按钮事件
-    $("#tip_btn").click(function(){
-        let check_list = $(".my_check:checked");
-        if(check_list.length > 0){
-            let event_ids = [];
-            for(let event of check_list){
-                event_ids.push($(event).attr("data-id"));
-            }
-            let args = {
-                    "event_id": JSON.stringify(event_ids),
-                    "the_type": "change_tip_status"  // 更改提醒状态
-                };
-            $.post("warning", args, function(resp){
-                let json = JSON.parse(resp);
-                console.log(json);
-                if(json['message'] === "success"){
-                    pop_tip_div("发送提醒成功");
-                    for(let event_id of event_ids){
-                        $(`#${event_id} .tip_status`).text("已提醒");
-                    }
-                }
-                else{
-                    pop_tip_div(json['message']);
-                }
-            });
-
-        }
-        else{
-            // 非编辑状态,pass
-        }
-    });
+    // 修改按钮事件
 
 
     // 确定跳转按钮事件
@@ -102,16 +71,16 @@ $(function(){
         if(city !== ""){
             args['city'] = city;
         }else{}
-        let driver = $.trim($("#select_driver").val());
-        if(driver !== ""){
-            args['user_id'] = driver;
+        let driver_name = $.trim($("#select_driver").val());
+        if(driver_name !== ""){
+            args['driver_name'] = driver_name;
         }else{}
         let plate_number = $.trim($("#select_car").val());
         if(plate_number !== ""){
             args['plate_number'] = plate_number;
         }else{}
 
-        let url = "warning?";
+        let url = "accident?";
         url += $.param(args);
         console.log("url = " + url);
         location.href = url;
@@ -142,7 +111,7 @@ $(function(){
                     else if (k === "end_date") {
                         $("#end_date").val(v.split(" ")[0]);
                     }
-                    else if (k === "user_id") {
+                    else if (k === "driver_name") {
                         $("#select_driver").val(v);
                     }
                     else if (k === "city") {

@@ -1559,6 +1559,36 @@ class BaseDoc:
         return result
 
     @classmethod
+    def update_many_plus(cls, filter_dict: dict, update_dict: dict, upsert: bool = False,
+                         document_validation: bool = False) -> (list, None):
+        """
+        根据条件查找对象,进行批量更新
+        :param filter_dict: 查找时匹配参数 字典
+        :param update_dict: 更新的数据，字典,注意例子中参数的写法,有$set和$inc两种更新方式.
+        :param upsert: 更新对象不存在的时候是否插入新的数据?
+        :param document_validation: 是否启用文档验证机制?(前提是你这个表设置了文档验证器)
+        :return:  pymongo.results.UpdateResult
+        example:
+        filter_dict = {"something": ...}
+        update_dict = {"$set": {"prev_date": datetime.datetime.now(),
+                                "last_query_result_id": last_query_result_id},
+                       "$inc": {"online_query_count": 1, "all_count": 1,
+                                "today_online_query_count": 1}}
+        self.find_one_and_update(filter_dict=filter_dict, update=update_dict)
+        """
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        args = {
+            "filter": filter_dict,
+            "update": update_dict,
+            "upsert": upsert,
+            "bypass_document_validation": document_validation,
+            "collation": None
+        }
+        res = ses.update_many(**args)
+        return res
+
+    @classmethod
     def near_by_point(cls, the_class: type = None, col: str = "loc",
                       min_distance: [float, int] = 0.0,
                       max_distance: [float, int] = 0.0,

@@ -1,0 +1,62 @@
+/*第一行违章统计*/
+html{
+    font-size:12px;
+}
+body{
+    font-size: 1.1667rem;
+}
+/*头部链接*/
+.my_url{
+    color:#666;
+    margin-right:2em;
+}
+.blue{
+    color:#7388f3;
+}
+.first_row, .second_row{
+    padding: 1em 4em;
+    background-color: white;
+    border:1px solid #ddd;
+    color: #666;
+}
+.first_row{
+    border-bottom: none;
+}
+.first_row .my_col{
+    margin-left:-1em;
+}
+.first_row>.my_col:nth-child(1){
+    font-size: 16px;
+}
+.my_col{
+    padding: 1em 0;
+}
+.my_item, .my_col{
+    display: flex;
+    flex-direction:row;
+    justify-content: flex-start;
+    /*align-items: baseline;*/
+}
+.second_row .my_col{
+    flex-direction:column;
+}
+
+.sub_item{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+}
+.sub_item input[type='text'], select{
+    /*width: 6em;*/
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    margin: 0.4em 2em 1em 0;
+}
+.check_div{
+    display: flex;
+    flex-direction: row;
+}
+.check_div .check_name{
+    margin-right:3em;
+}

@@ -1,0 +1,113 @@
+{% extends "manage/base_template_light.html" %}
+{% block extend_css %}
+<link rel="stylesheet" href="../static/css/manage/update_accident_light.css">
+{% endblock %}
+{% block main %}
+    <div id="main_zone" class="main_zone col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <!--顶部区域开始-->
+        <div class="row first_row">
+            <div class="my_col">
+                <a class="my_url" href="accident">事故统计</a><a class="my_url blue" href="update_accident">事故上报</a>
+            </div>
+        </div>
+        <!--顶部区域结束-->
+        <!--中间区域开始-->
+        <div class="second_row row">
+            <div class="my_col">
+
+                <div class="my_item">
+                    <div class="sub_item">
+                        <span class="my_label">事故名称</span>
+                        <input type="text" id="accident_title">
+                    </div>
+                    <div class="sub_item">
+                        <span class="my_label">事故类型</span>
+                        <select id="accident_title">
+                            {% for x in acc_type %}
+                                <option value="{{ x }}">{{ x }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="my_item">
+                    <div class="sub_item">
+                        <span class="my_label">事故地点</span>
+                        <input type="text" id="accident_address">
+                    </div>
+                    <div class="sub_item">
+                        <span class="my_label">事故时间</span>
+                        <input type="text" id="accident_time">
+                    </div>
+                    <div class="sub_item">
+                        <span class="my_label">事故城市</span>
+                        <input type="text" id="accident_city">
+                    </div>
+                </div>
+
+                <div class="my_item">
+                    <div class="sub_item">
+                        <span class="my_label">损失金额</span>
+                        <input type="text" id="accident_address">
+                    </div>
+                    <div class="sub_item">
+                        <span class="my_label">事故后果</span>
+                        <input type="text" id="accident_time">
+                    </div>
+                </div>
+
+                <div class="my_item">
+                    <div class="sub_item">
+                        <span>处理状态</span>
+                        <div class="check_div">
+                            <input type="checkbox" {{'checked' if vio_status is none or vio_statis == 1 else ''}}  id="check_processed">
+                            <span class="check_name">
+                            已处理
+                        </span>
+                            <input type="checkbox" {{'checked' if vio_status is none or vio_statis == 3 else ''}}  id="check_unprocessed">
+                            <span class="check_name">
+                            未处理
+                        </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my_item">
+                    <div class="sub_item">
+                        <span class="my_label">事件描述</span>
+                        <input type="text" id="accident_description">
+                    </div>
+                </div>
+
+                <div class="my_item">
+                    <div class="sub_item">
+                        <span class="my_label">图片和视频</span>
+                        <div class="file_list">
+                            <img id="add_file">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my_item">
+                    <div class="sub_item">
+                        <span class="my_label">备注</span>
+                        <input type="text" id="accident_comment">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!--中间区域结束-->
+
+    </div>
+{% endblock %}
+{% block extend_js %}
+    <!--日期选择器样式-->
+    <link rel="stylesheet" href="../static/css/bootstrap-datetimepicker.min.css">
+    <!--日期选择器-->
+    <script src="../../static/js/bootstrap-datetimepicker.min.js"></script>
+    <!--日期选择器本地化语言-->
+    <script src="../../static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+    <script src="../static/js/manage/update_accident_light.js"></script>
+{% endblock %}

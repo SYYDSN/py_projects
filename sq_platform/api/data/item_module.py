@@ -1140,7 +1140,7 @@ class Track(mongo_db.BaseDoc):
         else:
             if isinstance(user_id, str) and len(user_id) == 24:
                 user_id = mongo_db.get_obj_id(user_id)
-            elif isinstance(DBRef, MyDBRef):
+            elif isinstance(user_id, (DBRef, MyDBRef)):
                 user_id = user_id.id
             elif isinstance(user_id, ObjectId):
                 pass

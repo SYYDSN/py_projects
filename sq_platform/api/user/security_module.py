@@ -5,7 +5,7 @@ import sys
 project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 if project_dir not in sys.path:
     sys.path.append(project_dir)
-
+from bson import regex
 import mongo_db
 from uuid import uuid4
 import numpy as np
@@ -269,6 +269,7 @@ class DrivingEvent(mongo_db.BaseDoc):
     type_dict["user_id"] = DBRef  # 用户id，指向user_info表
     type_dict["real_name"] = str  # 用户真实姓名
     type_dict["user_phone"] = str  # 用户联系方式
+    type_dict["plate_number"] = str  # 车牌
     type_dict["loc"] = list  # 事件发生坐标 [经度, 纬度]
     type_dict["address"] = str  # 事件发生地址
     type_dict["event_time"] = datetime.datetime  # 事件发生时间
@@ -371,6 +372,87 @@ class DrivingEvent(mongo_db.BaseDoc):
             filter_dict['tip_status'] = tip_status
         if event_type is not None:
             filter_dict['event_type'] = {"$in": event_type}
+        filter_dict['event_time'] = {"$lte": end_date, "$gte": begin_date}
+        skip = (index - 1) * num
+        sort_dict = {"event_time": -1 if reverse else 1}
+        count = cls.count(filter_dict=filter_dict)
+        res = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, skip=skip, limit=num, to_dict=True)
+        if can_json:
+            res = [mongo_db.to_flat_dict(x) for x in res]
+        data = {"count": count, "data": res}
+        return data
+
+
+class Accident(mongo_db.BaseDoc):
+    """事故类
+    """
+    _table_name = "accident_info"
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['code'] = str  # 事故编号
+    type_dict['title'] = str  # 事故标题,非必须
+    type_dict['description'] = str  # 事故描述,非必须
+    type_dict['comment'] = str  # 事故备注,非必须
+    type_dict['type'] = str  # 事故类型 追尾碰撞, 双车刮蹭, 部件失效, 车辆倾覆
+    type_dict['class'] = str  # 事故大类 单车事故, 双车事故, 多车事故
+    type_dict['result'] = str  # 事故结果类别, 轻微事故, 一般事故, 重大事故, 特大事故
+    type_dict['loss'] = float  # 事故造成的损失.浮点.
+    type_dict['plate_number'] = str  # 肇事车牌
+    type_dict['driver_name'] = str  # 肇事司机真实姓名
+    type_dict['time'] = datetime.datetime  # 事发时间
+    type_dict['address'] = str  # 事发地址
+    type_dict['city'] = str  # 事发城市
+    type_dict['file'] = list  # 相关视频,文件资料.
+    type_dict['status'] = int   # 事故状态,0未处理.1 已处理
+
+    @classmethod
+    def random_accident(cls) -> dict:
+        """
+        生成一个事故的doc对象
+        :return:
+        """
+        args = {
+            "code": str(random.randint(100, 99999)).zfill(5),
+            "type": random.choice(["追尾碰撞", "双车刮蹭", "部件失效", "车辆倾覆"]),
+            "class": random.choice(["单车事故", "双车事故", "多车事故", '单车事故']),
+            "result": random.choice(["轻微事故", "一般事故", "重大事故", "轻微事故", "轻微事故"]),
+            "loss": random.randint(8, 40) * 100,
+            "plate_number": random.choice(["沪A45213", "沪D01298", "沪B51231"]),
+            "driver_name": random.choice(["薛飞", "刘成刚", "栾新军"]),
+            "time": generator_datetime(),
+            "address": generator_address(),
+            "city": "上海市",
+            "status": 1
+        }
+        return args
+
+    @classmethod
+    def page(cls, driver_name: str = None, status: int = None, plate_number: str = None, city: str = None,
+             begin_date: datetime.datetime = None, end_date: datetime.datetime = None,
+             index: int = 1, num: int = 20, can_json: bool = True, reverse: bool = True) -> dict:
+        """
+        分页查询行车记录
+        :param driver_name: 司机真实姓名,为空表示所有司机
+        :param status: int 处理状态 0未处理,1已处理
+        :param plate_number: 车牌
+        :param city: 城市
+        :param begin_date:   开始时间
+        :param end_date:   截至时间
+        :param index:  页码
+        :param can_json:   是否进行can json转换
+        :param num:   每页多少条记录
+        :param reverse:   是否倒序排列?
+        :return: 事件记录的列表和统计组成的dict
+        """
+        filter_dict = dict()
+        if driver_name is not None:
+            filter_dict['driver_name'] = driver_name
+        if status is not None:
+            filter_dict['status'] = status
+        if plate_number is not None:
+            filter_dict['plate_number'] = plate_number
+        if city is not None:
+            filter_dict['city'] = regex.Regex('.*{}.*'.format(city))  # 正则表达式
         filter_dict['time'] = {"$lte": end_date, "$gte": begin_date}
         skip = (index - 1) * num
         sort_dict = {"time": -1 if reverse else 1}
@@ -431,62 +513,62 @@ class SecurityReport(mongo_db.BaseDoc):
     type_dict["create_date"] = datetime.datetime  # 安全报告的生成日期/查询日期
     type_dict['url_polyline'] = str  # 相关轨迹缩略图 图片以文件形式保存在磁盘上，这里只是一个url
     type_dict['engine_version'] = str  # 引擎版本号
-    type_dict["fictitious_values"] = list  # 此字段指明了对象中哪些数据是虚拟的?默认为空数组.
 
     def __init__(self, **kwargs):
         """由于安全报告需要生成，耗时，所以不因该在查询的时候才生成实例，而是由后台的异步任务队列批量的安全报告"""
         city_names = ["上海", "天津", "北京", "苏州", "无锡", "南京", "杭州", "宁波", "武汉", "长沙", "常州", "广州", "福州",
                       "厦门", "深圳", "成都", "重庆", "郑州", "合肥", "徐州", "济南", "青岛", "太原", "石家庄"]
-        fictitious_values = list()
         factor = random.randint(5, 10)  # 因数
         score_pool = mongo_db.normal_distribution_range(50, 90, 1000, int)  # 公用的分值池
 
         if "user_id" not in kwargs:
             ms = "user_id不能为空"
             raise ValueError(ms)
+
         if "create_date" not in kwargs:
             kwargs['create_date'] = datetime.datetime.now()
 
-            fictitious_values.append("total_mileage")
+        if "url_poly" not in kwargs:
+            kwargs['url_poly'] = 'default.png'  # 默认轨迹缩略图
+
         if "sum_mile" not in kwargs:  # 报告涉及周期的总里程,单位 公里
             kwargs['sum_mile'] = kwargs['total_mileage'] = random.choice(mongo_db.normal_distribution_range(100, 600, value_type=int))
-            fictitious_values.append("sum_mile")
+
         if "scr_synt" not in kwargs:  # 综合分数
             kwargs['scr_synt'] = random.choice(score_pool)
-            fictitious_values.append("scr_synt")
+
         if "idx_slep" not in kwargs:  # 睡眠
             kwargs['idx_slep'] = random.choice([0, 1])
-            fictitious_values.append("idx_slep")
+
         if "idx_mood" not in kwargs:  # 情绪
             kwargs['idx_mood'] = random.choice([0, 1])
-            fictitious_values.append("idx_mood")
+
         if "idx_heal" not in kwargs:  # 健康
             kwargs['idx_heal'] = random.choice([0, 1])
-            fictitious_values.append("idx_heal")
+
         if "sum_time" not in kwargs:  # 本次报告所涉及的驾驶时长的累计。单位分钟
             kwargs['sum_time'] = random.randint(70, 90) * factor
-            fictitious_values.append("sum_time")
+
         if "cnt_make_call" not in kwargs:  # 打电话次数
             kwargs['cnt_make_call'] = random.randint(0, factor * 2)
-            fictitious_values.append("cnt_make_call")
+
         if "cnt_play_phon" not in kwargs:  # 看手机
             kwargs['cnt_play_phon'] = random.randint(0, factor * 2)
-            fictitious_values.append("cnt_play_phon")
+
         if "cnt_fati_driv" not in kwargs:  # 疲劳驾驶次数
             kwargs['cnt_fati_driv'] = random.choice([0, 0, 0, 0, 1, 1, 2])
-            fictitious_values.append("cnt_fati_driv")
+
         if "cnt_rapi_acce" not in kwargs:  # 急加速统计
             kwargs['cnt_rapi_acce'] = random.randint(0, factor * 2)
-            fictitious_values.append("cnt_rapi_acce")
+
         if "cnt_shar_turn" not in kwargs:  # 急转弯统计
             kwargs['cnt_shar_turn'] = random.randint(0, factor * 2)
-            fictitious_values.append("cnt_shar_turn")
+
         if "cnt_sudd_brak" not in kwargs:  # 急刹车统计
             kwargs['cnt_sudd_brak'] = random.randint(0, factor * 2)
-            fictitious_values.append("cnt_sudd_brak")
+
         if "cnt_over_sped" not in kwargs:  # 超速统计
             kwargs['cnt_over_sped'] = 0  # 超速统计容易惹麻烦,不要显示.(顺丰有车载设备监控速度)
-            fictitious_values.append("cnt_over_sped")
 
         super(SecurityReport, self).__init__(**kwargs)
 
@@ -502,6 +584,7 @@ class SecurityReport(mongo_db.BaseDoc):
     def create_report_track_thumb(cls, track_list: list, user_id: (str, ObjectId) = None,
                                   report_id: (str, ObjectId) = None) -> (str, None):
         """
+        废止,缩略图由客户端生成
         生成安全报告涉及的驾驶路线的回放轨迹的缩略图.
         :param track_list: 生成图像的数据，一般情况是Track实例的doc文档组成的数组
         :param user_id: 用户id
@@ -840,7 +923,6 @@ class SecurityReport(mongo_db.BaseDoc):
             # """用重力加速度数据来修正加速度数据"""
             # cls.acce_and_grav(acce_list, grav_list)
 
-            """轨迹缩略图"""
             report_id = ObjectId(None) if report_id is None else report_id
             args = {
                 "_id": report_id,  # 报告id,
@@ -851,8 +933,6 @@ class SecurityReport(mongo_db.BaseDoc):
                 "report_time": end_date  # 报告时间
             }
             args.update(temp_dict)
-            url_poly_line = cls.create_report_track_thumb(gps_list, user_id.id, report_id)
-            args['url_polyline'] = url_poly_line
             instance = cls(**args)
             return instance
 
@@ -1061,7 +1141,10 @@ class SecurityReport(mongo_db.BaseDoc):
         }
         sort_dict = {"report_time": -1}
         result_list = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict)
-        result_list.insert(0, report_today)
+        if report_today is None:
+            pass
+        else:
+            result_list.insert(0, report_today)
         if can_json:
             result_list = [x.to_flat_dict() for x in result_list]
         return result_list
@@ -1255,6 +1338,58 @@ class HealthReport(mongo_db.BaseDoc):
         return res_dict
 
 
+def generator_datetime():
+    """生成一个随机的时间"""
+    a_str = "2017-{}-{} {}:{}:{}".format(random.randint(1, 12), random.randint(1, 28),
+                                         random.randint(0, 23), random.randint(0, 59),
+                                         random.randint(0, 59))
+    return mongo_db.get_datetime_from_str(a_str)
+
+
+def generator_address() -> None:
+    """给生成一个虚拟地址,临时"""
+    roads = "北京路、天津路、上海路、广州路、南京路、武汉路、福州路、郑州路、沈阳路、长春路、昆明路、成都路、济南路、海口路、台北路、" \
+            "哈尔滨路、乌鲁木齐路、烟台路、威海路、大连路、洛阳路、宜昌路、九江路、赣州路、衡阳路、华山路、泰山路、长江路、洞庭湖路"
+    roads = roads.split("、")
+    direction = ['东', '西', '南', '北']
+    condition = random.choice([True, False])
+    address = "上海市"
+    if condition:
+        address += "{}{}路口向{}约{}米".format(random.choice(roads), random.choice(roads), random.choice(direction),
+                                         random.randint(1, 6) * 100)
+    else:
+        address += "{}{}号向{}约{}米".format(random.choice(roads), random.randint(200, 1000), random.choice(direction),
+                                         random.randint(1, 6) * 100)
+    return address
+
+
+def add_address():
+    """给没地址的行车事件加地址"""
+    events = DrivingEvent.find_plus({})
+    for event in events:
+        event.set_attr("address", generator_address())
+        event.save()
+
+
+def add_plate():
+    """给没车牌的行车事件加车牌"""
+    nums = ["沪A45213", "沪D01298", "沪B51231"]
+    events = DrivingEvent.find_plus({})
+    for event in events:
+        event.set_attr("plate_number", random.choice(nums))
+        event.save()
+
+
+def add_accident(num: int = 20) -> None:
+    """
+    往数据库添加虚拟的事故数据.
+    :param num: 添加的数
+    :return:
+    """
+    docs = [Accident.random_accident() for x in range(num)]
+    Accident.insert_many(docs)
+
+
 if __name__ == "__main__":
     u_id = ObjectId("59f19d8dad01be4d918cacb7")
     my_id = ObjectId("59895177de713e304a67d30c")
@@ -1273,5 +1408,5 @@ if __name__ == "__main__":
     # print(SecurityReport.query_report("sf", "59cda964ad01be237680e29d", "2018-01-03 2018-01-11"))
     # print(HealthReport.get_instance(ObjectId("59cda964ad01be237680e29d"), "2017-12-25").to_flat_dict())
     # print(DrivingEvent.random_event())
-    print(DrivingEvent.page())
+    add_accident(100)
     pass
