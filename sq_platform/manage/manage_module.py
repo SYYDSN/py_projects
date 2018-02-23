@@ -74,7 +74,7 @@ def app_version_table_func():
 def block_employee_list_func():
     """用户管理屏蔽列表的页面"""
     user_id = get_platform_session_arg("user_id")
-    head_img_url = get_platform_session_arg("head_img_url")
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     user = Employee.find_by_id(user_id)
     block_list = Employee.get_block_id_list(user_id, to_str=True)
     if request.method.lower() == "get" and isinstance(user, Employee):
@@ -250,12 +250,12 @@ def logout_func():
         return abort(400, "unknown request")
 
 
-@manage_blueprint.route("/show_track", methods=['get'])
+@manage_blueprint.route("/track", methods=['get'])
 @check_platform_session
-def show_track_func():
+def track_page_func():
     """展示用户轨迹页面"""
     user_id = get_platform_session_arg("user_id")
-    head_img_url = get_platform_session_arg("head_img_url")
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     real_name = get_platform_session_arg("real_name")
     if request.method.lower() == "get":
         return render_template("manage/show_track_light.html", head_img_url=head_img_url, real_name=real_name)
@@ -340,10 +340,23 @@ def track_info():
                     track_dict = Track.get_tracks_list(user_id, begin_date, end_date)
                     temp = dict()
                     temp['user_id'] = str(user_id.id)
-                    count += len(track_dict['track_list'])  # 计算track点的数量
+                    l = len(track_dict['track_list'])
+                    count += l  # 计算track点的数量
+                    if l > 100:
+                        # 如果轨迹点大于一定的数据,就假设他是有行车事件的
+                        filter_dict = {
+                            "user_id": user_id,
+                            "event_time": {
+                                "$lte": end_date,
+                                "$gte": begin_date
+                            }
+                        }
+                        events = security_module.DrivingEvent.find_plus(filter_dict=filter_dict, to_dict=True,
+                                                                        can_json=True)
+                        track_dict['event_list'] = events
                     temp['track_dict'] = track_dict
                     data.append(temp)
-                message['data'] = data
+                message['data'] = data  # 轨迹点的容器
                 message['count'] = count
             else:
                 message['message'] = "开始时间必须早于结束时间"
@@ -391,7 +404,7 @@ def index_func():
     """展示自定义的点的信息，用于实时显示一批司机的信息。后台的首页"""
     if request.method.lower() == "get":
         """返回页面"""
-        head_img_url = get_platform_session_arg("head_img_url") # 用户头像
+        head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png") # 用户头像
         real_name = get_platform_session_arg("real_name")
         return render_template("manage/index_light.html", head_img_url=head_img_url, real_name=real_name)
     else:
@@ -424,7 +437,7 @@ def driver_list_func():
 @check_platform_session
 def driver_detail_func():
     current_id = get_platform_session_arg("user_id")
-    head_img_url = get_platform_session_arg("head_img_url")
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     real_name = get_platform_session_arg("real_name")
     if request.method.lower() == "get":
         """员工/司机详情"""
@@ -559,7 +572,7 @@ def get_employee_archives_func():
 @check_platform_session
 def report_page_func():
     user_id = get_platform_session_arg("user_id")
-    head_img_url = get_platform_session_arg("head_img_url")
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     real_name = get_platform_session_arg("real_name")
     if request.method.lower() == "get":
         """报表"""
@@ -703,7 +716,7 @@ def get_archives_from_cache(current_user_id: str, clear: bool = False) -> dict:
 def violation_func():
     """违章页面"""
     current_user_id = get_platform_session_arg("user_id")
-    head_img_url = get_platform_session_arg("head_img_url")
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     current_real_name = get_platform_session_arg("real_name")
     """获取基本下属信息,用于身份验证,防止越权查看信息"""
     key = "base_info_list_{}".format(current_user_id)
@@ -888,7 +901,7 @@ def violation_func():
 def warning_func():
     """预警记录页面"""
     current_user_id = get_platform_session_arg("user_id")
-    head_img_url = get_platform_session_arg("head_img_url")
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     current_real_name = get_platform_session_arg("real_name")
     """获取基本下属信息,用于身份验证,防止越权查看信息"""
     key = "base_info_list_{}".format(current_user_id)
@@ -1076,7 +1089,7 @@ def warning_func():
 def accident_func():
     """事故(历史)页面"""
     current_user_id = get_platform_session_arg("user_id")
-    head_img_url = get_platform_session_arg("head_img_url")
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     current_real_name = get_platform_session_arg("real_name")
     """获取基本下属信息,用于身份验证,防止越权查看信息"""
     key = "base_info_list_{}".format(current_user_id)
@@ -1238,7 +1251,7 @@ def accident_func():
 def process_accident_func(prefix):
     """对事故信息的添加,修改,删除"""
     current_user_id = get_platform_session_arg("user_id")
-    head_img_url = get_platform_session_arg("head_img_url")
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     current_real_name = get_platform_session_arg("real_name")
     """获取基本下属信息,用于身份验证,防止越权查看信息"""
     key = "base_info_list_{}".format(current_user_id)
@@ -1272,7 +1285,7 @@ def process_accident_func(prefix):
                     accident = accident.to_flat_dict()
                 else:
                     pass
-            acc_type = ["追尾碰撞", "双车刮蹭", "部件失效", "车辆倾覆"];
+            acc_type = ["追尾碰撞", "双车刮蹭", "部件失效", "车辆倾覆"]
             return render_template("manage/update_accident_light.html", accident=accident, acc_type=acc_type,
                                    head_img_url=head_img_url, real_name=current_real_name)
     else:

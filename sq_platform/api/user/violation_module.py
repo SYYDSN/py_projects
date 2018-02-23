@@ -437,16 +437,19 @@ class ViolationQueryResult(mongo_db.BaseDoc):
         :return: 可序列化的字典
         """
 
-        violations = self.violations
+        violations = self.get_attr("violations", list())
         vio_list = list()
         if len(violations) == 0:
             pass
         else:
             for dbref in violations:
                 vio = ViolationRecode.get_instance_from_dbref(dbref)
-                vio = vio.check_position()
-                vio_list.append(vio.to_flat_dict())
-        self.violations = vio_list
+                if isinstance(vio, ViolationRecode):
+                    vio = vio.check_position()
+                    vio_list.append(vio.to_flat_dict())
+                else:
+                    pass
+        self.set_attr("violations", vio_list)
         data = self.to_flat_dict()
         return data
 
@@ -859,6 +862,11 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         return flag
 
     @classmethod
+    def test_query(cls, **kwargs):
+        """用于测试__query方法,仅仅做测试,不要在实际中调用"""
+        return cls.__query(**kwargs)
+
+    @classmethod
     def query(cls, object_id, to_flat_dict=True) -> dict:
         """
         查询违章，从api查询
@@ -958,7 +966,8 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 else:
                     """大于一天优先从网络读"""
                     user_id = generator.user_id
-                    flag = cls.check_query_count(user_id)
+                    flag = cls.check_query_count(user_id) # 检查是否出发查询次数限制?
+                    flag = True  # 调试问题,暂时取消查询次数限制
                     if flag:
                         """可以从互联网查询"""
                         message = cls.query(object_id)
@@ -1067,7 +1076,15 @@ def add_plate_number():
 
 
 if __name__ == "__main__":
-    args = {"user_id": "59895177de713e304a67d30c", "city": "上海市"}
-    add_plate_number()
+
+    args = {"plateNumber": "苏ER52Y5",
+                       "engineNo": "X74922",
+                       "vin": "118936",
+                       "city": "上海市"
+            }
+    # r = VioQueryGenerator.test_query(**args)
+    # print(r)
+    r2 = VioQueryGenerator.query(ObjectId("5a8fa5b2e39a7b3776dd8bcb"))
+    print(r2)
     pass
 

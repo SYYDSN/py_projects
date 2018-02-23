@@ -21,6 +21,19 @@ init_map();
 // 全局变量
 let global_track_time_list = [];  // 轨迹索引的时序，用于确认轨迹点的时间。
 let global_track_data_list = [];  // 轨序列，用于保存多条轨迹
+// 行车事件的图标url
+let event_image_dict = {
+    "超速": "../static/image/manage/driving_event/bg_chaosu.png",
+    "急转弯": "../static/image/manage/driving_event/bg_zhuanwan.png",
+    "情绪": "../static/image/manage/driving_event/bg_qingxu.png",
+    "看手机": "../static/image/manage/driving_event/bg_kanshouji.png",
+    "睡眠": "../static/image/manage/driving_event/bg_shui.png",
+    "健康": "../static/image/manage/driving_event/bg_jiakang.png",
+    "急刹车": "../static/image/manage/driving_event/bg_shache.png",
+    "疲劳驾驶": "../static/image/manage/driving_event/bg_pilaojiashi.png",
+    "打手机": "../static/image/manage/driving_event/bg_dashouji.png",
+    "急加速": "../static/image/manage/driving_event/bg_jiasu.png"
+};
 
 //加载PathSimplifier，loadUI的路径参数为模块名中 'ui/' 之后的部分
 AMapUI.load(['ui/misc/PathSimplifier'], function (PathSimplifier) {
@@ -29,7 +42,6 @@ AMapUI.load(['ui/misc/PathSimplifier'], function (PathSimplifier) {
         alert('当前环境不支持 Canvas！');
         return;
     }
-
     //启动页面
     initPage(PathSimplifier);
 });
@@ -70,6 +82,69 @@ function initPage(PathSimplifier) {
     }, 800);
 }
 
+fill_title = function(){
+    // 填充悬浮标题框的内容
+    console.log(this.G.extData);
+    let args = this.G.extData;
+    let div = $("#title_container .info_div");
+    div.empty();
+    let str_list = [];
+    let date = args['event_time'];
+    date = date.replace("-", "年");
+    date = date.replace("-", "月");
+    date = date.replace(" ", "日 ");
+    date = date.replace(":", "时");
+    date = date.replace(":", "分");
+    date = date + "秒";
+    div.append(`<div class="info_line">
+                    <span class="my_label">时间:</span><span class="my_info">${date}</span>
+                </div>`);
+    let address = args['address'];
+    div.append(`<div class="info_line">
+                    <span class="my_label">地址:</span><span class="my_info">${address}</span>
+                </div>`);
+    let name = args['real_name'];
+    div.append(`<div class="info_line">
+                    <span class="my_label">司机:</span><span class="my_info">${name}</span>
+                </div>`);
+    let plate_number = args['plate_number'];
+    div.append(`<div class="info_line">
+                    <span class="my_label">车辆:</span><span class="my_info">${plate_number}</span>
+                </div>`);
+    let type = args['event_type'];
+    div.append(`<div class="info_line">
+                    <span class="my_label">事件:</span><span class="my_info">${type}</span>
+                </div>`);
+};
+
+clear_title = function(){
+    // 清除悬浮标题框的内容
+    console.log("clear_title");
+};
+
+add_custom_marker = function(arg_dict, the_map){
+    // 添加自定义的标记点,batch_add_custom_marker的内部函数
+    let custom_marker = new AMap.Marker({
+        map: the_map,
+        position: arg_dict['loc'],
+        // position: global_track_data_list[Math.ceil(Math.random()*1000) % 98],
+        extData: arg_dict,
+        offset:  new AMap.Pixel(0, 0),  // 调整偏移量,
+        content: `<div class="my_custom_marker">
+                    <img src="${event_image_dict[arg_dict['event_type']]}">
+                  </div><span class="json" style="display:none">${JSON.stringify(arg_dict)}</span>`
+    });
+    custom_marker.on("mouseover", fill_title);
+    custom_marker.on("mouseout", clear_title);
+};
+
+batch_add_custom_marker = function(items, the_map){
+    // 批量添加标记点
+    for(let item of items){
+        add_custom_marker(item, the_map);
+    }
+};
+
 // 查询数据
 query_track_info = function () {
     var args = {
@@ -91,11 +166,14 @@ query_track_info = function () {
                     let user_id = item['user_id'];
                     let track_dict = item['track_dict'];
                     let tracks = track_dict['track_list'];   // 轨迹点数组
+                    let events = track_dict['event_list'];   // 行车事件数组
+                    batch_add_custom_marker(events, map);    // 填充行车事件的标记点
                     let total_mileage = track_dict['total_mileage'];  // 轨迹总里程.单位km
                     let total_time = track_dict['total_time'];  // 轨迹总耗时 单位秒
                     console.log(user_id, total_mileage, total_time, tracks.length);
                     let path_list = [];  // 路径点集合
                     let time_list = [];  // 时序集合
+                    // 填充轨迹数据
                     let length = tracks.length;
                     if (length > 1) {
                         nav_index += 1;
@@ -118,7 +196,7 @@ query_track_info = function () {
 
                 let nav_speed = 3000;
                 //创建一个巡航器
-                let colors = ['orange', 'blue'];
+                let colors = ['#2FFF46', 'blue'];  // 巡航器颜色
                 for(let i=0;i<nav_index;i++){
                     var navg = pathSimplifierIns.createPathNavigator(i, //关联第1条轨迹
                         {
@@ -311,23 +389,27 @@ function change_date() {
 // 查询提交按钮的事件
 $("#submit_query").click(function () {
     let date_str = $.trim($("#my_datetime_picker").val());
-    let date_list = date_str.split(" ");  // 拆分成开始和结束时间
+    let date_list = [];  // 起止时间字符串的容器
     let result_dates = [];    // 起终点日期容器
     let result_drivers = [];   // 选择的司机的容器
-    for (let i = 0; i < date_list.length; i++) {
-        let cur = date_list[i];
-        /*防止浏览器之间的差异,这里必须做手动转换,以保证时间字符串格式的一致性*/
-        let char_list = cur.split("-");
-        let year = char_list[0];
-        let month = String(char_list[1]).length < 1 ? "0" + char_list[1] : char_list[1];
-        let day = String(char_list[2]).length < 1 ? "0" + char_list[2] : char_list[2];
-        let query_date = `${year}-${month}-${day}`;  // 查询日期
-        if (typeof(query_date) !== "undefined") {
-            result_dates.push(query_date);
-        } else {
-        }
+    if(date_str !== ""){
+        date_list = date_str.split(" ");  // 拆分成开始和结束时间
+        for (let i = 0; i < date_list.length; i++) {
+            let cur = date_list[i];
+            /*防止浏览器之间的差异,这里必须做手动转换,以保证时间字符串格式的一致性*/
+            let char_list = cur.split("-");
+            let year = char_list[0];
+            let month = String(char_list[1]).length < 1 ? "0" + char_list[1] : char_list[1];
+            let day = String(char_list[2]).length < 1 ? "0" + char_list[2] : char_list[2];
+            let query_date = `${year}-${month}-${day}`;  // 查询日期
+            if (typeof(query_date) !== "undefined") {
+                result_dates.push(query_date);
+            } else {
+            }
 
-    }
+        }
+    }else{}
+
     // 取选择的用户
     $("#right_bar .selected_driver").each(function () {
         let cur = $(this);
@@ -344,35 +426,39 @@ $("#submit_query").click(function () {
         return false;
     }
     else {
-        let to_url = `/manage/show_track?ids=${JSON.stringify(result_drivers)}&date=${JSON.stringify(result_dates)}`;
+        let to_url = `/manage/track?ids=${JSON.stringify(result_drivers)}&date=${JSON.stringify(result_dates)}`;
         location.href = to_url;
     }
 });
 
-// 根据url参数对页面初始化
-let user_id_list = JSON.parse(get_url_arg("ids"));
-let date_list = JSON.parse(get_url_arg("date"));
-console.log(user_id_list);
-console.log(date_list);
-if (date_list !== null) {
-    $("#my_datetime_picker").val(date_list.join(" "));
-}
-if (user_id_list !== null) {
-    let flag = true;
-    let interval = setInterval(function () {
-        if (flag) {
-            if ($("#right_bar>div").length > 0) {
-                flag = false;
-            }
-        } else {
-            $("#right_bar>div").each(function () {
-                let $this = $(this);
-                if (user_id_list.indexOf($this.attr("data-id")) !== -1) {
-                    $this.click();
+// 页面初始化部分,页面启动时,根据url参数对页面初始化
+(function (){
+    let user_id_list = JSON.parse(get_url_arg("ids"));
+    let date_list = JSON.parse(get_url_arg("date"));
+    console.log(user_id_list);
+    console.log(date_list);
+    if (date_list !== null) {
+        // 初始化日期选择器显示
+        $("#my_datetime_picker").val(date_list.join(" "));9
+    }
+    if (user_id_list !== null) {
+        // 等待右边栏加载完毕,根据url参数改变对应用户的样式
+        let flag = true;
+        let interval = setInterval(function () {
+            if (flag) {
+                if ($("#right_bar>div").length > 0) {
+                    flag = false;
                 }
-            });
-            clearInterval(interval);
-        }
-    }, 200);
-}
+            } else {
+                $("#right_bar>div").each(function () {
+                    let $this = $(this);
+                    if (user_id_list.indexOf($this.attr("data-id")) !== -1) {
+                        $this.click();
+                    }
+                });
+                clearInterval(interval);
+            }
+        }, 200);
+    }
+})();
 

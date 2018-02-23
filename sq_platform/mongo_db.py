@@ -210,11 +210,11 @@ def get_conn(table_name):
 
 
 def other_can_json(obj):
-    """把其他对象转换成可json"""
+    """把其他对象转换成可json,是to_flat_dict的内部函数"""
     if isinstance(obj, ObjectId):
         return str(obj)
     elif isinstance(obj, (DBRef, MyDBRef)):
-        return obj.as_doc()
+        return str(obj.id)
     elif isinstance(obj, datetime.datetime):
         return obj.strftime("%Y-%m-%d %H:%M:%S")
     else:
@@ -228,7 +228,6 @@ def to_flat_dict(a_dict) -> dict:
     :return:
     """
     return {other_can_json(k): other_can_json(v) for k, v in a_dict.items()}
-
 
 
 def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
@@ -1389,7 +1388,7 @@ class BaseDoc:
 
     @classmethod
     def find_plus(cls, filter_dict: dict, sort_dict: dict = None, skip: int = None, limit: int = None,
-                  projection: list = None, to_dict: bool = False) -> (list, None):
+                  projection: list = None, to_dict: bool = False, can_json=False) -> (list, None):
         """
         find的增强版本,根据条件查找对象,返回多个对象的实例
         :param filter_dict:   过滤器,筛选条件.
@@ -1398,6 +1397,7 @@ class BaseDoc:
         :param limit:         输出数量限制.
         :param projection:    投影数组,决定输出哪些字段?
         :param to_dict:       True,返回的是字典的数组，False，返回的是实例的数组
+        :param can_json:       是否调用to_flat_dict函数转换成可以json的字典?
         :return:
         """
         if sort_dict is not None:
@@ -1419,7 +1419,10 @@ class BaseDoc:
             return result
         else:
             if to_dict:
-                result = [x for x in result]
+                if can_json:
+                    result = [to_flat_dict(x) for x in result]
+                else:
+                    result = [x for x in result]
             else:
                 result = [cls(**x) for x in result]
             return result

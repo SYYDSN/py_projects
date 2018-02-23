@@ -9,7 +9,7 @@
     font-size: 1.4rem;
     padding:0.6em 0.8em;
     position:fixed;
-    top:4rem;
+    top:5rem;
     right:14rem;
     z-index:100;
     background:rgba(255,255,255, 0.9);
@@ -38,9 +38,58 @@
 #title_container{
     position: absolute;
     z-index: 200;
-    top: 2rem;
-    left:4rem;
+    min-width: 17em;
+    font-size:14px;
+    color:#666666;
+    top: 1rem;
+    left:2rem;
     background-color: #ffffff;
     border: 1px solid #ddd;
-    display:flex; md
+    display:flex;
+    flex-direction: column; /*子元素垂直向下排列*/
+}
+#title_container .title_div,.info_div{
+    padding: 0 1.4em;
+}
+#title_container > .title_div{
+    display:flex;
+    flex-direction:row;
+    border-bottom: 1px dashed #ddd;
+    padding-top:0.5em;
+    padding-bottom:0.5em;
+
+}
+#title_container > .title_div>span{
+    margin-right:1em;
+}
+#title_container .info_div{
+    min-height:7em;
+    padding-top:0.5em;
+    padding-bottom:0.5em;
+}
+#title_container .info_div{
+    background-color: #e3e3e3;
+    display: flex;
+    flex-direction: column;
+    font-size:12px;
+    padding-top:0.1em;
+    padding-bottom:0.1em;
+}
+#title_container .info_div .info_line{
+    display: flex;
+    flex-direction:row;
+    justify-content:flex-start;
+}
+.info_line .my_label{
+    margin-right:1em;
+}
+.info_line .my_info{
+    color:#8E8E8E;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+/*行车事件的图标*/
+.my_custom_marker img{
+    width:2.5em;
+    height:2.5em;
 }

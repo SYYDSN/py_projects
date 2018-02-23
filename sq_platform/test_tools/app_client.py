@@ -59,9 +59,14 @@ def test_query_violation():
     """
     auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
     auth_token = "f4a624cff79d47448fcd41f071297db2"  # app段登录标识
+    auth_token = "196bca8c5aa54224b8c2b796f5664239"  # app段登录标识 陈浩
     headers = {"auth_token": auth_token}
     args = {"_id": "59ffb9b5e39a7b293e11d3ca"}
-    res = requests.post("http://127.0.0.1:5000/api/query_violation", data=args, headers=headers)
+    args = {"_id": "5a8fa5b2e39a7b3776dd8bcb"}   # 陈浩查询器 上海
+    # args = {"_id": "5a8fa53fe39a7b3776dd8bbb"}   # 陈浩查询器 无锡
+    url = "http://safego.org:5000/api/query_violation"
+    # url = "http://127.0.0.1:5000/api/query_violation"
+    res = requests.post(url, data=args, headers=headers)
     print(res.json())
 
 
@@ -209,7 +214,7 @@ if __name__ == "__main__":
     # """测试获取每日报告"""
     # test_get_daily_info()
     # """测试违章查询"""
-    # test_query_violation()
+    test_query_violation()
     # test_req(**args)
     # """测试用户上传行车证"""
     # test_upload_user_permit_image()
@@ -221,6 +226,6 @@ if __name__ == "__main__":
     # test_get_user_driving_license()
     # """测试用户安全指数排名接口"""
     # test_get_security_rank_list()
-    test_get_safety_report_history()
+    # test_get_safety_report_history()
     # test_gps_push()
     pass
