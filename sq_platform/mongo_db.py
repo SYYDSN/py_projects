@@ -243,6 +243,27 @@ def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
         return now
 
 
+def get_date_from_str(date_str: str) -> datetime.date:
+    """
+    根据字符串返回datet对象
+    :param date_str: 表示时间的字符串."%Y-%m-%d  "%Y/%m/%d或者 "%Y_%m_%d
+    :return: datetime.date对象
+    """
+    the_date = None
+    pattern = re.compile(r'^[1-2]\d{3}\D[0-1]?\d\D[0-3]?\d\D?$')
+    if pattern.match(date_str):
+        print("date_str is {}".format(date_str))
+        year = re.compile(r'^[1-2]\d{3}').match(date_str)
+        month = re.compile(r'[0-1]?\d').match(date_str, pos=year.end() + 1)
+        day = re.compile(r'[0-3]?\d').match(date_str, pos=month.end() + 1)
+        the_str = "{}-{}-{}".format(year.group(), month.group(), day.group())
+        the_date = datetime.datetime.strptime(the_str, "%Y-%m-%d").date()
+    else:
+        ms = "错误的日期格式:{}".format(date_str)
+        logger.exception(ms)
+    return the_date
+
+
 def get_datetime_from_str(date_str: str) -> datetime.datetime:
     """
     根据字符串返回datetime对象
@@ -764,17 +785,11 @@ class BaseDoc:
                                 else:
                                     pass
                         elif type_name.__name__ == "date":
-                            temp = None
-                            try:
-                                temp = datetime.datetime.strptime(v, "%Y-%m-%d")
-                            except TypeError as e:
-                                print(e)
-                                logger.error("datetime transform error", exc_info=True, stack_info=True)
-                            finally:
-                                if temp is not None:
-                                    self.__dict__[k] = temp
-                                else:
-                                    pass
+                            temp = get_date_from_str(v)
+                            if temp is not None:
+                                self.__dict__[k] = temp
+                            else:
+                                pass
                         elif type_name.__name__ == "DBRef" and v is None:
                             """允许初始化时为空"""
                             pass
@@ -1054,9 +1069,6 @@ class BaseDoc:
                 """如果用户已经自己定义了$开头的方法"""
                 pass
             else:
-                self.__init__(**update)
-                update_obj = self
-                update = {k: update_obj.__dict__[k] for k in keys}
                 update = {"$set": update}
         ses = get_conn(self._table_name)
         print("~~~~~~~~~~~~~~")
@@ -1463,7 +1475,7 @@ class BaseDoc:
         :param sort_dict: 排序的条件  比如: {"time": -1}  # -1表示倒序
         :param projection:    投影数组,决定输出哪些字段?
         :param instance: 返回的是实例还是doc对象？默认是doc对象
-        :return: 实例或者doc对象。
+        :return: None, 实例或者doc对象。
         """
         table_name = cls._table_name
         ses = get_conn(table_name=table_name)
@@ -1485,6 +1497,34 @@ class BaseDoc:
                 return result
             else:
                 return cls(**result)
+
+    @classmethod
+    def find_one_and_delete(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
+                            instance: bool = False) -> (dict, None):
+        """
+        找到并删除一个对象
+        :param filter_dict:  查询的条件，
+        :param sort_dict: 排序的条件  比如: {"time": -1}  # -1表示倒序
+        :param projection:    投影数组,决定输出哪些字段?
+        :param instance: 返回的是实例还是doc对象？默认是doc对象
+        :return: None, 实例或者doc对象。
+        """
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        if sort_dict is not None:
+            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        else:
+            sort_list = None
+        args = {
+            "filter": filter_dict,
+            "sort": sort_list,  # 可能是None,但是没问题.
+            "projection": projection
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        res = ses.find_one_and_delete(**args)
+        if instance:
+            res = cls(**res)
+        return res
 
     @classmethod
     def find_alone_and_update(cls, filter_dict: dict, update, projection=None, sort=None, upsert=True,
@@ -1755,6 +1795,6 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 
 if __name__ == "__main__":
-    print(get_datetime_from_str("2017-12-12T12:12:12.000Z"))
+    print(get_date_from_str("2018-02-24"))
     pass
 

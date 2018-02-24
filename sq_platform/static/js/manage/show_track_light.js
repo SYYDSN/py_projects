@@ -20,7 +20,8 @@ init_map();
 
 // 全局变量
 let global_track_time_list = [];  // 轨迹索引的时序，用于确认轨迹点的时间。
-let global_track_data_list = [];  // 轨序列，用于保存多条轨迹
+let global_track_data_list = [];  // 轨迹数据序列，用于保存多条轨迹
+let global_marker_dict = {};      // 自定义点的字典
 // 行车事件的图标url
 let event_image_dict = {
     "超速": "../static/image/manage/driving_event/bg_chaosu.png",
@@ -99,10 +100,13 @@ fill_title = function(){
     div.append(`<div class="info_line">
                     <span class="my_label">时间:</span><span class="my_info">${date}</span>
                 </div>`);
+    /*
+    注销的原因是地址是虚拟的,容易看出来问题
     let address = args['address'];
     div.append(`<div class="info_line">
                     <span class="my_label">地址:</span><span class="my_info">${address}</span>
                 </div>`);
+    */
     let name = args['real_name'];
     div.append(`<div class="info_line">
                     <span class="my_label">司机:</span><span class="my_info">${name}</span>
@@ -119,23 +123,26 @@ fill_title = function(){
 
 clear_title = function(){
     // 清除悬浮标题框的内容
-    console.log("clear_title");
+    let div = $("#title_container .info_div");
+    div.empty();
 };
 
 add_custom_marker = function(arg_dict, the_map){
     // 添加自定义的标记点,batch_add_custom_marker的内部函数
+    console.log(`自定义marker:${arg_dict['loc']}结束`);
     let custom_marker = new AMap.Marker({
         map: the_map,
         position: arg_dict['loc'],
-        // position: global_track_data_list[Math.ceil(Math.random()*1000) % 98],
+        showPositionPoint: {color: 'red', radius: 3},
         extData: arg_dict,
-        offset:  new AMap.Pixel(0, 0),  // 调整偏移量,
+        offset:  new AMap.Pixel(0, -20),  // 调整偏移量,
         content: `<div class="my_custom_marker">
                     <img src="${event_image_dict[arg_dict['event_type']]}">
                   </div><span class="json" style="display:none">${JSON.stringify(arg_dict)}</span>`
     });
     custom_marker.on("mouseover", fill_title);
     custom_marker.on("mouseout", clear_title);
+    global_marker_dict[arg_dict['_id']] = custom_marker;
 };
 
 batch_add_custom_marker = function(items, the_map){

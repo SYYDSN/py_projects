@@ -70,6 +70,46 @@ def test_query_violation():
     print(res.json())
 
 
+def test_upload_user_permit_image():
+    """测试用户上传行车证图片"""
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
+    headers = {"auth_token": auth_token}
+    img_path = "/home/walle/图片/img_mingcheng.png"
+    # img_path = "/home/walle/图片/general_dict.png"
+    file = open(img_path, 'rb')
+    files = {"permit_image": file}
+    url = "http://127.0.0.1:5000/api/upload_permit_image"
+    # url = "http://safego.org:5000/api/upload_permit_image"
+    res = requests.post(url, files=files, headers=headers)
+    print(res.json())
+
+
+def test_edit_user_permit_image():
+    """测试用户编辑行车证图片"""
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
+    headers = {"auth_token": auth_token}
+    img_path = "/home/walle/图片/img_mingcheng.png"
+    # img_path = "/home/walle/图片/general_dict.png"
+    file = open(img_path, 'rb')
+    files = {"permit_image": file}
+    args = {"_id": "5a5837cae39a7b2a5da57970"}
+    url = "http://127.0.0.1:5000/api/upload_permit_image"
+    url = "http://safego.org:5000/api/upload_permit_image"
+    res = requests.post(url, files=files, data=args, headers=headers)
+    print(res.json())
+
+
+def test_delete_user_vehicle_info():
+    """测试用户删除行车证"""
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
+    headers = {"auth_token": auth_token}
+    args = {"_id": "5a9110b3e39a7b7029a38980"}
+    url = "http://127.0.0.1:5000/api/delete_vehicle_info"
+    # url = "http://safego.org:5000/api/delete_vehicle_info"
+    res = requests.post(url, data=args, headers=headers)
+    print(res.json())
+
+
 def test_upload_user_driving_license():
     """测试用户上传驾驶证信息"""
     auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
@@ -80,19 +120,6 @@ def test_upload_user_driving_license():
     file = open(img_path, 'rb')
     files = {"license_image": file}
     res = requests.post("http://127.0.0.1:5000/api/upload_license_image", files=files, headers=headers)
-    print(res.json())
-
-
-def test_upload_user_permit_image():
-    """测试用户上传行车证信息"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
-    headers = {"auth_token": auth_token}
-    img_path = "/home/walle/图片/img_mingcheng.png"
-    # img_path = "/home/walle/图片/general_dict.png"
-    file = open(img_path, 'rb')
-    files = {"permit_image": file}
-    args = {"_id": "5a5837cae39a7b2a5da57970"}
-    res = requests.post("http://127.0.0.1:5000/api/upload_permit_image", files=files, data=args, headers=headers)
     print(res.json())
 
 
@@ -214,10 +241,14 @@ if __name__ == "__main__":
     # """测试获取每日报告"""
     # test_get_daily_info()
     # """测试违章查询"""
-    test_query_violation()
+    # test_query_violation()
     # test_req(**args)
-    # """测试用户上传行车证"""
-    # test_upload_user_permit_image()
+    # """测试用户上传行车证图片"""
+    test_upload_user_permit_image()
+    # """测试用户删除行车证"""
+    # test_delete_user_vehicle_info()
+    # """测试用户编辑行车证图片"""
+    # test_edit_user_permit_image()
     # """测试用户上传驾驶证"""
     # test_upload_user_driving_license()
     # """测试更新用户驾驶证信息"""

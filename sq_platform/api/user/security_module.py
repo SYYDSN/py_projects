@@ -307,6 +307,8 @@ class DrivingEvent(mongo_db.BaseDoc):
             ObjectId("59cda57bad01be0912b352da")] if len(user__ids) == 0 else user__ids
         raw_b = mongo_db.get_datetime_from_str("2018-1-9 0:0:0")
         raw_e = mongo_db.get_datetime_from_str("2018-1-9 23:59:59")
+        # raw_b = mongo_db.get_datetime_from_str("2017-11-16 0:0:0")
+        # raw_e = mongo_db.get_datetime_from_str("2017-11-16 23:59:59")
 
         for user_id in user__ids:
             user = User.find_by_id(user_id)
@@ -331,21 +333,24 @@ class DrivingEvent(mongo_db.BaseDoc):
                 print(filter_dict)
                 track_list = Track.find_plus(filter_dict, to_dict=True)
                 print(b.strftime("%F"), real_name, len(track_list))
-                if len(track_list) < 10:
+                if len(track_list) < 200:
                     """轨迹太少,不生成事件"""
                     pass
                 else:
                     print(real_name, )
-                    range_num = random.randint(1, 8)
+                    range_num = random.randint(1, 6)
                     print(range_num)
                     event_list = list()
                     for i in range(range_num):
                         """选择range_num个点"""
-                        track = random.choice(track_list)
-                        event_args['event_time'] = track['time']
-                        event_args['loc'] = track['loc']['coordinates']
-                        event_args['event_type'] = random.choice(type_list)
-                        event_list.append(event_args)
+                        temp = event_args.copy()
+                        track = track_list.pop(random.randint(0, len(track_list) - 1))
+                        temp['event_time'] = track['time']
+                        temp['loc'] = track['loc']['coordinates']
+                        temp['event_type'] = random.choice(type_list)
+                        temp['plate_number'] = random.choice(["沪A45213", "沪D01298", "沪B51231"])
+                        temp['address'] = generator_address()
+                        event_list.append(temp)
                     cls.insert_many(event_list)
 
     @classmethod
@@ -1346,7 +1351,7 @@ def generator_datetime():
     return mongo_db.get_datetime_from_str(a_str)
 
 
-def generator_address() -> None:
+def generator_address() -> str:
     """给生成一个虚拟地址,临时"""
     roads = "北京路、天津路、上海路、广州路、南京路、武汉路、福州路、郑州路、沈阳路、长春路、昆明路、成都路、济南路、海口路、台北路、" \
             "哈尔滨路、乌鲁木齐路、烟台路、威海路、大连路、洛阳路、宜昌路、九江路、赣州路、衡阳路、华山路、泰山路、长江路、洞庭湖路"
@@ -1408,5 +1413,5 @@ if __name__ == "__main__":
     # print(SecurityReport.query_report("sf", "59cda964ad01be237680e29d", "2018-01-03 2018-01-11"))
     # print(HealthReport.get_instance(ObjectId("59cda964ad01be237680e29d"), "2017-12-25").to_flat_dict())
     # print(DrivingEvent.random_event())
-    add_accident(100)
+    DrivingEvent.random_event()
     pass

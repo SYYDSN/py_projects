@@ -263,16 +263,17 @@ def update_image(user_id, key):
                     img_url = request.host_url + part_url
                     message['data'] = img_url
                     result = "Ok"  # 仅仅为了下面的if不报错而已
-                    _id = get_arg(request, "_id")  # 获取请求的行驶证信息的id
+                    _id = get_arg(request, "_id")  # 获取请求的行车证信息的id
                     _id = _id.strip() if isinstance(_id, str) else _id
-                    print("function update_image's arg _id: {}".format(_id))
                     """创建一个行车证信息"""
                     if _id is None or _id == "":
+                        """这是上传图片添加行车证的清空"""
                         car_license_kwargs = {"permit_image_url": part_url,
                                               "user_id": user_id}
-                        CarLicense.insert_one(**car_license_kwargs)  # 插入一个行车证信息
+                        print("new permit_image args: {}".format(_id))
+                        CarLicense.instance(**car_license_kwargs)  # 插入一个行车证信息
                     else:
-                        """修改一个行车证信息"""
+                        """这是修改一个行车证图片的情况"""
                         filter_dict = {"_id": _id}
                         update = {"permit_image_url": part_url}
                         CarLicense.find_alone_and_update(filter_dict, update)
@@ -449,7 +450,7 @@ def process_license_info(user_id, key):
 @api_user_blueprint.route("/<key>_vehicle_info", methods=['post', 'get'])
 @login_required_app
 def process_vehicle_info(user_id, key):
-    """获取/编辑车牌信息"""
+    """获取/编辑行车证信息"""
     message = {"message": "success"}
     args = get_args(request)
     args = dict() if args is None else args
@@ -459,16 +460,16 @@ def process_vehicle_info(user_id, key):
     if "token" in args:
         args.pop("token")
 
-    _id = args.get("_id")  # 获取请求的行驶证信息的id
+    _id = args.get("_id")  # 获取请求的行车证信息的id
     ms = "process_vehicle_info func key:{}, user_id:{}, args:{}".format(key, str(user_id), json.dumps(args))
     print(ms)
     logger.info(ms)
     args['user_id'] = user_id
     if key == "get":
-        """获取行驶证信息"""
+        """获取行车证信息"""
         host_url = request.host_url
         if _id is None:
-            """返回行驶证信息的列表"""
+            """返回行车证信息的列表"""
             obj_list = CarLicense.find(user_id=user_id)
             obj_list = [obj.to_flat_dict() for obj in obj_list]
             res_list = list()
@@ -508,6 +509,20 @@ def process_vehicle_info(user_id, key):
                 message = pack_message(message, 6001, filter_dict=filter_dict, update=update)
             else:
                 pass
+    elif key == "delete":
+        """删除行车证信息"""
+        filter_dict = {
+            "_id": mongo_db.get_obj_id(get_arg(request, "_id")),
+            "user_id": user_id
+        }
+        res = CarLicense.find_one_and_delete(filter_dict=filter_dict, instance=True)
+        if isinstance(res, CarLicense):
+            pass
+        else:
+            # 删除失败
+            ms = "删除行车证失败,参数:{}".format(filter_dict)
+            logger.exception(ms)
+            message = pack_message(message, 5000, **filter_dict)
     else:
         message = pack_message(message, 3012, key=key)
     print(message)

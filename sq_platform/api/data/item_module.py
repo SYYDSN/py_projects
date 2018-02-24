@@ -118,7 +118,6 @@ class User(mongo_db.BaseDoc):
     type_dict['license_class'] = str                       # 驾驶证类型,准驾车型
     type_dict['first_issued_date'] = datetime.datetime     # 首次领证日期
     type_dict['valid_date'] = datetime.datetime            # 驾驶证有效期
-    # type_dict['cars'] = list  # 名下车辆的id，是一个DBRef的List对象，默认为空  对应car_license_info表
     """
     有关行车证信息部分,由于行车证和用户没有意义对应关系.
     由于业务逻辑上个人可能创建和自己不相干的车牌的查询器，所以这个cars失去了业务逻辑上的意义。
@@ -172,7 +171,7 @@ class User(mongo_db.BaseDoc):
             phones = list()
         user_id = self.get_id()
         filter_dict = {"user_id": user_id}
-        """差相关的行驶证信息"""
+        """查相关的行驶证信息"""
         car_licenses = CarLicense.find_plus(filter_dict=filter_dict)
         car_licenses.sort(key=lambda obj: obj.get_id().generation_time, reverse=True)  # 按照_id保存的时间排序,倒序
         car_licenses = [x.to_flat_dict() for x in car_licenses]
@@ -738,6 +737,26 @@ class AppLoginToken(mongo_db.BaseDoc):
                 message['user_id'] = result.user_id
         return message
 
+class UserLicenseRelation(mongo_db.BaseDoc):
+    """关系表,记录用户和行车证/车辆的对应关系"""
+    _table_name = "user_license_relation"
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['user_id'] = DBRef  # 用户id,指向user_info表
+    type_dict['license_id'] = DBRef   # 驾驶证id,指向car_license_info表
+    type_dict['create_date'] = datetime.datetime  # 关系的建立时间
+    type_dict['end_date'] = datetime.datetime  # 关系的终结时间
+
+    @classmethod
+    def rebuild(cls):
+        """从旧的行车证/用户的关联模式转换到 行车证/关系/用户模式,仅仅在模型改变时使用,一次性转换函数"""
+        cars = CarLicense.find_plus(filter_dict={"user_id": {"$ne": None}})
+        relations = [{
+            "user_id": User.find_by_id(car.get_attr("user_id")).get_dbref(),
+            "license_id": car.get_dbref(),
+            "create_date": car.get_attr("create_date")
+        } for car in cars]
+        cls.insert_many(relations)
 
 class CarLicense(mongo_db.BaseDoc):
     """行车证"""
@@ -750,7 +769,7 @@ class CarLicense(mongo_db.BaseDoc):
     2.app在上传行车证图片的时候会先创建一个临时行车证记录,这和时候的和plate_number为空.而且这种记录可能有多个.
     所以用户id 和plate_number的联合主键因该删除
     """
-    type_dict["user_id"] = ObjectId  # 关联
+    type_dict["user_id"] = ObjectId  # 注意,这里是创建者的id
     type_dict["permit_image_url"] = str  # 车辆照片url
     type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
     type_dict["car_type"] = str  # 车辆类型  比如 重型箱式货车
@@ -766,6 +785,7 @@ class CarLicense(mongo_db.BaseDoc):
     type_dict["create_date"] = datetime.datetime  # 创建日期
 
     def __init__(self, **kwargs):
+        """因为牵扯到和用户的关系,此方法不应该直接调用"""
         if "create_date" not in kwargs:
             kwargs['create_date'] = datetime.datetime.now()
         if "plate_number" in kwargs:
@@ -778,8 +798,40 @@ class CarLicense(mongo_db.BaseDoc):
                 ms = "创建CarLicense实例失败，user_id缺失 kwargs={}".format(kwargs)
                 logger.exception(ms)
                 raise e
-
+        print(kwargs)
         super(CarLicense, self).__init__(**kwargs)
+
+    @classmethod
+    def instance(cls, **kwargs) -> (object, None):
+        """
+        创建实例请用此方法而不是__init__方法,
+        如果已存在
+        :param kwargs:
+        :return: 返回实例或者None
+        """
+        try:
+            obj = cls(**kwargs)
+            license_id = obj.save()
+        except Exception as e:
+            ms = "instance Error! args={}".format(kwargs)
+            logger.exception(ms)
+        finally:
+            result = None
+            if isinstance(license_id, ObjectId):
+                """行车证创建成功,可以创建用户和行车证的关系了"""
+                relation = {
+                    "license_id": DBRef(collection="car_license_info", id=license_id, database="platform_db"),
+                    "user_id": DBRef(collection="user_info", id=obj.get_attr("user_id"), database="platform_db")
+                }
+                """检查是否已有对象"""
+                find_obj = UserLicenseRelation.find_one_plus(filter_dict=relation)
+                if find_obj is None:
+                    relation['create_date'] = datetime.datetime.now()
+                    UserLicenseRelation.insert_one(**relation)
+                else:
+                    pass
+                result = obj
+                return result
 
     def get_vio_query_info(self):
         """获取用于违章查询的车牌,车架号等信息,返回字典"""
@@ -806,29 +858,6 @@ def rebuild_car_license() -> None:
         user_id = vio.get_attr("user_id")
         car_license.user_id = user_id
         car_license.save()
-
-
-class UserCar(mongo_db.BaseDoc):
-    """用户和行车证的关系类,一对多关系.但这里表现的是一对一,因为要考虑公司换车和同时开多个车的问题."""
-    _table_name = "user_car_relation"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
-    type_dict['user_id'] = DBRef              # 用户id,
-    type_dict['car_id'] = DBRef              # 行驶证id,
-    type_dict['begin_date'] = datetime.datetime              # 关系建立的开始时间
-    type_dict['end_date'] = datetime.datetime              # 关系建立的结束时间,可以为空
-
-    @classmethod
-    def check_can_use(cls, doc: (dict, list), date_range: list = list()) -> (bool, list):
-        """
-        检查用户和行车证的对应关系, 看这些行车证是否在指定的时间点/区间有效?
-        :param doc:
-        :param date_range: 时间的范围,如果为空,表示是检测截至到当前是否有效?如果只有一个,那就计算截至到
-        这个时间是否有效?如果有2个时间,那就看看是否和这2个时间形成的区间部分
-        :return:
-        """
-
-
 
 
 class TrafficRoute(mongo_db.BaseDoc):
@@ -1757,8 +1786,5 @@ if __name__ == "__main__":
     # User.app_version_list()
     # User.set_driving_license()
     # GPS.async_insert_many()
-    filter_dict = {"time": {"$lte": mongo_db.get_datetime_from_str("2017-1-1 0:0:0")}}
-    gps_list = GPS.find_plus(filter_dict=filter_dict)
-    for gps in gps_list:
-        print(gps)
+    UserLicenseRelation.rebuild()
     pass
