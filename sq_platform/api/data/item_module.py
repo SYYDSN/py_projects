@@ -833,6 +833,91 @@ class CarLicense(mongo_db.BaseDoc):
                 result = obj
                 return result
 
+    @classmethod
+    def get_usable_license(cls, user_id: (str, ObjectId, DBRef, MyDBRef)) -> list:
+        """
+        获取指定用户的可用行车证,行车证的可用状态是指行车证对应的UserLicenseRelation实例存在,并且
+        其end_date为null,不存在或者比现在的时间更靠后的状态.
+        :param user_id: 用户id
+        :return: CarLisence实例的数组
+        """
+        if isinstance(user_id, (MyDBRef, DBRef)):
+            pass
+        elif isinstance(user_id, ObjectId):
+            user_id = DBRef(collection=User.get_table_name(), id=user_id, database=mongo_db.db_name)
+        elif isinstance(user_id, str):
+            user_id = mongo_db.get_obj_id(user_id)
+            user_id = DBRef(collection=User.get_table_name(), id=user_id, database=mongo_db.db_name)
+        else:
+            ms = "CarLicense.get_usable_license Error,错误的user_id类型: {}".format(type(user_id))
+            logger.exception(ms)
+        if isinstance(user_id, (DBRef, MyDBRef)):
+            result = []
+            filter_dict = {
+                "user_id": user_id,
+                "$or": [
+                    {"end_date":{"$exists": False}},
+                    {"end_date":None},
+                    {"end_date":{"$lte": datetime.datetime.now()}}
+                ]
+            }
+            sort_dict = {"create_date": -1}
+            projection = ['license_id']
+            """查询可用的行车证的id"""
+            res = UserLicenseRelation.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, projection=projection)
+            license_ids = [x.get_attr("license_id").id for x in res]
+            if len(license_ids) == 0:
+                pass
+            else:
+                filter_dict = {"_id": {"$in": license_ids}}
+                sort_dict = {"create_date": -1}
+                result = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, can_json=True)
+            return result
+        else:
+            return None
+
+    @classmethod
+    def find_one_and_delete(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
+                            instance: bool = False):
+        """
+        找到并删除一个对象,这是重写了父类的方法.用于在删除的时候同步终止司机和行车证的对应关系.
+        :param filter_dict:  查询的条件，
+        :param sort_dict: 排序的条件  比如: {"time": -1}  # -1表示倒序
+        :param projection:    投影数组,决定输出哪些字段?
+        :param instance: 返回的是实例还是doc对象？默认是doc对象
+        :return: None, 实例或者doc对象。
+        """
+        result = False
+        table_name = cls._table_name
+        ses = mongo_db.get_conn(table_name=table_name)
+        if sort_dict is not None:
+            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        else:
+            sort_list = None
+        args = {
+            "filter": filter_dict,
+            "sort": sort_list,  # 可能是None,但是没问题.
+            "projection": projection
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        res = ses.find_one_and_delete(**args)
+        if res is None:
+            """删除失败"""
+            pass
+        else:
+            """删除成功,接着删除对应的UserLicenseRelation实例"""
+            license_id = DBRef(id=res['_id'], collection=table_name, database="platform_db")
+            user_id = DBRef(id=res['user_id'], collection=User.get_table_name(), database="platform_db")
+            filter_dict = {"license_id": license_id, "user_id": user_id}
+            update_dict = {"$set": {"end_date": datetime.datetime.now()}}
+            res = UserLicenseRelation.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+            if res is None:
+                """删除关系失败"""
+                pass
+            else:
+                result = True
+        return result
+
     def get_vio_query_info(self):
         """获取用于违章查询的车牌,车架号等信息,返回字典"""
         data_dict = self.__dict__

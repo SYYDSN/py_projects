@@ -8,7 +8,7 @@ if project_dir not in sys.path:
     sys.path.append(project_dir)
 import mongo_db
 from api.data.item_module import User, Track
-import error_module
+import datetime
 from log_module import get_logger
 
 
@@ -73,6 +73,76 @@ class Company(mongo_db.BaseDoc):
             res = {str(m['_id']): m['dept_name'] for m in Dept.find_plus(filter_dict=filter_dict, projection=["_id", "dept_name"], to_dict=True)}
         return res
 
+    @staticmethod
+    def in_post(company_id: (ObjectId, DBRef, str), post_id: (ObjectId, DBRef, str)) -> list:
+        """
+        查询某个公司，某个岗位的全体人员
+        :param company_id: 公司id
+        :param post_id: 职务id
+        :return: 实例列表
+        """
+        if not isinstance(company_id, (ObjectId, DBRef, str)) or not isinstance(company_id, (ObjectId, DBRef, str)):
+            try:
+                raise ValueError("公司id或岗位id类型错误.company_id's type is {},post_id's type is {}".
+                                 format(type(company_id), type(post_id)))
+            except ValueError as e:
+                logger.exception("error")
+                print(e)
+            except Exception as e:
+                print(e)
+                raise e
+        else:
+            """开始检查数据类型并进行转换"""
+            if isinstance(company_id, (str, ObjectId)):
+                company_obj = Company.find_by_id(company_id)
+                if not isinstance(company_obj, Company):
+                    try:
+                        raise ValueError("获取Company实例失败，company_id={}".
+                                         format(company_id))
+                    except ValueError as e:
+                        logger.exception("error")
+                        print(e)
+                    except Exception as e:
+                        print(e)
+                        raise e
+                else:
+                    company_id = company_obj.get_dbref()
+            else:
+                pass
+            if isinstance(post_id, (str, ObjectId)):
+                post_obj = Post.find_by_id(post_id)
+                if not isinstance(post_obj, Post):
+                    try:
+                        raise ValueError("获取Post实例失败，post_id={}".
+                                         format(post_id))
+                    except ValueError as e:
+                        logger.exception("error")
+                        print(e)
+                    except Exception as e:
+                        print(e)
+                        raise e
+                else:
+                    post_id = post_obj.get_dbref()
+            else:
+                pass
+            if not isinstance(company_id, DBRef) or not isinstance(post_id, DBRef):
+                """只要2个查询对象有一个不满足类型要求，就抛出异常"""
+                try:
+                    raise ValueError("转换DBRef对象失败，company_id={},post_id={}".
+                                     format(str(company_id), str(post_id)))
+                except ValueError as e:
+                    logger.exception("error")
+                    print(e)
+                except Exception as e:
+                    print(e)
+                    raise e
+            else:
+                company_id_obj = company_id.id
+                post_id_obj = post_id.id
+                args = {"post_id.$id": post_id_obj, "company_id.$id": company_id_obj}
+                instance_list = Employee.find(**args)
+                return instance_list
+
     @classmethod
     def get_prefix_by_user_id(cls, user_id: (str, ObjectId)) ->(str, None):
         """
@@ -121,6 +191,17 @@ class Post(mongo_db.BaseDoc):
     type_dict['post_level'] = str  # 岗位级别，某些公司用来区分待遇的标识。也会用来区分不同部门的相同名称的岗位的区别
 
 
+class EmployeePostRelation(mongo_db.BaseDoc):
+    """关系表,记录员工和职务的对应关系"""
+    _table_name = "employee_post_relation"
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['user_id'] = DBRef  # 员工id,指向user_info表,
+    type_dict['post_id'] = DBRef   # 职务id,指向post_info表
+    type_dict['create_date'] = datetime.datetime  # 关系的建立时间
+    type_dict['end_date'] = datetime.datetime  # 关系的终结时间
+
+
 class Dept(mongo_db.BaseDoc):
     """部门/团队类"""
     _table_name = "dept_info"
@@ -138,6 +219,7 @@ class Dept(mongo_db.BaseDoc):
         注意，company_id,higher_dept和dept_name构成联合主键
         """
         if 'secondary_leaders' not in kwargs:
+            """secondary_leaders是除一把手之外的,拥有领导权限的员工"""
             kwargs['secondary_leaders'] = []
         super(Dept, self).__init__(**kwargs)
 
@@ -299,6 +381,17 @@ class Dept(mongo_db.BaseDoc):
             return obj.dept_path()
 
 
+class EmployeeDeptRelation(mongo_db.BaseDoc):
+    """关系表,记录员工和部门的对应关系"""
+    _table_name = "employee_dept_relation"
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['user_id'] = DBRef  # 员工id,指向user_info表
+    type_dict['dept_id'] = DBRef   # 部门id,指向dept_info表
+    type_dict['create_date'] = datetime.datetime  # 关系的建立时间
+    type_dict['end_date'] = datetime.datetime  # 关系的终结时间
+
+
 class Scheduling(mongo_db.BaseDoc):
     """
     排班/调度 信息,用于指定员工按照哪个排班进行上下班安排,另外,这也是很多算法用于计算有效时间范围的标准
@@ -322,81 +415,14 @@ class Employee(User):
 
     def __init__(self, **kwargs):
         self.type_dict['company_id'] = DBRef  # 所属公司id  Company
-        self.type_dict['post_id'] = DBRef  # 岗位信息 Post
+        self.type_dict['post_id'] = DBRef  # 岗位信息 Post 即将废止,以post_relation_id替代
+        self.type_dict['post_relation_id'] = DBRef  # 岗位关系id,指向employee_post_relation表
         self.type_dict['employee_number'] = int  # 工号
-        self.type_dict['dept_path'] = list  # 所属团队DBRef组成的list，Dept
+        self.type_dict['dept_path'] = list  # 所属团队DBRef组成的list，Dept 即将废止,以dept_relation_id替代
+        self.type_dict['dept_relation_id'] = DBRef  # 部门关系id,指向employee_dept_relation表
         self.type_dict['block_list'] = list  # 不想显示的用户的DBRef组成的list，Employee
         self.type_dict['scheduling'] = list   # 排班的DBRef的list,对应于员工的排班,默认早9点到晚17点.（考虑加班和替班的情况）
         super(Employee, self).__init__(**kwargs)
-
-    def in_post(self, company_id: (ObjectId, DBRef, str), post_id: (ObjectId, DBRef, str)) -> list:
-        """
-        查询某个公司，某个岗位的全体人员
-        :param company_id: 公司id
-        :param post_id: 职务id
-        :return: 实例列表
-        """
-        if not isinstance(company_id, (ObjectId, DBRef, str)) or not isinstance(company_id, (ObjectId, DBRef, str)):
-            try:
-                raise ValueError("公司id或岗位id类型错误.company_id's type is {},post_id's type is {}".
-                                 format(type(company_id), type(post_id)))
-            except ValueError as e:
-                logger.exception("error")
-                print(e)
-            except Exception as e:
-                print(e)
-                raise e
-        else:
-            """开始检查数据类型并进行转换"""
-            if isinstance(company_id, (str, ObjectId)):
-                company_obj = Company.find_by_id(company_id)
-                if not isinstance(company_obj, Company):
-                    try:
-                        raise ValueError("获取Company实例失败，company_id={}".
-                                         format(company_id))
-                    except ValueError as e:
-                        logger.exception("error")
-                        print(e)
-                    except Exception as e:
-                        print(e)
-                        raise e
-                else:
-                    company_id = company_obj.get_dbref()
-            else:
-                pass
-            if isinstance(post_id, (str, ObjectId)):
-                post_obj = Post.find_by_id(post_id)
-                if not isinstance(post_obj, Post):
-                    try:
-                        raise ValueError("获取Post实例失败，post_id={}".
-                                         format(post_id))
-                    except ValueError as e:
-                        logger.exception("error")
-                        print(e)
-                    except Exception as e:
-                        print(e)
-                        raise e
-                else:
-                    post_id = post_obj.get_dbref()
-            else:
-                pass
-            if not isinstance(company_id, DBRef) or not isinstance(post_id, DBRef):
-                """只要2个查询对象有一个不满足类型要求，就抛出异常"""
-                try:
-                    raise ValueError("转换DBRef对象失败，company_id={},post_id={}".
-                                     format(str(company_id), str(post_id)))
-                except ValueError as e:
-                    logger.exception("error")
-                    print(e)
-                except Exception as e:
-                    print(e)
-                    raise e
-            else:
-                company_id_obj = company_id.id
-                post_id_obj = post_id.id
-                args = {"post_id.$id": post_id_obj, "company_id.$id": company_id_obj}
-                instance_list = Employee.find(**args)
-                return instance_list
 
     def get_archives(self) -> dict:
         """
@@ -589,16 +615,6 @@ class Employee(User):
                 logger.exception("remove_block_id Error")
                 raise e
         return res
-
-    @classmethod
-    def get_employee_in_post(cls, company_id: (ObjectId, DBRef, str), post_id: (ObjectId, DBRef, str)) -> list:
-        """
-        查询某个公司，某个岗位的全体人员,这实际上是self.n_post()的类方法版
-        :param company_id: 公司id
-        :param post_id: 职务id
-        :return: 实例列表
-        """
-        return cls().in_post(company_id, post_id)
 
     @classmethod
     def subordinates_instance(cls, user_id: (str, ObjectId), can_json: bool = True, include_blocking: bool = False) -> list:

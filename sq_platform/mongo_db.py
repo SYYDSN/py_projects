@@ -1351,9 +1351,11 @@ class BaseDoc:
         return result
 
     @classmethod
-    def find_by_id(cls, o_id: (str, ObjectId)):
+    def find_by_id(cls, o_id: (str, ObjectId), to_dict: bool = False, can_json: bool = False):
         """查找并返回一个对象，这个对象是o_id对应的类的实例
         :param o_id: _id可以是字符串或者ObjectId
+        :param to_dict: 是否转换结果为字典?
+        :param can_json: 是否转换结果为可json化的字典?注意如果can_json为真,to_dict参数自动为真
         return cls.instance
         """
         o_id = get_obj_id(o_id)
@@ -1362,7 +1364,15 @@ class BaseDoc:
         if result is None:
             return result
         else:
-            return cls(**result)
+            if can_json:
+                to_dict = True
+            if to_dict:
+                if can_json:
+                    return to_flat_dict(result)
+                else:
+                    return result
+            else:
+                return cls(**result)
 
     @classmethod
     def find(cls, to_dict: bool = False, **kwargs)->(list, None):
@@ -1412,6 +1422,8 @@ class BaseDoc:
         :param can_json:       是否调用to_flat_dict函数转换成可以json的字典?
         :return:
         """
+        if can_json:
+            to_dict = True
         if sort_dict is not None:
             sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
         else:
@@ -1558,8 +1570,9 @@ class BaseDoc:
     def find_one_and_update_plus(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
                               return_document: str="after"):
         """
-        find_one_and_update和find_alone_and_update的增强版.推荐使用本方法提前之前的两个方法.
-        本方法虽然更灵活,但是在设置参数时要求更高.
+        find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
+        find_one_and_update和find_alone_and_updatet替更简单医易用.
+        本方法更灵活,只是在设置参数时要求更高.
         找到一个文档然后更新它，如果找不到就插入
         :param filter_dict: 查找时匹配参数 字典
         :param update_dict: 更新的数据，字典,注意例子中参数的写法,有$set和$inc两种更新方式.

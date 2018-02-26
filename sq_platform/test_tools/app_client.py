@@ -79,7 +79,7 @@ def test_upload_user_permit_image():
     file = open(img_path, 'rb')
     files = {"permit_image": file}
     url = "http://127.0.0.1:5000/api/upload_permit_image"
-    # url = "http://safego.org:5000/api/upload_permit_image"
+    url = "http://safego.org:5000/api/upload_permit_image"
     res = requests.post(url, files=files, headers=headers)
     print(res.json())
 
@@ -103,7 +103,7 @@ def test_delete_user_vehicle_info():
     """测试用户删除行车证"""
     auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
-    args = {"_id": "5a9110b3e39a7b7029a38980"}
+    args = {"_id": "5a93b0c1e39a7b7c516cc2d1"}
     url = "http://127.0.0.1:5000/api/delete_vehicle_info"
     # url = "http://safego.org:5000/api/delete_vehicle_info"
     res = requests.post(url, data=args, headers=headers)
@@ -112,7 +112,7 @@ def test_delete_user_vehicle_info():
 
 def test_upload_user_driving_license():
     """测试用户上传驾驶证信息"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     auth_token = "f4a624cff79d47448fcd41f071297db2"  # app段登录标识
     headers = {"auth_token": auth_token}
     img_path = "/home/walle/图片/img_mingcheng.png"
@@ -125,7 +125,7 @@ def test_upload_user_driving_license():
 
 def test_update_user_driving_license():
     """测试更新用户驾驶证信息"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     args = {
                 "license_id": "dfdf54545我的驾驶证id43430as",                 # 驾驶证id
@@ -141,9 +141,17 @@ def test_update_user_driving_license():
     print(res.json())
 
 
+def test_get_car_license():
+    """测试获取用户驾行车证信息"""
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
+    headers = {"auth_token": auth_token}
+    res = requests.post("http://127.0.0.1:5000/api/get_vehicle_info", headers=headers)
+    print(res.json())
+
+
 def test_get_user_driving_license():
     """测试获取用户驾驶证信息"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     auth_token = "f4a624cff79d47448fcd41f071297db2"  # app段登录标识
     headers = {"auth_token": auth_token}
     res = requests.post("http://127.0.0.1:5000/api/get_license_info", headers=headers)
@@ -152,7 +160,7 @@ def test_get_user_driving_license():
 
 def test_gps_push():
     """测试是是上传gps数据"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     args = {
     "ct" : "上海市",
@@ -177,7 +185,7 @@ def test_gps_push():
 
 def test_add_alert_message():
     """测试发送推送消息"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     url = "http://127.0.0.1:5000/api/add_alert_message"
     data = {
@@ -192,7 +200,7 @@ def test_add_alert_message():
 
 def test_get_alert_message():
     """测试接收推送消息"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     url = "http://safego.org:5000/api/get_alert_message"
     r = requests.post(url, headers=headers)
@@ -201,7 +209,7 @@ def test_get_alert_message():
 
 def test_get_report_detail():
     """测试获取安全报告详情"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     # url = "http://127.0.0.1:5000/api/get_report_detail"
     url = "http://safego.org:5000/api/get_report_detail"
@@ -217,7 +225,7 @@ def test_get_report_detail():
 
 def test_get_safety_report_history():
     """测试获取安全报告历史"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     # url = "http://127.0.0.1:5000/api/get_safety_report_history"
     url = "http://safego.org:5000/api/get_safety_report_history"
@@ -244,7 +252,7 @@ if __name__ == "__main__":
     # test_query_violation()
     # test_req(**args)
     # """测试用户上传行车证图片"""
-    test_upload_user_permit_image()
+    # test_upload_user_permit_image()
     # """测试用户删除行车证"""
     # test_delete_user_vehicle_info()
     # """测试用户编辑行车证图片"""
@@ -253,6 +261,8 @@ if __name__ == "__main__":
     # test_upload_user_driving_license()
     # """测试更新用户驾驶证信息"""
     # test_update_user_driving_license()
+    # """测试获取用户行车证信息"""
+    test_get_car_license()
     # """测试获取用户驾驶证信息"""
     # test_get_user_driving_license()
     # """测试用户安全指数排名接口"""
