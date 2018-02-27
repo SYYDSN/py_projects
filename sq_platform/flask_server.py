@@ -8,6 +8,7 @@ from api.data.data_view import api_data_blueprint
 from manage.manage_module import manage_blueprint
 import manage.manage_module as m_module
 from flask_wtf.csrf import CSRFProtect
+from flask_debugtoolbar import DebugToolbarExtension
 import json
 import os
 from mongo_db import cache
@@ -73,7 +74,7 @@ def favicon():
 
 @app.before_request
 def show_request_before():
-    print(request)
+    # print(request)
     pass
 
 
@@ -92,6 +93,8 @@ def allow_cross_domain(response):
 if __name__ == '__main__':
     # print(app.url_map)  # 打印视图路由
     cache.set("flask_server_port", port)
-    app.run(host="0.0.0.0", port=port, debug=True, threaded=True)
+    app.debug = True  # 这一行必须在toolbar = DebugToolbarExtension(app)前面,否则不生效
+    toolbar = DebugToolbarExtension(app)  # 开启html调试toolbar
+    app.run(host="0.0.0.0", port=port, threaded=True)
     # app.run(host="0.0.0.0", port=port, threaded=True)
     # app.run(host="0.0.0.0", port=port, debug=True, threaded=True, ssl_context="adhoc")
