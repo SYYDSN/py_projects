@@ -18,14 +18,16 @@ import os
 from log_module import get_logger
 import threading
 
+
 """简道云对接模块,火狐版，没有问题"""
+
 
 logger = get_logger()
 
 
 def to_jiandao_cloud(**kwargs) -> bool:
     """
-    传送数据到简道云
+    推广页面的注册用户数据传送数据到简道云
     :param kwargs:
     :return:
     """
@@ -140,22 +142,111 @@ def to_jiandao_cloud(**kwargs) -> bool:
     return True
 
 
-def x(**kwargs):
-    print(kwargs['name'])
-    print(kwargs['age'])
+def listen_shengfx888():
+    """爬取实盘用户信息, 这是个临时方法,用来测试思路"""
+    display = Display(visible=0, size=(800, 600))
+    # display.start()  # 开启虚拟显示器
+    browser = webdriver.Firefox()  # 表示headless firefox browser
+    driver = WebDriverWait(browser, 10)
+    login_url = "http://office.shengfx888.com"
+    user_name = "849607604@qq.com"
+    user_password = "Kai3349665"
+    """平衡页(第一页)"""
+    balance_url = "http://office.shengfx888.com/report/history_trade?" \
+                  "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=&" \
+                  "qtype=&CMD=6&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=&" \
+                  "CLOSE_TIME_e=&T_LOGIN=&page=1"
+
+    """登录http://office.shengfx888.com"""
+    browser.get(url=login_url)
+    # 用户名输入
+    input_user_name = driver.until(
+        ec.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='请输入邮箱或者MT账号']")))
+    input_user_name.send_keys(user_name)  # 输入用户名
+    # 用户密码输入
+    input_user_password = driver.until(
+        ec.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='请输入登录密码']")))
+    input_user_password.send_keys(user_password)  # 输入用户密码
+    # 点击登录按钮
+    button_login = driver.until(
+        ec.presence_of_element_located((By.ID, "loginbtn")))  # 注意,这里用的不是css选择器而是id选择器
+    button_login.click()  # 登录
+
+    time.sleep(10)
+    browser.get(balance_url)
+    time.sleep(30)
+    browser.quit()
+    # display.stop()  # 关闭虚拟显示器
+
+
+class ShengFX888:
+    """爬取实盘用户信息的类"""
+    def __new__(cls, *args, **kwargs):
+        """单例模式设计"""
+        if not hasattr(cls, "instance"):
+            obj = super(ShengFX888, cls).__new__(cls)
+            obj.display = Display(visible=0, size=(800, 600))
+            # obj.display.start()
+            obj.browser = webdriver.Firefox()
+            obj.driver = WebDriverWait(obj.browser, 10)
+            obj.status = "free"  # 由于浏览器同时只能
+            obj.user_name = "849607604@qq.com"
+            obj.user_password = "Kai3349665"
+            obj.login_url = "http://office.shengfx888.com"
+            obj.balance_url_base = "http://office.shengfx888.com/report/history_trade?" \
+                  "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=&" \
+                  "qtype=&CMD=6&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=&" \
+                  "CLOSE_TIME_e=&T_LOGIN="
+            cls.instance = obj
+        return cls.instance
+
+    def get_balance_url(self, page_num: int = 1) -> str:
+        """
+        返回交易列表页的url
+        :param page_num: 第几页?
+        :return: 交易列表页的url
+        """
+        return "{}&page={}".format(self.balance_url_base, page_num)
+
+    def login(self):
+        """登录http://office.shengfx888.com"""
+        self.browser.get(url=self.login_url)
+        # 用户名输入
+        input_user_name = self.driver.until(
+            ec.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='请输入邮箱或者MT账号']")))
+        input_user_name.send_keys(self.user_name)  # 输入用户名
+        # 用户密码输入
+        input_user_password = self.driver.until(
+            ec.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='请输入登录密码']")))
+        input_user_password.send_keys(self.user_password)  # 输入用户密码
+        # 点击登录按钮
+        button_login = self.driver.until(
+            ec.presence_of_element_located((By.ID, "loginbtn")))  # 注意,这里用的不是css选择器而是id选择器
+        button_login.click()  # 登录
+
+        time.sleep(10)
+        # self.browser.close()
+        time.sleep(30)
+        self.browser.get(self.get_balance_url())
+        # self.browser.quit()
+
 
 
 if __name__ == "__main__":
-    args = {
-        "description": "搜索内容: 长江是有交易所↵预算: 0↵营销: 营销3↵水果: 梨子李子↵项目描述: 测试项目",
-        "page_url": "http://localhost:63342/projects/index.html?_ijt=22a6gi3e6no6e4dkrnrqsp6q8o",
-        "referrer": "",
-        "search_keyword": "长江是有交易所",
-        "sms_code": "6659",
-        "user_name": "测试人员",
-        "phone": "15618317376"
-    }
-    to_jiandao_cloud(**args)
-    # send_info(name="jadf", age=12)
-
-    time.sleep(1)
+    # args = {
+    #     "description": "搜索内容: 长江是有交易所↵预算: 0↵营销: 营销3↵水果: 梨子李子↵项目描述: 测试项目",
+    #     "page_url": "http://localhost:63342/projects/index.html?_ijt=22a6gi3e6no6e4dkrnrqsp6q8o",
+    #     "referrer": "",
+    #     "search_keyword": "长江是有交易所",
+    #     "sms_code": "6659",
+    #     "user_name": "测试人员",
+    #     "phone": "15618317376"
+    # }
+    # to_jiandao_cloud(**args)
+    # # send_info(name="jadf", age=12)
+    #
+    # time.sleep(1)
+    """测试爬取实盘用户信息"""
+    # listen_shengfx888()
+    ShengFX888().login()
+    pass
