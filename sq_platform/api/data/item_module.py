@@ -742,7 +742,7 @@ class UserLicenseRelation(mongo_db.BaseDoc):
     _table_name = "user_license_relation"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
-    type_dict['user_id'] = DBRef  # 用户id,指向user_info表
+    type_dict['user_id'] = DBRef  # 用户id,是指开这辆车的司机,指向user_info表
     type_dict['license_id'] = DBRef   # 驾驶证id,指向car_license_info表
     type_dict['create_date'] = datetime.datetime  # 关系的建立时间
     type_dict['end_date'] = datetime.datetime  # 关系的终结时间

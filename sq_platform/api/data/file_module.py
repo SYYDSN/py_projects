@@ -18,6 +18,8 @@ import json
 from api.data.item_module import User
 from api.data.item_module import *
 import threading
+import warnings
+
 
 """文件处理模块，主要是zip文件的读取和格式化"""
 
@@ -29,6 +31,8 @@ zip_dir_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.p
 if not os.path.exists(zip_dir_path):
     os.makedirs(zip_dir_path)
 print("zip_dir_path is {}".format(zip_dir_path))
+move_file_lock = threading.Lock()  # 移动/删除文件的多线程锁
+work_lock = threading.Lock()  # join_work/pop_work的锁
 
 
 """重启服务时，清除工作列表的缓存"""
@@ -42,7 +46,8 @@ def join_work(zip_path: str, key: str = "working_zipfile") -> bool:
     :param key: cache用的key
     :return: bool 返回True表示可以执行任务，返回False表示此文件已经在工作中了，无需再进行解压和读取。
     """
-    lock = threading.Lock()
+    global work_lock
+    lock = work_lock
     lock.acquire()
     values = cache.get(key)
     timeout = 60 * 5
@@ -68,7 +73,8 @@ def pop_work(zip_path: str, key: str = "working_zipfile") -> None:
     :param key: cache用的key
     :return: None
     """
-    lock = threading.Lock()
+    global work_lock
+    lock = work_lock
     lock.acquire()
     values = cache.get(key)
     timeout = 60 * 5
@@ -277,6 +283,93 @@ def read_zip(file_path: str) -> dict:
         return result_dict
 
 
+def files_to_mongodb_bak(args_dict: dict) -> None:
+    """
+    把一个zip文件的内容写入数据库
+    此函数现在处于声明废止状态,现在仅仅用作为备份,将在一定时间后被删除, 2018-3-2 12:37
+    :param args_dict: zip文件内部的文件的绝对路径和内容对象数组组成的字典
+    :return: None
+    """
+    ms = "此函数现在处于声明废止状态,现在仅仅用作为备份,将在一定时间后被删除, 2018-3-2 12:37"
+    warnings.warn(ms)
+    for file_path, obj_list in args_dict.items():
+        file_name = os.path.split(file_path)[-1]  # 获取文件名
+        print(file_name)
+        if file_name == "device_info.txt":
+            """设备信息"""
+            obj_dict = obj_list[0]
+            user_id = obj_dict.pop("user_id")
+            obj = PhoneDevice(**obj_dict)
+            device_id = PhoneDevice.find_by_id(obj.save()).get_dbref()
+            User.add_phone_device(user_id, device_id)
+        elif file_name == "rec_gps.txt":
+            """GPS传感器"""
+            obj_list = [x for x in obj_list if not (x.get("time") == "0" or x.get('ts') == "0")]
+            if len(obj_list) > 0:
+                inserted_obj_list = GPS.insert_many(obj_list)  # 插入成功的GPS实例的doc的数组
+                """开始生产track数据,并返回最后的位置点"""
+                last_position = Track.batch_create_item_from_gps(inserted_obj_list)
+                if last_position is not None:
+                    """发送给tornado服务器，通告最后的位置点"""
+                    flask_server_port = cache.get("flask_server_port")
+                    if flask_server_port is None:
+                        tornado_server_port = 5001
+                    else:
+                        try:
+                            flask_server_port = int(flask_server_port)
+                        except ValueError as e:
+                            flask_server_port = 5000
+                            print(e)
+                        except TypeError as e:
+                            flask_server_port = 5000
+                            print(e)
+                        finally:
+                            tornado_server_port = flask_server_port + 1
+                    url = "http://127.0.0.1:{}/listen_request".format(tornado_server_port)
+                    data = {"mes_type": "last_position",
+                            "data_dict": {"position": last_position}}
+                    try:
+                        # r = requests.post(url=url, data=data, timeout=1)  # tornado端未完善，暂时注销
+                        r = None
+                        if r is not None and r.status_code == 200:
+                            logger.info("last_position send success!", exc_info=True, stack_info=True)
+                    except requests.exceptions.Timeout as e:
+                        logger.exception("Connection timeout: ", exc_info=True, stack_info=True)
+                        raise e
+                    except requests.exceptions.ConnectionError as e:
+                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
+                        raise e
+                    except requests.exceptions.HTTPError as e:
+                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
+                        raise e
+                    except requests.exceptions.RequestException as e:
+                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
+                        raise e
+                    except Exception as e:
+                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
+                        raise e
+                    finally:
+                        pass
+            else:
+                print("empty file: {}".format(file_path))
+        else:
+            """其他传感器"""
+            sensor_type = file_name.split(".", 1)[0]
+            """转换传感器类型的字典"""
+            type_transform_dict = {"rec_acce": {"sensor_type": "accelerate", "description": "加速度传感器"},
+                                   "rec_grav": {"sensor_type": "gravitation", "description": "重力传感器(GV-sensor)"},
+                                   "rec_gyro": {"sensor_type": "gyroscope", "description": "陀螺仪传感器(Gyro-sensor)"},
+                                   "rec_rota": {"sensor_type": "rotation vector", "description": "旋转矢量传感器(RV-sensor)"},
+                                   "rec_magn": {"sensor_type": "magnetism", "description": "磁力传感器(M-sensor)"},
+                                   "rec_bpm": {"sensor_type": "beat per minute", "description": "心率传感器"}}
+            obj_list = [join_item(x, type_transform_dict.get(sensor_type)) for x in obj_list if
+                        not (x.get("time") == "0" or x.get('ts') == "0")]
+            if len(obj_list) > 0:
+                Sensor.insert_many(obj_list)
+            else:
+                print("empty file: {}".format(file_path))
+
+
 def files_to_mongodb(args_dict: dict) -> None:
     """
     把一个zip文件的内容写入数据库
@@ -382,7 +475,8 @@ def move_file_to_backup(file_path: str, backup_path: str = None) -> None:
         os.makedirs(backup_path)
     file_name = os.path.split(file_path)[-1]
     dst_path = os.path.join(backup_path, file_name)
-    lock = threading.Lock()
+    global move_file_lock
+    lock = move_file_lock
     lock.acquire()
     if os.path.exists(file_path):
         try:
@@ -518,6 +612,5 @@ def unzip_all_user_file() -> None:
 
 
 if __name__ == "__main__":
-    """列出所有用户"""
-    unzip_all_user_file()
+    files_to_mongodb_bak({})
     pass

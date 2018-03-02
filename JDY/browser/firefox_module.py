@@ -115,12 +115,15 @@ def to_jiandao_cloud(**kwargs) -> bool:
     js_desc_6 = """let d = $(".widget-wrapper>ul>li:eq(6) input"); d.val("{}");""".format(desc6)
     browser.execute_script(js_desc_6)  # 页面链接
 
-    search_keyword = kwargs['search_keyword']
-    description = kwargs['description']
-    desc7 = description if description != "" else search_keyword
+    desc7 = kwargs['description']
     js_desc_7 = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(desc7)
     print(js_desc_7)
     browser.execute_script(js_desc_7)  # 页面内容
+
+    desc8 = kwargs['search_keyword']
+    js_desc_8 = """let d = $(".widget-wrapper>ul>li:eq(9) input"); d.val("{}");""".format(desc8)
+    print(js_desc_8)
+    browser.execute_script(js_desc_8)  # 搜索关键字
 
     """
     如果查找器没有定位到dom元素或者页面尚未载入,会报如下的错误.
@@ -233,20 +236,19 @@ class ShengFX888:
 
 
 if __name__ == "__main__":
-    # args = {
-    #     "description": "搜索内容: 长江是有交易所↵预算: 0↵营销: 营销3↵水果: 梨子李子↵项目描述: 测试项目",
-    #     "page_url": "http://localhost:63342/projects/index.html?_ijt=22a6gi3e6no6e4dkrnrqsp6q8o",
-    #     "referrer": "",
-    #     "search_keyword": "长江是有交易所",
-    #     "sms_code": "6659",
-    #     "user_name": "测试人员",
-    #     "phone": "15618317376"
-    # }
-    # to_jiandao_cloud(**args)
-    # # send_info(name="jadf", age=12)
+    args = {
+        "description": "搜索内容: 长江是有交易所↵预算: 0↵营销: 营销3↵水果: 梨子李子↵项目描述: 测试项目",
+        "page_url": "http://localhost:63342/projects/index.html?_ijt=22a6gi3e6no6e4dkrnrqsp6q8o",
+        "referrer": "",
+        "search_keyword": "长江是有交易所",
+        "sms_code": "6659",
+        "user_name": "测试人员",
+        "phone": "15618317376"
+    }
+    to_jiandao_cloud(**args)
     #
     # time.sleep(1)
     """测试爬取实盘用户信息"""
     # listen_shengfx888()
-    ShengFX888().login()
+    # ShengFX888().login()
     pass

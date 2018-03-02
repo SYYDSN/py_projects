@@ -19,6 +19,7 @@ import base64
 import urllib.request
 import os
 from uuid import uuid4
+from module import user_module
 from werkzeug.contrib.cache import RedisCache
 
 
@@ -59,9 +60,9 @@ def save_platform_session(**kwargs) -> bool:
     :kwargs 必须包含 user_id user_name user_password三个参数
     return True代表保存成功，False代表保存失败
     """
-    user_id = kwargs.get('user_id')
-    user_name = kwargs.get('user_name')
-    user_password = kwargs.get('user_password')
+    user_id = kwargs.get('_id')
+    user_name = kwargs.get('phone')
+    user_password = kwargs.get('password')
     if not (user_id and user_name and user_password):
         """去掉session中的内容"""
         keys = list(session.keys())
@@ -128,42 +129,23 @@ def check_platform_session(f):
     """检测管操作员是否登录的装饰器,本域和跨域用户共用"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        cors = get_arg(request, "cors", default_value=None)  # 跨域标志
-        if cors == 'cors':
-            """跨域用户"""
-            sid = get_arg(request, "sid", default_value=None)  # 跨域会话id
-            user_info = get_platform_cors_session_dict(sid)
-            if user_info is None:
-                return json.dumps({"message": "invalid session"})
-            else:
-                now = datetime.datetime.now()
-                last_upate_date = user_info['last_update_date']
-                delta = (now - last_upate_date).total_seconds()
-                if delta > cors_session_timeout:
-                    """会话超时"""
-                    clear_platform_cors_session(sid)
-                    return json.dumps({"message": "session timeout"})
-                else:
-                    """放行"""
-                    save_platform_cors_session(**user_info)  # 保存/更新跨域的会话
-                    return f(*args, **kwargs)
+
+        """本域用户"""
+        phone = session.get("phone")  # 检测session中的user_name
+        password = session.get("password")  # user_password
+        user_id = session.get("_id")  # 检测session中的user_id
+        if not (phone and password and user_id):
+            return redirect(url_for("login_func"))
         else:
-            """本域用户"""
-            user_name = session.get("user_name")  # 检测session中的user_name
-            user_password = session.get("user_password")  # user_password
-            user_id = session.get("user_id")  # 检测session中的user_id
-            if not (user_password and user_name and user_id):
-                return redirect(url_for("manage_blueprint.login_func"))
+            checked_user_obj = user_module.User.login(phone=phone, password=password)
+            if checked_user_obj is None:
+                """用户名和密码不正确"""
+                return redirect(url_for("login_func"))
             else:
-                checked_user_obj = User.find_one(user_name=user_name, user_password=user_password)
-                if checked_user_obj is None:
-                    """用户名和密码不正确"""
-                    return redirect(url_for("manage_blueprint.login_func"))
+                if checked_user_obj['data']['_id'] == user_id:
+                    return f(*args, **kwargs)
                 else:
-                    if str(checked_user_obj.get_id()) == user_id:
-                        return f(*args, **kwargs)
-                    else:
-                        return redirect(url_for("manage_blueprint.login_func"))
+                    return redirect(url_for("login_func"))
     return decorated_function
 
 

@@ -64,9 +64,8 @@ class Customer(mongo_db.BaseDoc):
                 phone = kwargs.pop('phone')
                 filter_dict = {"phone": {"$all": [phone]}}
                 if cls.find_one_plus(filter_dict=filter_dict):
-                    # raise ValueError("重复的手机号码:{}".format(phone))
-                    # 注意.数据库去重索引关闭了
-                    kwargs['phone'] = [phone]
+                    raise ValueError("重复的手机号码:{}".format(phone))
+                    # kwargs['phone'] = [phone]
                 else:
                     kwargs['phone'] = [phone]
             if "qq" in kwargs:
@@ -118,6 +117,40 @@ class Customer(mongo_db.BaseDoc):
                 pass
         return message
 
+    @classmethod
+    def page(cls, _id: str = None,
+             begin_date: (str, datetime.datetime) = None, end_date: (str, datetime.datetime) = None,
+             index: int = 1, num: int = 20, can_json: bool = True, reverse: bool = True) -> dict:
+        """
+        分页注册客户记录
+        :param _id: 客户id,为空表示所有
+        :param begin_date:   开始时间
+        :param end_date:   截至时间
+        :param index:  页码
+        :param can_json:   是否进行can json转换
+        :param num:   每页多少条记录
+        :param reverse:   是否倒序排列?
+        :return: 事件记录的列表和统计组成的dict
+        """
+        filter_dict = dict()
+        if _id is not None:
+            filter_dict['_id'] = mongo_db.get_obj_id(_id)
+        end_date = datetime.datetime.now() if mongo_db.get_datetime_from_str(end_date) is None else \
+            mongo_db.get_datetime_from_str(end_date)
+        begin_date = mongo_db.get_datetime_from_str("2010-1-1 0:0:0") if \
+            mongo_db.get_datetime_from_str(begin_date) is None else mongo_db.get_datetime_from_str(begin_date)
+        filter_dict['time'] = {"$lte": end_date, "$gte": begin_date}
+        index = 1 if index is None else index
+        skip = (index - 1) * num
+        sort_dict = {"time": -1 if reverse else 1}
+        count = cls.count(filter_dict=filter_dict)
+        res = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, skip=skip, limit=num, to_dict=True)
+        if can_json:
+            res = [mongo_db.to_flat_dict(x) for x in res]
+        data = {"count": count, "data": res}
+        return data
+
 
 if __name__ == "__main__":
+    customer = Customer.reg(phone="15618317376", user_name="测试人员", time=datetime.datetime.now())
     pass

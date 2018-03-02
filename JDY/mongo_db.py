@@ -198,6 +198,27 @@ def get_conn(table_name):
         return conn
 
 
+def other_can_json(obj):
+    """把其他对象转换成可json,是to_flat_dict的内部函数"""
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    elif isinstance(obj, (DBRef, MyDBRef)):
+        return str(obj.id)
+    elif isinstance(obj, datetime.datetime):
+        return obj.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        return obj
+
+
+def to_flat_dict(a_dict) -> dict:
+    """
+    转换成可以json的字典,这是一个独立的方法
+    :param a_dict:
+    :return:
+    """
+    return {other_can_json(k): other_can_json(v) for k, v in a_dict.items()}
+
+
 def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
     """获取日期和时间，以字符串类型返回，格式为：2016-12-19 14:33:03
     number是指在当前日期上延后多少天，默认是0,可以是负值
@@ -209,6 +230,30 @@ def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
         return now.strftime("%Y-%m-%d %H:%M:%S")
     else:
         return now
+
+
+def get_date_from_str(date_str: str) -> datetime.date:
+    """
+    根据字符串返回datet对象
+    :param date_str: 表示时间的字符串."%Y-%m-%d  "%Y/%m/%d或者 "%Y_%m_%d
+    :return: datetime.date对象
+    """
+    the_date = None
+    pattern = re.compile(r'^[1-2]\d{3}\D[0-1]?\d\D[0-3]?\d\D?$')
+    if date_str is None:
+        ms = "日期字符串不能为None"
+        logger.exception(ms)
+    elif pattern.match(date_str):
+        print("date_str is {}".format(date_str))
+        year = re.compile(r'^[1-2]\d{3}').match(date_str)
+        month = re.compile(r'[0-1]?\d').match(date_str, pos=year.end() + 1)
+        day = re.compile(r'[0-3]?\d').match(date_str, pos=month.end() + 1)
+        the_str = "{}-{}-{}".format(year.group(), month.group(), day.group())
+        the_date = datetime.datetime.strptime(the_str, "%Y-%m-%d").date()
+    else:
+        ms = "错误的日期格式:{}".format(date_str)
+        logger.exception(ms)
+    return the_date
 
 
 def get_datetime_from_str(date_str: str) -> datetime.datetime:
@@ -750,17 +795,11 @@ class BaseDoc:
                                 else:
                                     pass
                         elif type_name.__name__ == "date":
-                            temp = None
-                            try:
-                                temp = datetime.datetime.strptime(v, "%Y-%m-%d")
-                            except TypeError as e:
-                                print(e)
-                                logger.error("datetime transform error", exc_info=True, stack_info=True)
-                            finally:
-                                if temp is not None:
-                                    self.__dict__[k] = temp
-                                else:
-                                    pass
+                            temp = get_date_from_str(v)
+                            if temp is not None:
+                                self.__dict__[k] = temp
+                            else:
+                                pass
                         elif type_name.__name__ == "DBRef" and v is None:
                             """允许初始化时为空"""
                             pass
@@ -1040,9 +1079,6 @@ class BaseDoc:
                 """如果用户已经自己定义了$开头的方法"""
                 pass
             else:
-                self.__init__(**update)
-                update_obj = self
-                update = {k: update_obj.__dict__[k] for k in keys}
                 update = {"$set": update}
         ses = get_conn(self._table_name)
         print("~~~~~~~~~~~~~~")
@@ -1255,6 +1291,7 @@ class BaseDoc:
             return list()
         else:
             is_instance = isinstance(doc_list[0], cls)
+            """如果是实例的数组,那就转成"""
             doc_list = doc_list if is_instance else [cls(**doc).__dict__ for doc in doc_list]  # 可以把实例的数组转成doc/dict的数组.
             success_doc_list = cls.insert_many_and_return_doc(input_list=doc_list)
             return success_doc_list
@@ -1299,6 +1336,18 @@ class BaseDoc:
         return result
 
     @classmethod
+    def count(cls, filter_dict: dict, session = None, **kwargs):
+        """统计
+        :param filter_dict: 过滤器字典
+        :param session: pymongo.client_session.ClientSession 实例
+        :return:
+        """
+        table_name = cls.get_table_name()
+        ses = get_conn(table_name)
+        result = ses.count(filter=filter_dict, session=session, **kwargs)
+        return result
+
+    @classmethod
     def distinct(cls, filter_dict: dict = None, key: str = None):
         """
         去重查找
@@ -1312,9 +1361,11 @@ class BaseDoc:
         return result
 
     @classmethod
-    def find_by_id(cls, o_id: (str, ObjectId)):
+    def find_by_id(cls, o_id: (str, ObjectId), to_dict: bool = False, can_json: bool = False):
         """查找并返回一个对象，这个对象是o_id对应的类的实例
         :param o_id: _id可以是字符串或者ObjectId
+        :param to_dict: 是否转换结果为字典?
+        :param can_json: 是否转换结果为可json化的字典?注意如果can_json为真,to_dict参数自动为真
         return cls.instance
         """
         o_id = get_obj_id(o_id)
@@ -1323,7 +1374,15 @@ class BaseDoc:
         if result is None:
             return result
         else:
-            return cls(**result)
+            if can_json:
+                to_dict = True
+            if to_dict:
+                if can_json:
+                    return to_flat_dict(result)
+                else:
+                    return result
+            else:
+                return cls(**result)
 
     @classmethod
     def find(cls, to_dict: bool = False, **kwargs)->(list, None):
@@ -1361,7 +1420,7 @@ class BaseDoc:
 
     @classmethod
     def find_plus(cls, filter_dict: dict, sort_dict: dict = None, skip: int = None, limit: int = None,
-                  projection: list = None, to_dict: bool = False) -> (list, None):
+                  projection: list = None, to_dict: bool = False, can_json=False) -> (list, None):
         """
         find的增强版本,根据条件查找对象,返回多个对象的实例
         :param filter_dict:   过滤器,筛选条件.
@@ -1370,8 +1429,11 @@ class BaseDoc:
         :param limit:         输出数量限制.
         :param projection:    投影数组,决定输出哪些字段?
         :param to_dict:       True,返回的是字典的数组，False，返回的是实例的数组
+        :param can_json:       是否调用to_flat_dict函数转换成可以json的字典?
         :return:
         """
+        if can_json:
+            to_dict = True
         if sort_dict is not None:
             sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
         else:
@@ -1391,7 +1453,10 @@ class BaseDoc:
             return result
         else:
             if to_dict:
-                result = [x for x in result]
+                if can_json:
+                    result = [to_flat_dict(x) for x in result]
+                else:
+                    result = [x for x in result]
             else:
                 result = [cls(**x) for x in result]
             return result
@@ -1424,7 +1489,8 @@ class BaseDoc:
             return cls(**result)
 
     @classmethod
-    def find_one_plus(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, instance: bool = False):
+    def find_one_plus(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
+                      instance: bool = False, can_json: bool = False):
         """
         find_one的增强版，有sort的功能，在查询一个结果的时候，比sort效率高很多
         同理也需要一个find_plus作为find的增强版
@@ -1432,8 +1498,11 @@ class BaseDoc:
         :param sort_dict: 排序的条件  比如: {"time": -1}  # -1表示倒序
         :param projection:    投影数组,决定输出哪些字段?
         :param instance: 返回的是实例还是doc对象？默认是doc对象
-        :return: 实例或者doc对象。
+        :param can_json: 是否转为可json 的dict?这个有联动性,can_json为真instance一定未假
+        :return: None, dict,实例或者doc对象。
         """
+        if can_json:
+            instance = False
         table_name = cls._table_name
         ses = get_conn(table_name=table_name)
         if sort_dict is None or len(sort_dict) == 0:
@@ -1451,9 +1520,40 @@ class BaseDoc:
             return result
         else:
             if not instance:
-                return result
+                if can_json:
+                    return to_flat_dict(result)
+                else:
+                    return result
             else:
                 return cls(**result)
+
+    @classmethod
+    def find_one_and_delete(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
+                            instance: bool = False) -> (dict, None):
+        """
+        找到并删除一个对象
+        :param filter_dict:  查询的条件，
+        :param sort_dict: 排序的条件  比如: {"time": -1}  # -1表示倒序
+        :param projection:    投影数组,决定输出哪些字段?
+        :param instance: 返回的是实例还是doc对象？默认是doc对象
+        :return: None, 实例或者doc对象。
+        """
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        if sort_dict is not None:
+            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        else:
+            sort_list = None
+        args = {
+            "filter": filter_dict,
+            "sort": sort_list,  # 可能是None,但是没问题.
+            "projection": projection
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        res = ses.find_one_and_delete(**args)
+        if instance:
+            res = cls(**res)
+        return res
 
     @classmethod
     def find_alone_and_update(cls, filter_dict: dict, update, projection=None, sort=None, upsert=True,
@@ -1487,8 +1587,9 @@ class BaseDoc:
     def find_one_and_update_plus(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
                               return_document: str="after"):
         """
-        find_one_and_update和find_alone_and_update的增强版.推荐使用本方法提前之前的两个方法.
-        本方法虽然更灵活,但是在设置参数时要求更高.
+        find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
+        find_one_and_update和find_alone_and_updatet替更简单医易用.
+        本方法更灵活,只是在设置参数时要求更高.
         找到一个文档然后更新它，如果找不到就插入
         :param filter_dict: 查找时匹配参数 字典
         :param update_dict: 更新的数据，字典,注意例子中参数的写法,有$set和$inc两种更新方式.
@@ -1521,8 +1622,44 @@ class BaseDoc:
 
         }
         args = {k: v for k, v in args.items() if v is not None}
-        result = ses.find_one_and_update(**args)
+        result = None
+        try:
+            result = ses.find_one_and_update(**args)
+        except Exception as e:
+            ms = "args: {}".format(args)
+            logger.exception(ms)
+            raise e
         return result
+
+    @classmethod
+    def update_many_plus(cls, filter_dict: dict, update_dict: dict, upsert: bool = False,
+                         document_validation: bool = False) -> (list, None):
+        """
+        根据条件查找对象,进行批量更新
+        :param filter_dict: 查找时匹配参数 字典
+        :param update_dict: 更新的数据，字典,注意例子中参数的写法,有$set和$inc两种更新方式.
+        :param upsert: 更新对象不存在的时候是否插入新的数据?
+        :param document_validation: 是否启用文档验证机制?(前提是你这个表设置了文档验证器)
+        :return:  pymongo.results.UpdateResult
+        example:
+        filter_dict = {"something": ...}
+        update_dict = {"$set": {"prev_date": datetime.datetime.now(),
+                                "last_query_result_id": last_query_result_id},
+                       "$inc": {"online_query_count": 1, "all_count": 1,
+                                "today_online_query_count": 1}}
+        self.find_one_and_update(filter_dict=filter_dict, update=update_dict)
+        """
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        args = {
+            "filter": filter_dict,
+            "update": update_dict,
+            "upsert": upsert,
+            "bypass_document_validation": document_validation,
+            "collation": None
+        }
+        res = ses.update_many(**args)
+        return res
 
     @classmethod
     def near_by_point(cls, the_class: type = None, col: str = "loc",
@@ -1688,6 +1825,6 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 
 if __name__ == "__main__":
-    print(get_datetime_from_str("2017-12-12T12:12:12.000Z"))
+    print(get_date_from_str("2018-02-24"))
     pass
 

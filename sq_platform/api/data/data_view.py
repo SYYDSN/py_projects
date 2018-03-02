@@ -267,6 +267,7 @@ def process_driving_data(user_id):
 
 @api_data_blueprint.route("/unzip_all_file", methods=['post', 'get'])
 def process_all_zip_file():
+    """测试解压缩程序是否正餐工作的非生产函数"""
     key = get_arg(request, "key")
     if key != "dfdK@-03":
         return abort(404)

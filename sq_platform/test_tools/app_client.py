@@ -142,7 +142,7 @@ def test_update_user_driving_license():
 
 
 def test_get_car_license():
-    """测试获取用户驾行车证信息"""
+    """测试获取用户行车证信息"""
     auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     res = requests.post("http://127.0.0.1:5000/api/get_vehicle_info", headers=headers)
@@ -156,6 +156,16 @@ def test_get_user_driving_license():
     headers = {"auth_token": auth_token}
     res = requests.post("http://127.0.0.1:5000/api/get_license_info", headers=headers)
     print(res.json())
+
+
+def test_add_driving_data():
+    """测试用户上传行车数据的压缩文件"""
+    auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
+    headers = {"auth_token": auth_token}
+    files = {"driving_data": open("/home/walle/work/temp/2018_03_02_12_41_35.zip", "rb")}
+    res = requests.post("http://127.0.0.1:5000/api/add_driving_data", headers=headers, files=files)
+    print(res.json())
+
 
 
 def test_gps_push():
@@ -211,8 +221,8 @@ def test_get_report_detail():
     """测试获取安全报告详情"""
     auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
-    # url = "http://127.0.0.1:5000/api/get_report_detail"
-    url = "http://safego.org:5000/api/get_report_detail"
+    url = "http://127.0.0.1:5000/api/get_report_detail"
+    # url = "http://safego.org:5000/api/get_report_detail"
     r = requests.post(url, headers=headers, data={"hello": "world"})
     j = r.json()
     if 'data' in j:
@@ -227,8 +237,8 @@ def test_get_safety_report_history():
     """测试获取安全报告历史"""
     auth_token = "595f65d77d8d4df5917742be1618b37a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
-    # url = "http://127.0.0.1:5000/api/get_safety_report_history"
-    url = "http://safego.org:5000/api/get_safety_report_history"
+    url = "http://127.0.0.1:5000/api/get_safety_report_history"
+    # url = "http://safego.org:5000/api/get_safety_report_history"
     r = requests.post(url, headers=headers, data={"hello": "world"})
     j = r.json()
     if 'data' in j:
@@ -246,27 +256,31 @@ if __name__ == "__main__":
     #     "method": "post",
     #     "user_id": "59cda886ad01be237680e28e"
     # }
-    # """测试获取每日报告"""
+    """测试获取每日报告"""
     # test_get_daily_info()
-    # """测试违章查询"""
+    """测试违章查询"""
     # test_query_violation()
     # test_req(**args)
-    # """测试用户上传行车证图片"""
+    """测试用户上传行车证图片"""
     # test_upload_user_permit_image()
-    # """测试用户删除行车证"""
+    """测试用户删除行车证"""
     # test_delete_user_vehicle_info()
     # """测试用户编辑行车证图片"""
     # test_edit_user_permit_image()
-    # """测试用户上传驾驶证"""
+    """测试用户上传驾驶证"""
     # test_upload_user_driving_license()
-    # """测试更新用户驾驶证信息"""
+    """测试更新用户驾驶证信息"""
     # test_update_user_driving_license()
-    # """测试获取用户行车证信息"""
-    test_get_car_license()
-    # """测试获取用户驾驶证信息"""
+    """测试获取用户行车证信息"""
+    # test_get_car_license()
+    """测试获取用户驾驶证信息"""
     # test_get_user_driving_license()
-    # """测试用户安全指数排名接口"""
+    """测试用户安全指数排名接口"""
     # test_get_security_rank_list()
-    # test_get_safety_report_history()
-    # test_gps_push()
+    """测试用户上传行车数据的压缩文件"""
+    # test_add_driving_data()
+    """测试获取安全报告详情"""
+    # test_get_report_detail()
+    """测试获取安全报告历史"""
+    test_get_safety_report_history()
     pass

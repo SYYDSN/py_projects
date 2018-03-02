@@ -251,7 +251,10 @@ def get_date_from_str(date_str: str) -> datetime.date:
     """
     the_date = None
     pattern = re.compile(r'^[1-2]\d{3}\D[0-1]?\d\D[0-3]?\d\D?$')
-    if pattern.match(date_str):
+    if date_str is None:
+        ms = "日期字符串不能为None"
+        logger.exception(ms)
+    elif pattern.match(date_str):
         print("date_str is {}".format(date_str))
         year = re.compile(r'^[1-2]\d{3}').match(date_str)
         month = re.compile(r'[0-1]?\d').match(date_str, pos=year.end() + 1)

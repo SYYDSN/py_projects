@@ -8,13 +8,16 @@ from flask import request
 from flask_session import Session
 from log_module import get_logger
 import sms_module
+from mongo_db import get_obj_id
 from flask_tokenauth import TokenAuth, TokenManager
 import json
 from werkzeug.contrib.cache import RedisCache
+from flask_debugtoolbar import DebugToolbarExtension
 from tools_module import *
 import item_module
 from module.spread_module import AllowOrigin
 from uuid import uuid4
+from module import user_module
 import os
 
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
@@ -178,6 +181,53 @@ def my_register():
     return resp
 
 
+@app.route("/xd_login", methods=['post', 'get'])
+def login_func():
+    """管理登录页"""
+    if request.method.lower() == 'get':
+        return render_template("login.html")
+    elif request.method.lower() == 'post':
+        phone = get_arg(request, "phone", None)
+        password = get_arg(request, "password", None)
+        if phone and password:
+            res = user_module.User.login(phone, password)
+            mes = {"message": "success"}
+            if isinstance(res, dict):
+                if res['message'] == "success":
+                    save_platform_session(**res['data'])
+            else:
+                mes = {"message": "登录错误"}
+            return json.dumps(mes)
+        else:
+            return abort(404)
+        pass
+    else:
+        return abort(404)
+
+
+@app.route("/customer_list", methods=['get', 'post'])
+@check_platform_session
+def customer_list_func():
+    """注册用户列表页"""
+    if request.method.lower() == 'get':
+        index = get_arg(request, "index", None)
+        res = item_module.Customer.page(index=index, num=200)
+        return render_template("customer_list.html", customer_list=res['data'])
+    elif request.method.lower() == 'post':
+        op_type = get_arg(request, "type")
+        if op_type == "delete":
+            """删除用户"""
+            customer_id = get_arg(request, "_id")
+            filter_dict = {"_id": get_obj_id(customer_id)}
+            mes = {"message": "success"}
+            res = item_module.Customer.find_one_and_delete(filter_dict=filter_dict)
+            if res is None:
+                mes['message'] = "删除失败"
+            else:
+                pass
+            return json.dumps(mes)
+    else:
+        return abort(404)
 @app.after_request
 def allow_cross_domain(response):
     """允许跨域资源访问管理"""
@@ -191,4 +241,6 @@ def allow_cross_domain(response):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=port, debug=True, threaded=True)
+    app.debug = True  # 这一行必须在toolbar = DebugToolbarExtension(app)前面,否则不生效
+    toolbar = DebugToolbarExtension(app)
+    app.run(host="0.0.0.0", port=port, threaded=True)
