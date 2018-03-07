@@ -827,7 +827,7 @@ class CarLicense(mongo_db.BaseDoc):
                 find_obj = UserLicenseRelation.find_one_plus(filter_dict=relation)
                 if find_obj is None:
                     relation['create_date'] = datetime.datetime.now()
-                    UserLicenseRelation.insert_one(**relation)
+                    find_obj = UserLicenseRelation.insert_one(**relation)
                 else:
                     pass
                 result = obj
@@ -858,7 +858,7 @@ class CarLicense(mongo_db.BaseDoc):
                 "$or": [
                     {"end_date":{"$exists": False}},
                     {"end_date":None},
-                    {"end_date":{"$lte": datetime.datetime.now()}}
+                    {"end_date":{"$gte": datetime.datetime.now()}}
                 ]
             }
             sort_dict = {"create_date": -1}

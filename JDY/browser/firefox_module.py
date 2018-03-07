@@ -32,7 +32,7 @@ def to_jiandao_cloud(**kwargs) -> bool:
     :return:
     """
     display = Display(visible=0, size=(800, 600))
-    display.start()  # 开启虚拟显示器
+    # display.start()  # 开启虚拟显示器
 
     """
     注意，pyvirtualdisplay需要xvfb支持。安装方法：sudo apt-get install xvfb

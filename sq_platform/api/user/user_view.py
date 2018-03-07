@@ -163,7 +163,7 @@ def api_send_sms():
     if check_phone(phone_num):
         message = sms.send_sms(phone_num)
     else:
-        message['message'] = "手机号码错误"
+        message = pack_message(message, 3013, phone_num=phone_num)
     logger.info("function={},args={}".format(sys._getframe().f_code.co_name, str(sys._getframe().f_locals)))
     return json.dumps(message)
 

@@ -1,9 +1,6 @@
 # -*- coding:utf8 -*-
 from mongo_db import get_conn
-from mongo_db import ObjectId
-from mongo_db import DBRef
-from api.user.violation_module import ViolationQueryResult
-from api.user.item_module import CarLicense
+from bson import regex
 
 
 def insert_error_code(**kwargs):
@@ -13,10 +10,12 @@ def insert_error_code(**kwargs):
     return inserted_id
 
 
-args = {"code": 5001,
-        "description": "文件写入磁盘失败"}
+args = {"code": 7001,
+        "description": "接口没有正确响应"}
 
 
 print(insert_error_code(**args))
+
+
 
 

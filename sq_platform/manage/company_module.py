@@ -208,8 +208,9 @@ class Dept(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
     type_dict['company_id'] = DBRef  # 所属公司 Company
-    type_dict['leader_id'] = DBRef  # 领导团队 Employee
-    type_dict['secondary_leaders'] = list  # 除部门正职领导之外的辅助的领导,是Employee的DBRef的list
+    # type_dict['leader_id'] = DBRef  # 领导团队 Employee  废弃,以Leader(关系类代替)
+    # 废弃,以Leader(关系类代替)
+    # type_dict['secondary_leaders'] = list  # 除部门正职领导之外的辅助的领导,是Employee的DBRef的list
     type_dict['dept_name'] = str  # 团队名称
     type_dict['description'] = str  # 说明
     type_dict['higher_dept'] = DBRef  # 上级部门

@@ -6,6 +6,7 @@ import datetime
 import random
 from mongo_db import cache
 from log_module import get_logger
+from error_module import pack_message
 
 
 logger = get_logger()
@@ -59,9 +60,11 @@ def __send_sms(phone_num):
         key = "sms_{}".format(phone_num)
         cache.set(key, validate_code, timeout=60 * 30)
     elif status_code == "20":
-        message['message'] = "余额不足"
+        # message['message'] = "余额不足"
+        message = pack_message(message, error_code=5002)
     else:
-        message['message'] = "短信发送失败:错误代码{}".format(status_code)
+        # message['message'] = "短信发送失败:错误代码{}".format(status_code)
+        message = pack_message(message, error_code=7002, status_code=status_code)
     return message
 
 
@@ -92,7 +95,8 @@ def send_sms(phone_num):
         seconds = (now - prev).total_seconds()
         """检查发送间隔"""
         if seconds < interval:
-            message['message'] = "短信发送频繁，请等待{}秒后再试".format(int(interval - seconds))
+            # message['message'] = "短信发送频繁，请等待{}秒后再试".format(int(interval - seconds))
+            message = pack_message(message, error_code=4190, delay_seconds=int(interval - seconds))
         else:
             message = __send_sms(phone_num)
             if message['message'] == "success":
@@ -100,7 +104,8 @@ def send_sms(phone_num):
                 temp_key = "{}_{}".format(key, str(len(recode_list)))
                 cache.set(temp_key, datetime.datetime.now(), timeout=60 * 24)
     else:
-        message['message'] = "已超本日短信最大发送次数"
+        # message['message'] = "已超本日短信最大发送次数"
+        message = pack_message(message, error_code=4014, count=len(recode_list))
     return message
 
 
@@ -110,9 +115,11 @@ def validate_sms(phone_num, validate_code):
     key = "sms_{}".format(phone_num)
     raw_code = cache.get(key)
     if raw_code is None:
-        message['message'] = "验证码无效"
+        # message['message'] = "验证码不能为None"
+        message = pack_message(message, error_code=3000, tel_verify_code=raw_code)
     elif int(validate_code) != raw_code:
-        message['message'] = "验证码错误"
+        # message['message'] = "验证码错误"
+        message = pack_message(message, error_code=3002, tel_verify_code=raw_code)
     else:
         pass
     return message
