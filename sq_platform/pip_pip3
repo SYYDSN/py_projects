@@ -1,1 +1,2 @@
-pip install bjoern tornado cherrypy meinheld flask-session flask-wtf redis pymongo numpy request requests opencv-python matplotlib haversine openpyxl celery elasticsearch flask-debugtoolbar gevent -i https://pypi.douban.com/simple
+apt-get install libev-dev
+pip3 install bjoern tornado cherrypy meinheld flask-session flask-wtf redis pymongo numpy request requests opencv-python matplotlib haversine openpyxl celery elasticsearch flask-debugtoolbar gevent -i https://pypi.douban.com/simple
