@@ -10,6 +10,7 @@ import mongo_db
 from api.data.item_module import User, Track
 import datetime
 from log_module import get_logger
+import warnings
 
 
 """公司模块"""
@@ -57,20 +58,25 @@ class Company(mongo_db.BaseDoc):
         return res
 
     @classmethod
-    def all_dept(cls, company_id: (str, ObjectId)) -> list:
+    def all_dept(cls, company_id: (str, ObjectId, object), can_json: bool = True) -> list:
         """
         根据公司id获取全部的职务的列表
-        :param company_id:
+        :param company_id:ObjectId或者cls的实例
+        :param can_json:返回的部门字典是否可以直接json? False返回的是Dept的实例的数组
         :return
         """
-        company = cls.find_by_id(company_id)
+        to_dict = False if can_json else True
+        if isinstance(company_id, cls):
+            company = company_id
+        else:
+            company = cls.find_by_id(company_id)
         res = list()
         if not isinstance(company, cls):
             pass
         else:
             company_dbref = company.get_dbref()
             filter_dict = {'company_id': company_dbref}
-            res = {str(m['_id']): m['dept_name'] for m in Dept.find_plus(filter_dict=filter_dict, projection=["_id", "dept_name"], to_dict=True)}
+            res = Dept.find_plus(filter_dict=filter_dict, to_dict=to_dict, can_json=True)
         return res
 
     @staticmethod
@@ -425,6 +431,12 @@ class Employee(User):
         self.type_dict['scheduling'] = list   # 排班的DBRef的list,对应于员工的排班,默认早9点到晚17点.（考虑加班和替班的情况）
         super(Employee, self).__init__(**kwargs)
 
+    def get_dept(self) -> Dept:
+        """
+        获取职员的部门信息
+        :return: Dept的实例
+        """
+
     def get_archives(self) -> dict:
         """
         获取个人档案,可以看作是超详细版的个人资料,主要是辅助显示个人详细信息,
@@ -620,12 +632,14 @@ class Employee(User):
     @classmethod
     def subordinates_instance(cls, user_id: (str, ObjectId), can_json: bool = True, include_blocking: bool = False) -> list:
         """
+        由于职员和部门的关系(EmployeeDeptRelation)的加入,此方法即将被废止 2018-3-8
         获取指定用户的所有下属的实例，有下属的时候包含自己，如果没有下属，那就返回一个空list
         :param user_id: 指定用户的id
         :param can_json: 是否为json做好类型转换?
         :param include_blocking: 是否包含被阻止的用户列表？
         :return: 下属的id的instance列表
         """
+        warnings.warn("此方法已过时, 请使用role包下对应的方法替代, begin at 2018-3-8")
         res = list()
         if isinstance(user_id, (str, ObjectId)):
             """正常的情况"""

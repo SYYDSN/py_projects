@@ -31,9 +31,15 @@ password = "Try@Ex68769"       # 数据库密码
 db_name = "platform_db"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 
-"""配置信息"""
+"""mongodb配置信息"""
+"""
+注意,使用连接池就不能使用mongos load balancer
+mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
+"""
 mongodb_setting = {
-    "host": "safego.org:20000",   # 数据库服务器地址
+    # "host": "safego.org:20000",   # 数据库服务器地址            mongos 1
+    "host": "pltf.safego.org:7171",   # 数据库服务器地址          mongos 2
+    # "host": "pltf.safego.org:8181",   # 数据库服务器地址        mongos 3
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 800,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
@@ -217,6 +223,10 @@ def other_can_json(obj):
         return str(obj.id)
     elif isinstance(obj, datetime.datetime):
         return obj.strftime("%Y-%m-%d %H:%M:%S")
+    elif isinstance(obj, list):
+        return [other_can_json(x) for x in obj]
+    elif isinstance(obj, dict):
+        return {k: other_can_json(v) for k, v in obj.items()}
     else:
         return obj
 

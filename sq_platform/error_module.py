@@ -2,6 +2,7 @@
 from mongo_db import BaseDoc, get_conn
 from bson.objectid import ObjectId
 import json
+import warnings
 
 
 """自定义错误模块"""
@@ -49,7 +50,6 @@ class ErrorCode(BaseDoc):
                     message = {"message": "success", "data": {"error_code": error.get_attr("code"),
                                                               "description": error.get_attr("description")}}
             return message
-
 
     @classmethod
     def show(cls, code: (str, int, float))->dict:

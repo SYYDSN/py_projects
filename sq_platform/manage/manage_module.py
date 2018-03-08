@@ -84,7 +84,7 @@ def block_employee_list_func():
         else:
             company_id = company_dbref.id
             post_dict = Company.all_post(company_id)
-            dept_dict = Company.all_dept(company_id)
+            dept_dict = Company.all_dept(company_id, can_json=True)
         employee_list = Employee.subordinates_instance(user_id, True, True)
         current_user_name = user.get_attr("phone_num") if user.get_attr("real_name", "") == '' \
             else user.get_attr("real_name", "")
@@ -107,7 +107,7 @@ def block_employee_list_func():
             else:
                 company_id = company_dbref.id
                 post_dict = Company.all_post(company_id)
-                dept_dict = Company.all_dept(company_id)
+                dept_dict = Company.all_dept(company_id, can_json=True)
             employee_list = Employee.subordinates_instance(user_id)
             current_user_name = user.get_attr("phone_num") if user.get_attr("real_name", "") == '' \
                 else user.get_attr("real_name", "")
