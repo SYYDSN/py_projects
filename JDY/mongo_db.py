@@ -206,6 +206,10 @@ def other_can_json(obj):
         return str(obj.id)
     elif isinstance(obj, datetime.datetime):
         return obj.strftime("%Y-%m-%d %H:%M:%S")
+    elif isinstance(obj, list):
+        return [other_can_json(x) for x in obj]
+    elif isinstance(obj, dict):
+        return {k: other_can_json(v) for k, v in obj.items()}
     else:
         return obj
 

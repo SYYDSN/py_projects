@@ -16,6 +16,8 @@ import datetime
 import time
 import os
 from log_module import get_logger
+from mail_module import send_mail
+import pyquery
 import threading
 
 
@@ -229,26 +231,77 @@ class ShengFX888:
 
         time.sleep(10)
         # self.browser.close()
-        time.sleep(30)
-        self.browser.get(self.get_balance_url())
+        # time.sleep(30)
+        # self.browser.get(self.get_balance_url())
         # self.browser.quit()
+        
+    def need_login(self) -> bool:
+        """
+        检查当前的登录会话是否过时?(是否需要登录?)
+        :return: 需要登录返回True,不需要登录返回False
+        """
+        if self.browser.current_url.startswith("http://office.shengfx888.com/Public/login?"):
+            return True
+        else:
+            return False
+
+    def open_balance_page(self, page_num: int = 1) -> bool:
+        """
+        打开出入金页面,如果已经登录,返回True,否则尝试重新login,三次失败后,返回False
+        :param page_num: 页码
+        :return: 布尔值
+        """
+        url = self.get_balance_url(page_num)
+        self.browser.get(url)
+        count = 0
+        while self.need_login() and count < 3:
+            self.login()
+            count += 1
+        self.browser.get(url)
+        return not self.need_login()
+
+    def parse_page(self, page_num: int = 1) -> dict:
+        """
+        分析页面数据
+        :param page_num: 页码
+        :return: 返回分析结果字典
+        """
+        message = {"message": "success"}
+        if self.open_balance_page():
+            """打开页面成功"""
+            source = self.browser.page_source
+            html = pyquery.PyQuery(source)
+            print(html)
+            trs = pyquery.PyQuery(html.find("#editable tbody tr"))
+        else:
+            title = "office.shengfx888.com爬取数据失败"
+            content = "{} {}".format(datetime.datetime.now(), title)
+            send_mail(title=title, content=content)
+            message['message'] = "数据爬取失败"
+        return message
+
+        
 
 
 
 if __name__ == "__main__":
-    args = {
-        "description": "搜索内容: 长江是有交易所↵预算: 0↵营销: 营销3↵水果: 梨子李子↵项目描述: 测试项目",
-        "page_url": "http://localhost:63342/projects/index.html?_ijt=22a6gi3e6no6e4dkrnrqsp6q8o",
-        "referrer": "",
-        "search_keyword": "长江是有交易所",
-        "sms_code": "6659",
-        "user_name": "测试人员",
-        "phone": "15618317376"
-    }
-    to_jiandao_cloud(**args)
+    """测试往简道云写数据"""
+    # args = {
+    #     "description": "搜索内容: 长江是有交易所↵预算: 0↵营销: 营销3↵水果: 梨子李子↵项目描述: 测试项目",
+    #     "page_url": "http://localhost:63342/projects/index.html?_ijt=22a6gi3e6no6e4dkrnrqsp6q8o",
+    #     "referrer": "",
+    #     "search_keyword": "长江是有交易所",
+    #     "sms_code": "6659",
+    #     "user_name": "测试人员",
+    #     "phone": "15618317376"
+    # }
+    # to_jiandao_cloud(**args)
     #
     # time.sleep(1)
     """测试爬取实盘用户信息"""
     # listen_shengfx888()
     # ShengFX888().login()
+    """测试抓取结算站点数据"""
+    crawler = ShengFX888()
+    crawler.parse_page()
     pass

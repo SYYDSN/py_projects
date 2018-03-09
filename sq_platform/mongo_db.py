@@ -1492,7 +1492,8 @@ class BaseDoc:
             return cls(**result)
 
     @classmethod
-    def find_one_plus(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, instance: bool = False):
+    def find_one_plus(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
+                      instance: bool = False, can_json: bool = False):
         """
         find_one的增强版，有sort的功能，在查询一个结果的时候，比sort效率高很多
         同理也需要一个find_plus作为find的增强版
@@ -1500,8 +1501,11 @@ class BaseDoc:
         :param sort_dict: 排序的条件  比如: {"time": -1}  # -1表示倒序
         :param projection:    投影数组,决定输出哪些字段?
         :param instance: 返回的是实例还是doc对象？默认是doc对象
-        :return: None, 实例或者doc对象。
+        :param can_json: 是否转为可json 的dict?这个有联动性,can_json为真instance一定未假
+        :return: None, dict,实例或者doc对象。
         """
+        if can_json:
+            instance = False
         table_name = cls._table_name
         ses = get_conn(table_name=table_name)
         if sort_dict is None or len(sort_dict) == 0:
@@ -1519,7 +1523,10 @@ class BaseDoc:
             return result
         else:
             if not instance:
-                return result
+                if can_json:
+                    return to_flat_dict(result)
+                else:
+                    return result
             else:
                 return cls(**result)
 
