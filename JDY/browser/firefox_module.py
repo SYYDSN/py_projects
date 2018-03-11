@@ -11,13 +11,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.select import By
 from module.spread_module import SpreadChannel
-import re
+from mongo_db import get_datetime_from_str
 import datetime
 import time
 import os
 from log_module import get_logger
 from mail_module import send_mail
 import pyquery
+import re
+from module.transaction_module import Transaction
 import threading
 
 
@@ -194,14 +196,14 @@ class ShengFX888:
             # obj.display.start()
             obj.browser = webdriver.Firefox()
             obj.driver = WebDriverWait(obj.browser, 10)
-            obj.status = "free"  # 由于浏览器同时只能
+            obj.stop = False  # 批量解析页面时的 中止标志
             obj.user_name = "849607604@qq.com"
             obj.user_password = "Kai3349665"
             obj.login_url = "http://office.shengfx888.com"
             obj.balance_url_base = "http://office.shengfx888.com/report/history_trade?" \
-                  "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=&" \
-                  "qtype=&CMD=6&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=&" \
-                  "CLOSE_TIME_e=&T_LOGIN="
+                                   "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=" \
+                                   "&PROFIT_e=&qtype=&CMD=&closetime=&OPEN_TIME_s=" \
+                                   "&OPEN_TIME_e=&CLOSE_TIME_s=&CLOSE_TIME_e=&T_LOGIN="
             cls.instance = obj
         return cls.instance
 
@@ -245,7 +247,7 @@ class ShengFX888:
         else:
             return False
 
-    def open_balance_page(self, page_num: int = 1) -> bool:
+    def open_page(self, page_num: int = 1) -> bool:
         """
         打开出入金页面,如果已经登录,返回True,否则尝试重新login,三次失败后,返回False
         :param page_num: 页码
@@ -260,28 +262,237 @@ class ShengFX888:
         self.browser.get(url)
         return not self.need_login()
 
-    def parse_page(self, page_num: int = 1) -> dict:
+    def __parse_tr_html(self, tr: pyquery.PyQuery) ->(dict, None):
         """
-        分析页面数据
-        :param page_num: 页码
-        :return: 返回分析结果字典
+        解析表格的tr，生成一个可以转化为Transaction的实例的字典对象，这是一个专用的方法。被parse_page调用
+        :param tr: tr的html文本 pyquery.PyQuery类型
+        :return: dict或者None
         """
-        message = {"message": "success"}
-        if self.open_balance_page():
+        init_dict = dict()
+        tds = tr.find("td")
+        sys_val = "office.shengfx888.com"  # 平台信息
+        init_dict['system'] = sys_val
+        """第一个td,取订单号和客户帐号"""
+        first = pyquery.PyQuery(tds[0])
+        texts_1 = first.text().split("\n")
+        ticket = int(re.search(r'\d{4,}', texts_1[0]).group())  # 订单号
+        login = int(re.search(r'\d{6,}', texts_1[-1]).group())  # 客户帐号
+        init_dict['ticket'] = ticket
+        init_dict['login'] = login
+        """第二个td，取英文名和真实姓名"""
+        second = pyquery.PyQuery(tds[1])
+        texts_2 = second.text().split("\n")
+        nick_name = texts_2[0][4:].strip("")
+        real_name = texts_2[-1][5:].strip("")
+        init_dict['nick_name'] = nick_name
+        init_dict['real_name'] = real_name
+        """第三个td，取交易指令和品种"""
+        third = pyquery.PyQuery(tds[2])
+        texts_3 = third.text().split("\n")
+        command = texts_3[0].lower()
+        init_dict['command'] = command[0]
+        print(ticket, command)
+        if command == "balance" or command == "credit":
+            """出入金和赠金，少了几个td"""
+            """第四个，交易时间"""
+            eighth = pyquery.PyQuery(tds[4]).text()
+            the_time = get_datetime_from_str(eighth)  # 交易时间
+            init_dict['time'] = the_time
+            print("出如金时间：{}".format(the_time))
+            """
+            第五个，盈亏
+            """
+            ninth = pyquery.PyQuery(tds[5]).text()
+            profit = re.search(r'[+, -]?\d+.?\d*', ninth)
+            if profit is not None:
+                profit = float(profit.group())
+                init_dict['profit'] = profit
+            """第六个，点差"""
+            tenth = pyquery.PyQuery(tds[6]).text()
+            spread_profit = float(tenth)
+            init_dict['spread_profit'] = spread_profit
+            """第七个，注释"""
+            eleventh = pyquery.PyQuery(tds[7]).text()
+            comment = eleventh
+            init_dict['comment'] = comment
+            init_dict = {k: v for k, v in init_dict.items() if v is not None}
+        else:
+            """buy和sell的情况"""
+            if len(texts_3) > 1:
+                symbol = texts_3[-1].lower()
+                init_dict['symbol'] = symbol
+            """第四个td，取交易手数"""
+            fourth = pyquery.PyQuery(tds[3])
+            lot_find = re.search(r'\d+.?\d*', fourth.text())
+            lot = lot_find if lot_find is None else float(lot_find.group())
+            init_dict['lot'] = lot
+            """
+            第五个，取价格，注意，由于目前看不到数据格式，只能简单的记录文本,
+            所以字段的名称暂时和类中描述的不同。
+            """
+            fifth = pyquery.PyQuery(tds[4])
+            prices = fifth.text().split("\n")
+            enter_price = float(re.search(r'\d+.?\d*', prices[0]).group())  # 开仓
+            exit_price = float(re.search(r'\d+.?\d*', prices[-1]).group())  # 平仓
+            init_dict['enter_price'] = enter_price
+            init_dict['exit_price'] = exit_price
+            """
+            第六个，止盈/止损，注意，由于目前看不到数据格式，只能简单的记录文本,
+            所以字段的名称暂时和类中描述的不同。
+            """
+            sixth = pyquery.PyQuery(tds[5])
+            stop = sixth.text().split("\n")
+            stop_losses = float(re.search(r'\d+.?\d*', stop[0]).group())  # 止损
+            take_profit = float(re.search(r'\d+.?\d*', stop[-1]).group())  # 止盈
+            init_dict['stop_losses'] = stop_losses
+            init_dict['take_profit'] = take_profit
+            """
+            第七个，利息/佣金，注意，由于目前看不到数据格式，只能简单的记录文本,
+            所以字段的名称暂时和类中描述的不同。
+            """
+            seventh = pyquery.PyQuery(tds[6])
+            seventh = seventh.text().split("\n")
+            swap = float(re.search(r'[+, -]?\d+.?\d*', seventh[0]).group())  # 利息
+            commission = float(re.search(r'[+, -]?\d+.?\d*', seventh[-1]).group())  # 手续费
+            init_dict['swap'] = swap
+            init_dict['commission'] = commission
+            """第八个，交易时间"""
+            eighth = pyquery.PyQuery(tds[7]).text()
+            eighth = eighth.split("\n")
+            if command != "balance":
+                print(eighth)
+                open_time = get_datetime_from_str(eighth[0].split("：")[1])  # 开仓时间
+                init_dict['open_time'] = open_time
+                if eighth[-1].find("持仓中") == -1:
+                    """持仓中不计算"""
+                    return None
+                else:
+                    colse_time_list = eighth[-1].split("：")
+                    if len(colse_time_list) > 1:
+                        close_time = get_datetime_from_str(colse_time_list[1])  # 平仓时间
+                        init_dict['close_time'] = close_time
+                    else:
+                        pass
+            else:
+                pass
+            """
+            第九个，盈亏
+            """
+            ninth = pyquery.PyQuery(tds[8]).text()
+            profit = re.search(r'[+, -]?\d+.?\d*', ninth)
+            if profit is not None:
+                profit = float(profit.group())
+                init_dict['profit'] = profit
+            """第十个，点差"""
+            tenth = pyquery.PyQuery(tds[9]).text()
+            spread_profit = float(tenth)
+            init_dict['spread_profit'] = spread_profit
+            """第十一个，注释"""
+            eleventh = pyquery.PyQuery(tds[10]).text()
+            comment = eleventh
+            init_dict['comment'] = comment
+
+            init_dict = {k: v for k, v in init_dict.items() if v is not None}
+        return init_dict
+
+    def parse_page(self, page_num: int = 1) -> (list, None):
+        """
+            分析页面数据
+            :param page_num: 页码
+            :return: 返回分析的多个tr的内容的字典组成的列表
+            """
+        res = None
+        if self.open_page(page_num):
             """打开页面成功"""
             source = self.browser.page_source
             html = pyquery.PyQuery(source)
-            print(html)
-            trs = pyquery.PyQuery(html.find("#editable tbody tr"))
+            tr_htmls = pyquery.PyQuery(html.find("#editable tbody tr"))
+            res = list()
+            for tr_html in tr_htmls:
+                tr = pyquery.PyQuery(tr_html)
+                tr_dict = self.__parse_tr_html(tr)
+                if isinstance(tr_dict, dict):
+                    res.append(tr_dict)
         else:
             title = "office.shengfx888.com爬取数据失败"
             content = "{} {}".format(datetime.datetime.now(), title)
             send_mail(title=title, content=content)
-            message['message'] = "数据爬取失败"
-        return message
+            logger.exception(msg=title)
+            raise ValueError(title)
+        return res
 
-        
+    def extend_data(self, data1: list, data2: list, ticket_limit: int = None) -> list:
+        """
+        组装数组，把data2接到data1,然后返回data1,
+        期间检查ticket是小于限制，
+        :param data1:
+        :param data2:
+        :param ticket_limit: ticket下限，不能小于此值
+        :return:
+        """
+        if len(data1) == 0:
+            data2.sort(key=lambda obj: obj['ticket'], reverse=True)
+            if ticket_limit is None:
+                data1.extend(data2)
+            else:
+                for x in data2:
+                    print("{} : {}".format(x['ticket'], ticket_limit))
+                    if x['ticket'] <= ticket_limit:
+                        self.stop = True
+                        break
+                    else:
+                        data1.append(x)
+        else:
+            """这时候的data1已经排序过了"""
+            data2.sort(key=lambda obj: obj['ticket'], reverse=True)
+            if ticket_limit is None:
+                ticket_limit = data1[-1]['ticket']
+                for x in data2:
+                    print("{} : {}".format(x['ticket'], ticket_limit))
+                    if x['ticket'] <= ticket_limit:
+                        self.stop = True
+                        break
+                    else:
+                        data1.append(x)
+            else:
+                for x in data2:
+                    print("{} : {}".format(x['ticket'], ticket_limit))
+                    if x['ticket'] <= ticket_limit:
+                        self.stop = True
+                        break
+                    else:
+                        data1.append(x)
+        return data1
 
+    def batch_parse(self, ticket_limit: int = None) -> list:
+        """
+        批量分析页面数据，并返回结果的list
+        :param ticket_limit: ticket下限，不能小于此值
+        :return:
+        """
+        res = list()
+        for i in range(1, 9999999999):
+            if not self.stop:
+                temp = self.parse_page(i)  # 一页内容解析的结果
+                if isinstance(temp, list):
+                    res = self.extend_data(res, temp, ticket_limit=ticket_limit)
+                else:
+                    break
+            else:
+                break
+        return res
+
+    def parse_and_save(self, ticket_limit: int = None) -> list:
+        """
+        解析页面内容，并保存解析结果
+        :param ticket_limit: ticket下限，不能小于此值
+        :return:
+         """
+        if ticket_limit is None:
+            ticket_limit = Transaction.last_ticket()
+        res = self.batch_parse(ticket_limit)
+        res = Transaction.insert_many(res)
+        print(res)
 
 
 if __name__ == "__main__":
@@ -303,5 +514,5 @@ if __name__ == "__main__":
     # ShengFX888().login()
     """测试抓取结算站点数据"""
     crawler = ShengFX888()
-    crawler.parse_page()
+    crawler.parse_and_save(ticket_limit=31949)
     pass
