@@ -471,6 +471,10 @@ class ShengFX888:
         :return:
         """
         res = list()
+        balance_data = list()
+        buy_data = list()
+        sell_data = list()
+        credit_data = list()
         for i in range(1, 9999999999):
             if not self.stop:
                 temp = self.parse_page(i)  # 一页内容解析的结果
