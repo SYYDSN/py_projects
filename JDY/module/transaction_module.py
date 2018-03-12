@@ -100,7 +100,7 @@ class Transaction(mongo_db.BaseDoc):
         super(Transaction, self).__init__(**kwargs)
 
     @classmethod
-    def last_ticket(cls) -> (None, int):
+    def last_ticket(cls) -> (None, dict):
         """
         获取最后一个出入金记录的ticket，用于判断最后一个交易号
         :return:
@@ -108,10 +108,24 @@ class Transaction(mongo_db.BaseDoc):
         filter_dict = {"command": "balance"}
         sort_dict = {"ticket": -1}
         record = cls.find_one_plus(filter_dict=filter_dict, sort_dict=sort_dict, projection=["ticket"])
+        holdings = cls.get_holdings()
+        if len(holdings) > 0:
+            record = record if holdings[-1]['ticket'] > record['ticket'] else holdings[-1]
         if record is None:
             pass
         else:
-            return record['ticket']
+            return {"last_ticket": record['ticket'], "holdings": holdings}
+
+    @classmethod
+    def get_holdings(cls) -> list:
+        """
+        获取数据库中，还在持仓的记录
+        :return:
+        """
+        filter_dict = {"command": {"$in": ['buy', 'sell']}, "close_time": {"$in": ['', None]}}
+        sort_dict = {"ticket": -1}
+        holdings = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
+        return holdings
 
 
 if __name__ == "__main__":

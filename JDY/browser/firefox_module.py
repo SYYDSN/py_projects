@@ -166,7 +166,7 @@ def listen_shengfx888():
     """平衡页(第一页)"""
     balance_url = "http://office.shengfx888.com/report/history_trade?" \
                   "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=&" \
-                  "qtype=&CMD=6&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=&" \
+                  "qtype=&CMD=&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=&" \
                   "CLOSE_TIME_e=&T_LOGIN=&page=1"
 
     """登录http://office.shengfx888.com"""
@@ -198,7 +198,7 @@ class ShengFX888:
         if not hasattr(cls, "instance"):
             obj = super(ShengFX888, cls).__new__(cls)
             obj.display = Display(visible=0, size=(800, 600))
-            # obj.display.start()
+            obj.display.start()
             obj.browser = webdriver.Firefox()
             obj.driver = WebDriverWait(obj.browser, 10)
             obj.stop = False  # 批量解析页面时的 中止标志
@@ -323,13 +323,15 @@ class ShengFX888:
             init_dict = {k: v for k, v in init_dict.items() if v is not None}
         else:
             """buy和sell的情况"""
+            symbol = ''
             if len(texts_3) > 1:
                 symbol = texts_3[-1].lower()
                 init_dict['symbol'] = symbol
             """第四个td，取交易手数"""
             fourth = pyquery.PyQuery(tds[3])
             lot_find = re.search(r'\d+.?\d*', fourth.text())
-            lot = lot_find if lot_find is None else float(lot_find.group())
+            lot = lot_find if lot_find is None else float(lot_find.group()) if symbol != "hk50mini" else \
+                float(lot_find.group()) / 10
             init_dict['lot'] = lot
             """
             第五个，取价格，
@@ -365,9 +367,9 @@ class ShengFX888:
                 print(eighth)
                 open_time = get_datetime_from_str(eighth[0].split("：")[1])  # 开仓时间
                 init_dict['open_time'] = open_time
-                if eighth[-1].find("持仓中") == -1:
-                    """持仓中不计算"""
-                    return None
+                if eighth[-1].find("持仓中") != -1:
+                    """持仓中"""
+                    pass
                 else:
                     close_time_list = eighth[-1].split("：")
                     if len(close_time_list) > 1:
@@ -395,7 +397,11 @@ class ShengFX888:
             init_dict['comment'] = comment
 
             init_dict = {k: v for k, v in init_dict.items() if v is not None}
-        return init_dict
+        """只记录指定类型的单子"""
+        if init_dict['command'] in ['balance', 'credit', 'buy', 'sell']:
+            return init_dict
+        else:
+            return None
 
     def parse_page(self, page_num: int = 1) -> (list, None):
         """
@@ -441,7 +447,7 @@ class ShengFX888:
             else:
                 for x in data2:
                     print("{} : {}".format(x['ticket'], ticket_limit))
-                    if x['ticket'] <= ticket_limit:
+                    if (x['ticket'] - ticket_limit) <= 0:
                         self.stop = True
                         break
                     else:
@@ -481,22 +487,27 @@ class ShengFX888:
                 break
         return res
 
-    def parse_and_save(self, ticket_limit: int = None) -> dict:
+    def parse_and_save(self, ticket_limit: int = None) -> None:
         """
         解析页面内容，并保存解析结果
-        :param ticket_limit: ticket下限，不能小于此值
+        :param ticket_limit: ticket下限，不能小于此值, 仅仅在调试时使用。用于缩小查找范围。
         :return:
          """
         if ticket_limit is None:
-            ticket_limit = Transaction.last_ticket()
+            query = Transaction.last_ticket()
+            if query is None:
+                ticket_limit = None
+                holdings = list()
+            else:
+                ticket_limit = query['last_ticket']
+                holdings = query['holdings']
         res = self.batch_parse(ticket_limit)
         res = self.split_data(res)
         all_records = res['all']
-        [self.upload_all_records(**record) for record in all_records]  # 上传所有交易记录
+        # [self.upload_all_records(**record) for record in all_records]  # 上传所有交易记录
         balance_records = res['balance']
-        [self.upload_balance_records(**record) for record in balance_records]  # 上传出入金信息
-        res = Transaction.insert_many(res)  # 存数据库
-        return res
+        # [self.upload_balance_records(**record) for record in balance_records]  # 上传出入金信息
+        res = Transaction.insert_many(all_records)  # 存数据库
 
     @staticmethod
     def split_data(records: list) -> dict:
