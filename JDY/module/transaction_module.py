@@ -43,7 +43,7 @@ class Transaction(mongo_db.BaseDoc):
     """
     type_dict['symbol'] = str  # 交易的产品的品种
     """交易的产品有多种,注意他们计算手数的计量方式不同,只有HK50mini (恒指迷你手)  一手相当于普通产品0.1手,其他的都是正常计量"""
-    type_dict['lot'] = int  # 交易手数
+    type_dict['lot'] = float  # 交易手数
     type_dict['enter_price'] = float  # 建仓价 订单进场价格 对于LIMIT，STOP类型订单，是等待到这个价格自动入场
     type_dict['exit_price'] = float  # 平仓价 订单出场价格 现在市场价格
     type_dict['take_profit'] = float  # 止盈价格

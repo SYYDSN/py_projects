@@ -29,6 +29,11 @@ import threading
 logger = get_logger()
 
 
+def month_str(month_int: int) -> str:
+    l = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+    return l[month_int - 1]
+
+
 def to_jiandao_cloud(**kwargs) -> bool:
     """
     推广页面的注册用户数据传送数据到简道云
@@ -36,7 +41,7 @@ def to_jiandao_cloud(**kwargs) -> bool:
     :return:
     """
     display = Display(visible=0, size=(800, 600))
-    # display.start()  # 开启虚拟显示器
+    display.start()  # 开启虚拟显示器
 
     """
     注意，pyvirtualdisplay需要xvfb支持。安装方法：sudo apt-get install xvfb
@@ -152,7 +157,7 @@ def to_jiandao_cloud(**kwargs) -> bool:
 def listen_shengfx888():
     """爬取实盘用户信息, 这是个临时方法,用来测试思路"""
     display = Display(visible=0, size=(800, 600))
-    # display.start()  # 开启虚拟显示器
+    display.start()  # 开启虚拟显示器
     browser = webdriver.Firefox()  # 表示headless firefox browser
     driver = WebDriverWait(browser, 10)
     login_url = "http://office.shengfx888.com"
@@ -290,8 +295,8 @@ class ShengFX888:
         third = pyquery.PyQuery(tds[2])
         texts_3 = third.text().split("\n")
         command = texts_3[0].lower()
-        init_dict['command'] = command[0]
-        print(ticket, command)
+        init_dict['command'] = command
+        print(ticket, command, texts_3)
         if command == "balance" or command == "credit":
             """出入金和赠金，少了几个td"""
             """第四个，交易时间"""
@@ -327,8 +332,7 @@ class ShengFX888:
             lot = lot_find if lot_find is None else float(lot_find.group())
             init_dict['lot'] = lot
             """
-            第五个，取价格，注意，由于目前看不到数据格式，只能简单的记录文本,
-            所以字段的名称暂时和类中描述的不同。
+            第五个，取价格，
             """
             fifth = pyquery.PyQuery(tds[4])
             prices = fifth.text().split("\n")
@@ -337,8 +341,7 @@ class ShengFX888:
             init_dict['enter_price'] = enter_price
             init_dict['exit_price'] = exit_price
             """
-            第六个，止盈/止损，注意，由于目前看不到数据格式，只能简单的记录文本,
-            所以字段的名称暂时和类中描述的不同。
+            第六个，止盈/止损，
             """
             sixth = pyquery.PyQuery(tds[5])
             stop = sixth.text().split("\n")
@@ -347,8 +350,7 @@ class ShengFX888:
             init_dict['stop_losses'] = stop_losses
             init_dict['take_profit'] = take_profit
             """
-            第七个，利息/佣金，注意，由于目前看不到数据格式，只能简单的记录文本,
-            所以字段的名称暂时和类中描述的不同。
+            第七个，利息/佣金，
             """
             seventh = pyquery.PyQuery(tds[6])
             seventh = seventh.text().split("\n")
@@ -359,7 +361,7 @@ class ShengFX888:
             """第八个，交易时间"""
             eighth = pyquery.PyQuery(tds[7]).text()
             eighth = eighth.split("\n")
-            if command != "balance":
+            if command not in ["balance", "credit"]:
                 print(eighth)
                 open_time = get_datetime_from_str(eighth[0].split("：")[1])  # 开仓时间
                 init_dict['open_time'] = open_time
@@ -367,9 +369,9 @@ class ShengFX888:
                     """持仓中不计算"""
                     return None
                 else:
-                    colse_time_list = eighth[-1].split("：")
-                    if len(colse_time_list) > 1:
-                        close_time = get_datetime_from_str(colse_time_list[1])  # 平仓时间
+                    close_time_list = eighth[-1].split("：")
+                    if len(close_time_list) > 1:
+                        close_time = get_datetime_from_str(close_time_list[1])  # 平仓时间
                         init_dict['close_time'] = close_time
                     else:
                         pass
@@ -413,6 +415,8 @@ class ShengFX888:
                 tr_dict = self.__parse_tr_html(tr)
                 if isinstance(tr_dict, dict):
                     res.append(tr_dict)
+                else:
+                    pass
         else:
             title = "office.shengfx888.com爬取数据失败"
             content = "{} {}".format(datetime.datetime.now(), title)
@@ -446,14 +450,9 @@ class ShengFX888:
             """这时候的data1已经排序过了"""
             data2.sort(key=lambda obj: obj['ticket'], reverse=True)
             if ticket_limit is None:
-                ticket_limit = data1[-1]['ticket']
                 for x in data2:
                     print("{} : {}".format(x['ticket'], ticket_limit))
-                    if x['ticket'] <= ticket_limit:
-                        self.stop = True
-                        break
-                    else:
-                        data1.append(x)
+                    data1.append(x)
             else:
                 for x in data2:
                     print("{} : {}".format(x['ticket'], ticket_limit))
@@ -471,22 +470,18 @@ class ShengFX888:
         :return:
         """
         res = list()
-        balance_data = list()
-        buy_data = list()
-        sell_data = list()
-        credit_data = list()
         for i in range(1, 9999999999):
             if not self.stop:
                 temp = self.parse_page(i)  # 一页内容解析的结果
                 if isinstance(temp, list):
-                    res = self.extend_data(res, temp, ticket_limit=ticket_limit)
+                    self.extend_data(res, temp, ticket_limit)
                 else:
                     break
             else:
                 break
         return res
 
-    def parse_and_save(self, ticket_limit: int = None) -> list:
+    def parse_and_save(self, ticket_limit: int = None) -> dict:
         """
         解析页面内容，并保存解析结果
         :param ticket_limit: ticket下限，不能小于此值
@@ -495,8 +490,317 @@ class ShengFX888:
         if ticket_limit is None:
             ticket_limit = Transaction.last_ticket()
         res = self.batch_parse(ticket_limit)
-        res = Transaction.insert_many(res)
-        print(res)
+        res = self.split_data(res)
+        all_records = res['all']
+        [self.upload_all_records(**record) for record in all_records]  # 上传所有交易记录
+        balance_records = res['balance']
+        [self.upload_balance_records(**record) for record in balance_records]  # 上传出入金信息
+        res = Transaction.insert_many(res)  # 存数据库
+        return res
+
+    @staticmethod
+    def split_data(records: list) -> dict:
+        """
+        把结果集按指令类型分类
+        :param records: 交易的记录
+        :return: 分类后的交易记录
+        """
+        credit_list = []
+        balance_list = []
+        buy_list = []
+        sell_list = []
+        other_list = []
+        for x in records:
+            command = x['command']
+            if command == "buy":
+                buy_list.append(x)
+            if command == "sell":
+                sell_list.append(x)
+            if command == "balance":
+                balance_list.append(x)
+            if command == "credit":
+                credit_list.append(x)
+            else:
+                other_list.append(x)
+        res = {
+            "all": records,
+            "buy": buy_list,
+            "sell": sell_list,
+            "balance": balance_list,
+            "credit": credit_list,
+            "other": other_list
+        }
+        return res
+
+    def upload_all_records(self, **kwargs) -> None:
+        """
+        上传所有的记录
+        :return:
+        """
+        command = kwargs['command']
+        open_time = kwargs['time'] if command in ["credit", "balance"] else kwargs['open_time']
+        close_time = kwargs['time'] if command in ["credit", "balance"] else kwargs.get('close_time')
+        close_time = '' if close_time is None else close_time
+        if close_time == "":
+            pass  # 持仓中的单子不需要记录
+        else:
+            browser = self.browser
+            url_1 = "https://jiandaoyun.com/f/5a9cf444dc9e7a6325f7684f"
+            browser.get(url=url_1)  # 打开页面
+            wait = WebDriverWait(browser, 10)
+
+            """检查是否需要登录"""
+            js_find = """return $(".password-write-tip>a").text();"""
+            if browser.execute_script(js_find) == "填写该表单需输入密码，请输入密码：":
+                """需要登录"""
+                print("需要登录")
+                # 密码输入按钮
+                input_password = wait.until(
+                    ec.presence_of_element_located((By.CSS_SELECTOR, ".x-layout-table input[type='password']")))
+                # 提交按钮
+                submit_password = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".x-layout-table .x-btn span")))
+
+                input_password.send_keys("XunDie963741")  # 输入密码
+                time.sleep(1)
+                submit_password.click()  # 提交密码
+
+            else:
+                print("不需要登录")
+            time.sleep(5)  # 等待是为了给页面时间载入
+            create_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print(create_time)
+            js_create_time = """let d = $(".widget-wrapper>ul>li:eq(0) input"); d.val("{}");""".format(create_time)
+            browser.execute_script(js_create_time)  # 输入创建时间
+
+            ticket = kwargs.get('ticket')
+            print(ticket)
+            js_ticket = """let d = $(".widget-wrapper>ul>li:eq(1) input"); d.val("{}");""".format(ticket)
+            browser.execute_script(js_ticket)  # 输入单号
+
+            js_login = """let d = $(".widget-wrapper>ul>li:eq(2) input"); d.val("{}");""".format(kwargs['login'])
+            browser.execute_script(js_login)  # 输入mt账户
+            js_blur = """$(".widget-wrapper>ul>li:eq(2) input").blur();"""
+            browser.execute_script(js_blur)  # blur激活关联
+            time.sleep(3)  # 等待3秒,让关联生效
+
+            js_real_name = """let d = $(".widget-wrapper>ul>li:eq(3) input"); d.val("{}");""".format(kwargs['real_name'])
+            browser.execute_script(js_real_name)  # 输入用户姓名
+
+            js_command = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(command)
+            browser.execute_script(js_command)  # 输入交易类型
+
+            symbol = '' if kwargs.get('symbol') is None else kwargs['symbol']
+            js_symbol = """let d = $(".widget-wrapper>ul>li:eq(8) input"); d.val("{}");""".format(symbol)
+            browser.execute_script(js_symbol)  # 输入产品
+
+            lot = '' if kwargs.get('lot') is None else kwargs['lot']
+            if lot == "":
+                print(kwargs)
+            js_lot = """let d = $(".widget-wrapper>ul>li:eq(9) input"); d.val("{}");""".format(lot)
+            browser.execute_script(js_lot)  # 输入手数
+
+            enter_price = '' if kwargs.get("enter_price") is None else kwargs['enter_price']
+            js_enter_price = """let d = $(".widget-wrapper>ul>li:eq(10) input"); d.val("{}");""".format(enter_price)
+            browser.execute_script(js_enter_price)  # 建仓点位
+
+            exit_price = '' if kwargs.get("exit_price") is None else kwargs['exit_price']
+            js_exit_price = """let d = $(".widget-wrapper>ul>li:eq(11) input"); d.val("{}");""".format(exit_price)
+            browser.execute_script(js_exit_price)  # 平仓点位
+
+            profit = '' if kwargs.get("profit") is None else kwargs['profit']
+            js_profit = """let d = $(".widget-wrapper>ul>li:eq(12) input"); d.val("{}");""".format(profit)
+            browser.execute_script(js_profit)  # 盈亏
+
+            commission = '' if kwargs.get("commission") is None else kwargs['commission']
+            js_commission = """let d = $(".widget-wrapper>ul>li:eq(13) input"); d.val("{}");""".format(commission)
+            browser.execute_script(js_commission)  # 佣金
+
+            """输入建仓时间"""
+            if isinstance(open_time, datetime.datetime):
+                click_date = wait.until(
+                    ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datetime[widgetname='_widget_1520834605640'] "
+                                                                 ".icon-widget-datetime")))
+                click_date.click()  # 弹出日期选择器
+                date_title = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datepicker .title")))
+                date_title.click()  # 弹出年份和月份选择
+                m_str = month_str(open_time.month)
+                y_str = str(open_time.year)
+                d_str = str(open_time.day)
+                hour_str = str(open_time.hour)
+                minute_str = str(open_time.minute)
+                second_str = str(open_time.second)
+                months = wait.until(ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".fui_datepicker .month")))
+                """选择月份"""
+                for month in months:
+                    if month.text == m_str:
+                        month.click()
+                        break
+                    else:
+                        pass
+                years = wait.until(
+                        ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".fui_datepicker .year")))
+                """选择年份"""
+                for year in years:
+                    if year.text == y_str:
+                        year.click()
+                        break
+                    else:
+                        pass
+                """点击月份和年份界面的确定按钮"""
+                btn_1 = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datepicker .ok[colspan='4']")))
+                btn_1.click()
+                days = wait.until(
+                    ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".fui_datepicker .day")))
+                """选择天"""
+                for day in days:
+                    if day.text == d_str:
+                        day.click()
+                        break
+                    else:
+                        pass
+                """修改小时,分钟,秒"""
+                tds = wait.until(ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".fui_datepicker .tt td")))
+                hour = tds[1].find_element_by_tag_name("input")
+                minute = tds[3].find_element_by_tag_name("input")
+                second = tds[5].find_element_by_tag_name("input")
+                hour.clear()
+                hour.send_keys(hour_str)
+                minute.clear()
+                minute.send_keys(minute_str)
+                second.clear()
+                second.send_keys(second_str)
+                """点击最后的确定按钮"""
+                btn_2 = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datepicker .ok[colspan='2']")))
+                btn_2.click()
+
+            """输入平仓时间"""
+            if isinstance(close_time, datetime.datetime):
+                click_date = wait.until(
+                    ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datetime[widgetname='_widget_1520834605650'] "
+                                                                 ".icon-widget-datetime")))
+                click_date.click()  # 弹出日期选择器
+                date_title = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datepicker .title")))
+                date_title.click()  # 弹出年份和月份选择
+                m_str = month_str(close_time.month)
+                y_str = str(close_time.year)
+                d_str = str(close_time.day)
+                hour_str = str(close_time.hour)
+                minute_str = str(close_time.minute)
+                second_str = str(close_time.second)
+                months = wait.until(ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".fui_datepicker .month")))
+                """选择月份"""
+                for month in months:
+                    if month.text == m_str:
+                        month.click()
+                        break
+                    else:
+                        pass
+                years = wait.until(
+                    ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".fui_datepicker .year")))
+                """选择年份"""
+                for year in years:
+                    if year.text == y_str:
+                        year.click()
+                        break
+                    else:
+                        pass
+                """点击月份和年份界面的确定按钮"""
+                btn_1 = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datepicker .ok[colspan='4']")))
+                btn_1.click()
+                days = wait.until(
+                    ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".fui_datepicker .day")))
+                """选择天"""
+                for day in days:
+                    if day.text == d_str:
+                        day.click()
+                        break
+                    else:
+                        pass
+                """修改小时,分钟,秒"""
+                tds = wait.until(ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".fui_datepicker .tt td")))
+                hour = tds[1].find_element_by_tag_name("input")
+                minute = tds[3].find_element_by_tag_name("input")
+                second = tds[5].find_element_by_tag_name("input")
+                hour.clear()
+                hour.send_keys(hour_str)
+                minute.clear()
+                minute.send_keys(minute_str)
+                second.clear()
+                second.send_keys(second_str)
+                """点击最后的确定按钮"""
+                btn_2 = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datepicker .ok[colspan='2']")))
+                btn_2.click()
+
+            profit = kwargs.get('profit')
+            profit = '' if profit is None else profit
+            js_profit = """let d = $(".widget-wrapper>ul>li:eq(16) input"); d.val("{}");""".format(profit)
+            browser.execute_script(js_profit)  # 盈利点数
+
+            time.sleep(1)
+            submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
+            submit_info.click()  # 提交信息
+
+            browser.refresh()  # 刷新页面
+
+    def upload_balance_records(self, **kwargs) -> None:
+        """
+        上传出入金的记录
+        :return:
+        """
+        browser = self.browser
+        url_deposit = "https://jiandaoyun.com/f/5a9cf3ea44b04926b03ce64c"  # 入金记录表地址
+        url_withdraw = "https://jiandaoyun.com/f/5a9cf2441fc6e726b6f08f8c"  # 出金记录表地址
+        comment = kwargs['comment']
+        if comment.startswith("deposit"):
+            """入金"""
+            browser.get(url=url_deposit)  # 打开页面
+        else:
+            browser.get(url=url_withdraw)  # 打开页面
+        wait = WebDriverWait(browser, 10)
+
+        """检查是否需要登录"""
+        js_find = """return $(".password-write-tip>a").text();"""
+        if browser.execute_script(js_find) == "填写该表单需输入密码，请输入密码：":
+            """需要登录"""
+            print("需要登录")
+            # 密码输入按钮
+            input_password = wait.until(
+                ec.presence_of_element_located((By.CSS_SELECTOR, ".x-layout-table input[type='password']")))
+            # 提交按钮
+            submit_password = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".x-layout-table .x-btn span")))
+
+            input_password.send_keys("XunDie963741")  # 输入密码
+            time.sleep(1)
+            submit_password.click()  # 提交密码
+            time.sleep(3)  # 等待是为了给页面时间载入
+        else:
+            print("不需要登录")
+
+        create_time = kwargs['time']
+        print(create_time)
+        js_create_time = """let d = $(".widget-wrapper>ul>li:eq(0) input"); d.val("{}");""".format(create_time)
+        browser.execute_script(js_create_time)  # 输入发生时间
+
+        ticket = kwargs.get('ticket')
+        print(ticket)
+        js_ticket = """let d = $(".widget-wrapper>ul>li:eq(1) input"); d.val("{}");""".format(ticket)
+        browser.execute_script(js_ticket)  # 输入单号
+
+        js_login = """let d = $(".widget-wrapper>ul>li:eq(2) input"); d.val("{}");""".format(kwargs['login'])
+        browser.execute_script(js_login)  # 输入mt账户
+
+        js_real_name = """let d = $(".widget-wrapper>ul>li:eq(3) input"); d.val("{}");""".format(kwargs['real_name'])
+        browser.execute_script(js_real_name)  # 输入用户姓名
+
+        profit = kwargs['profit']
+        js_profit = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(profit)
+        browser.execute_script(js_profit)  # 出金/入金金额
+
+        submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
+        submit_info.click()  # 提交信息
+
+        time.sleep(1)
+        browser.refresh()  # 刷新页面
 
 
 if __name__ == "__main__":
@@ -518,5 +822,12 @@ if __name__ == "__main__":
     # ShengFX888().login()
     """测试抓取结算站点数据"""
     crawler = ShengFX888()
-    crawler.parse_and_save(ticket_limit=31949)
+    crawler.parse_and_save(ticket_limit=31017)
+    # crawler.upload_all_records()
+    # a = {'description': '出金', 'command': 'balance', 'ticket': 31349, 'login': 880300399,
+    #      'time': datetime.datetime(2018, 3, 8, 17, 25, 38), 'spread_profit': 0.0,
+    #      'nick_name': '李琳', 'comment': 'Withdraw maxib#319',  'real_name': '李琳',
+    #      'profit': -2659.51, 'system': 'office.shengfx888.com', "lot": 0.5}
+    #
+    # crawler.upload_all_records(**a)
     pass
