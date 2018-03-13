@@ -199,11 +199,10 @@ class ShengFX888:
         if not hasattr(cls, "instance"):
             obj = super(ShengFX888, cls).__new__(cls)
             obj.display = Display(visible=0, size=(800, 600))
-            # obj.display.start()
+            obj.display.start()
             obj.browser = webdriver.Firefox()
             obj.driver = WebDriverWait(obj.browser, 10)
-            obj.stop = False  # 批量解析页面时的 平台1中止标志
-            obj.stop2 = False  # 批量解析页面时的 平台2中止标志
+            obj.stop = {"domain": False, "domain2": False}  # 批量解析页面时的 平台1/2中止标志
             obj.user_name = "849607604@qq.com"
             obj.user_password = "Kai3349665"
             obj.login_url = "http://office.shengfx888.com"
@@ -217,8 +216,8 @@ class ShengFX888:
             obj.domain2 = "office.shengfxchina.com:8443"
             obj.login_url2 = "https://office.shengfxchina.com:8443/Public/login"
             obj.page_url_base2 = "https://office.shengfxchina.com:8443/report/history_trade?" \
-                                 "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=" \
-                                 "&qtype=&CMD=&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=" \
+                                 "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=&qtype=" \
+                                 "&CMD=&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=" \
                                  "&CLOSE_TIME_e=&comm_type=&T_LOGIN="
             obj.withdraw_url_base2 = "https://office.shengfxchina.com:8443/deposit/waitin?" \
                                      "layout=yes&weburlredect=1&"    # 2号平台,出金申请
@@ -233,7 +232,7 @@ class ShengFX888:
         :return:
         """
         url_base = self.page_url_base if url_base is None else url_base
-        return "{}&PAGE={}".format(url_base, page_num)
+        return "{}&page={}".format(url_base, page_num)
 
     def login(self, login_url: str = None):
         """
@@ -250,13 +249,15 @@ class ShengFX888:
             user_name = self.user_name2
             user_password = self.user_password2
         self.browser.get(url=url)
+        # print(self.browser.current_url)
+        # print(self.browser.page_source)
         # 用户名输入
         input_user_name = self.driver.until(
-            ec.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='请输入邮箱或者MT账号']")))
+            ec.presence_of_element_located((By.CSS_SELECTOR, "form .uname")))
         input_user_name.send_keys(user_name)  # 输入用户名
         # 用户密码输入
         input_user_password = self.driver.until(
-            ec.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='请输入登录密码']")))
+            ec.presence_of_element_located((By.CSS_SELECTOR, "form .pword")))
         input_user_password.send_keys(user_password)  # 输入用户密码
         # 点击登录按钮
         button_login = self.driver.until(
@@ -300,19 +301,16 @@ class ShengFX888:
         self.browser.get(url)
         return not self.need_login()
 
-    def __parse_tr_html(self, tr: pyquery.PyQuery) ->(dict, None):
+    def __parse_tr_html(self, domain: str, tr: pyquery.PyQuery) ->(dict, None):
         """
         解析表格的tr，生成一个可以转化为Transaction的实例的字典对象，这是一个专用的方法。被parse_page调用
+        :param domain: domain
         :param tr: tr的html文本 pyquery.PyQuery类型
         :return: dict或者None
         """
         init_dict = dict()
         tds = tr.find("td")
-        if len(tds) == 11:
-            sys_val = self.domain  # 平台信息
-        else:
-            sys_val = self.domain2
-        init_dict['system'] = sys_val
+
         """第一个td,取订单号和客户帐号"""
         first = pyquery.PyQuery(tds[0])
         texts_1 = first.text().split("\n")
@@ -332,6 +330,9 @@ class ShengFX888:
         texts_3 = third.text().split("\n")
         command = texts_3[0].lower()
         init_dict['command'] = command
+        sys_val = domain
+        print("domain = {}, command = {}, tds,length = {}".format(sys_val, command, len(tds)))
+        init_dict['system'] = sys_val
         print(ticket, command, texts_3)
         if command == "balance" or command == "credit":
             """出入金和赠金，少了几个td"""
@@ -339,7 +340,7 @@ class ShengFX888:
             eighth = pyquery.PyQuery(tds[4]).text()
             the_time = get_datetime_from_str(eighth)  # 交易时间
             init_dict['time'] = the_time
-            print("出如金时间：{}".format(the_time))
+            print("出入金时间：{}".format(the_time))
             """
             第五个，盈亏
             """
@@ -546,12 +547,12 @@ class ShengFX888:
         :return: 返回分析的多个tr的内容的字典组成的列表
         """
         res = None
+        query = "#editable tbody tr"
         if url_base is None:
             url = self.page_url_base
-            query = "#editable tbody tr"
         else:
-            url = self.page_url_base2
-            query = "#editable tbody tr"
+            url = url_base
+        domain = self.domain if re.search(self.domain, url_base) else self.domain2
         if self.open_page(url, page_num):
             """打开页面成功"""
             source = self.browser.page_source
@@ -560,7 +561,7 @@ class ShengFX888:
             res = list()
             for tr_html in tr_htmls:
                 tr = pyquery.PyQuery(tr_html)
-                tr_dict = self.__parse_tr_html(tr)
+                tr_dict = self.__parse_tr_html(domain, tr)
                 if isinstance(tr_dict, dict):
                     res.append(tr_dict)
                 else:
@@ -601,14 +602,14 @@ class ShengFX888:
                 else:
                     pass
         else:
-            title = "{}&PAGE={}爬取数据失败".format(url, page_num)
+            title = "{}&page={}爬取数据失败".format(url, page_num)
             content = "{} {}".format(datetime.datetime.now(), title)
             send_mail(title=title, content=content)
             logger.exception(msg=title)
             raise ValueError(title)
         return res
 
-    def extend_data(self, data1: list, data2: list, ticket_limit: int = None) -> list:
+    def extend_data(self, data1: list, data2: list, ticket_limit: int = None) -> dict:
         """
         1. 组装数组，把data2接到data1,然后返回data1,
         2. 期间检查ticket是小于限制，
@@ -617,25 +618,29 @@ class ShengFX888:
         :param ticket_limit: ticket下限，不能小于此值
         :return:
         """
+        stop = False
         if len(data2) == 0:
-            return data1
+            pass
         else:
-            stop = self.stop
             time_limit = datetime.datetime.strptime("2018-2-1 0:0:0", "%Y-%m-%d %H:%M:%S")
-            if data2[0]['system'] == self.domain:
-                pass
-            else:
-                stop = self.stop2
             if len(data1) == 0:
                 data2.sort(key=lambda obj: obj['ticket'], reverse=True)
                 if ticket_limit is None:
-                    data1.extend(data2)
+                    for x in data2:
+                        the_time = x.get('time')
+                        the_time = x.get('close_time') if the_time is None else the_time
+                        print("extend_data function  {} : {} {}".format(x['ticket'], ticket_limit, the_time))
+                        if the_time is not None and the_time <= time_limit:
+                            stop = True
+                            break
+                        else:
+                            data1.append(x)
                 else:
                     for x in data2:
                         the_time = x.get('time')
-                        the_time = x.get('close_time') if the_time else the_time
-                        print("{} : {} {}".format(x['ticket'], ticket_limit, the_time))
-                        if (x['ticket'] - ticket_limit) <= 0 or (the_time is not None and the_time >= time_limit):
+                        the_time = x.get('close_time') if the_time is None else the_time
+                        print("extend_data function  {} : {} {}".format(x['ticket'], ticket_limit, the_time))
+                        if (x['ticket'] - ticket_limit) <= 0 or (the_time is not None and the_time <= time_limit):
                             stop = True
                             break
                         else:
@@ -645,19 +650,25 @@ class ShengFX888:
                 data2.sort(key=lambda obj: obj['ticket'], reverse=True)
                 if ticket_limit is None:
                     for x in data2:
-                        print("{} : {}".format(x['ticket'], ticket_limit))
-                        data1.append(x)
-                else:
-                    for x in data2:
                         the_time = x.get('time')
-                        the_time = x.get('close_time') if the_time else the_time
-                        print("{} : {} {}".format(x['ticket'], ticket_limit, the_time))
-                        if x['ticket'] <= ticket_limit or (the_time is not None and the_time >= time_limit):
+                        the_time = x.get('close_time') if the_time is None else the_time
+                        print("extend_data function  {} : {} {}".format(x['ticket'], ticket_limit, the_time))
+                        if the_time is not None and the_time <= time_limit:
                             stop = True
                             break
                         else:
                             data1.append(x)
-            return data1
+                else:
+                    for x in data2:
+                        the_time = x.get('time')
+                        the_time = x.get('close_time') if the_time is None else the_time
+                        print("extend_data function  {} : {} {}".format(x['ticket'], ticket_limit, the_time))
+                        if x['ticket'] <= ticket_limit or (the_time is not None and the_time <= time_limit):
+                            stop = True
+                            break
+                        else:
+                            data1.append(x)
+        return {"data": data1, "stop": stop}
 
     def batch_parse(self, domain: str = None, ticket_limit: int = None) -> list:
         """
@@ -667,18 +678,33 @@ class ShengFX888:
         :return:
         """
         res = list()
+        stop = False
+        stop2 = False
         domain = self.domain if domain is None else domain
         page_url_base = self.page_url_base if domain == self.domain else self.page_url_base2
-        stop = self.stop if domain == self.domain else self.stop2
         for i in range(1, 9999999999):
-            if not stop:
-                temp = self.parse_page(page_url_base, i)  # 一页内容解析的结果
-                if isinstance(temp, list):
-                    self.extend_data(res, temp, ticket_limit)  # 拼接每一页解析出来的数据
+            if domain == self.domain:
+                if not stop:
+                    temp = self.parse_page(page_url_base, i)  # 一页内容解析的结果
+                    if isinstance(temp, list) and len(temp) > 0:
+                        temp = self.extend_data(res, temp, ticket_limit)  # 拼接每一页解析出来的数据
+                        res = temp['data']
+                        stop = temp['stop']
+                    else:
+                        break
                 else:
                     break
             else:
-                break
+                if not stop2:
+                    temp = self.parse_page(page_url_base, i)  # 一页内容解析的结果
+                    if isinstance(temp, list) and len(temp) > 0:
+                        temp = self.extend_data(res, temp, ticket_limit)  # 拼接每一页解析出来的数据
+                        res = temp['data']
+                        stop2 = temp['stop']
+                    else:
+                        break
+                else:
+                    break
         return res
 
     def batch_parse_withdraw(self, url_base: str = None, ticket_limit: int = None) -> list:
@@ -694,8 +720,10 @@ class ShengFX888:
         for i in range(1, 9999999999):
             if not stop:
                 temp = self.parse_withdraw_page(page_url_base, i)  # 一页内容解析的结果
-                if isinstance(temp, list):
-                    self.extend_data(res, temp, ticket_limit)  # 拼接每一页解析出来的数据
+                if isinstance(temp, list) and len(temp) > 0:
+                    temp = self.extend_data(res, temp, ticket_limit)  # 拼接每一页解析出来的数据
+                    res = temp['data']
+                    stop = temp['stop']
                 else:
                     break
             else:
@@ -710,9 +738,13 @@ class ShengFX888:
         :return:
          """
         data = dict()
+        data["upload"] = list()  # 上传到简道云交易汇总信息
+        data["insert_db"] = list()  # 插入数据库
+        data["update_db"] = list()  # 更新数据库
+        data['other'] = list()
         domain = self.domain if domain is None else domain
         if ticket_limit is None:
-            query = Transaction.last_ticket()
+            query = Transaction.last_ticket([self.domain, self.domain2])
         else:
             query = {domain: {"last_ticket": ticket_limit, "holdings": list, "repeat": list()}}
         """采集两个平台大的四种交易信息"""
@@ -722,17 +754,30 @@ class ShengFX888:
             repeat = item['repeat']
             res = self.batch_parse(domain, ticket_limit)
             res = self.split_data(res, holdings, repeat)  # 按照类型拆分数据
-            data.update(res)
+            data['upload'].extend(res['upload'])
+            data['insert_db'].extend(res['insert_db'])
+            data['update_db'].extend(res['update_db'])
+            data['other'].extend(res['other'])
         """获取平台2的出金申请记录"""
         last_withdraw = Withdraw.last_record(self.domain2)
         last_ticket = None if last_withdraw is None else last_withdraw['ticket']
         withdraw_list = self.batch_parse_withdraw(self.withdraw_url_base2, last_ticket)
+        withdraw_list.sort(key=lambda obj: obj['apply_time'], reverse=False)
         data['withdraw'] = withdraw_list
-        all_records = res['all']
-        # [self.upload_all_records(**record) for record in all_records]  # 上传所有交易记录
-        balance_records = res['balance']
-        # [self.upload_balance_records(**record) for record in balance_records]  # 上传出入金信息
-        res = Transaction.insert_many(all_records)  # 存数据库
+        upload_list = data['upload']
+        upload_list.sort(key=lambda obj: (obj['time'] if obj.get("close_time") is None else
+                                          obj['close_time']), reverse=False)
+        update_list = data['update_db']
+        insert_list = data['insert_db']
+        [self.upload_all_records(**record) for record in upload_list]  # 上传所有交易记录
+        [self.upload_withdraw_apply(**record) for record in withdraw_list]  # 上传出金信息
+        res = Transaction.insert_many(insert_list)  # 存数据库
+        print("insert many result is {}".format(res))
+        for record in update_list:
+            filter_dict = {"ticket": record.pop('ticket'), 'system': record.pop('system')}
+            update_dict = {"$set": record}
+            res = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+            print("update result is {}".format(res))
 
     @staticmethod
     def split_data(records: list, holdings: list, repeat: list = list()) -> dict:
@@ -755,20 +800,30 @@ class ShengFX888:
             command = x['command']
             ticket = x['ticket']
             if command in ["buy", "sell"]:
-                """持仓中的buy/sell单子平仓了"""
                 if ticket in holding_tickets:
-                    """持仓中的单子平仓了"""
-                    update_db_list.append(x)
-                    """持仓的单子变成平仓了,需要上传"""
-                    upload_list.append(x)
+                    """持仓中的buy/sell单子"""
+                    close_time = x.get("close_time")
+                    if isinstance(close_time, datetime.datetime):
+                        """持仓中的单子平仓了"""
+                        update_db_list.append(x)
+                        """持仓的单子变成平仓了,需要上传"""
+                        upload_list.append(x)
+                    else:
+                        """仍然持仓的单子，不理会"""
+                        pass
                 else:
                     """新增加的buy/sell单子"""
                     if x.get('close_time') is None or x.get('close_time') == "":
                         """新增持仓中的单子,不要上传,只保存到数据库"""
                         insert_db_list.append(x)
                     else:
-                        """持仓单子转平仓状态的单子,这些单子需要上传到简道云"""
-                        upload_list.append(x)
+                        if ticket in repeat:
+                            """重复的无需插入"""
+                            pass
+                        else:
+                            """新增加的已平仓的buy/sell单子,这些单子需要上传到简道云和数据库"""
+                            upload_list.append(x)
+                            insert_db_list.append(x)
             elif command in ['balance', 'credit']:
                 """查询到的出入金和赠金"""
                 if ticket in repeat:
@@ -828,47 +883,50 @@ class ShengFX888:
             js_create_time = """let d = $(".widget-wrapper>ul>li:eq(0) input"); d.val("{}");""".format(create_time)
             browser.execute_script(js_create_time)  # 输入创建时间
 
-            ticket = kwargs.get('ticket')
-            print(ticket)
-            js_ticket = """let d = $(".widget-wrapper>ul>li:eq(1) input"); d.val("{}");""".format(ticket)
-            browser.execute_script(js_ticket)  # 输入单号
+            system_name = kwargs.get('system')
+            js_system_name = """let d = $(".widget-wrapper>ul>li:eq(1) input"); d.val("{}");""".format(system_name)
+            browser.execute_script(js_system_name)
 
-            js_login = """let d = $(".widget-wrapper>ul>li:eq(2) input"); d.val("{}");""".format(kwargs['login'])
+            ticket = kwargs.get('ticket')
+            js_ticket = """let d = $(".widget-wrapper>ul>li:eq(2) input"); d.val("{}");""".format(ticket)
+            browser.execute_script(js_ticket)
+
+            js_login = """let d = $(".widget-wrapper>ul>li:eq(3) input"); d.val("{}");""".format(kwargs['login'])
             browser.execute_script(js_login)  # 输入mt账户
-            js_blur = """$(".widget-wrapper>ul>li:eq(2) input").blur();"""
+            js_blur = """$(".widget-wrapper>ul>li:eq(3) input").blur();"""
             browser.execute_script(js_blur)  # blur激活关联
             time.sleep(3)  # 等待3秒,让关联生效
 
-            js_real_name = """let d = $(".widget-wrapper>ul>li:eq(3) input"); d.val("{}");""".format(kwargs['real_name'])
+            js_real_name = """let d = $(".widget-wrapper>ul>li:eq(4) input"); d.val("{}");""".format(kwargs['real_name'])
             browser.execute_script(js_real_name)  # 输入用户姓名
 
-            js_command = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(command)
+            js_command = """let d = $(".widget-wrapper>ul>li:eq(8) input"); d.val("{}");""".format(command)
             browser.execute_script(js_command)  # 输入交易类型
 
             symbol = '' if kwargs.get('symbol') is None else kwargs['symbol']
-            js_symbol = """let d = $(".widget-wrapper>ul>li:eq(8) input"); d.val("{}");""".format(symbol)
+            js_symbol = """let d = $(".widget-wrapper>ul>li:eq(9) input"); d.val("{}");""".format(symbol)
             browser.execute_script(js_symbol)  # 输入产品
 
             lot = '' if kwargs.get('lot') is None else kwargs['lot']
             if lot == "":
                 print(kwargs)
-            js_lot = """let d = $(".widget-wrapper>ul>li:eq(9) input"); d.val("{}");""".format(lot)
+            js_lot = """let d = $(".widget-wrapper>ul>li:eq(10) input"); d.val("{}");""".format(lot)
             browser.execute_script(js_lot)  # 输入手数
 
             enter_price = '' if kwargs.get("enter_price") is None else kwargs['enter_price']
-            js_enter_price = """let d = $(".widget-wrapper>ul>li:eq(10) input"); d.val("{}");""".format(enter_price)
+            js_enter_price = """let d = $(".widget-wrapper>ul>li:eq(11) input"); d.val("{}");""".format(enter_price)
             browser.execute_script(js_enter_price)  # 建仓点位
 
             exit_price = '' if kwargs.get("exit_price") is None else kwargs['exit_price']
-            js_exit_price = """let d = $(".widget-wrapper>ul>li:eq(11) input"); d.val("{}");""".format(exit_price)
+            js_exit_price = """let d = $(".widget-wrapper>ul>li:eq(12) input"); d.val("{}");""".format(exit_price)
             browser.execute_script(js_exit_price)  # 平仓点位
 
             profit = '' if kwargs.get("profit") is None else kwargs['profit']
-            js_profit = """let d = $(".widget-wrapper>ul>li:eq(12) input"); d.val("{}");""".format(profit)
+            js_profit = """let d = $(".widget-wrapper>ul>li:eq(13) input"); d.val("{}");""".format(profit)
             browser.execute_script(js_profit)  # 盈亏
 
             commission = '' if kwargs.get("commission") is None else kwargs['commission']
-            js_commission = """let d = $(".widget-wrapper>ul>li:eq(13) input"); d.val("{}");""".format(commission)
+            js_commission = """let d = $(".widget-wrapper>ul>li:eq(14) input"); d.val("{}");""".format(commission)
             browser.execute_script(js_commission)  # 佣金
 
             """输入建仓时间"""
@@ -989,7 +1047,7 @@ class ShengFX888:
 
             profit = kwargs.get('profit')
             profit = '' if profit is None else profit
-            js_profit = """let d = $(".widget-wrapper>ul>li:eq(16) input"); d.val("{}");""".format(profit)
+            js_profit = """let d = $(".widget-wrapper>ul>li:eq(17) input"); d.val("{}");""".format(profit)
             browser.execute_script(js_profit)  # 盈利点数
 
             time.sleep(1)
@@ -1158,8 +1216,7 @@ if __name__ == "__main__":
     # ShengFX888().login()
     """测试抓取结算站点数据"""
     crawler = ShengFX888()
-    r = crawler.parse_withdraw_page(crawler.withdraw_url_base2, 1)
-    crawler.upload_withdraw_apply(**r[0])
+    crawler.parse_and_save()
     # crawler.parse_and_save(ticket_limit=31017)
     # crawler.upload_all_records()
     # a = {'description': '出金', 'command': 'balance', 'ticket': 31349, 'login': 880300399,
