@@ -49,7 +49,7 @@ class Transaction(mongo_db.BaseDoc):
     type_dict['take_profit'] = float  # 止盈价格
     type_dict['stop_losses'] = float  # 止损价格
     type_dict['swap'] = float  # 利息,过夜费,当天进出场订单无利息，持仓过夜会产生利息，负数为从客户账户扣款，正数代表客户账户增加资金.成交订单，持仓过夜才会可能产生利息
-    type_dict['commission'] = float # 佣金/手续费,产生手续费的订单是有效订单.成交订单，才会产生手续费，一般为负数
+    type_dict['commission'] = float  # 佣金/手续费,产生手续费的订单是有效订单.成交订单，才会产生手续费，一般为负数
     type_dict['open_time'] = datetime.datetime  # 开仓时间
     type_dict['close_time'] = datetime.datetime  # 平仓时间
     type_dict['time'] = datetime.datetime  # 不存在过程的交易的时间，比如出如金
@@ -100,21 +100,29 @@ class Transaction(mongo_db.BaseDoc):
         super(Transaction, self).__init__(**kwargs)
 
     @classmethod
-    def last_ticket(cls) -> (None, dict):
+    def last_ticket(cls, system_names: list) -> (None, dict):
         """
-        获取最后一个出入金记录的ticket，用于判断最后一个交易号
-        :return:
+        获取最后一个记录的ticket，用于判断最后一个交易号,从页面新获取的交易号不能比这个更小,
+        : param system_names: 平台domain的数组
+        :return: holiding是还在持仓的记录,repeat 比last_ticket大的非持仓记录,用于去重复
         """
-        filter_dict = {"command": "balance"}
-        sort_dict = {"ticket": -1}
-        record = cls.find_one_plus(filter_dict=filter_dict, sort_dict=sort_dict, projection=["ticket"])
-        holdings = cls.get_holdings()
-        if len(holdings) > 0:
-            record = record if holdings[-1]['ticket'] > record['ticket'] else holdings[-1]
-        if record is None:
-            pass
-        else:
-            return {"last_ticket": record['ticket'], "holdings": holdings}
+        res = dict()
+        for name in system_names:
+            filter_dict = {"system": name}
+            sort_dict = {"ticket": -1}
+            record = cls.find_one_plus(filter_dict=filter_dict, sort_dict=sort_dict, projection=["ticket"])
+            holdings = cls.get_holdings()
+            if len(holdings) > 0:
+                record = record if holdings[-1]['ticket'] > record['ticket'] else holdings[-1]
+            else:
+                pass
+            if record is None:
+                res[name] = {"last_ticket": None, "holdings": list(), "repeat": list()}
+            else:
+                filter_dict['ticket'] = {"$gte": record['ticket']}
+                repeat = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
+                res[name] = {"last_ticket": record['ticket'], "holdings": holdings, "repeat": repeat}
+        return res
 
     @classmethod
     def get_holdings(cls) -> list:
@@ -126,6 +134,47 @@ class Transaction(mongo_db.BaseDoc):
         sort_dict = {"ticket": -1}
         holdings = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
         return holdings
+
+
+class Withdraw(mongo_db.BaseDoc):
+    """出金申请信息"""
+    _table_name = "withdraw_info"
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['system'] = str   # 平台信息 ,domain
+    type_dict['ticket'] = int  # 申请的id
+    type_dict['account'] = int  # mt帐号
+    type_dict['group'] = str  # 分组
+    type_dict['manager'] = str  # 客户经理
+    type_dict['nick_name'] = str  # 英文名
+    type_dict['amount_usd'] = str  # 金额/美元
+    type_dict['amount_cny'] = str  # 金额/人民币
+    type_dict['commission_usd'] = float  # 手续费/美元
+    type_dict['commission_cny'] = float  # 手续费/人民币
+    type_dict['channel'] = str  # 转账渠道
+    type_dict['apply_time'] = datetime.datetime  # 申请时间
+    type_dict['close_time'] = datetime.datetime  # 处理时间
+    type_dict['blank_name'] = str # 开户行
+    type_dict['blank_code'] = str  # 银行国际代码
+    type_dict['code_id'] = str  # 银行卡号
+    type_dict['status'] = str  # 状态
+    type_dict['account_balance'] = float  # 账户余额,单位美元
+    type_dict['account_value'] = float  # 账户净值,单位美元
+    type_dict['open_interest'] = float  # 持仓量,单位手
+    type_dict['account_margin'] = float  # 可用保证金,单位美元
+
+    @classmethod
+    def last_record(cls, system_name: str) -> (dict, None):
+        """
+        获取最后一条出金申请信息
+        : param system_name: 平台domain
+        :return:
+        """
+        filter_dict = {"system": system_name}
+        sort_dict = {"ticket": -1}
+        res = cls.find_one_plus(filter_dict=filter_dict, sort_dict=sort_dict, instance=False)
+        return res
+
 
 
 if __name__ == "__main__":

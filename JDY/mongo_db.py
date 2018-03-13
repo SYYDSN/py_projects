@@ -269,33 +269,40 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
     if isinstance(date_str, (datetime.datetime, datetime.date)):
         return date_str
     elif isinstance(date_str, str):
-        pattern_0 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d$')  # 时间匹配2017-01-01
-        pattern_1 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
-        pattern_2 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
-        pattern_3 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$') # 时间匹配2017-01-01 12:00:00 000
-        pattern_4 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
-        pattern_5 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01T12:00:00.000
-        pattern_6 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
-        pattern_7 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
+        search = re.search(r'\d{4}.\d{1,2}.*\d', date_str)
+        if search:
+            date_str = search.group()
+            pattern_0 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d$')  # 时间匹配2017-01-01
+            pattern_1 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
+            pattern_2 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
+            pattern_3 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$') # 时间匹配2017-01-01 12:00:00 000
+            pattern_4 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
+            pattern_5 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01T12:00:00.000
+            pattern_6 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
+            pattern_7 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
 
-        if pattern_7.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S %f")
-        elif pattern_6.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-        elif pattern_5.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
-        elif pattern_4.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
-        elif pattern_3.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S %f")
-        elif pattern_2.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
-        elif pattern_1.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-        elif pattern_0.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%d")
+            if pattern_7.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S %f")
+            elif pattern_6.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+            elif pattern_5.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
+            elif pattern_4.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
+            elif pattern_3.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S %f")
+            elif pattern_2.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
+            elif pattern_1.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+            elif pattern_0.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%d")
+            else:
+                ms = "get_datetime_from_str() 参数 {} 时间字符串格式不符合要求 2017-01-01或者2917-01-01 12:00:00".format(date_str)
+                print(ms)
+                logger.info(ms, exc_info=True, stack_info=True)
         else:
-            ms = "get_datetime_from_str() 参数 {} 时间字符串格式不符合要求 2017-01-01或者2917-01-01 12:00:00".format(date_str)
+            ms = "get_datetime_from_str() 参数 {} 时间字符串格式匹配失败".format(date_str)
             print(ms)
             logger.info(ms, exc_info=True, stack_info=True)
     else:
