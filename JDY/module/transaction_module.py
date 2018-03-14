@@ -165,6 +165,7 @@ class Withdraw(mongo_db.BaseDoc):
     type_dict['account_value'] = float  # 账户净值,单位美元
     type_dict['open_interest'] = float  # 持仓量,单位手
     type_dict['account_margin'] = float  # 可用保证金,单位美元
+    type_dict['upload'] = int  # 是否已上传?1已上传0未上传,默认0
 
     @classmethod
     def last_record(cls, system_name: str) -> (dict, None):

@@ -28,6 +28,7 @@ import threading
 
 
 logger = get_logger()
+current_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 def month_str(month_int: int) -> str:
@@ -730,55 +731,6 @@ class ShengFX888:
                 break
         return res
 
-    def parse_and_save(self, domain: str = None, ticket_limit: int = None) -> None:
-        """
-        解析页面内容，并保存解析结果
-        :param domain: 平台名称
-        :param ticket_limit: ticket下限，不能小于此值, 仅仅在调试时使用。用于缩小查找范围。
-        :return:
-         """
-        data = dict()
-        data["upload"] = list()  # 上传到简道云交易汇总信息
-        data["insert_db"] = list()  # 插入数据库
-        data["update_db"] = list()  # 更新数据库
-        data['other'] = list()
-        domain = self.domain if domain is None else domain
-        if ticket_limit is None:
-            query = Transaction.last_ticket([self.domain, self.domain2])
-        else:
-            query = {domain: {"last_ticket": ticket_limit, "holdings": list, "repeat": list()}}
-        """采集两个平台大的四种交易信息"""
-        for domain, item in query.items():
-            ticket_limit = item['last_ticket']
-            holdings = item['holdings']
-            repeat = item['repeat']
-            res = self.batch_parse(domain, ticket_limit)
-            res = self.split_data(res, holdings, repeat)  # 按照类型拆分数据
-            data['upload'].extend(res['upload'])
-            data['insert_db'].extend(res['insert_db'])
-            data['update_db'].extend(res['update_db'])
-            data['other'].extend(res['other'])
-        """获取平台2的出金申请记录"""
-        last_withdraw = Withdraw.last_record(self.domain2)
-        last_ticket = None if last_withdraw is None else last_withdraw['ticket']
-        withdraw_list = self.batch_parse_withdraw(self.withdraw_url_base2, last_ticket)
-        withdraw_list.sort(key=lambda obj: obj['apply_time'], reverse=False)
-        data['withdraw'] = withdraw_list
-        upload_list = data['upload']
-        upload_list.sort(key=lambda obj: (obj['time'] if obj.get("close_time") is None else
-                                          obj['close_time']), reverse=False)
-        update_list = data['update_db']
-        insert_list = data['insert_db']
-        [self.upload_all_records(**record) for record in upload_list]  # 上传所有交易记录
-        [self.upload_withdraw_apply(**record) for record in withdraw_list]  # 上传出金信息
-        res = Transaction.insert_many(insert_list)  # 存数据库
-        print("insert many result is {}".format(res))
-        for record in update_list:
-            filter_dict = {"ticket": record.pop('ticket'), 'system': record.pop('system')}
-            update_dict = {"$set": record}
-            res = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
-            print("update result is {}".format(res))
-
     @staticmethod
     def split_data(records: list, holdings: list, repeat: list = list()) -> dict:
         """
@@ -1195,6 +1147,55 @@ class ShengFX888:
 
         time.sleep(1)
         browser.refresh()  # 刷新页面
+
+    def parse_and_save(self, domain: str = None, ticket_limit: int = None) -> None:
+        """
+        解析页面内容，并保存解析结果
+        :param domain: 平台名称
+        :param ticket_limit: ticket下限，不能小于此值, 仅仅在调试时使用。用于缩小查找范围。
+        :return:
+         """
+        data = dict()
+        data["upload"] = list()  # 上传到简道云交易汇总信息
+        data["insert_db"] = list()  # 插入数据库
+        data["update_db"] = list()  # 更新数据库
+        data['other'] = list()
+        domain = self.domain if domain is None else domain
+        if ticket_limit is None:
+            query = Transaction.last_ticket([self.domain, self.domain2])
+        else:
+            query = {domain: {"last_ticket": ticket_limit, "holdings": list, "repeat": list()}}
+        """采集两个平台大的四种交易信息"""
+        for domain, item in query.items():
+            ticket_limit = item['last_ticket']
+            holdings = item['holdings']
+            repeat = item['repeat']
+            res = self.batch_parse(domain, ticket_limit)
+            res = self.split_data(res, holdings, repeat)  # 按照类型拆分数据
+            data['upload'].extend(res['upload'])
+            data['insert_db'].extend(res['insert_db'])
+            data['update_db'].extend(res['update_db'])
+            data['other'].extend(res['other'])
+        """获取平台2的出金申请记录"""
+        last_withdraw = Withdraw.last_record(self.domain2)
+        last_ticket = None if last_withdraw is None else last_withdraw['ticket']
+        withdraw_list = self.batch_parse_withdraw(self.withdraw_url_base2, last_ticket)
+        withdraw_list.sort(key=lambda obj: obj['apply_time'], reverse=False)
+        data['withdraw'] = withdraw_list
+        upload_list = data['upload']
+        upload_list.sort(key=lambda obj: (obj['time'] if obj.get("close_time") is None else
+                                          obj['close_time']), reverse=False)
+        update_list = data['update_db']
+        insert_list = data['insert_db']
+        [self.upload_all_records(**record) for record in upload_list]  # 上传所有交易记录
+        [self.upload_withdraw_apply(**record) for record in withdraw_list]  # 上传出金信息
+        res = Transaction.insert_many(insert_list)  # 存数据库
+        print("insert many result is {}".format(res))
+        for record in update_list:
+            filter_dict = {"ticket": record.pop('ticket'), 'system': record.pop('system')}
+            update_dict = {"$set": record}
+            res = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+            print("update result is {}".format(res))
 
 
 if __name__ == "__main__":
