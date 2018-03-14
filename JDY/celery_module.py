@@ -4,6 +4,7 @@ import datetime
 from celery import Celery
 
 from browser.firefox_module import to_jiandao_cloud
+from browser.firefox_module import ShengFX888
 from log_module import get_logger
 from mail_module import send_mail
 
@@ -78,6 +79,16 @@ def to_jiandao_cloud_and_send_mail(*args, **kwargs):
         content = str(kwargs)
         send_mail("583736361@qq.com", title, content)
     return res
+
+
+@app.task(bind=True)
+def check_platform_server(*args, **kwargs):
+    print(args)
+    print(kwargs)
+    """在平台服务器检查一下交易记录和出金申请"""
+    crawler = ShengFX888()
+    crawler.parse_and_save()
+    return "check platform server success!"
 
 
 if __name__ == "__main__":

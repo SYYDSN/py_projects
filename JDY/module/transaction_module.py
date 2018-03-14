@@ -113,7 +113,10 @@ class Transaction(mongo_db.BaseDoc):
             record = cls.find_one_plus(filter_dict=filter_dict, sort_dict=sort_dict, projection=["ticket"])
             holdings = cls.get_holdings()
             if len(holdings) > 0:
-                record = record if holdings[-1]['ticket'] > record['ticket'] else holdings[-1]
+                if record is None:
+                    record = holdings[-1]
+                else:
+                    record = record if holdings[-1]['ticket'] > record['ticket'] else holdings[-1]
             else:
                 pass
             if record is None:
