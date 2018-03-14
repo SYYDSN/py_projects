@@ -151,13 +151,14 @@ class Transaction(mongo_db.BaseDoc):
         if len(system_names) == 0:
             return dict()
         else:
-            data = dict(zip(system_names, [[]] * len(system_names)))
-            records = cls.find_plus(filter_dict=filter_dict, projection=['system', 'ticket'])
+            data = dict(zip(system_names, [list() for i in range(len(system_names))]))
+            records = cls.find_plus(filter_dict=filter_dict, projection=['system', 'ticket'], to_dict=True)
             for x in records:
-                temp = data[x['system']]
+                domain = x['system']
+                temp = data[domain]
                 temp.append(x['ticket'])
+                data[domain] = temp
             return data
-
 
 
 class Withdraw(mongo_db.BaseDoc):
@@ -213,7 +214,7 @@ class Withdraw(mongo_db.BaseDoc):
             return dict()
         else:
             data = dict(zip(system_names, [[]] * len(system_names)))
-            records = cls.find_plus(filter_dict=filter_dict, projection=['system', 'ticket'])
+            records = cls.find_plus(filter_dict=filter_dict, projection=['system', 'ticket'], to_dict=True)
             for x in records:
                 temp = data[x['system']]
                 temp.append(x['ticket'])

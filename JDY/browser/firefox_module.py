@@ -21,7 +21,7 @@ import pyquery
 import re
 from module.transaction_module import Transaction
 from module.transaction_module import Withdraw
-import threading
+
 
 
 """简道云对接模块,火狐版，没有问题"""
@@ -52,8 +52,10 @@ def to_jiandao_cloud(**kwargs) -> bool:
     下载后解压是一个geckodriver 文件。拷贝到/usr/local/bin目录下，然后加上可执行的权限
     sudo chmod +x /usr/local/bin/geckodriver
     """
-
-    browser = webdriver.Firefox()
+    profile = webdriver.FirefoxProfile()
+    """因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,这里必须设置浏览器的初始化参数"""
+    profile.set_preference("intl.accept_languages", "zh-cn")
+    browser = webdriver.Firefox(profile)
     wait = WebDriverWait(browser, 10)
 
     url_1 = "https://www.jiandaoyun.com/f/5a658cbc7b87e86216236cb3"
@@ -153,43 +155,6 @@ def to_jiandao_cloud(**kwargs) -> bool:
     return True
 
 
-def listen_shengfx888():
-    """爬取实盘用户信息, 这是个临时方法,用来测试思路"""
-    display = Display(visible=0, size=(800, 600))
-    display.start()  # 开启虚拟显示器
-    browser = webdriver.Firefox()  # 表示headless firefox browser
-    driver = WebDriverWait(browser, 10)
-    login_url = "http://office.shengfx888.com"
-    user_name = "849607604@qq.com"
-    user_password = "Kai3349665"
-    """平衡页(第一页)"""
-    balance_url = "http://office.shengfx888.com/report/history_trade?" \
-                  "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=&" \
-                  "qtype=&CMD=&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=&" \
-                  "CLOSE_TIME_e=&T_LOGIN=&page=1"
-
-    """登录http://office.shengfx888.com"""
-    browser.get(url=login_url)
-    # 用户名输入
-    input_user_name = driver.until(
-        ec.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='请输入邮箱或者MT账号']")))
-    input_user_name.send_keys(user_name)  # 输入用户名
-    # 用户密码输入
-    input_user_password = driver.until(
-        ec.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='请输入登录密码']")))
-    input_user_password.send_keys(user_password)  # 输入用户密码
-    # 点击登录按钮
-    button_login = driver.until(
-        ec.presence_of_element_located((By.ID, "loginbtn")))  # 注意,这里用的不是css选择器而是id选择器
-    button_login.click()  # 登录
-
-    time.sleep(10)
-    browser.get(balance_url)
-    time.sleep(30)
-    browser.quit()
-    # display.stop()  # 关闭虚拟显示器
-
-
 class ShengFX888:
     """爬取实盘用户信息的类"""
     def __new__(cls, *args, **kwargs):
@@ -198,7 +163,10 @@ class ShengFX888:
             obj = super(ShengFX888, cls).__new__(cls)
             obj.display = Display(visible=0, size=(800, 600))
             obj.display.start()
-            obj.browser = webdriver.Firefox()
+            profile = webdriver.FirefoxProfile()
+            """因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,这里必须设置浏览器的初始化参数"""
+            profile.set_preference("intl.accept_languages", "zh-cn")
+            obj.browser = webdriver.Firefox(profile)
             obj.driver = WebDriverWait(obj.browser, 10)
             obj.stop = {"domain": False, "domain2": False}  # 批量解析页面时的 平台1/2中止标志
             obj.user_name = "849607604@qq.com"
@@ -209,8 +177,8 @@ class ShengFX888:
                                    "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=" \
                                    "&PROFIT_e=&qtype=&CMD=&closetime=&OPEN_TIME_s=" \
                                    "&OPEN_TIME_e=&CLOSE_TIME_s=&CLOSE_TIME_e=&T_LOGIN="
-            obj.user_name2 = "admin@shengfxChina.com"
-            obj.user_password2 = "aykPA1h5"
+            obj.user_name2 = "627853018@qq.com"
+            obj.user_password2 = "XIAOxiao@741"
             obj.domain2 = "office.shengfxchina.com:8443"
             obj.login_url2 = "https://office.shengfxchina.com:8443/Public/login"
             obj.page_url_base2 = "https://office.shengfxchina.com:8443/report/history_trade?" \
@@ -822,10 +790,12 @@ class ShengFX888:
                 input_password.send_keys("XunDie963741")  # 输入密码
                 time.sleep(1)
                 submit_password.click()  # 提交密码
-
             else:
                 print("不需要登录")
-            time.sleep(5)  # 等待是为了给页面时间载入
+
+            # 等待直到表单填写页面完全载入
+            time.sleep(5)
+
             create_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             js_create_time = """let d = $(".widget-wrapper>ul>li:eq(0) input"); d.val("{}");""".format(create_time)
             browser.execute_script(js_create_time)  # 输入创建时间
@@ -999,8 +969,20 @@ class ShengFX888:
             submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
             submit_info.click()  # 提交信息
 
-            browser.refresh()  # 刷新页面
-            return True
+            res = False
+            try:
+                msg_span = WebDriverWait(browser, 10).until(ec.presence_of_element_located((
+                    By.CLASS_NAME, "msg-title")))
+                if msg_span.text == "操作成功":
+                    browser.refresh()  # 刷新页面
+                    res = True
+                else:
+                    pass  # 添加数据失败
+            except Exception as e:
+                print(e)
+                logger.exception()
+            finally:
+                return res
 
     def upload_withdraw_apply(self, **kwargs) -> bool:
         """
@@ -1139,13 +1121,24 @@ class ShengFX888:
         submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
         submit_info.click()  # 提交信息
 
-        time.sleep(1)
-        browser.refresh()  # 刷新页面
-        return True
+        res = False
+        try:
+            msg_span = WebDriverWait(browser, 10).until(ec.presence_of_element_located((
+                By.CLASS_NAME, "msg-title")))
+            if msg_span.text == "操作成功":
+                browser.refresh()  # 刷新页面
+                res = True
+            else:
+                pass  # 添加数据失败
+        except Exception as e:
+            print(e)
+            logger.exception()
+        finally:
+            return res
 
     def parse_and_save(self, domain: str = None, ticket_limit: int = None) -> None:
         """
-        解析页面内容，并保存解析结果
+        解析页面内容，并保存解析结果,
         :param domain: 平台名称
         :param ticket_limit: ticket下限，不能小于此值, 仅仅在调试时使用。用于缩小查找范围。
         :return:
@@ -1174,21 +1167,20 @@ class ShengFX888:
         """获取平台2的出金申请记录"""
         last_withdraw = Withdraw.last_record(self.domain2)
         last_ticket = None if last_withdraw is None else last_withdraw['ticket']
+        # 获取出金申请
         withdraw_list = self.batch_parse_withdraw(self.withdraw_url_base2, last_ticket)
-        withdraw_list.sort(key=lambda obj: obj['apply_time'], reverse=False)
-        data['withdraw'] = withdraw_list
-        upload_list = data['upload']
-        upload_list.sort(key=lambda obj: (obj['time'] if obj.get("close_time") is None else
-                                          obj['close_time']), reverse=False)
+
+        # 需要更新的数据
         update_list = data['update_db']
+        # 需要插入的数据
         insert_list = data['insert_db']
 
         uploaded_01 = Transaction.get_uploaded()  # 查询已上传的数据
         if len(uploaded_01) == 0:
             """数据库没有已上传的记录"""
-            Transaction.insert_many(insert_list)  #
+            Transaction.insert_many(insert_list)  # 插入新的交易记录
             for x in update_list:
-                """更新数据库"""
+                """更新交易记录中的持仓信息(平仓)"""
                 raw = x.copy()
                 filter_dict = {"ticket": x.pop('ticket'), "system": x.pop('system')}
                 update_dict = {"$set": x}
@@ -1198,23 +1190,8 @@ class ShengFX888:
                     raise ValueError(ms)
                 else:
                     pass
-            """上传交易数据"""
-            for x in upload_list:
-                raw = x.copy()
-                res = self.upload_all_records(**x)
-                if res:
-                    filter_dict = {"ticket": x.pop('ticket'), "system": x.pop('system')}
-                    update_dict = {"$set": {"upload": 1}}
-                    res_1 = Transaction.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
-                    if res_1 is None:
-                        ms = "更新数据库的上传信息失败, 实例:{}".format(raw)
-                        raise ValueError(ms)
-                    else:
-                        pass
-                else:
-                    ms = "上传交易记录失败, 实例:{}".format(raw)
-                    raise ValueError(ms)
         else:
+            """有已上传数据的情况"""
             for x in insert_list:
                 ticket = x['ticket']
                 domain = x['system']
@@ -1245,73 +1222,78 @@ class ShengFX888:
                         raise ValueError(ms)
                     else:
                         pass
-            """上传交易数据"""
-            for x in upload_list:
-                ticket = x['ticket']
-                domain = x['system']
-                if ticket in uploaded_01[domain]:
-                    """已经上传过的忽略"""
-                    pass
+
+    def db_to_cloud(self):
+        """
+        把数据库中的数据上传到简道云,这个方法会略过从网络爬取数据的过程.
+        包含上传交易数据和出金申请两部分
+        :return:
+        """
+        """先查询交易信息"""
+        filter_dict = {"$or": [
+            {
+                "command": {"$in": ["credit", "balance"]},
+                "$or": [{"upload": {"$ne": 1}}, {"upload": {"$exists": False}}]
+            },
+            {
+                "command": {"$in": ["buy", "sell"]},
+                "$or": [{"upload": {"$ne": 1}}, {"upload": {"$exists": False}}],
+                "close_time": {"$exists": True}
+            }
+        ]}
+        trans_list = Transaction.find_plus(filter_dict=filter_dict, to_dict=True)
+        trans_list.sort(key=lambda obj: (obj['time'] if obj.get("close_time") is None else obj['close_time']),
+                        reverse=False)
+        """循环处理交易信息,先上传,再更新数据库标识"""
+        for trans in trans_list:
+            res = self.upload_all_records(**trans)
+            count = 0
+            while not res and count <= 3:
+                ms = "上传交易信息失败,实例:{}".format(trans)
+                print(ms)
+                count += 1
+                time.sleep(3)
+            if not res:
+                ms = "上传交易信息已连续失败失败{}次,实例:{}".format(count, trans)
+                raise ValueError(ms)
+            else:
+                """上传交易信息成功,更新数据库的upload标识"""
+                filter_dict = {"_id": trans["_id"]}
+                update_dict = {"$set": {"upload": 1}}
+                res = Transaction.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+                if res:
+                    print("{} {} success".format(trans['system'], trans['ticket']))
                 else:
-                    raw = x.copy()
-                    res = self.upload_all_records(**x)
-                    if res:
-                        filter_dict = {"ticket": x.pop('ticket'), "system": x.pop('system')}
-                        update_dict = {"$set": {"upload": 1}}
-                        res_1 = Transaction.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
-                        if res_1 is None:
-                            ms = "更新数据库的上传信息失败, 实例:{}".format(raw)
-                            raise ValueError(ms)
-                        else:
-                            pass
-                    else:
-                        ms = "上传交易记录失败, 实例:{}".format(raw)
-                        raise ValueError(ms)
-        """上传所有出金申请"""
-        uploaded_02 = Withdraw.get_uploaded()
-        if len(uploaded_02) == 0:
-            """数据库没有已上传的记录"""
-            for x in withdraw_list:
-                o_id = Withdraw.insert_one(**x)
-                x['_id'] = o_id
-                res_1 = self.upload_withdraw_apply(**x)  # 上传出金信息
-                if res_1:
-                    """上传出金信息成功,开始更新数据库的上传成功标志"""
-                    filter_dict = {"_id": o_id}
-                    update_dict = {"$set": {"upload": 1}}
-                    res_2 = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
-                    if res_2 is None:
-                        ms = "更新数据库上传完成标志位失败,数据:{}".format(x)
-                        raise ValueError(ms)
-                    else:
-                        pass
-                else:
-                    ms = "上传交易记录失败,数据:{}".format(x)
+                    ms = "更新交易信息数据库的upload标识失败,实例:{}".format(count, trans)
                     raise ValueError(ms)
-        else:
-            for x in upload_list:
-                ticket = x['ticket']
-                domain = x['system']
-                if ticket in uploaded_01[domain]:
-                    """已经上传过的忽略"""
-                    pass
+        """开始查询出金申请"""
+        filter_dict = {"$or": [{"upload": {"$ne": 1}}, {"upload": {"$exists": False}}]}
+        sort_dict = {"ticket": 1}
+        withdraw_list = Withdraw.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
+        """循环处理出金,先上传,再更新数据库标识"""
+        for withdraw in withdraw_list:
+            res = self.upload_withdraw_apply(**withdraw)
+            count = 0
+            while not res and count <= 3:
+                ms = "上传出金申请失败,实例:{}".format(withdraw)
+                print(ms)
+                count += 1
+                time.sleep(3)
+            if not res:
+                ms = "上传出金申请已连续失败失败{}次,实例:{}".format(count, trans)
+                raise ValueError(ms)
+            else:
+                """上传出金申请成功,更新数据库的upload标识"""
+                filter_dict = {"_id": trans["_id"]}
+                update_dict = {"$set": {"upload": 1}}
+                res = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+                if res:
+                    print("{} {} success".format(trans['system'], trans['ticket']))
                 else:
-                    o_id = Withdraw.insert_one(**x)
-                    x['_id'] = o_id
-                    res_1 = self.upload_withdraw_apply(**x)
-                    if res_1:
-                        """更新数据库的上传成功标志"""
-                        filter_dict = {"_id": o_id}
-                        update_dict = {"$set": {"upload": 1}}
-                        res_2 = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
-                        if res_2 is None:
-                            ms = "更新数据库上传完成标志位失败,数据:{}".format(x)
-                            raise ValueError(ms)
-                        else:
-                            pass
-                    else:
-                        ms = "上传交易记录失败,数据:{}".format(x)
-                        raise ValueError(ms)
+                    ms = "更新出金申请数据库的upload标识失败,实例:{}".format(count, trans)
+                    raise ValueError(ms)
+
+
 
 
 if __name__ == "__main__":
@@ -1333,13 +1315,13 @@ if __name__ == "__main__":
     # ShengFX888().login()
     """测试抓取结算站点数据"""
     crawler = ShengFX888()
-    crawler.parse_and_save()
+    # crawler.parse_and_save()
+    crawler.db_to_cloud()
     # crawler.parse_and_save(ticket_limit=31017)
     # crawler.upload_all_records()
-    # a = {'description': '出金', 'command': 'balance', 'ticket': 31349, 'login': 880300399,
-    #      'time': datetime.datetime(2018, 3, 8, 17, 25, 38), 'spread_profit': 0.0,
-    #      'nick_name': '李琳', 'comment': 'Withdraw maxib#319',  'real_name': '李琳',
-    #      'profit': -2659.51, 'system': 'office.shengfx888.com', "lot": 0.5}
-    #
+    a = {'spread_profit': 0.0, 'real_name': '费绍武', 'profit': -962.0, 'ticket': 9999, 'command': 'balance',
+         'nick_name': '费绍武', 'login': 880300328, 'time': datetime.datetime(2018, 3, 14, 9, 52, 35),
+         'comment': 'Withdraw maxib#338', 'system': 'office.shengfx888.com'}
     # crawler.upload_all_records(**a)
+    # Transaction.insert_one(**a)
     pass

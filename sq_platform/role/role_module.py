@@ -41,7 +41,7 @@ class Scope:
         4. self      个人级权限,操作自己的数据,一般是普通用户的默认权限.
         5. custom    定制的权限, 比如以列表形式直接列出权限范围.具体方法暂时不明
         :param user_id:
-        :return: 返回的是None或者过滤器字典,过滤器字典以scope作为条件限制对象操作范围.其中:
+        :return: 返回scope_filter范围过滤器,可能是None或者字典,过滤器字典以scope作为条件限制对象操作范围.其中:
         None     表示没有任何访问权限
         dict()  空字典表示没有条件限制.
         """

@@ -1598,7 +1598,7 @@ class BaseDoc:
                               return_document: str="after"):
         """
         find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
-        find_one_and_update和find_alone_and_updatet替更简单医易用.
+        find_one_and_update和find_alone_and_update替更简单医易用.
         本方法更灵活,只是在设置参数时要求更高.
         找到一个文档然后更新它，如果找不到就插入
         :param filter_dict: 查找时匹配参数 字典

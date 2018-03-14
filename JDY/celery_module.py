@@ -87,7 +87,8 @@ def check_platform_server(*args, **kwargs):
     print(kwargs)
     """在平台服务器检查一下交易记录和出金申请"""
     crawler = ShengFX888()
-    crawler.parse_and_save()
+    crawler.parse_and_save()  # 爬取并保存到数据库
+    crawler.db_to_cloud()  # 上传到简道云
     return "check platform server success!"
 
 
