@@ -57,6 +57,7 @@ class Transaction(mongo_db.BaseDoc):
     type_dict['spread_profit'] = float  # 点差/价格利润
     type_dict['comment'] = str  # 注释
     type_dict['description'] = str  # 对注释的补充说明
+    type_dict['upload'] = int  # 是否已上传?1已上传0未上传,默认0
     """
     注释有多种,现部分举例如下:
     1. cancelled     订单取消.
@@ -138,6 +139,26 @@ class Transaction(mongo_db.BaseDoc):
         holdings = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
         return holdings
 
+    @classmethod
+    def get_uploaded(cls) -> dict:
+        """
+        获取已上传的数据
+        :return:
+        """
+        ses = mongo_db.get_conn(cls.get_table_name())
+        system_names = ses.distinct("system")
+        filter_dict = {"upload": 1}
+        if len(system_names) == 0:
+            return dict()
+        else:
+            data = dict(zip(system_names, [[]] * len(system_names)))
+            records = cls.find_plus(filter_dict=filter_dict, projection=['system', 'ticket'])
+            for x in records:
+                temp = data[x['system']]
+                temp.append(x['ticket'])
+            return data
+
+
 
 class Withdraw(mongo_db.BaseDoc):
     """出金申请信息"""
@@ -179,8 +200,26 @@ class Withdraw(mongo_db.BaseDoc):
         res = cls.find_one_plus(filter_dict=filter_dict, sort_dict=sort_dict, instance=False)
         return res
 
+    @classmethod
+    def get_uploaded(cls) -> dict:
+        """
+        获取已上传的数据
+        :return:
+        """
+        ses = mongo_db.get_conn(cls.get_table_name())
+        system_names = ses.distinct("system")
+        filter_dict = {"upload": 1}
+        if len(system_names) == 0:
+            return dict()
+        else:
+            data = dict(zip(system_names, [[]] * len(system_names)))
+            records = cls.find_plus(filter_dict=filter_dict, projection=['system', 'ticket'])
+            for x in records:
+                temp = data[x['system']]
+                temp.append(x['ticket'])
+            return data
 
 
 if __name__ == "__main__":
-    print(Transaction.last_ticket())
+    print(Transaction.get_uploaded())
     pass

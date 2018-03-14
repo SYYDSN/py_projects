@@ -78,7 +78,6 @@ def to_jiandao_cloud(**kwargs) -> bool:
     click_today.click()  # 选今天
 
     user_name = kwargs.get('user_name')
-    print(user_name)
     js_name = """let d = $(".widget-wrapper>ul>li:eq(1) input"); d.val("{}");""".format(kwargs['user_name'])
     browser.execute_script(js_name)  # 输入姓名
 
@@ -128,12 +127,10 @@ def to_jiandao_cloud(**kwargs) -> bool:
 
     desc7 = kwargs['description']
     js_desc_7 = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(desc7)
-    print(js_desc_7)
     browser.execute_script(js_desc_7)  # 页面内容
 
     desc8 = kwargs['search_keyword']
     js_desc_8 = """let d = $(".widget-wrapper>ul>li:eq(9) input"); d.val("{}");""".format(desc8)
-    print(js_desc_8)
     browser.execute_script(js_desc_8)  # 搜索关键字
 
     """
@@ -332,16 +329,16 @@ class ShengFX888:
         command = texts_3[0].lower()
         init_dict['command'] = command
         sys_val = domain
-        print("domain = {}, command = {}, tds,length = {}".format(sys_val, command, len(tds)))
+        print("domain = {}, command = {}, tds'length = {}".format(sys_val, command, len(tds)))
         init_dict['system'] = sys_val
-        print(ticket, command, texts_3)
+        # print(ticket, command, texts_3)
         if command == "balance" or command == "credit":
             """出入金和赠金，少了几个td"""
             """第四个，交易时间"""
             eighth = pyquery.PyQuery(tds[4]).text()
             the_time = get_datetime_from_str(eighth)  # 交易时间
             init_dict['time'] = the_time
-            print("出入金时间：{}".format(the_time))
+            # print("出入金时间：{}".format(the_time))
             """
             第五个，盈亏
             """
@@ -402,7 +399,6 @@ class ShengFX888:
             eighth = pyquery.PyQuery(tds[7]).text()
             eighth = eighth.split("\n")
             if command not in ["balance", "credit"]:
-                print(eighth)
                 open_time = get_datetime_from_str(eighth[0].split("：")[1])  # 开仓时间
                 init_dict['open_time'] = open_time
                 if eighth[-1].find("持仓中") != -1:
@@ -795,7 +791,7 @@ class ShengFX888:
         }
         return res
 
-    def upload_all_records(self, **kwargs) -> None:
+    def upload_all_records(self, **kwargs) -> bool:
         """
         上传所有的出入金,赠金,已平仓的buy和sell记录
         :return:
@@ -831,7 +827,6 @@ class ShengFX888:
                 print("不需要登录")
             time.sleep(5)  # 等待是为了给页面时间载入
             create_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            print(create_time)
             js_create_time = """let d = $(".widget-wrapper>ul>li:eq(0) input"); d.val("{}");""".format(create_time)
             browser.execute_script(js_create_time)  # 输入创建时间
 
@@ -859,9 +854,7 @@ class ShengFX888:
             js_symbol = """let d = $(".widget-wrapper>ul>li:eq(9) input"); d.val("{}");""".format(symbol)
             browser.execute_script(js_symbol)  # 输入产品
 
-            lot = '' if kwargs.get('lot') is None else kwargs['lot']
-            if lot == "":
-                print(kwargs)
+            lot = 0 if kwargs.get('lot') is None or kwargs.get('lot') is None == "" else kwargs['lot']
             js_lot = """let d = $(".widget-wrapper>ul>li:eq(10) input"); d.val("{}");""".format(lot)
             browser.execute_script(js_lot)  # 输入手数
 
@@ -1007,8 +1000,9 @@ class ShengFX888:
             submit_info.click()  # 提交信息
 
             browser.refresh()  # 刷新页面
+            return True
 
-    def upload_withdraw_apply(self, **kwargs) -> None:
+    def upload_withdraw_apply(self, **kwargs) -> bool:
         """
         上传出金的记录
         :return:
@@ -1147,6 +1141,7 @@ class ShengFX888:
 
         time.sleep(1)
         browser.refresh()  # 刷新页面
+        return True
 
     def parse_and_save(self, domain: str = None, ticket_limit: int = None) -> None:
         """
@@ -1187,15 +1182,136 @@ class ShengFX888:
                                           obj['close_time']), reverse=False)
         update_list = data['update_db']
         insert_list = data['insert_db']
-        [self.upload_all_records(**record) for record in upload_list]  # 上传所有交易记录
-        [self.upload_withdraw_apply(**record) for record in withdraw_list]  # 上传出金信息
-        res = Transaction.insert_many(insert_list)  # 存数据库
-        print("insert many result is {}".format(res))
-        for record in update_list:
-            filter_dict = {"ticket": record.pop('ticket'), 'system': record.pop('system')}
-            update_dict = {"$set": record}
-            res = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
-            print("update result is {}".format(res))
+
+        uploaded_01 = Transaction.get_uploaded()  # 查询已上传的数据
+        if len(uploaded_01) == 0:
+            """数据库没有已上传的记录"""
+            Transaction.insert_many(insert_list)  #
+            for x in update_list:
+                """更新数据库"""
+                raw = x.copy()
+                filter_dict = {"ticket": x.pop('ticket'), "system": x.pop('system')}
+                update_dict = {"$set": x}
+                res_1 = Transaction.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+                if res_1 is None:
+                    ms = "更新数据库的平仓信息失败, 实例:{}".format(raw)
+                    raise ValueError(ms)
+                else:
+                    pass
+            """上传交易数据"""
+            for x in upload_list:
+                raw = x.copy()
+                res = self.upload_all_records(**x)
+                if res:
+                    filter_dict = {"ticket": x.pop('ticket'), "system": x.pop('system')}
+                    update_dict = {"$set": {"upload": 1}}
+                    res_1 = Transaction.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+                    if res_1 is None:
+                        ms = "更新数据库的上传信息失败, 实例:{}".format(raw)
+                        raise ValueError(ms)
+                    else:
+                        pass
+                else:
+                    ms = "上传交易记录失败, 实例:{}".format(raw)
+                    raise ValueError(ms)
+        else:
+            for x in insert_list:
+                ticket = x['ticket']
+                domain = x['system']
+                if ticket in uploaded_01[domain]:
+                    """已经上传过的忽略"""
+                    pass
+                else:
+                    o_id = Transaction.insert_one(**x)
+                    if o_id is None:
+                        ms = "插入数据库交易信息失败,数据:{}".format(x)
+                        raise ValueError(ms)
+                    else:
+                        pass
+            """更新数据库平仓信息"""
+            for x in update_list:
+                ticket = x['ticket']
+                domain = x['system']
+                if ticket in uploaded_01[domain]:
+                    """已经上传过的忽略"""
+                    pass
+                else:
+                    raw = x.copy()
+                    filter_dict = {"ticket": x.pop('ticket'), "system": x.pop('system')}
+                    update_dict = {"$set": x}
+                    res_1 = Transaction.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+                    if res_1 is None:
+                        ms = "更新数据库的平仓信息失败, 实例:{}".format(raw)
+                        raise ValueError(ms)
+                    else:
+                        pass
+            """上传交易数据"""
+            for x in upload_list:
+                ticket = x['ticket']
+                domain = x['system']
+                if ticket in uploaded_01[domain]:
+                    """已经上传过的忽略"""
+                    pass
+                else:
+                    raw = x.copy()
+                    res = self.upload_all_records(**x)
+                    if res:
+                        filter_dict = {"ticket": x.pop('ticket'), "system": x.pop('system')}
+                        update_dict = {"$set": {"upload": 1}}
+                        res_1 = Transaction.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+                        if res_1 is None:
+                            ms = "更新数据库的上传信息失败, 实例:{}".format(raw)
+                            raise ValueError(ms)
+                        else:
+                            pass
+                    else:
+                        ms = "上传交易记录失败, 实例:{}".format(raw)
+                        raise ValueError(ms)
+        """上传所有出金申请"""
+        uploaded_02 = Withdraw.get_uploaded()
+        if len(uploaded_02) == 0:
+            """数据库没有已上传的记录"""
+            for x in withdraw_list:
+                o_id = Withdraw.insert_one(**x)
+                x['_id'] = o_id
+                res_1 = self.upload_withdraw_apply(**x)  # 上传出金信息
+                if res_1:
+                    """上传出金信息成功,开始更新数据库的上传成功标志"""
+                    filter_dict = {"_id": o_id}
+                    update_dict = {"$set": {"upload": 1}}
+                    res_2 = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+                    if res_2 is None:
+                        ms = "更新数据库上传完成标志位失败,数据:{}".format(x)
+                        raise ValueError(ms)
+                    else:
+                        pass
+                else:
+                    ms = "上传交易记录失败,数据:{}".format(x)
+                    raise ValueError(ms)
+        else:
+            for x in upload_list:
+                ticket = x['ticket']
+                domain = x['system']
+                if ticket in uploaded_01[domain]:
+                    """已经上传过的忽略"""
+                    pass
+                else:
+                    o_id = Withdraw.insert_one(**x)
+                    x['_id'] = o_id
+                    res_1 = self.upload_withdraw_apply(**x)
+                    if res_1:
+                        """更新数据库的上传成功标志"""
+                        filter_dict = {"_id": o_id}
+                        update_dict = {"$set": {"upload": 1}}
+                        res_2 = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+                        if res_2 is None:
+                            ms = "更新数据库上传完成标志位失败,数据:{}".format(x)
+                            raise ValueError(ms)
+                        else:
+                            pass
+                    else:
+                        ms = "上传交易记录失败,数据:{}".format(x)
+                        raise ValueError(ms)
 
 
 if __name__ == "__main__":
