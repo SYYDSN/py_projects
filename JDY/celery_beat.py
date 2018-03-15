@@ -21,7 +21,7 @@ app.conf.CELERYBEAT_SCHEDULE = {
     """每5分钟在平台服务器检查一下交易记录和出金申请"""
     'every_file_minutes_check_platform_server': {
         'task': 'celery_module.check_platform_server',
-        'schedule': crontab(minute="*/5", hour="*")  # 每5分钟检查一次
+        'schedule': crontab(minute="*/30", hour="*")  # 每5分钟检查一次
     }
 }
 

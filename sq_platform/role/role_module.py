@@ -1,7 +1,13 @@
 #  -*- coding: utf-8 -*-
+import os
+import sys
+__project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+if __project_dir__ not in sys.path:
+    sys.path.append(__project_dir__)
 import mongo_db
 from manage import company_module
 from log_module import get_logger
+from api.data import item_module
 
 
 """
@@ -45,13 +51,14 @@ class Scope:
         None     表示没有任何访问权限
         dict()  空字典表示没有条件限制.
         """
-        scope_filter = dict()  # 对象范围限制字典
+        # scope_filter = dict()  # 对象范围限制字典
+        scope_filter = None  # 对象范围限制字典,None表示没有权限,
         if scope == 0 or scope == "refuse":
             """没有权限"""
-            scope_filter = None
+            pass
         elif scope == 1 or scope == "system":
             """系统级权限"""
-            pass
+            scope_filter = dict()
         elif scope == 2 or scope == "company":
             """公司级权限"""
             admin = company_module.CompanyAdmin.find_by_id(user_id)
@@ -83,14 +90,35 @@ class Scope:
                         logger.exception(ms)
                         raise ValueError(ms)
         elif scope == 3 or scope == "dept":
-            """部门级权限,此时user_id不能是admin_id"""
+            """
+            部门级权限,此时user_id不能是admin_id,需要判断1.此员工是不是有部门(是不是员工)?如果不是,放弃,是,返回部门权限的筛选条件字典
+            """
             employee = company_module.Employee.find_by_id(user_id)
             if isinstance(employee, company_module.Employee):
-                user_dept_relation =
-            pass
+                user_dbref = DBRef(collection=company_module.Employee.get_table_name(), database="platform_db",
+                                   id=user_id)
+                """查找user_id对应的关系"""
+                filter_dict = {"user_id": user_dbref}
+                user_dept_relation = company_module.EmployeeDeptRelation.find_one_plus(filter_dict=filter_dict)
+                if user_dept_relation is None:
+                    """没有权限"""
+                    pass
+                else:
+                    """部门存在"""
+                    scope_filter = {"dept_id": user_dept_relation.get_attr("dept_id")}
+            else:
+                """没有对应的权限"""
+                pass
         elif scope == 4 or scope == "self":
-            """个人级权限"""
-            pass
+            """
+            个人级权限,只检查这个账户是不是存在?
+            """
+            user = item_module.User.find_by_id(user_id)
+            if isinstance(user, item_module.User):
+                scope_filter = {"user_id": user.get_dbref()}
+            else:
+                """用户不存在,没有权限"""
+                pass
         elif scope == 5 or scope == "custom":
             """定制的权限,暂未实现"""
             pass
@@ -149,6 +177,14 @@ class Role(mongo_db.BaseDoc):
     type_dict['company_id'] = DBRef  # 公司id,确认权限属于哪个公司?
     type_dict['role_name'] = str  # 角色名称,公司内部不重复
     type_dict['rule_dict'] = dict  # 规则字典
+
+    @classmethod
+    def get_company_id(cls, user_id: ObjectId) -> (ObjectId, None):
+        """
+        获取一个用户的公司id,
+        :param user_id:
+        :return:
+        """
 
     @classmethod
     def get_rule_cls(cls, ):

@@ -1,7 +1,6 @@
 #  -*- coding: utf-8 -*-
 import os
 import sys
-
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
@@ -14,7 +13,6 @@ from module.spread_module import SpreadChannel
 from mongo_db import get_datetime_from_str
 import datetime
 import time
-import os
 from log_module import get_logger
 from mail_module import send_mail
 import pyquery
@@ -276,133 +274,287 @@ class ShengFX888:
         """
         init_dict = dict()
         tds = tr.find("td")
+        """平台1和平台2区别对待"""
+        if domain == self.domain:
+            """第一个td,取订单号和客户帐号"""
+            first = pyquery.PyQuery(tds[0])
+            texts_1 = first.text().split("\n")
+            ticket = int(re.search(r'\d{4,}', texts_1[0]).group())  # 订单号
+            login = int(re.search(r'\d{6,}', texts_1[-1]).group())  # 客户帐号
+            init_dict['ticket'] = ticket
+            init_dict['login'] = login
+            """第二个td，取英文名和真实姓名"""
+            second = pyquery.PyQuery(tds[1])
+            texts_2 = second.text().split("\n")
+            nick_name = texts_2[0][4:].strip("")
+            real_name = texts_2[-1][5:].strip("")
+            init_dict['nick_name'] = nick_name
+            init_dict['real_name'] = real_name
+            """第三个td，取交易指令和品种"""
+            third = pyquery.PyQuery(tds[2])
+            texts_3 = third.text().split("\n")
+            command = texts_3[0].lower()
+            init_dict['command'] = command
+            sys_val = domain
+            print("domain = {}, command = {}, tds'length = {}".format(sys_val, command, len(tds)))
+            init_dict['system'] = sys_val
+            # print(ticket, command, texts_3)
+            if command == "balance" or command == "credit":
+                """出入金和赠金，少了几个td"""
+                """第四个，交易时间"""
+                eighth = pyquery.PyQuery(tds[4]).text()
+                the_time = get_datetime_from_str(eighth)  # 交易时间
+                init_dict['time'] = the_time
+                # print("出入金时间：{}".format(the_time))
+                """
+                第五个，盈亏
+                """
+                ninth = pyquery.PyQuery(tds[5]).text()
+                profit = re.search(r'[+, -]?\d+.?\d*', ninth)
+                if profit is not None:
+                    profit = float(profit.group())
+                    init_dict['profit'] = profit
+                """第六个，点差"""
+                tenth = pyquery.PyQuery(tds[6]).text()
+                spread_profit = None
+                try:
+                    spread_profit = float(tenth)
+                except ValueError as e:
+                    print(e)
+                finally:
+                    if spread_profit is None:
+                        pass
+                    else:
+                        init_dict['spread_profit'] = spread_profit
+                """第七个，注释"""
+                comment = None
+                try:
+                    eleventh = pyquery.PyQuery(tds[7]).text()
+                    comment = eleventh
 
-        """第一个td,取订单号和客户帐号"""
-        first = pyquery.PyQuery(tds[0])
-        texts_1 = first.text().split("\n")
-        ticket = int(re.search(r'\d{4,}', texts_1[0]).group())  # 订单号
-        login = int(re.search(r'\d{6,}', texts_1[-1]).group())  # 客户帐号
-        init_dict['ticket'] = ticket
-        init_dict['login'] = login
-        """第二个td，取英文名和真实姓名"""
-        second = pyquery.PyQuery(tds[1])
-        texts_2 = second.text().split("\n")
-        nick_name = texts_2[0][4:].strip("")
-        real_name = texts_2[-1][5:].strip("")
-        init_dict['nick_name'] = nick_name
-        init_dict['real_name'] = real_name
-        """第三个td，取交易指令和品种"""
-        third = pyquery.PyQuery(tds[2])
-        texts_3 = third.text().split("\n")
-        command = texts_3[0].lower()
-        init_dict['command'] = command
-        sys_val = domain
-        print("domain = {}, command = {}, tds'length = {}".format(sys_val, command, len(tds)))
-        init_dict['system'] = sys_val
-        # print(ticket, command, texts_3)
-        if command == "balance" or command == "credit":
-            """出入金和赠金，少了几个td"""
-            """第四个，交易时间"""
-            eighth = pyquery.PyQuery(tds[4]).text()
-            the_time = get_datetime_from_str(eighth)  # 交易时间
-            init_dict['time'] = the_time
-            # print("出入金时间：{}".format(the_time))
-            """
-            第五个，盈亏
-            """
-            ninth = pyquery.PyQuery(tds[5]).text()
-            profit = re.search(r'[+, -]?\d+.?\d*', ninth)
-            if profit is not None:
-                profit = float(profit.group())
-                init_dict['profit'] = profit
-            """第六个，点差"""
-            tenth = pyquery.PyQuery(tds[6]).text()
-            spread_profit = float(tenth)
-            init_dict['spread_profit'] = spread_profit
-            """第七个，注释"""
-            eleventh = pyquery.PyQuery(tds[7]).text()
-            comment = eleventh
-            init_dict['comment'] = comment
-            init_dict = {k: v for k, v in init_dict.items() if v is not None}
-        else:
-            """buy和sell的情况"""
-            symbol = ''
-            if len(texts_3) > 1:
-                symbol = texts_3[-1].lower()
-                init_dict['symbol'] = symbol
-            """第四个td，取交易手数"""
-            fourth = pyquery.PyQuery(tds[3])
-            lot_find = re.search(r'\d+.?\d*', fourth.text())
-            lot = lot_find if lot_find is None else float(lot_find.group()) if symbol != "hk50mini" else \
-                float(lot_find.group()) / 10
-            init_dict['lot'] = lot
-            """
-            第五个，取价格，
-            """
-            fifth = pyquery.PyQuery(tds[4])
-            prices = fifth.text().split("\n")
-            enter_price = float(re.search(r'\d+.?\d*', prices[0]).group())  # 开仓
-            exit_price = float(re.search(r'\d+.?\d*', prices[-1]).group())  # 平仓
-            init_dict['enter_price'] = enter_price
-            init_dict['exit_price'] = exit_price
-            """
-            第六个，止盈/止损，
-            """
-            sixth = pyquery.PyQuery(tds[5])
-            stop = sixth.text().split("\n")
-            stop_losses = float(re.search(r'\d+.?\d*', stop[0]).group())  # 止损
-            take_profit = float(re.search(r'\d+.?\d*', stop[-1]).group())  # 止盈
-            init_dict['stop_losses'] = stop_losses
-            init_dict['take_profit'] = take_profit
-            """
-            第七个，利息/佣金，
-            """
-            seventh = pyquery.PyQuery(tds[6])
-            seventh = seventh.text().split("\n")
-            swap = float(re.search(r'[+, -]?\d+.?\d*', seventh[0]).group())  # 利息
-            commission = float(re.search(r'[+, -]?\d+.?\d*', seventh[-1]).group())  # 手续费
-            init_dict['swap'] = swap
-            init_dict['commission'] = commission
-            """第八个，交易时间"""
-            eighth = pyquery.PyQuery(tds[7]).text()
-            eighth = eighth.split("\n")
-            if command not in ["balance", "credit"]:
-                open_time = get_datetime_from_str(eighth[0].split("：")[1])  # 开仓时间
-                init_dict['open_time'] = open_time
-                if eighth[-1].find("持仓中") != -1:
-                    """持仓中"""
-                    pass
-                else:
-                    close_time_list = eighth[-1].split("：")
-                    if len(close_time_list) > 1:
-                        close_time = get_datetime_from_str(close_time_list[1])  # 平仓时间
-                        init_dict['close_time'] = close_time
+                except IndexError as e:
+                    print(e)
+                finally:
+                    if comment is not None:
+                        init_dict['comment'] = comment
                     else:
                         pass
-            else:
-                pass
-            """
-            第九个，盈亏
-            """
-            ninth = pyquery.PyQuery(tds[8]).text()
-            profit = re.search(r'[+, -]?\d+.?\d*', ninth)
-            if profit is not None:
-                profit = float(profit.group())
-                init_dict['profit'] = profit
-            """注意,平台1和平台2的列数不一样,平台1有点差,11列,平台2没有点差,10列"""
-            if len(tds) == 11:
-                """第十个，点差"""
-                tenth = pyquery.PyQuery(tds[-2]).text()
-                spread_profit = float(tenth)
-                init_dict['spread_profit'] = spread_profit
-            else:
-                pass
-            """最后一个，注释"""
-            eleventh = pyquery.PyQuery(tds[-1]).text()
-            comment = eleventh
-            init_dict['comment'] = comment
 
-            init_dict = {k: v for k, v in init_dict.items() if v is not None}
+                init_dict = {k: v for k, v in init_dict.items() if v is not None}
+            else:
+                """buy和sell的情况"""
+                symbol = ''
+                if len(texts_3) > 1:
+                    symbol = texts_3[-1].lower()
+                    init_dict['symbol'] = symbol
+                """第四个td，取交易手数"""
+                fourth = pyquery.PyQuery(tds[3])
+                lot_find = re.search(r'\d+.?\d*', fourth.text())
+                lot = lot_find if lot_find is None else float(lot_find.group()) if symbol != "hk50mini" else \
+                    float(lot_find.group()) / 10
+                init_dict['lot'] = lot
+                """
+                第五个，取价格，
+                """
+                fifth = pyquery.PyQuery(tds[4])
+                prices = fifth.text().split("\n")
+                enter_price = float(re.search(r'\d+.?\d*', prices[0]).group())  # 开仓
+                exit_price = float(re.search(r'\d+.?\d*', prices[-1]).group())  # 平仓
+                init_dict['enter_price'] = enter_price
+                init_dict['exit_price'] = exit_price
+                """
+                第六个，止盈/止损，
+                """
+                sixth = pyquery.PyQuery(tds[5])
+                stop = sixth.text().split("\n")
+                stop_losses = float(re.search(r'\d+.?\d*', stop[0]).group())  # 止损
+                take_profit = float(re.search(r'\d+.?\d*', stop[-1]).group())  # 止盈
+                init_dict['stop_losses'] = stop_losses
+                init_dict['take_profit'] = take_profit
+                """
+                第七个，利息/佣金，
+                """
+                seventh = pyquery.PyQuery(tds[6])
+                seventh = seventh.text().split("\n")
+                swap_match = re.search(r'[+, -]?\d+.?\d*', seventh[0])
+                if swap_match is not None:
+                    swap = float(swap_match.group())  # 利息
+                else:
+                    swap = None
+                commission_match = re.search(r'[+, -]?\d+.?\d*', seventh[-1])
+                if commission_match is not None:
+                    commission = float(commission_match.group())  # 手续费
+                else:
+                    commission = None
+                init_dict['swap'] = swap
+                init_dict['commission'] = commission
+                """第八个，交易时间"""
+                eighth = pyquery.PyQuery(tds[7]).text()
+                eighth = eighth.split("\n")
+                if command not in ["balance", "credit"]:
+                    open_time = get_datetime_from_str(eighth[0].split("：")[1])  # 开仓时间
+                    init_dict['open_time'] = open_time
+                    if eighth[-1].find("持仓中") != -1:
+                        """持仓中"""
+                        pass
+                    else:
+                        close_time_list = eighth[-1].split("：")
+                        if len(close_time_list) > 1:
+                            close_time = get_datetime_from_str(close_time_list[1])  # 平仓时间
+                            init_dict['close_time'] = close_time
+                        else:
+                            pass
+                else:
+                    pass
+                """
+                第九个，盈亏
+                """
+                ninth = pyquery.PyQuery(tds[8]).text()
+                profit = re.search(r'[+, -]?\d+.?\d*', ninth)
+                if profit is not None:
+                    profit = float(profit.group())
+                    init_dict['profit'] = profit
+                """注意,平台1和平台2的列数不一样,平台1有点差,11列,平台2没有点差,10列"""
+                if len(tds) == 11:
+                    """第十个，点差"""
+                    tenth = pyquery.PyQuery(tds[-2]).text()
+                    spread_profit = float(tenth)
+                    init_dict['spread_profit'] = spread_profit
+                else:
+                    pass
+                """最后一个，注释"""
+                eleventh = pyquery.PyQuery(tds[-1]).text()
+                comment = eleventh
+                init_dict['comment'] = comment
+
+        else:
+            """平台2的解析"""
+            """第一个td,取订单号和客户帐号"""
+            first = pyquery.PyQuery(tds[0])
+            texts_1 = first.text().split("\n")
+            ticket = int(re.search(r'\d{4,}', texts_1[0]).group())  # 订单号
+            login = int(re.search(r'\d{6,}', texts_1[-1]).group())  # 客户帐号
+            init_dict['ticket'] = ticket
+            init_dict['login'] = login
+            """第二个td，取英文名和MT名称"""
+            second = pyquery.PyQuery(tds[1])
+            texts_2 = second.text().split("\n")
+            nick_name = texts_2[0][4:].strip("")
+            real_name = texts_2[-1][5:].strip("")
+            init_dict['nick_name'] = nick_name
+            init_dict['real_name'] = real_name
+            """第三个td，取交易指令和品种"""
+            third = pyquery.PyQuery(tds[2])
+            texts_3 = third.text().split("\n")
+            command = texts_3[0].lower()
+            init_dict['command'] = command
+            sys_val = domain
+            print("domain = {}, command = {}, tds'length = {}".format(sys_val, command, len(tds)))
+            init_dict['system'] = sys_val
+            # print(ticket, command, texts_3)
+            if command == "balance" or command == "credit":
+                """出入金和赠金，少了几个td"""
+                """第四个，交易时间"""
+                eighth = pyquery.PyQuery(tds[4]).text()
+                the_time = get_datetime_from_str(eighth)  # 交易时间
+                init_dict['time'] = the_time
+                # print("出入金时间：{}".format(the_time))
+                """
+                第五个，盈亏
+                """
+                ninth = pyquery.PyQuery(tds[5]).text()
+                profit = re.search(r'[+, -]?\d+.?\d*', ninth)
+                if profit is not None:
+                    profit = float(profit.group())
+                    init_dict['profit'] = profit
+                """第六个，注释"""
+                comment = None
+                try:
+                    eleventh = pyquery.PyQuery(tds[-1]).text()
+                    comment = eleventh
+
+                except IndexError as e:
+                    print(e)
+                finally:
+                    if comment is not None:
+                        init_dict['comment'] = comment
+                    else:
+                        pass
+
+                init_dict = {k: v for k, v in init_dict.items() if v is not None}
+            else:
+                """buy和sell的情况"""
+                symbol = ''
+                if len(texts_3) > 1:
+                    symbol = texts_3[-1].lower()
+                    init_dict['symbol'] = symbol
+                """第四个td，取交易手数"""
+                fourth = pyquery.PyQuery(tds[3])
+                lot_find = re.search(r'\d+.?\d*', fourth.text())
+                lot = lot_find if lot_find is None else float(lot_find.group()) if symbol != "hk50mini" else \
+                    float(lot_find.group()) / 10
+                init_dict['lot'] = lot
+                """
+                第五个，取价格，
+                """
+                fifth = pyquery.PyQuery(tds[4])
+                prices = fifth.text().split("\n")
+                enter_price = float(re.search(r'\d+.?\d*', prices[0]).group())  # 开仓
+                exit_price = float(re.search(r'\d+.?\d*', prices[-1]).group())  # 平仓
+                init_dict['enter_price'] = enter_price
+                init_dict['exit_price'] = exit_price
+                """
+                第六个，止盈/止损，
+                """
+                sixth = pyquery.PyQuery(tds[5])
+                stop = sixth.text().split("\n")
+                stop_losses = float(re.search(r'\d+.?\d*', stop[0]).group())  # 止损
+                take_profit = float(re.search(r'\d+.?\d*', stop[-1]).group())  # 止盈
+                init_dict['stop_losses'] = stop_losses
+                init_dict['take_profit'] = take_profit
+                """
+                第七个td是空的
+                """
+                """第八个，交易时间"""
+                eighth = pyquery.PyQuery(tds[7]).text()
+                eighth = eighth.split("\n")
+                if command not in ["balance", "credit"]:
+                    open_time = get_datetime_from_str(eighth[0].split("：")[1])  # 开仓时间
+                    init_dict['open_time'] = open_time
+                    if eighth[-1].find("持仓中") != -1:
+                        """持仓中"""
+                        pass
+                    else:
+                        close_time_list = eighth[-1].split("：")
+                        if len(close_time_list) > 1:
+                            close_time = get_datetime_from_str(close_time_list[1])  # 平仓时间
+                            init_dict['close_time'] = close_time
+                        else:
+                            pass
+                else:
+                    pass
+                """
+                第九个，盈亏
+                """
+                ninth = pyquery.PyQuery(tds[8]).text()
+                profit = re.search(r'[+, -]?\d+.?\d*', ninth)
+                if profit is not None:
+                    profit = float(profit.group())
+                    init_dict['profit'] = profit
+                """注意,平台1和平台2的列数不一样,平台1有点差,11列,平台2没有点差,10列"""
+                if len(tds) == 11:
+                    """第十个，点差"""
+                    tenth = pyquery.PyQuery(tds[-2]).text()
+                    spread_profit = float(tenth)
+                    init_dict['spread_profit'] = spread_profit
+                else:
+                    pass
+                """最后一个，注释"""
+                eleventh = pyquery.PyQuery(tds[-1]).text()
+                comment = eleventh
+                init_dict['comment'] = comment
+        """先整理初始化字典"""
+        init_dict = {k: v for k, v in init_dict.items() if v is not None}  # 去None
         """只记录指定类型的单子"""
         if init_dict['command'] in ['balance', 'credit', 'buy', 'sell']:
             return init_dict
@@ -537,7 +689,8 @@ class ShengFX888:
             else:
                 domain = self.domain2
             title = "{}爬取数据失败".format(domain)
-            content = "{} {}".format(datetime.datetime.now(), title)
+            content = "{} 返回网址: {}  返回页面".format(datetime.datetime.now(), self.browser.current_url,
+                                                 self.browser.page_source)
             send_mail(title=title, content=content)
             logger.exception(msg=title)
             raise ValueError(title)
@@ -1191,7 +1344,7 @@ class ShengFX888:
                 else:
                     pass
         else:
-            """有已上传数据的情况"""
+            """有已上传数据的情况,需要对比数据库"""
             for x in insert_list:
                 ticket = x['ticket']
                 domain = x['system']
@@ -1222,6 +1375,8 @@ class ShengFX888:
                         raise ValueError(ms)
                     else:
                         pass
+        ms = "{} to_cloud success".format(datetime.datetime.now())
+        logger.info(ms)
 
     def db_to_cloud(self):
         """
@@ -1292,8 +1447,8 @@ class ShengFX888:
                 else:
                     ms = "更新出金申请数据库的upload标识失败,实例:{}".format(count, trans)
                     raise ValueError(ms)
-
-
+        ms = "{} to_cloud success".format(datetime.datetime.now())
+        logger.info(ms)
 
 
 if __name__ == "__main__":
@@ -1315,7 +1470,7 @@ if __name__ == "__main__":
     # ShengFX888().login()
     """测试抓取结算站点数据"""
     crawler = ShengFX888()
-    # crawler.parse_and_save()
+    crawler.parse_and_save()
     crawler.db_to_cloud()
     # crawler.parse_and_save(ticket_limit=31017)
     # crawler.upload_all_records()
