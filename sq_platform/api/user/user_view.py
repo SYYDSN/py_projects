@@ -670,6 +670,7 @@ def get_report_detail_func(user_id) -> str:
             }
     """
     message = {"message": "success"}
+    begin = datetime.datetime.now()
     report_id = get_arg(request, "report_id", None)  # 报告id,必须参数.
     if report_id is None:
         pass
@@ -678,12 +679,17 @@ def get_report_detail_func(user_id) -> str:
     url_poly = data['url_poly']
     url_poly = "{}static/image/poly_image/{}".format(url_root, url_poly)
     data['url_poly'] = url_poly
-    ms = "get_report_detail func is running args: user_id={}, report_id={}".format(user_id, report_id)
-    logger.info(ms)
     poly = Track.get_tracks_list(user_id=user_id, for_app=True)
     data['poly'] = poly['track_list']
     message['data'] = data
-    return json.dumps(message)
+    end = datetime.datetime.now()
+    seconds = (end - begin).microseconds
+    resp = json.dumps(message)
+    ms = "get_report_detail func is running args: user_id={}, report_id={}, begin={}, end={}, seconds={}".\
+        format(user_id, report_id, begin, end, seconds)
+    print(ms)
+    logger.info(ms)
+    return resp
 
 
 @api_user_blueprint.route("/get_safety_report_history", methods=['post', 'get'])

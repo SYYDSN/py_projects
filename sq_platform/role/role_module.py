@@ -83,7 +83,9 @@ class Scope:
                         logger.exception(ms)
                         raise ValueError(ms)
         elif scope == 3 or scope == "dept":
-            """部门级权限,此时user_id不能是admin_id"""
+            """
+            部门级权限,此时user_id不能是admin_id,需要判断1.此员工是不是有部门(是不是员工)?如果不是,放弃,是,返回部门权限的筛选条件字典
+            """
             employee = company_module.Employee.find_by_id(user_id)
             if isinstance(employee, company_module.Employee):
                 user_dept_relation =
