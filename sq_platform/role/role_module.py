@@ -174,9 +174,16 @@ class Role(mongo_db.BaseDoc):
     _table_name = "role_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId  # id 唯一
-    type_dict['company_id'] = DBRef  # 公司id,确认权限属于哪个公司?
-    type_dict['role_name'] = str  # 角色名称,公司内部不重复
+    type_dict['company_id'] = DBRef  # 公司id,确认权限属于哪个公司?在创建公司的时候,会创建一个默认角色
+    type_dict['description'] = str  # 对此角色的说明.非必须
     type_dict['rule_dict'] = dict  # 规则字典
+
+    @classmethod
+    def default_role(cls, company_id: (ObjectId, DBRef)) -> object:
+        """
+        创建并返回一个公司的默认角色
+        :return: Role对象实例.注意这个实例并未被保存到数据库.
+        """
 
     @classmethod
     def get_company_id(cls, user_id: ObjectId) -> (ObjectId, None):
@@ -189,3 +196,9 @@ class Role(mongo_db.BaseDoc):
     @classmethod
     def get_rule_cls(cls, ):
         pass
+
+
+if __name__ == "__main__":
+    init_dict = {
+
+    }

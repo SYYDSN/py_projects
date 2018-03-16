@@ -26,7 +26,7 @@ def get_func(func_name: str):
     """
     func_map = {
         "create_dept": create_dept,
-        "all_dept": all_dept
+        "view_all_dept": view_all_dept
     }
     return func_map.get(func_name, None)
 
@@ -97,7 +97,7 @@ def create_dept(user_id: ObjectId, company_id: ObjectId, dept_name: str, descrip
     return message
 
 
-def all_dept(user_id: ObjectId = None, can_json: bool = True) -> dict:
+def view_all_dept(user_id: ObjectId = None, can_json: bool = True) -> dict:
     """
     以列表形式返回指定公司的全部部门信息.
     权限:

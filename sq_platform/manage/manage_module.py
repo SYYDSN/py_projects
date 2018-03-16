@@ -1290,3 +1290,12 @@ def process_accident_func(prefix):
                                    head_img_url=head_img_url, real_name=current_real_name)
     else:
         return abort(404, "页面不存在")
+
+
+@manage_blueprint.route("/<prefix>_structure", methods=["get", "post"])
+@check_platform_session
+def process__structure_func(prefix):
+    """组织架构管理页面"""
+    current_user_id = get_platform_session_arg("user_id")
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
+    current_real_name = get_platform_session_arg("real_name")
