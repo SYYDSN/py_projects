@@ -21,6 +21,7 @@ from werkzeug.contrib.cache import RedisCache
 from log_module import get_logger
 from pymongo import ReturnDocument
 from pymongo.errors import *
+import warnings
 from pymongo.errors import DuplicateKeyError
 
 
@@ -216,28 +217,45 @@ def get_conn(table_name):
 
 
 def other_can_json(obj):
-    """把其他对象转换成可json,是to_flat_dict的内部函数"""
+    """
+    把其他对象转换成可json,是to_flat_dict的内部函数
+    v = v.strftime("%F %H:%M:%S.%f")是v = v.strftime("%Y-%m-%d %H:%M:%S")的
+    简化写法，其中%f是指毫秒， %F等价于%Y-%m-%d.
+    注意，这个%F只可以用在strftime方法中，而不能用在strptime方法中
+    """
     if isinstance(obj, ObjectId):
         return str(obj)
     elif isinstance(obj, (DBRef, MyDBRef)):
         return str(obj.id)
     elif isinstance(obj, datetime.datetime):
         return obj.strftime("%Y-%m-%d %H:%M:%S")
+    elif isinstance(obj, datetime.date):
+        return obj.strftime("%F")
     elif isinstance(obj, list):
         return [other_can_json(x) for x in obj]
     elif isinstance(obj, dict):
-        return {k: other_can_json(v) for k, v in obj.items()}
+        keys = list(obj.keys())
+        if len(keys) == 2 and "coordinates" in keys and "type" in keys:
+            """这是一个GeoJSON对象"""
+            return obj['coordinates']  # 前经度后纬度
+        else:
+            return {k: other_can_json(v) for k, v in obj.items()}
     else:
         return obj
 
 
-def to_flat_dict(a_dict) -> dict:
+def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     """
     转换成可以json的字典,这是一个独立的方法
-    :param a_dict:
+    to_flat_dict 实例方法.
+    to_flat_dict 独立方法
+    doc_to_dict  独立方法
+    三个方法将在最后的评估后进行统一 2018-3-16
+    :param a_dict: 待处理的doc.
+    :param ignore_columns: 不需要返回的列
     :return:
     """
-    return {other_can_json(k): other_can_json(v) for k, v in a_dict.items()}
+    return {other_can_json(k): other_can_json(v) for k, v in a_dict.items() if k not in ignore_columns}
 
 
 def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
@@ -484,12 +502,21 @@ def get_datetime_from_timestamp(timestamp_str: str)->datetime.datetime:
 
 def doc_to_dict(doc_obj: dict, ignore_columns: list = list())->dict:
     """
+    此方法和to_flat_dict独立方法的不同是本方法不能处理嵌套的对象,
+    所以推荐to_flat_dict独立方法.此函数保留只是为了兼容性.
+    调用时会警告
     把一个mongodb的doc对象转换为纯的，可以被json转换的dict对象,
     注意，这个方法不能转换嵌套对象，嵌套对象请自行处理。
+    to_flat_dict 实例方法.
+    to_flat_dict 独立方法
+    doc_to_dict  独立方法
+    三个方法将在最后的评估后进行统一 2018-3-16
     :param doc_obj: mongodb的doc对象
     :param ignore_columns: 不需要返回的列
     :return: 可以被json转换的dict对象
     """
+    ms = "已不推荐使用此方法,请用独立的to_flat_dict函数替代, 2018-3-16"
+    warnings.warn(message=ms)
     res = dict()
     for k, v in doc_obj.items():
         if k in ignore_columns:
@@ -972,7 +999,12 @@ class BaseDoc:
         self.__dict__[attr_name] = old_dbref_list
 
     def to_flat_dict(self, obj=None):
-        """转换成可以json的字典"""
+        """转换成可以json的字典,此方法和同名的独立方法仍在评估中
+            to_flat_dict 实例方法.
+            to_flat_dict 独立方法
+            doc_to_dict  独立方法
+            三个方法将在最后的评估后进行统一 2018-3-16
+        """
         obj = self if obj is None else obj
         raw_type = obj.type_dict
         data_dict = {k: v for k, v in obj.__dict__.items() if v is not None}

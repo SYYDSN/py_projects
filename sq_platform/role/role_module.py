@@ -8,28 +8,35 @@ import mongo_db
 from manage import company_module
 from log_module import get_logger
 from api.data import item_module
+from role import method_map
 
 
 """
 权限控制模块
 目前暂时以用户组来确定权限.
-用户执行某一操作的权限描述如下:
-某人 使用 某方法 操作 某对象
-操作权限 = 对象范围 + 方法
-对象范围包括6类:
-1. (s)elf 自己 
-2. (g)roup 本组 
-3. (d)ept 本部门
-4. (c)ompay 本公司 
-方法分三类: 1. (R)ead 读 2.(W)rite 写 (包含修改) 3.(D)elete 删除
-
-
 """
 
 
 logger = get_logger()
 ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
+
+
+class Func:
+    """函数映射类,主要用来根据名字获取函数,这不是一个持久化类"""
+    def __init__(self):
+            the_map = method_map.FUNC_MAP.copy()
+            obj = object()
+            for k, v in the_map.items():
+                self.__dict__[k] = v
+
+    def get(self, name: str):
+        """
+        获取函数
+        :param name:
+        :return:
+        """
+        return self.__dict__.get(name)
 
 
 class Scope:
@@ -160,7 +167,10 @@ class Scope:
 
 
 class Rule(mongo_db.BaseDoc):
-    """权限规则,一个角色有多个权限规则"""
+    """
+    权限规则,一个角色有多个权限规则,
+    此类存在的意义目前尚不明朗,可能会被删除, 2018-3-16
+    """
     _table_name = "rule_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId  # id 唯一
@@ -174,16 +184,45 @@ class Role(mongo_db.BaseDoc):
     _table_name = "role_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId  # id 唯一
-    type_dict['company_id'] = DBRef  # 公司id,确认权限属于哪个公司?在创建公司的时候,会创建一个默认角色
+    type_dict['company_id'] = DBRef  # 公司id,确认权限属于哪个公司?逻辑上讲,在创建公司的时候,会创建一个默认角色
+    type_dict['role_name'] = str  # 角色名,同一公司下唯一
     type_dict['description'] = str  # 对此角色的说明.非必须
     type_dict['rule_dict'] = dict  # 规则字典
 
     @classmethod
-    def default_role(cls, company_id: (ObjectId, DBRef)) -> object:
+    def default_role(cls, company_id: (ObjectId, DBRef) = None) -> object:
         """
         创建并返回一个公司的默认角色
+        : param company_id: 公司id,None表示任何公司都可以使用的角色,常用来提供一些基础操作的权限
         :return: Role对象实例.注意这个实例并未被保存到数据库.
         """
+        func_names = method_map.func_names()
+        res = dict()
+        for name in func_names:
+            """
+            0. refuse    没有权限.
+            1. system    系统级权限,操作全系统的数据,一般颁发给超级管理员,只用做调试或特殊情况,不会颁发给用户.
+            2. company   公司级权限,操作本公司数据,一般颁发给公司管理员
+            3. dept      部门级权限,操作本部门数据,一般颁发给部门领导,
+            4. self      个人级权限,操作自己的数据,一般是普通用户的默认权限.
+            5. custom    定制的权限, 比如以列表形式直接列出权限范围.具体方法暂时不明
+            """
+            if name == "web_login":
+                """网页端登录,验证用户名和密码的范围是全公司"""
+                res[name] = 2
+            elif name == "get_company_by_domain":
+                """根据公司域名查找公司信息,全系统范围"""
+                res[name] = 1
+            else:
+                res[name] = 4  # 默认权限
+        init = {
+            "company_id": company_id,
+            "role_name": "default_role",
+            "description": "公司的默认角色,拥有最低的权限",
+            "rule_dict": res
+        }
+        init_dict = {k: v for k, v in init.items() if v is not None}
+        return init_dict
 
     @classmethod
     def get_company_id(cls, user_id: ObjectId) -> (ObjectId, None):
@@ -199,6 +238,6 @@ class Role(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    init_dict = {
-
-    }
+    func = Func()
+    print(func)
+    pass

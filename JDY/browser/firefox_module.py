@@ -21,7 +21,6 @@ from module.transaction_module import Transaction
 from module.transaction_module import Withdraw
 
 
-
 """简道云对接模块,火狐版，没有问题"""
 
 
@@ -40,6 +39,8 @@ def to_jiandao_cloud(**kwargs) -> bool:
     :param kwargs:
     :return:
     """
+    ms = "开始向简道云推广资源表单写数据,参数: {}".format(kwargs)
+    logger.info(ms)
     display = Display(visible=0, size=(800, 600))
     display.start()  # 开启虚拟显示器
 
@@ -78,13 +79,13 @@ def to_jiandao_cloud(**kwargs) -> bool:
     click_today.click()  # 选今天
 
     user_name = kwargs.get('user_name')
-    js_name = """let d = $(".widget-wrapper>ul>li:eq(1) input"); d.val("{}");""".format(kwargs['user_name'])
+    js_name = """let d = $(".widget-wrapper>ul>li:eq(1) input"); d.val("{}");""".format(kwargs.get('user_name'))
     browser.execute_script(js_name)  # 输入姓名
 
-    js_phone = """let d = $(".widget-wrapper>ul>li:eq(2) input"); d.val("{}");""".format(kwargs['phone'])
+    js_phone = """let d = $(".widget-wrapper>ul>li:eq(2) input"); d.val("{}");""".format(kwargs.get('phone'))
     browser.execute_script(js_phone)  # 输入电话
 
-    spread_keywords = SpreadChannel.analysis_url(kwargs['page_url'])
+    spread_keywords = SpreadChannel.analysis_url(kwargs.get('page_url'))
     desc1 = ''
     try:
         desc1 = spread_keywords[0]
@@ -101,10 +102,9 @@ def to_jiandao_cloud(**kwargs) -> bool:
     try:
         desc2 = spread_keywords[1]
     except IndexError as e:
-        logger.exception("to_jiandao_cloud error!")
+        logger.exception(e)
     except Exception as e:
-        logger.exception("to_jiandao_cloud error!")
-        raise e
+        logger.exception(e)
     finally:
         js_desc_2 = """let d = $(".widget-wrapper>ul>li:eq(4) input"); d.val("{}");""".format(desc2)
         browser.execute_script(js_desc_2)  # 备注2
@@ -113,23 +113,25 @@ def to_jiandao_cloud(**kwargs) -> bool:
     try:
         desc3 = spread_keywords[2]
     except IndexError as e:
-        logger.exception("to_jiandao_cloud error!")
+        logger.exception(e)
     except Exception as e:
-        logger.exception("to_jiandao_cloud error!")
-        raise e
+        logger.exception(e)
     finally:
         js_desc_3 = """let d = $(".widget-wrapper>ul>li:eq(5) input"); d.val("{}");""".format(desc3)
         browser.execute_script(js_desc_3)  # 备注3
 
-    desc6 = kwargs['page_url']
+    desc6 = kwargs.get('page_url')
+    desc6 = '' if desc6 is None else desc6
     js_desc_6 = """let d = $(".widget-wrapper>ul>li:eq(6) input"); d.val("{}");""".format(desc6)
     browser.execute_script(js_desc_6)  # 页面链接
 
-    desc7 = kwargs['description']
+    desc7 = kwargs.get('description')
+    desc7 = '' if desc7 is None else desc7
     js_desc_7 = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(desc7)
     browser.execute_script(js_desc_7)  # 页面内容
 
-    desc8 = kwargs['search_keyword']
+    desc8 = kwargs.get('search_keyword')
+    desc8 = '' if desc8 is None else desc8
     js_desc_8 = """let d = $(".widget-wrapper>ul>li:eq(9) input"); d.val("{}");""".format(desc8)
     browser.execute_script(js_desc_8)  # 搜索关键字
 
@@ -150,6 +152,8 @@ def to_jiandao_cloud(**kwargs) -> bool:
     time.sleep(10)
     browser.quit()
     display.stop()  # 关闭虚拟显示器
+    ms = "向简道云推广资源表单写数据成功,参数: {}".format(kwargs)
+    logger.info(ms)
     return True
 
 
@@ -1453,25 +1457,25 @@ class ShengFX888:
 
 if __name__ == "__main__":
     """测试往简道云写数据"""
-    # args = {
-    #     "description": "搜索内容: 长江是有交易所↵预算: 0↵营销: 营销3↵水果: 梨子李子↵项目描述: 测试项目",
-    #     "page_url": "http://localhost:63342/projects/index.html?_ijt=22a6gi3e6no6e4dkrnrqsp6q8o",
-    #     "referrer": "",
-    #     "search_keyword": "长江是有交易所",
-    #     "sms_code": "6659",
-    #     "user_name": "测试人员",
-    #     "phone": "15618317376"
-    # }
-    # to_jiandao_cloud(**args)
+    args = {
+        "description": "搜索内容: 长江是有交易所↵预算: 0↵营销: 营销3↵水果: 梨子李子↵项目描述: 测试项目",
+        "page_url": "http://localhost:63342/projects/index.html?_ijt=22a6gi3e6no6e4dkrnrqsp6q8o",
+        "referrer": "",
+        "search_keyword": "长江是有交易所",
+        "sms_code": "6659",
+        "user_name": "测试人员",
+        "phone": "15618317376"
+    }
+    to_jiandao_cloud(**args)
     #
     # time.sleep(1)
     """测试爬取实盘用户信息"""
     # listen_shengfx888()
     # ShengFX888().login()
     """测试抓取结算站点数据"""
-    crawler = ShengFX888()
-    crawler.parse_and_save()
-    crawler.db_to_cloud()
+    # crawler = ShengFX888()
+    # crawler.parse_and_save()
+    # crawler.db_to_cloud()
     # crawler.parse_and_save(ticket_limit=31017)
     # crawler.upload_all_records()
     a = {'spread_profit': 0.0, 'real_name': '费绍武', 'profit': -962.0, 'ticket': 9999, 'command': 'balance',

@@ -174,7 +174,9 @@ query_track_info = function () {
                     let track_dict = item['track_dict'];
                     let tracks = track_dict['track_list'];   // 轨迹点数组
                     let events = track_dict['event_list'];   // 行车事件数组
-                    batch_add_custom_marker(events, map);    // 填充行车事件的标记点
+                    if(typeof(events) !== "undefined"){
+                        batch_add_custom_marker(events, map);    // 填充行车事件的标记点
+                    }else{}
                     let total_mileage = track_dict['total_mileage'];  // 轨迹总里程.单位km
                     let total_time = track_dict['total_time'];  // 轨迹总耗时 单位秒
                     console.log(user_id, total_mileage, total_time, tracks.length);

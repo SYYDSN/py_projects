@@ -10,6 +10,7 @@ from manage import company_module
 from mongo_db import ObjectId, DBRef
 from log_module import get_logger
 import mongo_db
+from error_module import pack_message
 
 
 logger = get_logger()
@@ -24,15 +25,87 @@ def get_func(func_name: str):
     :param func_name:
     :return:
     """
-    func_map = {
-        "create_dept": create_dept,
-        "view_all_dept": view_all_dept
-    }
+    global FUNC_MAP
+    func_map = FUNC_MAP.copy()
     return func_map.get(func_name, None)
 
 
+def func_names() -> list:
+    """
+    获取所有定义过的函数名
+    :return:
+    """
+    global FUNC_MAP
+    names = list(FUNC_MAP.keys())
+    return names
+
+
+def get_company_by_domain(domain: str) -> (dict, None):
+    """
+    根据访问的域名判断这是对哪个公司进行访问?
+    如果在本机调试状态,建议在域名后面追加domain的参数用于进行修正.
+    权限:
+    1.不限
+    :param domain: 请求的域名
+    :return:
+    """
+    filter_dict = {"domain": domain}
+    r = company_module.Company.find_one_plus(filter_dict=filter_dict, instance=False)
+    return r
+
+
+def web_login(user_name: str, user_password: str, company_id: ObjectId, rule: int = 2) -> dict:
+    """
+    在网页端进行登录操作,
+    权限:
+    1.不限
+    函数会依次进行一下的检查:
+    1. 是管理员?
+    2. 员工? 还是普通用户?
+
+    :param user_name: 用户名
+    :param user_password: 密码
+    :param company_id: 公司id
+    :param rule: 权限,默认公司级别
+    :return: 消息字典
+    """
+    m = {"message": "success"}
+    if rule == 0:
+        m['message'] = "没有权限"
+    else:
+        filter_dict = {
+            "user_name": user_name,
+            "user_password": user_password,
+            "company_id": DBRef(database="platform_db", collection=company_module.Company.get_table_name(),
+                                id=company_id)
+        }
+        r = company_module.CompanyAdmin.find_one_plus(filter_dict=filter_dict, instance=False)
+        if r:
+            """是管理员"""
+            r['class'] = "admin"
+            m['data'] = r
+        else:
+            """不是管理员,查user_info表.这个方法是测试用的,实际上要查用户和公司的关系,而且用户不一定是企业"""
+            filter_dict = {
+                "user_name": user_name,
+                "user_password": user_password
+            }
+            r = company_module.Employee.find_one_plus(filter_dict=filter_dict, instance=False)
+            if r is None:
+                """既不是管理员也不是一般用户"""
+                m['message'] = "用户名或密码错误"
+            else:
+                if hasattr(r, "company_relation_id"):
+                    """是员工"""
+                    r['class'] = 'employee'
+                else:
+                    r['class'] = 'user'
+                m['data'] = r
+    return m
+
+
 def create_dept(user_id: ObjectId, company_id: ObjectId, dept_name: str, description: str = '',
-                higher_dept_id: (str, ObjectId, DBRef) = None) -> dict:
+                higher_dept_id: (str, ObjectId, DBRef) = None, scope: int = 0) -> dict:
     """
     创建部门
     权限:
@@ -43,6 +116,7 @@ def create_dept(user_id: ObjectId, company_id: ObjectId, dept_name: str, descrip
     :param dept_name: 部门名称
     :param description: 部门说明
     :param higher_dept_id: 上级部门id
+    :param scope: 权限范围
     :return:
     """
     message = {"message": "success"}
@@ -109,7 +183,7 @@ def view_all_dept(user_id: ObjectId = None, can_json: bool = True) -> dict:
     """
     message = {"message": "success"}
     admin_id = mongo_db.get_obj_id(user_id) if isinstance(user_id, str) else user_id
-    employee_id = mongo_db.get_obj_id(employee_id) if isinstance(employee_id, str) else employee_id
+    employee_id = mongo_db.get_obj_id(user_id) if isinstance(user_id, str) else user_id
     if isinstance(admin_id, ObjectId):
         admin_dbref = DBRef(collection=company_module.CompanyAdmin.get_table_name(), database="platform_db",
                             id=admin_id) if isinstance(admin_id, ObjectId) else admin_id
@@ -203,6 +277,14 @@ def edit_dept(**kwargs) -> dict:
     return message
 
 
+FUNC_MAP = {
+        "get_company_by_domain": get_company_by_domain,
+        "web_login": web_login,
+        "create_dept": create_dept,
+        "view_all_dept": view_all_dept
+    }
+
+
 if __name__ == "__main__":
-    edit_dept([12,12])
+    edit_dept([12, 12])
     pass

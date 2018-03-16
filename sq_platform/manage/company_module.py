@@ -8,6 +8,7 @@ if project_dir not in sys.path:
     sys.path.append(project_dir)
 import mongo_db
 from api.data.item_module import User, Track
+import hashlib
 import datetime
 from log_module import get_logger
 import warnings
@@ -26,11 +27,11 @@ class Company(mongo_db.BaseDoc):
     _table_name = "company_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
-    type_dict['full_name'] = str  # 公司全称
-    type_dict['prefix'] = str  # 公司查询前缀,url路径在用做公司标识,唯一.
+    type_dict['full_name'] = str  # 公司全称,中国的公司法允许公司名称重复,但不允许商标重复
+    type_dict['domain'] = str  # 域名,唯一,在用户访问系统时,标识公司的唯一性
+    type_dict['prefix'] = str  # 公司查询前缀,唯一.用于向安全模块查询接口.在此查询中向安全模块标识身份的唯一性
     type_dict['short_name'] = str  # 简称
     type_dict['description'] = str  # 公司简介
-    type_dict['admin'] = DBRef  # 公司管理员 指向company_admin_info
 
     def __init__(self, **kwargs):
         if 'prefix' not in kwargs:
@@ -185,6 +186,23 @@ class CompanyAdmin(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
     type_dict['user_name'] = str  # 用户名，唯一
     type_dict['user_password'] = str  # 用户密码
+    type_dict['company_id'] = DBRef  # 指向company_id 是哪个公司的管理员?
+    type_dict['description'] = str  # 说明
+
+    def __init__(self, **kwargs):
+        """
+        :param kwargs:
+        arg md5: 布尔值,是否对user_password进行md5加密?当参数user_password未加密的时候,启用此项
+        """
+        md5_flag = kwargs.pop("md5", False)
+        if md5_flag:
+            user_password = kwargs['user_password']
+            if isinstance(user_password, str):
+                user_password = hashlib.md5(user_password.encode(encoding='utf-8')).hexdigest()
+                kwargs['user_password'] = user_password
+            else:
+                pass
+        super(CompanyAdmin, self).__init__(**kwargs)
 
 
 class Post(mongo_db.BaseDoc):
@@ -388,6 +406,17 @@ class Dept(mongo_db.BaseDoc):
             return obj.dept_path()
 
 
+class EmployeeCompanyRelation(mongo_db.BaseDoc):
+    """关系表,记录员工和公司的对应关系"""
+    _table_name = "employee_dept_relation"
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['user_id'] = DBRef  # 员工id,指向user_info表
+    type_dict['company_id'] = DBRef   # 部门id,指向cpmpany_info表
+    type_dict['create_date'] = datetime.datetime  # 关系的建立时间
+    type_dict['end_date'] = datetime.datetime  # 关系的终结时间
+
+
 class EmployeeDeptRelation(mongo_db.BaseDoc):
     """关系表,记录员工和部门的对应关系"""
     _table_name = "employee_dept_relation"
@@ -414,19 +443,17 @@ class Scheduling(mongo_db.BaseDoc):
 
 class Employee(User):
     """公司员工类,注意，此类的表名也是user_info
-    dept_path 是此员工所属部门的路径的list，代表了从顶层到此员工位置的部门/团队的路径。
-    比如[总公司_DBRef,上海分公司_DBRef,嘉定分部_DBRef,安亭车队_DBRef,A队_DBRef]，
-    可根据每一个DBRef对象获知此部门的领导。
     测试团队A组组长: 17321067312
     """
 
     def __init__(self, **kwargs):
-        self.type_dict['company_id'] = DBRef  # 所属公司id  Company
+        self.type_dict['company_id'] = DBRef   # 公司id,指向company_info 即将废止,以company_relation_id替代
+        self.type_dict['company_relation_id'] = DBRef  # 和公司的关系id,指向EmployeeCompanyRelation
         self.type_dict['post_id'] = DBRef  # 岗位信息 Post 即将废止,以post_relation_id替代
         self.type_dict['post_relation_id'] = DBRef  # 岗位关系id,指向employee_post_relation表
         self.type_dict['employee_number'] = int  # 工号
         self.type_dict['dept_path'] = list  # 所属团队DBRef组成的list，Dept 即将废止,以dept_relation_id替代
-        self.type_dict['dept_relation_id'] = DBRef  # 部门关系id,指向employee_dept_relation表
+        self.type_dict['post_relation_id'] = DBRef  # 部门关系id,指向employee_dept_relation表
         self.type_dict['block_list'] = list  # 不想显示的用户的DBRef组成的list，Employee
         self.type_dict['scheduling'] = list   # 排班的DBRef的list,对应于员工的排班,默认早9点到晚17点.（考虑加班和替班的情况）
         super(Employee, self).__init__(**kwargs)
@@ -812,7 +839,4 @@ def rebuild_test_team() -> None:
 
 
 if __name__ == "__main__":
-    employee_id = ObjectId("59cb4c03ad01be0912b34e5a")
-    # employee_id = ObjectId("59fa8ee8e39a7b515f288406")
-    Employee.subordinates_id(employee_id)
     pass

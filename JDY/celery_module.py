@@ -32,8 +32,8 @@ CELERY_ROUTES = {
     "celery_module.test": "test"
 }
 
-broker_url = "redis://127.0.0.1:6379/15"
-backend_url = "redis://127.0.0.1:6379/14"
+broker_url = "redis://127.0.0.1:6379/12"
+backend_url = "redis://127.0.0.1:6379/13"
 
 
 CELERY_TIMEZONE = 'Asia/Shanghai'

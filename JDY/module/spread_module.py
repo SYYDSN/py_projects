@@ -41,25 +41,28 @@ class SpreadChannel(mongo_db.BaseDoc):
         :param the_str: url
         :return: list/dict
         """
-        key_str = r'channel=\S+\b'
-        pattern = re.compile(key_str)
-        mat = pattern.search(the_str)
         words = list()
-        if mat is None:
+        if the_str is None:
             pass
         else:
-            group = mat.group()
-            if "&" in group:
-                """说明后面还有其他参数"""
-                group = group.split("=")[0]
-            else:
+            key_str = r'channel=\S+\b'
+            pattern = re.compile(key_str)
+            mat = pattern.search(the_str)
+            if mat is None:
                 pass
-            group = group.split("=")[1].strip()
-            keys = group.split("-")
-            for key in keys:
-                res = SpreadKeyword.get_word(key)
-                res = '' if res is None else res['chinese']
-                words.append(res)
+            else:
+                group = mat.group()
+                if "&" in group:
+                    """说明后面还有其他参数"""
+                    group = group.split("=")[0]
+                else:
+                    pass
+                group = group.split("=")[1].strip()
+                keys = group.split("-")
+                for key in keys:
+                    res = SpreadKeyword.get_word(key)
+                    res = '' if res is None else res['chinese']
+                    words.append(res)
         return words
 
 

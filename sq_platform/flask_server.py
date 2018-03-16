@@ -93,8 +93,7 @@ def allow_cross_domain(response):
 if __name__ == '__main__':
     # print(app.url_map)  # 打印视图路由
     cache.set("flask_server_port", port)
-    app.debug = True  # 这一行必须在toolbar = DebugToolbarExtension(app)前面,否则不生效
+    # app.debug = True  # 这一行必须在toolbar = DebugToolbarExtension(app)前面,否则不生效
     toolbar = DebugToolbarExtension(app)  # 开启html调试toolbar
-    app.run(host="0.0.0.0", port=port, threaded=True)
-    # app.run(host="0.0.0.0", port=port, threaded=True)
-    # app.run(host="0.0.0.0", port=port, debug=True, threaded=True, ssl_context="adhoc")
+    # app.run(host="0.0.0.0", port=port, threaded=True)  # 开启DebugToolbar的调试模式. 对应app.debug = True
+    app.run(host="0.0.0.0", port=port, debug=True, threaded=True)  # 一般调试模式

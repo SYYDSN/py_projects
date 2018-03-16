@@ -15,6 +15,8 @@ from api.user import security_module
 from werkzeug.contrib.cache import RedisCache
 from mongo_db import get_datetime_from_str
 from api.user.violation_module import ViolationRecode
+from role.role_module import Role
+from role.role_module import Func
 
 
 """管理页面模块/后台管理/登录"""
@@ -154,7 +156,7 @@ def process_error_code(key):
 @manage_blueprint.route("/login", methods=['post', 'get'])
 def login_func():
     """
-    登录页
+    登录页,有关访问地址的逻辑有问题,毕竟不是所有的用户都有公司归属的
     """
     if request.method.lower() == "get":
         login_title = '登录'
@@ -162,53 +164,68 @@ def login_func():
     elif request.method.lower() == "post":
         """验证用户身份"""
         message = {"message": "success"}
-        user_name = get_arg(request, "user_name")
-        user_password = get_arg(request, "user_password")
-        cors = get_arg(request, "cors", None)
-        args = {"user_name": user_name, "user_password": user_password}
-        result = User.find_one(**args)
-        if result is None:
-            message['message'] = "用户名或密码错误"
-        else:
-            """登录成功,写入会话"""
-            args['user_id'] = str(result.get_id())  # 写入用户id的str格式.
-            real_name = result.get_attr("real_name")
-            real_name = result.get_attr("user_name") if real_name is None or real_name == "" else real_name
-            args['real_name'] = real_name
-            head_img_url = result.get_attr("head_img_url", default="/static/image/head_img/default_01.png")
-            args['head_img_url'] = head_img_url
-            employee_number = result.get_attr("employee_number", "")  # 工号
-            args['employee_number'] = employee_number
-            """写入用户所在公司的查询前缀"""
-            company_obj = result.get_attr("company_id")
-            if company_obj is None:
-                pass
+        """先获取域名,用于判断是哪个公司的管理员/用户登录"""
+        domain = request.host.split(":")[0]
+        domain_arg = get_arg(request, "domain", None)
+        domain = domain if domain_arg is None else domain_arg
+        rule_dict = Role.default_role()['rule_dict']
+        func_dict = Func()
+        key = 'domain_company'
+        company = cache.get(key)
+        if not company:
+            company = func_dict.get('get_company_by_domain')(domain)
+            if company is None:
+                message['massage'] = '访问地址错误'
             else:
-                company_id = company_obj.id
-                prefix = Company.find_by_id(company_id).get_attr("prefix")
-                if prefix is None:
-                    pass
+                web_login = func_dict.get('web_login')
+                user_name = get_arg(request, "user_name")
+                user_password = get_arg(request, "user_password")
+                cors = get_arg(request, "cors", None)
+                company_id = company['_id']
+                args = {"user_name": user_name, "user_password": user_password, "company_id": company_id}
+                result = web_login(**args)
+                if result is None:
+                    message['message'] = "用户名或密码错误"
                 else:
-                    args['prefix'] = prefix
-            if cors == "cors":
-                """如果是跨域用户"""
-                save_res = save_platform_cors_session(**args)
-            else:
-
-                save_res = save_platform_session(**args)
-            if not save_res:
-                """写入会话失败"""
-                try:
-                    raise ValueError("会话保存失败，args={}".format(str(args)))
-                except ValueError as e:
-                    print(e)
-                    message['message'] = "会话保存失败"
-                    logger.exception("error:")
-            elif isinstance(save_res, str):
-                """这是跨域用户返回的会话id"""
-                message['sid'] = save_res
-            else:
-                pass
+                    """登录成功,写入会话"""
+                    result = result['data']
+                    args['user_id'] = str(result['_id'])  # 写入用户id的str格式.
+                    real_name = result.get("real_name")
+                    real_name = result.get("user_name") if real_name is None or real_name == "" else real_name
+                    args['real_name'] = real_name
+                    head_img_url = result.get("head_img_url", "/static/image/head_img/default_01.png")
+                    args['head_img_url'] = head_img_url
+                    employee_number = result.get("employee_number", "")  # 工号
+                    args['employee_number'] = employee_number
+                    """写入用户所在公司的查询前缀"""
+                    company_obj = result.get("company_id")
+                    if company_obj is None:
+                        pass
+                    else:
+                        company_id = company_obj.id
+                        prefix = Company.find_by_id(company_id).get("prefix")
+                        if prefix is None:
+                            pass
+                        else:
+                            args['prefix'] = prefix
+                    if cors == "cors":
+                        """如果是跨域用户"""
+                        save_res = save_platform_cors_session(**args)
+                    else:
+                        save_res = save_platform_session(**args)
+                    if not save_res:
+                        """写入会话失败"""
+                        try:
+                            raise ValueError("会话保存失败，args={}".format(str(args)))
+                        except ValueError as e:
+                            print(e)
+                            message['message'] = "会话保存失败"
+                            logger.exception("error:")
+                    elif isinstance(save_res, str):
+                        """这是跨域用户返回的会话id"""
+                        message['sid'] = save_res
+                    else:
+                        pass
         return json.dumps(message)
     else:
         return abort(400, "unknown request")
