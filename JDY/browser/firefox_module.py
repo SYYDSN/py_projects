@@ -13,7 +13,6 @@ from module.spread_module import SpreadChannel
 from mongo_db import get_datetime_from_str
 import datetime
 import time
-import os
 from log_module import get_logger
 from mail_module import send_mail
 import pyquery
@@ -1376,6 +1375,8 @@ class ShengFX888:
                         raise ValueError(ms)
                     else:
                         pass
+        ms = "{} to_cloud success".format(datetime.datetime.now())
+        logger.info(ms)
 
     def db_to_cloud(self):
         """
@@ -1446,8 +1447,8 @@ class ShengFX888:
                 else:
                     ms = "更新出金申请数据库的upload标识失败,实例:{}".format(count, trans)
                     raise ValueError(ms)
-
-
+        ms = "{} to_cloud success".format(datetime.datetime.now())
+        logger.info(ms)
 
 
 if __name__ == "__main__":
