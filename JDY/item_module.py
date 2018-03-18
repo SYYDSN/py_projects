@@ -7,6 +7,7 @@ if __project_dir__ not in sys.path:
 import mongo_db
 from log_module import get_logger
 from celery_module import to_jiandao_cloud_and_send_mail
+from browser.crawler_module import add_job
 import datetime
 
 
@@ -113,7 +114,8 @@ class Customer(mongo_db.BaseDoc):
                         # to_jiandao_cloud_and_send_mail(**reg_dict)
                         ms = "用户已保存,开始调用to_jiandao_cloud_and_send_mail, arg={}".format(reg_dict)
                         logger.info(ms)
-                        to_jiandao_cloud_and_send_mail.delay(**reg_dict)
+                        # to_jiandao_cloud_and_send_mail.delay(**reg_dict)
+                        add_job("reg", reg_dict)
                     else:
                         pass
             else:

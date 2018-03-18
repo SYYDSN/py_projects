@@ -5,6 +5,8 @@ from celery import Celery
 
 from browser.firefox_module import to_jiandao_cloud
 from browser.firefox_module import ShengFX888
+from browser.crawler_module import do_jobs
+from browser.crawler_module import add_job
 from log_module import get_logger
 from mail_module import send_mail
 
@@ -82,14 +84,26 @@ def to_jiandao_cloud_and_send_mail(*args, **kwargs):
 
 
 @app.task(bind=True)
-def check_platform_server(*args, **kwargs):
+def query_transaction(*args, **kwargs):
+    """每天检查一下平台1/2"""
+    add_job("query_transaction", dict())
+    return "add query_transaction success"
+
+
+@app.task(bind=True)
+def query_withdraw(*args, **kwargs):
+    """每5分钟检查一下出金申请"""
+    add_job("query_withdraw", dict())
+    return "add query_withdraw success"
+
+
+@app.task(bind=True)
+def do_works(*args, **kwargs):
     print(args)
     print(kwargs)
-    """在平台服务器检查一下交易记录和出金申请"""
-    crawler = ShengFX888()
-    crawler.parse_and_save()  # 爬取并保存到数据库
-    crawler.db_to_cloud()  # 上传到简道云
-    return "check platform server success!"
+    """每分钟检查一下工作"""
+    do_jobs()
+    return "works success!"
 
 
 if __name__ == "__main__":
