@@ -44,7 +44,8 @@ CELERY_TIMEZONE = 'Asia/Shanghai'
 CELERY_TASK_SERIALIZER = "json"
 CELERYD_CONCURRENCY = 2  # 并发worker数
 CELERYD_PREFETCH_MULTIPLIER = 4  # celery worker 每次去rabbitmq取任务的数量，我这里预取了4个慢慢执行,因为任务有长有短没有预取太多
-CELERYD_MAX_TASKS_PER_CHILD = 200  # 每个worker执行了多少任务就会死掉，我建议数量可以大一些，比如200
+CELERYD_MAX_TASKS_PER_CHILD = 10  # 每个worker执行了多少任务就会死掉，越小释放内存越快
+CELERYD_FORCE_EXECV = True          # 有些情况下可以防止死锁
 CELERY_DEFAULT_QUEUE = "default"  # 默认的队列，如果一个消息不符合其他的队列就会放在默认队列里面
 
 app = Celery('my_task', broker=broker_url, backend=backend_url)

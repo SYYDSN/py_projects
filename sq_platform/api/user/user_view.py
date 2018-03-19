@@ -275,7 +275,7 @@ def update_image(user_id, key):
                     else:
                         """这是修改一个行车证图片的情况"""
                         filter_dict = {"_id": _id}
-                        update = {"#set": {"permit_image_url": part_url}}
+                        update = {"$set": {"permit_image_url": part_url}}
                         CarLicense.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update)
                 elif key == "license_image":
                     """上传驾驶证照片信息,驾驶证的照片地址是User的直接属性"""

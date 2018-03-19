@@ -160,6 +160,26 @@ class Transaction(mongo_db.BaseDoc):
                 data[domain] = temp
             return data
 
+    @classmethod
+    def sum_commission(cls, begin: str, end: str) -> float:
+        """
+        统计佣金
+        :param begin:
+        :param end:
+        :return:
+        """
+        begin = mongo_db.get_datetime_from_str(begin)
+        end = mongo_db.get_datetime_from_str(end)
+        filter_dict = {
+            "close_time": {"$exists": True},
+            "close_time": {"$lte": end, "$gte": begin}
+        }
+        res = cls.find_plus(filter_dict=filter_dict, to_dict=True)
+        f = 0
+        for x in res:
+            f += x['commission']
+        return f
+
 
 class Withdraw(mongo_db.BaseDoc):
     """出金申请信息"""
@@ -222,5 +242,5 @@ class Withdraw(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    print(Transaction.get_uploaded())
+    print(Transaction.sum_commission('2018-02-01 0:0:0', "2018-3-1 0:0:0"))
     pass

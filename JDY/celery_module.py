@@ -42,7 +42,8 @@ CELERY_TIMEZONE = 'Asia/Shanghai'
 CELERY_TASK_SERIALIZER = "json"
 CELERYD_CONCURRENCY = 2  # 并发worker数
 CELERYD_PREFETCH_MULTIPLIER = 4  # celery worker 每次去rabbitmq取任务的数量，我这里预取了4个慢慢执行,因为任务有长有短没有预取太多
-CELERYD_MAX_TASKS_PER_CHILD = 200  # 每个worker执行了多少任务就会死掉，我建议数量可以大一些，比如200
+CELERYD_MAX_TASKS_PER_CHILD = 10  # 每个worker执行了多少任务就会死掉，大一些，性能会好，小一些省内存
+CELERYD_FORCE_EXECV = True          # 有些情况下可以防止死锁
 CELERY_DEFAULT_QUEUE = "default"  # 默认的队列，如果一个消息不符合其他的队列就会放在默认队列里面
 
 app = Celery('my_task', broker=broker_url, backend=backend_url)
@@ -85,14 +86,14 @@ def to_jiandao_cloud_and_send_mail(*args, **kwargs):
 
 @app.task(bind=True)
 def query_transaction(*args, **kwargs):
-    """每天检查一下平台1/2"""
+    """每天检查一下平台1/2的buy和sell"""
     add_job("query_transaction", dict())
     return "add query_transaction success"
 
 
 @app.task(bind=True)
 def query_withdraw(*args, **kwargs):
-    """每5分钟检查一下出金申请"""
+    """每5分钟检查一下出金申请,出入金记录和赠金"""
     add_job("query_withdraw", dict())
     return "add query_withdraw success"
 
@@ -102,8 +103,16 @@ def do_works(*args, **kwargs):
     print(args)
     print(kwargs)
     """每分钟检查一下工作"""
-    do_jobs()
-    return "works success!"
+    err = None
+    try:
+        err = do_jobs()
+    except Exception as e:
+        err = e
+    finally:
+        if err is None:
+            return "works success!"
+        else:
+            return err
 
 
 if __name__ == "__main__":

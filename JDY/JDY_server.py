@@ -228,6 +228,8 @@ def customer_list_func():
             return json.dumps(mes)
     else:
         return abort(404)
+
+
 @app.after_request
 def allow_cross_domain(response):
     """允许跨域资源访问管理"""

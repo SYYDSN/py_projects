@@ -9,6 +9,7 @@ from mail_module import send_mail
 import requests
 import re
 import time
+import json
 import datetime
 import mongo_db
 from module.spread_module import SpreadChannel
@@ -26,6 +27,7 @@ from werkzeug.contrib.cache import RedisCache
 from module.transaction_module import Transaction
 from module.transaction_module import Withdraw
 from gevent.queue import JoinableQueue
+from threading import Lock
 
 
 logger = get_logger()
@@ -66,10 +68,10 @@ __page_url_base1 = "http://office.shengfx888.com/report/history_trade?" \
                 "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=" \
                 "&PROFIT_e=&qtype=&CMD={}&closetime=&OPEN_TIME_s=" \
                 "&OPEN_TIME_e=&CLOSE_TIME_s=&CLOSE_TIME_e=&T_LOGIN=&page={}"
-# user_name2 = "627853018@qq.com"
-# user_password2 = "XIAOxiao@741"
-user_name2 = "admin@shengfxChina.com"
-user_password2 = "aykPA1h5"
+user_name2 = "627853018@qq.com"
+user_password2 = "XIAOxiao@741"
+# user_name2 = "admin@shengfxChina.com"
+# user_password2 = "aykPA1h5"
 domain2 = "office.shengfxchina.com:8443"
 login_url2 = "https://office.shengfxchina.com:8443/Public/login"
 check_login_url2 = "https://office.shengfxchina.com:8443/Public/checkLogin"
@@ -212,6 +214,8 @@ def upload_and_update_reg(browser, **kwargs) -> bool:
     """ec.presence_of_all_elements_located方法可以取一组输入框,然后循环操作"""
     input_list = wait.until(
         ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".widget-wrapper>ul>li input")))  # 输入组
+    ms = "简道云推广资源表单胡据填充完毕,准备提交"
+    logger.info(ms)
     submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
     submit_info.click()  # 提交信息
 
@@ -257,7 +261,6 @@ def login_platform(browser, domain: str):
         url = login_url2
         user_name = user_name2
         user_password = user_password2
-
 
     browser.get(url=url)
     # print(self.browser.current_url)
@@ -830,9 +833,10 @@ def extend_data(data1: list, data2: list, ticket_limit: int = None) -> dict:
     return {"data": data1, "stop": stop}
 
 
-def parse_page(domain: str = None, t_type: str = None, ticket_limit: int = None) -> list:
+def parse_page(browser, domain: str = None, t_type: str = None, ticket_limit: int = None) -> list:
     """
     分析某一类型的页面数据（包含交易和出金申请），并返回结果的list,此函数必须按照交易类型分别调用
+    :param browser:
     :param domain: 平台域名
     :param t_type: 交易类型,None表示是出金申请
     :param ticket_limit: ticket下限，不能小于此值
@@ -840,7 +844,6 @@ def parse_page(domain: str = None, t_type: str = None, ticket_limit: int = None)
     """
     res = list()
     stop = False
-    browser = get_browser(True)
     # browser = get_browser(False)
     if open_platform(browser, domain):
         for i in range(1, 9999999999):
@@ -857,6 +860,7 @@ def parse_page(domain: str = None, t_type: str = None, ticket_limit: int = None)
                     print("stop page by empty: {}".format(url))
                     break
             else:
+                """buy, sell, balance credit"""
                 url = get_page_url(domain, t_type, i)
                 html = get_page_platform(browser, url)
                 records = extract_transaction_table(html, domain)
@@ -878,18 +882,26 @@ def parse_page(domain: str = None, t_type: str = None, ticket_limit: int = None)
         send_mail(title=title, content=content)
         logger.exception(msg=title)
         raise ValueError(title)
-    browser.quit()
-    del browser
     """去除已上传的数据"""
     if len(res) > 0:
-        system_str = res[0]['system']
-        uploads = get_uploaded_transaction()
-        if len(uploads) == 0:
-            pass
-        else:
-            tickets = uploads.get(system_str)
-            if isinstance(tickets, list):
+        if t_type is None:
+            """出金申请"""
+            f_dict = {"upload": 1}
+            uploads = Withdraw.find_plus(filter_dict=f_dict, to_dict=True)
+            if len(uploads) == 0:
+                pass
+            else:
+                tickets = [x['ticket'] for x in uploads]
                 res = [x for x in res if x['ticket'] not in tickets]
+        else:
+            system_str = res[0]['system']
+            uploads = get_uploaded_transaction()
+            if len(uploads) == 0:
+                pass
+            else:
+                tickets = uploads.get(system_str)
+                if isinstance(tickets, list):
+                    res = [x for x in res if x['ticket'] not in tickets]
     return res
 
 
@@ -1361,14 +1373,20 @@ def get_uploaded_transaction() -> dict:
         return data
 
 
-def query_transaction(upload: bool = True) ->list:
+def query_transaction(upload: bool = True, only_transaction: bool = False) ->list:
     """
-    从数据库查询四类交易。
+    从数据库查询buy, sell交易。
     :param upload: 是否只查需要上传的？
+    :param only_transaction: 是否只包含交易信息？ True=['sell', 'buy']  False=['sell', 'buy'， ‘balance', 'credit]
     :return:
     """
+    types = ['sell', 'buy'] if only_transaction else ['sell', 'buy', 'balance', 'credit']
     if upload:
-        filter_dict = {"$or": [{"upload": {"$ne": 1}}, {"upload": {"$exists": False}}], "close_time": {"$exists": True}}
+        filter_dict = {
+            "$or": [{"upload": {"$ne": 1}}, {"upload": {"$exists": False}}],
+            "close_time": {"$exists": True},
+            "command": {"$in": types}
+        }
     else:
         filter_dict = dict()
     sort_dict = {"close_time": 1, "time": 1}
@@ -1443,7 +1461,7 @@ def upload_and_update_withdraw(browser, **kwargs):
         raise ValueError(ms)
     else:
         """上传出金申请成功,更新数据库的upload标识"""
-        filter_dict = {"_id": kwargs["_id"]}
+        filter_dict = {"_id": kwargs.get("_id")}
         update_dict = {"$set": {"upload": 1}}
         res = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
         if res:
@@ -1454,71 +1472,175 @@ def upload_and_update_withdraw(browser, **kwargs):
             raise ValueError(ms)
 
 
-def draw_transaction():
-    browser = get_browser()
-    parse_page()
+def draw_transaction(browser):
+    """
+    从站点上查询buy和sell数据
+    :return:
+    """
+    names = [domain2, domain1]
+    limits = Transaction.last_ticket(names)
+    for key in ['buy', 'sell']:
+        s2 = parse_page(browser, domain2, key, limits[domain2]['last_ticket'])  # 平台2
+        save_transaction_data(s2)
+        ms = "平台2 {}数据抓取完毕,可插入数据长度{}".format(key, len(s2))
+        logger.info(ms)
+        print(ms)
+        s1 = parse_page(browser, domain1, key, limits[domain1]['last_ticket'])  # 平台1
+        save_transaction_data(s1)
+        ms = "平台1 {}数据抓取完毕,可插入数据长度{}".format(key, len(s1))
+        logger.info(ms)
+        print(ms)
+    return True
+
+
+b1 = get_browser()
+b2 = get_browser()
+
+
+def draw_withdraw():
+    """
+    从站点上查询withdraw,balance,credit
+    :return:
+    """
+    names = [domain2, domain1]
+    limits = Transaction.last_ticket(names)
+    for key in ['balance', 'credit']:
+        s2 = parse_page(b2, domain2, key, limits[domain2]['last_ticket'])  # 平台2
+        save_transaction_data(s2)
+        ms = "平台2 {}数据抓取完毕,可插入数据长度{}".format(key, len(s2))
+        logger.info(ms)
+        print(ms)
+        s1 = parse_page(b1, domain1, key, limits[domain1]['last_ticket'])  # 平台1
+        save_transaction_data(s1)
+        ms = "平台1 {}数据抓取完毕,可插入数据长度{}".format(key, len(s1))
+        logger.info(ms)
+        print(ms)
+    s = parse_page(browser, domain2, None)  # 出金申请
+    save_withdraw_data(s)
+    ms = "平台2 withdraw数据抓取完毕,可插入数据长度{}".format(len(s))
+    logger.info(ms)
+    print(ms)
+    return True
 
 
 def add_job(job_type: str, job_dict: dict) -> None:
     """
     增加一个任务到工作队列
     :param job_type:
-    :param job_dict:
+    :param job_dict: 参数字典/None
+    共计5种任务
+    1. job_type=‘reg' job_dict=reg_dict
+    注册
+    2. job_type=‘draw_transaction' job_dict=None
+    从平台查询buy和sell信息并写入数据库，每天凌晨一次。
+    3. job_type=‘draw_withdraw' job_dict=None
+    从平台查询withdraw，credit， balance数据并写入数据库，5分钟一次。
+    4. job_type=‘query_transaction' job_dict=None
+    从数据库查询是否有新的buy和sell数据，有的话就写入云，五分钟一次。
+    5. job_type=‘query_withdraw' job_dict=None
+    从数据库查询是否有新的withdraw，credit， balance数据，有的话就写入云，五分钟一次。
     :return:
     """
     job = {"job_type": job_type, "job_dict": job_dict}
     global jobs
-    jobs.put(job)
+    types = [x['job_type'] for x in jobs]
+    if job_type in types:
+        ms = "重复的任务：{}，放弃".format(job_type)
+    else:
+        ms = "加入新的任务：{}".format(job_type)
+        jobs.put(job)
+    logger.info(ms)
+
+
+lock = Lock()
 
 
 def do_jobs():
     """批量做工作"""
     global jobs
-    if jobs.empty():
-        pass
+    key = "in_do_jobs"
+    lock.acquire()
+    ms = "{} do_jobs locked".format(datetime.datetime.now())
+    logger.info(ms)
+    in_do_jobs = cache.get(key)
+    if in_do_jobs == 1:
+        """in_do_jobs表示工作中"""
+        ms = "{} in_do_jobs ".format(datetime.datetime.now())
+        logger.info(ms)
     else:
-        browser = get_browser()
-        while not jobs.empty():
-            job = jobs.get()
-            job_type = job['job_type']
-            job_dict = job['job_dict']
-            if job_type == 'test':
-                print(job_dict)
-            elif job_type == 'transaction':
-                upload_and_update_transaction(browser=browser, **job)
-                print("upload transaction success")
-            elif job_type == 'withdraw':
-                upload_and_update_withdraw(browser=browser, **job)
-                print("upload withdraw success")
-            elif job_type == 'reg':
-                upload_and_update_reg(browser=browser, **job)
-                print("upload reg success")
-            elif job_type == "query_transaction":
-                transaction = query_transaction(True)
-                print("query transaction success")
-            elif job_type == "query_withdraw":
-                withdraw = query_withdraw(True)
-                print("query withdraw success")
-            else:
-                ms = "error job, type={} ,dict={}".format(job_type, job_dict)
-                logger.exception(ms)
-            jobs.task_done()
-        browser.quit()
-        del browser
+        ms = "{} not in_do_jobs ".format(datetime.datetime.now())
+        logger.info(ms)
+        in_do_jobs = 1
+        cache.set(key, in_do_jobs, timeout=3600)
+        raw = dict()
+        if jobs.empty():
+            pass
+        else:
+            ms = "{} begin do_jobs ".format(datetime.datetime.now())
+            logger.info(ms)
+            browser = get_browser(headless=True)
+            while not jobs.empty():
+                job = jobs.get()
+                job_type = job['job_type']
+                job_dict = job['job_dict']
+                if job_type == 'test':
+                    print(job_dict)
+                elif job_type == "draw_transaction":
+                    draw_transaction(browser)  # 从平台查询并写入数据库
+                elif job_type == "draw_withdraw":
+                    draw_withdraw()  # 从平台查询并写入数据库
+                elif job_type == "query_transaction":
+                    transaction = query_transaction(True)
+                    if len(transaction) == 0:
+                        print("query transaction success")
+                    else:
+                        for x in transaction:
+                            upload_and_update_transaction(browser=browser, **x)
+                        print("upload transaction success")
+                elif job_type == "query_withdraw":
+                    data = query_withdraw(True)
+                    print("query withdraw,balance and credit success")
+                    withdraw = data['withdraw']
+                    other = data['other']  # 赠金和出入金记录
+                    if isinstance(withdraw, list):
+                        for x in withdraw:
+                            upload_and_update_withdraw(browser=browser, **x)
+                        print("upload withdraw success")
+                    if isinstance(other, list):
+                        for x in other:
+                            upload_and_update_transaction(browser=browser, **x)
+                        print("upload withdraw success")
+                elif job_type == 'reg':
+                    upload_and_update_reg(browser=browser, **job_dict)
+                    raw[job_type] = job_dict
+                    print("upload reg success")
+                else:
+                    ms = "error job, type={} ,dict={}".format(job_type, job_dict)
+                    logger.exception(ms)
+                jobs.task_done()
+            browser.quit()
+            del browser
+        in_do_jobs = 0
+        cache.set(key, in_do_jobs, timeout=3600)
+    lock.release()
+    ms = "{} do_jobs unlocked".format(datetime.datetime.now())
+    logger.info(ms)
+    return True
 
 
 if __name__ == "__main__":
+    """全套测试开始"""
     """draw"""
-    for key in type_dict.keys():
-        s2 = parse_page(domain2, key)  # 平台2
-        save_transaction_data(s2)
-        s1 = parse_page(domain1, key)  # 平台1
-        save_transaction_data(s1)
-
-    s = parse_page(domain2, None)  # 出金申请
-    save_withdraw_data(s)
-    """upload"""
     browser = get_browser()
+    # for key in type_dict.keys():
+    #     s2 = parse_page(browser, domain2, key)  # 平台2
+    #     save_transaction_data(s2)
+    #     s1 = parse_page(browser, domain1, key)  # 平台1
+    #     save_transaction_data(s1)
+    #
+    # s = parse_page(browser, domain2, None)  # 出金申请
+    # save_withdraw_data(s)
+    # """upload"""
     transaction = query_transaction(True)
     for x in transaction:
         upload_and_update_transaction(browser=browser, **x)
@@ -1531,4 +1653,33 @@ if __name__ == "__main__":
         upload_and_update_transaction(browser=browser, **x)
     browser.quit()
     del browser
+    """全套测试结束"""
+    """填入一条假的出金申请"""
+    # a = {
+    #     "blank_code" : "",
+    #     "account_balance" : 228.71,
+    #     "apply_time" : datetime.datetime.now(),
+    #     "account_value" : 228.71,
+    #     "nick_name" : "提汝洪",
+    #     "channel" : "银联",
+    #     "open_interest" : 0.0,
+    #     "amount_usd" : "228.71",
+    #     "account" : 8300082,
+    #     "account_margin" : 228.71,
+    #     "manager" : "王鹏",
+    #     "commission_usd" : 0.0,
+    #     "code_id" : "6230520530029871070",
+    #     "status" : "审核中",
+    #     "system" : "office.shengfxchina.com:8443",
+    #     "ticket" : 30,
+    #     "blank_name" : "中国农业银行吉林省长春市西安大路支行",
+    #     "group" : "zxzg50",
+    #     "amount_cny" : "1555.23",
+    #     "commission_cny" : 0.0
+    # }
+    # b = get_browser()
+    # upload_and_update_withdraw(b, **a)
+    # b.quit()
+    # del b
+    """测试吸取网站数据"""
     pass

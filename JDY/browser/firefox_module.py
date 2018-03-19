@@ -17,6 +17,7 @@ from log_module import get_logger
 from mail_module import send_mail
 import pyquery
 import re
+from browser.crawler_module import get_browser
 from module.transaction_module import Transaction
 from module.transaction_module import Withdraw
 
@@ -41,8 +42,6 @@ def to_jiandao_cloud(**kwargs) -> bool:
     """
     ms = "开始向简道云推广资源表单写数据,参数: {}".format(kwargs)
     logger.info(ms)
-    display = Display(visible=0, size=(800, 600))
-    display.start()  # 开启虚拟显示器
 
     """
     注意，pyvirtualdisplay需要xvfb支持。安装方法：sudo apt-get install xvfb
@@ -51,10 +50,11 @@ def to_jiandao_cloud(**kwargs) -> bool:
     下载后解压是一个geckodriver 文件。拷贝到/usr/local/bin目录下，然后加上可执行的权限
     sudo chmod +x /usr/local/bin/geckodriver
     """
-    profile = webdriver.FirefoxProfile()
-    """因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,这里必须设置浏览器的初始化参数"""
-    profile.set_preference("intl.accept_languages", "zh-cn")
-    browser = webdriver.Firefox(profile)
+    # profile = webdriver.FirefoxProfile()
+    # """因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,这里必须设置浏览器的初始化参数"""
+    # profile.set_preference("intl.accept_languages", "zh-cn")
+    # browser = webdriver.Firefox(profile)
+    browser = get_browser()
     wait = WebDriverWait(browser, 10)
 
     url_1 = "https://www.jiandaoyun.com/f/5a658cbc7b87e86216236cb3"
@@ -151,9 +151,9 @@ def to_jiandao_cloud(**kwargs) -> bool:
 
     time.sleep(10)
     browser.quit()
-    display.stop()  # 关闭虚拟显示器
     ms = "向简道云推广资源表单写数据成功,参数: {}".format(kwargs)
     logger.info(ms)
+    del browser
     return True
 
 

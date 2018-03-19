@@ -169,4 +169,6 @@ if __name__ == "__main__":
     "time" : datetime.datetime.now()
 }
     customer = Customer.reg(**args)
+    # from browser.crawler_module import do_jobs
+    # do_jobs()
     pass
