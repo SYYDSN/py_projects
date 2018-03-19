@@ -66,8 +66,10 @@ __page_url_base1 = "http://office.shengfx888.com/report/history_trade?" \
                 "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=" \
                 "&PROFIT_e=&qtype=&CMD={}&closetime=&OPEN_TIME_s=" \
                 "&OPEN_TIME_e=&CLOSE_TIME_s=&CLOSE_TIME_e=&T_LOGIN=&page={}"
-user_name2 = "627853018@qq.com"
-user_password2 = "XIAOxiao@741"
+# user_name2 = "627853018@qq.com"
+# user_password2 = "XIAOxiao@741"
+user_name2 = "admin@shengfxChina.com"
+user_password2 = "aykPA1h5"
 domain2 = "office.shengfxchina.com:8443"
 login_url2 = "https://office.shengfxchina.com:8443/Public/login"
 check_login_url2 = "https://office.shengfxchina.com:8443/Public/checkLogin"
@@ -1374,9 +1376,9 @@ def query_transaction(upload: bool = True) ->list:
     return r
 
 
-def query_withdraw(upload: bool = True) ->list:
+def query_withdraw(upload: bool = True) ->dict:
     """
-    从数据库查询出金申请。
+    从数据库查询出金申请。出入金和赠金记录
     :param upload: 是否只查需要上传的？
     :return:
     """
@@ -1384,9 +1386,12 @@ def query_withdraw(upload: bool = True) ->list:
         filter_dict = {"$or": [{"upload": {"$ne": 1}}, {"upload": {"$exists": False}}]}
     else:
         filter_dict = dict()
-    sort_dict = {"close_time": 1, "time": 1}
-    r = Withdraw.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
-    return r
+    sort_dict = {"apply_time": 1}
+    withdraw = Withdraw.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
+    sort_dict = {"time": 1}
+    filter_dict['command'] = {"$in": ['balance', 'credit']}
+    other = Withdraw.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
+    return {"withdraw": withdraw, "other": other}
 
 
 def upload_and_update_transaction(browser, **kwargs):
@@ -1503,21 +1508,27 @@ def do_jobs():
 
 
 if __name__ == "__main__":
-    # for key in type_dict.keys():
-    #     s = parse_page(domain1, key)  # 平台1
-    #     save_transaction_data(s)
-    #     s = parse_page(domain2, key)  # 平台2
-    #     save_transaction_data(s)
+    """draw"""
+    for key in type_dict.keys():
+        s2 = parse_page(domain2, key)  # 平台2
+        save_transaction_data(s2)
+        s1 = parse_page(domain1, key)  # 平台1
+        save_transaction_data(s1)
+
     s = parse_page(domain2, None)  # 出金申请
     save_withdraw_data(s)
     """upload"""
-    # browser = get_browser()
-    # transaction = query_transaction(True)
-    # for x in transaction:
-    #     upload_and_update_transaction(browser=browser, **x)
-    # withdraw = query_withdraw(True)
-    # for x in withdraw:
-    #     upload_and_update_withdraw(browser=browser, **x)
-    # add_job("test", dict())
-    # do_jobs()
+    browser = get_browser()
+    transaction = query_transaction(True)
+    for x in transaction:
+        upload_and_update_transaction(browser=browser, **x)
+    data = query_withdraw(True)
+    withdraw = data['query_withdraw']
+    other = data['other']
+    for x in withdraw:
+        upload_and_update_withdraw(browser=browser, **x)
+    for x in withdraw:
+        upload_and_update_transaction(browser=browser, **x)
+    browser.quit()
+    del browser
     pass
