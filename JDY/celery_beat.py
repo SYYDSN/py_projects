@@ -29,10 +29,10 @@ app.conf.CELERYBEAT_SCHEDULE = {
         'task': 'celery_module.query_withdraw',
         'schedule': datetime.timedelta(seconds=300)  # 每5分钟检查一次
     },
-    """添加每5分钟处理一次作业"""
+    """添加每2分钟处理一次作业"""
     'every_minutes_do_works': {
         'task': 'celery_module.do_works',
-        'schedule': datetime.timedelta(seconds=300)  # 每5分钟间隔作业一次
+        'schedule': datetime.timedelta(seconds=120)  # 每2分钟间隔作业一次
     }
 }
 

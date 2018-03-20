@@ -33,7 +33,7 @@ from threading import Lock
 logger = get_logger()
 cache = RedisCache()
 queue = JoinableQueue()
-jobs = JoinableQueue()
+jobs = list()
 
 
 """爬虫模块"""
@@ -99,7 +99,16 @@ def get_browser(headless: bool = True) -> Firefox:
     :return:
     """
     profile = FirefoxProfile()
-    """因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,这里必须设置浏览器的初始化参数"""
+    """
+    因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,
+    这里必须设置浏览器的初始化参数,
+    注意，使用headless必须先安装对应浏览器正常的版本,然后再安装headless版本
+    比如火狐的headless
+    下载火狐的geckodriver驱动。(当前文件夹下已经有一个了)地址是：
+    https://github.com/mozilla/geckodriver/releases
+    下载后解压是一个geckodriver 文件。拷贝到/usr/local/bin目录下，然后加上可执行的权限
+    sudo chmod +x /usr/local/bin/geckodriver
+    """
     profile.set_preference("intl.accept_languages", "zh-cn")
     options = FirefoxOptions()
     options.add_argument("--headless")
@@ -1181,6 +1190,7 @@ def upload_transaction(browser, **kwargs) -> bool:
         time.sleep(1)
         submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
         submit_info.click()  # 提交信息
+        time.sleep(3)
 
         res = False
         try:
@@ -1338,6 +1348,7 @@ def upload_withdraw(browser, **kwargs) -> bool:
 
     submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
     submit_info.click()  # 提交信息
+    time.sleep(3)
 
     res = False
     try:
@@ -1550,7 +1561,7 @@ def add_job(job_type: str, job_dict: dict) -> None:
         ms = "重复的任务：{}，放弃".format(job_type)
     else:
         ms = "加入新的任务：{}".format(job_type)
-        jobs.put(job)
+        jobs.append(job)
     logger.info(ms)
 
 
@@ -1575,14 +1586,14 @@ def do_jobs():
         in_do_jobs = 1
         cache.set(key, in_do_jobs, timeout=3600)
         raw = dict()
-        if jobs.empty():
+        if len(jobs) == 0:
             pass
         else:
             ms = "{} begin do_jobs ".format(datetime.datetime.now())
             logger.info(ms)
             browser = get_browser(headless=True)
-            while not jobs.empty():
-                job = jobs.get()
+            while len(jobs) > 0:
+                job = jobs.pop(0)
                 job_type = job['job_type']
                 job_dict = job['job_dict']
                 if job_type == 'test':
@@ -1619,7 +1630,6 @@ def do_jobs():
                 else:
                     ms = "error job, type={} ,dict={}".format(job_type, job_dict)
                     logger.exception(ms)
-                jobs.task_done()
             browser.quit()
             del browser
         in_do_jobs = 0
@@ -1634,18 +1644,18 @@ if __name__ == "__main__":
     """全套测试开始"""
     """draw"""
     browser = get_browser()
-    # for key in type_dict.keys():
-    #     s2 = parse_page(browser, domain2, key)  # 平台2
-    #     save_transaction_data(s2)
-    #     s1 = parse_page(browser, domain1, key)  # 平台1
-    #     save_transaction_data(s1)
-    #
-    # s = parse_page(browser, domain2, None)  # 出金申请
-    # save_withdraw_data(s)
-    # """upload"""
-    # transaction = query_transaction(True)
-    # for x in transaction:
-    #     upload_and_update_transaction(browser=browser, **x)
+    for key in type_dict.keys():
+        s2 = parse_page(browser, domain2, key)  # 平台2
+        save_transaction_data(s2)
+        s1 = parse_page(browser, domain1, key)  # 平台1
+        save_transaction_data(s1)
+
+    s = parse_page(browser, domain2, None)  # 出金申请
+    save_withdraw_data(s)
+    """upload"""
+    transaction = query_transaction(True)
+    for x in transaction:
+        upload_and_update_transaction(browser=browser, **x)
     data = query_withdraw(True)
     withdraw = data['withdraw']
     other = data['other']
