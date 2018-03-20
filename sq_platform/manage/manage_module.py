@@ -17,6 +17,7 @@ from mongo_db import get_datetime_from_str
 from api.user.violation_module import ViolationRecode
 from role.role_module import Role
 from role.role_module import Func
+from manage.company_module import Employee
 
 
 """管理页面模块/后台管理/登录"""
@@ -1316,3 +1317,49 @@ def process__structure_func(prefix):
     current_user_id = get_platform_session_arg("user_id")
     head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     current_real_name = get_platform_session_arg("real_name")
+
+
+@manage_blueprint.route("/batch_insert_user", methods=['get', 'post'])
+def batch_insert_user():
+    """批量插入用户"""
+    token = get_arg(request, 'x_token', None)  # 确认身份的
+    if token == "bae96f78b38b4e21ab94dab75582918f":
+        if request.method.lower() == "get":
+            """示范"""
+            html = """
+            python3 demo code<br>
+            ==========================================<br>
+            import requests<br>
+            import json <br>
+            user_list = [{"real_name": "张三", '"phone_num": "13900000001",...},.....]<br>
+            x_token = "bae96f78b38b4e21ab94dab75582918f"<br>
+            data = {"x_token": x_token, "user_list": json.dumps(user_list)}<br>
+            url = "http://xzx.safego.org/manage/batch_insert_user"<br>
+            r = requests.post(url, data=data)<br>
+            if r.status_code == 200:<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;print(r.json())<br>
+            else:<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;print(r.status_code)<br>
+            """
+            return html
+        elif request.method.lower() == "post":
+            user_list = json.loads(get_arg(request, "user_list", ''))
+            ms = "batch_insert_user, args:{}".format(user_list)
+            logger.info(ms)
+            error = ''
+            try:
+                r = Employee.insert_many(user_list)
+            except Exception as e:
+                error = "Error: {}".format(e)
+            finally:
+                mes = {"message": "success"}
+                if len(error) > 0:
+                    mes['message'] = error
+                else:
+                    pass
+                return json.dumps(mes)
+        else:
+            return abort(405)
+
+    else:
+        return abort(404)

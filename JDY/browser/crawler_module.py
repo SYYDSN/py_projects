@@ -1186,7 +1186,10 @@ def upload_transaction(browser, **kwargs) -> bool:
         try:
             msg_span = WebDriverWait(browser, 10).until(ec.presence_of_element_located((
                 By.CLASS_NAME, "msg-title")))
-            if msg_span.text == "操作成功":
+            print(msg_span.get_attribute("class"))
+            print(msg_span.text)
+            if msg_span.get_attribute("class") == "msg-title":
+                """操作成功"""
                 browser.refresh()  # 刷新页面
                 res = True
             else:
@@ -1340,7 +1343,10 @@ def upload_withdraw(browser, **kwargs) -> bool:
     try:
         msg_span = WebDriverWait(browser, 10).until(ec.presence_of_element_located((
             By.CLASS_NAME, "msg-title")))
-        if msg_span.text == "操作成功":
+        print(msg_span.get_attribute("class"))
+        print(msg_span.text)
+        if msg_span.get_attribute("class") == "msg-title":
+            """操作成功"""
             browser.refresh()  # 刷新页面
             res = True
         else:
@@ -1408,7 +1414,7 @@ def query_withdraw(upload: bool = True) ->dict:
     withdraw = Withdraw.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
     sort_dict = {"time": 1}
     filter_dict['command'] = {"$in": ['balance', 'credit']}
-    other = Withdraw.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
+    other = Transaction.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
     return {"withdraw": withdraw, "other": other}
 
 
@@ -1427,7 +1433,7 @@ def upload_and_update_transaction(browser, **kwargs):
         count += 1
         time.sleep(3)
     if not res:
-        ms = "上传出金申请已连续失败失败{}次,实例:{}".format(count, kwargs)
+        ms = "上传交易信息已连续失败{}次,实例:{}".format(count, kwargs)
         raise ValueError(ms)
     else:
         """上传出金申请成功,更新数据库的upload标识"""
@@ -1457,7 +1463,7 @@ def upload_and_update_withdraw(browser, **kwargs):
         count += 1
         time.sleep(3)
     if not res:
-        ms = "上传出金申请已连续失败失败{}次,实例:{}".format(count, kwargs)
+        ms = "上传出金申请已连续失败{}次,实例:{}".format(count, kwargs)
         raise ValueError(ms)
     else:
         """上传出金申请成功,更新数据库的upload标识"""
@@ -1493,11 +1499,7 @@ def draw_transaction(browser):
     return True
 
 
-b1 = get_browser()
-b2 = get_browser()
-
-
-def draw_withdraw():
+def draw_withdraw(browser):
     """
     从站点上查询withdraw,balance,credit
     :return:
@@ -1505,12 +1507,12 @@ def draw_withdraw():
     names = [domain2, domain1]
     limits = Transaction.last_ticket(names)
     for key in ['balance', 'credit']:
-        s2 = parse_page(b2, domain2, key, limits[domain2]['last_ticket'])  # 平台2
+        s2 = parse_page(browser, domain2, key, limits[domain2]['last_ticket'])  # 平台2
         save_transaction_data(s2)
         ms = "平台2 {}数据抓取完毕,可插入数据长度{}".format(key, len(s2))
         logger.info(ms)
         print(ms)
-        s1 = parse_page(b1, domain1, key, limits[domain1]['last_ticket'])  # 平台1
+        s1 = parse_page(browser, domain1, key, limits[domain1]['last_ticket'])  # 平台1
         save_transaction_data(s1)
         ms = "平台1 {}数据抓取完毕,可插入数据长度{}".format(key, len(s1))
         logger.info(ms)
@@ -1588,7 +1590,7 @@ def do_jobs():
                 elif job_type == "draw_transaction":
                     draw_transaction(browser)  # 从平台查询并写入数据库
                 elif job_type == "draw_withdraw":
-                    draw_withdraw()  # 从平台查询并写入数据库
+                    draw_withdraw(browser)  # 从平台查询并写入数据库
                 elif job_type == "query_transaction":
                     transaction = query_transaction(True)
                     if len(transaction) == 0:
@@ -1641,16 +1643,16 @@ if __name__ == "__main__":
     # s = parse_page(browser, domain2, None)  # 出金申请
     # save_withdraw_data(s)
     # """upload"""
-    transaction = query_transaction(True)
-    for x in transaction:
-        upload_and_update_transaction(browser=browser, **x)
+    # transaction = query_transaction(True)
+    # for x in transaction:
+    #     upload_and_update_transaction(browser=browser, **x)
     data = query_withdraw(True)
-    withdraw = data['query_withdraw']
+    withdraw = data['withdraw']
     other = data['other']
     for x in withdraw:
-        upload_and_update_withdraw(browser=browser, **x)
-    for x in withdraw:
-        upload_and_update_transaction(browser=browser, **x)
+        upload_and_update_withdraw(browser=browser, **x)  # 上传出金申请
+    for x in other:
+        upload_and_update_transaction(browser=browser, **x)  # 上传balance和credit
     browser.quit()
     del browser
     """全套测试结束"""

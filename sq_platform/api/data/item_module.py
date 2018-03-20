@@ -110,6 +110,8 @@ class User(mongo_db.BaseDoc):
     type_dict['description'] = str  #
     type_dict['emergency_contact'] = str  # 紧急联系人(姓名)
     type_dict['emergency_phone'] = str  # 紧急联系号码
+    type_dict['user_status'] = int  # 用户状态，1表示可以登录，0表示禁止登录
+    type_dict['desscription'] = str  # 备注
     """
     驾驶证信息部分,驾驶证和用户有一一对应的关系.所以需要直接存储在对象中.
     """
@@ -125,7 +127,6 @@ class User(mongo_db.BaseDoc):
     车牌号码和使用者id构成了联合唯一主键。  
     """
     type_dict['phones'] = list      # 名下手机的的id，是一个DBRef的List对象，默认为空  对应phone_device_info表
-    type_dict['user_status'] = int  # 用户状态，1表示可以登录，0表示禁止登录
     type_dict['wx_id'] = str        # 微信id
     type_dict['weibo_id'] = str     # 微博id
     type_dict['create_date'] = datetime.datetime  # 用户的注册/创建日期
@@ -135,6 +136,8 @@ class User(mongo_db.BaseDoc):
     def __init__(self, **kwargs):
         if "user_name" not in kwargs:
             kwargs['user_name'] = kwargs['phone_num']
+        if "user_status" not in kwargs:
+            kwargs['user_name'] = 1
         if "country" not in kwargs:
             kwargs['country'] = "中国"
         if "user_password" not in kwargs:
@@ -1862,14 +1865,6 @@ def clear_phone() -> None:
 
 
 if __name__ == "__main__":
-    # city_list = ['上海市', '嘉善县', '嘉兴市', '杭州市', '绍兴市', '余姚市', '宁波市']
-    # code_list = [310000, 330421, 330400, 330100, 330600, 330281, 330200]
-    # args = {"city_code_list": code_list, "city_name_list": city_list}
-    # weathers = RouteWeather.get_route_weather(ObjectId("5a052d294660d327825df124"))
-    # print(weathers)
-    # User.app_version_list()
-    # User.app_version_list()
-    # User.set_driving_license()
-    # GPS.async_insert_many()
-    UserLicenseRelation.rebuild()
+    # UserLicenseRelation.rebuild()
+    User.update_many_plus({},{"$set": {"user_status": 1}})
     pass

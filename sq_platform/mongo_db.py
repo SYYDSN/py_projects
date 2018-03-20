@@ -38,8 +38,8 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
 """
 mongodb_setting = {
-    # "host": "safego.org:20000",   # 数据库服务器地址            mongos 1
-    "host": "pltf.safego.org:7171",   # 数据库服务器地址          mongos 2
+    "host": "safego.org:20000",   # 数据库服务器地址            mongos 1
+    # "host": "pltf.safego.org:7171",   # 数据库服务器地址          mongos 2
     # "host": "pltf.safego.org:8181",   # 数据库服务器地址        mongos 3
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 800,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
@@ -48,7 +48,8 @@ mongodb_setting = {
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
-    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
+    # "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
+    "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
     "username": user,       # 用户名
     "password": password    # 密码
 }
