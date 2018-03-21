@@ -19,6 +19,7 @@ from uuid import uuid4
 import base64
 import urllib.request
 import os
+from manage.company_module import Company
 from uuid import uuid4
 from api.data.item_module import AppLoginToken, User
 from werkzeug.contrib.cache import RedisCache
@@ -78,6 +79,39 @@ def save_platform_session(**kwargs) -> bool:
             if v is not None:
                 session[k] = v
         return True
+
+
+def get_company_from_req(req: request) -> (dict, None):
+    """
+    根据request的host参数判断是哪个公司登录?
+    :param req: flask的request对象
+    :return:
+    """
+    domain = req.host.split(":")[0]
+    key = 'domain_company_{}'.format(domain)
+    company = cache.get(key)
+    if company is None:
+        f_dict = {"domain": domain}
+        if domain.startswith("192.168.") or domain == "127.0.0.1":
+            """开发调试状态,当前项目是新振兴"""
+            company = {
+                "_id": ObjectId("5aab48ed4660d32b752a7ee9"),
+                "full_name": " 江西新振兴投资集团有限公司",
+                "domain": "xzx.safego.org",
+                "description": "用于高安项目的公司",
+                "prefix": "xzx",
+                "short_name": "新振兴"
+            }
+        else:
+            company = Company.find_one_plus(filter_dict=f_dict, instance=False)
+        """写缓存"""
+        if company is not None:
+            cache.set(key=key, value=company, timeout=900)  # 15分钟
+        else:
+            pass
+    else:
+        pass
+    return company
 
 
 def save_platform_cors_session(**kwargs) -> (str, None):

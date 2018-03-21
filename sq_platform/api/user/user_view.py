@@ -317,7 +317,7 @@ def update_image(user_id, key):
             logger.exception("Error! ")
             message = pack_message(message, 5000, avatar=str(None))
         finally:
-            print("update_avatar function : ", end="")
+            print("update_image function : ", end="")
             print(message)
             return json.dumps(message)
     else:

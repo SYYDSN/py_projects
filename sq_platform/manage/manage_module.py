@@ -157,76 +157,66 @@ def process_error_code(key):
 @manage_blueprint.route("/login", methods=['post', 'get'])
 def login_func():
     """
-    登录页,有关访问地址的逻辑有问题,毕竟不是所有的用户都有公司归属的
+    登录页,
+    针对新振兴项目,现在决定需求如下:
+    1. 固定的几个部门/组管理员 手动添加
+    2. 权限为基于方法的权限,不再推进基于角色的权限.(基于角色的权限管理暂停)
+    3. 不考虑跨域用户
     """
+    """先获取域名,根据域名判断公司"""
+    company = get_company_from_req(request)
     if request.method.lower() == "get":
-        login_title = '登录'
-        return render_template("manage/login.html", login_title=login_title)
+        if company:
+            login_title = '登录'
+            return render_template("manage/login.html", login_title=login_title)
+        else:
+            return abort(400, "validate fail, access refused!")
     elif request.method.lower() == "post":
         """验证用户身份"""
         message = {"message": "success"}
-        """先获取域名,用于判断是哪个公司的管理员/用户登录"""
-        domain = request.host.split(":")[0]
-        domain_arg = get_arg(request, "domain", None)
-        domain = domain if domain_arg is None else domain_arg
-        rule_dict = Role.default_role()['rule_dict']
-        func_dict = Func()
-        key = 'domain_company'
-        company = cache.get(key)
         if not company:
-            company = func_dict.get('get_company_by_domain')(domain)
-            if company is None:
-                message['massage'] = '访问地址错误'
+            message['message'] = '访问地址错误'
+        else:
+            """取登录参数"""
+            user_name = get_arg(request, "user_name", None)
+            user_password = get_arg(request, "user_password", None)
+            if user_name is None or user_name == '' or user_password == '' or user_password is None:
+                message['message'] = '用户名或密码不能为空'
             else:
-                web_login = func_dict.get('web_login')
-                user_name = get_arg(request, "user_name")
-                user_password = get_arg(request, "user_password")
-                cors = get_arg(request, "cors", None)
-                company_id = company['_id']
-                args = {"user_name": user_name, "user_password": user_password, "company_id": company_id}
-                result = web_login(**args)
-                if result is None:
-                    message['message'] = "用户名或密码错误"
+                """登录参数合法,开始验证"""
+                args = {"user_name": user_name}
+                f_dict = {"user_name": user_name}
+                employee = Employee.find_one_plus(filter_dict=f_dict, instance=False)
+                if employee is None:
+                    message['message'] = "用户名不存在或手机未注册"
                 else:
-                    """登录成功,写入会话"""
-                    result = result['data']
-                    args['user_id'] = str(result['_id'])  # 写入用户id的str格式.
-                    real_name = result.get("real_name")
-                    real_name = result.get("user_name") if real_name is None or real_name == "" else real_name
-                    args['real_name'] = real_name
-                    head_img_url = result.get("head_img_url", "/static/image/head_img/default_01.png")
-                    args['head_img_url'] = head_img_url
-                    employee_number = result.get("employee_number", "")  # 工号
-                    args['employee_number'] = employee_number
-                    """写入用户所在公司的查询前缀"""
-                    company_obj = result.get("company_id")
-                    if company_obj is None:
-                        pass
+                    if user_password.lower() != employee['user_password']:
+                        message['message'] = "密码错误"
+                    elif employee.get("user_status") != 1:
+                        message['message'] = "账户未启用"
                     else:
-                        company_id = company_obj.id
-                        prefix = Company.find_by_id(company_id).get("prefix")
-                        if prefix is None:
-                            pass
+                        """员工身份验证成功,需要验证公司是否有这个员工?"""
+                        company_id = company['_id']
+                        employee_id = employee['_id']
+                        short_name = company['short_name']
+                        employee_name = employee.get("real_name", employee['user_name'])
+                        validate = Company.validate_employee(company_id, employee_id)
+                        if validate:
+                            """登录成功,写入会话"""
+                            args['user_id'] = str(employee['_id'])  # 写入用户id的str格式.
+                            args['real_name'] = employee_name
+                            head_img_url = employee.get("head_img_url", "/static/image/head_img/default_01.png")
+                            args['head_img_url'] = head_img_url
+                            employee_number = employee.get("employee_number", "")  # 工号
+                            args['employee_number'] = employee_number
+                            """写入用户所在公司的信息"""
+                            args['prefix'] = company.get("prefix")
+                            args['company_id'] = str(company_id)
+                            save_platform_session(**args)
                         else:
-                            args['prefix'] = prefix
-                    if cors == "cors":
-                        """如果是跨域用户"""
-                        save_res = save_platform_cors_session(**args)
-                    else:
-                        save_res = save_platform_session(**args)
-                    if not save_res:
-                        """写入会话失败"""
-                        try:
-                            raise ValueError("会话保存失败，args={}".format(str(args)))
-                        except ValueError as e:
-                            print(e)
-                            message['message'] = "会话保存失败"
-                            logger.exception("error:")
-                    elif isinstance(save_res, str):
-                        """这是跨域用户返回的会话id"""
-                        message['sid'] = save_res
-                    else:
-                        pass
+                            """公司没这个员工"""
+                            ms = "当前用户不在{}就职.".format(short_name)
+                            message['message'] = ms
         return json.dumps(message)
     else:
         return abort(400, "unknown request")

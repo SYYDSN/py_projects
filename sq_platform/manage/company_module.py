@@ -41,6 +41,102 @@ class Company(mongo_db.BaseDoc):
         super(Company, self).__init__(**kwargs)
 
     @classmethod
+    def validate_employee(cls, company_id: (str, ObjectId), employee_id: (str, ObjectId)) -> bool:
+        """
+        公司是否存在某位员工
+        :param company_id:
+        :param employee_id:
+        :return:
+        """
+        company_id = mongo_db.get_obj_id(company_id)
+        employee_id = mongo_db.get_obj_id(employee_id)
+        company_dbref = DBRef(database="platform_db", collection=cls.get_table_name(), id=company_id)
+        employee_dbref = DBRef(database="platform_db", collection=Employee.get_table_name(), id=employee_id)
+        now = datetime.datetime.now()
+        f_dict = {
+            "$and": [
+                {"employee_id": employee_dbref},
+                {"company_id": company_dbref},
+                {"create_date": {"$lte": now}},
+                {"$or": [
+                    {"end_date": {"$exists": False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$gte": now}}
+                ]
+                }]
+        }
+        r = EmployeeCompanyRelation.find_one_plus(filter_dict=f_dict, instance=False)
+        if r is None:
+            return False
+        else:
+            return True
+
+    @classmethod
+    def add_employees(cls, company_id: (str, ObjectId), args_list: list) -> (list, None):
+        """
+        添加员工, 逻辑如下:
+        1. 确认公司id是否存在?不存在退出,
+        2. 添加一个employee的对象.
+        3. 创建一条EmployeeCompanyRelation记录.保存.然后在employee添加company_relation_id属性.
+        4. 如果有部门id,就验证一下部门id是否存在?存在就添加一条EmployeeDeptRelation记录,不存在就报错.
+        然后在employee添加dept_relation_id属性.如果没有部门id,那就添加一个默认的部门的dept_relation_id属性,
+        如果没有默认部门.报错退出.
+        5. 如果有职务id,就验证一下职务id是否存在?存在就添加一条EmployeePostRelation记录,不存在就报错.
+        然后在employee添加post_relation_id属性.如果没有职务id,那就添加一个默认的职务的post_relation_id属性,
+        如果没有默认职务.报错退出.
+        6.再次保存employee的对象
+        :param company_id:
+        :param args_list: 员工的初始化参数的字典组成的list,一般是从app或者web端接收的信息.
+        :return: 添加失败的的args参数的list
+        """
+        company = cls.find_by_id(company_id)
+        error_list = list()  # 插入失败的对象.args的list
+        if isinstance(company, cls):
+            """公司存在"""
+            company_dbref = company.get_dbref()
+            now = datetime.datetime.now()
+            for args in args_list:
+                obj = Employee.find_one_plus(filter_dict={"phone_num": args.get("phone_num")}, instance=False)
+                if obj is None:
+                    pass
+                else:
+                    args["_id"] = obj['_id']
+                emp = Employee(**args)
+                _id = emp.save()
+                if isinstance(_id, ObjectId):
+                    """employee插入成功"""
+                    employee_dbref = emp.get_dbref()
+                    """检查EmployeeCompanyRelation记录是否存在"""
+                    f = {"company_id": company_dbref, "employee_id": employee_dbref, "$or":[
+                        {"end_date": {"$exists": False}},
+                        {"end_date": {"$eq": None}},
+                        {"end_date": {"$gte": now}}
+                    ]}
+                    company_relation = EmployeeCompanyRelation.find_one_plus(filter_dict=f, instance=True)
+                    if company_relation is None:
+                        """添加EmployeeCompanyRelation记录"""
+                        company_relation = EmployeeCompanyRelation(company_id=company_dbref, employee_id=employee_dbref,
+                                                                   create_date=now)
+                        company_relation_id = company_relation.save()
+                        if isinstance(company_relation_id, ObjectId):
+                            """添加EmployeeCompanyRelation记录成功"""
+                            company_relation_id = company_relation.get_dbref()
+                        else:
+                            raise ValueError("添加EmployeeCompanyRelation记录失败, args={}".format(args))
+                    else:
+                        company_relation_id = company_relation.get_dbref()
+                    """检查部门id是否正确?"""
+                    dept_id = args.get("dept_id")
+                    dept = Dept.find_by_id(dept_id)
+                    if isinstance(dept, Dept):
+                        
+                    """添加EmployeeDeptRelation记录"""
+                else:
+                    error_list.append(emp)
+        else:
+            raise ValueError("公司id错误")
+
+    @classmethod
     def all_post(cls, company_id: (str, ObjectId)) -> dict:
         """
         根据公司id获取全部的职务的列表
@@ -212,7 +308,37 @@ class Post(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
     type_dict['company_id'] = DBRef  # 所属公司 Company
     type_dict['post_name'] = str  # 岗位名称
-    type_dict['post_level'] = str  # 岗位级别，某些公司用来区分待遇的标识。也会用来区分不同部门的相同名称的岗位的区别
+    type_dict['default_post'] = bool  # 是否是默认职务?默认职务是作为未确认职务时的默认值,只可修改,不可删除
+    type_dict['level'] = int  # 职务的管理级别,默认为0
+    type_dict['description'] = str  # 说明
+    """
+    用来标识此职务是否具备管理权限?或者具备何种管理权限?在目前情况下,可选的值只有0和1
+    0代表是普通职员,没有管理权限.
+    1代表是管理员,可以查看本组/部门的其他人的信息.
+    """
+
+    def __init__(self, **kwargs):
+        if "level" not in kwargs:
+            kwargs['level'] = 0
+        else:
+            level = kwargs['level']
+            if isinstance(level, (int, str)):
+                if isinstance(level, str):
+                    try:
+                        level = int(level)
+                    except ValueError as e:
+                        print(e)
+                        raise ValueError("{}不能转化为int类型".format(level))
+                else:
+                    pass
+                if 0 > level or level > 1:
+                    level = 0
+                else:
+                    pass
+                kwargs['level'] = level
+            else:
+                raise ValueError("level必须是int,或者可转化为int类型")
+        super(Post, self).__init__(**kwargs)
 
 
 class EmployeePostRelation(mongo_db.BaseDoc):
@@ -220,7 +346,7 @@ class EmployeePostRelation(mongo_db.BaseDoc):
     _table_name = "employee_post_relation"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
-    type_dict['user_id'] = DBRef  # 员工id,指向user_info表,
+    type_dict['employee_id'] = DBRef  # 员工id,指向user_info表,
     type_dict['post_id'] = DBRef   # 职务id,指向post_info表
     type_dict['create_date'] = datetime.datetime  # 关系的建立时间
     type_dict['end_date'] = datetime.datetime  # 关系的终结时间
@@ -236,6 +362,7 @@ class Dept(mongo_db.BaseDoc):
     # 废弃,以Leader(关系类代替)
     # type_dict['secondary_leaders'] = list  # 除部门正职领导之外的辅助的领导,是Employee的DBRef的list
     type_dict['dept_name'] = str  # 团队名称
+    type_dict['default_dept'] = bool  # 是否是默认部门?默认部门是作为未确认部门归属时的默认值,只可修改,不可删除
     type_dict['description'] = str  # 说明
     type_dict['higher_dept'] = DBRef  # 上级部门
 
@@ -408,10 +535,10 @@ class Dept(mongo_db.BaseDoc):
 
 class EmployeeCompanyRelation(mongo_db.BaseDoc):
     """关系表,记录员工和公司的对应关系"""
-    _table_name = "employee_dept_relation"
+    _table_name = "employee_company_relation"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
-    type_dict['user_id'] = DBRef  # 员工id,指向user_info表
+    type_dict['employee_id'] = DBRef  # 员工id,指向user_info表
     type_dict['company_id'] = DBRef   # 部门id,指向cpmpany_info表
     type_dict['create_date'] = datetime.datetime  # 关系的建立时间
     type_dict['end_date'] = datetime.datetime  # 关系的终结时间
@@ -422,7 +549,7 @@ class EmployeeDeptRelation(mongo_db.BaseDoc):
     _table_name = "employee_dept_relation"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
-    type_dict['user_id'] = DBRef  # 员工id,指向user_info表
+    type_dict['employee_id'] = DBRef  # 员工id,指向user_info表
     type_dict['dept_id'] = DBRef   # 部门id,指向dept_info表
     type_dict['create_date'] = datetime.datetime  # 关系的建立时间
     type_dict['end_date'] = datetime.datetime  # 关系的终结时间
@@ -453,7 +580,7 @@ class Employee(User):
         self.type_dict['post_relation_id'] = DBRef  # 岗位关系id,指向employee_post_relation表
         self.type_dict['employee_number'] = int  # 工号
         self.type_dict['dept_path'] = list  # 所属团队DBRef组成的list，Dept 即将废止,以dept_relation_id替代
-        self.type_dict['post_relation_id'] = DBRef  # 部门关系id,指向employee_dept_relation表
+        self.type_dict['dept_relation_id'] = DBRef  # 部门关系id,指向employee_dept_relation表
         self.type_dict['block_list'] = list  # 不想显示的用户的DBRef组成的list，Employee
         self.type_dict['scheduling'] = list   # 排班的DBRef的list,对应于员工的排班,默认早9点到晚17点.（考虑加班和替班的情况）
         super(Employee, self).__init__(**kwargs)
@@ -839,4 +966,23 @@ def rebuild_test_team() -> None:
 
 
 if __name__ == "__main__":
+    # """创建一批员工和新振兴公司之间的雇佣关系"""
+    # company = Company.find_by_id(ObjectId("5aab48ed4660d32b752a7ee9"))
+    # company_dbref = company.get_dbref()
+    # post = Post.find_by_id(ObjectId("5ab21fc74660d376c982ee27"))
+    # post_dbref = post.get_dbref()
+    # dept = Dept.find_by_id(ObjectId("5ab21b2a4660d3745e53adfa"))
+    # dept_dbref = dept.get_dbref()
+    # now = datetime.datetime.now()
+    # f = {"description": {"$exists": True}}
+    # es = Employee.find_plus(filter_dict=f, to_dict=True)
+    # for e in es:
+    #     post_relation_id = e['post_relation_id']
+    #     post_relation_dbref = DBRef(database="platform_db", collection="employee_post_relation", id=post_relation_id)
+    #     e["post_relation_id"] = post_relation_dbref
+    #     dept_relation_id = e['dept_relation_id']
+    #     dept_relation_dbref = DBRef(database="platform_db", collection="employee_dept_relation", id=dept_relation_id)
+    #     e["dept_relation_id"] = dept_relation_dbref  # 设置用户和职务的关系id
+    #     e = Employee(**e)
+    #     e.save()
     pass
