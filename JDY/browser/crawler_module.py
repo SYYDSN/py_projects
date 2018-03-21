@@ -5,6 +5,7 @@ __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 from log_module import get_logger
+from log_module import recode
 from mail_module import send_mail
 import requests
 import re
@@ -33,7 +34,8 @@ from threading import Lock
 logger = get_logger()
 cache = RedisCache()
 queue = JoinableQueue()
-jobs = list()
+job_key = "job_list"
+cache.delete(job_key)
 
 
 """爬虫模块"""
@@ -336,9 +338,13 @@ def get_page_platform(browser, page_url: str) -> (PyQuery, None):
         browser.get(page_url)
     except TimeoutException as e:
         print(page_url)
+        ms = "Error {} on {}".format(page_url, e)
+        recode(ms)
         raise e
     except Exception as e:
         print(e)
+        ms = "Error {} on {}".format(page_url, e)
+        recode(ms)
         raise e
     source = browser.page_source
     html = PyQuery(source)
@@ -394,6 +400,8 @@ def parse_transaction_tr(tr: PyQuery, domain: str) -> dict:
     :param domain: 
     :return: 
     """
+    ms = "begin parse_transaction_tr"
+    recode(ms)
     init_dict = dict()
     tds = tr.find("td")
     """平台1和平台2区别对待"""
@@ -692,6 +700,8 @@ def parse_withdraw_tr(tr: PyQuery) -> dict:
     """
     init_dict = dict()
     tds = tr.find("td")
+    ms = "begin parse_withdraw_tr"
+    recode(ms)
     if len(tds) < 15:
         return None
     else:
@@ -866,7 +876,9 @@ def parse_page(browser, domain: str = None, t_type: str = None, ticket_limit: in
                     res = temp['data']
                     stop = temp['stop']
                 else:
-                    print("stop page by empty: {}".format(url))
+                    ms = "stop page by empty: {}".format(url)
+                    print(ms)
+                    recode(ms)
                     break
             else:
                 """buy, sell, balance credit"""
@@ -878,10 +890,14 @@ def parse_page(browser, domain: str = None, t_type: str = None, ticket_limit: in
                     res = temp['data']
                     stop = temp['stop']
                 else:
-                    print("stop page by empty: {}".format(url))
+                    ms = "stop page by empty: {}".format(url)
+                    print(ms)
+                    recode(ms)
                     break
             if stop:
-                print("stop page by flag: {}".format(url))
+                ms = "stop page by flag: {}".format(url)
+                print(ms)
+                recode(ms)
                 break
             else:
                 pass
@@ -957,6 +973,8 @@ def save_transaction_data(raw_data: list) -> list:
                         insert_list.append(x)
         if len(insert_list) > 0:
             r = Transaction.insert_many(insert_list)
+            ms = "save_transaction_data success"
+            recode(ms)
             return r
         else:
             pass
@@ -977,6 +995,8 @@ def save_withdraw_data(raw_data: list) -> list:
         else:
             pass
         r = Withdraw.insert_many(raw_data)
+        ms = "save_withdraw_data success"
+        recode(ms)
         return r
 
 
@@ -1201,11 +1221,17 @@ def upload_transaction(browser, **kwargs) -> bool:
             if msg_span.get_attribute("class") == "msg-title":
                 """操作成功"""
                 browser.refresh()  # 刷新页面
+                ms = "upload transaction success"
+                recode(ms)
                 res = True
             else:
+                ms = "upload transaction fail"
+                recode(ms)
                 pass  # 添加数据失败
         except Exception as e:
             print(e)
+            ms = str(e)
+            recode(ms)
             logger.exception()
         finally:
             return res
@@ -1359,11 +1385,17 @@ def upload_withdraw(browser, **kwargs) -> bool:
         if msg_span.get_attribute("class") == "msg-title":
             """操作成功"""
             browser.refresh()  # 刷新页面
+            ms = "upload withdraw success"
+            recode(ms)
             res = True
         else:
+            ms = "upload withdraw fail"
+            recode(ms)
             pass  # 添加数据失败
     except Exception as e:
         print(e)
+        ms = str(e)
+        recode(ms)
         logger.exception()
     finally:
         return res
@@ -1371,7 +1403,7 @@ def upload_withdraw(browser, **kwargs) -> bool:
 
 def get_uploaded_transaction() -> dict:
     """
-    获取已上传的交易数据
+    获取已上传的交易数据,用于去重
     :return:
     """
     ses = mongo_db.get_conn("transaction_info")
@@ -1408,6 +1440,8 @@ def query_transaction(upload: bool = True, only_transaction: bool = False) ->lis
         filter_dict = dict()
     sort_dict = {"close_time": 1, "time": 1}
     r = Transaction.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
+    ms = "query transaction success"
+    recode(ms)
     return r
 
 
@@ -1426,6 +1460,8 @@ def query_withdraw(upload: bool = True) ->dict:
     sort_dict = {"time": 1}
     filter_dict['command'] = {"$in": ['balance', 'credit']}
     other = Transaction.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
+    ms = "query withdraw success!"
+    recode(ms)
     return {"withdraw": withdraw, "other": other}
 
 
@@ -1452,10 +1488,13 @@ def upload_and_update_transaction(browser, **kwargs):
         update_dict = {"$set": {"upload": 1}}
         res = Transaction.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
         if res:
-            print("{} {} success".format(kwargs['system'], kwargs['ticket']))
+            ms = "{} {} success".format(kwargs['system'], kwargs['ticket'])
+            print(ms)
+            recode(ms)
             return True
         else:
             ms = "更新出金申请数据库的upload标识失败,实例:{}".format(count, kwargs)
+            recode(ms)
             raise ValueError(ms)
 
 
@@ -1475,6 +1514,7 @@ def upload_and_update_withdraw(browser, **kwargs):
         time.sleep(3)
     if not res:
         ms = "上传出金申请已连续失败{}次,实例:{}".format(count, kwargs)
+        recode(ms)
         raise ValueError(ms)
     else:
         """上传出金申请成功,更新数据库的upload标识"""
@@ -1482,10 +1522,13 @@ def upload_and_update_withdraw(browser, **kwargs):
         update_dict = {"$set": {"upload": 1}}
         res = Withdraw.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
         if res:
-            print("{} {} success".format(kwargs['system'], kwargs['ticket']))
+            ms = "{} {} success".format(kwargs['system'], kwargs['ticket'])
+            print(ms)
+            recode(ms)
             return True
         else:
             ms = "更新出金申请数据库的upload标识失败,实例:{}".format(count, kwargs)
+            recode(ms)
             raise ValueError(ms)
 
 
@@ -1500,11 +1543,13 @@ def draw_transaction(browser):
         s2 = parse_page(browser, domain2, key, limits[domain2]['last_ticket'])  # 平台2
         save_transaction_data(s2)
         ms = "平台2 {}数据抓取完毕,可插入数据长度{}".format(key, len(s2))
+        recode(ms)
         logger.info(ms)
         print(ms)
         s1 = parse_page(browser, domain1, key, limits[domain1]['last_ticket'])  # 平台1
         save_transaction_data(s1)
         ms = "平台1 {}数据抓取完毕,可插入数据长度{}".format(key, len(s1))
+        recode(ms)
         logger.info(ms)
         print(ms)
     return True
@@ -1522,16 +1567,19 @@ def draw_withdraw(browser):
         save_transaction_data(s2)
         ms = "平台2 {}数据抓取完毕,可插入数据长度{}".format(key, len(s2))
         logger.info(ms)
+        recode(ms)
         print(ms)
         s1 = parse_page(browser, domain1, key, limits[domain1]['last_ticket'])  # 平台1
         save_transaction_data(s1)
         ms = "平台1 {}数据抓取完毕,可插入数据长度{}".format(key, len(s1))
+        recode(ms)
         logger.info(ms)
         print(ms)
     s = parse_page(browser, domain2, None)  # 出金申请
     save_withdraw_data(s)
     ms = "平台2 withdraw数据抓取完毕,可插入数据长度{}".format(len(s))
     logger.info(ms)
+    recode(ms)
     print(ms)
     return True
 
@@ -1555,13 +1603,20 @@ def add_job(job_type: str, job_dict: dict) -> None:
     :return:
     """
     job = {"job_type": job_type, "job_dict": job_dict}
-    global jobs
+    jobs = cache.get(job_key)
+    if jobs is None:
+        jobs = list()
+    else:
+        pass
     types = [x['job_type'] for x in jobs]
     if job_type in types:
         ms = "重复的任务：{}，放弃".format(job_type)
     else:
         ms = "加入新的任务：{}".format(job_type)
         jobs.append(job)
+    cache.set(job_key, jobs, timeout=24*3600)
+    recode(ms)
+    recode(str(jobs))
     logger.info(ms)
 
 
@@ -1575,22 +1630,32 @@ def do_jobs():
     lock.acquire()
     ms = "{} do_jobs locked".format(datetime.datetime.now())
     logger.info(ms)
+    recode(ms)
     in_do_jobs = cache.get(key)
     if in_do_jobs == 1:
         """in_do_jobs表示工作中"""
         ms = "{} in_do_jobs ".format(datetime.datetime.now())
         logger.info(ms)
+        recode(ms)
     else:
         ms = "{} not in_do_jobs ".format(datetime.datetime.now())
         logger.info(ms)
+        recode(ms)
         in_do_jobs = 1
         cache.set(key, in_do_jobs, timeout=3600)
-        raw = dict()
+        jobs = cache.get(job_key)
+        ms = "jobs = {}".format(jobs)
+        recode(ms)
+        if jobs is None:
+            jobs = list()
+        else:
+            pass
         if len(jobs) == 0:
             pass
         else:
             ms = "{} begin do_jobs ".format(datetime.datetime.now())
             logger.info(ms)
+            recode(ms)
             browser = get_browser(headless=True)
             while len(jobs) > 0:
                 job = jobs.pop(0)
@@ -1625,10 +1690,10 @@ def do_jobs():
                         print("upload withdraw success")
                 elif job_type == 'reg':
                     upload_and_update_reg(browser=browser, **job_dict)
-                    raw[job_type] = job_dict
                     print("upload reg success")
                 else:
                     ms = "error job, type={} ,dict={}".format(job_type, job_dict)
+                    recode(ms)
                     logger.exception(ms)
             browser.quit()
             del browser
@@ -1636,6 +1701,7 @@ def do_jobs():
         cache.set(key, in_do_jobs, timeout=3600)
     lock.release()
     ms = "{} do_jobs unlocked".format(datetime.datetime.now())
+    recode(ms)
     logger.info(ms)
     return True
 

@@ -8,9 +8,8 @@ from browser.firefox_module import ShengFX888
 from browser.crawler_module import do_jobs
 from browser.crawler_module import add_job
 from log_module import get_logger
+from log_module import recode
 from mail_module import send_mail
-
-logger = get_logger("celery")
 
 
 """
@@ -86,22 +85,29 @@ def to_jiandao_cloud_and_send_mail(*args, **kwargs):
 
 @app.task(bind=True)
 def query_transaction(*args, **kwargs):
-    """每天检查一下平台1/2的buy和sell"""
+    add_job("draw_transaction", dict())
+    ms = "beat task add draw_transaction success"
+    recode(ms)
     add_job("query_transaction", dict())
-    return "add query_transaction success"
+    ms = "beat task add query_transaction success"
+    recode(ms)
+    return "celery query_transaction ok"
 
 
 @app.task(bind=True)
-def query_withdraw(*args, **kwargs):
+def query_withdraw(self, *args, **kwargs):
     """每5分钟检查一下出金申请,出入金记录和赠金"""
+    add_job("draw_withdraw", dict())
+    ms = "beat task add draw_withdraw success"
+    recode(ms)
     add_job("query_withdraw", dict())
-    return "add query_withdraw success"
+    ms = "beat task add query_withdraw success"
+    recode(ms)
+    return "celery query_withdraw ok"
 
 
 @app.task(bind=True)
-def do_works(*args, **kwargs):
-    print(args)
-    print(kwargs)
+def do_works(self, *args, **kwargs):
     """每分钟检查一下工作"""
     err = None
     try:
@@ -112,6 +118,7 @@ def do_works(*args, **kwargs):
         if err is None:
             return "works success!"
         else:
+            recode(err)
             return err
 
 

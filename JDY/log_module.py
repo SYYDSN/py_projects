@@ -73,7 +73,7 @@ def recode(mes: str)->None:
     :param mes: 需要被记录的内容
     :return:
     """
-    if 1:
+    if 0:
         pass
     else:
         recode_path_str = os.path.join(dir_path, "logs", "recode")
