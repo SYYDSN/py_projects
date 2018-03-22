@@ -17,8 +17,9 @@ def test_get_security_rank_list():
     auth_token = "ed3774bc553a4714a16d62d72f67fded"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     res = requests.post("http://127.0.0.1:5000/api/get_security_rank_list", headers=headers)
-    for k,v in res.json().items():
-        print("{} {}".format(k, v))
+    for n in res.json()['data']:
+        print(n)
+
 
 def test_req(**kwargs) -> None:
     """测试app客户端的请求"""

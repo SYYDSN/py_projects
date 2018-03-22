@@ -9,6 +9,7 @@ from log_module import recode
 from mail_module import send_mail
 import requests
 import re
+import gc
 import time
 import json
 import datetime
@@ -702,7 +703,7 @@ def parse_withdraw_tr(tr: PyQuery) -> dict:
     tds = tr.find("td")
     ms = "begin parse_withdraw_tr"
     recode(ms)
-    if len(tds) < 15:
+    if len(tds) < 10:
         return None
     else:
         domain = domain2
@@ -711,42 +712,35 @@ def parse_withdraw_tr(tr: PyQuery) -> dict:
         first = PyQuery(tds[0])
         texts_1 = first.text().split("\n")
         account = int(re.search(r'\d{4,}', texts_1[0].lower()).group())  # mt账户
-        group = texts_1[-1].lower()[5:]  # mt分组
         init_dict['account'] = account
-        init_dict['group'] = group
         """第二个td，取客户2"""
         second = PyQuery(tds[1])
-        init_dict['manager'] = second.text().strip()
-        """第三个td，取英文名"""
-        third = PyQuery(tds[2])
-        texts_3 = third.text().split("\n")
-        nick_name = texts_3[0][4:].strip("")
-        init_dict['nick_name'] = nick_name
-        """第四个，金额"""
-        fourth = PyQuery(tds[3])
+        init_dict['nick_name'] = second.text().split("\n")[0].split("：")[-1].strip()
+        """第三个td，金额"""
+        fourth = PyQuery(tds[2])
         texts_4 = fourth.text().split("\n")
         amount_usd = float(texts_4[0].split("$")[-1].strip())  # 金额/美元
         amount_cny = float(texts_4[-1].split("￥")[-1].strip())  # 金额/人民币
         init_dict['amount_usd'] = amount_usd
         init_dict['amount_cny'] = amount_cny
         """
-        第五个，取手续费
+        第四个，取手续费
         """
-        fifth = PyQuery(tds[4])
+        fifth = PyQuery(tds[3])
         texts_5 = fifth.text().split("\n")
         commission_usd = float(texts_5[0].split("$")[-1].strip())  # 手续费/美元
         commission_cny = float(texts_5[-1].split("￥")[-1].strip())  # 手续费/人民币
         init_dict['commission_usd'] = commission_usd
         init_dict['commission_cny'] = commission_cny
         """
-        第六个，转账方式，
+        第五个，转账方式，
         """
-        sixth = PyQuery(tds[5])
+        sixth = PyQuery(tds[4])
         init_dict['channel'] = sixth.text().strip()
         """
-        第七个，时间
+        第六个，时间
         """
-        seventh = PyQuery(tds[6])
+        seventh = PyQuery(tds[5])
         seventh = seventh.text().split("\n")
         apply_time = seventh[0][5:].strip("")
         apply_time = get_datetime_from_str(apply_time)
@@ -754,32 +748,29 @@ def parse_withdraw_tr(tr: PyQuery) -> dict:
         close_time = get_datetime_from_str(close_time)
         init_dict['apply_time'] = apply_time
         init_dict['close_time'] = close_time
-        """第八个，开户行"""
-        eighth = PyQuery(tds[7]).text()
+        """第七个，开户行"""
+        eighth = PyQuery(tds[6]).text()
         init_dict['blank_name'] = eighth.strip()
-        """第九个，开户行代码"""
-        ninth = PyQuery(tds[8]).text()
-        init_dict['blank_code'] = ninth.strip()
-        """第十个，银行"""
-        tenth = PyQuery(tds[9]).text()
+        """第八个，银行卡号"""
+        tenth = PyQuery(tds[7]).text()
         init_dict['code_id'] = tenth.strip()
-        """第十一个，状态"""
-        eleventh = PyQuery(tds[10]).text()
+        """第九个，状态"""
+        eleventh = PyQuery(tds[8]).text()
         init_dict['status'] = eleventh.strip()
-        """第十二个，账户余额"""
-        twelfth = PyQuery(tds[11]).text()
+        """第十个，账户余额"""
+        twelfth = PyQuery(tds[9]).text()
         init_dict['account_balance'] = float(twelfth.strip()[1:])
-        """第十三个，账户净值"""
-        thirteenth = PyQuery(tds[12]).text()
+        """第十一个，账户净值"""
+        thirteenth = PyQuery(tds[10]).text()
         init_dict['account_value'] = float(thirteenth.strip()[1:])
-        """第十四个，持仓量"""
-        fourteenth = PyQuery(tds[13]).text()
+        """第十二个，持仓量"""
+        fourteenth = PyQuery(tds[11]).text()
         init_dict['open_interest'] = float(fourteenth.strip()[0: -1])
-        """第十五个，可用保证金"""
-        fifteenth = PyQuery(tds[14]).text()
+        """第十三个，可用保证金"""
+        fifteenth = PyQuery(tds[12]).text()
         init_dict['account_margin'] = float(fifteenth.strip()[1:])
-        """第十六个，单号"""
-        sixth = PyQuery(tds[15].find("a"))
+        """第十四个，单号"""
+        sixth = PyQuery(tds[13].find("a"))
         init_dict['ticket'] = int(sixth.attr("href").split("/")[-1])
 
         init_dict = {k: v for k, v in init_dict.items()}
@@ -1266,7 +1257,7 @@ def upload_withdraw(browser, **kwargs) -> bool:
     else:
         print("不需要登录")
 
-    apply_time = kwargs['apply_time']
+    apply_time = kwargs.get('apply_time')
     """输入申请时间"""
     if isinstance(apply_time, datetime.datetime):
         click_date = wait.until(
@@ -1697,6 +1688,7 @@ def do_jobs():
                     logger.exception(ms)
             browser.quit()
             del browser
+            gc.collect()
         in_do_jobs = 0
         cache.set(key, in_do_jobs, timeout=3600)
     lock.release()
@@ -1709,28 +1701,28 @@ def do_jobs():
 if __name__ == "__main__":
     """全套测试开始"""
     """draw"""
-    browser = get_browser()
-    for key in type_dict.keys():
-        s2 = parse_page(browser, domain2, key)  # 平台2
-        save_transaction_data(s2)
-        s1 = parse_page(browser, domain1, key)  # 平台1
-        save_transaction_data(s1)
-
-    s = parse_page(browser, domain2, None)  # 出金申请
-    save_withdraw_data(s)
-    """upload"""
-    transaction = query_transaction(True)
-    for x in transaction:
-        upload_and_update_transaction(browser=browser, **x)
-    data = query_withdraw(True)
-    withdraw = data['withdraw']
-    other = data['other']
-    for x in withdraw:
-        upload_and_update_withdraw(browser=browser, **x)  # 上传出金申请
-    for x in other:
-        upload_and_update_transaction(browser=browser, **x)  # 上传balance和credit
-    browser.quit()
-    del browser
+    # browser = get_browser()
+    # for key in type_dict.keys():
+    #     s2 = parse_page(browser, domain2, key)  # 平台2
+    #     save_transaction_data(s2)
+    #     s1 = parse_page(browser, domain1, key)  # 平台1
+    #     save_transaction_data(s1)
+    #
+    # s = parse_page(browser, domain2, None)  # 出金申请
+    # save_withdraw_data(s)
+    # """upload"""
+    # transaction = query_transaction(True)
+    # for x in transaction:
+    #     upload_and_update_transaction(browser=browser, **x)
+    # data = query_withdraw(True)
+    # withdraw = data['withdraw']
+    # other = data['other']
+    # for x in withdraw:
+    #     upload_and_update_withdraw(browser=browser, **x)  # 上传出金申请
+    # for x in other:
+    #     upload_and_update_transaction(browser=browser, **x)  # 上传balance和credit
+    # browser.quit()
+    # del browser
     """全套测试结束"""
     """填入一条假的出金申请"""
     # a = {
@@ -1760,4 +1752,13 @@ if __name__ == "__main__":
     # b.quit()
     # del b
     """测试吸取网站数据"""
+    # b = get_browser(0)
+    # b.quit()
+    # del b
+    # gc.collect()
+    # draw_withdraw(b)
+    # """测试写入出金申请"""
+    # a = {'account_balance': 949.9, 'account': 8300109, 'commission_cny': 0.0, 'amount_usd': 1000.0, 'commission_usd': 0.0, 'close_time': None, 'amount_cny': 6800.0, 'code_id': '6228480039009384874', 'status': '审核中', 'apply_time': datetime.datetime(2018, 3, 22, 19, 0, 42), 'blank_name': '中国农业银行上海市山阳支行', 'ticket': 34, 'open_interest': 0.0, 'nick_name': '张赛华', 'account_value': 949.9, 'account_margin': 949.9, 'channel': '银联', 'system': 'office.shengfxchina.com:8443'}
+    upload_and_update_withdraw(b, **a)
+    # del b
     pass

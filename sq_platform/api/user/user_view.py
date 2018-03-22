@@ -615,6 +615,13 @@ def get_security_rank_list_func(user_id) -> str:
         public int scr_synt; 驾驶综合分数
         public String driver_name; 司机姓名
         public String url_avatar； 司机头像地址
+    example:
+    {
+    'rank': '441', 
+    'url_avatar': 'http://127.0.0.1:5000/static/image/head_img/default_01.png', 
+    'scr_synt': '70', 
+    'driver_name': '李四'
+    }
     """
     message = {"message": "success"}
     # user_id = "59cda964ad01be237680e29d"
