@@ -624,10 +624,13 @@ def get_security_rank_list_func(user_id) -> str:
     }
     """
     message = {"message": "success"}
-    # user_id = "59cda964ad01be237680e29d"
+    prefix = Company.get_prefix_by_user_id(user_id)
+    user_id = '5a3b3cd5db122cd9fbc21c40'
+    prefix = "sf" if prefix is None else prefix
     host_url = request.host_url
     try:
-        mes = security_module.SecurityLevel.get_security_rank_list(user_id=user_id, host_url=host_url)
+        # mes = security_module.SecurityLevel.get_security_rank_list(user_id=user_id, host_url=host_url)
+        mes = security_module.SecurityReport.query_report2(prefix=prefix, report_type="tank", size=10)
         message['data'] = mes
     except Exception as e:
         logger.exception(e)
