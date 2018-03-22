@@ -678,6 +678,23 @@ def get_report_detail_func(user_id) -> str:
     if report_id is None:
         pass
     data = security_module.SecurityReport.get_report_detail(report_id, user_id)
+    """查询ai模块"""
+    prefix = Company.get_prefix_by_user_id(user_id)
+    prefix = "sf" if prefix is None else prefix
+    try:
+        user_id = '5a3b3cd5db122cd9fbc21c40'
+        report = security_module.SecurityReport.query_report2(prefix=prefix, user_id=user_id, size=1)
+        if len(report) == 0:
+            pass
+        else:
+            """把报告内容附加到档案中"""
+            report = report[0]['_source']
+    except Exception as e:
+        print(e)
+        logger.exception("get_daily_info_func Error:")
+        message = pack_message(message, 3010, user_id=user_id)
+    finally:
+        data['scr_synt'] = report['drive_score']  # 安全得分
     url_root = request.url_root
     url_poly = data['url_poly']
     url_poly = "{}static/image/poly_image/{}".format(url_root, url_poly)
@@ -774,7 +791,8 @@ def get_daily_info_func(user_id) -> str:
     prefix = Company.get_prefix_by_user_id(user_id)
     prefix = "sf" if prefix is None else prefix
     try:
-        report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+        user_id = '5a3b3cd5db122cd9fbc21c40'
+        report = security_module.SecurityReport.query_report2(prefix=prefix, user_id=user_id)
         archive = dict()
         if len(report) == 0:
             pass
@@ -783,16 +801,9 @@ def get_daily_info_func(user_id) -> str:
             _source = report[0]['_source']
             archive['_id'] = _source['id']  # id
             archive['td_miles'] = int(float(_source['drive_distance'].rstrip("km")))  # 总里程    公里, 注意,这是个str
-            # archive['driving_hours_sum'] = _source['drive_time']  # 总时长    小时
-            # archive['max_speed'] = _source['max_speed']  # 最高时速  公里/小时
             archive['td_fuels'] = _source['oil_cost']  # 油耗     升/百公里
-            # archive['reset_time'] = _source['reset_time']  # 休息次数
             archive['synt'] = _source['drive_score']  # 驾驶得分
-            # archive['drive_age'] = _source['drive_age']  # 驾龄
-            # archive['bad_drive_action'] = _source['bad_drive_action']  # 不良驾驶事件, 字典的数组
-            # archive['health'] = _source['health']  # 健康记录, 字典的数组
             archive['td_rank'] = _source['drive_rank']  # 排名
-            # archive['report_datetime'] = _source['report_datetime'].split("T")[0]  # 报告日期
         message['data'] = archive
     except Exception as e:
         print(e)

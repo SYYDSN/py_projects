@@ -885,7 +885,16 @@ class BaseDoc:
         """添加一个属性"""
         self.__dict__[attr_name] = attr_value
 
+    def pop_attr(self, attr_name, default=None):
+        """弹出一个属性,同时删除对应的值"""
+        return self.__dict__.pop(attr_name, default)
+
+    def remove_attr(self, attr_name):
+        """移除一个属性"""
+        self.__dict__.pop(attr_name, None)
+
     def set_attr(self, attr_name: str, attr_value) -> bool:
+        """设置属性"""
         res = False
         try:
             self.__dict__[attr_name] = attr_value
@@ -932,6 +941,20 @@ class BaseDoc:
             raise ValueError(mes)
         return inserted_id
 
+    def save_plus(self, ignore: list = None) -> bool:
+        """
+        更新
+        :param ignore: 忽略的更新的字段,一般是有唯一性验证的字段
+        :return:
+        """
+        ignore = ["_id"] if ignore is None else ignore
+        ses = get_conn(self.table_name())
+        doc = self.__dict__
+        doc = {k: v for k, v in doc.items() if k not in ignore}
+        f = {"_id": doc.pop("_id", None)}
+        res = ses.replace_one(filter=f, replacement=doc, upsert=False)
+        return res
+
     def save(self, obj=None)->ObjectId:
         """更新
         1.如果原始对象不存在，那就插入，返回objectid
@@ -940,6 +963,8 @@ class BaseDoc:
         4.其他问题会抛出/记录错误,返回None
         return ObjectId
         """
+        ms = "此方法已不建议使用,请使用实例方法save_plus和类方法replace_one替代, 2018-3-22"
+        warnings.warn(ms)
         obj = self if obj is None else obj
         table_name = obj.table_name()
         ses = get_conn(table_name=table_name)
@@ -1050,6 +1075,19 @@ class BaseDoc:
                     result_dict[k] = v
 
         return result_dict
+
+    @classmethod
+    def replace_one(cls, filter_dict: dict, replace_dict: dict, upsert: bool = False) -> bool:
+        """
+        替换一个文档.
+        :param filter_dict: 过滤器
+        :param replace_dict:  替换字典
+        :param upset: 不存在是否插入?
+        :return:
+        """
+        ses = get_conn(cls.get_table_name())
+        res = ses.replace_one(filter=filter_dict, replacement=replace_dict, upsert=upsert)
+        return res
 
     @staticmethod
     def simple_doc(doc_dict: dict, ignore_columns: list = None) -> dict:
@@ -1338,6 +1376,19 @@ class BaseDoc:
             doc_list = doc_list if is_instance else [cls(**doc).__dict__ for doc in doc_list]  # 可以把实例的数组转成doc/dict的数组.
             success_doc_list = cls.insert_many_and_return_doc(input_list=doc_list)
             return success_doc_list
+
+    @classmethod
+    def delete_many(cls, filter_dict: dict) -> None:
+        """
+        批量删除
+        :param filter_dict:
+        :return:
+        """
+        if filter_dict is None or len(filter_dict) == 0:
+            pass
+        else:
+            ses = get_conn(cls.get_table_name())
+            ses.delete_many(filter=filter_dict)
 
     @classmethod
     def create_dbref(cls, object_id):

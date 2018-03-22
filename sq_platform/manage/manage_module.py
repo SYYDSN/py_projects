@@ -7,6 +7,8 @@ from tools_module import *
 import amap_module
 import random
 import math
+import json
+import json.decoder
 from manage.company_module import *
 from api.data.item_module import User
 from api.data.item_module import Track
@@ -1311,7 +1313,7 @@ def process__structure_func(prefix):
 
 @manage_blueprint.route("/batch_insert_user", methods=['get', 'post'])
 def batch_insert_user():
-    """批量插入用户"""
+    """批量插入用户,需要3个参数:x_token, company_id和员工列表"""
     token = get_arg(request, 'x_token', None)  # 确认身份的
     if token == "bae96f78b38b4e21ab94dab75582918f":
         if request.method.lower() == "get":
@@ -1321,9 +1323,16 @@ def batch_insert_user():
             ==========================================<br>
             import requests<br>
             import json <br>
-            user_list = [{"real_name": "张三", '"phone_num": "13900000001",...},.....]<br>
+            company_id = "5aab48ed4660d32b752a7ee9"  # 新振兴的id,<br>
+            e1 = {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"phone_num": "15618318888", <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"real_name": "张三",                  <br>  
+            &nbsp;&nbsp;&nbsp;&nbsp;"dept_id": "5ab21b2a4660d3745e53adfa",  # 新振兴的默认部门id<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"post_id": "5ab21fc74660d376c982ee27"   # 新振兴的默认职务id<br>
+            }<br>
+            user_list = [e1,....]<br>
             x_token = "bae96f78b38b4e21ab94dab75582918f"<br>
-            data = {"x_token": x_token, "user_list": json.dumps(user_list)}<br>
+            data = {"x_token": x_token, "company_id": company_id, "user_list": json.dumps(user_list)}<br>
             url = "http://xzx.safego.org/manage/batch_insert_user"<br>
             r = requests.post(url, data=data)<br>
             if r.status_code == 200:<br>
@@ -1333,21 +1342,48 @@ def batch_insert_user():
             """
             return html
         elif request.method.lower() == "post":
-            user_list = json.loads(get_arg(request, "user_list", ''))
-            ms = "batch_insert_user, args:{}".format(user_list)
-            logger.info(ms)
             error = ''
+            user_list = None
             try:
-                r = Employee.insert_many(user_list)
+                user_list = json.loads(get_arg(request, "user_list", ''))
+            except TypeError as e:
+                print(e)
+                error = str(e)
+                logger.exception()
+            except json.decoder.JSONDecodeError as e:
+                print(e)
+                error = str(e)
+                logger.exception()
             except Exception as e:
-                error = "Error: {}".format(e)
+                print(e)
+                error = str(e)
+                logger.exception()
             finally:
-                mes = {"message": "success"}
-                if len(error) > 0:
-                    mes['message'] = error
-                else:
-                    pass
-                return json.dumps(mes)
+                pass
+            company_id = get_arg(request, "company", '').strip()
+            ms = "batch_insert_user, company_id:{}. args:{}".format(company_id, user_list)
+            logger.info(ms)
+            mes = {"message": "success"}
+            if error != '':
+                pass
+            elif len(company_id) != 24:
+                error = "错误的公司id:{}".format(company_id)
+            elif isinstance(user_list, list):
+                error = "导入的数据必须是字典的数组"
+            elif len(user_list) == 0:
+                error = "导入的数据为空"
+            else:
+                try:
+                    Company.add_employee(company_id, user_list)
+                except Exception as e:
+                    error = "{}".format(e)
+                finally:
+                    if len(error) > 0:
+                        mes['message'] = error
+                    else:
+                        pass
+            mes['message'] = error
+            return json.dumps(mes)
         else:
             return abort(405)
 

@@ -14,11 +14,11 @@ from api.data import item_module
 
 def test_get_security_rank_list():
     """测试用户安全指数排名接口"""
-    auth_token = "19be87a739504c6a92bba4c16c89058a"  # app段登录标识 me
+    auth_token = "ed3774bc553a4714a16d62d72f67fded"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     res = requests.post("http://127.0.0.1:5000/api/get_security_rank_list", headers=headers)
-    print(res.json())
-
+    for k,v in res.json().items():
+        print("{} {}".format(k, v))
 
 def test_req(**kwargs) -> None:
     """测试app客户端的请求"""
@@ -46,7 +46,7 @@ def test_get_daily_info():
     测试获取每日报告
     :return:
     """
-    auth_token = "1bed59649f2f454ea50b73c9fb46c7e8"  # app段登录标识
+    auth_token = "ed3774bc553a4714a16d62d72f67fded"  # app段登录标识
     headers = {"auth_token": auth_token}
     res = requests.post("http://127.0.0.1:5000/api/get_daily_info", headers=headers)
     print(res.json())
@@ -216,7 +216,7 @@ def test_get_alert_message():
 
 def test_get_report_detail():
     """测试获取安全报告详情"""
-    auth_token = "1bed59649f2f454ea50b73c9fb46c7e8"  # app段登录标识 me
+    auth_token = "ed3774bc553a4714a16d62d72f67fded"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     url = "http://127.0.0.1:5000/api/get_report_detail"
     # url = "http://safego.org:5000/api/get_report_detail"
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     """测试用户删除行车证"""
     # test_delete_user_vehicle_info()
     # """测试用户编辑行车证图片"""
-    test_edit_user_permit_image()
+    # test_edit_user_permit_image()
     """测试用户上传驾驶证"""
     # test_upload_user_driving_license()
     """测试更新用户驾驶证信息"""
@@ -273,7 +273,7 @@ if __name__ == "__main__":
     """测试获取用户驾驶证信息"""
     # test_get_user_driving_license()
     """测试用户安全指数排名接口"""
-    # test_get_security_rank_list()
+    test_get_security_rank_list()
     """测试用户上传行车数据的压缩文件"""
     # test_add_driving_data()
     """测试获取安全报告详情"""

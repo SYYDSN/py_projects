@@ -134,10 +134,12 @@ class User(mongo_db.BaseDoc):
     type_dict['last_update'] = datetime.datetime  # 用户当前的app信息
 
     def __init__(self, **kwargs):
+        if "phone_num" not in kwargs:
+            raise ValueError("phone_num参数必须!")
         if "user_name" not in kwargs:
             kwargs['user_name'] = kwargs['phone_num']
         if "user_status" not in kwargs:
-            kwargs['user_name'] = 1
+            kwargs['user_status'] = 1
         if "country" not in kwargs:
             kwargs['country'] = "中国"
         if "user_password" not in kwargs:

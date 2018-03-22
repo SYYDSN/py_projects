@@ -1199,6 +1199,8 @@ class SecurityReport(mongo_db.BaseDoc):
                         }
                     }
                 }
+                """排序"""
+                query['sort'] = {"post_date": {"order": "desc"}}
         else:
             """date_str为None是查询最后一个安全报告"""
             l = 100
@@ -1234,6 +1236,65 @@ class SecurityReport(mongo_db.BaseDoc):
             finally:
                 pass
         return res
+
+    @classmethod
+    def query_report2(cls, prefix: str = "sf", user_id: str = None, report_type: str = "report",
+                      size: int = 1, begin_date: str = None, end_date: str = None) -> list:
+        """
+        从ai模块查询安全报告
+        :param prefix:  查询前缀
+        :param user_id:  用户id. 为None表示查所有人的.
+        :param report_type:  报告类型.report/rank ,可以查询报告/排名信息
+        :param begin_date: 开始日期, 2018-1-1 字符串
+        :param end_date:
+        :return:
+        """
+        user_id = str(user_id) if not isinstance(user_id, str) else user_id
+        filter_dict = dict()
+        query = dict()
+        if user_id is not None:
+            query = {"bool": {"must": {"match": {"id": user_id}}}}
+        else:
+            pass
+        if begin_date is None and end_date is None:
+            pass
+        else:
+            """设定了时间"""
+            if begin_date is None:
+                begin_date = end_date
+            elif end_date is None:
+                end_date = begin_date
+            else:
+                pass
+            query['bool']['filter'] = {"range": {"report_datetime": {"gte": begin_date, "lte": end_date}}}
+        filter_dict['query'] = query
+        filter_dict['size'] = size
+        filter_dict['sort'] = {"report_datetime": "desc"} if report_type == "report" else {"drive_rank": "asc"}
+
+        es = Elasticsearch(['http://safego:safego.org@api.safego.org:9200'])
+        res = list()
+        try:
+            res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+            total = res['hits']['total']  # 总共有读少返回记录?
+            ms = "elasticsearch query success! at {}, user_id:{},date:{}共计查询到{}条记录".format(
+                mongo_db.get_datetime(), user_id, "{}~{}".format(begin_date, end_date), total)
+            print(ms)
+            logger.info(ms)
+            res = res['hits']['hits']
+        except ES_NotFoundError as e:
+            logger.exception("elasticsearch Error:")
+            print(e)
+            raise e
+        except ConnectionError as e:
+            logger.exception("elasticsearch Error:")
+            print(e)
+            raise e
+        except Exception as e:
+            print(e)
+            logger.exception("elasticsearch Error:")
+            raise e
+        finally:
+            return res
 
 
 class HealthReport(mongo_db.BaseDoc):
@@ -1399,19 +1460,10 @@ if __name__ == "__main__":
     u_id = ObjectId("59f19d8dad01be4d918cacb7")
     my_id = ObjectId("59895177de713e304a67d30c")
     date_str = "2017-11-16"
-    # date_str = "2017-11-15"
-    # SecurityReport.create_instance_by_day(u_id, date_str, True)
-    #############################################################
-    # SecurityReport.batch_create_instance_in_background(prev_day=15, rebuild=1)
-    ###########################################################
-    # SecurityReport.get_report_history(u_id, datetime.datetime.strptime("2017-11-15", "%Y-%m-%d"))
-    # report = SecurityReport.create_instance_by_day(u_id, date_str, True)
-    # SecurityReport.virtual_data_generator(rebuild=True)
-    # '59cda57bad01be0912b352da 59cda886ad01be237680e28e 59cda964ad01be237680e29d'
-    # print(SecurityReport.query_report("sf", "59cda964ad01be237680e29d", "2017-12-21"))
-    # print(SecurityReport.query_report("sf", "59cda964ad01be237680e29d", "2018-01-02"))
-    # print(SecurityReport.query_report("sf", "59cda964ad01be237680e29d", "2018-01-03 2018-01-11"))
-    # print(HealthReport.get_instance(ObjectId("59cda964ad01be237680e29d"), "2017-12-25").to_flat_dict())
-    # print(DrivingEvent.random_event())
-    DrivingEvent.random_event()
+    """查询某人最新安全报告"""
+    SecurityReport.query_report2(user_id="5a3b3cd5db122cd9fbc21c40")
+    """查询某人某段时间安全报告"""
+    # SecurityReport.query_report2(user_id="5a3b3cd5db122cd9fbc21c40", begin_date='2018-01-01', end_date='2018-03-01')
+    """查询最近的安全得分排名"""
+    # SecurityReport.query_report2(prefix="xzx", report_type="rank")
     pass

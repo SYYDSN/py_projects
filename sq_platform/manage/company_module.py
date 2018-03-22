@@ -72,69 +72,370 @@ class Company(mongo_db.BaseDoc):
             return True
 
     @classmethod
-    def add_employees(cls, company_id: (str, ObjectId), args_list: list) -> (list, None):
+    def add_employee(cls, company_id: (str, ObjectId), args_list: (list, dict)) -> None:
         """
-        添加员工, 逻辑如下:
-        1. 确认公司id是否存在?不存在退出,
+        单独/批量添加员工, 重复的导入会覆盖以前的数据.添加一个员工也可以使用此方法.
+        调用此方法之前,建议检查对应的权限.
+        此方法没有线程锁,方法的逻辑如下:
+        1. 确认公司id是否存在?不存在退出,存在就要验证部门id和职务id的合法性
         2. 添加一个employee的对象.
-        3. 创建一条EmployeeCompanyRelation记录.保存.然后在employee添加company_relation_id属性.
+        3. 先清除职员和其他公司的关机记录,然后再创建一条EmployeeCompanyRelation记录.保存.然后在employee添加company_relation_id属性.
         4. 如果有部门id,就验证一下部门id是否存在?存在就添加一条EmployeeDeptRelation记录,不存在就报错.
+        先清除员工和其他部门的关系.
         然后在employee添加dept_relation_id属性.如果没有部门id,那就添加一个默认的部门的dept_relation_id属性,
         如果没有默认部门.报错退出.
         5. 如果有职务id,就验证一下职务id是否存在?存在就添加一条EmployeePostRelation记录,不存在就报错.
+        先清除员工和其他职务的关系.
         然后在employee添加post_relation_id属性.如果没有职务id,那就添加一个默认的职务的post_relation_id属性,
         如果没有默认职务.报错退出.
         6.再次保存employee的对象
         :param company_id:
         :param args_list: 员工的初始化参数的字典组成的list,一般是从app或者web端接收的信息.
-        :return: 添加失败的的args参数的list
+        :return:
         """
         company = cls.find_by_id(company_id)
-        error_list = list()  # 插入失败的对象.args的list
+        """如果用户输入的数据不是数组,那就转换成数组,这是应对客户只输入了一个用户信息字典的情况"""
+        args_list = [args_list] if not isinstance(args_list, list) else args_list
+        """检查公司id是否正确"""
         if isinstance(company, cls):
             """公司存在"""
             company_dbref = company.get_dbref()
             now = datetime.datetime.now()
             for args in args_list:
+                dept_id = args.pop("dept_id", None)  # 部门id
+                post_id = args.pop("post_id", None)  # 职务id
+                """检查部门id是否正确?"""
+                dept = Dept.find_by_id(dept_id)
+                if dept.get_attr("company_id") != company_dbref:
+                    ms = "部门信息:{} 和 公司信息:{} 不符".format(dept_id, company_id)
+                    raise ValueError(ms)
+                """检查职务id是否正确?"""
+                post = Post.find_by_id(post_id)
+                if post.get_attr("company_id") != company_dbref:
+                    ms = "职务信息:{} 和 公司信息:{} 不符".format(post_id, company_id)
+                    raise ValueError(ms)
+                """检查注册手机号码是否北占用?"""
                 obj = Employee.find_one_plus(filter_dict={"phone_num": args.get("phone_num")}, instance=False)
                 if obj is None:
+                    """手机号没有被占用,可以创建一个新用户"""
                     pass
                 else:
-                    args["_id"] = obj['_id']
+                    """此手机号码已被注册过,添加变成修改"""
+                    for k, v in obj.items():
+                        if k == "_id":
+                            args['_id'] = v
+                        elif k not in args:
+                            args[k] = v
+                        else:
+                            pass
                 emp = Employee(**args)
-                _id = emp.save()
-                if isinstance(_id, ObjectId):
+                employee_id = emp.save()
+                if isinstance(employee_id, ObjectId):
                     """employee插入成功"""
                     employee_dbref = emp.get_dbref()
                     """检查EmployeeCompanyRelation记录是否存在"""
-                    f = {"company_id": company_dbref, "employee_id": employee_dbref, "$or":[
-                        {"end_date": {"$exists": False}},
-                        {"end_date": {"$eq": None}},
-                        {"end_date": {"$gte": now}}
-                    ]}
+                    f = {"company_id": company_dbref, "employee_id": employee_dbref, "create_date": {"$lte": now},
+                         "$or": [
+                             {"end_date": {"$exists": False}},
+                             {"end_date": {"$eq": None}},
+                             {"end_date": {"$gte": now}}
+                         ]}
                     company_relation = EmployeeCompanyRelation.find_one_plus(filter_dict=f, instance=True)
                     if company_relation is None:
+                        """没有员工和公司的关系记录,检查是否有此人和其他公司的记录?"""
+                        f = {
+                            "employee_id": employee_dbref,
+                            "$or": [
+                                {"end_date": {"$exists": False}},
+                                {"end_date": {"$eq": None}},
+                                {"end_date": {"$gte": now}}
+                            ]
+                        }
+                        relations = EmployeeCompanyRelation.find_plus(filter_dict=f, to_dict=False)
+                        for relation in relations:
+                            relation.set_attr("end_date", now)
                         """添加EmployeeCompanyRelation记录"""
                         company_relation = EmployeeCompanyRelation(company_id=company_dbref, employee_id=employee_dbref,
                                                                    create_date=now)
                         company_relation_id = company_relation.save()
                         if isinstance(company_relation_id, ObjectId):
                             """添加EmployeeCompanyRelation记录成功"""
-                            company_relation_id = company_relation.get_dbref()
+                            pass
                         else:
                             raise ValueError("添加EmployeeCompanyRelation记录失败, args={}".format(args))
                     else:
-                        company_relation_id = company_relation.get_dbref()
-                    """检查部门id是否正确?"""
-                    dept_id = args.get("dept_id")
-                    dept = Dept.find_by_id(dept_id)
+                        """有员工和公司的关系记录,无需添加EmployeeCompanyRelation记录"""
+                        pass
+                    company_relation_dbref = company_relation.get_dbref()
+                    emp.set_attr("company_relation_id", company_relation_dbref)
                     if isinstance(dept, Dept):
-                        
-                    """添加EmployeeDeptRelation记录"""
+                        dept_dbref = dept.get_dbref()
+                        """部门存在,无需额外添加Dept记录,检查是否有EmployeeDeptRelation记录"""
+                        f = {"company_id": dept_dbref, "employee_id": employee_dbref, "create_date": {"$lte": now},
+                             "$or": [
+                                 {"end_date": {"$exists": False}},
+                                 {"end_date": {"$eq": None}},
+                                 {"end_date": {"$gte": now}}
+                             ]}
+                        dept_relation = Dept.find_one_plus(filter_dict=f, instance=True)
+                        if dept_relation is None:
+                            """没有员工和部门的关系记录,检查是否有此人和其他部门的记录?"""
+                            f = {
+                                "employee_id": employee_dbref,
+                                "$or": [
+                                    {"end_date": {"$exists": False}},
+                                    {"end_date": {"$eq": None}},
+                                    {"end_date": {"$gte": now}}
+                                ]
+                            }
+                            relations = EmployeeDeptRelation.find_plus(filter_dict=f, to_dict=False)
+                            for relation in relations:
+                                relation.set_attr("end_date", now)
+                            """没有对应的EmployeeDeptRelation记录,可以创建一个"""
+                            dept_relation = EmployeeDeptRelation(dept_id=dept_dbref, employee_id=employee_dbref,
+                                                                 create_date=now)
+                            dept_relation_id = dept_relation.save()
+                            if isinstance(dept_relation_id, ObjectId):
+                                """EmployeeDeptRelation记录保存成功"""
+                                pass
+                            else:
+                                raise ValueError("{} 部门关系信息保存失败".format(dept_id))
+                        else:
+                            """有对应的EmployeeDeptRelation记录,无需创建"""
+                            pass
+                        dept_relation_dbref = dept_relation.get_dbref()
+                        emp.set_attr("dept_relation_id", dept_relation_dbref)
+                        if isinstance(post, Post):
+                            post_dbref = post.get_dbref()
+                            """职务存在,无需额外添加Post记录,检查是否有EmployeePostRelation记录"""
+                            f = {"post_id": post_dbref, "employee_id": employee_dbref, "create_date": {"$lte": now},
+                                 "$or": [
+                                     {"end_date": {"$exists": False}},
+                                     {"end_date": {"$eq": None}},
+                                     {"end_date": {"$gte": now}}
+                                 ]}
+                            post_relation = Post.find_one_plus(filter_dict=f, instance=True)
+                            if post_relation is None:
+                                """没有员工和职务的关系记录,检查是否有此人和其他职务的记录?"""
+                                f = {
+                                    "employee_id": employee_dbref,
+                                    "$or": [
+                                        {"end_date": {"$exists": False}},
+                                        {"end_date": {"$eq": None}},
+                                        {"end_date": {"$gte": now}}
+                                    ]
+                                }
+                                relations = EmployeePostRelation.find_plus(filter_dict=f, to_dict=False)
+                                for relation in relations:
+                                    relation.set_attr("end_date", now)
+                                """没有对应的EmployeePostRelation记录,可以创建一个"""
+                                post_relation = EmployeePostRelation(post_id=post_dbref, employee_id=employee_dbref,
+                                                                     create_date=now)
+                                post_relation_id = post_relation.save()
+                                if isinstance(post_relation_id, ObjectId):
+                                    """EmployeePostRelation记录保存成功"""
+                                    pass
+                                else:
+                                    raise ValueError("{} 职务关系信息保存失败".format(post_id))
+                            else:
+                                """有对应的EmployeePostRelation记录,无需创建"""
+                                pass
+                            post_relation_dbref = post_relation.get_dbref()
+                            emp.set_attr("post_relation_id", post_relation_dbref)
+                            emp_id = emp.save()
+                            if isinstance(emp_id, ObjectId):
+                                """最终保存成功"""
+                                pass
+                            else:
+                                raise ValueError("最后employee信息保存失败")
+                        else:
+                            """职务不存在"""
+                            raise ValueError("{} 职务不存在".format(post_id))
+                    else:
+                        """部门不存在"""
+                        raise ValueError("{} 部门不存在".format(dept_id))
                 else:
-                    error_list.append(emp)
+                    raise ValueError("用户插入失败,args={}".format(args))
         else:
-            raise ValueError("公司id错误")
+            raise ValueError("{}公司id错误".format(company_id))
+
+    @classmethod
+    def dismiss_employee(cls, company_id: (str, ObjectId), id_list: (list, dict)) -> None:
+        """
+        解雇单个/多个员工,注意,只是解除公司和员工的雇佣关系.不是删除员工的账户.
+        调用此方法之前,建议检查对应的权限.
+        此方法没有线程锁,方法的逻辑如下:
+        1. 确认公司id是否存在?不存在退出,
+        2. 确认员工是否归属这个公司? 确认公司的部门?(确认部门其实是为了确认)
+        3. 修改对应的EmployeePostRelation记录
+        4. 修改对应的EmployeeDeptRelation记录
+        5. 修改对应的EmployeeCompanyRelation记录
+        6. 修改employee信息
+        :param company_id:
+        :param id_list: 员工id组成的list
+        :return:
+        """
+        company = cls.find_by_id(company_id)
+        """如果用户输入的数据不是数组,那就转换成数组,这是应对客户只输入了一个用户信息字典的情况"""
+        id_list = [id_list] if not isinstance(id_list, list) else id_list
+        """检查公司id是否正确"""
+        if isinstance(company, cls):
+            """公司存在"""
+            company_dbref = company.get_dbref()
+            for emp_id in id_list:
+                emp = Employee.find_by_id(emp_id)
+                if isinstance(emp, Employee):
+                    """员工id正确,检查归属关系"""
+                    company_relation_dbref = emp.get_attr("company_relation_id")
+                    if company_relation_dbref is None:
+                        raise ValueError("员工 {} 不属于任何公司".format(emp_id))
+                    else:
+                        pass
+                    company_relation_id = company_relation_dbref.id
+                    company_relation = EmployeeCompanyRelation.find_by_id(company_relation_id)
+                    if isinstance(company_relation, EmployeeCompanyRelation) and company_relation.get_attr(
+                            "company_id") == company_dbref:
+                        """是公司员工"""
+                        dept_relation_dbref = emp.get_attr("dept_relation_id")
+                        dept_relation_id = dept_relation_dbref.id
+                        dept_relation = EmployeeDeptRelation.find_by_id(dept_relation_id)
+
+                        post_relation_dbref = emp.get_attr("post_relation_id")
+                        post_relation_id = post_relation_dbref.id
+                        post_relation = EmployeePostRelation.find_by_id(post_relation_id)
+
+                        now = datetime.datetime.now()
+                        if isinstance(dept_relation, EmployeeDeptRelation):
+                            dept_relation.set_attr("end_date", now)
+                            dept_relation.save_plus()
+                        else:
+                            pass
+                        if isinstance(post_relation, EmployeePostRelation):
+                            post_relation.set_attr("end_date", now)
+                            post_relation.save_plus()
+                        else:
+                            pass
+                        company_relation.set_attr("end_date", now)
+                        company_relation.save_plus()
+                        emp.remove_attr("company_relation_id")
+                        emp.remove_attr("dept_relation_id")
+                        emp.remove_attr("post_relation_id")
+                        emp.save_plus()  # 解雇成功
+                    else:
+                        ms = "员工id {} 不是 {} 的职员".format(emp_id, company.get_attr("short_name"))
+                        raise ValueError(ms)
+                else:
+                    raise ValueError("员工id错误 {}".format(emp_id))
+        else:
+            raise ValueError("公司id错误 {}".format(company_id))
+
+    @classmethod
+    def clear_employee(cls, company_id: (str, ObjectId), id_list: (list, dict)) -> None:
+        """
+        清除单个/多个员工及其相关的关系记录,注意,这会完全删除员工的档案.把员工降级为一般用户
+        调用此方法之前,建议检查对应的权限.
+        此方法没有线程锁,方法的逻辑如下:
+        1. 确认公司id是否存在?不存在退出,
+        2. 确认员工是否归属这个公司? 确认公司的部门?(确认部门其实是为了确认)
+        3. 删除对应的EmployeePostRelation记录
+        4. 删除对应的EmployeeDeptRelation记录
+        5. 删除对应的EmployeeCompanyRelation记录
+        6. 修改employee信息
+        :param company_id:
+        :param id_list: 员工id组成的list
+        :return:
+        """
+        ms = "正在清除员工和公司之间的记录,清除结束后,员工账户将会变成非企业用户"
+        warnings.warn(ms)
+        company = cls.find_by_id(company_id)
+        """如果用户输入的数据不是数组,那就转换成数组,这是应对客户只输入了一个用户信息字典的情况"""
+        id_list = [id_list] if not isinstance(id_list, list) else id_list
+        """检查公司id是否正确"""
+        if isinstance(company, cls):
+            """公司存在"""
+            company_dbref = company.get_dbref()
+            for emp_id in id_list:
+                emp = Employee.find_by_id(emp_id)
+                if isinstance(emp, Employee):
+                    """员工id正确,检查归属关系"""
+                    company_relation_dbref = emp.get_attr("company_relation_id")
+                    if company_relation_dbref is None:
+                        raise ValueError("员工 {} 不属于任何公司".format(emp_id))
+                    else:
+                        pass
+                    company_relation_id = company_relation_dbref.id
+                    company_relation = EmployeeCompanyRelation.find_by_id(company_relation_id)
+                    if isinstance(company_relation, EmployeeCompanyRelation) and company_relation.get_attr(
+                            "company_id") == company_dbref:
+                        """是公司员工"""
+                        f = {"employee_id": emp.get_dbref()}
+                        EmployeePostRelation.delete_many(f)
+                        EmployeeDeptRelation.delete_many(f)
+                        EmployeeCompanyRelation.delete_many(f)
+                        emp.delete_self()  # 删除成功.
+                        emp.remove_attr("company_relation_id")
+                        emp.remove_attr("dept_relation_id")
+                        emp.remove_attr("post_relation_id")
+                        emp.save()  # 清除成功
+                    else:
+                        ms = "员工id {} 不是 {} 的职员".format(emp_id, company.get_attr("short_name"))
+                        raise ValueError(ms)
+                else:
+                    raise ValueError("员工id错误 {}".format(emp_id))
+        else:
+            raise ValueError("公司id错误 {}".format(company_id))
+
+    @classmethod
+    def delete_employee(cls, company_id: (str, ObjectId), id_list: (list, dict)) -> None:
+        """
+        删除单个/多个员工及其相关的关系记录,注意,这会完全删除员工的档案.用户账户将不可登录,此操作不可逆转.
+        调用此方法之前,建议检查对应的权限.
+        此方法没有线程锁,方法的逻辑如下:
+        1. 确认公司id是否存在?不存在退出,
+        2. 确认员工是否归属这个公司? 确认公司的部门?(确认部门其实是为了确认)
+        3. 删除对应的EmployeePostRelation记录
+        4. 删除对应的EmployeeDeptRelation记录
+        5. 删除对应的EmployeeCompanyRelation记录
+        6. 删除employee信息
+        :param company_id:
+        :param id_list: 员工id组成的list
+        :return:
+        """
+        ms = "正在删除员工账户,这将清理员工在系统中的所有记录,用户账户将不再可用,此操作不可逆转"
+        warnings.warn(ms)
+        company = cls.find_by_id(company_id)
+        """如果用户输入的数据不是数组,那就转换成数组,这是应对客户只输入了一个用户信息字典的情况"""
+        id_list = [id_list] if not isinstance(id_list, list) else id_list
+        """检查公司id是否正确"""
+        if isinstance(company, cls):
+            """公司存在"""
+            company_dbref = company.get_dbref()
+            for emp_id in id_list:
+                emp = Employee.find_by_id(emp_id)
+                if isinstance(emp, Employee):
+                    """员工id正确,检查归属关系"""
+                    company_relation_dbref = emp.get_attr("company_relation_id")
+                    if company_relation_dbref is None:
+                        raise ValueError("员工 {} 不属于任何公司".format(emp_id))
+                    else:
+                        pass
+                    company_relation_id = company_relation_dbref.id
+                    company_relation = EmployeeCompanyRelation.find_by_id(company_relation_id)
+                    if isinstance(company_relation, EmployeeCompanyRelation) and company_relation.get_attr(
+                            "company_id") == company_dbref:
+                        """是公司员工"""
+                        f = {"employee_id": emp.get_dbref()}
+                        EmployeePostRelation.delete_many(f)
+                        EmployeeDeptRelation.delete_many(f)
+                        EmployeeCompanyRelation.delete_many(f)
+                        emp.delete_self()  # 删除成功.
+                    else:
+                        ms = "员工id {} 不是 {} 的职员".format(emp_id, company.get_attr("short_name"))
+                        raise ValueError(ms)
+                else:
+                    raise ValueError("员工id错误 {}".format(emp_id))
+        else:
+            raise ValueError("公司id错误 {}".format(company_id))
 
     @classmethod
     def all_post(cls, company_id: (str, ObjectId)) -> dict:
@@ -985,4 +1286,18 @@ if __name__ == "__main__":
     #     e["dept_relation_id"] = dept_relation_dbref  # 设置用户和职务的关系id
     #     e = Employee(**e)
     #     e.save()
+    """测试批量添加employee的方法"""
+    company_id = "5aab48ed4660d32b752a7ee9"
+    # company_id = "5aab5db852d59ccd9a300dee"
+    e1 = {
+        "phone_num": "15618318888", "real_name": "张三",
+        "dept_id": "5ab21b2a4660d3745e53adfa", "post_id": "5ab21fc74660d376c982ee27"
+    }
+    e2 = {
+        "phone_num": "15618318889", "real_name": "李四",
+        "dept_id": "5ab21b2a4660d3745e53adfa", "post_id": "5ab21fc74660d376c982ee27"
+    }
+    es = [e1, e2]
+    # Company.add_employee(company_id, es)
+    Company.dismiss_employee(company_id, ["5ab3533e4660d34126213654", "5ab3516c4660d34002f8e178"])
     pass
