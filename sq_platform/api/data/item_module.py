@@ -111,6 +111,7 @@ class User(mongo_db.BaseDoc):
     type_dict['emergency_contact'] = str  # 紧急联系人(姓名)
     type_dict['emergency_phone'] = str  # 紧急联系号码
     type_dict['user_status'] = int  # 用户状态，1表示可以登录，0表示禁止登录
+    type_dict['online_time'] = float  # 在线时长的统计.单位分钟
     type_dict['desscription'] = str  # 备注
     """
     驾驶证信息部分,驾驶证和用户有一一对应的关系.所以需要直接存储在对象中.
@@ -1300,8 +1301,8 @@ class Track(mongo_db.BaseDoc):
             }
             sort_dict = {"time": -1}
             result = cls.find_one_plus(filter_dict=filter_dict, sort_dict=sort_dict, instance=False)
-            if result is None:
-                result['real_name'] = user.get_attr("real_name")
+            if result is not None:
+                result['real_name'] = user.get_attr("user_name") if  user.get_attr("real_name") else user.get_attr("real_name")
                 result['gender'] = user.get_attr("gender")
                 result['phone_num'] = user.get_attr("phone_num")
                 result['user_id'] = user.get_attr("phone_num")

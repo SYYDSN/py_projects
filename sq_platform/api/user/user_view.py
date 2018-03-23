@@ -625,13 +625,47 @@ def get_security_rank_list_func(user_id) -> str:
     """
     message = {"message": "success"}
     prefix = Company.get_prefix_by_user_id(user_id)
-    user_id = '5a3b3cd5db122cd9fbc21c40'
-    prefix = "sf" if prefix is None else prefix
+    user_id = ObjectId('5ab0ad831315e00e3cb61c62')
+    prefix = "xzx"
     host_url = request.host_url
     try:
-        # mes = security_module.SecurityLevel.get_security_rank_list(user_id=user_id, host_url=host_url)
-        mes = security_module.SecurityReport.query_report2(prefix=prefix, report_type="tank", size=10)
-        message['data'] = mes
+        begin_date = datetime.datetime.now().strftime("%F")
+        """个人排名数据"""
+        my_report = security_module.SecurityReport.query_report2(prefix=prefix, user_id=user_id, report_type="rank", size=1)
+        """精简排名数据"""
+        mes = security_module.SecurityReport.query_report2(prefix=prefix, report_type="rank", size=15, begin_date=begin_date)
+        res = list()
+        my_rank = dict()
+        if len(mes) == 0:
+            pass
+        else:
+            """查询头像地址"""
+            ids = [ObjectId(x['_source']["id"]) for x in mes]
+            if user_id not in ids:
+                ids.append(user_id)
+            imgs = User.find_plus(filter_dict={"_id": {"$in": ids}}, projection=['head_img_url'], to_dict=True,
+                                  can_json=True)
+            imgs = {x["_id"]: x["head_img_url"] for x in imgs}
+
+            if len(my_report) == 0:
+                pass
+            else:
+                my_report = my_report[0]['_source']
+                my_rank['rank'] = my_report['drive_rank']
+                my_rank['scr_synt'] = my_report['drive_score']
+                my_rank['driver_name'] = my_report['username'] if my_report.get('real_name') is None else \
+                    my_report.get('real_name')
+                my_rank['url_avatar'] = "{}{}".format(host_url, imgs[my_report['id']])
+            for x in mes:
+                s = x['_source']
+                t = dict()
+                t['rank'] = s['drive_rank']
+                t['scr_synt'] = s['drive_score']
+                t['driver_name'] = s['username'] if s.get('real_name') is None else s.get('real_name')
+                t['url_avatar'] = "{}{}".format(host_url, imgs[s['id']])
+                res.append(t)
+        message['data'] = res       # top10
+        message['myself'] = my_rank  # 个人排名数据
     except Exception as e:
         logger.exception(e)
         message = pack_message(message, 5000, user_id=user_id)
@@ -701,7 +735,7 @@ def get_report_detail_func(user_id) -> str:
             report = report[0]['_source']
     except Exception as e:
         print(e)
-        logger.exception("get_daily_info_func Error:")
+        logger.exception("get_report_detail_func Error:")
         message = pack_message(message, 3010, user_id=user_id)
     finally:
         data['scr_synt'] = report['drive_score']  # 安全得分
@@ -867,4 +901,33 @@ def process_alert_message_func(user_id, key):
                 pass
     else:
         mes = pack_message(mes, 3003, key=key)
+    return json.dumps(mes)
+
+
+@api_user_blueprint.route("/<key>_online_surplus", methods=['post', 'get'])
+@login_required_app
+def process__online_surplus_func(user_id, key):
+    """在线时长的接口"""
+    mes = {"message": "success"}
+    if key == "upload":
+        """上传在线时常.单位:分钟"""
+        online_time = get_arg(request, "duration", None)
+        if online_time is None:
+            pass
+        else:
+            try:
+                online_time = float(online_time)
+            except ValueError as e:
+                print(e)
+                logger.exception("错误的在线时长:{}".format(online_time))
+                mes = pack_message(mes, 3001, duration=online_time)
+            finally:
+                if isinstance(online_time, float):
+                    f = {"_id": user_id}
+                    u = {"$set": {"online_time": online_time}}
+                    User.find_one_and_update_plus(filter_dict=f, update_dict=u)
+                else:
+                    mes = pack_message(mes, 5000, duration=online_time)
+    else:
+        mes = pack_message(mes, 3014, url="{}_online_surplus".format(key))
     return json.dumps(mes)

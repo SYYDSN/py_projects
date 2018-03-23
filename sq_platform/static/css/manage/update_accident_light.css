@@ -40,7 +40,19 @@ body{
 .second_row .my_col{
     flex-direction:column;
 }
-
+.hr_outer{
+    display: block;
+    flex-direction:row;
+    justify-content: flex-start;
+}
+.my_hr{
+    width:580px;
+    border-top:none;
+    border-left:none;
+    brder-right:none;
+    border-bottom: 1px solid #ddd;
+    float:left;
+}
 .sub_item{
     display: flex;
     flex-direction: column;

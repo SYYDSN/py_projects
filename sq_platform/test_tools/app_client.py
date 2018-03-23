@@ -14,11 +14,10 @@ from api.data import item_module
 
 def test_get_security_rank_list():
     """测试用户安全指数排名接口"""
-    auth_token = "ed3774bc553a4714a16d62d72f67fded"  # app段登录标识 me
+    auth_token = "5b30f2c1e8d640ffa5f132a34918d93f" # app段登录标识 me
     headers = {"auth_token": auth_token}
     res = requests.post("http://127.0.0.1:5000/api/get_security_rank_list", headers=headers)
-    for n in res.json()['data']:
-        print(n)
+    print(res.json())
 
 
 def test_req(**kwargs) -> None:
@@ -47,7 +46,7 @@ def test_get_daily_info():
     测试获取每日报告
     :return:
     """
-    auth_token = "ed3774bc553a4714a16d62d72f67fded"  # app段登录标识
+    auth_token = "5b30f2c1e8d640ffa5f132a34918d93f" # app段登录标识
     headers = {"auth_token": auth_token}
     res = requests.post("http://127.0.0.1:5000/api/get_daily_info", headers=headers)
     print(res.json())
@@ -217,7 +216,7 @@ def test_get_alert_message():
 
 def test_get_report_detail():
     """测试获取安全报告详情"""
-    auth_token = "ed3774bc553a4714a16d62d72f67fded"  # app段登录标识 me
+    auth_token = "5b30f2c1e8d640ffa5f132a34918d93f" # app段登录标识 me
     headers = {"auth_token": auth_token}
     url = "http://127.0.0.1:5000/api/get_report_detail"
     # url = "http://safego.org:5000/api/get_report_detail"

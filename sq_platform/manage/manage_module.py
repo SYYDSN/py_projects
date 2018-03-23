@@ -185,6 +185,7 @@ def login_func():
             if user_name is None or user_name == '' or user_password == '' or user_password is None:
                 message['message'] = '用户名或密码不能为空'
             else:
+                user_password = user_password.lower()
                 """登录参数合法,开始验证"""
                 args = {"user_name": user_name}
                 f_dict = {"user_name": user_name}
@@ -192,7 +193,7 @@ def login_func():
                 if employee is None:
                     message['message'] = "用户名不存在或手机未注册"
                 else:
-                    if user_password.lower() != employee['user_password']:
+                    if user_password != employee['user_password']:
                         message['message'] = "密码错误"
                     elif employee.get("user_status") != 1:
                         message['message'] = "账户未启用"
@@ -207,6 +208,8 @@ def login_func():
                             """登录成功,写入会话"""
                             args['user_id'] = str(employee['_id'])  # 写入用户id的str格式.
                             args['real_name'] = employee_name
+                            args['user_name'] = user_name
+                            args['user_password'] = user_password
                             head_img_url = employee.get("head_img_url", "/static/image/head_img/default_01.png")
                             args['head_img_url'] = head_img_url
                             employee_number = employee.get("employee_number", "")  # 工号

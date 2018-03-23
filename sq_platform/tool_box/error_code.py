@@ -3,7 +3,7 @@ from mongo_db import get_conn
 from mongo_db import ObjectId
 from mongo_db import DBRef
 from api.user.violation_module import ViolationQueryResult
-from api.user.item_module import CarLicense
+from api.data.item_module import CarLicense
 
 
 def insert_error_code(**kwargs):
@@ -13,8 +13,8 @@ def insert_error_code(**kwargs):
     return inserted_id
 
 
-args = {"code": 5001,
-        "description": "文件写入磁盘失败"}
+args = {"code": 3014,
+        "description": "错误的url"}
 
 
 print(insert_error_code(**args))

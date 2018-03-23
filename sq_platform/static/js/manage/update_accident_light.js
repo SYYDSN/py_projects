@@ -24,6 +24,7 @@ $(function(){
     var resize = function(){
         // 重新计算中间表格的高度
         console.log(1);
+
         let main_zone_height = $("#main_zone").height();
         let first_height = $(".first_row").height();
         let second_height = $(".second_row").height();

@@ -23,7 +23,10 @@ logger = get_logger()
 
 
 class Company(mongo_db.BaseDoc):
-    """公司类"""
+    """
+    公司类
+    新振兴的管理员 xzx_admin  密码 xzx@1588
+    """
     _table_name = "company_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
@@ -388,6 +391,7 @@ class Company(mongo_db.BaseDoc):
     @classmethod
     def delete_employee(cls, company_id: (str, ObjectId), id_list: (list, dict)) -> None:
         """
+        这个方法只允许系统管理员使用.
         删除单个/多个员工及其相关的关系记录,注意,这会完全删除员工的档案.用户账户将不可登录,此操作不可逆转.
         调用此方法之前,建议检查对应的权限.
         此方法没有线程锁,方法的逻辑如下:
@@ -413,12 +417,8 @@ class Company(mongo_db.BaseDoc):
             for emp_id in id_list:
                 emp = Employee.find_by_id(emp_id)
                 if isinstance(emp, Employee):
-                    """员工id正确,检查归属关系"""
+                    """员工id正确,无需检查归属关系"""
                     company_relation_dbref = emp.get_attr("company_relation_id")
-                    if company_relation_dbref is None:
-                        raise ValueError("员工 {} 不属于任何公司".format(emp_id))
-                    else:
-                        pass
                     company_relation_id = company_relation_dbref.id
                     company_relation = EmployeeCompanyRelation.find_by_id(company_relation_id)
                     if isinstance(company_relation, EmployeeCompanyRelation) and company_relation.get_attr(
@@ -548,27 +548,68 @@ class Company(mongo_db.BaseDoc):
                 return instance_list
 
     @classmethod
-    def get_prefix_by_user_id(cls, user_id: (str, ObjectId)) ->(str, None):
+    def get_prefix_by_user_id(cls, user_id: (str, ObjectId)) ->str:
         """
-        根据用户id获取用户所在公司的前缀
+        根据用户id获取用户所在公司的前缀,这用于向AI模块查询报告和排名
+
+        用户和公司之间的约束关系如下:
+        Employee: 员工类
+        Company:  公司类
+        EmployeeCompanyRelation: 员工和公司的关系类
+        EmployeeCompanyRelation作为桥梁,建立起Employee和Company之间的关系.
+        Employee-->EmployeeCompanyRelation<---Company
+
+        EmployeeCompanyRelation的属性说明如下:
+        EmployeeCompanyRelation.company_id 是一个DBRef对象,指向Company对象的id
+        EmployeeCompanyRelation.employee_id 是一个DBRef对象,指向Employee对象的id
+        EmployeeCompanyRelation.create_date 是一个datetime对象,是指关系建立的时间.
+        EmployeeCompanyRelation.end_date  是一个datetime对象,是指关系终结的时间.这个属性如果为不存在,为None或者大于当前的时间,
+        都可以认为员工和公司间的关系处于有效的状态.
+
+        Employee有一个company_relation_id的属性,DBRef类型.,指向EmployeeCompanyRelation的id.这是个非必须的属性.
+        存在的目的用于快速检索EmployeeCompanyRelation对象.
+
+        整个方法的逻辑如下:
+        1. 确认user_id有效.
+        2. 确认对应的user记录有company_relation_id.
+        3. 确认确认对应的user记录有company_relation_id对应的EmployeeCompanyRelation处于有效关系状态.
+        4. 查找EmployeeCompanyRelation.company_id对应的Company对象.
+        5. 取出Company对象的prefix属性.
+
         :param user_id: 用户id
-        :return:
+        :return: Company.prefix, 散户是xxx作为prefix
         """
         user = User.find_by_id(user_id)
-        prefix = None
+        prefix = "xxx"
         if isinstance(user, User):
-            company_dbref = user.get_attr("company_id")
-            if company_dbref is None:
+            company_relation_dbref = user.get_attr("company_relation_id")
+            if company_relation_dbref is None:
                 ms = "用户{}没有company_id信息".format(str(user_id))
                 print(ms)
                 logger.info(ms)
             else:
-                company_id = company_dbref.id
-                company = Company.find_by_id(company_id)
-                if isinstance(company, Company):
-                    prefix = company.get_attr("prefix")
+                company_relation_id = company_relation_dbref.id
+                """查找关系对象"""
+                company_relation = EmployeeCompanyRelation.find_by_id(company_relation_id)
+                if isinstance(company_relation, EmployeeCompanyRelation):
+                    """EmployeeCompanyRelation对象存在"""
+                    now = datetime.datetime.now()
+                    if (not hasattr(company_relation, "end_date")) or company_relation.get_attr("end_date") is None or \
+                                    company_relation.get_attr("end_date") < now:
+                        """EmployeeCompanyRelation对象有效"""
+                        company = Company.find_by_id(company_relation.get_attr(attr_name="company_id").id)
+                        if isinstance(company, Company):
+                            """公司存在"""
+                            if hasattr(company, "prefix"):
+                                prefix = company.get_attr("prefix")
+                            else:
+                                pass
+                        else:
+                            ms = "company对象错误, {}".format(company_relation.get_attr(attr_name="company_id"))
+                            print(ms)
+                            logger.info(ms)
                 else:
-                    ms = "company_id:{}错误".format(str(company_id))
+                    ms = "company_relation_dbref:{}错误".format(str(company_relation_dbref))
                     print(ms)
                     logger.info(ms)
         else:
@@ -607,15 +648,15 @@ class Post(mongo_db.BaseDoc):
     _table_name = "post_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
-    type_dict['company_id'] = DBRef  # 所属公司 Company
+    type_dict['company_id'] = DBRef  # 所属公司 Company,必须
     type_dict['post_name'] = str  # 岗位名称
     type_dict['default_post'] = bool  # 是否是默认职务?默认职务是作为未确认职务时的默认值,只可修改,不可删除
     type_dict['level'] = int  # 职务的管理级别,默认为0
     type_dict['description'] = str  # 说明
     """
     用来标识此职务是否具备管理权限?或者具备何种管理权限?在目前情况下,可选的值只有0和1
-    0代表是普通职员,没有管理权限.
-    1代表是管理员,可以查看本组/部门的其他人的信息.
+    1代表是普通职员,没有管理权限. 0是默认本公司管理员
+    1代表是管理员,可以查看本组/部门的其他人的信息. 
     """
 
     def __init__(self, **kwargs):
@@ -1290,14 +1331,22 @@ if __name__ == "__main__":
     company_id = "5aab48ed4660d32b752a7ee9"
     # company_id = "5aab5db852d59ccd9a300dee"
     e1 = {
-        "phone_num": "15618318888", "real_name": "张三",
+        "phone_num": "15618318888", "real_name": "管理员",
+        "user_name": "xzx_admin",
         "dept_id": "5ab21b2a4660d3745e53adfa", "post_id": "5ab21fc74660d376c982ee27"
     }
-    e2 = {
-        "phone_num": "15618318889", "real_name": "李四",
-        "dept_id": "5ab21b2a4660d3745e53adfa", "post_id": "5ab21fc74660d376c982ee27"
+    # e2 = {
+    #     "phone_num": "15618318889", "real_name": "李四",
+    #     "dept_id": "5ab21b2a4660d3745e53adfa", "post_id": "5ab21fc74660d376c982ee27"
+    # }
+    admin = {
+        "phone_num": "19999998888", "real_name": "管理员",
+        "user_password": "024a65d035a96a7402eec9c1533851bc",
+        "user_name": "xzx_admin",
+        "dept_id": "5ab21b2a4660d3745e53adfa", "post_id": "5ab4922c52d59ccd9a35fc8b"  # 公司管理员职务
     }
-    es = [e1, e2]
-    # Company.add_employee(company_id, es)
-    Company.dismiss_employee(company_id, ["5ab3533e4660d34126213654", "5ab3516c4660d34002f8e178"])
+    es = [admin]
+    Company.add_employee(company_id, es)
+    # Company.dismiss_employee(company_id, ["5ab3533e4660d34126213654", "5ab3516c4660d34002f8e178"])
+    """"""
     pass

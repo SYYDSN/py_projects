@@ -80,8 +80,9 @@ li {
 .logo_outer{
     /*logo外围容器*/
     display:flex;
+    width:150px;
     flex-direction: column;
-    padding:1rem;
+    padding:0.8rem;
 }
 .logo_outer .img_div{
     display: flex;

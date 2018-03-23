@@ -1249,7 +1249,7 @@ class SecurityReport(mongo_db.BaseDoc):
         :param end_date:
         :return:
         """
-        user_id = str(user_id) if not isinstance(user_id, str) else user_id
+        user_id = str(user_id) if not isinstance(user_id, str) and user_id is not None else user_id
         filter_dict = dict()
         query = dict()
         if user_id is not None:
@@ -1266,10 +1266,13 @@ class SecurityReport(mongo_db.BaseDoc):
                 end_date = begin_date
             else:
                 pass
+            if not hasattr(query, 'bool'):
+                query.update({"bool": {"filter": {}}})
             query['bool']['filter'] = {"range": {"report_datetime": {"gte": begin_date, "lte": end_date}}}
         filter_dict['query'] = query
         filter_dict['size'] = size
         filter_dict['sort'] = {"report_datetime": "desc"} if report_type == "report" else {"drive_rank": "asc"}
+        # filter_dict['sort'] = {"report_datetime": "desc"} if report_type == "report" else {"drive_score": "desc"}
 
         es = Elasticsearch(['http://safego:safego.org@api.safego.org:9200'])
         res = list()
