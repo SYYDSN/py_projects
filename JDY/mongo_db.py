@@ -199,28 +199,45 @@ def get_conn(table_name):
 
 
 def other_can_json(obj):
-    """把其他对象转换成可json,是to_flat_dict的内部函数"""
+    """
+    把其他对象转换成可json,是to_flat_dict的内部函数
+    v = v.strftime("%F %H:%M:%S.%f")是v = v.strftime("%Y-%m-%d %H:%M:%S")的
+    简化写法，其中%f是指毫秒， %F等价于%Y-%m-%d.
+    注意，这个%F只可以用在strftime方法中，而不能用在strptime方法中
+    """
     if isinstance(obj, ObjectId):
         return str(obj)
     elif isinstance(obj, (DBRef, MyDBRef)):
         return str(obj.id)
     elif isinstance(obj, datetime.datetime):
         return obj.strftime("%Y-%m-%d %H:%M:%S")
+    elif isinstance(obj, datetime.date):
+        return obj.strftime("%F")
     elif isinstance(obj, list):
         return [other_can_json(x) for x in obj]
     elif isinstance(obj, dict):
-        return {k: other_can_json(v) for k, v in obj.items()}
+        keys = list(obj.keys())
+        if len(keys) == 2 and "coordinates" in keys and "type" in keys:
+            """这是一个GeoJSON对象"""
+            return obj['coordinates']  # 前经度后纬度
+        else:
+            return {k: other_can_json(v) for k, v in obj.items()}
     else:
         return obj
 
 
-def to_flat_dict(a_dict) -> dict:
+def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     """
     转换成可以json的字典,这是一个独立的方法
-    :param a_dict:
+    to_flat_dict 实例方法.
+    to_flat_dict 独立方法
+    doc_to_dict  独立方法
+    三个方法将在最后的评估后进行统一 2018-3-16
+    :param a_dict: 待处理的doc.
+    :param ignore_columns: 不需要返回的列
     :return:
     """
-    return {other_can_json(k): other_can_json(v) for k, v in a_dict.items()}
+    return {other_can_json(k): other_can_json(v) for k, v in a_dict.items() if k not in ignore_columns}
 
 
 def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
@@ -485,12 +502,21 @@ def get_datetime_from_timestamp(timestamp_str: str)->datetime.datetime:
 
 def doc_to_dict(doc_obj: dict, ignore_columns: list = list())->dict:
     """
+    此方法和to_flat_dict独立方法的不同是本方法不能处理嵌套的对象,
+    所以推荐to_flat_dict独立方法.此函数保留只是为了兼容性.
+    调用时会警告
     把一个mongodb的doc对象转换为纯的，可以被json转换的dict对象,
     注意，这个方法不能转换嵌套对象，嵌套对象请自行处理。
+    to_flat_dict 实例方法.
+    to_flat_dict 独立方法
+    doc_to_dict  独立方法
+    三个方法将在最后的评估后进行统一 2018-3-16
     :param doc_obj: mongodb的doc对象
     :param ignore_columns: 不需要返回的列
     :return: 可以被json转换的dict对象
     """
+    ms = "已不推荐使用此方法,请用独立的to_flat_dict函数替代, 2018-3-16"
+    warnings.warn(message=ms)
     res = dict()
     for k, v in doc_obj.items():
         if k in ignore_columns:
@@ -858,7 +884,16 @@ class BaseDoc:
         """添加一个属性"""
         self.__dict__[attr_name] = attr_value
 
+    def pop_attr(self, attr_name, default=None):
+        """弹出一个属性,同时删除对应的值"""
+        return self.__dict__.pop(attr_name, default)
+
+    def remove_attr(self, attr_name):
+        """移除一个属性"""
+        self.__dict__.pop(attr_name, None)
+
     def set_attr(self, attr_name: str, attr_value) -> bool:
+        """设置属性"""
         res = False
         try:
             self.__dict__[attr_name] = attr_value
@@ -905,6 +940,20 @@ class BaseDoc:
             raise ValueError(mes)
         return inserted_id
 
+    def save_plus(self, ignore: list = None) -> bool:
+        """
+        更新
+        :param ignore: 忽略的更新的字段,一般是有唯一性验证的字段
+        :return:
+        """
+        ignore = ["_id"] if ignore is None else ignore
+        ses = get_conn(self.table_name())
+        doc = self.__dict__
+        doc = {k: v for k, v in doc.items() if k not in ignore}
+        f = {"_id": doc.pop("_id", None)}
+        res = ses.replace_one(filter=f, replacement=doc, upsert=False)
+        return res
+
     def save(self, obj=None)->ObjectId:
         """更新
         1.如果原始对象不存在，那就插入，返回objectid
@@ -913,6 +962,8 @@ class BaseDoc:
         4.其他问题会抛出/记录错误,返回None
         return ObjectId
         """
+        ms = "此方法已不建议使用,请使用实例方法save_plus和类方法replace_one替代, 2018-3-22"
+        warnings.warn(ms)
         obj = self if obj is None else obj
         table_name = obj.table_name()
         ses = get_conn(table_name=table_name)
@@ -973,7 +1024,12 @@ class BaseDoc:
         self.__dict__[attr_name] = old_dbref_list
 
     def to_flat_dict(self, obj=None):
-        """转换成可以json的字典"""
+        """转换成可以json的字典,此方法和同名的独立方法仍在评估中
+            to_flat_dict 实例方法.
+            to_flat_dict 独立方法
+            doc_to_dict  独立方法
+            三个方法将在最后的评估后进行统一 2018-3-16
+        """
         obj = self if obj is None else obj
         raw_type = obj.type_dict
         data_dict = {k: v for k, v in obj.__dict__.items() if v is not None}
@@ -1018,6 +1074,19 @@ class BaseDoc:
                     result_dict[k] = v
 
         return result_dict
+
+    @classmethod
+    def replace_one(cls, filter_dict: dict, replace_dict: dict, upsert: bool = False) -> bool:
+        """
+        替换一个文档.
+        :param filter_dict: 过滤器
+        :param replace_dict:  替换字典
+        :param upset: 不存在是否插入?
+        :return:
+        """
+        ses = get_conn(cls.get_table_name())
+        res = ses.replace_one(filter=filter_dict, replacement=replace_dict, upsert=upsert)
+        return res
 
     @staticmethod
     def simple_doc(doc_dict: dict, ignore_columns: list = None) -> dict:
@@ -1306,6 +1375,19 @@ class BaseDoc:
             doc_list = doc_list if is_instance else [cls(**doc).__dict__ for doc in doc_list]  # 可以把实例的数组转成doc/dict的数组.
             success_doc_list = cls.insert_many_and_return_doc(input_list=doc_list)
             return success_doc_list
+
+    @classmethod
+    def delete_many(cls, filter_dict: dict) -> None:
+        """
+        批量删除
+        :param filter_dict:
+        :return:
+        """
+        if filter_dict is None or len(filter_dict) == 0:
+            pass
+        else:
+            ses = get_conn(cls.get_table_name())
+            ses.delete_many(filter=filter_dict)
 
     @classmethod
     def create_dbref(cls, object_id):

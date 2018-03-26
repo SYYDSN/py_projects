@@ -736,6 +736,75 @@ class GeoJSON(dict):
                     raise e
 
 
+class MyCache:
+    """缓存类,这是一个非持久化的类,需要redis的支持"""
+    def __init__(self, cache_name: str):
+        """
+        初始化
+        :param cache_name: cache的key名字的前缀,用于区分是缓存哪个表/类的对象/属性.用来组合key,一般常使用类的表名
+        """
+        global cache
+        if isinstance(cache, RedisCache):
+            pass
+        else:
+            cache = RedisCache()
+        self.cache = RedisCache()
+        self.cache_name = cache_name
+
+    def set_value(self, key, value, timeout: int = 1800) -> bool:
+        """
+        设置一个值到缓存中
+        :param key: 缓存key,一般是str类型
+        :param value: 缓存值,可以是任何类型
+        :param timeout: 老化时间,默认是半个小时
+        :return:
+        """
+        r = False
+        try:
+            cache = self.cache
+            key = "{}.{}".format(self.cache_name, key)
+            cache.set(key, value, timeout=timeout)
+            r = True
+        except Exception as e:
+            logger.exception()
+            raise e
+        finally:
+            return r
+
+    def get_value(self, key):
+        """
+        从缓存里取一个值出来
+        :param key: 缓存key,一般是str类型
+        :return: None/object
+        """
+        r = False
+        try:
+            cache = self.cache
+            key = "{}.{}".format(self.cache_name, key)
+            r = cache.get(key)
+        except Exception as e:
+            logger.exception()
+            raise e
+        finally:
+            return r
+
+    def delete_value(self, key):
+        """
+        从缓存里删除一个值出来
+        :param key: 缓存key,一般是str类型
+        :return: None
+        """
+        try:
+            cache = self.cache
+            key = "{}.{}".format(self.cache_name, key)
+            cache.delete(key)
+        except Exception as e:
+            logger.exception()
+            raise e
+        finally:
+            return
+
+
 class BaseDoc:
     """所有存储到mongo的类都应该继承此类"""
     type_dict = dict()
@@ -782,9 +851,38 @@ class BaseDoc:
         return cls._table_name
 
     @classmethod
+    def get_attr_from_cache(cls, o_id: (ObjectId, str), attr_name: str, default=None)-> (object, None):
+        """
+        从缓存中获取属性.
+        :param o_id:　ObjectId
+        :param attr_name:　属性名称
+        :param default:　　默认值
+        :return:
+        """
+        cache = MyCache(cls.get_table_name())
+        o_id = o_id if isinstance(o_id, str) else str(o_id)
+        if attr_name not in cls.type_dict:
+            pass
+        else:
+            r = cache.get_value("{}.{}".format(o_id, attr_name))
+            return r
+
+
+    @classmethod
+    def get_attr_cls(cls, o_id: ObjectId, attr_name: str, default=None) -> object:
+        """
+        ｇｅｔ_attr的类方法，带缓存．
+        :param o_id:
+        :param attr_name:
+        :param default:
+        :return:
+        """
+        r = cls.get_attr_from_cache(o_id, attr_name, default)
+
+    @classmethod
     def get_unique_index_info(cls) -> dict:
         """
-        获取所有唯一索引信息
+        获取所有唯一索引信息,这个方法还不完善.暂未使用
         :param ses: 一个ｐｙｍｏｎｇｏ的连接对象
         :return: dict,索引名,索引列名的list组成的字典．
         """
@@ -1919,6 +2017,5 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 
 if __name__ == "__main__":
-    print(get_date_from_str("2018-02-24"))
     pass
 

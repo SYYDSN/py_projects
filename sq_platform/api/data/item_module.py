@@ -1869,5 +1869,5 @@ def clear_phone() -> None:
 
 if __name__ == "__main__":
     # UserLicenseRelation.rebuild()
-    User.update_many_plus({},{"$set": {"user_status": 1}})
+    User.get_attr_cls(o_id=ObjectId("598d6ac2de713e32dfc74796"), attr_name="nick_name")
     pass
