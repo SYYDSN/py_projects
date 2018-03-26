@@ -5,6 +5,7 @@ __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import mongo_db
+import datetime
 import re
 
 
@@ -17,7 +18,26 @@ class SpreadKeyword(mongo_db.BaseDoc):
     type_dict = dict()             # 属性字典
     type_dict['_id'] = mongo_db.ObjectId     # id,唯一
     type_dict['english'] = str     # 英文词汇,唯一
-    type_dict['chinese'] = str     # 中文词汇
+    type_dict['chinese'] = str     # 中文词汇，唯一
+    type_dict['create_date'] = datetime. datetime    # 创建时间
+
+    def __init__(self, **kwargs):
+        if "create_date" not in kwargs:
+            kwargs['create_date'] = datetime.datetime.now()
+        super(SpreadKeyword, self).__init__(**kwargs)
+
+    @classmethod
+    def rebuild_create_date(cls):
+        """
+        修复创建时间
+        :return:
+        """
+        rs = cls.find_plus(filter_dict={}, to_dict=True)
+        for r in rs:
+            if "create_date" not in r:
+                r['create_date'] = r['_id'].generation_time
+                x = cls(**r)
+                x.save_plus()
 
     @classmethod
     def get_word(cls, english: str) -> str:
@@ -68,7 +88,7 @@ class SpreadChannel(mongo_db.BaseDoc):
 
 class AllowOrigin(mongo_db.BaseDoc):
     """允许跨域注册的域名，域名要待http的"""
-    _table_name = "customer_info"
+    _table_name = "allow_origin_info"
     type_dict = dict()
     type_dict["_id"] = mongo_db.ObjectId  # id 唯一
     type_dict["origin"] = mongo_db.ObjectId  # 域名，理论上唯一
@@ -108,5 +128,6 @@ class AllowOrigin(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    SpreadChannel.analysis_url("http://www.91master.cn/zj-jg-zg/meg.html?channel=sg-pc-ziguan")
+    # SpreadChannel.analysis_url("http://www.91master.cn/zj-jg-zg/meg.html?channel=sg-pc-ziguan")
+    SpreadKeyword.rebuild_create_date()
     pass

@@ -1048,8 +1048,9 @@ class BaseDoc:
         ignore = ["_id"] if ignore is None else ignore
         ses = get_conn(self.table_name())
         doc = self.__dict__
+        _id = doc.pop("_id", None)
         doc = {k: v for k, v in doc.items() if k not in ignore}
-        f = {"_id": doc.pop("_id", None)}
+        f = {"_id": _id}
         res = ses.replace_one(filter=f, replacement=doc, upsert=False)
         return res
 

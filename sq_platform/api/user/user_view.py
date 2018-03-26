@@ -632,8 +632,9 @@ def get_security_rank_list_func(user_id) -> str:
         begin_date = datetime.datetime.now().strftime("%F")
         """个人排名数据"""
         my_report = security_module.SecurityReport.query_report2(prefix=prefix, user_id=user_id, report_type="rank", size=1)
-        """精简排名数据"""
+        """精简个人排名数据"""
         mes = security_module.SecurityReport.query_report2(prefix=prefix, report_type="rank", size=15, begin_date=begin_date)
+        """团队排名数据"""
         res = list()
         my_rank = dict()
         if len(mes) == 0:
