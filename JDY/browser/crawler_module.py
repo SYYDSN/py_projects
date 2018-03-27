@@ -1701,10 +1701,10 @@ def do_jobs():
 if __name__ == "__main__":
     """全套测试开始"""
     """draw"""
-    # browser = get_browser()
+    browser = get_browser()
     # for key in type_dict.keys():
-    #     s2 = parse_page(browser, domain2, key)  # 平台2
-    #     save_transaction_data(s2)
+    #     s2 = parse_page(browser, domain2, key, 37250)  # 平台2
+        # save_transaction_data(s2)
     #     s1 = parse_page(browser, domain1, key)  # 平台1
     #     save_transaction_data(s1)
     #
@@ -1721,8 +1721,8 @@ if __name__ == "__main__":
     #     upload_and_update_withdraw(browser=browser, **x)  # 上传出金申请
     # for x in other:
     #     upload_and_update_transaction(browser=browser, **x)  # 上传balance和credit
-    # browser.quit()
-    # del browser
+    browser.quit()
+    del browser
     """全套测试结束"""
     """填入一条假的出金申请"""
     # a = {
@@ -1752,13 +1752,11 @@ if __name__ == "__main__":
     # b.quit()
     # del b
     """测试吸取网站数据"""
-    # b = get_browser(0)
-    # b.quit()
-    # del b
-    # gc.collect()
-    # draw_withdraw(b)
+    b = get_browser(0)
+    draw_withdraw(b)
     # """测试写入出金申请"""
     # a = {'account_balance': 949.9, 'account': 8300109, 'commission_cny': 0.0, 'amount_usd': 1000.0, 'commission_usd': 0.0, 'close_time': None, 'amount_cny': 6800.0, 'code_id': '6228480039009384874', 'status': '审核中', 'apply_time': datetime.datetime(2018, 3, 22, 19, 0, 42), 'blank_name': '中国农业银行上海市山阳支行', 'ticket': 34, 'open_interest': 0.0, 'nick_name': '张赛华', 'account_value': 949.9, 'account_margin': 949.9, 'channel': '银联', 'system': 'office.shengfxchina.com:8443'}
-    upload_and_update_withdraw(b, **a)
-    # del b
+    # upload_and_update_withdraw(b, **a)
+    del b
+    gc.collect()
     pass

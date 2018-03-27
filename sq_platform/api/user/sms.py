@@ -7,6 +7,7 @@ import random
 from mongo_db import cache
 from log_module import get_logger
 from error_module import pack_message
+import datetime
 
 
 logger = get_logger()
@@ -131,6 +132,46 @@ def clear_sms_code(phone_num):
     cache.delete(key)
 
 
+def send_download_sms(phone: str):
+    """
+    发送下载页面短信
+    :param phone:
+    :return:
+    """
+    mes = {"message": "success"}
+    url = "http://www.api.zthysms.com/sendSms.do"
+    username = "soooqooohy"
+    password = "KDXKeo"
+    tkey = time.strftime('%Y%m%d%H%M%S')
+    pmd5 = md5(password.encode()).hexdigest() + tkey
+    omd5 = md5(pmd5.encode()).hexdigest()
+    content = "新振兴将与货源方合作，司机尽快安装“保驾犬”APP，关心司机安全，提供更多好货，下载链接:http://uee.me/HLwA，请转发司机！【保驾犬】".encode('utf-8')
+    args = {'username': username,
+            'password': omd5,
+            'tkey': tkey,
+            'mobile': phone,
+            'content': content,
+            'xh': ''
+            }
+    result = requests.post(url, data=args)
+    status = result.status_code
+    if status != 200:
+        mes['message'] = "服务器返回错误，状态码：{}".format(status)
+    else:
+        result = result.text
+        status_code = result.split(",")[0]
+        if status_code == "1":
+            """成功发送"""
+            pass
+        elif status_code == "20":
+            mes['message'] = "余额不足"
+        else:
+            mes['message'] = "短信发送失败:错误代码{}".format(status_code)
+    return mes
+
+
 if __name__ == '__main__':
     phoneNum = '15618317376'
-    send_sms(phoneNum)
+    print(send_download_sms(phoneNum))
+    # __send_sms(phoneNum)
+    pass

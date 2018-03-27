@@ -861,12 +861,22 @@ class BaseDoc:
         """
         cache = MyCache(cls.get_table_name())
         o_id = o_id if isinstance(o_id, str) else str(o_id)
+        r = default
         if attr_name not in cls.type_dict:
             pass
         else:
             r = cache.get_value("{}.{}".format(o_id, attr_name))
-            return r
+        return r
 
+    @classmethod
+    def save_attr_to_cache(cls, o_id: (ObjectId, str), attr_name: str, attr_val: object)-> (object, None):
+        """
+        保存属性值到缓存
+        :param o_id:
+        :param attr_name:
+        :param attr_val:
+        :return:
+        """
 
     @classmethod
     def get_attr_cls(cls, o_id: ObjectId, attr_name: str, default=None) -> object:
@@ -1039,10 +1049,11 @@ class BaseDoc:
             raise ValueError(mes)
         return inserted_id
 
-    def save_plus(self, ignore: list = None) -> bool:
+    def save_plus(self, ignore: list = None, upsert: bool = True) -> bool:
         """
         更新
         :param ignore: 忽略的更新的字段,一般是有唯一性验证的字段
+        :param upsert:
         :return:
         """
         ignore = ["_id"] if ignore is None else ignore
@@ -1051,7 +1062,7 @@ class BaseDoc:
         _id = doc.pop("_id", None)
         doc = {k: v for k, v in doc.items() if k not in ignore}
         f = {"_id": _id}
-        res = ses.replace_one(filter=f, replacement=doc, upsert=False)
+        res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
         return res
 
     def save(self, obj=None)->ObjectId:
