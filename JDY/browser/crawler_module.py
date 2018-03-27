@@ -116,9 +116,23 @@ def get_browser(headless: bool = True) -> Firefox:
     options = FirefoxOptions()
     options.add_argument("--headless")
     if headless:
-        browser = Firefox(firefox_profile=profile, firefox_options=options)
+        try:
+            browser = Firefox(firefox_profile=profile, firefox_options=options)
+        except Exception as e:
+            title = "{} headless浏览器打开失败".format(datetime.datetime.now())
+            content = "错误原因是：{}".format(e)
+            send_mail(title=title, content=content)
+            logger.exception()
+            raise e
     else:
-        browser = Firefox(firefox_profile=profile)
+        try:
+            browser = Firefox(firefox_profile=profile)
+        except Exception as e:
+            title = "{} headless浏览器打开失败".format(datetime.datetime.now())
+            content = "错误原因是：{}".format(e)
+            send_mail(title=title, content=content)
+            logger.exception()
+            raise e
     return browser
 
 
@@ -338,11 +352,17 @@ def get_page_platform(browser, page_url: str) -> (PyQuery, None):
     try:
         browser.get(page_url)
     except TimeoutException as e:
+        title = "{} 打开页面失败".format(datetime.datetime.now())
+        content = "错误原因：{}".format(e)
+        send_mail(title=title, content=content)
         print(page_url)
         ms = "Error {} on {}".format(page_url, e)
         recode(ms)
         raise e
     except Exception as e:
+        title = "{} 打开页面失败".format(datetime.datetime.now())
+        content = "错误原因：{}".format(e)
+        send_mail(title=title, content=content)
         print(e)
         ms = "Error {} on {}".format(page_url, e)
         recode(ms)
@@ -936,9 +956,24 @@ def save_transaction_data(raw_data: list) -> list:
         system_str = end['system']
         insert_list = list()
         if type_str not in ['sell', 'buy']:
+            """
+            credit和balance类型的单子，
+            无需要考虑持仓变平仓的问题，
+            所有的新数据直接插入。
+            直接保存即可。
+            """
             insert_list = raw_data
         else:
+            """
+            buy和sell类型的单子。
+            分四种情况：
+            1. 抓取到的是新单子。处于平仓状态的。写入。
+            2. 抓取到的是旧单子。处于平常状态的。update
+            3. 抓取到的是新单子。处于持仓状态的。写入
+            4. 抓取带的是旧单子。处于持仓状态的。放弃
+            """
             filter_dict = {"close_time": {"$exists": False}, "command": type_str, 'system': system_str}
+            """查找处于持仓状态的单子，用于应对以上的2/3/4状态中的比较"""
             db_holdings = Transaction.find_plus(filter_dict=filter_dict, to_dict=True, projection=["_id", "ticket"])
             if len(db_holdings) == 0:
                 insert_list = raw_data
@@ -947,12 +982,24 @@ def save_transaction_data(raw_data: list) -> list:
                 tickets = db_holdings.keys()
                 for x in raw_data:
                     t = x['ticket']
-                    close_time = x.get('close_time')
+                    close_time = x.get('close_time')  # 抓取到的数据的平仓时间
+                    """检查抓取到的数据是否有平仓记录并且是持仓变平仓的状态，"""
                     if t in tickets and isinstance(close_time, datetime.datetime):
                         """持仓变平仓的记录"""
                         _id = db_holdings[t]
                         f_dict = {"_id": _id}
-                        u_dict = {"$set": {"close_time": close_time}}
+                        u_dict = {
+                            "$set":
+                                {
+                                    "close_time": close_time,   # 平仓时间
+                                    "profit": x.get("profit"),  # 盈亏
+                                    "exit_price": x.get("exit_price"),
+                                    "swap": x.get("swap"),
+                                    "spread_profit": x.get("spread_profit"),
+                                    "description": x.get("description")
+                            }
+                        }
+                        """update持仓变平仓的记录"""
                         r = Transaction.find_one_and_update_plus(filter_dict=f_dict, update_dict=u_dict)
                         if r is None:
                             ms = "更新平仓信息失败,_id:{}  close_time:{}".format(_id, close_time)
@@ -963,6 +1010,7 @@ def save_transaction_data(raw_data: list) -> list:
                     else:
                         insert_list.append(x)
         if len(insert_list) > 0:
+            """保存抓取到的四种交易的订单信息"""
             r = Transaction.insert_many(insert_list)
             ms = "save_transaction_data success"
             recode(ms)
@@ -1689,6 +1737,8 @@ def do_jobs():
             browser.quit()
             del browser
             gc.collect()
+            ms = "headless浏览器资源已经释放，无法释放的内存资源是：{}".format(gc.garbage)
+            recode(ms)
         in_do_jobs = 0
         cache.set(key, in_do_jobs, timeout=3600)
     lock.release()
@@ -1701,7 +1751,7 @@ def do_jobs():
 if __name__ == "__main__":
     """全套测试开始"""
     """draw"""
-    browser = get_browser()
+    # browser = get_browser()
     # for key in type_dict.keys():
     #     s2 = parse_page(browser, domain2, key, 37250)  # 平台2
         # save_transaction_data(s2)
@@ -1721,8 +1771,8 @@ if __name__ == "__main__":
     #     upload_and_update_withdraw(browser=browser, **x)  # 上传出金申请
     # for x in other:
     #     upload_and_update_transaction(browser=browser, **x)  # 上传balance和credit
-    browser.quit()
-    del browser
+    # browser.quit()
+    # del browser
     """全套测试结束"""
     """填入一条假的出金申请"""
     # a = {
@@ -1757,6 +1807,8 @@ if __name__ == "__main__":
     # """测试写入出金申请"""
     # a = {'account_balance': 949.9, 'account': 8300109, 'commission_cny': 0.0, 'amount_usd': 1000.0, 'commission_usd': 0.0, 'close_time': None, 'amount_cny': 6800.0, 'code_id': '6228480039009384874', 'status': '审核中', 'apply_time': datetime.datetime(2018, 3, 22, 19, 0, 42), 'blank_name': '中国农业银行上海市山阳支行', 'ticket': 34, 'open_interest': 0.0, 'nick_name': '张赛华', 'account_value': 949.9, 'account_margin': 949.9, 'channel': '银联', 'system': 'office.shengfxchina.com:8443'}
     # upload_and_update_withdraw(b, **a)
+    b.quit()
     del b
     gc.collect()
+    print(gc.garbage)
     pass
