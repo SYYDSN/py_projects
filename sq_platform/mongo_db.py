@@ -1192,7 +1192,7 @@ class BaseDoc:
         替换一个文档.
         :param filter_dict: 过滤器
         :param replace_dict:  替换字典
-        :param upset: 不存在是否插入?
+        :param upsert: 不存在是否插入?
         :return:
         """
         ses = get_conn(cls.get_table_name())

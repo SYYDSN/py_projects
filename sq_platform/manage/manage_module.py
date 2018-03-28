@@ -166,7 +166,7 @@ def login_func():
     3. 不考虑跨域用户
     """
     """先获取域名,根据域名判断公司"""
-    company = get_company_from_req(request)
+    company = get_company_from_req(request)  # 调试状态,默认会返回新振兴
     if request.method.lower() == "get":
         if company:
             login_title = '登录'
@@ -188,8 +188,7 @@ def login_func():
                 user_password = user_password.lower()
                 """登录参数合法,开始验证"""
                 args = {"user_name": user_name}
-                f_dict = {"user_name": user_name}
-                employee = Employee.find_one_plus(filter_dict=f_dict, instance=False)
+                employee = Employee.find_one_plus(filter_dict=args, instance=False)
                 if employee is None:
                     message['message'] = "用户名不存在或手机未注册"
                 else:
@@ -203,8 +202,8 @@ def login_func():
                         employee_id = employee['_id']
                         short_name = company['short_name']
                         employee_name = employee.get("real_name", employee['user_name'])
-                        validate = Company.validate_employee(company_id, employee_id)
-                        if validate:
+                        post = Company.validate_employee(company_id, employee_id)
+                        if post is not None:
                             """登录成功,写入会话"""
                             args['user_id'] = str(employee['_id'])  # 写入用户id的str格式.
                             args['real_name'] = employee_name

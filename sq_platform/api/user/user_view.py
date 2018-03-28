@@ -624,9 +624,8 @@ def get_security_rank_list_func(user_id) -> str:
     }
     """
     message = {"message": "success"}
+    # user_id = ObjectId('5ab0ad831315e00e3cb61c62')  # 新振兴李侠
     prefix = Company.get_prefix_by_user_id(user_id)
-    user_id = ObjectId('5ab0ad831315e00e3cb61c62')
-    prefix = "xzx"
     host_url = request.host_url
     try:
         begin_date = datetime.datetime.now().strftime("%F")

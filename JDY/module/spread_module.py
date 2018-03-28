@@ -6,10 +6,14 @@ if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import mongo_db
 import datetime
+from log_module import get_logger
 import re
 
 
 """推广模块"""
+
+
+logger = get_logger()
 
 
 class SpreadKeyword(mongo_db.BaseDoc):
@@ -74,15 +78,22 @@ class SpreadChannel(mongo_db.BaseDoc):
                 group = mat.group()
                 if "&" in group:
                     """说明后面还有其他参数"""
-                    group = group.split("=")[0]
+                    group = group.split("&")[0]
                 else:
                     pass
-                group = group.split("=")[1].strip()
-                keys = group.split("-")
-                for key in keys:
-                    res = SpreadKeyword.get_word(key)
-                    res = '' if res is None else res['chinese']
-                    words.append(res)
+                try:
+                    group = group.split("=")[1].strip()
+                    keys = group.split("-")
+                    for key in keys:
+                        res = SpreadKeyword.get_word(key)
+                        res = '' if res is None else res['chinese']
+                        words.append(res)
+                except Exception as e:
+                    ms = "Error:{}, url: {}".format(e, the_str)
+                    logger.exception(ms)
+                    raise e
+                finally:
+                    pass
         return words
 
 
@@ -129,5 +140,6 @@ class AllowOrigin(mongo_db.BaseDoc):
 
 if __name__ == "__main__":
     # SpreadChannel.analysis_url("http://www.91master.cn/zj-jg-zg/meg.html?channel=sg-pc-ziguan")
-    SpreadKeyword.rebuild_create_date()
+    # SpreadKeyword.rebuild_create_date()
+    SpreadChannel.analysis_url("http://touzi.jyschaxun.com/20160316wapMt4/index.html?channel=bd-yd-MT4-XUN003338&t=1522223265832")
     pass
