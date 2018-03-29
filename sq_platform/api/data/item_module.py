@@ -1869,5 +1869,23 @@ def clear_phone() -> None:
 
 if __name__ == "__main__":
     # UserLicenseRelation.rebuild()
-    User.get_attr_cls(o_id=ObjectId("598d6ac2de713e32dfc74796"), attr_name="nick_name")
+    # User.get_attr_cls(o_id=ObjectId("598d6ac2de713e32dfc74796"), attr_name="nick_name")
+    # u = User(phone_num="15999189918")
+    # u.insert()
+    token = 'e5b04beded71473687527f9caed79dfa'
+    # oid = AppLoginToken.get_id_by_token(token)
+    # print(oid)
+    """
+    type_dict['user_id'] = ObjectId  # 用户id，是一个ObjectId对象，唯一
+    type_dict['token'] = str  # 用户登录标示，登录过的app用户
+    type_dict['create_date'] = datetime.datetime  # token有效的开始/创建日期
+    """
+    # args = {
+    #     "user_id" : ObjectId("59895177de713e304a67d30c"),
+    #     "create_date": datetime.datetime.now(),
+    #     "token": "1234"
+    # }
+    # t = AppLoginToken(**args)
+    # i = t.insert()
+    # print(i)
     pass

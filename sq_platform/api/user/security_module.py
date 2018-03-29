@@ -1271,7 +1271,9 @@ class SecurityReport(mongo_db.BaseDoc):
             query['bool']['filter'] = {"range": {"report_datetime": {"gte": begin_date, "lte": end_date}}}
         filter_dict['query'] = query
         filter_dict['size'] = size
-        filter_dict['sort'] = {"report_datetime": "desc"} if report_type == "report" else {"drive_rank": "asc"}
+        if report_type == "report":
+            pass
+        # filter_dict['sort'] = {"report_datetime": "desc"} if report_type == "report" else {"drive_rank": "asc"}
         # filter_dict['sort'] = {"report_datetime": "desc"} if report_type == "report" else {"drive_score": "desc"}
 
         es = Elasticsearch(['http://safego:safego.org@api.safego.org:9200'])
@@ -1295,6 +1297,9 @@ class SecurityReport(mongo_db.BaseDoc):
         except Exception as e:
             print(e)
             logger.exception("elasticsearch Error:")
+            ms = {"prefix": prefix, "user_id": user_id}
+            ms = "本次错误使用的请求参数 args: {}".format(ms)
+            logger.exception(ms)
             raise e
         finally:
             return res
@@ -1460,11 +1465,14 @@ def add_accident(num: int = 20) -> None:
 
 
 if __name__ == "__main__":
-    u_id = ObjectId("59f19d8dad01be4d918cacb7")
+    from manage.company_module import Company
+    u_id = ObjectId("5a3b3cd5db122cd9fbc21c40")
     my_id = ObjectId("59895177de713e304a67d30c")
     date_str = "2017-11-16"
-    """查询某人最新安全报告"""
-    SecurityReport.query_report2(user_id="5a3b3cd5db122cd9fbc21c40")
+    """查询某2人最新安全报告"""
+    pre = Company.get_prefix_by_user_id(u_id)
+    # print(SecurityReport.query_report2(user_id="{} {}".format(str(u_id), str(my_id))))
+    print(SecurityReport.query_report2(prefix="sf", user_id="{}".format(str(u_id))))
     """查询某人某段时间安全报告"""
     # SecurityReport.query_report2(user_id="5a3b3cd5db122cd9fbc21c40", begin_date='2018-01-01', end_date='2018-03-01')
     """查询最近的安全得分排名"""
