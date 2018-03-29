@@ -67,6 +67,11 @@ def listen_func(key):
         """测试消息"""
         secret_str = "ckFqpdtIr45aXwPkSITuW2iY"  # 不同的消息定义的secret不同，用来验证消息的合法性
         print(validate_signature(request, secret_str, signature))
+    elif key == "signal_test":
+        """分析师发信号测试"""
+        secret_str = 'P5lxNPYgF6cylkMBUenhkOE7'
+        check = validate_signature(request, secret_str, signature)
+        print("signal_test check is {}".format(check))
     else:
         mes['message'] = '错误的path'
     return json.dumps(mes)

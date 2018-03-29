@@ -1,0 +1,2162 @@
+2018-03-28 13:34:17,198 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 13:34:24,727 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 13:35:00,456 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 13:35:01,917 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 13:35:17,915 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 13:35:21,277 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 13:44:20,639 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 13:44:26,576 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:09:46,745 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:09:50,676 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:11:59,857 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-28 14:16:43,456 item_module.py[line:259] ERROR 参数:first_issued_date的值 非法.
+NoneType
+2018-03-28 14:16:43,457 item_module.py[line:259] ERROR 参数:valid_date的值 非法.
+NoneType
+2018-03-28 14:16:45,158 item_module.py[line:259] ERROR 参数:first_issued_date的值 非法.
+NoneType
+2018-03-28 14:16:45,159 item_module.py[line:259] ERROR 参数:valid_date的值 非法.
+NoneType
+2018-03-28 14:16:46,257 item_module.py[line:259] ERROR 参数:first_issued_date的值 非法.
+NoneType
+2018-03-28 14:16:46,258 item_module.py[line:259] ERROR 参数:valid_date的值 非法.
+NoneType
+2018-03-28 14:16:53,427 item_module.py[line:259] ERROR 参数:first_issued_date的值 非法.
+NoneType
+2018-03-28 14:16:53,428 item_module.py[line:259] ERROR 参数:valid_date的值 非法.
+NoneType
+2018-03-28 14:28:44,015 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-28 14:41:26,438 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:41:31,388 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:41:42,366 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:41:49,866 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:42:30,705 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:42:54,342 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:44:28,504 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:45:32,357 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:45:40,721 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:45:48,840 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:54:59,588 mongo_db.py[line:295] ERROR 错误的日期格式:
+NoneType
+2018-03-28 14:57:53,129 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:57:56,633 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 14:58:42,092 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 15:10:06,658 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 15:44:35,159 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 15:48:57,682 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 15:52:29,744 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 16:16:29,212 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 16:33:11,093 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 16:34:21,012 mlogging.py[line:70] ERROR BrokenPipeError: [Errno 32] Broken pipe
+
+2018-03-28 16:34:22,141 mlogging.py[line:70] ERROR BrokenPipeError: [Errno 32] Broken pipe
+
+2018-03-28 16:35:20,350 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 16:37:16,290 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 16:37:38,626 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 16:41:11,759 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 17:10:54,457 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 17:18:30,133 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 17:30:45,405 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 17:52:27,457 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:03:00,624 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:11:17,201 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:11:25,553 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:11:32,573 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:13:21,184 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:13:22,596 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:13:22,623 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:17:45,979 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:30:33,676 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:31:47,476 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:38:53,697 mongo_db.py[line:295] ERROR 错误的日期格式:
+NoneType
+2018-03-28 18:38:57,537 mongo_db.py[line:295] ERROR 错误的日期格式:
+NoneType
+2018-03-28 18:39:39,230 mongo_db.py[line:295] ERROR 错误的日期格式:
+NoneType
+2018-03-28 18:57:51,856 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:58:20,144 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 18:59:26,656 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:06:46,911 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:06:55,232 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:07:16,607 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:07:19,595 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:07:26,148 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:21:21,323 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:26:49,312 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:27:57,286 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:27:57,405 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:29:06,869 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:29:06,993 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:29:07,040 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:31:32,507 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:31:36,968 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:34:02,774 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:52:41,112 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:52:53,508 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:53:04,090 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 19:56:43,767 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:00:57,133 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:01:05,912 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:01:23,741 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:03:30,554 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:12:18,744 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:15:58,285 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:17:21,338 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:18:18,429 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:18:18,526 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:22:06,547 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:44:13,976 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:50:07,182 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 20:59:22,739 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 21:01:48,960 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 21:24:22,925 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 21:24:48,901 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 21:31:33,420 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 21:39:58,046 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 23:00:56,904 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 23:00:58,353 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 23:22:16,093 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 23:22:22,527 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-28 23:47:11,410 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 00:00:27,714 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 00:01:27,864 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 00:02:27,735 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 00:03:27,979 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 00:04:34,034 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 00:11:38,896 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 00:12:20,558 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 00:16:59,406 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 00:17:01,570 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 00:17:18,144 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 00:17:28,905 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 03:49:25,633 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 03:49:27,066 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 03:49:55,295 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 03:49:57,357 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 03:50:06,179 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 06:33:51,042 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 06:33:53,226 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 07:20:33,361 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 07:20:34,887 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 09:19:44,739 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 09:19:47,274 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 09:34:30,339 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 09:34:32,766 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 09:34:36,460 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 09:34:48,190 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 10:04:35,704 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 10:04:37,822 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 10:04:46,616 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 10:06:52,591 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 10:12:50,802 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 10:37:19,325 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 10:45:53,974 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 10:47:24,140 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 10:58:51,834 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 11:04:28,335 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 11:23:35,554 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 11:35:49,621 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 11:38:19,896 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 11:38:38,221 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 11:38:41,710 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 11:38:48,432 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 11:38:56,478 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 12:09:16,856 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 12:09:18,582 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 12:09:27,574 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 12:32:56,107 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 12:35:34,827 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 12:35:36,710 user_view.py[line:313] ERROR Error! 
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 235, in update_image
+    file = upload_files[key]
+  File "/home/web/my_env/lib/python3.5/site-packages/werkzeug/datastructures.py", line 428, in __getitem__
+    raise exceptions.BadRequestKeyError(key)
+werkzeug.exceptions.HTTPException.wrap.<locals>.newcls: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-03-29 12:39:52,225 item_module.py[line:259] ERROR 参数:first_issued_date的值 非法.
+NoneType
+2018-03-29 12:40:17,141 security_module.py[line:1288] ERROR elasticsearch Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1280, in query_report2
+    res = es.search(index=prefix, doc_type="daily_report", body=filter_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.NotFoundError: TransportError(404, 'index_not_found_exception', 'no such index')
+2018-03-29 13:06:26,928 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=a5f546cea4f8482b9a3a3a0f4142b00e, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: a5f546cea4f8482b9a3a3a0f4142b00e
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:06:42,430 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=b4088dcb255a4572a37ba30cad397cbb, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: b4088dcb255a4572a37ba30cad397cbb
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:06:55,880 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=0cd2204a28484e0b821fffab557038d2, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: 0cd2204a28484e0b821fffab557038d2
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:08:13,387 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=f4d555464b83421aa12ce49a2af52c25, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: f4d555464b83421aa12ce49a2af52c25
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:09:22,342 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=2f993cb039d643f0990b3a77dfa6b3dc, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: 2f993cb039d643f0990b3a77dfa6b3dc
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:09:55,225 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=20e61254cda443c991b66c465e51d0f9, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: 20e61254cda443c991b66c465e51d0f9
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:13:56,781 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=b2aad106846245d1bf00e398946d0e58, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: b2aad106846245d1bf00e398946d0e58
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:27:59,591 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=8d7374c0b4a4442eb1d31108c8326dd5, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: 8d7374c0b4a4442eb1d31108c8326dd5
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:28:08,462 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=fca8ed6a14bc4a7187473a16b21f53d8, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: fca8ed6a14bc4a7187473a16b21f53d8
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:28:17,428 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=cb4428cc29564a50ba1eba8cf2a49c67, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: cb4428cc29564a50ba1eba8cf2a49c67
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:29:48,462 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=07d633f7fb964373bea6ca82056075c7, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: 07d633f7fb964373bea6ca82056075c7
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType
+2018-03-29 13:30:16,544 tools_module.py[line:261] ERROR app token验证失败: api=/api/get_daily_info, args=None, auth_token=6c40e063b4ad4b97b33d5013437ff8ab, token=None, headers=Accept-Encoding: gzip
+Content-Length: 0
+Connection: Keep-Alive
+Cache-Control: no-cache
+Auth-Token: 6c40e063b4ad4b97b33d5013437ff8ab
+User-Agent: okhttp/3.9.1
+Host: safego.org:5000
+
+NoneType

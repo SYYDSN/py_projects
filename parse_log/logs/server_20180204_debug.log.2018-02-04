@@ -1,0 +1,21 @@
+2018-02-04 03:35:56,330 retry.py[line:200] DEBUG Converted retries value: False -> Retry(total=False, connect=None, read=None, redirect=0, status=None)
+2018-02-04 03:35:56,330 connectionpool.py[line:208] DEBUG Starting new HTTP connection (1): api.safego.org
+2018-02-04 03:35:56,361 connectionpool.py[line:396] DEBUG http://api.safego.org:9200 "GET /sf/daily_report/_search?size=100 HTTP/1.1" 200 134
+2018-02-04 03:35:56,362 base.py[line:83] INFO GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:200 request:0.032s]
+2018-02-04 03:35:56,362 base.py[line:85] DEBUG > {"query": {"bool": {"must": [{"match": {"id": "59895177de713e304a67d30c"}}]}}, "sort": {"report_datetime": {"order": "desc"}}}
+2018-02-04 03:35:56,363 base.py[line:86] DEBUG < {"took":3,"timed_out":false,"_shards":{"total":5,"successful":5,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}
+2018-02-04 03:35:56,363 security_module.py[line:1032] INFO elasticsearch query success! at 2018-02-04 03:35:56, user_id:59895177de713e304a67d30c,date:None共计查询到0条记录
+2018-02-04 03:37:18,036 retry.py[line:200] DEBUG Converted retries value: False -> Retry(total=False, connect=None, read=None, redirect=0, status=None)
+2018-02-04 03:37:18,037 connectionpool.py[line:208] DEBUG Starting new HTTP connection (1): api.safego.org
+2018-02-04 03:37:18,091 connectionpool.py[line:396] DEBUG http://api.safego.org:9200 "GET /sf/daily_report/_search?size=1000 HTTP/1.1" 200 135
+2018-02-04 03:37:18,092 base.py[line:83] INFO GET http://api.safego.org:9200/sf/daily_report/_search?size=1000 [status:200 request:0.056s]
+2018-02-04 03:37:18,092 base.py[line:85] DEBUG > {"query": {"bool": {"must": [{"match": {"id": "59895177de713e304a67d30c"}}, {"match": {"report_datetime": "2018-02-04"}}]}}}
+2018-02-04 03:37:18,092 base.py[line:86] DEBUG < {"took":29,"timed_out":false,"_shards":{"total":5,"successful":5,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}
+2018-02-04 03:37:18,092 security_module.py[line:1032] INFO elasticsearch query success! at 2018-02-04 03:37:18, user_id:59895177de713e304a67d30c,date:2018-02-04共计查询到0条记录
+2018-02-04 03:37:44,503 retry.py[line:200] DEBUG Converted retries value: False -> Retry(total=False, connect=None, read=None, redirect=0, status=None)
+2018-02-04 03:37:44,503 connectionpool.py[line:208] DEBUG Starting new HTTP connection (1): api.safego.org
+2018-02-04 03:37:44,532 connectionpool.py[line:396] DEBUG http://api.safego.org:9200 "GET /sf/daily_report/_search?size=100 HTTP/1.1" 200 134
+2018-02-04 03:37:44,533 base.py[line:83] INFO GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:200 request:0.030s]
+2018-02-04 03:37:44,533 base.py[line:85] DEBUG > {"query": {"bool": {"must": [{"match": {"id": "59895177de713e304a67d30c"}}]}}, "sort": {"report_datetime": {"order": "desc"}}}
+2018-02-04 03:37:44,533 base.py[line:86] DEBUG < {"took":3,"timed_out":false,"_shards":{"total":5,"successful":5,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}
+2018-02-04 03:37:44,534 security_module.py[line:1032] INFO elasticsearch query success! at 2018-02-04 03:37:44, user_id:59895177de713e304a67d30c,date:None共计查询到0条记录

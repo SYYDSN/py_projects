@@ -1,0 +1,90 @@
+2018-03-13 08:18:00,369 user_view.py[line:790] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 768, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1219, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.TransportError: TransportError(502, '<html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body bgcolor="white">\r\n<center><h1>502 Bad Gateway</h1></center>\r\n<hr><center>nginx/1.10.3 (Ubuntu)</center>\r\n</body>\r\n</html>\r\n')
+2018-03-13 08:20:12,339 user_view.py[line:790] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 768, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1219, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.TransportError: TransportError(502, '<html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body bgcolor="white">\r\n<center><h1>502 Bad Gateway</h1></center>\r\n<hr><center>nginx/1.10.3 (Ubuntu)</center>\r\n</body>\r\n</html>\r\n')
+2018-03-13 08:20:17,353 user_view.py[line:790] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 768, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1219, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.TransportError: TransportError(502, '<html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body bgcolor="white">\r\n<center><h1>502 Bad Gateway</h1></center>\r\n<hr><center>nginx/1.10.3 (Ubuntu)</center>\r\n</body>\r\n</html>\r\n')
+2018-03-13 08:25:08,470 user_view.py[line:790] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 768, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1219, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 161, in perform_request
+    self._raise_error(response.status, raw_data)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.TransportError: TransportError(502, '<html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body bgcolor="white">\r\n<center><h1>502 Bad Gateway</h1></center>\r\n<hr><center>nginx/1.10.3 (Ubuntu)</center>\r\n</body>\r\n</html>\r\n')
+2018-03-13 13:17:04,995 mongo_db.py[line:913] ERROR mongo_db.save func Error,原因:not master
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/mongo_db.py", line 904, in save
+    save_id = ses.save(save_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/pymongo/collection.py", line 2481, in save
+    collation=collation)
+  File "/home/web/my_env/lib/python3.5/site-packages/pymongo/collection.py", line 767, in _update
+    _check_write_command_response([(0, result)])
+  File "/home/web/my_env/lib/python3.5/site-packages/pymongo/helpers.py", line 315, in _check_write_command_response
+    raise WriteError(error.get("errmsg"), error.get("code"), error)
+pymongo.errors.WriteError: not master
+2018-03-13 13:17:05,011 mongo_db.py[line:913] ERROR mongo_db.save func Error,原因:not master
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/mongo_db.py", line 904, in save
+    save_id = ses.save(save_dict)
+  File "/home/web/my_env/lib/python3.5/site-packages/pymongo/collection.py", line 2481, in save
+    collation=collation)
+  File "/home/web/my_env/lib/python3.5/site-packages/pymongo/collection.py", line 767, in _update
+    _check_write_command_response([(0, result)])
+  File "/home/web/my_env/lib/python3.5/site-packages/pymongo/helpers.py", line 315, in _check_write_command_response
+    raise WriteError(error.get("errmsg"), error.get("code"), error)
+pymongo.errors.WriteError: not master

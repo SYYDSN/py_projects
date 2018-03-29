@@ -1,0 +1,492 @@
+2018-02-02 15:49:20,001 user_view.py[line:775] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5f036a0>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 753, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1027, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fafc5f036a0>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fafc5f036a0>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-02 15:50:25,323 user_view.py[line:775] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9470>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 753, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1027, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fafc5ef9470>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fafc5ef9470>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-02 16:19:16,760 user_view.py[line:775] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9a58>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 753, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1027, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fafc5ef9a58>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fafc5ef9a58>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-02 16:33:01,020 user_view.py[line:775] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5efd320>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 753, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1027, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fafc5efd320>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fafc5efd320>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-02 17:34:54,351 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21524.91ms
+2018-02-02 17:35:15,875 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.90ms
+2018-02-02 17:35:37,400 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20192.23ms
+2018-02-02 17:35:58,919 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21518.65ms
+2018-02-02 17:36:19,948 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.53ms
+2018-02-02 17:36:40,977 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21027.86ms
+2018-02-02 17:37:02,007 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.97ms
+2018-02-02 17:49:36,347 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.85ms
+2018-02-02 17:49:57,867 wsgi.py[line:355] ERROR 500 POST /api/get_report_detail (210.22.99.54) 21519.38ms
+2018-02-02 17:50:19,390 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21519.23ms
+2018-02-02 17:50:40,915 wsgi.py[line:355] ERROR 500 POST /api/get_user_info (210.22.99.54) 21523.71ms
+2018-02-02 17:51:02,442 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.57ms
+2018-02-02 17:51:23,867 wsgi.py[line:355] ERROR 500 POST /api/get_user_info (210.22.99.54) 21423.34ms
+2018-02-02 17:51:45,383 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21515.72ms
+2018-02-02 17:52:06,903 wsgi.py[line:355] ERROR 500 POST /api/get_user_info (210.22.99.54) 21518.79ms
+2018-02-02 17:52:28,422 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21518.19ms
+2018-02-02 17:52:49,940 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21516.61ms
+2018-02-02 17:53:11,457 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21515.19ms
+2018-02-02 17:53:32,977 wsgi.py[line:355] ERROR 500 POST /api/get_user_info (210.22.99.54) 21519.10ms
+2018-02-02 17:53:54,498 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21520.95ms
+2018-02-02 17:54:16,019 wsgi.py[line:355] ERROR 500 POST /api/get_report_detail (210.22.99.54) 21519.68ms
+2018-02-02 17:54:37,534 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21513.89ms
+2018-02-02 17:54:58,944 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21409.27ms
+2018-02-02 17:55:20,471 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.77ms
+2018-02-02 17:55:41,993 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.87ms
+2018-02-02 17:56:03,512 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21518.65ms
+2018-02-02 17:56:25,030 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21516.45ms
+2018-02-02 17:56:46,551 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21519.75ms
+2018-02-02 17:57:08,070 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21517.96ms
+2018-02-02 17:57:29,457 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21385.93ms
+2018-02-02 17:57:50,980 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.96ms
+2018-02-02 18:28:55,063 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21524.10ms
+2018-02-02 18:29:16,098 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21034.24ms
+2018-02-02 18:29:37,128 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.10ms
+2018-02-02 18:29:58,652 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.02ms
+2018-02-02 18:30:19,686 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21032.75ms
+2018-02-02 18:30:40,710 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21022.90ms
+2018-02-02 18:31:01,737 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21026.21ms
+2018-02-02 18:35:55,579 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 24712.27ms
+2018-02-02 19:04:06,504 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24607.71ms
+2018-02-02 19:04:27,535 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.50ms
+2018-02-02 19:04:49,062 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.01ms
+2018-02-02 19:05:15,511 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20131.01ms
+2018-02-02 19:05:36,540 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.57ms
+2018-02-02 19:05:57,569 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21028.11ms
+2018-02-02 19:33:17,466 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.52ms
+2018-02-02 19:33:38,495 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.71ms
+2018-02-02 19:33:59,522 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.11ms
+2018-02-02 19:34:21,045 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.25ms
+2018-02-02 19:34:42,564 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20255.48ms
+2018-02-02 19:35:03,596 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.10ms
+2018-02-02 19:35:56,533 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21195.76ms
+2018-02-02 20:10:08,045 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 22827.90ms
+2018-02-02 20:10:29,566 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.18ms
+2018-02-02 20:10:56,554 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21727.50ms
+2018-02-02 20:11:17,587 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21032.08ms
+2018-02-02 20:11:38,622 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21033.78ms
+2018-02-02 20:11:59,653 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.82ms
+2018-02-02 20:12:21,175 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.89ms
+2018-02-02 20:13:39,623 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21528.55ms
+2018-02-02 20:16:28,127 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 22854.13ms
+2018-02-02 20:53:57,289 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23013.08ms
+2018-02-02 20:54:18,318 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.92ms
+2018-02-02 20:54:39,343 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21023.95ms
+2018-02-02 20:55:00,380 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21035.19ms
+2018-02-02 20:55:21,405 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21024.76ms
+2018-02-02 20:55:42,438 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.95ms
+2018-02-02 20:56:03,464 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21024.98ms
+2018-02-02 20:58:09,880 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 19658.97ms
+2018-02-02 20:59:11,050 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 20019.94ms
+2018-02-02 21:32:01,802 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.74ms
+2018-02-02 21:32:23,324 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.72ms
+2018-02-02 21:32:44,357 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.09ms
+2018-02-02 21:33:05,383 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.66ms
+2018-02-02 21:33:26,411 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.76ms
+2018-02-02 21:33:47,212 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20799.97ms
+2018-02-02 21:34:08,734 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.35ms
+2018-02-02 21:37:09,259 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24662.37ms
+2018-02-02 21:38:10,410 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.25ms
+2018-02-02 22:15:42,724 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21525.74ms
+2018-02-02 22:16:03,767 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21041.31ms
+2018-02-02 22:16:24,799 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.54ms
+2018-02-02 22:16:45,829 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.78ms
+2018-02-02 22:17:07,226 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21395.90ms
+2018-02-02 22:17:27,870 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20643.09ms
+2018-02-02 22:17:49,394 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.68ms
+2018-02-02 22:18:58,408 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.08ms
+2018-02-02 22:21:52,643 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21519.20ms
+2018-02-02 22:22:42,079 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.56ms
+2018-02-02 22:23:58,302 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24150.09ms
+2018-02-02 22:25:58,468 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21518.19ms
+2018-02-02 23:03:53,193 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20577.41ms
+2018-02-02 23:04:14,215 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21021.60ms
+2018-02-02 23:04:35,738 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.53ms
+2018-02-02 23:04:56,702 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20963.11ms
+2018-02-02 23:05:17,731 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.32ms
+2018-02-02 23:05:38,758 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.05ms
+2018-02-02 23:05:59,782 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21023.13ms
+2018-02-02 23:06:21,805 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21531.73ms
+2018-02-02 23:07:05,097 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21318.31ms
+2018-02-02 23:08:16,740 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21196.73ms
+2018-02-02 23:08:52,118 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.80ms
+2018-02-02 23:43:55,999 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.31ms
+2018-02-02 23:44:17,035 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21034.73ms
+2018-02-02 23:44:44,395 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24172.54ms
+2018-02-02 23:45:05,922 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21525.77ms
+2018-02-02 23:45:26,951 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.71ms
+2018-02-02 23:45:47,669 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20717.40ms
+2018-02-02 23:46:08,701 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21030.60ms
+2018-02-03 00:28:54,104 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.50ms
+2018-02-03 00:29:15,259 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21153.62ms
+2018-02-03 00:29:36,785 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21525.49ms
+2018-02-03 00:29:58,311 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21524.62ms
+2018-02-03 00:30:19,341 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21029.46ms
+2018-02-03 00:30:40,271 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20928.82ms
+2018-02-03 00:31:01,794 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21519.71ms
+2018-02-03 01:34:47,994 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19542.38ms
+2018-02-03 01:35:08,855 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20691.54ms
+2018-02-03 01:35:36,271 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 22867.22ms
+2018-02-03 01:35:57,301 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21028.64ms
+2018-02-03 01:36:18,329 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.63ms
+2018-02-03 01:36:39,358 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.67ms
+2018-02-03 01:40:52,846 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 23205.09ms
+2018-02-03 02:23:55,358 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20969.86ms
+2018-02-03 02:24:16,383 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21023.32ms
+2018-02-03 02:24:37,910 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.76ms
+2018-02-03 02:25:05,436 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24242.61ms
+2018-02-03 02:25:26,465 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21028.26ms
+2018-02-03 02:25:47,498 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21032.08ms
+2018-02-03 02:26:09,021 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.78ms
+2018-02-03 02:29:09,901 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 24951.70ms
+2018-02-03 03:13:55,882 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20993.63ms
+2018-02-03 03:14:16,909 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.03ms
+2018-02-03 03:14:37,934 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21024.60ms
+2018-02-03 03:14:59,143 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21207.57ms
+2018-02-03 03:15:26,168 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24965.30ms
+2018-02-03 03:15:47,200 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.77ms
+2018-02-03 03:16:08,728 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.43ms
+2018-02-03 03:17:23,278 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21173.35ms
+2018-02-03 03:17:44,911 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21318.59ms
+2018-02-03 03:18:06,917 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.76ms
+2018-02-03 04:03:54,927 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 22226.41ms
+2018-02-03 04:04:15,953 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.66ms
+2018-02-03 04:04:36,987 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.60ms
+2018-02-03 04:04:58,450 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21462.18ms
+2018-02-03 04:05:25,473 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23227.34ms
+2018-02-03 04:05:46,505 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.03ms
+2018-02-03 04:06:08,025 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21518.89ms
+2018-02-03 04:54:00,635 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20035.83ms
+2018-02-03 04:54:21,662 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.20ms
+2018-02-03 04:54:48,680 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23473.08ms
+2018-02-03 04:55:09,712 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.64ms
+2018-02-03 04:55:31,227 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21514.92ms
+2018-02-03 04:55:52,256 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21027.66ms
+2018-02-03 04:56:25,292 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24040.58ms
+2018-02-03 04:57:55,670 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24858.99ms
+2018-02-03 04:58:50,175 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19648.27ms
+2018-02-03 04:59:11,446 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21269.94ms
+2018-02-03 05:34:10,218 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21531.63ms
+2018-02-03 05:34:31,251 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.99ms
+2018-02-03 05:34:52,280 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.21ms
+2018-02-03 05:35:13,309 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.74ms
+2018-02-03 05:35:34,205 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20895.23ms
+2018-02-03 05:35:55,236 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21030.65ms
+2018-02-03 05:36:16,268 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.40ms
+2018-02-03 05:36:37,303 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21033.90ms
+2018-02-03 05:36:58,339 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21034.01ms
+2018-02-03 05:37:19,365 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.65ms
+2018-02-03 05:37:40,391 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21024.57ms
+2018-02-03 05:38:01,424 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.66ms
+2018-02-03 05:38:22,948 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21523.27ms
+2018-02-03 05:58:56,466 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21517.78ms
+2018-02-03 05:59:17,501 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21033.81ms
+2018-02-03 05:59:38,533 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.69ms
+2018-02-03 06:00:00,052 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21517.56ms
+2018-02-03 06:00:21,086 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21032.89ms
+2018-02-03 06:00:42,260 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.07ms
+2018-02-03 06:01:03,714 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21453.58ms
+2018-02-03 06:05:39,056 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.38ms
+2018-02-03 06:06:00,083 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.77ms
+2018-02-03 06:06:21,117 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.58ms
+2018-02-03 06:06:42,152 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21034.10ms
+2018-02-03 06:07:03,182 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.03ms
+2018-02-03 06:07:24,213 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21029.15ms
+2018-02-03 06:07:45,243 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.26ms
+2018-02-03 06:08:06,767 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21522.86ms
+2018-02-03 06:10:58,415 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 20269.86ms
+2018-02-03 07:00:23,427 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.62ms
+2018-02-03 07:00:44,462 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21033.84ms
+2018-02-03 07:01:05,491 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21028.57ms
+2018-02-03 07:01:26,524 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.54ms
+2018-02-03 07:01:47,187 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20661.87ms
+2018-02-03 07:02:08,213 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21025.29ms
+2018-02-03 07:02:29,735 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.29ms
+2018-02-03 07:02:52,047 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19881.52ms
+2018-02-03 07:03:51,955 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.51ms
+2018-02-03 07:05:17,598 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24744.60ms
+2018-02-03 07:06:32,112 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20667.57ms
+2018-02-03 07:08:05,471 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.95ms
+2018-02-03 07:08:44,851 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.42ms
+2018-02-03 07:09:12,178 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20953.54ms
+2018-02-03 07:33:52,552 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19941.79ms
+2018-02-03 07:34:13,581 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.61ms
+2018-02-03 07:34:34,608 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.24ms
+2018-02-03 07:34:55,730 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21120.79ms
+2018-02-03 07:35:16,759 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21027.68ms
+2018-02-03 07:35:38,276 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21516.96ms
+2018-02-03 07:35:59,798 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.89ms
+2018-02-03 07:38:08,953 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.95ms
+2018-02-03 07:42:27,158 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21408.87ms
+2018-02-03 07:42:48,186 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.86ms
+2018-02-03 07:43:09,217 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.77ms
+2018-02-03 07:43:30,244 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.76ms
+2018-02-03 07:43:51,275 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.60ms
+2018-02-03 07:44:12,303 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.10ms
+2018-02-03 07:44:33,334 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.10ms
+2018-02-03 07:47:18,677 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20296.98ms
+2018-02-03 07:48:09,317 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21529.76ms
+2018-02-03 07:48:52,717 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21524.59ms
+2018-02-03 08:29:03,839 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23687.43ms
+2018-02-03 08:29:24,870 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.80ms
+2018-02-03 08:29:46,887 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.41ms
+2018-02-03 08:30:13,910 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20704.67ms
+2018-02-03 08:30:34,940 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.00ms
+2018-02-03 08:30:55,971 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.92ms
+2018-02-03 08:31:33,378 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20211.15ms
+2018-02-03 08:32:58,898 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24625.47ms
+2018-02-03 08:33:52,220 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21525.13ms
+2018-02-03 08:35:50,537 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21513.83ms
+2018-02-03 09:03:58,646 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19533.82ms
+2018-02-03 09:04:25,664 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24453.75ms
+2018-02-03 09:04:46,693 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.39ms
+2018-02-03 09:05:07,726 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.57ms
+2018-02-03 09:05:28,756 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.34ms
+2018-02-03 09:05:49,785 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.51ms
+2018-02-03 09:06:11,312 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21526.21ms
+2018-02-03 09:41:04,935 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19710.17ms
+2018-02-03 09:41:26,274 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21022.37ms
+2018-02-03 09:41:47,298 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21023.33ms
+2018-02-03 09:42:08,321 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21021.62ms
+2018-02-03 09:42:29,839 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19631.68ms
+2018-02-03 09:42:50,862 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21022.34ms
+2018-02-03 09:43:12,386 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.80ms
+2018-02-03 09:43:53,087 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.99ms
+2018-02-03 09:44:30,295 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21531.13ms
+2018-02-03 09:44:53,932 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21530.06ms
+2018-02-03 09:46:34,445 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21395.25ms
+2018-02-03 09:47:44,827 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.60ms
+2018-02-03 09:48:06,355 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21526.31ms
+2018-02-03 10:14:34,791 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19687.39ms
+2018-02-03 10:14:55,824 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.25ms
+2018-02-03 10:15:17,348 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.46ms
+2018-02-03 10:15:44,378 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23176.30ms
+2018-02-03 10:16:05,409 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.04ms
+2018-02-03 10:16:26,435 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.24ms
+2018-02-03 10:16:47,465 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.77ms
+2018-02-03 10:52:29,060 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.79ms
+2018-02-03 10:52:50,585 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.69ms
+2018-02-03 10:53:11,610 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21024.49ms
+2018-02-03 10:53:32,641 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.79ms
+2018-02-03 10:53:53,676 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21033.81ms
+2018-02-03 10:54:14,707 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.76ms
+2018-02-03 10:57:48,851 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 19828.96ms
+2018-02-03 10:58:40,753 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 24242.80ms

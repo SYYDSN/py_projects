@@ -1,0 +1,1384 @@
+2018-02-02 14:40:36,890 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 10.83ms
+2018-02-02 14:40:44,793 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.09ms
+2018-02-02 14:41:44,144 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.61ms
+2018-02-02 14:42:44,390 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 18.32ms
+2018-02-02 14:43:19,311 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.80ms
+2018-02-02 14:43:43,967 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 18.88ms
+2018-02-02 14:44:44,326 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.03ms
+2018-02-02 14:45:36,785 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 10.95ms
+2018-02-02 14:45:44,723 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.68ms
+2018-02-02 14:46:44,305 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.93ms
+2018-02-02 14:47:44,864 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.60ms
+2018-02-02 14:48:25,317 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.60ms
+2018-02-02 14:48:44,595 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.74ms
+2018-02-02 14:49:27,672 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 11.30ms
+2018-02-02 14:49:38,353 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 11.22ms
+2018-02-02 14:49:46,023 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.33ms
+2018-02-02 14:50:44,447 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.87ms
+2018-02-02 14:51:44,502 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 19.30ms
+2018-02-02 14:51:44,987 data_view.py[line:236] INFO 2018-02-02 14:51:44.987037: user_id: 598d6ac2de713e32dfc74796, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_14_51_46.zip' ('multipart/form-data')>)])
+2018-02-02 14:51:44,990 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.10ms
+2018-02-02 14:52:44,542 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.88ms
+2018-02-02 14:53:45,268 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.04ms
+2018-02-02 14:54:44,712 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.55ms
+2018-02-02 14:55:44,757 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.90ms
+2018-02-02 14:56:44,782 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.94ms
+2018-02-02 14:57:44,842 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.47ms
+2018-02-02 14:58:46,325 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.98ms
+2018-02-02 14:59:44,918 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.95ms
+2018-02-02 15:00:45,126 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.22ms
+2018-02-02 15:01:45,963 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.98ms
+2018-02-02 15:02:48,555 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.62ms
+2018-02-02 15:03:48,266 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.43ms
+2018-02-02 15:04:48,506 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.35ms
+2018-02-02 15:05:48,419 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.90ms
+2018-02-02 15:06:48,488 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.24ms
+2018-02-02 15:07:50,576 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.52ms
+2018-02-02 15:08:48,474 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.69ms
+2018-02-02 15:09:48,518 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.99ms
+2018-02-02 15:10:48,745 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.51ms
+2018-02-02 15:11:49,577 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.06ms
+2018-02-02 15:12:49,477 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.71ms
+2018-02-02 15:13:48,711 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.31ms
+2018-02-02 15:14:49,909 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.75ms
+2018-02-02 15:15:48,965 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.73ms
+2018-02-02 15:16:48,991 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.40ms
+2018-02-02 15:17:49,230 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.04ms
+2018-02-02 15:18:49,109 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.19ms
+2018-02-02 15:19:49,229 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.39ms
+2018-02-02 15:20:49,315 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.70ms
+2018-02-02 15:21:49,384 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.40ms
+2018-02-02 15:22:51,242 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.98ms
+2018-02-02 15:23:49,639 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.56ms
+2018-02-02 15:24:49,743 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.57ms
+2018-02-02 15:25:50,607 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.90ms
+2018-02-02 15:26:49,746 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 18.32ms
+2018-02-02 15:27:50,767 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 20.04ms
+2018-02-02 15:27:55,422 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.85ms
+2018-02-02 15:28:49,552 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.63ms
+2018-02-02 15:29:49,592 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.71ms
+2018-02-02 15:29:50,197 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.35ms
+2018-02-02 15:30:49,777 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.75ms
+2018-02-02 15:31:51,889 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.97ms
+2018-02-02 15:31:52,668 data_view.py[line:236] INFO 2018-02-02 15:31:52.668637: user_id: 598d6ac2de713e32dfc74796, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_15_31_53.zip' ('multipart/form-data')>)])
+2018-02-02 15:31:52,673 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 10.89ms
+2018-02-02 15:32:27,151 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 10.75ms
+2018-02-02 15:32:50,519 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.45ms
+2018-02-02 15:33:50,725 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.58ms
+2018-02-02 15:34:50,111 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.79ms
+2018-02-02 15:35:50,972 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.63ms
+2018-02-02 15:36:50,743 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 18.64ms
+2018-02-02 15:37:50,005 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.73ms
+2018-02-02 15:38:50,207 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.24ms
+2018-02-02 15:39:50,110 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.08ms
+2018-02-02 15:40:50,334 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.13ms
+2018-02-02 15:41:50,570 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.72ms
+2018-02-02 15:42:50,163 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.05ms
+2018-02-02 15:43:52,788 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.01ms
+2018-02-02 15:44:50,484 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.90ms
+2018-02-02 15:45:50,530 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.86ms
+2018-02-02 15:46:50,579 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.86ms
+2018-02-02 15:48:36,892 wsgi.py[line:355] INFO 200 GET /api/check_version (210.22.99.54) 60.01ms
+2018-02-02 15:48:39,920 company_module.py[line:90] INFO 用户598d6ac2de713e32dfc74796没有company_id信息
+2018-02-02 15:48:49,931 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.010s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5f03940>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 15:48:59,985 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.009s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5f03780>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 15:49:09,996 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.010s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5f03b00>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 15:49:19,999 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.002s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5f036a0>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 15:49:20,001 user_view.py[line:775] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5f036a0>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 753, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1027, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fafc5f036a0>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fafc5f036a0>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-02 15:49:20,039 wsgi.py[line:355] INFO 200 POST /api/get_daily_info (210.22.99.54) 40129.10ms
+2018-02-02 15:49:20,055 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.46ms
+2018-02-02 15:49:20,065 user_view.py[line:198] INFO function=process_user_info,args={'user_id': ObjectId('59f19d8dad01be4d918cacb7'), 'key': 'get', 'host_url': 'http://safego.org:5000/', 'message': {'data': {'address': '', 'birth_date': '1988-01-05', 'description': '物联网卡用户', 'head_img_url': 'http://safego.org:5000/static/image/head_img/default_01.png', 'create_date': '2017-10-26 16:32:13', '_id': '59f19d8dad01be4d918cacb7', 'license_class': '', 'last_update': '2018-02-02 15:49:04', 'user_name': '1064823647997', 'license_id': '', 'user_password': 'f2574ff24e7b753b98530afe2ed5e386', 'country': '中国', 'phone_num': '1064823647997', 'app_version': '1.2.5.0202 Debug', 'real_name': '陈浩', 'nick_name': '', 'gender': '男', 'phones': ['59c0daf3ad01be6e562471d7'], 'age': 0}, 'message': 'success'}}
+2018-02-02 15:49:20,067 wsgi.py[line:355] INFO 200 POST /api/get_user_info (210.22.99.54) 11.15ms
+2018-02-02 15:49:43,957 user_view.py[line:198] INFO function=process_user_info,args={'user_id': ObjectId('59f19d8dad01be4d918cacb7'), 'key': 'get', 'host_url': 'http://safego.org:5000/', 'message': {'data': {'address': '', 'birth_date': '1988-01-05', 'description': '物联网卡用户', 'head_img_url': 'http://safego.org:5000/static/image/head_img/default_01.png', 'create_date': '2017-10-26 16:32:13', '_id': '59f19d8dad01be4d918cacb7', 'license_class': '', 'last_update': '2018-02-02 15:49:04', 'user_name': '1064823647997', 'license_id': '', 'user_password': 'f2574ff24e7b753b98530afe2ed5e386', 'country': '中国', 'phone_num': '1064823647997', 'app_version': '1.2.5.0202 Debug', 'real_name': '陈浩', 'nick_name': '', 'gender': '男', 'phones': ['59c0daf3ad01be6e562471d7'], 'age': 0}, 'message': 'success'}}
+2018-02-02 15:49:43,958 wsgi.py[line:355] INFO 200 POST /api/get_user_info (210.22.99.54) 12.25ms
+2018-02-02 15:49:45,298 company_module.py[line:90] INFO 用户59f19d8dad01be4d918cacb7没有company_id信息
+2018-02-02 15:49:55,304 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.006s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9d68>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 15:50:05,308 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.003s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9710>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 15:50:15,318 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.008s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9da0>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 15:50:25,322 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.003s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9470>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 15:50:25,323 user_view.py[line:775] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9470>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 753, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1027, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fafc5ef9470>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fafc5ef9470>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-02 15:50:25,330 wsgi.py[line:355] INFO 200 POST /api/get_daily_info (210.22.99.54) 40043.19ms
+2018-02-02 15:52:49,877 wsgi.py[line:355] WARNING 404 GET / (116.62.230.22) 1.57ms
+2018-02-02 15:52:55,579 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.13ms
+2018-02-02 15:53:50,967 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.68ms
+2018-02-02 15:54:18,027 user_view.py[line:198] INFO function=process_user_info,args={'user_id': ObjectId('598d6ac2de713e32dfc74796'), 'key': 'get', 'host_url': 'http://safego.org:5000/', 'message': {'data': {'user_password': '67531f05888af75a526b07df6c4aec32', 'create_date': '2017-08-11 16:28:50', 'license_class': 'C1', 'user_name': '18706202810', 'license_id': '340888888', 'first_issued_date': '2014-04-25 00:00:00', 'country': '中国', 'phone_num': '18706202810', 'valid_date': '2020-12-30 00:00:00', 'birth_date': '1976-12-11', 'nick_name': '小笨蛋2', 'gender': '男', 'invite_code': '000', 'age': 0, 'address': '上海市嘉定区安亭镇昌吉东路156号', 'real_name': '猜猜', 'head_img_url': 'http://safego.org:5000/static/image/avatar/c181666905954b57aedff75ddc8d57b6.jpg', '_id': '598d6ac2de713e32dfc74796', 'license_image_url': 'static/image/license_image/f60976b00b234d71898f1d3e13165a8e.jpg', 'last_update': '2018-02-02 15:48:50', 'app_version': '1.2.5.0202 Debug', 'phones': ['59bb2e1aad01be2ffb0f4f0c', '59c0daf3ad01be6e562471d7', '59ae7888de713e343baaf5d1', '59b20e0dde713e1456cfdb52', '59b0dc3dde713e17164296f3']}, 'message': 'success'}}
+2018-02-02 15:54:18,029 wsgi.py[line:355] INFO 200 POST /api/get_user_info (210.22.99.54) 12.78ms
+2018-02-02 15:54:22,790 user_view.py[line:198] INFO function=process_user_info,args={'user_id': ObjectId('598d6ac2de713e32dfc74796'), 'key': 'get', 'host_url': 'http://safego.org:5000/', 'message': {'data': {'user_password': '67531f05888af75a526b07df6c4aec32', 'create_date': '2017-08-11 16:28:50', 'license_class': 'C1', 'user_name': '18706202810', 'license_id': '340888888', 'first_issued_date': '2014-04-25 00:00:00', 'country': '中国', 'phone_num': '18706202810', 'valid_date': '2020-12-30 00:00:00', 'birth_date': '1976-12-11', 'nick_name': '小笨蛋2', 'gender': '男', 'invite_code': '000', 'age': 0, 'address': '上海市嘉定区安亭镇昌吉东路156号', 'real_name': '猜猜', 'head_img_url': 'http://safego.org:5000/static/image/avatar/c181666905954b57aedff75ddc8d57b6.jpg', '_id': '598d6ac2de713e32dfc74796', 'license_image_url': 'static/image/license_image/f60976b00b234d71898f1d3e13165a8e.jpg', 'last_update': '2018-02-02 15:48:50', 'app_version': '1.2.5.0202 Debug', 'phones': ['59bb2e1aad01be2ffb0f4f0c', '59c0daf3ad01be6e562471d7', '59ae7888de713e343baaf5d1', '59b20e0dde713e1456cfdb52', '59b0dc3dde713e17164296f3']}, 'message': 'success'}}
+2018-02-02 15:54:22,792 wsgi.py[line:355] INFO 200 POST /api/get_user_info (210.22.99.54) 13.69ms
+2018-02-02 15:54:27,676 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.70ms
+2018-02-02 15:54:45,749 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 10.53ms
+2018-02-02 15:55:28,888 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.65ms
+2018-02-02 15:56:26,606 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.44ms
+2018-02-02 15:57:26,967 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.63ms
+2018-02-02 15:58:26,742 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 19.86ms
+2018-02-02 15:59:22,888 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 11.35ms
+2018-02-02 15:59:26,901 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.90ms
+2018-02-02 16:00:26,859 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.18ms
+2018-02-02 16:01:27,862 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.03ms
+2018-02-02 16:02:26,832 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 18.91ms
+2018-02-02 16:03:26,745 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.18ms
+2018-02-02 16:04:22,862 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 11.33ms
+2018-02-02 16:04:27,918 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.48ms
+2018-02-02 16:05:27,069 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.88ms
+2018-02-02 16:06:26,980 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.18ms
+2018-02-02 16:07:27,347 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.15ms
+2018-02-02 16:08:28,023 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.44ms
+2018-02-02 16:09:23,870 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 10.42ms
+2018-02-02 16:09:27,462 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 18.44ms
+2018-02-02 16:10:29,084 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.68ms
+2018-02-02 16:11:27,443 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.08ms
+2018-02-02 16:12:28,477 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 19.78ms
+2018-02-02 16:13:27,916 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.74ms
+2018-02-02 16:14:22,909 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 11.74ms
+2018-02-02 16:14:27,498 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.69ms
+2018-02-02 16:14:28,435 data_view.py[line:236] INFO 2018-02-02 16:14:28.435747: user_id: 598d6ac2de713e32dfc74796, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_16_14_29.zip' ('multipart/form-data')>)])
+2018-02-02 16:14:28,439 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 10.01ms
+2018-02-02 16:15:27,388 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.93ms
+2018-02-02 16:16:27,623 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.55ms
+2018-02-02 16:17:28,012 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 19.88ms
+2018-02-02 16:18:27,765 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.91ms
+2018-02-02 16:18:33,567 user_view.py[line:198] INFO function=process_user_info,args={'user_id': ObjectId('598d6ac2de713e32dfc74796'), 'key': 'get', 'host_url': 'http://safego.org:5000/', 'message': {'data': {'user_password': '67531f05888af75a526b07df6c4aec32', 'create_date': '2017-08-11 16:28:50', 'license_class': 'C1', 'user_name': '18706202810', 'license_id': '340888888', 'first_issued_date': '2014-04-25 00:00:00', 'country': '中国', 'phone_num': '18706202810', 'valid_date': '2020-12-30 00:00:00', 'birth_date': '1976-12-11', 'nick_name': '小笨蛋2', 'gender': '男', 'invite_code': '000', 'age': 0, 'address': '上海市嘉定区安亭镇昌吉东路156号', 'real_name': '猜猜', 'head_img_url': 'http://safego.org:5000/static/image/avatar/c181666905954b57aedff75ddc8d57b6.jpg', '_id': '598d6ac2de713e32dfc74796', 'license_image_url': 'static/image/license_image/f60976b00b234d71898f1d3e13165a8e.jpg', 'last_update': '2018-02-02 16:14:28', 'app_version': '1.2.5.0202 Debug', 'phones': ['59bb2e1aad01be2ffb0f4f0c', '59c0daf3ad01be6e562471d7', '59ae7888de713e343baaf5d1', '59b20e0dde713e1456cfdb52', '59b0dc3dde713e17164296f3']}, 'message': 'success'}}
+2018-02-02 16:18:33,569 wsgi.py[line:355] INFO 200 POST /api/get_user_info (210.22.99.54) 12.54ms
+2018-02-02 16:18:36,723 company_module.py[line:90] INFO 用户598d6ac2de713e32dfc74796没有company_id信息
+2018-02-02 16:18:46,729 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.006s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5f03208>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 16:18:56,741 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.011s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5f03470>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 16:19:06,750 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.008s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9048>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 16:19:16,759 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.007s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9a58>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 16:19:16,760 user_view.py[line:775] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9a58>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 753, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1027, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fafc5ef9a58>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fafc5ef9a58>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-02 16:19:16,766 wsgi.py[line:355] INFO 200 POST /api/get_daily_info (210.22.99.54) 40056.03ms
+2018-02-02 16:19:22,953 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 10.96ms
+2018-02-02 16:19:23,899 wsgi.py[line:355] INFO 200 GET /manage/login (210.22.99.54) 13.80ms
+2018-02-02 16:19:24,171 wsgi.py[line:355] INFO 200 GET /static/css/skins/dneglu.css (210.22.99.54) 2.49ms
+2018-02-02 16:19:24,173 wsgi.py[line:355] INFO 200 GET /static/js/jquery-1.11.3.min.js (210.22.99.54) 2.04ms
+2018-02-02 16:19:24,175 wsgi.py[line:355] INFO 200 GET /static/js/denglu.js (210.22.99.54) 1.54ms
+2018-02-02 16:19:24,177 wsgi.py[line:355] INFO 200 GET /static/css/particles.css (210.22.99.54) 1.55ms
+2018-02-02 16:19:24,179 wsgi.py[line:355] INFO 200 GET /static/css/login.css (210.22.99.54) 1.55ms
+2018-02-02 16:19:24,182 wsgi.py[line:355] INFO 200 GET /static/js/jquery.base64.js (210.22.99.54) 1.62ms
+2018-02-02 16:19:24,196 wsgi.py[line:355] INFO 304 GET /static/css/bootstrap.min.css (210.22.99.54) 2.07ms
+2018-02-02 16:19:24,198 wsgi.py[line:355] INFO 200 GET /static/js/jquery.md5.js (210.22.99.54) 1.64ms
+2018-02-02 16:19:24,207 wsgi.py[line:355] INFO 200 GET /static/js/login.js (210.22.99.54) 1.91ms
+2018-02-02 16:19:24,210 wsgi.py[line:355] INFO 304 GET /static/js/bootstrap.min.js (210.22.99.54) 1.76ms
+2018-02-02 16:19:24,213 wsgi.py[line:355] INFO 304 GET /static/js/common.js (210.22.99.54) 1.66ms
+2018-02-02 16:19:24,420 wsgi.py[line:355] INFO 200 GET /static/image/head_img/tubiao.png (210.22.99.54) 2.36ms
+2018-02-02 16:19:24,478 wsgi.py[line:355] INFO 200 GET /static/image/head_img/37f671a0d8071b66ecfb9b7d2a17286d.png (210.22.99.54) 2.80ms
+2018-02-02 16:19:24,842 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.66ms
+2018-02-02 16:19:42,160 data_view.py[line:236] INFO 2018-02-02 16:19:42.160046: user_id: 59895177de713e304a67d30c, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_01_24_03_28_10.zip' ('multipart/form-data')>)])
+2018-02-02 16:19:42,177 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 23.54ms
+2018-02-02 16:19:44,134 data_view.py[line:236] INFO 2018-02-02 16:19:44.134706: user_id: 59895177de713e304a67d30c, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_16_19_43.zip' ('multipart/form-data')>)])
+2018-02-02 16:19:44,137 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.04ms
+2018-02-02 16:20:16,550 wsgi.py[line:355] INFO 206 GET /static/apk/downloads/safego.apk (210.22.99.54) 36.32ms
+2018-02-02 16:20:28,233 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.12ms
+2018-02-02 16:21:24,647 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.23ms
+2018-02-02 16:22:24,703 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.46ms
+2018-02-02 16:23:25,772 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.98ms
+2018-02-02 16:23:38,488 wsgi.py[line:355] INFO 206 GET /static/apk/downloads/safego.apk (210.22.99.54) 24.08ms
+2018-02-02 16:24:22,946 wsgi.py[line:355] INFO 200 POST /api/get_alert_message (210.22.99.54) 10.39ms
+2018-02-02 16:24:24,844 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.08ms
+2018-02-02 16:25:24,763 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.92ms
+2018-02-02 16:27:14,283 user_view.py[line:198] INFO function=process_user_info,args={'user_id': ObjectId('59f19d8dad01be4d918cacb7'), 'key': 'get', 'host_url': 'http://safego.org:5000/', 'message': {'data': {'address': '', 'birth_date': '1988-01-05', 'description': '物联网卡用户', 'head_img_url': 'http://safego.org:5000/static/image/head_img/default_01.png', 'create_date': '2017-10-26 16:32:13', '_id': '59f19d8dad01be4d918cacb7', 'license_class': '', 'last_update': '2018-02-02 15:49:04', 'user_name': '1064823647997', 'license_id': '', 'user_password': 'f2574ff24e7b753b98530afe2ed5e386', 'country': '中国', 'phone_num': '1064823647997', 'app_version': '1.2.5.0202 Debug', 'real_name': '陈浩', 'nick_name': '', 'gender': '男', 'phones': ['59c0daf3ad01be6e562471d7'], 'age': 0}, 'message': 'success'}}
+2018-02-02 16:27:14,284 wsgi.py[line:355] INFO 200 POST /api/get_user_info (210.22.99.54) 12.27ms
+2018-02-02 16:27:15,048 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.11ms
+2018-02-02 16:27:16,168 data_view.py[line:236] INFO 2018-02-02 16:27:16.168824: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_16_27_15.zip' ('multipart/form-data')>)])
+2018-02-02 16:27:16,172 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 10.97ms
+2018-02-02 16:28:14,607 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.20ms
+2018-02-02 16:29:12,321 wsgi.py[line:355] INFO 206 GET /static/apk/downloads/safego.apk (210.22.99.54) 4.78ms
+2018-02-02 16:30:17,419 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.46ms
+2018-02-02 16:32:13,831 user_view.py[line:198] INFO function=process_user_info,args={'user_id': ObjectId('59f19d8dad01be4d918cacb7'), 'key': 'get', 'host_url': 'http://safego.org:5000/', 'message': {'data': {'address': '', 'birth_date': '1988-01-05', 'description': '物联网卡用户', 'head_img_url': 'http://safego.org:5000/static/image/head_img/default_01.png', 'create_date': '2017-10-26 16:32:13', '_id': '59f19d8dad01be4d918cacb7', 'license_class': '', 'last_update': '2018-02-02 16:27:16', 'user_name': '1064823647997', 'license_id': '', 'user_password': 'f2574ff24e7b753b98530afe2ed5e386', 'country': '中国', 'phone_num': '1064823647997', 'app_version': '1.2.5.0202 Debug', 'real_name': '陈浩', 'nick_name': '', 'gender': '男', 'phones': ['59c0daf3ad01be6e562471d7'], 'age': 0}, 'message': 'success'}}
+2018-02-02 16:32:13,832 wsgi.py[line:355] INFO 200 POST /api/get_user_info (210.22.99.54) 11.63ms
+2018-02-02 16:32:14,170 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 15.87ms
+2018-02-02 16:32:20,975 company_module.py[line:90] INFO 用户59f19d8dad01be4d918cacb7没有company_id信息
+2018-02-02 16:32:30,985 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.009s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5ef9198>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 16:32:40,996 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.010s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5efdda0>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 16:32:51,008 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.011s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5efd4a8>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 16:33:01,019 base.py[line:97] WARNING GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:N/A request:10.010s]
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5efd320>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+2018-02-02 16:33:01,020 user_view.py[line:775] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fafc5efd320>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 753, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1027, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fafc5efd320>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fafc5efd320>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-02 16:33:01,027 wsgi.py[line:355] INFO 200 POST /api/get_daily_info (210.22.99.54) 40061.98ms
+2018-02-02 16:33:14,148 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.33ms
+2018-02-02 16:41:07,589 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 35.44ms
+2018-02-02 16:41:26,644 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.87ms
+2018-02-02 16:42:11,357 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.64ms
+2018-02-02 16:42:26,130 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.56ms
+2018-02-02 16:43:36,096 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 18.45ms
+2018-02-02 16:46:08,423 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.00ms
+2018-02-02 17:34:54,351 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21524.91ms
+2018-02-02 17:35:15,875 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.90ms
+2018-02-02 17:35:37,400 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20192.23ms
+2018-02-02 17:35:58,919 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21518.65ms
+2018-02-02 17:36:19,948 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.53ms
+2018-02-02 17:36:40,977 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21027.86ms
+2018-02-02 17:37:02,007 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.97ms
+2018-02-02 17:49:00,253 wsgi.py[line:355] INFO 200 GET /api/check_version (183.61.51.51) 117.63ms
+2018-02-02 17:49:36,347 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.85ms
+2018-02-02 17:49:57,867 wsgi.py[line:355] ERROR 500 POST /api/get_report_detail (210.22.99.54) 21519.38ms
+2018-02-02 17:49:57,870 wsgi.py[line:355] INFO 200 GET /api/check_version (183.61.51.51) 2.05ms
+2018-02-02 17:50:19,390 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21519.23ms
+2018-02-02 17:50:40,915 wsgi.py[line:355] ERROR 500 POST /api/get_user_info (210.22.99.54) 21523.71ms
+2018-02-02 17:51:02,442 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.57ms
+2018-02-02 17:51:23,867 wsgi.py[line:355] ERROR 500 POST /api/get_user_info (210.22.99.54) 21423.34ms
+2018-02-02 17:51:45,383 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21515.72ms
+2018-02-02 17:52:06,903 wsgi.py[line:355] ERROR 500 POST /api/get_user_info (210.22.99.54) 21518.79ms
+2018-02-02 17:52:28,422 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21518.19ms
+2018-02-02 17:52:49,940 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21516.61ms
+2018-02-02 17:53:11,457 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21515.19ms
+2018-02-02 17:53:32,977 wsgi.py[line:355] ERROR 500 POST /api/get_user_info (210.22.99.54) 21519.10ms
+2018-02-02 17:53:54,498 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21520.95ms
+2018-02-02 17:54:16,019 wsgi.py[line:355] ERROR 500 POST /api/get_report_detail (210.22.99.54) 21519.68ms
+2018-02-02 17:54:37,534 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21513.89ms
+2018-02-02 17:54:58,944 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21409.27ms
+2018-02-02 17:55:20,471 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.77ms
+2018-02-02 17:55:41,993 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.87ms
+2018-02-02 17:56:03,512 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21518.65ms
+2018-02-02 17:56:25,030 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21516.45ms
+2018-02-02 17:56:46,551 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21519.75ms
+2018-02-02 17:57:08,070 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21517.96ms
+2018-02-02 17:57:29,457 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21385.93ms
+2018-02-02 17:57:50,980 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.96ms
+2018-02-02 17:57:51,080 wsgi.py[line:355] INFO 200 GET /api/check_version (183.61.51.54) 98.42ms
+2018-02-02 18:28:55,063 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21524.10ms
+2018-02-02 18:29:16,098 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21034.24ms
+2018-02-02 18:29:37,128 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.10ms
+2018-02-02 18:29:58,652 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.02ms
+2018-02-02 18:30:19,686 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21032.75ms
+2018-02-02 18:30:40,710 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21022.90ms
+2018-02-02 18:31:01,737 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21026.21ms
+2018-02-02 18:35:55,579 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 24712.27ms
+2018-02-02 19:04:06,504 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24607.71ms
+2018-02-02 19:04:27,535 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.50ms
+2018-02-02 19:04:49,062 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.01ms
+2018-02-02 19:05:15,511 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20131.01ms
+2018-02-02 19:05:36,540 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.57ms
+2018-02-02 19:05:57,569 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21028.11ms
+2018-02-02 19:33:17,466 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.52ms
+2018-02-02 19:33:38,495 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.71ms
+2018-02-02 19:33:59,522 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.11ms
+2018-02-02 19:34:21,045 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.25ms
+2018-02-02 19:34:42,564 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20255.48ms
+2018-02-02 19:35:03,596 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.10ms
+2018-02-02 19:35:56,533 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21195.76ms
+2018-02-02 20:10:08,045 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 22827.90ms
+2018-02-02 20:10:29,566 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.18ms
+2018-02-02 20:10:56,554 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21727.50ms
+2018-02-02 20:11:17,587 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21032.08ms
+2018-02-02 20:11:38,622 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21033.78ms
+2018-02-02 20:11:59,653 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.82ms
+2018-02-02 20:12:21,175 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.89ms
+2018-02-02 20:13:39,623 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21528.55ms
+2018-02-02 20:16:28,127 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 22854.13ms
+2018-02-02 20:53:57,289 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23013.08ms
+2018-02-02 20:54:18,318 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.92ms
+2018-02-02 20:54:39,343 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21023.95ms
+2018-02-02 20:55:00,380 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21035.19ms
+2018-02-02 20:55:21,405 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21024.76ms
+2018-02-02 20:55:42,438 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.95ms
+2018-02-02 20:56:03,464 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21024.98ms
+2018-02-02 20:58:09,880 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 19658.97ms
+2018-02-02 20:59:11,050 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 20019.94ms
+2018-02-02 21:32:01,802 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.74ms
+2018-02-02 21:32:23,324 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.72ms
+2018-02-02 21:32:44,357 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.09ms
+2018-02-02 21:33:05,383 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.66ms
+2018-02-02 21:33:26,411 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.76ms
+2018-02-02 21:33:47,212 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20799.97ms
+2018-02-02 21:34:08,734 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.35ms
+2018-02-02 21:37:09,259 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24662.37ms
+2018-02-02 21:38:10,410 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.25ms
+2018-02-02 22:15:42,724 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21525.74ms
+2018-02-02 22:16:03,767 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21041.31ms
+2018-02-02 22:16:24,799 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.54ms
+2018-02-02 22:16:45,829 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.78ms
+2018-02-02 22:17:07,226 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21395.90ms
+2018-02-02 22:17:27,870 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20643.09ms
+2018-02-02 22:17:49,394 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.68ms
+2018-02-02 22:18:58,408 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.08ms
+2018-02-02 22:21:52,643 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21519.20ms
+2018-02-02 22:22:42,079 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.56ms
+2018-02-02 22:23:58,302 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24150.09ms
+2018-02-02 22:25:58,468 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21518.19ms
+2018-02-02 23:03:53,193 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20577.41ms
+2018-02-02 23:04:14,215 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21021.60ms
+2018-02-02 23:04:35,738 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.53ms
+2018-02-02 23:04:56,702 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20963.11ms
+2018-02-02 23:05:17,731 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.32ms
+2018-02-02 23:05:38,758 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.05ms
+2018-02-02 23:05:59,782 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21023.13ms
+2018-02-02 23:06:21,805 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21531.73ms
+2018-02-02 23:07:05,097 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21318.31ms
+2018-02-02 23:08:16,740 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21196.73ms
+2018-02-02 23:08:52,118 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.80ms
+2018-02-02 23:43:55,999 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.31ms
+2018-02-02 23:44:17,035 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21034.73ms
+2018-02-02 23:44:44,395 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24172.54ms
+2018-02-02 23:45:05,922 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21525.77ms
+2018-02-02 23:45:26,951 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.71ms
+2018-02-02 23:45:47,669 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20717.40ms
+2018-02-02 23:46:08,701 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21030.60ms
+2018-02-03 00:28:54,104 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.50ms
+2018-02-03 00:29:15,259 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21153.62ms
+2018-02-03 00:29:36,785 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21525.49ms
+2018-02-03 00:29:58,311 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21524.62ms
+2018-02-03 00:30:19,341 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21029.46ms
+2018-02-03 00:30:40,271 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20928.82ms
+2018-02-03 00:31:01,794 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21519.71ms
+2018-02-03 01:34:47,994 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19542.38ms
+2018-02-03 01:35:08,855 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20691.54ms
+2018-02-03 01:35:36,271 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 22867.22ms
+2018-02-03 01:35:57,301 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21028.64ms
+2018-02-03 01:36:18,329 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.63ms
+2018-02-03 01:36:39,358 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.67ms
+2018-02-03 01:40:52,846 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 23205.09ms
+2018-02-03 02:23:22,624 wsgi.py[line:355] WARNING 404 GET / (47.100.130.114) 1.67ms
+2018-02-03 02:23:55,358 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20969.86ms
+2018-02-03 02:24:16,383 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21023.32ms
+2018-02-03 02:24:37,910 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.76ms
+2018-02-03 02:25:05,436 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24242.61ms
+2018-02-03 02:25:26,465 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21028.26ms
+2018-02-03 02:25:47,498 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21032.08ms
+2018-02-03 02:26:09,021 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.78ms
+2018-02-03 02:29:09,901 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 24951.70ms
+2018-02-03 03:13:55,882 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20993.63ms
+2018-02-03 03:14:16,909 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.03ms
+2018-02-03 03:14:37,934 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21024.60ms
+2018-02-03 03:14:59,143 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21207.57ms
+2018-02-03 03:15:26,168 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24965.30ms
+2018-02-03 03:15:47,200 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.77ms
+2018-02-03 03:16:08,728 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.43ms
+2018-02-03 03:17:23,278 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21173.35ms
+2018-02-03 03:17:44,911 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21318.59ms
+2018-02-03 03:18:06,917 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.76ms
+2018-02-03 04:03:54,927 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 22226.41ms
+2018-02-03 04:04:15,953 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.66ms
+2018-02-03 04:04:36,987 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.60ms
+2018-02-03 04:04:58,450 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21462.18ms
+2018-02-03 04:05:25,473 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23227.34ms
+2018-02-03 04:05:46,505 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.03ms
+2018-02-03 04:06:08,025 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21518.89ms
+2018-02-03 04:54:00,635 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20035.83ms
+2018-02-03 04:54:21,662 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.20ms
+2018-02-03 04:54:48,680 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23473.08ms
+2018-02-03 04:55:09,712 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.64ms
+2018-02-03 04:55:31,227 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21514.92ms
+2018-02-03 04:55:52,256 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21027.66ms
+2018-02-03 04:56:25,292 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24040.58ms
+2018-02-03 04:57:55,670 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24858.99ms
+2018-02-03 04:58:50,175 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19648.27ms
+2018-02-03 04:59:11,446 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21269.94ms
+2018-02-03 05:34:10,218 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21531.63ms
+2018-02-03 05:34:31,251 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.99ms
+2018-02-03 05:34:52,280 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.21ms
+2018-02-03 05:35:13,309 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.74ms
+2018-02-03 05:35:34,205 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20895.23ms
+2018-02-03 05:35:55,236 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21030.65ms
+2018-02-03 05:36:16,268 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.40ms
+2018-02-03 05:36:37,303 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21033.90ms
+2018-02-03 05:36:58,339 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21034.01ms
+2018-02-03 05:37:19,365 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.65ms
+2018-02-03 05:37:40,391 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21024.57ms
+2018-02-03 05:38:01,424 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.66ms
+2018-02-03 05:38:22,948 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21523.27ms
+2018-02-03 05:58:56,466 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21517.78ms
+2018-02-03 05:59:17,501 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21033.81ms
+2018-02-03 05:59:38,533 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.69ms
+2018-02-03 06:00:00,052 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21517.56ms
+2018-02-03 06:00:21,086 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21032.89ms
+2018-02-03 06:00:42,260 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.07ms
+2018-02-03 06:01:03,714 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21453.58ms
+2018-02-03 06:05:39,056 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21527.38ms
+2018-02-03 06:06:00,083 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.77ms
+2018-02-03 06:06:21,117 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.58ms
+2018-02-03 06:06:42,152 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21034.10ms
+2018-02-03 06:07:03,182 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.03ms
+2018-02-03 06:07:24,213 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21029.15ms
+2018-02-03 06:07:45,243 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.26ms
+2018-02-03 06:08:06,767 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21522.86ms
+2018-02-03 06:10:58,415 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 20269.86ms
+2018-02-03 07:00:23,427 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.62ms
+2018-02-03 07:00:44,462 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21033.84ms
+2018-02-03 07:01:05,491 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21028.57ms
+2018-02-03 07:01:26,524 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.54ms
+2018-02-03 07:01:47,187 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20661.87ms
+2018-02-03 07:02:08,213 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21025.29ms
+2018-02-03 07:02:29,735 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.29ms
+2018-02-03 07:02:52,047 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19881.52ms
+2018-02-03 07:03:51,955 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.51ms
+2018-02-03 07:05:17,598 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24744.60ms
+2018-02-03 07:06:32,112 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20667.57ms
+2018-02-03 07:08:05,471 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.95ms
+2018-02-03 07:08:44,851 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.42ms
+2018-02-03 07:09:12,178 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20953.54ms
+2018-02-03 07:33:52,552 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19941.79ms
+2018-02-03 07:34:13,581 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.61ms
+2018-02-03 07:34:34,608 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21026.24ms
+2018-02-03 07:34:55,730 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21120.79ms
+2018-02-03 07:35:16,759 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21027.68ms
+2018-02-03 07:35:38,276 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21516.96ms
+2018-02-03 07:35:59,798 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.89ms
+2018-02-03 07:38:08,953 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.95ms
+2018-02-03 07:42:27,158 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21408.87ms
+2018-02-03 07:42:48,186 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.86ms
+2018-02-03 07:43:09,217 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.77ms
+2018-02-03 07:43:30,244 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.76ms
+2018-02-03 07:43:51,275 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.60ms
+2018-02-03 07:44:12,303 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21027.10ms
+2018-02-03 07:44:33,334 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.10ms
+2018-02-03 07:47:18,677 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20296.98ms
+2018-02-03 07:48:09,317 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21529.76ms
+2018-02-03 07:48:52,717 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21524.59ms
+2018-02-03 08:29:03,839 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23687.43ms
+2018-02-03 08:29:24,870 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.80ms
+2018-02-03 08:29:46,887 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.41ms
+2018-02-03 08:30:13,910 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 20704.67ms
+2018-02-03 08:30:34,940 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.00ms
+2018-02-03 08:30:55,971 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.92ms
+2018-02-03 08:31:33,378 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 20211.15ms
+2018-02-03 08:32:58,898 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24625.47ms
+2018-02-03 08:33:52,220 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21525.13ms
+2018-02-03 08:35:50,537 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21513.83ms
+2018-02-03 09:03:58,646 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19533.82ms
+2018-02-03 09:04:25,664 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 24453.75ms
+2018-02-03 09:04:46,693 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.39ms
+2018-02-03 09:05:07,726 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21031.57ms
+2018-02-03 09:05:28,756 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.34ms
+2018-02-03 09:05:49,785 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.51ms
+2018-02-03 09:06:11,312 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21526.21ms
+2018-02-03 09:41:04,935 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19710.17ms
+2018-02-03 09:41:26,274 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21022.37ms
+2018-02-03 09:41:47,298 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21023.33ms
+2018-02-03 09:42:08,321 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21021.62ms
+2018-02-03 09:42:29,839 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19631.68ms
+2018-02-03 09:42:50,862 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21022.34ms
+2018-02-03 09:43:12,386 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.80ms
+2018-02-03 09:43:53,087 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21521.99ms
+2018-02-03 09:44:30,295 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21531.13ms
+2018-02-03 09:44:53,932 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21530.06ms
+2018-02-03 09:46:34,445 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21395.25ms
+2018-02-03 09:47:44,827 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21526.60ms
+2018-02-03 09:48:06,355 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21526.31ms
+2018-02-03 10:14:34,791 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 19687.39ms
+2018-02-03 10:14:55,824 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21032.25ms
+2018-02-03 10:15:17,348 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21522.46ms
+2018-02-03 10:15:44,378 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 23176.30ms
+2018-02-03 10:16:05,409 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.04ms
+2018-02-03 10:16:26,435 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21025.24ms
+2018-02-03 10:16:47,465 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21028.77ms
+2018-02-03 10:52:29,060 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21520.79ms
+2018-02-03 10:52:50,585 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21523.69ms
+2018-02-03 10:53:11,610 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 21024.49ms
+2018-02-03 10:53:32,641 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21029.79ms
+2018-02-03 10:53:53,676 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 21033.81ms
+2018-02-03 10:54:14,707 wsgi.py[line:355] ERROR 500 POST /api/add_driving_data (210.22.99.54) 21030.76ms
+2018-02-03 10:57:48,851 wsgi.py[line:355] ERROR 500 POST /api/gps_push (210.22.99.54) 19828.96ms
+2018-02-03 10:58:40,753 wsgi.py[line:355] ERROR 500 POST /api/get_alert_message (210.22.99.54) 24242.80ms
+2018-02-03 11:43:31,200 data_view.py[line:236] INFO 2018-02-03 11:43:31.200627: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_17_34_32.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:31,203 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 22.97ms
+2018-02-03 11:43:31,500 data_view.py[line:236] INFO 2018-02-03 11:43:31.500700: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_18_28_31.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:31,504 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.24ms
+2018-02-03 11:43:32,775 data_view.py[line:236] INFO 2018-02-03 11:43:32.775753: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_19_03_33.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:32,778 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.75ms
+2018-02-03 11:43:33,549 data_view.py[line:236] INFO 2018-02-03 11:43:33.549788: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_19_32_54.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:33,553 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 10.45ms
+2018-02-03 11:43:34,544 data_view.py[line:236] INFO 2018-02-03 11:43:34.543960: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_20_09_42.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:34,547 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.73ms
+2018-02-03 11:43:35,557 data_view.py[line:236] INFO 2018-02-03 11:43:35.557406: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_20_53_31.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:35,561 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.89ms
+2018-02-03 11:43:36,578 data_view.py[line:236] INFO 2018-02-03 11:43:36.578408: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_21_31_37.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:36,581 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.16ms
+2018-02-03 11:43:37,589 data_view.py[line:236] INFO 2018-02-03 11:43:37.589054: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_22_15_19.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:37,593 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 10.12ms
+2018-02-03 11:43:38,587 data_view.py[line:236] INFO 2018-02-03 11:43:38.587408: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_02_23_03_30.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:38,590 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.26ms
+2018-02-03 11:43:39,583 data_view.py[line:236] INFO 2018-02-03 11:43:39.583683: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_00_28_30.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:39,586 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 8.54ms
+2018-02-03 11:43:42,217 data_view.py[line:236] INFO 2018-02-03 11:43:42.217551: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_00_58_30.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:42,223 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 35.04ms
+2018-02-03 11:43:43,564 data_view.py[line:236] INFO 2018-02-03 11:43:43.564292: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_02_23_32.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:43,568 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 10.55ms
+2018-02-03 11:43:44,678 data_view.py[line:236] INFO 2018-02-03 11:43:44.678358: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_03_13_33.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:44,682 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 11.55ms
+2018-02-03 11:43:45,590 data_view.py[line:236] INFO 2018-02-03 11:43:45.590886: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_04_03_31.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:45,593 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.16ms
+2018-02-03 11:43:48,211 data_view.py[line:236] INFO 2018-02-03 11:43:48.210984: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_04_53_32.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:48,214 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.54ms
+2018-02-03 11:43:51,244 data_view.py[line:236] INFO 2018-02-03 11:43:51.243880: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_05_33_46.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:51,247 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.93ms
+2018-02-03 11:43:53,197 data_view.py[line:236] INFO 2018-02-03 11:43:53.197327: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_05_58_33.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:53,200 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.70ms
+2018-02-03 11:43:56,822 data_view.py[line:236] INFO 2018-02-03 11:43:56.822645: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_07_00_00.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:56,825 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.42ms
+2018-02-03 11:43:57,196 data_view.py[line:236] INFO 2018-02-03 11:43:57.196372: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_07_33_31.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:57,202 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 12.05ms
+2018-02-03 11:43:58,214 data_view.py[line:236] INFO 2018-02-03 11:43:58.214809: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_08_28_31.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:58,217 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.18ms
+2018-02-03 11:43:59,883 data_view.py[line:236] INFO 2018-02-03 11:43:59.883484: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_09_03_30.zip' ('multipart/form-data')>)])
+2018-02-03 11:43:59,886 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.17ms
+2018-02-03 11:44:02,249 data_view.py[line:236] INFO 2018-02-03 11:44:02.249513: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_09_40_36.zip' ('multipart/form-data')>)])
+2018-02-03 11:44:02,252 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 8.94ms
+2018-02-03 11:44:04,252 data_view.py[line:236] INFO 2018-02-03 11:44:04.252320: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_10_14_14.zip' ('multipart/form-data')>)])
+2018-02-03 11:44:04,258 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 13.19ms
+2018-02-03 11:44:06,805 data_view.py[line:236] INFO 2018-02-03 11:44:06.804904: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_10_52_05.zip' ('multipart/form-data')>)])
+2018-02-03 11:44:06,809 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 10.99ms
+2018-02-03 11:44:07,274 data_view.py[line:236] INFO 2018-02-03 11:44:07.274560: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_11_43_29.zip' ('multipart/form-data')>)])
+2018-02-03 11:44:07,277 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 9.55ms
+2018-02-03 11:44:34,227 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.04ms
+2018-02-03 11:45:03,056 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.18ms
+2018-02-03 12:33:32,224 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 29.57ms
+2018-02-03 12:35:05,214 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.78ms
+2018-02-03 13:13:33,111 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 36.82ms
+2018-02-03 13:15:06,437 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.48ms
+2018-02-03 13:15:09,239 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.09ms
+2018-02-03 13:58:32,580 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 32.21ms
+2018-02-03 13:58:33,668 data_view.py[line:236] INFO 2018-02-03 13:58:33.667948: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_13_58_31.zip' ('multipart/form-data')>)])
+2018-02-03 13:58:33,671 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 24.16ms
+2018-02-03 14:00:07,360 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 17.89ms
+2018-02-03 14:36:05,275 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 32.08ms
+2018-02-03 14:36:05,639 data_view.py[line:236] INFO 2018-02-03 14:36:05.639888: user_id: 59f19d8dad01be4d918cacb7, files: ImmutableMultiDict([('driving_data', <FileStorage: '2018_02_03_14_36_04.zip' ('multipart/form-data')>)])
+2018-02-03 14:36:05,643 wsgi.py[line:355] INFO 200 POST /api/add_driving_data (210.22.99.54) 24.16ms
+2018-02-03 14:37:41,976 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 41.71ms
+2018-02-03 14:37:59,242 wsgi.py[line:355] INFO 200 POST /api/gps_push (210.22.99.54) 16.28ms

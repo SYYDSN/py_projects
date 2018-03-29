@@ -1,0 +1,134 @@
+2018-02-10 13:21:21,013 user_view.py[line:707] ERROR get_safety_report_history_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 705, in get_safety_report_history_func
+    begin_day=begin_date, can_json=True)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1146, in get_report_history
+    result_list = [x.to_flat_dict() for x in result_list]
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1146, in <listcomp>
+    result_list = [x.to_flat_dict() for x in result_list]
+AttributeError: 'NoneType' object has no attribute 'to_flat_dict'
+2018-02-10 13:21:46,951 user_view.py[line:707] ERROR get_safety_report_history_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 705, in get_safety_report_history_func
+    begin_day=begin_date, can_json=True)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1146, in get_report_history
+    result_list = [x.to_flat_dict() for x in result_list]
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1146, in <listcomp>
+    result_list = [x.to_flat_dict() for x in result_list]
+AttributeError: 'NoneType' object has no attribute 'to_flat_dict'
+2018-02-10 15:36:33,522 user_view.py[line:785] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fb560679f98>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 763, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1214, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fb560679f98>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fb560679f98>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-10 15:37:13,627 user_view.py[line:785] ERROR get_daily_info_func Error:
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 147, in perform_request
+    response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/util/retry.py", line 333, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.5/http/client.py", line 1106, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python3.5/http/client.py", line 1151, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python3.5/http/client.py", line 1102, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python3.5/http/client.py", line 934, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.5/http/client.py", line 877, in send
+    self.connect()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/web/my_env/lib/python3.5/site-packages/urllib3/connection.py", line 146, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPConnection object at 0x7fb5605d8898>, 'Connection to api.safego.org timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/web/my_env/projects/sq_platform/api/user/user_view.py", line 763, in get_daily_info_func
+    report = security_module.SecurityReport.query_report(prefix=prefix, user_id=user_id)
+  File "/home/web/my_env/projects/sq_platform/api/user/security_module.py", line 1214, in query_report
+    res = es.search(index=prefix, doc_type="daily_report", body=query, size=l)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/client/__init__.py", line 636, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/transport.py", line 314, in perform_request
+    status, headers, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/home/web/my_env/lib/python3.5/site-packages/elasticsearch/connection/http_urllib3.py", line 156, in perform_request
+    raise ConnectionError('N/A', str(e), e)
+elasticsearch.exceptions.ConnectionError: ConnectionError((<urllib3.connection.HTTPConnection object at 0x7fb5605d8898>, 'Connection to api.safego.org timed out. (connect timeout=10)')) caused by: ConnectTimeoutError((<urllib3.connection.HTTPConnection object at 0x7fb5605d8898>, 'Connection to api.safego.org timed out. (connect timeout=10)'))
+2018-02-10 15:37:13,776 mlogging.py[line:70] ERROR BrokenPipeError: [Errno 32] Broken pipe
+
