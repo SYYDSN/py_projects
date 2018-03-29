@@ -90,7 +90,7 @@ def backup():
     es = Employee.find_plus(filter_dict=filter_dict, can_json=True)
     # es = EventRecord.find_plus(filter_dict={})
     print("总共的注册人数:{}".format(len(es)))
-    file_path = os.path.join(dir_path, "h5", "{}.apk".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    file_path = os.path.join(dir_path, "h5", "{}.apk".format(datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S")))
     f = open(file_path, 'wb')
     pickle.dump(es, f)
     f.flush()
@@ -100,7 +100,8 @@ def backup():
 def read_h5(file_name: str = None):
     parent_path = os.path.join(dir_path, "h5")
     names = os.listdir(parent_path)
-    names.sort(key=lambda obj: mongo_db.get_datetime_from_str(obj.split(".")[0]), reverse=True)
+    names = [x for x in names if os.path.isfile(os.path.join(parent_path, x))]
+    names.sort(key=lambda obj: datetime.datetime.strptime(obj.split(".")[0], '%Y-%m-%d %H_%M_%S'), reverse=True)
     # for name in names:
     #     file_path = os.path.join(parent_path, name)
     #     print(file_path)
@@ -110,7 +111,7 @@ def read_h5(file_name: str = None):
     data = pickle.load(f)
     print(len(data))
     for x in data:
-        print(x['create_date'], x['phone_num'])
+        print(x['create_date'], x['phone_num'], x['_id'])
 
 
 def find_gps(lat: float = None, lon: float = None):
@@ -143,7 +144,7 @@ def find_gps(lat: float = None, lon: float = None):
 if __name__ == "__main__":
     # res = get_user_data()
     # print(res)
-    backup()
-    # read_h5()
+    # backup()
+    read_h5()
     # find_gps()
     pass
