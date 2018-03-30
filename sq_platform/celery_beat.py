@@ -19,11 +19,17 @@ app.conf.CELERYBEAT_SCHEDULE = {
     在此影响下,程序会比预订的时间晚8个小时运行.
     """
 
-    """每日对刚生成的安全报告附加扩展的虚拟数据并发送结果邮件"""
+    """每日备份注册并发送结果邮件"""
     'generator_yesterday_health_report': {
-        'task': 'celery_module.generator_yesterday_health_report',
-        'schedule': crontab(minute="30", hour="22"),  # 由于时区问题实际是临晨6:30点执行
-        'args': (2, 3)
+        'task': 'celery_module.backup_reg',
+        'schedule': crontab(minute="0", hour="0"),  # 由于时区问题实际是临晨6:30点执行
+        'args': (1,)
+    },
+"""每日备份注册并发送结果邮件"""
+    'generator_yesterday_health_report': {
+        'task': 'celery_module.backup_reg_today',
+        'schedule': crontab(minute="0", hour="11"),  # 由于时区问题实际是临晨6:30点执行
+        'args': (1,)
     },
     """每5分钟检查一下内网的shard服务器是否可以从外网访问"""
     'every_file_minutes_check_mongodb_server': {

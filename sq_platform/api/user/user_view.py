@@ -271,7 +271,8 @@ def update_image(user_id, key):
                         car_license_kwargs = {"permit_image_url": part_url,
                                               "user_id": user_id}
                         print("new permit_image args: {}".format(_id))
-                        CarLicense.instance(**car_license_kwargs)  # 插入一个行车证信息
+                        r = CarLicense.instance(**car_license_kwargs)  # 插入一个行车证信息
+                        message['data'] = str(r.get_id())
                     else:
                         """这是修改一个行车证图片的情况"""
                         print("修改行车证图片,_id={}".format(_id))

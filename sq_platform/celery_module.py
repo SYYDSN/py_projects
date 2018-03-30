@@ -10,6 +10,7 @@ from api.data.file_module import unzip_all_user_file
 from mongo_db import get_conn, get_obj_id, cache, replica_hosts
 import telnetlib
 from mail_module import send_mail
+from manage.analysis_module import backup
 
 
 logger = get_logger("celery")
@@ -261,6 +262,27 @@ def check_server_and_send_mail(*args, **kwargs):
                 pass
     ms = "check_server_and_send_mail 函数检测结果: {}".format(status_dict)
     logger.info(ms)  # celery有特殊的日志系统,传统的做法无效
+
+
+@app.task
+def backup_reg(*args, **kwargs):
+    """备份注册"""
+    res = backup()
+    title = res['title']
+    content = "{}".format(res['content'])
+    send_mail(title=title, content=content)
+    return "backup_reg success"
+
+
+@app.task
+def backup_reg_today(*args, **kwargs):
+    """备份今日注册"""
+    res = backup(show_today=True)
+    title = res['title']
+    content = "{}".format(res['content'])
+    # send_mail(to_email='zixuan.gao@soooqooo.com', title=title, content=content)
+    send_mail(title=title, content=content)
+    return "backup_reg_today success"
 
 
 if __name__ == "__main__":

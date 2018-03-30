@@ -19,6 +19,7 @@ from error_module import RepeatError
 from error_module import MongoDeleteError
 from api.data.item_module import CarLicense
 from api.data.item_module import Position
+from api.data.item_module import UserLicenseRelation
 from amap_module import get_position_by_address
 
 
@@ -668,6 +669,63 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 license_list.append(plate_number)
 
         return results
+
+    @classmethod
+    def default_generator(cls, user_id) -> (None, dict):
+        """
+        生成一个默认的违章查询器,如果有已违章查询器,就不再生成.
+        :param user_id:
+        :return:
+        """
+        res = None
+        user = User.find_by_id(user_id)
+        user_id = user.get_id()
+        f = {"user_id": user_id}
+        r = cls.find_one_plus(filter_dict=f)
+        if r is None:
+            """此用户无违章查询器"""
+            user_dbref = user.get_dbref()
+            now = datetime.datetime.now()
+            f = {
+                "user_id": user_dbref,
+                "$or": [
+                    {"end_date": {"$exists": False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$gte": now}}
+                ]
+            }
+            license_relation = UserLicenseRelation.find_one_plus(filter_dict=f, instance=False)
+            if license_relation is None:
+                """没有可用行车证"""
+                pass
+            else:
+                """取对应的行车证信息"""
+                license_id = license_relation['license_id'].id
+                car_license = CarLicense.find_by_id(license_id)
+                if car_license is None:
+                    """错误的license_relation信息"""
+                    f ={"_id": license_relation['_id']}
+                    u = {"$set": {'end_date': now}}
+                    UserLicenseRelation.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                else:
+                    """生成违章查询器"""
+                    plate_number = car_license.plate_number
+                    init = {
+                        "_id": ObjectId(),
+                        "user_id": user_id
+
+                    }
+        else:
+            _id = r['_id']
+            city = r['city']
+            children_id = r['car_license'].id
+            children = CarLicense.find_one(_id=children_id)
+            if children is not None:
+                plate_number = children.plate_number
+                temp = {"_id": str(_id), "plate_number": plate_number, "city": city}
+                res = temp
+        return res
+
 
     @classmethod
     def generator_list(cls, user_id):

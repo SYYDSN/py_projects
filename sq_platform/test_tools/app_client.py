@@ -52,6 +52,19 @@ def test_get_daily_info():
     print(res.json())
 
 
+def test_get_vio_query_shortcuts():
+    """
+    测试获取违章查询器列表
+    :return:
+    """
+    auth_token = "0594292764f749c0914288d07473ffcf"  # app段登录标识 me
+    headers = {"auth_token": auth_token}
+    # url = "http://safego.org:5000/api/get_vio_query_shortcuts"
+    url = "http://127.0.0.1:5000/api/get_vio_query_shortcuts"
+    res = requests.post(url, headers=headers)
+    print(res.json())
+
+
 def test_query_violation():
     """
     测试违章查询
@@ -62,15 +75,15 @@ def test_query_violation():
     args = {"_id": "59ffb9b5e39a7b293e11d3ca"}
     args = {"_id": "5a8fa5b2e39a7b3776dd8bcb"}   # 陈浩查询器 上海
     # args = {"_id": "5a8fa53fe39a7b3776dd8bbb"}   # 陈浩查询器 无锡
-    url = "http://safego.org:5000/api/query_violation"
-    # url = "http://127.0.0.1:5000/api/query_violation"
+    # url = "http://safego.org:5000/api/query_violation"
+    url = "http://127.0.0.1:5000/api/query_violation"
     res = requests.post(url, data=args, headers=headers)
     print(res.json())
 
 
 def test_upload_user_permit_image():
     """测试用户上传行车证图片"""
-    auth_token = "b4979e1c54584f1cb2a58ae8f60f3862"  # app段登录标识 me
+    auth_token = "0594292764f749c0914288d07473ffcf"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     img_path = "/home/walle/图片/img_mingcheng.png"
     # img_path = "/home/walle/图片/general_dict.png"
@@ -256,10 +269,12 @@ if __name__ == "__main__":
     """测试违章查询"""
     # test_query_violation()
     # test_req(**args)
+    """测试获取违章查询器列表"""
+    # test_get_vio_query_shortcuts()
     """测试获取用户行车证信息"""
     # test_get_car_license()
     """测试用户上传行车证图片"""
-    # test_upload_user_permit_image()
+    test_upload_user_permit_image()
     """测试用户删除行车证"""
     # test_delete_user_vehicle_info()
     # """测试用户编辑行车证图片"""
@@ -271,7 +286,7 @@ if __name__ == "__main__":
     """测试获取用户驾驶证信息"""
     # test_get_user_driving_license()
     """测试用户安全指数排名接口"""
-    test_get_security_rank_list()
+    # test_get_security_rank_list()
     """测试用户上传行车数据的压缩文件"""
     # test_add_driving_data()
     """测试获取安全报告详情"""

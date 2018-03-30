@@ -78,9 +78,10 @@ def simple_query(begin, end):
     print(phone1)
 
 
-def backup():
+def backup(show_today: bool = False):
     begin = "2018-03-26"
-    end = datetime.datetime.today().strftime("%F")
+    today = datetime.datetime.today()
+    end = today.strftime("%F")
     filter_dict = {'create_date': {
         "$gte": mongo_db.get_datetime_from_str("{} 0:0:0".format(begin)),
         "$lte": mongo_db.get_datetime_from_str("{} 23:59:59.999".format(end))
@@ -90,11 +91,34 @@ def backup():
     es = Employee.find_plus(filter_dict=filter_dict, can_json=True)
     # es = EventRecord.find_plus(filter_dict={})
     print("总共的注册人数:{}".format(len(es)))
-    file_path = os.path.join(dir_path, "h5", "{}.apk".format(datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S")))
+    file_path = os.path.join(dir_path, "h5", "{}.pkl".format(datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S")))
     f = open(file_path, 'wb')
     pickle.dump(es, f)
     f.flush()
     f.close()
+    """返回前一日的注册数据组成的title和content"""
+    es.sort(key=lambda obj: obj['create_date'], reverse=True)
+    yesterday = today - datetime.timedelta(days=1)
+    y_str = yesterday.strftime("%F")
+    b2 = mongo_db.get_datetime_from_str("{} 0:0:0".format(y_str))
+    e2 = mongo_db.get_datetime_from_str("{} 23:59:59.999".format(y_str))
+    re = list()
+    for e in es:
+        c_date = mongo_db.get_datetime_from_str(e['create_date'])
+        if b2 <= c_date <= e2:
+            temp = {
+                "手机": e['phone_num'],
+                "注册时间": c_date.strftime("%Y-%m-%d %H:%M:%S"),
+                "真实姓名": e.get("real_name", '')
+            }
+            re.append(temp)
+        else:
+            pass
+    res = {
+        "title": "{}注册共计{}人".format(y_str, len(re)),
+        "content": re
+    }
+    return res
 
 
 def read_h5(file_name: str = None):
@@ -109,9 +133,8 @@ def read_h5(file_name: str = None):
     print(file_path)
     f = open(file_path, "rb")
     data = pickle.load(f)
-    print(len(data))
-    for x in data:
-        print(x['create_date'], x['phone_num'], x['_id'])
+    f.close()
+    return data
 
 
 def find_gps(lat: float = None, lon: float = None):
@@ -144,7 +167,14 @@ def find_gps(lat: float = None, lon: float = None):
 if __name__ == "__main__":
     # res = get_user_data()
     # print(res)
-    # backup()
-    read_h5()
+    rs = backup()
+    # for i in rs:
+    #     print(i)
+    # us = read_h5()
+    # for u in us:
+    #     print(u)
+    # from api.data.item_module import User
+    # r = User.insert_many(us)
+    # print(r)
     # find_gps()
     pass
