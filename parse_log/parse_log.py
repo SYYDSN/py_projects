@@ -31,14 +31,14 @@ if __name__ == "__main__":
     l2 = list()
     l3 = list()
     for x in res:
-        if x.startswith("2018-03-29"):
+        if x.startswith("2018-03-30"):
             l1.append(x)
-        elif x.startswith("2018-03-28"):
-            l2.append(x)
-        elif x.startswith("2018-03-27"):
-            l3.append(x)
-    l1.extend(l2)
-    l1.extend(l3)
+    #     elif x.startswith("2018-03-28"):
+    #         l2.append(x)
+    #     elif x.startswith("2018-03-27"):
+    #         l3.append(x)
+    # l1.extend(l2)
+    # l1.extend(l3)
     for x in l1:
         print(x)
     print(len(l1))

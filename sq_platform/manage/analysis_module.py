@@ -114,8 +114,9 @@ def backup(show_today: bool = False):
             re.append(temp)
         else:
             pass
+    f
     res = {
-        "title": "{}注册共计{}人".format(y_str, len(re)),
+        "title": "{}新增注册{}人".format(y_str, len(re)),
         "content": re
     }
     return res

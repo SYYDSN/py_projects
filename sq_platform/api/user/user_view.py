@@ -53,6 +53,9 @@ def app_user_reg():
         """组装添加客户的数据"""
         user_password = hashlib.md5(phone_num[5:].encode()).hexdigest() if user_password == "" else user_password
         create_date = datetime.datetime.now()
+        """先记录注册信息"""
+        ip = get_real_ip(request)
+        RegRecord.insert_one(reg_date=create_date, ip=ip, phone_num=phone_num)
         args = {"user_name": user_name, "user_password": user_password, "phone_num": phone_num,
                 "create_date": create_date, "invite_code": invite_code}
         try:

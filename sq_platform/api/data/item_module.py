@@ -2,9 +2,9 @@
 import sys
 import os
 """直接运行此脚本，避免import失败的方法"""
-project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-if project_dir not in sys.path:
-    sys.path.append(project_dir)
+item_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+if item_dir not in sys.path:
+    sys.path.append(item_dir)
 import mongo_db
 from bson.objectid import ObjectId
 import datetime
@@ -37,7 +37,6 @@ insert_queue_lock = threading.Lock()
 """定义用户的模型及相关方法"""
 
 image_patch = "static/image/head_img/"
-
 
 
 class Log(mongo_db.BaseDoc):
@@ -84,6 +83,16 @@ class LoginRecord(mongo_db.BaseDoc):
         if "app_version" not in kwargs:
             kwargs['app_version'] = ""
         super(LoginRecord, self).__init__(**kwargs)
+
+
+class RegRecord(mongo_db.BaseDoc):
+    """用户注册的记录"""
+    _table_name = "register_record_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId  # 记录，是一个ObjectId对象，唯一
+    type_dict['phone_num'] = str  # 注册时用的手机号码
+    type_dict['ip'] = str  # 用户登陆时的ip
+    type_dict['reg_date'] = datetime.datetime  # 注册行为发生的时间
 
 
 class User(mongo_db.BaseDoc):
@@ -1099,8 +1108,6 @@ class Track(mongo_db.BaseDoc):
         try:
             interval = (cur['time'] - prev['time']).total_seconds()
         except KeyError as e:
-            print(item)
-            print(prev_item)
             raise e
         print(interval)
         print(cur['time'])
@@ -1888,4 +1895,32 @@ if __name__ == "__main__":
     # t = AppLoginToken(**args)
     # i = t.insert()
     # print(i)
+    phones = """13761535610
+                18301911556
+                13661849103
+                13817754724
+                13916948352
+                15000290053
+                13816938418
+                13916944469
+                18721809762
+                13524045060
+                13918677317
+                13818111580
+                13621933035
+                15202115278
+                13917918313
+                13564203498
+                18321390368
+                18721538393
+                13764126926
+                13816174254
+            """
+    import re
+    pattern = re.compile(r'1\d{10}')
+    phones = [re.search(pattern, x).group() for x in phones.split("\n") if re.search(pattern, x)]
+    f = {"phone_num": phones[1]}
+    f = {"_id": ObjectId("5abb7bf8e39a7b3d99d6a25f")}
+    us = User.find_plus(filter_dict=f)
+    print(len(us))
     pass
