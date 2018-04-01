@@ -1,2 +1,9 @@
+bjorn依赖
 apt-get install libev-dev
+cv2依赖
+apt-get install libsm6
+apt-get install libxrender1
+apt-get install libxext-dev
+
+安装
 pip3 install bjoern tornado cherrypy meinheld flask-session flask-wtf redis pymongo numpy request requests opencv-python matplotlib haversine openpyxl celery elasticsearch flask-debugtoolbar gevent -i https://pypi.douban.com/simple

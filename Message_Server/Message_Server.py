@@ -12,6 +12,7 @@ from log_module import get_logger
 import sms_module
 import json
 from tools_module import *
+from item_module import *
 import os
 
 
@@ -72,6 +73,8 @@ def listen_func(key):
         secret_str = 'P5lxNPYgF6cylkMBUenhkOE7'
         check = validate_signature(request, secret_str, signature)
         print("signal_test check is {}".format(check))
+        signal = Signal(**data)
+        signal.send()
     else:
         mes['message'] = '错误的path'
     return json.dumps(mes)
