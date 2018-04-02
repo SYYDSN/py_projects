@@ -46,7 +46,11 @@ class Signal(mongo_db.BaseDoc):
             raise ValueError(ms)
         else:
             arg_dict = dict()
+            arg_dict['receive_time'] = datetime.datetime.now()
             arg_dict['op'] = op
+            create_time = mongo_db.get_datetime_from_str(data.pop('createTime', None))
+            if create_time is not None:
+                arg_dict['create_time'] = create_time
             delete_time = mongo_db.get_datetime_from_str(data.pop('deleteTime', None))
             if delete_time is not None:
                 arg_dict['delete_time'] = delete_time
@@ -164,7 +168,7 @@ class Signal(mongo_db.BaseDoc):
             res = r.json()
             if res['errmsg'] == 'ok':
                 """success"""
-                self.__dict__['send'] = True
+                self.__dict__['send_time'] = datetime.datetime.now()
                 self.save_plus()
             else:
                 ms = '发送消息到钉订机器人失败，错误原因：{}， 参数{}'.format(res['errmsg'], data)
