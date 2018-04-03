@@ -1063,7 +1063,10 @@ class BaseDoc:
         doc = {k: v for k, v in doc.items() if k not in ignore}
         f = {"_id": _id}
         res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
-        return res
+        if res is None:
+            return res
+        else:
+            return res.upserted_id
 
     def save(self, obj=None)->ObjectId:
         """更新

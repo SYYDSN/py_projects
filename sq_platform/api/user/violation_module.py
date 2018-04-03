@@ -725,25 +725,35 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                     """生成违章查询器"""
                     plate_number = car_license.get_attr('plate_number')
                     city = car_license.get_attr('city')
+                    city = "上海市"
+                    if city is None:
+                        ms = "行车证（id:{}）信息不完整：缺少注册城市".format(license_id)
+                        logger.exception(ms)
+                        raise ValueError(ms)
+                    else:
+                        pass
                     # 违章查询器的初始化参数
                     init = {
                         "_id": ObjectId(),
-                        "user_id": user_dbref,
+                        "user_id": user_id,  # 这个参数不是dbref，这是历史问题
                         "city": city,
                         "create_date": now,
                         "all_count": 0,
+                        "car_license": car_license.get_dbref(),
                         "online_query_count": 0,
                         "today_online_query_count": 0,
                         "today_offline_query_count": 0
                     }
                     """保存违章查询器"""
-                    r = cls.insert_one(**init)
+                    generator = cls(**init)
+                    r = generator.save_plus()
                     if r is None:
                         ms = "VioQueryGenerator对象保存失败,参数{}".format(init)
                         logger.exception(ms)
                         raise ValueError(ms)
                     else:
                         """保存成功,返回违章查询器的快捷方式"""
+                        generator.set_attr("_id", r)
                         temp = {"_id": str(r), "plate_number": plate_number, "city": city}
                         res = temp
         else:
@@ -761,22 +771,25 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         """
         user_id = mongo_db.get_obj_id(user_id)
         data = list()
-        generators = cls.find(user_id=user_id)
+        f = {"user_id": user_id}
+        generators = cls.find_plus(filter_dict=f, to_dict=False)
         for generator in generators:
             _id = generator.get_id()
-            city = generator.city
-            children_id = generator.car_license.id
+            city = generator.get_attr("city")
+            children_id = generator.get_attr("car_license").id
             children = CarLicense.find_one(_id=children_id)
             if children is not None:
                 plate_number = children.plate_number
                 temp = {"_id": str(_id), "plate_number": plate_number, "city": city}
                 data.append(temp)
             else:
-                pass
+                """错误的违章查询器信息，删除"""
+                generator.delete_self()
         if len(data) == 0:
             """用户没有违章查询器,那就获取一个默认的违章查询器,加入list容器后返回"""
             default_generator = cls.default_generator(user_id)
-            data.append(default_generator)
+            if default_generator is not None:
+                data.append(default_generator)
         return data
 
     def update_count_online(self, last_query_result_id):

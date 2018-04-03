@@ -57,7 +57,7 @@ def test_get_vio_query_shortcuts():
     测试获取违章查询器列表
     :return:
     """
-    auth_token = "0594292764f749c0914288d07473ffcf"  # app段登录标识 me
+    auth_token = "f40bc71e130c48f4bcebff1169dfe22a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     # url = "http://safego.org:5000/api/get_vio_query_shortcuts"
     url = "http://127.0.0.1:5000/api/get_vio_query_shortcuts"
