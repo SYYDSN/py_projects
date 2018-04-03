@@ -752,6 +752,7 @@ class AppLoginToken(mongo_db.BaseDoc):
                 message['user_id'] = result.user_id
         return message
 
+
 class UserLicenseRelation(mongo_db.BaseDoc):
     """关系表,记录用户和行车证/车辆的对应关系"""
     _table_name = "user_license_relation"
@@ -819,7 +820,7 @@ class CarLicense(mongo_db.BaseDoc):
     @classmethod
     def instance(cls, **kwargs) -> (object, None):
         """
-        创建实例请用此方法而不是__init__方法,
+        创建实例请用此方法而不是__init__方法,此方法同时会创建UserLicenseRelation关系对象
         如果已存在
         :param kwargs:
         :return: 返回实例或者None
