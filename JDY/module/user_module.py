@@ -12,7 +12,7 @@ import mongo_db
 
 class User(mongo_db.BaseDoc):
     """用户"""
-    _table_name = "spread_keyword"
+    _table_name = "user_info"
     type_dict = dict()  # 属性字典
     type_dict['_id'] = mongo_db.ObjectId  # id,唯一
     type_dict['real_name'] = str  # 真实姓名

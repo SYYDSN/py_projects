@@ -138,11 +138,13 @@ def check_platform_session(f):
             return redirect(url_for("login_func"))
         else:
             checked_user_obj = user_module.User.login(phone=phone, password=password)
+            print("checked_user_obj")
+            print(checked_user_obj)
             if checked_user_obj is None:
                 """用户名和密码不正确"""
                 return redirect(url_for("login_func"))
             else:
-                if checked_user_obj['data']['_id'] == user_id:
+                if checked_user_obj.get('data')['_id'] == user_id:
                     return f(*args, **kwargs)
                 else:
                     return redirect(url_for("login_func"))

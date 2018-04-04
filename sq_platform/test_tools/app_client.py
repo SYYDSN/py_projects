@@ -72,9 +72,7 @@ def test_query_violation():
     """
     auth_token = "f40bc71e130c48f4bcebff1169dfe22a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
-    args = {"_id": "59ffb9b5e39a7b293e11d3ca"}
-    args = {"_id": "5a8fa5b2e39a7b3776dd8bcb"}   # 陈浩查询器 上海
-    # args = {"_id": "5a8fa53fe39a7b3776dd8bbb"}   # 陈浩查询器 无锡
+    args = {"_id": "5ac400a409d20f32d731b6e2"}   #
     # url = "http://safego.org:5000/api/query_violation"
     url = "http://127.0.0.1:5000/api/query_violation"
     res = requests.post(url, data=args, headers=headers)
@@ -125,8 +123,7 @@ def test_upload_user_driving_license():
     """测试用户上传驾驶证信息"""
     auth_token = "f40bc71e130c48f4bcebff1169dfe22a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
-    img_path = "/home/walle/图片/img_mingcheng.png"
-    img_path = "/home/walle/图片/general_dict.png"
+    img_path = "/home/walle/图片/2017-10-31 08-39-52屏幕截图.png"
     file = open(img_path, 'rb')
     files = {"license_image": file}
     res = requests.post("http://127.0.0.1:5000/api/upload_license_image", files=files, headers=headers)
@@ -270,7 +267,7 @@ if __name__ == "__main__":
     # test_query_violation()
     # test_req(**args)
     """测试获取违章查询器列表"""
-    test_get_vio_query_shortcuts()
+    # test_get_vio_query_shortcuts()
     """测试获取用户行车证信息"""
     # test_get_car_license()
     """测试用户上传行车证图片"""
@@ -284,7 +281,7 @@ if __name__ == "__main__":
     """测试更新用户驾驶证信息"""
     # test_update_user_driving_license()
     """测试获取用户驾驶证信息"""
-    # test_get_user_driving_license()
+    test_get_user_driving_license()
     """测试用户安全指数排名接口"""
     # test_get_security_rank_list()
     """测试用户上传行车数据的压缩文件"""

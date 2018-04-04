@@ -27,7 +27,7 @@ from pymongo.errors import DuplicateKeyError
 
 cache = RedisCache()
 logger = get_logger()
-user = "exe_root"              # 数据库用户名
+user = "eroot"              # 数据库用户名
 password = "Try@Ex68769"       # 数据库密码
 db_name = "platform_db"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。

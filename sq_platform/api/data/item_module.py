@@ -121,15 +121,18 @@ class User(mongo_db.BaseDoc):
     type_dict['emergency_phone'] = str  # 紧急联系号码
     type_dict['user_status'] = int  # 用户状态，1表示可以登录，0表示禁止登录
     type_dict['online_time'] = float  # 在线时长的统计.单位分钟
-    type_dict['desscription'] = str  # 备注
+    type_dict['description'] = str  # 备注
     """
     驾驶证信息部分,驾驶证和用户有一一对应的关系.所以需要直接存储在对象中.
     """
     type_dict['license_id'] = str                          # 驾驶证id
     type_dict['license_image_url'] = str                   # 驾驶证照片
     type_dict['license_class'] = str                       # 驾驶证类型,准驾车型
+    type_dict['official_name'] = str                       # 驾驶证上的名字,扫描输入
+    type_dict['nationality'] = str                         # 驾驶证上的国家,扫描输入
     type_dict['first_issued_date'] = datetime.datetime     # 首次领证日期
-    type_dict['valid_date'] = datetime.datetime            # 驾驶证有效期
+    type_dict['valid_from'] = datetime.datetime            # 驾照有效期的开始时间
+    type_dict['valid_duration'] = str                      # 驾照有效持续期,比如1年有效期
     """
     有关行车证信息部分,由于行车证和用户没有意义对应关系.
     由于业务逻辑上个人可能创建和自己不相干的车牌的查询器，所以这个cars失去了业务逻辑上的意义。
@@ -237,18 +240,18 @@ class User(mongo_db.BaseDoc):
             "real_name",               # 名字
             "gender",                  # 性别
             "nationality",             # 国家
-            "country",                 # 国家
             "birth_date",              # 出生日期
             "first_issued_date",       # 首次领证日期
-            "valid_date"               # 驾照有效期
-
+            "valid_duration",          # 驾照有效持续期,比如1年有效期
+            "valid_from"               # 驾照有效期的开始时间
         ]
         # 转换字典
         transform_dict = {"image_url": "license_image_url", "official_name": "real_name", "nationality": "country"}
+        transform_dict = {"image_url": "license_image_url"}
         for k, v in kwargs.items():
             if k in attr_names:
                 k = k if transform_dict.get(k) is None else transform_dict.get(k)
-                if k in ['valid_date', 'first_issued_date', 'birth_date']:
+                if k in ['valid_from', 'first_issued_date', 'birth_date']:
                     val = None
                     try:
                         the_datetime = mongo_db.get_datetime_from_str(v)
@@ -304,12 +307,13 @@ class User(mongo_db.BaseDoc):
                 "image_url": "static/image/license_image/example.png" if
                 res.get_attr("license_image_url") is None else
                 res.get_attr("license_image_url"),                        # 驾驶证图片地址
-                "official_name": res.get_attr("real_name"),               # 名字
+                "official_name": res.get_attr("official_name"),           # 驾驶证上的名字
                 "gender": res.get_attr("gender"),                         # 性别
-                "nationality": res.get_attr("country"),                   # 国家
+                "nationality": res.get_attr("nationality"),               # 驾驶证上的国家
                 "birth_date": res.get_attr("birth_date"),                 # 出生日期
                 "first_issued_date": res.get_attr("first_issued_date"),   # 首次领证日期
-                "valid_date": res.get_attr("valid_date")                  # 驾照有效期
+                "valid_from": res.get_attr("valid_from"),                 # 驾照有效期的开始时间
+                "valid_duration": res.get_attr("valid_duration")          # 驾照有效持续期,比如1年有效期
             }
             data = {k: (v.strftime("%F") if isinstance(v, datetime.datetime) else v) for k, v in data.items() if v is not None}
         return data
@@ -774,6 +778,7 @@ class UserLicenseRelation(mongo_db.BaseDoc):
         } for car in cars]
         cls.insert_many(relations)
 
+
 class CarLicense(mongo_db.BaseDoc):
     """行车证"""
     _table_name = "car_license_info"
@@ -791,7 +796,7 @@ class CarLicense(mongo_db.BaseDoc):
     type_dict["car_type"] = str  # 车辆类型  比如 重型箱式货车
     type_dict["owner_name"] = str  # 车主姓名/不一定是驾驶员
     type_dict["address"] = str  # 地址
-    type_dict["use_nature"] = str  # 使用性质
+    type_dict["use_character"] = str  # 使用性质
     type_dict["car_model"] = str  # 车辆型号  比如 一汽解放J6
     type_dict["vin_id"] = str  # 车辆识别码/车架号的后六位 如果大于6未，查询违章的时候就用后6位查询
     type_dict["engine_id"] = str  # 发动机号
@@ -872,9 +877,9 @@ class CarLicense(mongo_db.BaseDoc):
             filter_dict = {
                 "user_id": user_id,
                 "$or": [
-                    {"end_date":{"$exists": False}},
-                    {"end_date":None},
-                    {"end_date":{"$gte": datetime.datetime.now()}}
+                    {"end_date": {"$exists": False}},
+                    {"end_date": None},
+                    {"end_date": {"$gte": datetime.datetime.now()}}
                 ]
             }
             sort_dict = {"create_date": -1}
@@ -1515,6 +1520,26 @@ class GPS(mongo_db.BaseDoc):
             pass
         else:
             super(GPS, self).__init__(**kwargs)
+
+    @classmethod
+    def city_list(cls, user_id: (str, ObjectId)) -> list:
+        """
+        根据用户id,获取这个用户曾经经过的城市的数组
+        :param user_id:
+        :return:
+        """
+        res = list()
+        if user_id is None:
+            ms = "function city_list Error!用户id不能为None"
+            logger.exception(ms)
+        else:
+            user = User.find_by_id(user_id)
+            if user is None:
+                ms = "function city_list Error!用户id无效, user_id={}".format(user_id)
+                logger.exception(ms)
+            else:
+                user_dbref = user.get_dbref()
+                f = {""}
 
     @staticmethod
     def mile_time_speed(gps_list: list) -> dict:

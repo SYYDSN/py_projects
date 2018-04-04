@@ -444,7 +444,6 @@ class AMapAdCode:
         wb = load_workbook(file_path)
         print(wb)
 
-
     @staticmethod
     def check_update():
         """

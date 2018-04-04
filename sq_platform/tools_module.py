@@ -88,13 +88,7 @@ def get_company_from_req(req: request) -> (dict, None):
     :return:
     """
     domain = req.host.split(":")[0]
-    key = 'domain_company_{}'.format(domain)
-    company = cache.get(key)
-    if company is None:
-        f_dict = {"domain": domain}
-        if domain.startswith("192.168.") or domain == "127.0.0.1":
-            """开发调试状态,当前项目是新振兴"""
-            company = {
+    default_company = {
                 "_id": ObjectId("5aab48ed4660d32b752a7ee9"),
                 "full_name": " 江西新振兴投资集团有限公司",
                 "domain": "xzx.safego.org",
@@ -102,6 +96,13 @@ def get_company_from_req(req: request) -> (dict, None):
                 "prefix": "xzx",
                 "short_name": "新振兴"
             }
+    key = 'domain_company_{}'.format(domain)
+    company = cache.get(key)
+    if company is None:
+        f_dict = {"domain": domain}
+        if domain.startswith("192.168.") or domain == "127.0.0.1":
+            """开发调试状态,当前项目是新振兴"""
+            company = default_company
         else:
             company = Company.find_one_plus(filter_dict=f_dict, instance=False)
         """写缓存"""
@@ -111,7 +112,11 @@ def get_company_from_req(req: request) -> (dict, None):
             pass
     else:
         pass
-    return company
+    """调试状态下,默认是新振兴公司"""
+    if company is None:
+        return default_company
+    else:
+        return company
 
 
 def save_platform_cors_session(**kwargs) -> (str, None):

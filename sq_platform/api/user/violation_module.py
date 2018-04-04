@@ -21,6 +21,7 @@ from api.data.item_module import CarLicense
 from api.data.item_module import Position
 from api.data.item_module import UserLicenseRelation
 from amap_module import get_position_by_address
+from extends.car_city import CarCity
 
 
 """违章查询模块"""
@@ -513,6 +514,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
     """违章查询器"""
     _table_name = "violation_query_generator_info"
 
+    """car_license和city组成唯一性index"""
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
     type_dict['user_id'] = ObjectId  # 关联用户的id
@@ -673,92 +675,144 @@ class VioQueryGenerator(mongo_db.BaseDoc):
     @classmethod
     def default_generator(cls, user_id) -> (None, dict):
         """
-        生成一个默认的违章查询器,用于在获取不到其他查询器的时候,提供一个默认的查询器
+        生成一组默认的违章查询器,
+        生成条件是:
+        1. 用户的行车证
         默认查询器在生成的时候会自动保存.
         :param user_id:
         :return:
         """
-        res = None
-        """先确认用户是否有违章查询器"""
-        user = User.find_by_id(user_id)
-        user_id = user.get_id()
-        f = {"user_id": user_id}
-        r = cls.find_one_plus(filter_dict=f)
-        if r is None:
-            """
-            此用户无违章查询器,创建一个默认的违章查询器.
-            第一步,确认其有无行车证?
-            """
-            user_dbref = user.get_dbref()
-            now = datetime.datetime.now()
-            f = {
-                "user_id": user_dbref,
-                "$or": [
-                    {"end_date": {"$exists": False}},
-                    {"end_date": {"$eq": None}},
-                    {"end_date": {"$gte": now}}
-                ]
-            }
-            s = {"create": -1}
-            license_relation = UserLicenseRelation.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
-            if license_relation is None:
-                """没有可用行车证"""
-                ms = "用户{}没有可用的行车证信息".format(user_id)
-                logger.exception(ms)
-                raise ValueError(ms)
-            else:
-                """取对应的行车证信息"""
-                license_id = license_relation['license_id'].id
-                car_license = CarLicense.find_by_id(license_id)
-                if car_license is None:
-                    """
-                    没有找到对应的car_license信息,由于之前已经确认了用户有UserLicenseRelation记录,
-                    现在看来是无效的记录,需要被清除.
-                    """
-                    f = {"_id": license_relation['_id']}
-                    u = {"$set": {'end_date': now}}
-                    UserLicenseRelation.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
-                    ms = "用户{}的行车证关系中,对应的行车证id无效,license_id={}".format(user_id, license_id)
-                    logger.exception(ms)
-                    raise ValueError(ms)
-                else:
-                    """生成违章查询器"""
-                    plate_number = car_license.get_attr('plate_number')
-                    city = car_license.get_attr('city')
-                    city = "上海市"
-                    if city is None:
-                        ms = "行车证（id:{}）信息不完整：缺少注册城市".format(license_id)
-                        logger.exception(ms)
-                        raise ValueError(ms)
-                    else:
-                        pass
-                    # 违章查询器的初始化参数
-                    init = {
-                        "_id": ObjectId(),
-                        "user_id": user_id,  # 这个参数不是dbref，这是历史问题
-                        "city": city,
-                        "create_date": now,
-                        "all_count": 0,
-                        "car_license": car_license.get_dbref(),
-                        "online_query_count": 0,
-                        "today_online_query_count": 0,
-                        "today_offline_query_count": 0
-                    }
-                    """保存违章查询器"""
-                    generator = cls(**init)
-                    r = generator.save_plus()
-                    if r is None:
-                        ms = "VioQueryGenerator对象保存失败,参数{}".format(init)
-                        logger.exception(ms)
-                        raise ValueError(ms)
-                    else:
-                        """保存成功,返回违章查询器的快捷方式"""
-                        generator.set_attr("_id", r)
-                        temp = {"_id": str(r), "plate_number": plate_number, "city": city}
-                        res = temp
-        else:
-            """如果有违章查询器,那就不需要默认违章查询器了,返回None"""
+        res = list()
+        user_id = mongo_db.get_obj_id(user_id)
+        """先取用户的行车证"""
+        license_list = CarLicense.get_usable_license(user_id)
+        if len(license_list) == 0:
+            """用户没有行车证信息,忽视"""
             pass
+        else:
+            for car_license in license_list:
+                dbref = DBRef(database="platform_db", collection=CarLicense.get_table_name(),
+                      id=ObjectId(car_license['_id']))
+                """检查是否所有的行车证都有对应的并且查询城市相同?"""
+                plate_number = car_license.get("plate_number")
+                city = CarCity.get_city(plate_number)
+                if city is None:
+                    """查询不到对应城市的"""
+                    pass
+                else:
+                    f = {"user_id": user_id, "city": city}
+                    r = cls.find_one_plus(filter_dict=f, instance=False)
+                    if r is not None:
+                        temp = {"_id": str(r['_id']), "plate_number": plate_number, "city": city}
+                        res.append(temp)
+                    else:
+                        """新建一个查询器"""
+                        # 违章查询器的初始化参数
+                        now = datetime.datetime.now()
+                        init = {
+                            "_id": ObjectId(),
+                            "user_id": user_id,  # 这个参数不是dbref，这是历史问题
+                            "city": city,
+                            "create_date": now,
+                            "all_count": 0,
+                            "car_license": dbref,
+                            "online_query_count": 0,
+                            "today_online_query_count": 0,
+                            "today_offline_query_count": 0
+                        }
+                        generator = cls(**init)
+                        r = generator.save_plus()
+                        if r is None:
+                            ms = "VioQueryGenerator对象保存失败,参数{}".format(init)
+                            logger.exception(ms)
+                            raise ValueError(ms)
+                        else:
+                            """保存成功,返回违章查询器的快捷方式"""
+                            generator.set_attr("_id", r)
+                            temp = {"_id": str(r), "plate_number": plate_number, "city": city}
+                            res.append(temp)
+
+
+        """旧方法,逻辑放弃"""
+        # """先确认用户是否有违章查询器"""
+        # user = User.find_by_id(user_id)
+        # user_id = user.get_id()
+        # f = {"user_id": user_id}
+        # r = cls.find_one_plus(filter_dict=f)
+        # if r is None:
+        #     """
+        #     此用户无违章查询器,创建一个默认的违章查询器.
+        #     第一步,确认其有无行车证?
+        #     """
+        #     user_dbref = user.get_dbref()
+        #     now = datetime.datetime.now()
+        #     f = {
+        #         "user_id": user_dbref,
+        #         "$or": [
+        #             {"end_date": {"$exists": False}},
+        #             {"end_date": {"$eq": None}},
+        #             {"end_date": {"$gte": now}}
+        #         ]
+        #     }
+        #     s = {"create": -1}
+        #     license_relation = UserLicenseRelation.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+        #     if license_relation is None:
+        #         """没有可用行车证"""
+        #         ms = "用户{}没有可用的行车证信息".format(user_id)
+        #         logger.exception(ms)
+        #         raise ValueError(ms)
+        #     else:
+        #         """取对应的行车证信息"""
+        #         license_id = license_relation['license_id'].id
+        #         car_license = CarLicense.find_by_id(license_id)
+        #         if car_license is None:
+        #             """
+        #             没有找到对应的car_license信息,由于之前已经确认了用户有UserLicenseRelation记录,
+        #             现在看来是无效的记录,需要被清除.
+        #             """
+        #             f = {"_id": license_relation['_id']}
+        #             u = {"$set": {'end_date': now}}
+        #             UserLicenseRelation.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+        #             ms = "用户{}的行车证关系中,对应的行车证id无效,license_id={}".format(user_id, license_id)
+        #             logger.exception(ms)
+        #             raise ValueError(ms)
+        #         else:
+        #             """生成违章查询器"""
+        #             plate_number = car_license.get_attr('plate_number')
+        #             city = CarCity.get_city(plate_number)
+        #             if city is None:
+        #                 ms = "行车证（id:{}）信息不完整：缺少注册城市".format(license_id)
+        #                 logger.exception(ms)
+        #                 raise ValueError(ms)
+        #             else:
+        #                 pass
+        #             # 违章查询器的初始化参数
+        #             init = {
+        #                 "_id": ObjectId(),
+        #                 "user_id": user_id,  # 这个参数不是dbref，这是历史问题
+        #                 "city": city,
+        #                 "create_date": now,
+        #                 "all_count": 0,
+        #                 "car_license": car_license.get_dbref(),
+        #                 "online_query_count": 0,
+        #                 "today_online_query_count": 0,
+        #                 "today_offline_query_count": 0
+        #             }
+        #             """保存违章查询器"""
+        #             generator = cls(**init)
+        #             r = generator.save_plus()
+        #             if r is None:
+        #                 ms = "VioQueryGenerator对象保存失败,参数{}".format(init)
+        #                 logger.exception(ms)
+        #                 raise ValueError(ms)
+        #             else:
+        #                 """保存成功,返回违章查询器的快捷方式"""
+        #                 generator.set_attr("_id", r)
+        #                 temp = {"_id": str(r), "plate_number": plate_number, "city": city}
+        #                 res = temp
+        # else:
+        #     """如果有违章查询器,那就不需要默认违章查询器了,返回None"""
+        #     pass
         return res
 
     @classmethod
@@ -771,25 +825,28 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         """
         user_id = mongo_db.get_obj_id(user_id)
         data = list()
-        f = {"user_id": user_id}
-        generators = cls.find_plus(filter_dict=f, to_dict=False)
-        for generator in generators:
-            _id = generator.get_id()
-            city = generator.get_attr("city")
-            children_id = generator.get_attr("car_license").id
-            children = CarLicense.find_one(_id=children_id)
-            if children is not None:
-                plate_number = children.plate_number
-                temp = {"_id": str(_id), "plate_number": plate_number, "city": city}
-                data.append(temp)
-            else:
-                """错误的违章查询器信息，删除"""
-                generator.delete_self()
+        """
+        目前情况下,只返回默认查询器,不给用户自定义查询器的机会
+        """
+        # f = {"user_id": user_id}
+        # generators = cls.find_plus(filter_dict=f, to_dict=False)
+        # for generator in generators:
+        #     _id = generator.get_id()
+        #     city = generator.get_attr("city")
+        #     children_id = generator.get_attr("car_license").id
+        #     children = CarLicense.find_one(_id=children_id)
+        #     if children is not None:
+        #         plate_number = children.plate_number
+        #         temp = {"_id": str(_id), "plate_number": plate_number, "city": city}
+        #         data.append(temp)
+        #     else:
+        #         """错误的违章查询器信息，删除"""
+        #         generator.delete_self()
         if len(data) == 0:
             """用户没有违章查询器,那就获取一个默认的违章查询器,加入list容器后返回"""
-            default_generator = cls.default_generator(user_id)
-            if default_generator is not None:
-                data.append(default_generator)
+            default_generator_list = cls.default_generator(user_id)
+            if len(default_generator_list) > 0:
+                data.extend(default_generator_list)
         return data
 
     def update_count_online(self, last_query_result_id):
@@ -1049,8 +1106,15 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             """检查此查询器是否和用户身份吻合"""
             now = datetime.datetime.now()
             try:
-                prev_date = generator.prev_date
-                interval_time = (now - prev_date).total_seconds()
+                prev_date = generator.get_attr("prev_date")  # 取上一次从互联网查询的时间,和现在的时间比较
+                """
+                如果prev_date是None,那就是没用过的的新查询器.直接就从互联网查了.
+                interval_time = interval_seconds + 1 是为了创造大于interval_seconds的条件
+                """
+                if prev_date is None:
+                    interval_time = interval_seconds + 1
+                else:
+                    interval_time = (now - prev_date).total_seconds()
                 """检查查询的时间间隔"""
                 if interval_time < interval_seconds:
                     """间隔小于一天就从数据库里读"""
@@ -1184,7 +1248,7 @@ if __name__ == "__main__":
             }
     # r = VioQueryGenerator.test_query(**args)
     # print(r)
-    r2 = VioQueryGenerator.query(ObjectId("5a8fa5b2e39a7b3776dd8bcb"))
+    r2 = VioQueryGenerator.default_generator(ObjectId("59895177de713e304a67d30c"))
     print(r2)
     pass
 

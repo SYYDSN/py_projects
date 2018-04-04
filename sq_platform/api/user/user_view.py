@@ -293,12 +293,12 @@ def update_image(user_id, key):
                         if not isinstance(_id, ObjectId):
                             _id = ObjectId(_id)
                         filter_dict = {"_id": _id}
+                        permit_image_url = request.host_url + part_url
                         update = {"$set": {"permit_image_url": part_url}}
                         r = CarLicense.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update)
                         if r is not None:
                             res = dict()
                             res['_id'] = str(_id)
-                            permit_image_url = request.host_url + part_url
                             res['permit_image_url'] = permit_image_url
                             message['data'] = res
                         else:
@@ -316,7 +316,10 @@ def update_image(user_id, key):
                     if isinstance(user, User):
                         res = user.update_driving_license(image_url=part_url)
                         if res['message'] == "success":
-                            message['data'] = img_url  # 返回驾驶证图片的绝对地址
+                            image_url = img_url  # 返回驾驶证图片的绝对地址
+                            _id = str(user_id)
+                            data = {"_id": _id, "image_url": image_url}
+                            message['data'] = data
                         else:
                             ms = "update_image func Error: key={},img_url={}".format(key, img_url)
                             logger.exception(ms)
@@ -501,6 +504,7 @@ def process_vehicle_info(user_id, key):
             """返回行车证信息的列表"""
             obj_list = CarLicense.get_usable_license(user_id=user_id)
             for obj in obj_list:
+                """按照app段需求整理转换字段名"""
                 if 'permit_image_url' in obj:
                     obj['permit_image_url'] = host_url + obj['permit_image_url']
             message['data'] = obj_list
@@ -510,8 +514,11 @@ def process_vehicle_info(user_id, key):
             if obj is None:
                 pass
             else:
+                """按照app段需求整理转换字段名"""
                 if 'permit_image_url' in obj:
                     obj['permit_image_url'] = host_url + obj['permit_image_url']
+                else:
+                    pass
                 message['data'] = obj
     elif key == "edit":
         """编辑行车证信息"""
