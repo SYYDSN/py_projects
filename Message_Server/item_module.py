@@ -59,9 +59,8 @@ class Signal(mongo_db.BaseDoc):
             if isinstance(delete_time, datetime.datetime):
                 delete_time = self.transform_time_zone(delete_time)  # 调整时区
                 arg_dict['delete_time'] = delete_time
-            event_date = mongo_db.get_datetime_from_str(self.__dict__['_widget_1514518782504'])
+            event_date = datetime.datetime.now()
             if isinstance(event_date, datetime.datetime):
-                event_date = self.transform_time_zone(event_date)  # 调整时区
                 arg_dict['event_date'] = event_date
 
             arg_dict['app_name'] = data.pop('formName', None)  # 表单名称，重要区别依据，应该是唯一的
