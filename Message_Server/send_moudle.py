@@ -8,21 +8,31 @@ from log_module import get_logger
 
 
 logger = get_logger()
-# 钉订小助手
-url_assistant = "https://oapi.dingtalk.com/robot/send?access_token=f346ad6b04dec14dfee9298f9e34aca4605efe4deb2" \
-                "0b1ee8b18adfc54af5ca3"
+# 钉订机器人的链接的token
+url_map = {
+    "钉订小助手": "f346ad6b04dec14dfee9298f9e34aca4605efe4deb20b1ee8b18adfc54af5ca3",
+    "策略助手 小迅": "f007c608f52b78620a52372764d17b42367e22bef78d6966925fee4fe7f715f6"
+}
 
 
-def send_signal(send_data: dict) -> bool:
+def send_signal(send_data: dict, token_name: str = None) -> bool:
     """
     发送建仓/平仓交易信号
-    :param send_data:
+    :param send_data:发动的信息字典
+    :param token_name:  token映射的key，对应url_map的key
     :return:
     """
     res = False
+    if token_name is None:
+        token = url_map['钉订小助手']
+    else:
+        token = url_map.get(token_name)
+    token = url_map['钉订小助手'] if token is None else token
     data = json.dumps(send_data)
     headers = {'Content-Type': 'application/json'}
-    r = requests.post(url_assistant, data=data, headers=headers)
+    base_url = "https://oapi.dingtalk.com/robot/send?access_token="
+    robot_url = "{}{}".format(base_url, token)
+    r = requests.post(robot_url, data=data, headers=headers)
     status_code = r.status_code
     if status_code == 200:
         r = r.json()

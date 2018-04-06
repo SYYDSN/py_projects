@@ -48,11 +48,22 @@ class Signal(mongo_db.BaseDoc):
             arg_dict['receive_time'] = datetime.datetime.now()
             arg_dict['op'] = op
             create_time = mongo_db.get_datetime_from_str(data.pop('createTime', None))
-            if create_time is not None:
+            if isinstance(create_time, datetime.datetime):
+                create_time = self.transform_time_zone(create_time)  # 调整时区
                 arg_dict['create_time'] = create_time
+            update_time = mongo_db.get_datetime_from_str(data.pop('updateTime', None))
+            if isinstance(update_time, datetime.datetime):
+                update_time = self.transform_time_zone(update_time)  # 调整时区
+                arg_dict['update_time'] = update_time
             delete_time = mongo_db.get_datetime_from_str(data.pop('deleteTime', None))
-            if delete_time is not None:
+            if isinstance(delete_time, datetime.datetime):
+                delete_time = self.transform_time_zone(delete_time)  # 调整时区
                 arg_dict['delete_time'] = delete_time
+            event_date = mongo_db.get_datetime_from_str(self.__dict__['_widget_1514518782504'])
+            if isinstance(event_date, datetime.datetime):
+                event_date = self.transform_time_zone(event_date)  # 调整时区
+                arg_dict['event_date'] = event_date
+
             arg_dict['app_name'] = data.pop('formName', None)  # 表单名称，重要区别依据，应该是唯一的
             updater = data.pop('updater', None)
             if updater is not None:
@@ -66,10 +77,20 @@ class Signal(mongo_db.BaseDoc):
             if creator is not None:
                 arg_dict['creator_name'] = creator['name']
                 arg_dict['creator_id'] = creator['_id']
+            arg_dict['token_name'] = "策略助手 小迅"
             for k, v in data.items():
                 if v is not None:
                     arg_dict[k] = v
             super(Signal, self).__init__(**arg_dict)
+
+    @staticmethod
+    def transform_time_zone(a_time) -> datetime.datetime:
+        """
+        转换时区，把时间+8个小时
+        :param a_time:
+        :return:
+        """
+        return a_time + datetime.timedelta(hours=8)  # 调整时区
 
     def replace_column(self) -> None:
         """
@@ -98,21 +119,33 @@ class Signal(mongo_db.BaseDoc):
         if direction is not None:
             self.set_attr("direction", direction)
         enter_price = self.__dict__.pop('_widget_1514518782592', None)
-        if enter_price is not None:
-            self.set_attr("enter_price", enter_price)
+        try:
+            enter_price = float(enter_price) if enter_price is not None else enter_price
+        except Exception as e:
+            logger.exception(e)
+            print(e)
+        finally:
+            if isinstance(enter_price, float):
+                self.set_attr("enter_price", enter_price)
+            else:
+                pass
         exit_price = self.__dict__.pop('_widget_1514887799231', None)
-        if exit_price is not None:
-            self.set_attr("exit_price", exit_price)
+        try:
+            exit_price = float(exit_price) if exit_price is not None else exit_price
+        except Exception as e:
+            logger.exception(e)
+            print(e)
+        finally:
+            if isinstance(exit_price, float):
+                self.set_attr("exit_price", exit_price)
+            else:
+                pass
         profit = self.__dict__.pop('_widget_1514518782842', None)  # 获利
         if profit is not None:
             self.set_attr("profit", profit)
         each_profit = self.__dict__.pop('_widget_1522117404041', None)  # 每手获利
         if profit is not None:
             self.set_attr("each_profit", each_profit)
-        event_date = mongo_db.get_datetime_from_str(self.__dict__['_widget_1514518782504'])
-        event_date = event_date + datetime.timedelta(hours=8)  # 调整时区
-        if isinstance(event_date, datetime.datetime):
-            self.set_attr("event_date", event_date)
 
     def send(self):
         """
@@ -121,17 +154,25 @@ class Signal(mongo_db.BaseDoc):
         """
         self.replace_column()
         print(self.__dict__)
-        if self.op == "data_create":
+        create_time = self.get_attr("create_time")
+        update_time = self.get_attr("update_time")
+        delete_time = self.get_attr("delete_time")
+        op = self.get_attr("op")
+        enter_price = self.get_attr("enter_price")
+        exit_price = self.get_attr("exit_price")
+        if self.op == "data_create" and enter_price is not None:
             """进场信号"""
             the_type = "建仓提醒"
-            auth = self.creator_name
-        elif self.op == "data_update":
+            auth = self.get_attr("creator_name")
+            event_date = create_time
+        elif self.op == "data_update" and enter_price is not None and exit_price is not None:
             the_type = "平仓提醒"
-            auth = self.updater_name
+            auth = self.get_attr("updater_name")
+            event_date = update_time
         else:
             the_type = '提醒'
-            auth = self.deleter_name
-        event_date = self.get_attr("event_date", None)
+            auth = self.get_attr("deleter_name")
+            event_date = self.get_attr("event_date", None)
         if isinstance(event_date, datetime.datetime):
             event_date = event_date.strftime("%m月%d日 %H:%M:%S")
         """
@@ -157,16 +198,16 @@ class Signal(mongo_db.BaseDoc):
         out_put['msgtype'] = 'markdown'
         title = the_type
         if the_type == "建仓提醒":
-            text = "#### {}\n > {}老师{}{} \n\r >建仓价格：{} \n\r > {}".format(self.get_attr("the_type", ''),
+            text = "#### {}\n > {}老师{}{} \n\r >建仓价格：{} \n\r > {}".format(title,
                                                                           auth,
                                                                           self.get_attr("direction", ''),
                                                                           self.get_attr("product", ''),
-                                                                          self.get_attr("enter_price", ''),
+                                                                          enter_price,
                                                                           event_date)
         else:
             text = "#### {}\n > {}老师平仓{}方向{}订单 \n\r > 建仓：{} <br> \n\r > 平仓：{} <br> \n\r > 每手实际盈利 {} \n\r > <br> {}".format(
-                self.get_attr("the_type", ''), auth, self.get_attr("direction", ""),
-                self.get_attr("product", ""), self.get_attr("enter_price", ""), self.get_attr("exit_price", ""),
+                title, auth, self.get_attr("direction", ""),
+                self.get_attr("product", ""), enter_price, exit_price,
                 self.get_attr("each_profit", ''),
                 event_date)
         markdown = dict()
@@ -176,7 +217,7 @@ class Signal(mongo_db.BaseDoc):
         out_put['at'] = {'atMobiles': [], 'isAtAll': False}
 
         """发送消息到钉订群"""
-        res = send_signal(out_put)
+        res = send_signal(out_put, token_name=self.get_attr("token_name"))
         if res:
             self.__dict__['send_time'] = datetime.datetime.now()
             self.save_plus()
@@ -204,6 +245,22 @@ class Signal(mongo_db.BaseDoc):
         #     logger.exception(ms)
         #     raise ValueError(ms)
 
+    def welcome(self):
+        """
+        发送欢迎消息
+        :return:
+        """
+        out_put = dict()
+        markdown = dict()
+        out_put['msgtype'] = 'markdown'
+        markdown['title'] = "机器人开通"
+        markdown['text'] = "> {}已开通 \n > {}".format(self.get_attr("token_name"), datetime.datetime.now().strftime(
+            "%Y年%m月%d日 %H:%M:%S"))
+        out_put['markdown'] = markdown
+        out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+        res = send_signal(out_put, token_name=self.get_attr("token_name"))
+        print(res)
+
 
 if __name__ == "__main__":
     data = {'op': 'data_create',
@@ -221,4 +278,6 @@ if __name__ == "__main__":
                      }
             }
     d = Signal(**data)
-    d.send()
+    # d.send()
+    d.welcome()
+    pass

@@ -141,5 +141,5 @@ class AllowOrigin(mongo_db.BaseDoc):
 if __name__ == "__main__":
     # SpreadChannel.analysis_url("http://www.91master.cn/zj-jg-zg/meg.html?channel=sg-pc-ziguan")
     # SpreadKeyword.rebuild_create_date()
-    SpreadChannel.analysis_url("http://touzi.jyschaxun.com/20160316wapMt4/index.html?channel=bd-yd-MT4-XUN003338&t=1522223265832")
+    # SpreadChannel.analysis_url("http://touzi.jyschaxun.com/20160316wapMt4/index.html?channel=bd-yd-MT4-XUN003338&t=1522223265832")
     pass

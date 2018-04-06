@@ -6,10 +6,10 @@ if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import mongo_db
 import openpyxl
-from module.spread_module import
+from module.spread_module import *
 
 
-"""excel操作模块"""
+"""excel操作模块，用于导入数据"""
 
 
 excel_dir = "excel"
@@ -36,16 +36,22 @@ def get_excel_path_list(dir_path: str = None) -> list:
 
 def read_sheet_01(sh) -> list:
     """
-    读取excel文件里的工作簿，这里读取的是《推广关键字和标记字符之间的对应关系》
+    读取excel文件里的工作簿，这里读取的是推广关键字和标记字符之间的对应关系
     :param sh:
     :return:
     """
+    res = list()
+    now = datetime.datetime.now()
     for i, tr in enumerate(sh):
         if i == 0:
             pass
         else:
             chinese = tr[0].value
             english = tr[0].value
+            c = SpreadKeyword(chinese=chinese, english=english, create_date=now)
+            res.append(c)
+    return res
+
 
 
 def read_excel(file_path: str):
@@ -63,6 +69,6 @@ def read_excel(file_path: str):
 
 
 if __name__ == "__main__":
-    paths = get_excel_path_list()
-    for x in paths:
-        read_excel(x)
+    f_path = os.path.join(excel_path, "域名和要加的字符.xlsx")
+    read_excel(f_path)
+    pass

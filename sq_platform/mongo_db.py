@@ -853,7 +853,7 @@ class BaseDoc:
     @classmethod
     def get_attr_from_cache(cls, o_id: (ObjectId, str), attr_name: str, default=None)-> (object, None):
         """
-        从缓存中获取属性.
+        从缓存中获取属性. 方法没写完
         :param o_id:　ObjectId
         :param attr_name:　属性名称
         :param default:　　默认值

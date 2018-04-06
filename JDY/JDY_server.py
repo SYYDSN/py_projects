@@ -244,6 +244,6 @@ def allow_cross_domain(response):
 
 
 if __name__ == '__main__':
-    app.debug = True  # 这一行必须在toolbar = DebugToolbarExtension(app)前面,否则不生效
+    # app.debug = True  # 这一行必须在toolbar = DebugToolbarExtension(app)前面,否则不生效
     toolbar = DebugToolbarExtension(app)
     app.run(host="0.0.0.0", port=port, threaded=True)

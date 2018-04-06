@@ -42,9 +42,12 @@ mongodb_setting = {
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
-    "waitQueueTimeoutMS": 50,  #
+    "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
+    # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
+    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
+    # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
     "username": user,       # 用户名
     "password": password    # 密码
 }
@@ -839,7 +842,7 @@ class BaseDoc:
     @classmethod
     def get_attr_from_cache(cls, o_id: (ObjectId, str), attr_name: str, default=None)-> (object, None):
         """
-        从缓存中获取属性.
+        从缓存中获取属性. 方法没写完
         :param o_id:　ObjectId
         :param attr_name:　属性名称
         :param default:　　默认值
@@ -1049,7 +1052,10 @@ class BaseDoc:
         doc = {k: v for k, v in doc.items() if k not in ignore}
         f = {"_id": _id}
         res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
-        return res
+        if res is None:
+            return res
+        else:
+            return res.upserted_id
 
     def save(self, obj=None)->ObjectId:
         """更新
