@@ -56,7 +56,7 @@ def hello_world():
 @app.route("/listen_<key>", methods=['post'])
 def listen_func(key):
     """监听简道云发送过来的消息"""
-    mes = {"message":"success"}
+    mes = {"message": "success"}
     headers = request.headers
     event_id = headers.get("X-JDY-DeliverId")
     signature = headers.get("X-JDY-Signature")

@@ -261,6 +261,14 @@ class Signal(mongo_db.BaseDoc):
         print(res)
 
 
+class CustomerManagerRelation(mongo_db.BaseDoc):
+    """客户和客户经理/总监的对应关系类，用来确认客户归属"""
+    _table_name = 'customer_manager_relation'
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['deleted'] = bool  # 是否已删除？ 默认为False
+
+
 if __name__ == "__main__":
     data = {'op': 'data_create',
             'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
