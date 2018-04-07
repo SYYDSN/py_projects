@@ -32,6 +32,8 @@ from gevent.queue import JoinableQueue
 from threading import Lock
 
 
+ObjectId = mongo_db.ObjectId
+DBRef = mongo_db.DBRef
 logger = get_logger()
 cache = RedisCache()
 queue = JoinableQueue()
@@ -73,11 +75,9 @@ __page_url_base1 = "http://office.shengfx888.com/report/history_trade?" \
                 "&OPEN_TIME_e=&CLOSE_TIME_s=&CLOSE_TIME_e=&T_LOGIN=&page={}"
 user_name2 = "627853018@qq.com"
 user_password2 = "XIAOxiao@741"
-# user_name2 = "admin@shengfxChina.com"
-# user_password2 = "aykPA1h5"
-domain2 = "office.shengfxchina.com:8443"
 login_url2 = "https://office.shengfxchina.com:8443/Public/login"
 check_login_url2 = "https://office.shengfxchina.com:8443/Public/checkLogin"
+domain2 = "office.shengfxchina.com:8443"
 page_url_base2 = "https://office.shengfxchina.com:8443/report/history_trade?" \
                  "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=&qtype=" \
                  "&CMD=&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=" \
@@ -122,7 +122,8 @@ def get_browser(headless: bool = True) -> Firefox:
             title = "{} headless浏览器打开失败".format(datetime.datetime.now())
             content = "错误原因是：{}".format(e)
             send_mail(title=title, content=content)
-            logger.exception()
+            recode(e)
+            logger.exception(e)
             raise e
     else:
         try:
@@ -131,7 +132,8 @@ def get_browser(headless: bool = True) -> Firefox:
             title = "{} headless浏览器打开失败".format(datetime.datetime.now())
             content = "错误原因是：{}".format(e)
             send_mail(title=title, content=content)
-            logger.exception()
+            recode(e)
+            logger.exception(e)
             raise e
     return browser
 
@@ -189,8 +191,11 @@ def upload_and_update_reg(browser, **kwargs) -> bool:
         desc1 = spread_keywords[0]
     except IndexError as e:
         logger.exception("to_jiandao_cloud error!")
+        recode(e)
+        raise e
     except Exception as e:
         logger.exception("to_jiandao_cloud error!")
+        recode(e)
         raise e
     finally:
         js_desc_1 = """let d = $(".widget-wrapper>ul>li:eq(3) input"); d.val("{}");""".format(desc1)
@@ -211,8 +216,10 @@ def upload_and_update_reg(browser, **kwargs) -> bool:
     try:
         desc3 = spread_keywords[2]
     except IndexError as e:
+        recode(e)
         logger.exception(e)
     except Exception as e:
+        recode(e)
         logger.exception(e)
     finally:
         js_desc_3 = """let d = $(".widget-wrapper>ul>li:eq(5) input"); d.val("{}");""".format(desc3)
@@ -242,6 +249,7 @@ def upload_and_update_reg(browser, **kwargs) -> bool:
         ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".widget-wrapper>ul>li input")))  # 输入组
     ms = "简道云推广资源表单胡据填充完毕,准备提交"
     logger.info(ms)
+    recode(ms)
     submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
     submit_info.click()  # 提交信息
 
@@ -252,6 +260,7 @@ def upload_and_update_reg(browser, **kwargs) -> bool:
     time.sleep(10)
     ms = "向简道云推广资源表单写数据成功,参数: {}".format(kwargs)
     logger.info(ms)
+    recode(ms)
     return True
 
 
@@ -289,8 +298,6 @@ def login_platform(browser, domain: str):
         user_password = user_password2
 
     browser.get(url=url)
-    # print(self.browser.current_url)
-    # print(self.browser.page_source)
     # 用户名输入
     input_user_name = WebDriverWait(browser, 10).until(
         ec.presence_of_element_located((By.CSS_SELECTOR, "form .uname")))
@@ -333,13 +340,25 @@ def open_platform(browser, domain: str) -> bool:
     else:
         url = page_url_base2
 
-    browser.get(url)
-    count = 0
-    while need_login_platform(browser) and count < 3:
-        login_platform(browser, domain)
-        count += 1
-    browser.get(url)
-    return not need_login_platform(browser)
+    try:
+        browser.get(url)
+    except Exception as e:
+        print(e)
+        recode(e)
+        logger.exception(e)
+    finally:
+        open_count = 0
+        while need_login_platform(browser) and open_count < 3:
+            if open_count > 1:
+                """第一次登录失败，要等五分钟"""
+                time.sleep(60 * 5)
+            else:
+                pass
+            open_count += 1
+            login_platform(browser=browser, domain=domain)
+
+        browser.get(url)
+        return not need_login_platform(browser)
 
 
 def get_page_platform(browser, page_url: str) -> (PyQuery, None):
@@ -1034,6 +1053,7 @@ def save_withdraw_data(raw_data: list) -> list:
         else:
             pass
         r = Withdraw.insert_many(raw_data)
+        """向机器人消息服务器发送出金申请消息"""
         ms = "save_withdraw_data success"
         recode(ms)
         return r
@@ -1124,6 +1144,18 @@ def upload_transaction(browser, **kwargs) -> bool:
         commission = '' if kwargs.get("commission") is None else kwargs['commission']
         js_commission = """let d = $(".widget-wrapper>ul>li:eq(14) input"); d.val("{}");""".format(commission)
         browser.execute_script(js_commission)  # 佣金
+
+        swap = '' if kwargs.get("swap") is None else kwargs['swap']
+        js_swap = """let d = $(".widget-wrapper>ul>li:eq(15) input"); d.val("{}");""".format(swap)
+        browser.execute_script(js_swap)  # 利息
+
+        spread_profit = '' if kwargs.get("spread_profit") is None else kwargs['spread_profit']
+        js_spread_profit = """let d = $(".widget-wrapper>ul>li:eq(16) input"); d.val("{}");""".format(spread_profit)
+        browser.execute_script(js_spread_profit)  # 点差
+
+        comment = '' if kwargs.get("comment") is None else kwargs['comment']
+        js_comment = """let d = $(".widget-wrapper>ul>li:eq(17) input"); d.val("{}");""".format(comment)
+        browser.execute_script(js_comment)  # 注释
 
         """输入建仓时间"""
         if isinstance(open_time, datetime.datetime):
@@ -1243,7 +1275,7 @@ def upload_transaction(browser, **kwargs) -> bool:
 
         profit = kwargs.get('profit')
         profit = '' if profit is None else profit
-        js_profit = """let d = $(".widget-wrapper>ul>li:eq(17) input"); d.val("{}");""".format(profit)
+        js_profit = """let d = $(".widget-wrapper>ul>li:eq(20) input"); d.val("{}");""".format(profit)
         browser.execute_script(js_profit)  # 盈利点数
 
         time.sleep(1)
@@ -1271,7 +1303,7 @@ def upload_transaction(browser, **kwargs) -> bool:
             print(e)
             ms = str(e)
             recode(ms)
-            logger.exception()
+            logger.exception(e)
         finally:
             return res
 
@@ -1435,7 +1467,7 @@ def upload_withdraw(browser, **kwargs) -> bool:
         print(e)
         ms = str(e)
         recode(ms)
-        logger.exception()
+        logger.exception(e)
     finally:
         return res
 
@@ -1522,7 +1554,7 @@ def upload_and_update_transaction(browser, **kwargs):
         ms = "上传交易信息已连续失败{}次,实例:{}".format(count, kwargs)
         raise ValueError(ms)
     else:
-        """上传出金申请成功,更新数据库的upload标识"""
+        """上传成功,更新数据库的upload标识"""
         filter_dict = {"_id": kwargs["_id"]}
         update_dict = {"$set": {"upload": 1}}
         res = Transaction.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
@@ -1707,19 +1739,21 @@ def do_jobs():
                 elif job_type == "draw_withdraw":
                     draw_withdraw(browser)  # 从平台查询并写入数据库
                 elif job_type == "query_transaction":
-                    transaction = query_transaction(True)
+                    transaction = query_transaction(True)  # 只查询数据库，没有上传动作。
                     if len(transaction) == 0:
                         print("query transaction success")
                     else:
                         for x in transaction:
+                            """上传交易信息"""
                             upload_and_update_transaction(browser=browser, **x)
                         print("upload transaction success")
                 elif job_type == "query_withdraw":
-                    data = query_withdraw(True)
+                    data = query_withdraw(True)  # 只从数据库查询出金申请。出入金和赠金记录.没有上传动作
                     print("query withdraw,balance and credit success")
                     withdraw = data['withdraw']
                     other = data['other']  # 赠金和出入金记录
                     if isinstance(withdraw, list):
+                        """上传出金申请"""
                         for x in withdraw:
                             upload_and_update_withdraw(browser=browser, **x)
                         print("upload withdraw success")
@@ -1753,7 +1787,7 @@ if __name__ == "__main__":
     """draw"""
     browser = get_browser()
     for key in type_dict.keys():
-        s2 = parse_page(browser, domain2, key, 37250)  # 平台2
+        s2 = parse_page(browser, domain2, key)  # 平台2
         save_transaction_data(s2)
         s1 = parse_page(browser, domain1, key)  # 平台1
         save_transaction_data(s1)
@@ -1773,7 +1807,38 @@ if __name__ == "__main__":
         upload_and_update_transaction(browser=browser, **x)  # 上传balance和credit
     browser.quit()
     del browser
+    gc.collect()
     """全套测试结束"""
+    """测试一条假的交易记录"""
+    # browser = get_browser(0)
+    # b = {
+    #     "_id": ObjectId("5aaf48754513530b24fa429b"),
+    #     "ticket": 34563,
+    #     "profit": -60.0,
+    #     "open_time": mongo_db.get_datetime_from_str("2018-03-19T08:56:26.000Z"),
+    #     "enter_price": 1312.04,
+    #     "nick_name": "吴川",
+    #     "spread_profit": -44.0,
+    #     "swap": 0.0,
+    #     "login": 8300047,
+    #     "take_profit": 0.0,
+    #     "symbol": "xauusd",
+    #     "description": "",
+    #     "commission": -50.0,
+    #     "system": "office.shengfxchina.com:8443",
+    #     "exit_price": 1311.44,
+    #     "command": "buy",
+    #     "real_name": "吴川",
+    #     "comment": "",
+    #     "lot": 1.0,
+    #     "stop_losses": 0.0,
+    #     "close_time": mongo_db.get_datetime_from_str("2018-03-20T14:04:44.000Z"),
+    #     "upload": 1
+    # }
+    # upload_and_update_transaction(browser, **b)
+    # browser.quit()
+    # del browser
+    # gc.collect()
     """填入一条假的出金申请"""
     # a = {
     #     "blank_code" : "",

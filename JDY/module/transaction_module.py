@@ -58,6 +58,7 @@ class Transaction(mongo_db.BaseDoc):
     type_dict['comment'] = str  # 注释
     type_dict['description'] = str  # 对注释的补充说明
     type_dict['upload'] = int  # 是否已上传?1已上传0未上传,默认0
+    type_dict['create_date'] = datetime.datetime  # 记录创建时间
     """
     注释有多种,现部分举例如下:
     1. cancelled     订单取消.
@@ -98,6 +99,8 @@ class Transaction(mongo_db.BaseDoc):
             kwargs['description'] = description
         else:
             pass
+        if "create_date" not in kwargs:
+            kwargs['create_date'] = datetime.datetime.now()
         super(Transaction, self).__init__(**kwargs)
 
     @classmethod

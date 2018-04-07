@@ -85,11 +85,14 @@ def to_jiandao_cloud_and_send_mail(*args, **kwargs):
 
 @app.task(bind=True)
 def query_transaction(*args, **kwargs):
-    add_job("draw_transaction", dict())
+    add_job("draw_transaction", dict())  # 抓取交易信息
     ms = "beat task add draw_transaction success"
     recode(ms)
-    add_job("query_transaction", dict())
+    add_job("query_transaction", dict())  # 提取交易信息并上传
     ms = "beat task add query_transaction success"
+    recode(ms)
+    add_job("query_withdraw", dict())    # 提取出金申请并上传。
+    ms = "beat task add query_withdraw success"
     recode(ms)
     return "celery query_transaction ok"
 
@@ -97,11 +100,8 @@ def query_transaction(*args, **kwargs):
 @app.task(bind=True)
 def query_withdraw(self, *args, **kwargs):
     """每5分钟检查一下出金申请,出入金记录和赠金"""
-    add_job("draw_withdraw", dict())
+    add_job("draw_withdraw", dict())  # 查询出金申请并发消息给钉订机器人。
     ms = "beat task add draw_withdraw success"
-    recode(ms)
-    add_job("query_withdraw", dict())
-    ms = "beat task add query_withdraw success"
     recode(ms)
     return "celery query_withdraw ok"
 

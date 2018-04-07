@@ -1744,12 +1744,9 @@ def do_jobs():
     return True
 
 
-def batch_draw():
-    """
-    1.批量抓取2个平台的四类数据。
-    2.写入数据库。
-    3.写入简道云。
-    """
+if __name__ == "__main__":
+    """全套测试开始"""
+    """draw"""
     browser = get_browser()
     for key in type_dict.keys():
         s2 = parse_page(browser, domain2, key, 37250)  # 平台2
@@ -1773,11 +1770,6 @@ def batch_draw():
     browser.quit()
     del browser
     gc.collect()
-
-
-if __name__ == "__main__":
-    """全套测试开始"""
-    """draw"""
     # browser = get_browser()
     # for key in type_dict.keys():
     #     s2 = parse_page(browser, domain2, key, 37250)  # 平台2
