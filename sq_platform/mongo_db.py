@@ -17,6 +17,7 @@ import numpy as np
 import re
 import math
 from pymongo import errors
+from pymongo.client_session import ClientSession
 from werkzeug.contrib.cache import RedisCache
 from log_module import get_logger
 from pymongo import ReturnDocument
@@ -252,6 +253,7 @@ def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     to_flat_dict 独立方法
     doc_to_dict  独立方法
     三个方法将在最后的评估后进行统一 2018-3-16
+    推荐to_flat_dict独立方法
     :param a_dict: 待处理的doc.
     :param ignore_columns: 不需要返回的列
     :return:
@@ -1049,12 +1051,12 @@ class BaseDoc:
             raise ValueError(mes)
         return inserted_id
 
-    def save_plus(self, ignore: list = None, upsert: bool = True) -> bool:
+    def save_plus(self, ignore: list = None, upsert: bool = True) -> (None, ObjectId):
         """
         更新
         :param ignore: 忽略的更新的字段,一般是有唯一性验证的字段
         :param upsert:
-        :return:
+        :return: ObjectId
         """
         ignore = ["_id"] if ignore is None else ignore
         ses = get_conn(self.table_name())
@@ -1066,7 +1068,8 @@ class BaseDoc:
         if res is None:
             return res
         else:
-            return res.upserted_id
+            """如果是upsert的对象,res.upserted_id就是对象的_id,否则,res.upserted_id对象为空"""
+            return _id if res.upserted_id is None else res.upserted_id
 
     def save(self, obj=None)->ObjectId:
         """更新
@@ -1143,6 +1146,7 @@ class BaseDoc:
             to_flat_dict 独立方法
             doc_to_dict  独立方法
             三个方法将在最后的评估后进行统一 2018-3-16
+            推荐to_flat_dict独立方法
         """
         obj = self if obj is None else obj
         raw_type = obj.type_dict
@@ -1353,6 +1357,16 @@ class BaseDoc:
             return self.get_dbref()
 
     @classmethod
+    def get_collection(cls):
+        """
+        获取一个collection对象,这个对象可以执行绝大多数对数据库的操作.
+        可以看作这是一个万能的数据库操作handler.只是略微复杂点而已.
+        """
+        table_name = cls.get_table_name()
+        conn = get_conn(table_name)
+        return conn
+
+    @classmethod
     def get_instance_from_dbref(cls, dbref):
         """
         根据dbref返回一个实例对象
@@ -1543,7 +1557,7 @@ class BaseDoc:
         return result
 
     @classmethod
-    def count(cls, filter_dict: dict, session = None, **kwargs):
+    def count(cls, filter_dict: dict, session: ClientSession = None, **kwargs):
         """统计
         :param filter_dict: 过滤器字典
         :param session: pymongo.client_session.ClientSession 实例

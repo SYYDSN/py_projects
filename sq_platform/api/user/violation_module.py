@@ -19,9 +19,11 @@ from error_module import RepeatError
 from error_module import MongoDeleteError
 from api.data.item_module import CarLicense
 from api.data.item_module import Position
+from api.data.item_module import ThroughCity
 from api.data.item_module import UserLicenseRelation
 from amap_module import get_position_by_address
 from extends.car_city import CarCity
+import warnings
 
 
 """违章查询模块"""
@@ -682,6 +684,8 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         :param user_id:
         :return:
         """
+        ms = "由于业务逻辑的变更,此函数已被声明废止,并在将来被移除.{}".format(datetime.datetime.now())
+        warnings.warn(ms)
         res = list()
         user_id = mongo_db.get_obj_id(user_id)
         """先取用户的行车证"""
@@ -818,18 +822,57 @@ class VioQueryGenerator(mongo_db.BaseDoc):
     @classmethod
     def generator_list(cls, user_id):
         """
-        查询用户名下所有的查询器,如果用户一个违章查询器都没有(新用户),
-        那就返回一个默认的违章查询器(默认的违章查询器在生成的同时会保存)
+        查询用户名下所有的查询器,现阶段,利用用户车牌信息和去过的城市(ThroughCity类的实例)
+        来自动组合生成违章查询器.
         :param user_id: 用户id
         :return:  字典的list
         """
         user_id = mongo_db.get_obj_id(user_id)
         data = list()
+        """查询行车证"""
+        license_list = CarLicense.get_usable_license(user_id, to_dict=True, can_json=False)  # [doc]
+        """查询最近的城市list"""
+        city_list = ThroughCity.get_cities(user_id=user_id)  # [str]
+        """查询已有的违章查询器"""
+        f = {"user_id": user_id}
+        generator_list = cls.find_plus(filter_dict=f, to_dict=True)  # [doc]
         """
-        目前情况下,只返回默认查询器,不给用户自定义查询器的机会
+        将违章查询器列表整理成字典对象
         """
-        # f = {"user_id": user_id}
-        # generators = cls.find_plus(filter_dict=f, to_dict=False)
+        generator_dict = {"{}_{}".format(str(x['car_license'].id), x["city"]): x for x in generator_list}
+        g_keys = generator_dict.keys()
+        new_generators = list()  # 需要被创建和保存的generator集合
+        res = list()  # 需要被返回的generator集合,包含已存在的和新创建的
+        now = datetime.datetime.now()
+        plate_map = dict()  # car_license的_id和plate_number的映射关系
+        for l in license_list:
+            o_id = l['_id']
+            l_dbref = DBRef(database="platform_db", collection=CarLicense.get_table_name(), id=o_id)
+            plate_map[o_id] = l["plate_number"]
+            for c in city_list:
+                temp_key = "{}_{}".format(str(o_id), c)
+                if temp_key not in g_keys:
+                    """需要添加的查询器,初始化实例"""
+                    init = {
+                        "user__id": user_id,
+                        "car_license": l_dbref,
+                        "city": c,
+                        "create_date": now,
+                        "all_count": 0,
+                        "online_query_count": 0,
+                        "today_online_query_count": 0,
+                        "today_offline_query_count": 0
+                    }
+                    new_generators.append(init)
+                else:
+                    g = generator_dict.pop(temp_key)
+                    res.append(g)
+        """generator_dict剩余的元素就是需要被删除的违章查询器"""
+        delete_ids = [x['_id'] for x in list(generator_dict.values())]
+        cls.delete_many(filter_dict={"_id": {"$in": delete_ids}})
+        new_generators = cls.insert_many(doc_list=new_generators)
+        res.extend(new_generators)
+        res = [{"_id": str(x['_id']), "plate_number": plate_map[x['car_license'].id], "city": x['city']} for x in res]
         # for generator in generators:
         #     _id = generator.get_id()
         #     city = generator.get_attr("city")
@@ -842,12 +885,12 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         #     else:
         #         """错误的违章查询器信息，删除"""
         #         generator.delete_self()
-        if len(data) == 0:
-            """用户没有违章查询器,那就获取一个默认的违章查询器,加入list容器后返回"""
-            default_generator_list = cls.default_generator(user_id)
-            if len(default_generator_list) > 0:
-                data.extend(default_generator_list)
-        return data
+        # if len(data) == 0:
+        #     """用户没有违章查询器,那就获取一个默认的违章查询器,加入list容器后返回"""
+        #     default_generator_list = cls.default_generator(user_id)
+        #     if len(default_generator_list) > 0:
+        #         data.extend(default_generator_list)
+        return res
 
     def update_count_online(self, last_query_result_id):
         """更新查询器在线查询的统计信息
@@ -1248,7 +1291,7 @@ if __name__ == "__main__":
             }
     # r = VioQueryGenerator.test_query(**args)
     # print(r)
-    r2 = VioQueryGenerator.default_generator(ObjectId("59895177de713e304a67d30c"))
+    r2 = VioQueryGenerator.generator_list(ObjectId("59895177de713e304a67d30c"))
     print(r2)
     pass
 

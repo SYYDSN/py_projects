@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import sys
 import os
+
 """直接运行此脚本，避免import失败的方法"""
 item_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 if item_dir not in sys.path:
@@ -21,7 +22,6 @@ from error_module import RepeatError, pack_message
 from amap_module import *
 import mail_module
 import threading
-
 
 """为防止循环引用,不要引用tools_module模块"""
 """定义gps和传感器数据模型及相关方法"""
@@ -125,23 +125,23 @@ class User(mongo_db.BaseDoc):
     """
     驾驶证信息部分,驾驶证和用户有一一对应的关系.所以需要直接存储在对象中.
     """
-    type_dict['license_id'] = str                          # 驾驶证id
-    type_dict['license_image_url'] = str                   # 驾驶证照片
-    type_dict['license_class'] = str                       # 驾驶证类型,准驾车型
-    type_dict['official_name'] = str                       # 驾驶证上的名字,扫描输入
-    type_dict['nationality'] = str                         # 驾驶证上的国家,扫描输入
-    type_dict['first_issued_date'] = datetime.datetime     # 首次领证日期
-    type_dict['valid_from'] = datetime.datetime            # 驾照有效期的开始时间
-    type_dict['valid_duration'] = str                      # 驾照有效持续期,比如1年有效期
+    type_dict['license_id'] = str  # 驾驶证id
+    type_dict['license_image_url'] = str  # 驾驶证照片
+    type_dict['license_class'] = str  # 驾驶证类型,准驾车型
+    type_dict['official_name'] = str  # 驾驶证上的名字,扫描输入
+    type_dict['nationality'] = str  # 驾驶证上的国家,扫描输入
+    type_dict['first_issued_date'] = datetime.datetime  # 首次领证日期
+    type_dict['valid_from'] = datetime.datetime  # 驾照有效期的开始时间
+    type_dict['valid_duration'] = str  # 驾照有效持续期,比如1年有效期
     """
     有关行车证信息部分,由于行车证和用户没有意义对应关系.
     由于业务逻辑上个人可能创建和自己不相干的车牌的查询器，所以这个cars失去了业务逻辑上的意义。
     在车牌信息用，有一个user_id参数。用于确认车牌信息的使用者。
     车牌号码和使用者id构成了联合唯一主键。  
     """
-    type_dict['phones'] = list      # 名下手机的的id，是一个DBRef的List对象，默认为空  对应phone_device_info表
-    type_dict['wx_id'] = str        # 微信id
-    type_dict['weibo_id'] = str     # 微博id
+    type_dict['phones'] = list  # 名下手机的的id，是一个DBRef的List对象，默认为空  对应phone_device_info表
+    type_dict['wx_id'] = str  # 微信id
+    type_dict['weibo_id'] = str  # 微博id
     type_dict['create_date'] = datetime.datetime  # 用户的注册/创建日期
     type_dict['app_version'] = str  # 用户当前的app信息
     type_dict['last_update'] = datetime.datetime  # 用户当前的app信息
@@ -164,14 +164,6 @@ class User(mongo_db.BaseDoc):
         if "create_date" not in kwargs:
             kwargs['create_date'] = datetime.datetime.now()
         super(User, self).__init__(**kwargs)
-
-    def my_cars(self) -> list:
-        """
-        获取车辆信息对应car_license_info表
-        :return: 车辆信息的DBRef的List对象
-        """
-        cars = self.get_attr("cars")
-        return cars
 
     def get_archives(self) -> dict:
         """
@@ -204,19 +196,19 @@ class User(mongo_db.BaseDoc):
         :return: 数据字典,没有经过json转换.
         """
         data = {
-            "_id": self.get_id(),                                      # 和用户信息共享一个id
-            "license_id": self.get_attr("license_id"),                 # 驾驶证id
-            "license_class": self.get_attr("license_class"),           # 驾驶证类型/准驾车型
-            "address": self.get_attr("address"),                       # 地址
+            "_id": self.get_id(),  # 和用户信息共享一个id
+            "license_id": self.get_attr("license_id"),  # 驾驶证id
+            "license_class": self.get_attr("license_class"),  # 驾驶证类型/准驾车型
+            "address": self.get_attr("address"),  # 地址
             "image_url": "static/image/license_image/example.png" if
             self.get_attr("license_image_url") is None else
-            self.get_attr("license_image_url"),                        # 驾驶证图片地址
-            "official_name": self.get_attr("real_name"),               # 名字
-            "gender": self.get_attr("gender"),                         # 性别
-            "nationality": self.get_attr("country"),                   # 国家
-            "birth_date": self.get_attr("birth_date"),                 # 出生日期
-            "first_issued_date": self.get_attr("first_issued_date"),   # 首次领证日期
-            "valid_date": self.get_attr("valid_date")                  # 驾照有效期
+            self.get_attr("license_image_url"),  # 驾驶证图片地址
+            "official_name": self.get_attr("real_name"),  # 名字
+            "gender": self.get_attr("gender"),  # 性别
+            "nationality": self.get_attr("country"),  # 国家
+            "birth_date": self.get_attr("birth_date"),  # 出生日期
+            "first_issued_date": self.get_attr("first_issued_date"),  # 首次领证日期
+            "valid_date": self.get_attr("valid_date")  # 驾照有效期
         }
         return data
 
@@ -231,19 +223,19 @@ class User(mongo_db.BaseDoc):
 
         # 合法的属性名
         attr_names = [
-            "license_id",              # 驾驶证id
-            "license_class",           # 驾驶证类型/准驾车型
-            "address",                 # 地址
-            "image_url",               # 驾驶证图片地址
-            "license_image_url",       # 驾驶证图片地址
-            "official_name",           # 名字
-            "real_name",               # 名字
-            "gender",                  # 性别
-            "nationality",             # 国家
-            "birth_date",              # 出生日期
-            "first_issued_date",       # 首次领证日期
-            "valid_duration",          # 驾照有效持续期,比如1年有效期
-            "valid_from"               # 驾照有效期的开始时间
+            "license_id",  # 驾驶证id
+            "license_class",  # 驾驶证类型/准驾车型
+            "address",  # 地址
+            "image_url",  # 驾驶证图片地址
+            "license_image_url",  # 驾驶证图片地址
+            "official_name",  # 名字
+            "real_name",  # 名字
+            "gender",  # 性别
+            "nationality",  # 国家
+            "birth_date",  # 出生日期
+            "first_issued_date",  # 首次领证日期
+            "valid_duration",  # 驾照有效持续期,比如1年有效期
+            "valid_from"  # 驾照有效期的开始时间
         ]
         # 转换字典
         transform_dict = {"image_url": "license_image_url", "official_name": "real_name", "nationality": "country"}
@@ -301,21 +293,22 @@ class User(mongo_db.BaseDoc):
         else:
             data = {
                 "_id": str(res.get_id()),  # 和用户信息共享一个id
-                "license_id": res.get_attr("license_id"),                 # 驾驶证id
-                "license_class": res.get_attr("license_class"),           # 驾驶证类型/准驾车型
-                "address": res.get_attr("address"),                       # 地址
+                "license_id": res.get_attr("license_id"),  # 驾驶证id
+                "license_class": res.get_attr("license_class"),  # 驾驶证类型/准驾车型
+                "address": res.get_attr("address"),  # 地址
                 "image_url": "static/image/license_image/example.png" if
                 res.get_attr("license_image_url") is None else
-                res.get_attr("license_image_url"),                        # 驾驶证图片地址
-                "official_name": res.get_attr("official_name"),           # 驾驶证上的名字
-                "gender": res.get_attr("gender"),                         # 性别
-                "nationality": res.get_attr("nationality"),               # 驾驶证上的国家
-                "birth_date": res.get_attr("birth_date"),                 # 出生日期
-                "first_issued_date": res.get_attr("first_issued_date"),   # 首次领证日期
-                "valid_from": res.get_attr("valid_from"),                 # 驾照有效期的开始时间
-                "valid_duration": res.get_attr("valid_duration")          # 驾照有效持续期,比如1年有效期
+                res.get_attr("license_image_url"),  # 驾驶证图片地址
+                "official_name": res.get_attr("official_name"),  # 驾驶证上的名字
+                "gender": res.get_attr("gender"),  # 性别
+                "nationality": res.get_attr("nationality"),  # 驾驶证上的国家
+                "birth_date": res.get_attr("birth_date"),  # 出生日期
+                "first_issued_date": res.get_attr("first_issued_date"),  # 首次领证日期
+                "valid_from": res.get_attr("valid_from"),  # 驾照有效期的开始时间
+                "valid_duration": res.get_attr("valid_duration")  # 驾照有效持续期,比如1年有效期
             }
-            data = {k: (v.strftime("%F") if isinstance(v, datetime.datetime) else v) for k, v in data.items() if v is not None}
+            data = {k: (v.strftime("%F") if isinstance(v, datetime.datetime) else v) for k, v in data.items() if
+                    v is not None}
         return data
 
     @classmethod
@@ -344,7 +337,6 @@ class User(mongo_db.BaseDoc):
         else:
             message['message'] = "参数集必须是dict"
         return message
-
 
     @classmethod
     def get_all_user_id(cls) -> list:
@@ -757,13 +749,215 @@ class AppLoginToken(mongo_db.BaseDoc):
         return message
 
 
+class ThroughCity(mongo_db.BaseDoc):
+    """用户途经的城市"""
+    _table_name = "through_city_info"
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    """
+    途径的城市列表, 
+    [{"上海市": last_time},...]
+    last_time最后经过城市的时间, 用于在城市列表过大时,淘汰部分老旧数据
+    """
+    type_dict['city_dict'] = dict
+    type_dict['user_id'] = DBRef  # 用户id
+    """
+    最后更新时间,用于对比何时更新city_dict,初步设定,一天更新一次.
+    """
+    type_dict['last_update'] = datetime.datetime
+
+    @classmethod
+    def get_instance(cls,user_id: (str, ObjectId, DBRef)):
+        """
+        根据user_Id查询/生成一个实例对象.
+        :param user_id:
+        :return:
+        """
+        res = None
+        user_dbref = None
+        if isinstance(user_id, DBRef):
+            user_dbref = user_id
+        elif isinstance(user_id, (str, ObjectId)):
+            user = User.find_by_id(user_id)
+            if isinstance(user, User):
+                user_dbref = user.get_dbref()
+            else:
+                ms = "错误的用户id,user_id:{}".format(user_id)
+                logger.exception(ms)
+                raise ValueError(ms)
+        else:
+            ms = "错误的用户id:{}".format(user_id)
+            logger.exception(ms)
+            raise ValueError(ms)
+        if user_dbref is not None:
+            f = {"user_id": user_dbref}
+            s = {"last_update": -1}
+            obj = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=True)
+            if obj is None:
+                """没有ThroughCity对象,创建一个"""
+                obj = cls(city_dict=dict(), user_id=user_dbref)
+            else:
+                pass
+            res = obj
+        else:
+            ms = "user_dbref:{}".format(user_dbref)
+            logger.exception(ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def update_city(cls, user_id: (str, ObjectId, DBRef), cities: list) -> bool:
+        """
+        更新用户途径的城市列表.
+        如果这个ThroughCity对象不存在,那就创建一个新的.
+        最后自动保存此对象
+        :param user_id:
+        :param cities:
+        :return:
+        """
+        res = False
+        user_dbref = None
+        if isinstance(user_id, DBRef):
+            user_dbref = user_id
+        elif isinstance(user_id, (str, ObjectId)):
+            user = User.find_by_id(user_id)
+            if isinstance(user, User):
+                user_dbref = user.get_dbref()
+            else:
+                ms = "错误的用户id,user_id:{}".format(user_id)
+                logger.exception(ms)
+                raise ValueError(ms)
+        else:
+            ms = "错误的用户id:{}".format(user_id)
+            logger.exception(ms)
+            raise ValueError(ms)
+        if user_dbref is not None:
+            obj = cls.get_instance(user_dbref)
+            city_dict = obj.get_attr("city_dict", dict())
+            now = datetime.datetime.now()
+            for city in cities:
+                """更新city_dict的最后更新时间"""
+                city_dict[city] = now
+            obj.set_attr("city_dict", city_dict)
+            obj.set_attr("last_update", now)
+            oid = obj.save_plus(upsert=True)
+            if oid is None:
+                ms = "ThroughCity对象保存失败. {}".format(obj.to_flat_dict())
+                logger.exception(ms)
+                raise ValueError(ms)
+            else:
+                obj.set_attr("_id", oid)
+                res = obj
+        else:
+            ms = "user_dbref:{}".format(user_dbref)
+            logger.exception(ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def get_new_cities(cls, user_dbref: (str, ObjectId, DBRef), the_date: datetime) -> list:
+        """
+        从gps数据中查询指定的日期到现在,用户新增的途经城市列表
+        :param user_dbref:
+        :param the_date:
+        :return: 城市名称的list
+        """
+        if user_dbref is None:
+            ms = "user_dbref不能为空"
+            logger.exception(ms)
+            raise ValueError(ms)
+        elif not isinstance(user_dbref, DBRef):
+            user = User.find_by_id(user_dbref)
+            if not isinstance(user, User):
+                ms = "user_dbref必须是DBRef对象,错误的类型:{}".format(type(user_dbref))
+                logger.exception(ms)
+                raise TypeError(ms)
+            else:
+                user_dbref = user.get_dbref()
+        else:
+            pass
+        if not isinstance(the_date, datetime.datetime):
+            ms = "the_date必须是datetime.datetime对象,错误的类型:{}".format(type(the_date))
+            logger.exception(ms)
+            raise TypeError(ms)
+        else:
+            res = list()
+            f = {"user_id": user_dbref, "time": {"$gte": the_date}}
+            r = GPS.distinct(filter_dict=f, key="ct")  # 城市列表
+            if len(r) == 0:
+                pass
+            else:
+                res = [x for x in r if x != "" and x is not None]
+            """保存/追加数据到ThrughCity对象中"""
+            cls.update_city(user_dbref, res)
+            return res
+
+    @classmethod
+    def get_cities(cls, user_id: (str, ObjectId), time_delta: int = 180) -> (None, list):
+        """
+        获取指定的用户,之前一段时间到现在途经的城市列表.这"之前的一段时间"由time_delta参数指定.
+        如果最后的更新时间和现在相差不到1天,那就不更新.直接读取.
+        如果相差超过一天.那就调用get_new_cities方法更新.
+        注意,这里说的一天不是指24小时,翻过24点就算第二天.
+        :param user_id:
+        :param time_delta: 前推的时间,单位天
+        :return: 城市名称的list
+        """
+        """先查找是否有对应的实例"""
+        user = User.find_by_id(user_id)
+        if isinstance(user, User):
+            user_dbref = user.get_dbref()
+            obj = cls.get_instance(user_dbref)
+            last_update = None
+            res = list()
+            if hasattr(obj, "last_update"):
+                """旧的对象,不是新生成的"""
+                last_update = obj.get_attr("last_update")
+            else:
+                pass
+            """last_update是None表示这是个新对象,需要查询的,否则是旧对象,需要比较是不是一天?"""
+            need_query = True if last_update is None else False
+            now = datetime.datetime.now()
+            if not need_query:
+                """比较一下时间"""
+                day1 = last_update.day
+                day2 = now.day
+                if day1 != day2:
+                    need_query = True
+                else:
+                    pass
+            else:
+                pass
+            city_dict = obj.get_attr("city_dict")
+            limit_date = now - datetime.timedelta(days=time_delta)
+            """太早途经的城市不计算在内"""
+            res = list([k for k, v in city_dict.items() if v >= limit_date])
+            if not need_query:
+                """不需要查询"""
+                pass
+            else:
+                """需要从gps中查询"""
+                if last_update is None:
+                    the_date = limit_date
+                else:
+                    the_date = last_update
+                new_cities = cls.get_new_cities(user_dbref=user_dbref, the_date=the_date)
+                """get_new_cities函数会保存数据,不需额外保存动作"""
+                res.extend(new_cities)
+            return res
+        else:
+            ms = "错误的用户id:{}".format(user_id)
+            logger.exception(ms)
+            raise ValueError(ms)
+
+
 class UserLicenseRelation(mongo_db.BaseDoc):
     """关系表,记录用户和行车证/车辆的对应关系"""
     _table_name = "user_license_relation"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
     type_dict['user_id'] = DBRef  # 用户id,是指开这辆车的司机,指向user_info表
-    type_dict['license_id'] = DBRef   # 驾驶证id,指向car_license_info表
+    type_dict['license_id'] = DBRef  # 驾驶证id,指向car_license_info表
     type_dict['create_date'] = datetime.datetime  # 关系的建立时间
     type_dict['end_date'] = datetime.datetime  # 关系的终结时间
 
@@ -855,13 +1049,17 @@ class CarLicense(mongo_db.BaseDoc):
                 return result
 
     @classmethod
-    def get_usable_license(cls, user_id: (str, ObjectId, DBRef, MyDBRef)) -> list:
+    def get_usable_license(cls, user_id: (str, ObjectId, DBRef, MyDBRef), to_dict: bool = True,
+                           can_json: bool = True) -> list:
         """
         获取指定用户的可用行车证,行车证的可用状态是指行车证对应的UserLicenseRelation实例存在,并且
         其end_date为null,不存在或者比现在的时间更靠后的状态.
         :param user_id: 用户id
-        :return: CarLisence实例的数组
+        :param to_dict: 是否转换为dict?这个参数容易被can_json覆盖,请注意
+        :param can_json: 是否做json序列化转换?
+        :return: CarLisence的doc的数组. (经过to_json序列化化处理.)
         """
+        to_dict = True if can_json else to_dict
         if isinstance(user_id, (MyDBRef, DBRef)):
             pass
         elif isinstance(user_id, ObjectId):
@@ -892,7 +1090,7 @@ class CarLicense(mongo_db.BaseDoc):
             else:
                 filter_dict = {"_id": {"$in": license_ids}}
                 sort_dict = {"create_date": -1}
-                result = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, can_json=True)
+                result = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=to_dict, can_json=can_json)
             return result
         else:
             return None
@@ -983,7 +1181,7 @@ class TrafficRoute(mongo_db.BaseDoc):
         if 'city_code_list' not in kwargs or 'city_name_list' not in kwargs:
             ms = "city_name_list和city_code_list都是必要参数"
             raise ValueError(ms)
-        if len(kwargs['city_code_list']) == 0  or len(kwargs['city_name_list']) == 0:
+        if len(kwargs['city_code_list']) == 0 or len(kwargs['city_name_list']) == 0:
             ms = "city_name_list和city_code_list长度不能为0"
             raise ValueError(ms)
         if len(kwargs['city_code_list']) != len(kwargs['city_name_list']):
@@ -1032,7 +1230,7 @@ class RouteWeather(mongo_db.BaseDoc):
                 if isinstance(instance, cls):
                     prev = instance.get_attr("create_date")
                     now = datetime.datetime.now()
-                    if(now - prev).total_seconds() < 1 * 60 * 60:  # 查询间隔1个小时
+                    if (now - prev).total_seconds() < 1 * 60 * 60:  # 查询间隔1个小时
                         result = instance.get_attr("city_weather")
                     else:
                         from_amap = True
@@ -1315,7 +1513,8 @@ class Track(mongo_db.BaseDoc):
             sort_dict = {"time": -1}
             result = cls.find_one_plus(filter_dict=filter_dict, sort_dict=sort_dict, instance=False)
             if result is not None:
-                result['real_name'] = user.get_attr("user_name") if  user.get_attr("real_name") else user.get_attr("real_name")
+                result['real_name'] = user.get_attr("user_name") if user.get_attr("real_name") else user.get_attr(
+                    "real_name")
                 result['gender'] = user.get_attr("gender")
                 result['phone_num'] = user.get_attr("phone_num")
                 result['user_id'] = user.get_attr("phone_num")
@@ -1566,7 +1765,7 @@ class GPS(mongo_db.BaseDoc):
                 total_time += times
                 prev_gps = gps
         """根据坐标计算出来的里程有误差，需要修正一下"""
-        total_mileage = mileage * (61 / 49)    # 61 / 49是一个估算的修正值
+        total_mileage = mileage * (61 / 49)  # 61 / 49是一个估算的修正值
         total_hour = total_time / (60 * 60)  # 把total_time换算成小时.
         avg_speed = 0 if total_hour == 0 else total_mileage / total_hour  # 平均速度 公里/小时
         res = {
@@ -1674,7 +1873,7 @@ class GPS(mongo_db.BaseDoc):
                 if gps is None:
                     pass
                 else:
-                    cache.set(key=key, value=gps, timeout=86400) # 保存一天
+                    cache.set(key=key, value=gps, timeout=86400)  # 保存一天
             return gps
 
     @classmethod
@@ -1873,13 +2072,12 @@ class Message(mongo_db.BaseDoc):
     """
     _table_name = "message_info"
     type_dict = dict()
-    type_dict['_id'] = ObjectId                      # id，是一个ObjectId对象，唯一
-    type_dict['ticker'] = str                        # 收到消息的时候,通知栏的一次滚动消息
-    type_dict['title'] = str                         # 标题
-    type_dict['detail'] = str                        # 内容
-    type_dict['url'] = str                           # 详情页面地址
+    type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
+    type_dict['ticker'] = str  # 收到消息的时候,通知栏的一次滚动消息
+    type_dict['title'] = str  # 标题
+    type_dict['detail'] = str  # 内容
+    type_dict['url'] = str  # 详情页面地址
     type_dict['effective_time'] = datetime.datetime  # 最后有效时间  默认15分钟. 用户收到后会重置这个变量
-
 
     def __init__(self, **kwargs):
         if "title" not in kwargs or "detail" not in kwargs:
@@ -1921,32 +2119,37 @@ if __name__ == "__main__":
     # t = AppLoginToken(**args)
     # i = t.insert()
     # print(i)
-    phones = """13761535610
-                18301911556
-                13661849103
-                13817754724
-                13916948352
-                15000290053
-                13816938418
-                13916944469
-                18721809762
-                13524045060
-                13918677317
-                13818111580
-                13621933035
-                15202115278
-                13917918313
-                13564203498
-                18321390368
-                18721538393
-                13764126926
-                13816174254
-            """
-    import re
-    pattern = re.compile(r'1\d{10}')
-    phones = [re.search(pattern, x).group() for x in phones.split("\n") if re.search(pattern, x)]
-    f = {"phone_num": phones[1]}
-    f = {"_id": ObjectId("5abb7bf8e39a7b3d99d6a25f")}
-    us = User.find_plus(filter_dict=f)
-    print(len(us))
+    # phones = """13761535610
+    #             18301911556
+    #             13661849103
+    #             13817754724
+    #             13916948352
+    #             15000290053
+    #             13816938418
+    #             13916944469
+    #             18721809762
+    #             13524045060
+    #             13918677317
+    #             13818111580
+    #             13621933035
+    #             15202115278
+    #             13917918313
+    #             13564203498
+    #             18321390368
+    #             18721538393
+    #             13764126926
+    #             13816174254
+    #         """
+    # import re
+    # pattern = re.compile(r'1\d{10}')
+    # phones = [re.search(pattern, x).group() for x in phones.split("\n") if re.search(pattern, x)]
+    # f = {"phone_num": phones[1]}
+    # f = {"_id": ObjectId("5abb7bf8e39a7b3d99d6a25f")}
+    # us = User.find_plus(filter_dict=f)
+    # print(len(us))
+    """添加一个ThroughCity对象"""
+    # ThroughCity.update_city(ObjectId("59895177de713e304a67d30c"), ['上海市', "漳州市"])
+    """获取指定用户,指定时间距今途经的城市列表"""
+    the_date = mongo_db.get_datetime_from_str("2017-01-01 0:0:0")
+    ThroughCity.get_cities(ObjectId("59895177de713e304a67d30c"))
     pass
