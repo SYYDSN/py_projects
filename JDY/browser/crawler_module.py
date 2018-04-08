@@ -445,7 +445,7 @@ def parse_transaction_tr(tr: PyQuery, domain: str) -> dict:
     init_dict = dict()
     tds = tr.find("td")
     """平台1和平台2区别对待"""
-    if domain == domain:
+    if domain == domain1:
         """第一个td,取订单号和客户帐号"""
         first = PyQuery(tds[0])
         texts_1 = first.text().split("\n")
@@ -544,20 +544,29 @@ def parse_transaction_tr(tr: PyQuery, domain: str) -> dict:
             """
             第七个，利息/佣金，
             """
-            seventh = PyQuery(tds[6])
-            seventh = seventh.text().split("\n")
-            swap_match = re.search(r'[+, -]?\d+.?\d*', seventh[0])
-            if swap_match is not None:
-                swap = float(swap_match.group())  # 利息
-            else:
-                swap = None
-            commission_match = re.search(r'[+, -]?\d+.?\d*', seventh[-1])
-            if commission_match is not None:
-                commission = float(commission_match.group())  # 手续费
-            else:
-                commission = None
-            init_dict['swap'] = swap
-            init_dict['commission'] = commission
+            if command.lower() in ['buy', 'sell']:
+                seventh = PyQuery(tds[6])
+                seventh = seventh.text().split("\n")
+                if len(seventh) < 2:
+                    """只有手续费"""
+                    commission_match = re.search(r'[+, -]?\d+.?\d*', seventh[-1])
+                    if commission_match is not None:
+                        commission = float(commission_match.group())  # 手续费
+                    else:
+                        commission = None
+                else:
+                    swap_match = re.search(r'[+, -]?\d+.?\d*', seventh[0])
+                    if swap_match is not None:
+                        swap = float(swap_match.group())  # 利息
+                    else:
+                        swap = None
+                    commission_match = re.search(r'[+, -]?\d+.?\d*', seventh[-1])
+                    if commission_match is not None:
+                        commission = float(commission_match.group())  # 手续费
+                    else:
+                        commission = None
+                    init_dict['swap'] = swap
+                init_dict['commission'] = commission
             """第八个，交易时间"""
             eighth = PyQuery(tds[7]).text()
             eighth = eighth.split("\n")
@@ -683,8 +692,31 @@ def parse_transaction_tr(tr: PyQuery, domain: str) -> dict:
             init_dict['stop_losses'] = stop_losses
             init_dict['take_profit'] = take_profit
             """
-            第七个td是空的
+            第七个，利息/佣金，
             """
+            if command.lower() in ['buy', 'sell']:
+                seventh = PyQuery(tds[6])
+                seventh = seventh.text().split("\n")
+                if len(seventh) < 2:
+                    """只有手续费"""
+                    commission_match = re.search(r'[+, -]?\d+.?\d*', seventh[-1])
+                    if commission_match is not None:
+                        commission = float(commission_match.group())  # 手续费
+                    else:
+                        commission = None
+                else:
+                    swap_match = re.search(r'[+, -]?\d+.?\d*', seventh[0])
+                    if swap_match is not None:
+                        swap = float(swap_match.group())  # 利息
+                    else:
+                        swap = None
+                    commission_match = re.search(r'[+, -]?\d+.?\d*', seventh[-1])
+                    if commission_match is not None:
+                        commission = float(commission_match.group())  # 手续费
+                    else:
+                        commission = None
+                    init_dict['swap'] = swap
+                init_dict['commission'] = commission
             """第八个，交易时间"""
             eighth = PyQuery(tds[7]).text()
             eighth = eighth.split("\n")
@@ -711,14 +743,12 @@ def parse_transaction_tr(tr: PyQuery, domain: str) -> dict:
             if profit is not None:
                 profit = float(profit.group())
                 init_dict['profit'] = profit
-            """注意,平台1和平台2的列数不一样,平台1有点差,11列,平台2没有点差,10列"""
-            if len(tds) == 11:
-                """第十个，点差"""
-                tenth = PyQuery(tds[-2]).text()
-                spread_profit = float(tenth)
-                init_dict['spread_profit'] = spread_profit
-            else:
-                pass
+
+            """第十个，点差"""
+            tenth = PyQuery(tds[-2]).text()
+            spread_profit = float(tenth)
+            init_dict['spread_profit'] = spread_profit
+
             """最后一个，注释"""
             eleventh = PyQuery(tds[-1]).text()
             comment = eleventh
