@@ -9,12 +9,16 @@ from log_module import get_logger
 from celery_module import to_jiandao_cloud_and_send_mail
 from browser.crawler_module import add_job
 import datetime
+from module.send_moudle import send_signal
+from module.spread_module import SpreadChannel
 
 
 """基本模型模块"""
 
 
 logger = get_logger()
+ObjectId = mongo_db.ObjectId
+DBRef = mongo_db.DBRef
 
 
 class CsrfError(mongo_db.BaseDoc):
@@ -22,8 +26,9 @@ class CsrfError(mongo_db.BaseDoc):
     _table_name = "csrf_error_info"
     type_dict = dict()
     type_dict['_id'] = mongo_db.ObjectId  # id,唯一
+    type_dict['page_url'] = str  # 原始注册链接地址
     type_dict['host_url'] = str  # 链接地址
-    type_dict['base_url'] = str  # 完整url
+    type_dict['base_url'] = str  # 基础url
     type_dict['referrer'] = str  # referrer
     type_dict['user_agent'] = str  # 浏览器信息
     type_dict['args'] = dict  # 参数字典
@@ -123,6 +128,30 @@ class Customer(mongo_db.BaseDoc):
         return message
 
     @classmethod
+    def send_signal(cls, reg_info: dict):
+        """
+        发送注册信息到钉订机器人的消息服务器
+        :param reg_info:
+        :return:
+        """
+        out_put = dict()
+        markdown = dict()
+        token_name = "推广助手"
+        out_put['msgtype'] = 'markdown'
+        markdown['title'] = "注册信息"
+        channel_info = SpreadChannel.analysis_url(reg_info.get('page_url'))
+        channel_str = ",".join(channel_info)
+        d = datetime.datetime.now().strftime(
+            "%Y年%m月%d日 %H:%M:%S")
+        n = "" if reg_info.get("user_name") is None else reg_info.get("user_name")
+        p = "" if reg_info.get("phone") is None else reg_info.get("phone")
+        markdown['text'] = "> 用户注册 \n\r > {} \n\r > 注册通道：{} \n\r > 用户姓名：{} \n\r > 手机号码:{} ".format(d, channel_str, n, p)
+        out_put['markdown'] = markdown
+        out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+        res = send_signal(out_put, token_name=token_name)
+        print(res)
+
+    @classmethod
     def page(cls, _id: str = None,
              begin_date: (str, datetime.datetime) = None, end_date: (str, datetime.datetime) = None,
              index: int = 1, num: int = 20, can_json: bool = True, reverse: bool = True) -> dict:
@@ -156,6 +185,22 @@ class Customer(mongo_db.BaseDoc):
         return data
 
 
+class CustomerManagerRelation(mongo_db.BaseDoc):
+    """客户和客户经理/总监的对应关系类，用来确认客户归属"""
+    _table_name = 'customer_manager_relation'
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['create_date'] = datetime.datetime
+    type_dict['update_date'] = datetime.datetime
+    type_dict['delete_date'] = datetime.datetime
+    type_dict['mt4_account'] = str
+    type_dict['platform'] = str   # 平台名称
+    type_dict['customer_name'] = str
+    type_dict['sales_name'] = str
+    type_dict['manager_name'] = str
+    type_dict['director_name'] = str  # 总监
+
+
 if __name__ == "__main__":
     args = {
     "phone" :  "37665103177"
@@ -168,7 +213,15 @@ if __name__ == "__main__":
     "user_name" : "测试人员",
     "time" : datetime.datetime.now()
 }
-    customer = Customer.reg(**args)
+    # customer = Customer.reg(**args)
     # from browser.crawler_module import do_jobs
     # do_jobs()
+    """测试发送注册信号给机器人服务器"""
+    # Customer.send_signal(args)
+    """导入客户归属关系"""
+    # from module.excel_module import excel_path
+    # from module.excel_module import read_excel
+    # f_path = os.path.join(excel_path, "开户激活_20180407201228.xlsx")
+    # r = read_excel(f_path)
+    # CustomerManagerRelation.insert_many(r)
     pass

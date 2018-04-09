@@ -7,6 +7,9 @@ if __project_dir__ not in sys.path:
 from selenium import webdriver
 from pyvirtualdisplay import Display
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver import FirefoxProfile
+from selenium.webdriver import FirefoxOptions
+from selenium.webdriver import Firefox
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.select import By
 from module.spread_module import SpreadChannel
@@ -17,7 +20,7 @@ from log_module import get_logger
 from mail_module import send_mail
 import pyquery
 import re
-from browser.crawler_module import get_browser
+from log_module import recode
 from module.transaction_module import Transaction
 from module.transaction_module import Withdraw
 
@@ -32,6 +35,49 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 def month_str(month_int: int) -> str:
     l = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
     return l[month_int - 1]
+
+
+def get_browser(headless: bool = True) -> Firefox:
+    """
+    获取一个浏览器
+    :param headless:
+    :return:
+    """
+    profile = FirefoxProfile()
+    """
+    因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,
+    这里必须设置浏览器的初始化参数,
+    注意，使用headless必须先安装对应浏览器正常的版本,然后再安装headless版本
+    比如火狐的headless
+    下载火狐的geckodriver驱动。(当前文件夹下已经有一个了)地址是：
+    https://github.com/mozilla/geckodriver/releases
+    下载后解压是一个geckodriver 文件。拷贝到/usr/local/bin目录下，然后加上可执行的权限
+    sudo chmod +x /usr/local/bin/geckodriver
+    """
+    profile.set_preference("intl.accept_languages", "zh-cn")
+    options = FirefoxOptions()
+    options.add_argument("--headless")
+    if headless:
+        try:
+            browser = Firefox(firefox_profile=profile, firefox_options=options)
+        except Exception as e:
+            title = "{} headless浏览器打开失败".format(datetime.datetime.now())
+            content = "错误原因是：{}".format(e)
+            send_mail(title=title, content=content)
+            recode(e)
+            logger.exception(e)
+            raise e
+    else:
+        try:
+            browser = Firefox(firefox_profile=profile)
+        except Exception as e:
+            title = "{} headless浏览器打开失败".format(datetime.datetime.now())
+            content = "错误原因是：{}".format(e)
+            send_mail(title=title, content=content)
+            recode(e)
+            logger.exception(e)
+            raise e
+    return browser
 
 
 def to_jiandao_cloud(**kwargs) -> bool:

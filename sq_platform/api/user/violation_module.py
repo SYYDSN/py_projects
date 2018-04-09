@@ -1346,7 +1346,7 @@ if __name__ == "__main__":
     # g_id = ObjectId("5acac5214660d32418a93f3c")  # 信阳市
     g_id = ObjectId("5ac49aa74660d356cce9df9f")  # 违章查询器id
     q = {
-        'vin': 'LG6ZDCNH5GY203349', 'carType': '03', 'engineNo': '1416C016063', 'plateNumber': '赣CX3963',
+        'vin': 'LG6ZDCNH5GY203349', 'carType': '01', 'engineNo': '1416C016063', 'plateNumber': '赣CX3963',
         'city': '宜春市'
     }
     """获取用户的违章查询器列表"""

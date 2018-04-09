@@ -14,6 +14,7 @@ import time
 import json
 import datetime
 import mongo_db
+from module.send_moudle import send_signal
 from module.spread_module import SpreadChannel
 from gevent.queue import JoinableQueue
 from selenium.webdriver.support.ui import WebDriverWait
@@ -1087,6 +1088,41 @@ def save_withdraw_data(raw_data: list) -> list:
         ms = "save_withdraw_data success"
         recode(ms)
         return r
+
+
+def send_all_withdraw_signal():
+    """
+    从数据库查询所有未发送过消息的出金申请，并依次发送信号给机器人服务器
+    :return:
+    """
+    f = {"$or": [
+        {"send_signal": {"$exists": False}},
+        {"send_signal": {"$ne": 1}}
+    ]}
+
+
+def send_withdraw_signal(reg_info: dict):
+    """
+    发送出金信息到钉订机器人的消息服务器
+    :param reg_info:
+    :return:
+    """
+    out_put = dict()
+    markdown = dict()
+    token_name = "钉订小助手"
+    out_put['msgtype'] = 'markdown'
+    markdown['title'] = "出金申请"
+    d = datetime.datetime.now().strftime(
+        "%Y年%m月%d日 %H:%M:%S")
+    n = "" if reg_info.get("user_name") is None else reg_info.get("user_name")
+    p = "" if reg_info.get("phone") is None else reg_info.get("phone")
+    markdown['text'] = """> 出金申请 \n\r >提交时间：{} \n\r > 所属平台：{} \n\r > MT帐号：{} \n\r > 客户姓名：{} \n\r 
+                          > 出金金额:{} \n\r > 目前持仓手数:{} \n\r > 目前余额：{} \n\r > 所属员工:{} \n\r 
+                          > 所属经理：{} \n\r > 所属总监:{} """.format()
+    out_put['markdown'] = markdown
+    out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+    res = send_signal(out_put, token_name=token_name)
+    print(res)
 
 
 def upload_transaction(browser, **kwargs) -> bool:

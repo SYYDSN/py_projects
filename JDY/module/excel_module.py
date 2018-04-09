@@ -5,8 +5,9 @@ __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import mongo_db
+import datetime
 import openpyxl
-from module.spread_module import *
+
 
 
 """excel操作模块，用于导入数据"""
@@ -36,7 +37,7 @@ def get_excel_path_list(dir_path: str = None) -> list:
 
 def read_sheet_01(sh) -> list:
     """
-    读取excel文件里的工作簿，这里读取的是推广关键字和标记字符之间的对应关系
+    读取excel文件里的工作簿，这里代码要根据读取的文件不同自行该比那
     :param sh:
     :return:
     """
@@ -46,12 +47,26 @@ def read_sheet_01(sh) -> list:
         if i == 0:
             pass
         else:
-            chinese = tr[0].value
-            english = tr[0].value
-            c = SpreadKeyword(chinese=chinese, english=english, create_date=now)
-            res.append(c)
+            p = tr[6].value
+            if p == '盛汇中国':
+                p = 'shengfxchina'
+            elif p == 'fx888':
+                p = 'shengfx888'
+            elif p == 'fx china':
+                p = 'shengfxchina'
+            else:
+                pass
+            init = {
+                "customer_name": tr[3].value,
+                "mt4_account": tr[5].value,
+                "platform": p,
+                "sales_name": tr[7].value,
+                "manager_name": tr[8].value,
+                "director_name": tr[9].value,
+                "create_date": now
+            }
+            res.append(init)
     return res
-
 
 
 def read_excel(file_path: str):
@@ -62,13 +77,13 @@ def read_excel(file_path: str):
     """
     excel = openpyxl.load_workbook(file_path)
     sheets = excel.sheetnames
-    print(sheets)
+    res = list()
     for sheet in sheets:
         sheet = excel.get_sheet_by_name(sheet)
         lines = read_sheet_01(sheet)
+        res.extend(lines)
+    return res
 
 
 if __name__ == "__main__":
-    f_path = os.path.join(excel_path, "域名和要加的字符.xlsx")
-    read_excel(f_path)
     pass
