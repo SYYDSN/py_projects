@@ -920,8 +920,8 @@ class ThroughCity(mongo_db.BaseDoc):
             now = datetime.datetime.now()
             if not need_query:
                 """比较一下时间"""
-                day1 = last_update.day
-                day2 = now.day
+                day1 = last_update.strftime("%F")
+                day2 = now.strftime("%F")
                 if day1 != day2:
                     need_query = True
                 else:
@@ -1088,7 +1088,18 @@ class CarLicense(mongo_db.BaseDoc):
             if len(license_ids) == 0:
                 pass
             else:
-                filter_dict = {"_id": {"$in": license_ids}}
+                filter_dict = {
+                    "_id": {"$in": license_ids},
+                    "vin_id": {
+                        "$exists": True,   # vin_id 字段存在
+                        "$type": 2,       # vin_id 字段是字符串
+                    },
+                    "plate_number": {
+                        "$exists": True,  # plate_nuber 字段存在
+                        "$type": 2,  # plate_nuber 字段是字符串
+                    },
+                    "$where": "this.vin_id.length >= 6 && this.plate_number.length == 7" # 车架号长度大于6,车牌长度等于7
+                }
                 sort_dict = {"create_date": -1}
                 result = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=to_dict, can_json=can_json)
             return result
@@ -2104,6 +2115,7 @@ if __name__ == "__main__":
     # u = User(phone_num="15999189918")
     # u.insert()
     token = 'e5b04beded71473687527f9caed79dfa'
+    u_id = ObjectId("59895177de713e304a67d30c")
     # oid = AppLoginToken.get_id_by_token(token)
     # print(oid)
     """
@@ -2148,8 +2160,10 @@ if __name__ == "__main__":
     # us = User.find_plus(filter_dict=f)
     # print(len(us))
     """添加一个ThroughCity对象"""
-    # ThroughCity.update_city(ObjectId("59895177de713e304a67d30c"), ['上海市', "漳州市"])
+    # ThroughCity.update_city(u_i, ['上海市', "漳州市"])
     """获取指定用户,指定时间距今途经的城市列表"""
-    the_date = mongo_db.get_datetime_from_str("2017-01-01 0:0:0")
-    ThroughCity.get_cities(ObjectId("59895177de713e304a67d30c"))
+    # the_date = mongo_db.get_datetime_from_str("2017-01-01 0:0:0")
+    # ThroughCity.get_cities(ObjectId("59895177de713e304a67d30c"))
+    """查询制定用户的有效行车证列表"""
+    print(CarLicense.get_usable_license(u_id))
     pass

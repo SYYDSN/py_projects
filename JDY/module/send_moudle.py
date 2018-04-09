@@ -11,7 +11,8 @@ logger = get_logger()
 # 钉订机器人的链接的token
 url_map = {
     "钉订小助手": "f346ad6b04dec14dfee9298f9e34aca4605efe4deb20b1ee8b18adfc54af5ca3",
-    "策略助手 小迅": "f007c608f52b78620a52372764d17b42367e22bef78d6966925fee4fe7f715f6"
+    "策略助手 小迅": "f007c608f52b78620a52372764d17b42367e22bef78d6966925fee4fe7f715f6",
+    "推广助手": "9028ccfe1733a13ae6fe97d0f519ba9a53431709231a9bfa33a413f125d8cb56"
 }
 
 

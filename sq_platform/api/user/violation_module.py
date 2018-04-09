@@ -234,6 +234,82 @@ def query_position(*arg, **kwargs):
     return str(position_id)
 
 
+class InvalidCity(mongo_db.BaseDoc):
+    """
+    无效的查询城市,由于并非所有的城市都可以进行违章查询.
+    所以需要维护一个无效的查询城市的列表,避免过度的浪费查询资源.
+    """
+    _table_name = "invalid_city_list"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['name'] = str   # 城市名称,唯一
+    type_dict['invalid_date'] = datetime.datetime  # 无效状态的结束日期,这是一个未来的时间,到达这个时间要重新评估是否无效
+    """
+    由于无效的查询城市也可能变成有效的,所以要设置老化期.过了老化期的就重新检查是否无效?
+    """
+
+    def __init__(self, **kwargs):
+        if "invalid_date" not in kwargs:
+            now = datetime.datetime.now()
+            delta = datetime.timedelta(weeks=1)   # 老化时间,默认是一周
+            invalid_date = now + delta
+            kwargs['invalid_date'] = invalid_date
+        super(InvalidCity, self).__init__(**kwargs)
+
+    @classmethod
+    def get_cities(cls) -> list:
+        """
+        获取无效城市的list
+        :return:
+        """
+        key = cls.get_table_name()
+        cities = cache.get(key)
+        if cities is None:
+            """从数据库查询"""
+            timeout = 7200  # 缓存保存2小时
+            delta = datetime.timedelta(seconds=timeout)
+            d = datetime.datetime.now() + delta
+            f = {"invalid_date": {"$gt": d}}
+            cities = cls.find_plus(filter_dict=f, projection=['name'], to_dict=True, can_json=False)
+            if len(cities) > 0:
+                cities = [x['name'] for x in cities]
+            else:
+                pass
+            cache.set(key, cities, timeout=timeout)
+        else:
+            pass
+        return cities
+
+    @classmethod
+    def add(cls, city_name: str) -> None:
+        """
+        添加一个无效的查询城市
+        :param city_name:
+        :return:
+        """
+        cities = cls.get_cities()
+        if city_name in cities:
+            pass
+        else:
+            init = {"name": city_name}
+            i = cls(**init)
+            i.insert()
+            cache.delete(key=cls.get_table_name())
+
+    @classmethod
+    def validate(cls, city_name: str) -> bool:
+        """
+        验证一个城市是否可以查询?
+        :param city_name: 城市名称
+        :return:
+        """
+        cities = cls.get_cities()
+        if city_name in cities:
+            return False
+        else:
+            return True
+
+
 class ViolationRecode(mongo_db.BaseDoc):
     """违章记录"""
     _table_name = "violation_info"
@@ -524,16 +600,38 @@ class VioQueryGenerator(mongo_db.BaseDoc):
     type_dict['city'] = str  # 查询的城市
     type_dict['create_date'] = datetime.datetime  # 查询器的创建时间
     type_dict['prev_date'] = datetime.datetime  # 查询器的上一次使用时间(从网络)
-    type_dict['last_query_result_id'] = ObjectId  # 查询器的上一次的结果集的id(从网络)
+    type_dict['prev_date_local'] = datetime.datetime  # 查询器的上一次使用时间(从本地数据库)
+    """
+    查询器的上一次的结果集的id(从网络),查询器每一次从网络查询违章记录后,
+    都会更新此字段
+    """
+    type_dict['last_query_result_id'] = ObjectId
     type_dict['all_count'] = int  # 查询器的使用计数，包括本地查询
     type_dict['online_query_count'] = int  # 查询器的使用计数(从网络)
     type_dict['today_online_query_count'] = int  # 查询器的当日使用计数(从网络)
     type_dict['today_offline_query_count'] = int  # 查询器的当日使用计数
 
+    def __init__(self, **kwargs):
+        if "create_date" not in kwargs:
+            kwargs['create_date'] = datetime.datetime.now()
+        if "prev_date" not in kwargs:
+            kwargs['prev_date'] = datetime.datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
+        if "prev_date_local" not in kwargs:
+            kwargs['prev_date_local'] = datetime.datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
+        if "all_count" not in kwargs:
+            kwargs['all_count'] = 0
+        if "online_query_count" not in kwargs:
+            kwargs['online_query_count'] = 0
+        if "today_online_query_count" not in kwargs:
+            kwargs['today_online_query_count'] = 0
+        if "today_offline_query_count" not in kwargs:
+            kwargs['today_offline_query_count'] = 0
+        super(VioQueryGenerator, self).__init__(**kwargs)
+
     @classmethod
     def create(cls, **kwargs):
-        """工厂函数，此函数会创建CarLicense对象。所以初始化函数中需要
-        部分的CarLicense类初始化参数.
+        """工厂函数，此函数会创建CarLicense对象。
+        所以初始化函数中需要部分的CarLicense类初始化参数.
         此方法会先检测相关的行车证信息是否存在。
         存在就返回旧的objid，不存在就插入一个新的行车证信息。
         然后检测当前用户是否已有相同的行车证信息？
@@ -589,7 +687,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
     @classmethod
     def is_only(cls, user_id, plate_number, city):
         """
-        检查是否有相同车牌和城市的违章查询其
+        检查是否有相同车牌和城市的违章查询器,
         :param user_id:  用户id
         :param plate_number:  车牌
         :param city: 城市
@@ -677,6 +775,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
     @classmethod
     def default_generator(cls, user_id) -> (None, dict):
         """
+        由于业务逻辑的变更,此函数已被声明废止
         生成一组默认的违章查询器,
         生成条件是:
         1. 用户的行车证
@@ -735,88 +834,6 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                             generator.set_attr("_id", r)
                             temp = {"_id": str(r), "plate_number": plate_number, "city": city}
                             res.append(temp)
-
-
-        """旧方法,逻辑放弃"""
-        # """先确认用户是否有违章查询器"""
-        # user = User.find_by_id(user_id)
-        # user_id = user.get_id()
-        # f = {"user_id": user_id}
-        # r = cls.find_one_plus(filter_dict=f)
-        # if r is None:
-        #     """
-        #     此用户无违章查询器,创建一个默认的违章查询器.
-        #     第一步,确认其有无行车证?
-        #     """
-        #     user_dbref = user.get_dbref()
-        #     now = datetime.datetime.now()
-        #     f = {
-        #         "user_id": user_dbref,
-        #         "$or": [
-        #             {"end_date": {"$exists": False}},
-        #             {"end_date": {"$eq": None}},
-        #             {"end_date": {"$gte": now}}
-        #         ]
-        #     }
-        #     s = {"create": -1}
-        #     license_relation = UserLicenseRelation.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
-        #     if license_relation is None:
-        #         """没有可用行车证"""
-        #         ms = "用户{}没有可用的行车证信息".format(user_id)
-        #         logger.exception(ms)
-        #         raise ValueError(ms)
-        #     else:
-        #         """取对应的行车证信息"""
-        #         license_id = license_relation['license_id'].id
-        #         car_license = CarLicense.find_by_id(license_id)
-        #         if car_license is None:
-        #             """
-        #             没有找到对应的car_license信息,由于之前已经确认了用户有UserLicenseRelation记录,
-        #             现在看来是无效的记录,需要被清除.
-        #             """
-        #             f = {"_id": license_relation['_id']}
-        #             u = {"$set": {'end_date': now}}
-        #             UserLicenseRelation.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
-        #             ms = "用户{}的行车证关系中,对应的行车证id无效,license_id={}".format(user_id, license_id)
-        #             logger.exception(ms)
-        #             raise ValueError(ms)
-        #         else:
-        #             """生成违章查询器"""
-        #             plate_number = car_license.get_attr('plate_number')
-        #             city = CarCity.get_city(plate_number)
-        #             if city is None:
-        #                 ms = "行车证（id:{}）信息不完整：缺少注册城市".format(license_id)
-        #                 logger.exception(ms)
-        #                 raise ValueError(ms)
-        #             else:
-        #                 pass
-        #             # 违章查询器的初始化参数
-        #             init = {
-        #                 "_id": ObjectId(),
-        #                 "user_id": user_id,  # 这个参数不是dbref，这是历史问题
-        #                 "city": city,
-        #                 "create_date": now,
-        #                 "all_count": 0,
-        #                 "car_license": car_license.get_dbref(),
-        #                 "online_query_count": 0,
-        #                 "today_online_query_count": 0,
-        #                 "today_offline_query_count": 0
-        #             }
-        #             """保存违章查询器"""
-        #             generator = cls(**init)
-        #             r = generator.save_plus()
-        #             if r is None:
-        #                 ms = "VioQueryGenerator对象保存失败,参数{}".format(init)
-        #                 logger.exception(ms)
-        #                 raise ValueError(ms)
-        #             else:
-        #                 """保存成功,返回违章查询器的快捷方式"""
-        #                 generator.set_attr("_id", r)
-        #                 temp = {"_id": str(r), "plate_number": plate_number, "city": city}
-        #                 res = temp
-        # else:
-        #     """如果有违章查询器,那就不需要默认违章查询器了,返回None"""
-        #     pass
         return res
 
     @classmethod
@@ -854,7 +871,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 if temp_key not in g_keys:
                     """需要添加的查询器,初始化实例"""
                     init = {
-                        "user__id": user_id,
+                        "user_id": user_id,
                         "car_license": l_dbref,
                         "city": c,
                         "create_date": now,
@@ -870,43 +887,67 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         """generator_dict剩余的元素就是需要被删除的违章查询器"""
         delete_ids = [x['_id'] for x in list(generator_dict.values())]
         cls.delete_many(filter_dict={"_id": {"$in": delete_ids}})
-        new_generators = cls.insert_many(doc_list=new_generators)
-        res.extend(new_generators)
+        if len(new_generators) > 0:
+            new_generators = cls.insert_many(doc_list=new_generators)
+            res.extend(new_generators)
         res = [{"_id": str(x['_id']), "plate_number": plate_map[x['car_license'].id], "city": x['city']} for x in res]
-        # for generator in generators:
-        #     _id = generator.get_id()
-        #     city = generator.get_attr("city")
-        #     children_id = generator.get_attr("car_license").id
-        #     children = CarLicense.find_one(_id=children_id)
-        #     if children is not None:
-        #         plate_number = children.plate_number
-        #         temp = {"_id": str(_id), "plate_number": plate_number, "city": city}
-        #         data.append(temp)
-        #     else:
-        #         """错误的违章查询器信息，删除"""
-        #         generator.delete_self()
-        # if len(data) == 0:
-        #     """用户没有违章查询器,那就获取一个默认的违章查询器,加入list容器后返回"""
-        #     default_generator_list = cls.default_generator(user_id)
-        #     if len(default_generator_list) > 0:
-        #         data.extend(default_generator_list)
         return res
 
     def update_count_online(self, last_query_result_id):
-        """更新查询器在线查询的统计信息
-        last_query_result_id 查询结果集的id
+        """
+        更新查询器在线查询的统计信息
+        :param last_query_result_id: 查询结果集的id
+        :return:
+        """
+        now = datetime.datetime.now()
+        prev_date = self.get_attr("prev_date", datetime.datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"))
+        now_str = now.strftime("%F")
+        prev_date_str = prev_date.strftime("%F")
+        """
+        比较一下,看看是不是在同一天?同一天的话,today_online_query_count就加一.
+        不是同一天的话,today_online_query_count=1
         """
         filter_dict = {"_id": self.get_id()}
-        update_dict = {"$set": {"prev_date": datetime.datetime.now(),
-                                "last_query_result_id": last_query_result_id},
-                       "$inc": {"online_query_count": 1, "all_count": 1,
-                                "today_online_query_count": 1}}
+        if prev_date_str == now_str:
+            """同一天"""
+            update_dict = {"$set": {"prev_date": now,
+                                    "last_query_result_id": last_query_result_id},
+                           "$inc": {"online_query_count": 1, "all_count": 1,
+                                    "today_online_query_count": 1}}
+        else:
+            """不是同一天"""
+            update_dict = {"$set": {"prev_date": now,
+                                    "last_query_result_id": last_query_result_id,
+                                    "today_online_query_count": 1
+                                    },
+                           "$inc": {"online_query_count": 1, "all_count": 1}
+                           }
         self.find_one_and_update(filter_dict=filter_dict, update=update_dict)
 
     def update_count_offline(self):
         """更新查询器本地查询的统计信息"""
+        now = datetime.datetime.now()
+        prev_date_local = self.get_attr("prev_date_local", datetime.datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"))
+        now_str = now.strftime("%F")
+        prev_date_local_str = prev_date_local.strftime("%F")
+        """
+        比较一下,看看是不是在同一天?同一天的话,today_online_query_count就加一.
+        不是同一天的话,today_online_query_count=1
+        """
         filter_dict = {"_id": self.get_id()}
-        update_dict = {"$inc": {"today_offline_query_count": 1, "all_count": 1}}
+        if prev_date_local_str == now_str:
+            """同一天"""
+            update_dict = {
+                "$inc": {"today_offline_query_count": 1, "all_count": 1}
+            }
+        else:
+            update_dict = {
+                "$set": {
+                    "today_offline_query_count": 1,
+                    "prev_date_local": now
+                },
+                "$inc": {"all_count": 1}
+            }
         self.find_one_and_update(filter_dict=filter_dict, update=update_dict)
 
     @classmethod
@@ -1028,57 +1069,29 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             return {"success": False, 'message': '服务器未正确响应', 'errCode': resp.status_code}
 
     @classmethod
-    def check_query_count(cls, user_id):
+    @classmethod
+    def validate_query_args(cls, args_dict) -> bool:
         """
-        检查当日的查询次数。用于辅助判断是从数据库查询还是从互联网查询
-        :param user_id: 用户的id
-        :return: 布尔值,代表是否可以从互联网查询
+        检测一个违章查询参数是否合法.
+        :param args_dict:
+        :return:
         """
-        user_id = mongo_db.get_obj_id(user_id)
-        obj_list = cls.find(user_id=user_id)  # 客户名下所有的查询器
-        max_limited = 1  # 未验证用户的每天的最大查询次数。
-        count = 0  # 计数器
-        now = datetime.datetime.now()
-        if len(obj_list) > 0:
-            for generator in obj_list:
-                try:
-                    prev_date = generator.prev_date
-                    if isinstance(prev_date, datetime.datetime):
-                        total_seconds = (now - prev_date).total_seconds()
-                        if total_seconds < interval_seconds:
-                            """如果相隔不到一天"""
-                            count += 1
-                        else:
-                            pass
-                except AttributeError:
-                    pass
-        else:
-            pass
-        flag = False
-        if count < max_limited:
-            flag = True
-        else:
-            pass
-        return flag
 
     @classmethod
-    def test_query(cls, **kwargs):
-        """用于测试__query方法,仅仅做测试,不要在实际中调用"""
-        return cls.__query(**kwargs)
-
-    @classmethod
-    def query(cls, object_id, to_flat_dict=True) -> dict:
+    def query(cls, object_id, arg_dict: dict = None) -> dict:
         """
         查询违章，从api查询
         :param object_id: 查询器id
-        :param to_flat_dict: 是否转换成可json的字典
+        :param arg_dict: 查询参数字典,调试的时候使用这个参数直接传值.平时不用
         :return: 查询结果的字典
         """
         message = {"message": "success"}
-        object_id = mongo_db.get_obj_id(object_id)
-        ses = mongo_db.get_conn(cls._table_name)
-        obj = cls.find_by_id(object_id)  # 查询器对象
-        args = obj.get_query_args()
+        if isinstance(arg_dict, dict):
+            args = arg_dict
+        else:
+            object_id = mongo_db.get_obj_id(object_id)
+            obj = cls.find_by_id(object_id)  # 查询器对象
+            args = obj.get_query_args()
         result = cls.__query(**args)  # 节省资源先临时注销
         # result = {'success': True, 'data': {'amount': 9, 'totalFine': '0.00', 'totalPoints': 0, 'violations': [
         #     {'violationNum': '10180', 'province': '上海市', 'violationCity': '', 'time': '2017-04-12 08:53:29',
@@ -1145,7 +1158,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         object_id = mongo_db.get_obj_id(object_id)
         generator = cls.find_by_id(object_id)
         user_id = mongo_db.get_obj_id(user_id)
-        if user_id == generator.user_id:
+        if user_id == generator.get_attr("user_id"):
             """检查此查询器是否和用户身份吻合"""
             now = datetime.datetime.now()
             try:
@@ -1172,9 +1185,9 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                         generator.update_count_offline()
                 else:
                     """大于一天优先从网络读"""
-                    user_id = generator.user_id
-                    flag = cls.check_query_count(user_id) # 检查是否出发查询次数限制?
-                    flag = True  # 调试问题,暂时取消查询次数限制
+                    """检查是否出发查询次数限制?现在的限制是一个查询器一天只能从网络查一次"""
+                    today_online_query_count = generator.get_attr("today_online_query_count", 0)
+                    flag = True if today_online_query_count < 1 else False
                     if flag:
                         """可以从互联网查询"""
                         message = cls.query(object_id)
@@ -1188,10 +1201,56 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             except AttributeError as e:
                 print(e)
                 logger.exception("Error! args:{}".format(str({"object_id": object_id})), exc_info=True, stack_info=True)
-                raise ValueError("{}不合法".format(object_id))
                 message = pack_message(message, 3008, object_id=object_id)
+            except Exception as e:
+                print(e)
+                logger.exception("Error! args:{}".format(str({"object_id": object_id})), exc_info=True, stack_info=True)
+                message = pack_message(message, 5000, object_id=object_id)
             finally:
-                pass
+                """
+                返回的message.error_code的值:
+                1. 如果是int,类型的.而且大于1000的,那就是包装过的.
+                2. 如果是int类型的,小于1000的,那就是服务器返回的错误码
+                3. 过是str类型的,那就是违章查询接口返回的错误码
+                """
+                error_code = message.get("error_code")
+                if error_code is None:
+                    """正常的返回.没有错误信息"""
+                    pass
+                else:
+                    ms = "查询违章接口发生错误error_code类型出错,error_code:{}".format(error_code)
+                    city = generator.get_attr("city")
+                    logger.exception(msg=ms, stack_info=True, exc_info=True)
+                    if isinstance(error_code, int) and error_code >= 1000:
+                        """包装过的message"""
+                        pass
+                    elif isinstance(error_code, int) and error_code < 1000:
+                        """
+                        违章查询接口返回了错误的状态码
+                        """
+                        desc = "服务器返回了错误的状态码:{}".format(error_code)
+                        message = pack_message(message, 7001, desc=desc, city=city)
+                    else:
+                        error_map = {
+                            "1000": "系统异常",
+                            "1001": "请求参数错误",
+                            "1003": "违章查询请求参数错误",
+                            "1012": "API接口调用过于频繁",
+                            "1013": "查询失败	交管接口网络异常",
+                            "1014": "查询中，请稍后再试",
+                            "1015": "官方接口维护中",
+                            "1016": "该接口不支持异地车牌查询",
+                            "1020": "车辆信息错误",
+                            "1021": "发动机号错误",
+                            "1022": "车架号错误",
+                            "1030": "车牌格式错误",
+                            "1031": "该城市暂未开通",
+                            "1032": "车架号或发动机号位数错误"}
+                        if error_code in error_map:
+                            desc = error_map[error_code]
+                        else:
+                            desc = "服务器返回了未识别的错误提示--error_code:{}".format(error_code)
+                        message = pack_message(message, 7002, desc=desc, city=city)
         else:
             message = pack_message(message, 3011, user_id=str(user_id), generator_id=str(object_id))
         return message
@@ -1227,7 +1286,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         object_id = mongo_db.get_obj_id(object_id)
         generator = cls.find_by_id(object_id)
         user_id = mongo_db.get_obj_id(user_id)
-        if user_id == generator.user_id:
+        if user_id == generator.get_attr("user_id"):
             """检查此查询器是否和用户身份吻合"""
             ses = mongo_db.get_conn(ViolationQueryResult.get_table_name())
             query = {"generator_id": object_id}
@@ -1283,15 +1342,20 @@ def add_plate_number():
 
 
 if __name__ == "__main__":
-
-    args = {"plateNumber": "苏ER52Y5",
-                       "engineNo": "X74922",
-                       "vin": "118936",
-                       "city": "上海市"
-            }
-    # r = VioQueryGenerator.test_query(**args)
-    # print(r)
-    r2 = VioQueryGenerator.generator_list(ObjectId("59895177de713e304a67d30c"))
-    print(r2)
+    u_id = ObjectId("59895177de713e304a67d30c")  # 上海市
+    # g_id = ObjectId("5acac5214660d32418a93f3c")  # 信阳市
+    g_id = ObjectId("5ac49aa74660d356cce9df9f")  # 违章查询器id
+    q = {
+        'vin': 'LG6ZDCNH5GY203349', 'carType': '03', 'engineNo': '1416C016063', 'plateNumber': '赣CX3963',
+        'city': '宜春市'
+    }
+    """获取用户的违章查询器列表"""
+    # r2 = VioQueryGenerator.generator_list(u_id)
+    """利用违章查询器查询违章记录"""
+    # vios = VioQueryGenerator.get_prev_query_result(user_id=u_id, object_id=g_id)
+    # print(vios)
+    """测试直接调用查询接口的方法"""
+    # print(VioQueryGenerator.query(g_id))
+    print(VioQueryGenerator.query(object_id=None, arg_dict=q))
     pass
 

@@ -13,8 +13,8 @@ def insert_error_code(**kwargs):
     return inserted_id
 
 
-args = {"code": 3017,
-        "description": "用户和行车证关系的行车证id不存在"}
+args = {"code": 7002,
+        "description": "接口返回了出错信息"}
 
 
 print(insert_error_code(**args))
