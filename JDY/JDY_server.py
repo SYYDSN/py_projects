@@ -6,6 +6,7 @@ from flask import render_template
 from flask import render_template_string
 from flask import send_file
 from flask import request
+from mongo_db import get_datetime_from_str
 from flask_session import Session
 from log_module import get_logger
 import sms_module
@@ -20,6 +21,9 @@ from module.spread_module import AllowOrigin
 from uuid import uuid4
 from module import user_module
 import os
+from mail_module import send_mail
+from browser.crawler_module import CustomerManagerRelation
+
 
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
 app = Flask(__name__)
@@ -54,7 +58,7 @@ token_manager = TokenManager(secret_key=secret_key)
 
 
 def get_token() -> str:
-    """获取token"""
+    """生成防csrf的token"""
     uuid_str = uuid4().hex
     token = token_manager.generate(name=uuid_str).decode()
     cache.set(token, uuid_str, 3600)
@@ -63,7 +67,7 @@ def get_token() -> str:
 
 @token_auth.verify_token
 def verify_token(token):
-    """token验证器"""
+    """csrf的token验证器"""
     if request.method.lower() == 'post':
         str1 = token_manager.verify(token)
         str2 = cache.get(token)
@@ -73,6 +77,174 @@ def verify_token(token):
             return False
     else:
         return True
+
+
+def get_signature(nonce, payload, secret, timestamp):
+    """生成简道云的签名验证"""
+    content = ':'.join([nonce, payload, secret, timestamp]).encode('utf-8')
+    m = hashlib.sha1()
+    m.update(content)
+    return m.hexdigest()
+
+
+def validate_signature(req, secret, signature) -> bool:
+    """验证简道云发来的消息的签名是否正确？"""
+    payload = req.data.decode('utf-8')
+    nonce = req.args['nonce']
+    timestamp = req.args['timestamp']
+    if signature != get_signature(nonce, payload, secret, timestamp):
+        return False
+    else:
+        return True
+
+
+@app.route("/listen_<key>", methods=['post'])
+def listen_func(key):
+    """
+    监听简道云发送过来的消息,绑定在39.108.67.178上运行。
+    尽量让47.106.68.161上的JDY工作保持单一，只负责爬虫部分。
+    因为爬虫服务器还在评估中，一旦资源消耗严重，就很可能重写。
+    """
+    mes = {"message": "success"}
+    headers = request.headers
+    event_id = headers.get("X-JDY-DeliverId")
+    signature = headers.get("X-JDY-Signature")
+    data = request.json
+    print(event_id)
+    print(signature)
+    print(data)
+    if key == "customermanagerrelation":
+        """更新客户和管理者之间的关系"""
+        secret_str = 'n63tPGK9e7TvrAqPXnUTwiGG'  # 不同的消息定义的secret不同，用来验证消息的合法性
+        check = validate_signature(request, secret_str, signature)
+        print("signal_test check is {}".format(check))
+        """
+        字段名称	字段ID	字段类型	说明
+        表单名称	formName	string	
+        数据ID	_id	string	数据的唯一ID
+        提交人	creator	json	
+        修改人	updater	json	
+        删除人	deleter	json	
+        提交时间	createTime	string	
+        更新时间	updateTime	string	
+        删除时间	deleteTime	string	
+        日期时间	_widget_1515400344910	string	
+        EC命名	_widget_1516598763647	string	
+        客户姓名	_widget_1515400344920	string	
+        首次接触时间	_widget_1516598763627	string	
+        客户MT账号	_widget_1515400344933	number	
+        所属平台	_widget_1517984569439	string	
+        所属员工	_widget_1520476984707	string	
+        所属经理	_widget_1520476984720	string	
+        所属总监	_widget_1520476984733	string	
+        客户状态	_widget_1516347713330	string	
+        激活金额/美金	_widget_1515400345101	number	
+        备注	_widget_1522391716801	number	
+        example:
+        {
+          "op": "data_create",
+          "data": {
+            "formName": "开户激活",
+            "_id": "5acd21b714c0ae71e9271630",
+            "creator": {
+              "_id": "5acd21b714c0ae71e9271633",
+              "name": "张秀兰"
+            },
+            "updater": {
+              "_id": "5acd21b714c0ae71e9271634",
+              "name": "唐伟"
+            },
+            "deleter": {
+              "_id": "5acd21b714c0ae71e9271635",
+              "name": "任涛"
+            },
+            "createTime": "2018-04-10T14:16:38.10Z",
+            "updateTime": "2018-04-10T01:07:48.739Z",
+            "deleteTime": "2018-04-10T02:53:08.761Z",
+            "_widget_1515400344910": "2018-04-10T06:25:13.146Z",
+            "_widget_1516598763647": "受问须史",
+            "_widget_1515400344920": "这着向几",
+            "_widget_1516598763627": "2018-04-10T14:54:51.174Z",
+            "_widget_1515400344933": -930.3609,
+            "_widget_1517984569439": "响才之转",
+            "_widget_1520476984707": "即第界转",
+            "_widget_1520476984720": "少说民断",
+            "_widget_1520476984733": "将只素精",
+            "_widget_1516347713330": "党权划",
+            "_widget_1515400345101": -289.5047,
+            "_widget_1522391716801": 647.2173
+          }
+        }
+        """
+        op = data['op']
+        data = data['data']
+        record_id = data['_id']
+        create_date_str = data.get('createTime')
+        print("create_date_str is {}".format(create_date_str))
+        create_date = get_datetime_from_str(create_date_str)
+        if isinstance(create_date, datetime.datetime):
+            create_date = create_date + datetime.timedelta(hours=8)
+        update_date_str = data.get('updateTime')
+        print("update_date_str is {}".format(update_date_str))
+        update_date = get_datetime_from_str(update_date_str)
+        if isinstance(update_date, datetime.datetime):
+            update_date = update_date + datetime.timedelta(hours=8)
+        delete_date_str = data.get('deleteTime')
+        print("delete_date_str is {}".format(delete_date_str))
+        delete_date = get_datetime_from_str(delete_date_str)
+        if isinstance(delete_date, datetime.datetime):
+            delete_date = delete_date + datetime.timedelta(hours=8)
+        mt4_account = data.get("_widget_1515400344933")
+        customer_name = data.get("_widget_1515400344920")
+        platform = data.get("_widget_1517984569439")
+        if platform == '盛汇中国':
+            platform = 'shengfxchina'
+        elif platform == 'fx888':
+            platform = 'shengfx888'
+        elif platform == 'fx china':
+            platform = 'shengfxchina'
+        else:
+            pass
+        sales_name = data.get("_widget_1520476984707")
+        manager_name = data.get("_widget_1520476984720")
+        director_name = data.get("_widget_1520476984733")
+        args = {
+            "record_id": record_id,
+            "create_date": create_date,
+            "update_date": update_date,
+            "delete_date": delete_date,
+            "mt4_account": mt4_account,
+            "customer_name": customer_name,
+            "platform": platform,
+            "sales_name": sales_name,
+            "manager_name": manager_name,
+            "director_name": director_name
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        f = {"mt4_account": args.pop("mt4_account")}
+        flag = True
+        print("op is {}".format(op))
+        print(args)
+        if op == 'data_create':
+            """如果是创建用户？那就先检查是否重复？"""
+            r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
+            if r is None:
+                pass
+            else:
+                flag = False
+                title = "重复的添加客户！mt4账户：{}".format(mt4_account)
+                mes['message'] = title
+                content = ''
+                send_mail(title=title, content=content)
+        if flag:
+            args = {"$set": args}
+            r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=True)
+            print(r)
+        else:
+            pass
+    else:
+        mes['message'] = '错误的path'
+    return json.dumps(mes)
 
 
 @app.route("/")
@@ -245,5 +417,7 @@ def allow_cross_domain(response):
 
 if __name__ == '__main__':
     # app.debug = True  # 这一行必须在toolbar = DebugToolbarExtension(app)前面,否则不生效
-    toolbar = DebugToolbarExtension(app)
-    app.run(host="0.0.0.0", port=port, threaded=True)
+    # toolbar = DebugToolbarExtension(app)
+    # app.run(host="0.0.0.0", port=port, threaded=True)
+    """正常模式"""
+    app.run(host="0.0.0.0", port=port, debug=True, threaded=True)

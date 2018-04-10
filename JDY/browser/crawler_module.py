@@ -52,9 +52,9 @@ class CustomerManagerRelation(mongo_db.BaseDoc):
     _table_name = 'customer_manager_relation'
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['create_date'] = datetime.datetime
-    type_dict['update_date'] = datetime.datetime
-    type_dict['delete_date'] = datetime.datetime
+    type_dict['create_date'] = datetime.datetime  # 记录的创建时间
+    type_dict['update_date'] = datetime.datetime  # 记录的最近一次修改时间
+    type_dict['delete_date'] = datetime.datetime  # 记录的删除时间
     type_dict['mt4_account'] = str
     type_dict['platform'] = str   # 平台名称
     type_dict['customer_name'] = str

@@ -241,6 +241,7 @@ def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     to_flat_dict 独立方法
     doc_to_dict  独立方法
     三个方法将在最后的评估后进行统一 2018-3-16
+    推荐to_flat_dict独立方法
     :param a_dict: 待处理的doc.
     :param ignore_columns: 不需要返回的列
     :return:
@@ -294,6 +295,7 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
     if isinstance(date_str, (datetime.datetime, datetime.date)):
         return date_str
     elif isinstance(date_str, str):
+        date_str.strip()
         search = re.search(r'\d{4}.\d{1,2}.*\d', date_str)
         if search:
             date_str = search.group()
@@ -2021,5 +2023,6 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 
 if __name__ == "__main__":
+    print(get_datetime_from_str("2018-04-10T22:53:29.270Z"))
     pass
 
