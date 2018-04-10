@@ -246,8 +246,7 @@ class Signal(mongo_db.BaseDoc):
             out_put['at'] = {'atMobiles': [], 'isAtAll': False}
 
             """发送消息到钉订群"""
-            # res = send_signal(out_put, token_name=self.get_attr("token_name"))
-            res = 1
+            res = send_signal(out_put, token_name=self.get_attr("token_name"))
             if res:
                 if the_type == "删除订单":
                     self.__dict__['send_time_delete'] = datetime.datetime.now()
