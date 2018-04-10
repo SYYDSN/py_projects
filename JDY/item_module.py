@@ -115,8 +115,9 @@ class Customer(mongo_db.BaseDoc):
                 finally:
                     if isinstance(save, mongo_db.ObjectId):
                         message['user_id'] = str(save)
+                        """发送到钉钉机器人"""
+                        cls.send_signal(reg_dict)
                         """转发到简道云"""
-                        # to_jiandao_cloud_and_send_mail(**reg_dict)
                         ms = "用户已保存,开始调用to_jiandao_cloud_and_send_mail, arg={}".format(reg_dict)
                         logger.info(ms)
                         to_jiandao_cloud_and_send_mail.delay(**reg_dict)
@@ -185,22 +186,6 @@ class Customer(mongo_db.BaseDoc):
         return data
 
 
-class CustomerManagerRelation(mongo_db.BaseDoc):
-    """客户和客户经理/总监的对应关系类，用来确认客户归属"""
-    _table_name = 'customer_manager_relation'
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    type_dict['create_date'] = datetime.datetime
-    type_dict['update_date'] = datetime.datetime
-    type_dict['delete_date'] = datetime.datetime
-    type_dict['mt4_account'] = str
-    type_dict['platform'] = str   # 平台名称
-    type_dict['customer_name'] = str
-    type_dict['sales_name'] = str
-    type_dict['manager_name'] = str
-    type_dict['director_name'] = str  # 总监
-
-
 if __name__ == "__main__":
     args = {
     "phone" :  "37665103177"
@@ -213,15 +198,9 @@ if __name__ == "__main__":
     "user_name" : "测试人员",
     "time" : datetime.datetime.now()
 }
-    # customer = Customer.reg(**args)
+    customer = Customer.reg(**args)
     # from browser.crawler_module import do_jobs
     # do_jobs()
     """测试发送注册信号给机器人服务器"""
     # Customer.send_signal(args)
-    """导入客户归属关系"""
-    # from module.excel_module import excel_path
-    # from module.excel_module import read_excel
-    # f_path = os.path.join(excel_path, "开户激活_20180407201228.xlsx")
-    # r = read_excel(f_path)
-    # CustomerManagerRelation.insert_many(r)
     pass

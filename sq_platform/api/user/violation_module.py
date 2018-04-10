@@ -234,82 +234,6 @@ def query_position(*arg, **kwargs):
     return str(position_id)
 
 
-class InvalidCity(mongo_db.BaseDoc):
-    """
-    无效的查询城市,由于并非所有的城市都可以进行违章查询.
-    所以需要维护一个无效的查询城市的列表,避免过度的浪费查询资源.
-    """
-    _table_name = "invalid_city_list"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    type_dict['name'] = str   # 城市名称,唯一
-    type_dict['invalid_date'] = datetime.datetime  # 无效状态的结束日期,这是一个未来的时间,到达这个时间要重新评估是否无效
-    """
-    由于无效的查询城市也可能变成有效的,所以要设置老化期.过了老化期的就重新检查是否无效?
-    """
-
-    def __init__(self, **kwargs):
-        if "invalid_date" not in kwargs:
-            now = datetime.datetime.now()
-            delta = datetime.timedelta(weeks=1)   # 老化时间,默认是一周
-            invalid_date = now + delta
-            kwargs['invalid_date'] = invalid_date
-        super(InvalidCity, self).__init__(**kwargs)
-
-    @classmethod
-    def get_cities(cls) -> list:
-        """
-        获取无效城市的list
-        :return:
-        """
-        key = cls.get_table_name()
-        cities = cache.get(key)
-        if cities is None:
-            """从数据库查询"""
-            timeout = 7200  # 缓存保存2小时
-            delta = datetime.timedelta(seconds=timeout)
-            d = datetime.datetime.now() + delta
-            f = {"invalid_date": {"$gt": d}}
-            cities = cls.find_plus(filter_dict=f, projection=['name'], to_dict=True, can_json=False)
-            if len(cities) > 0:
-                cities = [x['name'] for x in cities]
-            else:
-                pass
-            cache.set(key, cities, timeout=timeout)
-        else:
-            pass
-        return cities
-
-    @classmethod
-    def add(cls, city_name: str) -> None:
-        """
-        添加一个无效的查询城市
-        :param city_name:
-        :return:
-        """
-        cities = cls.get_cities()
-        if city_name in cities:
-            pass
-        else:
-            init = {"name": city_name}
-            i = cls(**init)
-            i.insert()
-            cache.delete(key=cls.get_table_name())
-
-    @classmethod
-    def validate(cls, city_name: str) -> bool:
-        """
-        验证一个城市是否可以查询?
-        :param city_name: 城市名称
-        :return:
-        """
-        cities = cls.get_cities()
-        if city_name in cities:
-            return False
-        else:
-            return True
-
-
 class ViolationRecode(mongo_db.BaseDoc):
     """违章记录"""
     _table_name = "violation_info"
@@ -1346,8 +1270,7 @@ if __name__ == "__main__":
     # g_id = ObjectId("5acac5214660d32418a93f3c")  # 信阳市
     g_id = ObjectId("5ac49aa74660d356cce9df9f")  # 违章查询器id
     q = {
-        'vin': 'LG6ZDCNH5GY203349', 'carType': '01', 'engineNo': '1416C016063', 'plateNumber': '赣CX3963',
-        'city': '宜春市'
+        'vin': 'LGGX5D659GL327051', 'carType': '01', 'engineNo': 'L6AL3G00185', 'plateNumber': '赣CX4469', 'city': "宜春市"
     }
     """获取用户的违章查询器列表"""
     # r2 = VioQueryGenerator.generator_list(u_id)

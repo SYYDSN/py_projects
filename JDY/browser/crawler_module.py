@@ -22,6 +22,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import FirefoxProfile
 from selenium.webdriver import FirefoxOptions
 from selenium.webdriver import Firefox
+from selenium.webdriver import ChromeOptions
+from selenium.webdriver import Chrome
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.select import By
 from pyquery import PyQuery
@@ -44,6 +46,47 @@ cache.delete(job_key)
 
 """爬虫模块"""
 
+
+class CustomerManagerRelation(mongo_db.BaseDoc):
+    """客户和客户经理/总监的对应关系类，用来确认客户归属"""
+    _table_name = 'customer_manager_relation'
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['create_date'] = datetime.datetime
+    type_dict['update_date'] = datetime.datetime
+    type_dict['delete_date'] = datetime.datetime
+    type_dict['mt4_account'] = str
+    type_dict['platform'] = str   # 平台名称
+    type_dict['customer_name'] = str
+    type_dict['sales_name'] = str
+    type_dict['manager_name'] = str
+    type_dict['director_name'] = str  # 总监
+
+    @classmethod
+    def get_relation(cls, mt4_account: str) -> dict:
+        """
+        根据用户的mt4帐号,查询用户的归属关系
+        :param mt4_account:
+        :return:
+        """
+        f = {"mt4_account": mt4_account}
+        r = cls.find_one_plus(filter_dict=f, instance=False, can_json=False)
+        res = dict()
+        if r is None:
+            res['director_name'] = ''
+            res['sales_name'] = ''
+            res['manager_name'] = ''
+            res['customer_name'] = ''
+        else:
+            res['director_name'] = r['director_name']
+            res['sales_name'] = r['sales_name']
+            res['manager_name'] = r['manager_name']
+            res['customer_name'] = r['customer_name']
+        return res
+
+
+chrome_driver = "/opt/google/chrome/chromedriver"  # chromedriver的路径
+os.environ["ChromeDriver"] = chrome_driver  # 必须配置,否则会在execute_script的时候报错.
 type_dict = {"buy": 0, "sell": 1, "balance": 6, "credit": 7}
 # headers1 = {'Accept': 'text/html',
 #            'Accept-Encoding': 'gzip, deflate',
@@ -96,13 +139,13 @@ def month_str(month_int: int) -> str:
     return l[month_int - 1]
 
 
-def get_browser(headless: bool = True) -> Firefox:
+def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
     """
     获取一个浏览器
     :param headless:
+    :param browser_class: 浏览器种类,0是谷歌, 1 是火狐,
     :return:
     """
-    profile = FirefoxProfile()
     """
     因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,
     这里必须设置浏览器的初始化参数,
@@ -113,29 +156,54 @@ def get_browser(headless: bool = True) -> Firefox:
     下载后解压是一个geckodriver 文件。拷贝到/usr/local/bin目录下，然后加上可执行的权限
     sudo chmod +x /usr/local/bin/geckodriver
     """
-    profile.set_preference("intl.accept_languages", "zh-cn")
-    options = FirefoxOptions()
-    options.add_argument("--headless")
-    if headless:
-        try:
-            browser = Firefox(firefox_profile=profile, firefox_options=options)
-        except Exception as e:
-            title = "{} headless浏览器打开失败".format(datetime.datetime.now())
-            content = "错误原因是：{}".format(e)
-            send_mail(title=title, content=content)
-            recode(e)
-            logger.exception(e)
-            raise e
+    if browser_class == 1:
+        profile = FirefoxProfile()
+        profile.set_preference("intl.accept_languages", "zh-cn")
+        options = FirefoxOptions()
+        options.add_argument("--headless")
+        if headless:
+            try:
+                browser = Firefox(firefox_profile=profile, firefox_options=options)
+            except Exception as e:
+                title = "{} Firefox headless浏览器打开失败".format(datetime.datetime.now())
+                content = "错误原因是：{}".format(e)
+                send_mail(title=title, content=content)
+                recode(e)
+                logger.exception(e)
+                raise e
+        else:
+            try:
+                browser = Firefox(firefox_profile=profile)
+            except Exception as e:
+                title = "{} Firefox headless浏览器打开失败".format(datetime.datetime.now())
+                content = "错误原因是：{}".format(e)
+                send_mail(title=title, content=content)
+                recode(e)
+                logger.exception(e)
+                raise e
     else:
-        try:
-            browser = Firefox(firefox_profile=profile)
-        except Exception as e:
-            title = "{} headless浏览器打开失败".format(datetime.datetime.now())
-            content = "错误原因是：{}".format(e)
-            send_mail(title=title, content=content)
-            recode(e)
-            logger.exception(e)
-            raise e
+        options = ChromeOptions()
+        options.add_argument("--headless")
+        if headless:
+            try:
+                browser = Chrome(executable_path=chrome_driver, chrome_options=options)
+            except Exception as e:
+                title = "{} Chrome headless浏览器打开失败".format(datetime.datetime.now())
+                content = "错误原因是：{}".format(e)
+                send_mail(title=title, content=content)
+                recode(e)
+                logger.exception(e)
+                raise e
+        else:
+            try:
+                browser = Chrome(executable_path=chrome_driver)
+            except Exception as e:
+                title = "{} Chrome headless浏览器打开失败".format(datetime.datetime.now())
+                content = "错误原因是：{}".format(e)
+                send_mail(title=title, content=content)
+                recode(e)
+                logger.exception(e)
+                raise e
     return browser
 
 
@@ -299,6 +367,7 @@ def login_platform(browser, domain: str):
         user_password = user_password2
 
     browser.get(url=url)
+    recode("html= {}".format(browser.page_source))
     # 用户名输入
     input_user_name = WebDriverWait(browser, 10).until(
         ec.presence_of_element_located((By.CSS_SELECTOR, "form .uname")))
@@ -1085,6 +1154,7 @@ def save_withdraw_data(raw_data: list) -> list:
             pass
         r = Withdraw.insert_many(raw_data)
         """向机器人消息服务器发送出金申请消息"""
+        send_all_withdraw_signal()
         ms = "save_withdraw_data success"
         recode(ms)
         return r
@@ -1099,6 +1169,16 @@ def send_all_withdraw_signal():
         {"send_signal": {"$exists": False}},
         {"send_signal": {"$ne": 1}}
     ]}
+    res = Withdraw.find_plus(filter_dict=f, to_dict=False)
+    for obj in res:
+        d = obj.__dict__
+        r = send_withdraw_signal(d)
+        if r:
+            """发送到机器人成功"""
+            obj.set_attr("send_signal", 1)
+            obj.save_plus()
+        else:
+            pass
 
 
 def send_withdraw_signal(reg_info: dict):
@@ -1112,17 +1192,28 @@ def send_withdraw_signal(reg_info: dict):
     token_name = "钉订小助手"
     out_put['msgtype'] = 'markdown'
     markdown['title'] = "出金申请"
-    d = datetime.datetime.now().strftime(
-        "%Y年%m月%d日 %H:%M:%S")
-    n = "" if reg_info.get("user_name") is None else reg_info.get("user_name")
-    p = "" if reg_info.get("phone") is None else reg_info.get("phone")
+    system_info = reg_info['system']
+    apply_time = reg_info['apply_time']
+    apply_time = apply_time.strftime("%Y年%m月%d日 %H:%M:%S")
+    mt4_account = reg_info['account']
+    relation = CustomerManagerRelation.get_relation(mt4_account)
+    customer_name = relation['customer_name']
+    sales_name = relation['sales_name']
+    manager_name = relation['manager_name']
+    director_name = relation['director_name']
+    amount_usd = reg_info['amount_usd']
+    open_interest = reg_info['open_interest']
+    account_balance = reg_info['account_balance']
     markdown['text'] = """> 出金申请 \n\r >提交时间：{} \n\r > 所属平台：{} \n\r > MT帐号：{} \n\r > 客户姓名：{} \n\r 
                           > 出金金额:{} \n\r > 目前持仓手数:{} \n\r > 目前余额：{} \n\r > 所属员工:{} \n\r 
-                          > 所属经理：{} \n\r > 所属总监:{} """.format()
+                          > 所属经理：{} \n\r > 所属总监:{} """.format(apply_time, system_info, mt4_account,
+                                                              customer_name, amount_usd, open_interest, account_balance,
+                                                              sales_name, manager_name, director_name)
     out_put['markdown'] = markdown
     out_put['at'] = {'atMobiles': [], 'isAtAll': False}
     res = send_signal(out_put, token_name=token_name)
     print(res)
+    return res
 
 
 def upload_transaction(browser, **kwargs) -> bool:
@@ -1851,7 +1942,7 @@ def do_jobs():
 if __name__ == "__main__":
     """全套测试开始"""
     """draw"""
-    browser = get_browser()
+    browser = get_browser(1, 1)
     for key in type_dict.keys():
         s2 = parse_page(browser, domain2, key)  # 平台2
         save_transaction_data(s2)

@@ -39,7 +39,6 @@ def to_jiandao_cloud(**kwargs) -> dict:
     browser = webdriver.Chrome(chrome_driver)
     wait = WebDriverWait(browser, 10)
 
-
     url_1 = "https://www.jiandaoyun.com/f/5a658cbc7b87e86216236cb3"
     browser.get(url=url_1)  # 打开页面
 

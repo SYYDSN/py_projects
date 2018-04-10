@@ -202,7 +202,7 @@ class Withdraw(mongo_db.BaseDoc):
     type_dict['channel'] = str  # 转账渠道
     type_dict['apply_time'] = datetime.datetime  # 申请时间
     type_dict['close_time'] = datetime.datetime  # 处理时间
-    type_dict['blank_name'] = str # 开户行
+    type_dict['blank_name'] = str  # 开户行
     type_dict['blank_code'] = str  # 银行国际代码
     type_dict['code_id'] = str  # 银行卡号
     type_dict['status'] = str  # 状态

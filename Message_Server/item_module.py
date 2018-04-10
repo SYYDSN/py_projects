@@ -63,6 +63,7 @@ class Signal(mongo_db.BaseDoc):
             if isinstance(event_date, datetime.datetime):
                 arg_dict['event_date'] = event_date
 
+            arg_dict['record_id'] = data.pop('_id', None)   # 事件唯一id,用于判断是不是同一个交易?
             arg_dict['app_name'] = data.pop('formName', None)  # 表单名称，重要区别依据，应该是唯一的
             updater = data.pop('updater', None)
             if updater is not None:
@@ -159,6 +160,7 @@ class Signal(mongo_db.BaseDoc):
         op = self.get_attr("op")
         enter_price = self.get_attr("enter_price")
         exit_price = self.get_attr("exit_price")
+        now = datetime.datetime.now()
         if self.op == "data_create" and enter_price is not None:
             """进场信号"""
             the_type = "建仓提醒"
@@ -168,10 +170,20 @@ class Signal(mongo_db.BaseDoc):
             the_type = "平仓提醒"
             auth = self.get_attr("updater_name")
             event_date = update_time
-        else:
-            the_type = '提醒'
+        elif self.op == "data_update":
+            the_type = '修改订单'
+            auth = self.get_attr("updater_name")
+            event_date = now
+        elif self.op == "data_delete":
+            the_type = '删除订单'
             auth = self.get_attr("deleter_name")
-            event_date = self.get_attr("event_date", None)
+            event_date = self.get_attr("delete_time", now)
+        else:
+            the_type = '异常'
+            auth = self.get_attr("updater_name")
+            event_date = now
+            ms = "位置的操作:{}".format(self.__dict__)
+            logger.exception(ms)
         if isinstance(event_date, datetime.datetime):
             event_date = event_date.strftime("%m月%d日 %H:%M:%S")
         """
@@ -196,53 +208,70 @@ class Signal(mongo_db.BaseDoc):
         out_put = dict()
         out_put['msgtype'] = 'markdown'
         title = the_type
-        if the_type == "建仓提醒":
-            text = "#### {}\n > {}老师{}{} \n\r >建仓价格：{} \n\r > {}".format(title,
-                                                                          auth,
-                                                                          self.get_attr("direction", ''),
-                                                                          self.get_attr("product", ''),
-                                                                          enter_price,
-                                                                          event_date)
-        else:
-            text = "#### {}\n > {}老师平仓{}方向{}订单 \n\r > 建仓：{} <br> \n\r > 平仓：{} <br> \n\r > 每手实际盈利 {} \n\r > <br> {}".format(
-                title, auth, self.get_attr("direction", ""),
-                self.get_attr("product", ""), enter_price, exit_price,
-                self.get_attr("each_profit", ''),
-                event_date)
-        markdown = dict()
-        markdown['title'] = title
-        markdown['text'] = text
-        out_put['markdown'] = markdown
-        out_put['at'] = {'atMobiles': [], 'isAtAll': False}
-
-        """发送消息到钉订群"""
-        res = send_signal(out_put, token_name=self.get_attr("token_name"))
-        if res:
-            self.__dict__['send_time'] = datetime.datetime.now()
-            self.save_plus()
-        else:
+        if the_type == "异常":
             pass
-        """旧的方法"""
-        # url = "https://oapi.dingtalk.com/robot/send?access_token=" \
-        #       "1f84ff5a4e5515d505ca0c31074788609b4ceac2a5e579aa91df8f197fb894cd"
-        # headers = {'Content-Type': 'application/json'}
-        # data = json.dumps(out_put)
-        # r = requests.post(url, data=data, headers=headers)
-        # status_code = r.status_code
-        # if status_code == 200:
-        #     res = r.json()
-        #     if res['errmsg'] == 'ok':
-        #         """success"""
-        #         self.__dict__['send_time'] = datetime.datetime.now()
-        #         self.save_plus()
-        #     else:
-        #         ms = '发送消息到钉订机器人失败，错误原因：{}， 参数{}'.format(res['errmsg'], data)
-        #         logger.exception(ms)
-        #         raise ValueError(ms)
-        # else:
-        #     ms = '钉订机器人没有返回正确的响应，错误代码：{}'.format(status_code)
-        #     logger.exception(ms)
-        #     raise ValueError(ms)
+        else:
+            if the_type == "建仓提醒":
+                text = "#### {}\n > {}老师{}{} \n\r >建仓价格：{} \n\r > {}".format(title,
+                                                                              auth,
+                                                                              self.get_attr("direction", ''),
+                                                                              self.get_attr("product", ''),
+                                                                              enter_price,
+                                                                              event_date)
+            elif the_type == "平仓提醒":
+                text = "#### {}\n > {}老师平仓{}方向{}订单 \n\r > 建仓：{} <br> \n\r > 平仓：{} <br> \n\r > 每手实际盈利 {} \n\r > <br> {}".format(
+                    title, auth, self.get_attr("direction", ""),
+                    self.get_attr("product", ""), enter_price, exit_price,
+                    self.get_attr("each_profit", ''),
+                    event_date)
+            elif the_type == "修改订单":
+                text = "#### {}\n > {}老师平仓{}方向{}订单 \n\r > 建仓：{} <br> \n\r > 平仓：{} <br> \n\r" \
+                       " > 每手实际盈利 {} \n\r > <br> {}".format(
+                    title, auth, self.get_attr("direction", ""),
+                    self.get_attr("product", ""),
+                    "" if enter_price is None else enter_price,
+                    "" if exit_price is None else exit_price,
+                    self.get_attr("each_profit", ''),
+                    event_date)
+            else:
+                """这应该是删除订单"""
+                text = "#### {}\n > {}老师删除 {} 订单 \n\r > {}".format(title,
+                                                                             auth,
+                                                                             self.get_attr("product", ''),
+                                                                             event_date)
+            markdown = dict()
+            markdown['title'] = title
+            markdown['text'] = text
+            out_put['markdown'] = markdown
+            out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+
+            """发送消息到钉订群"""
+            # res = send_signal(out_put, token_name=self.get_attr("token_name"))
+            res = 1
+            if res:
+                if the_type == "删除订单":
+                    self.__dict__['send_time_delete'] = datetime.datetime.now()
+                elif the_type == "修改订单":
+                    self.__dict__['send_time_prev_update'] = datetime.datetime.now()
+                elif the_type == "建仓提醒":
+                    self.__dict__['send_time_enter'] = datetime.datetime.now()
+                elif the_type == "平仓提醒":
+                    self.__dict__['send_time_exit'] = datetime.datetime.now()
+                else:
+                    pass
+                u = self.__dict__
+                u.pop("_id", None)
+                record_id = u.pop("record_id", None)
+                if record_id is None:
+                    pass
+                else:
+                    f = {"record_id": record_id}
+                    u = {"$set": u}
+                    conn = mongo_db.get_conn(self._table_name)
+                    r = conn.find_one_and_update(filter=f, update=u, upsert=True)
+                    print(r)
+            else:
+                pass
 
     def welcome(self):
         """
@@ -270,13 +299,13 @@ if __name__ == "__main__":
                      'createTime': '2018-03-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
                      '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
                      'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'}, '_widget_1520843228626': 1000,
-                     '_id': '5abd5d81493acc231b27af1c', 'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
+                     '_id': '7abd5d81493acc231b27af1c', 'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
                      '_widget_1514518782603': [{'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
                      'updateTime': '2018-03-29T21:41:21.491Z', '_widget_1514518782514': '原油',
                      'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
                      }
             }
     d = Signal(**data)
-    # d.send()
-    d.welcome()
+    d.send()
+    # d.welcome()
     pass
