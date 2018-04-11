@@ -122,131 +122,160 @@ def listen_func(key):
         secret_str = 'n63tPGK9e7TvrAqPXnUTwiGG'  # 不同的消息定义的secret不同，用来验证消息的合法性
         check = validate_signature(request, secret_str, signature)
         print("signal_test check is {}".format(check))
-        """
-        字段名称	字段ID	字段类型	说明
-        表单名称	formName	string	
-        数据ID	_id	string	数据的唯一ID
-        提交人	creator	json	
-        修改人	updater	json	
-        删除人	deleter	json	
-        提交时间	createTime	string	
-        更新时间	updateTime	string	
-        删除时间	deleteTime	string	
-        日期时间	_widget_1515400344910	string	
-        EC命名	_widget_1516598763647	string	
-        客户姓名	_widget_1515400344920	string	
-        首次接触时间	_widget_1516598763627	string	
-        客户MT账号	_widget_1515400344933	number	
-        所属平台	_widget_1517984569439	string	
-        所属员工	_widget_1520476984707	string	
-        所属经理	_widget_1520476984720	string	
-        所属总监	_widget_1520476984733	string	
-        客户状态	_widget_1516347713330	string	
-        激活金额/美金	_widget_1515400345101	number	
-        备注	_widget_1522391716801	number	
-        example:
-        {
-          "op": "data_create",
-          "data": {
-            "formName": "开户激活",
-            "_id": "5acd21b714c0ae71e9271630",
-            "creator": {
-              "_id": "5acd21b714c0ae71e9271633",
-              "name": "张秀兰"
-            },
-            "updater": {
-              "_id": "5acd21b714c0ae71e9271634",
-              "name": "唐伟"
-            },
-            "deleter": {
-              "_id": "5acd21b714c0ae71e9271635",
-              "name": "任涛"
-            },
-            "createTime": "2018-04-10T14:16:38.10Z",
-            "updateTime": "2018-04-10T01:07:48.739Z",
-            "deleteTime": "2018-04-10T02:53:08.761Z",
-            "_widget_1515400344910": "2018-04-10T06:25:13.146Z",
-            "_widget_1516598763647": "受问须史",
-            "_widget_1515400344920": "这着向几",
-            "_widget_1516598763627": "2018-04-10T14:54:51.174Z",
-            "_widget_1515400344933": -930.3609,
-            "_widget_1517984569439": "响才之转",
-            "_widget_1520476984707": "即第界转",
-            "_widget_1520476984720": "少说民断",
-            "_widget_1520476984733": "将只素精",
-            "_widget_1516347713330": "党权划",
-            "_widget_1515400345101": -289.5047,
-            "_widget_1522391716801": 647.2173
-          }
-        }
-        """
-        set_trace()
-        op = data['op']
-        data = data['data']
-        record_id = data['_id']
-        create_date_str = data.get('createTime')
-        print("create_date_str is {}".format(create_date_str))
-        create_date = get_datetime_from_str(create_date_str)
-        if isinstance(create_date, datetime.datetime):
-            create_date = create_date + datetime.timedelta(hours=8)
-        update_date_str = data.get('updateTime')
-        print("update_date_str is {}".format(update_date_str))
-        update_date = get_datetime_from_str(update_date_str)
-        if isinstance(update_date, datetime.datetime):
-            update_date = update_date + datetime.timedelta(hours=8)
-        delete_date_str = data.get('deleteTime')
-        print("delete_date_str is {}".format(delete_date_str))
-        delete_date = get_datetime_from_str(delete_date_str)
-        if isinstance(delete_date, datetime.datetime):
-            delete_date = delete_date + datetime.timedelta(hours=8)
-        mt4_account = data.get("_widget_1515400344933")
-        customer_name = data.get("_widget_1515400344920")
-        platform = data.get("_widget_1517984569439")
-        if platform == '盛汇中国':
-            platform = 'shengfxchina'
-        elif platform == 'fx888':
-            platform = 'shengfx888'
-        elif platform == 'fx china':
-            platform = 'shengfxchina'
+        if not check:
+            return abort(404)
         else:
-            pass
-        sales_name = data.get("_widget_1520476984707")
-        manager_name = data.get("_widget_1520476984720")
-        director_name = data.get("_widget_1520476984733")
-        args = {
-            "record_id": record_id,
-            "create_date": create_date,
-            "update_date": update_date,
-            "delete_date": delete_date,
-            "mt4_account": mt4_account,
-            "customer_name": customer_name,
-            "platform": platform,
-            "sales_name": sales_name,
-            "manager_name": manager_name,
-            "director_name": director_name
-        }
-        args = {k: v for k, v in args.items() if v is not None}
-        f = {"mt4_account": args.pop("mt4_account")}
-        flag = True
-        print("op is {}".format(op))
-        print(args)
-        if op == 'data_create':
-            """如果是创建用户？那就先检查是否重复？"""
-            r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
-            if r is None:
-                pass
+            """
+            字段名称	字段ID	字段类型	说明
+            表单名称	formName	string	
+            数据ID	_id	string	数据的唯一ID
+            提交人	creator	json	
+            修改人	updater	json	
+            删除人	deleter	json	
+            提交时间	createTime	string	
+            更新时间	updateTime	string	
+            删除时间	deleteTime	string	
+            日期时间	_widget_1515400344910	string	
+            EC命名	_widget_1516598763647	string	
+            客户姓名	_widget_1515400344920	string	
+            首次接触时间	_widget_1516598763627	string	
+            客户MT账号	_widget_1515400344933	number	
+            所属平台	_widget_1517984569439	string	
+            所属员工	_widget_1520476984707	string	
+            所属经理	_widget_1520476984720	string	
+            所属总监	_widget_1520476984733	string	
+            客户状态	_widget_1516347713330	string	
+            激活金额/美金	_widget_1515400345101	number	
+            备注	_widget_1522391716801	number	
+            example:
+            {
+              "op": "data_create",
+              "data": {
+                "formName": "开户激活",
+                "_id": "5acd21b714c0ae71e9271630",
+                "creator": {
+                  "_id": "5acd21b714c0ae71e9271633",
+                  "name": "张秀兰"
+                },
+                "updater": {
+                  "_id": "5acd21b714c0ae71e9271634",
+                  "name": "唐伟"
+                },
+                "deleter": {
+                  "_id": "5acd21b714c0ae71e9271635",
+                  "name": "任涛"
+                },
+                "createTime": "2018-04-10T14:16:38.10Z",
+                "updateTime": "2018-04-10T01:07:48.739Z",
+                "deleteTime": "2018-04-10T02:53:08.761Z",
+                "_widget_1515400344910": "2018-04-10T06:25:13.146Z",
+                "_widget_1516598763647": "受问须史",
+                "_widget_1515400344920": "这着向几",
+                "_widget_1516598763627": "2018-04-10T14:54:51.174Z",
+                "_widget_1515400344933": -930.3609,
+                "_widget_1517984569439": "响才之转",
+                "_widget_1520476984707": "即第界转",
+                "_widget_1520476984720": "少说民断",
+                "_widget_1520476984733": "将只素精",
+                "_widget_1516347713330": "党权划",
+                "_widget_1515400345101": -289.5047,
+                "_widget_1522391716801": 647.2173
+              }
+            }
+            """
+            op = data['op']
+            data = data['data']
+            record_id = data['_id']
+            create_date_str = data.get('createTime')
+            print("create_date_str is {}".format(create_date_str))
+            create_date = get_datetime_from_str(create_date_str)
+            if isinstance(create_date, datetime.datetime):
+                create_date = create_date + datetime.timedelta(hours=8)
+            update_date_str = data.get('updateTime')
+            print("update_date_str is {}".format(update_date_str))
+            update_date = get_datetime_from_str(update_date_str)
+            if isinstance(update_date, datetime.datetime):
+                update_date = update_date + datetime.timedelta(hours=8)
+            delete_date_str = data.get('deleteTime')
+            print("delete_date_str is {}".format(delete_date_str))
+            delete_date = get_datetime_from_str(delete_date_str)
+            if isinstance(delete_date, datetime.datetime):
+                delete_date = delete_date + datetime.timedelta(hours=8)
+            mt4_account = str(data.get("_widget_1515400344933"))
+            customer_name = data.get("_widget_1515400344920")
+            platform = data.get("_widget_1517984569439")
+            if platform == '盛汇中国':
+                platform = 'shengfxchina'
+            elif platform == 'fx888':
+                platform = 'shengfx888'
+            elif platform == 'fx china':
+                platform = 'shengfxchina'
             else:
-                flag = False
-                title = "重复的添加客户！mt4账户：{}".format(mt4_account)
-                mes['message'] = title
-                content = ''
-                send_mail(title=title, content=content)
-        if flag:
-            args = {"$set": args}
-            r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=True)
-            print(r)
-        else:
-            pass
+                pass
+            sales_name = data.get("_widget_1520476984707")
+            manager_name = data.get("_widget_1520476984720")
+            director_name = data.get("_widget_1520476984733")
+            args = {
+                "record_id": record_id,
+                "create_date": create_date,
+                "update_date": update_date,
+                "delete_date": delete_date,
+                "mt4_account": mt4_account,
+                "customer_name": customer_name,
+                "platform": platform,
+                "sales_name": sales_name,
+                "manager_name": manager_name,
+                "director_name": director_name
+            }
+            args = {k: v for k, v in args.items() if v is not None}
+            print("op is {}".format(op))
+            print(args)
+            if op == 'data_create':
+                f = {"mt4_account": args.pop("mt4_account")}
+                """如果是创建用户？那就先检查是否重复？"""
+                r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
+                if r is not None:
+                    """有重复客户，发送警告消息，仍然添加"""
+                    title = "重复的添加客户！mt4账户：{}".format(mt4_account)
+                    mes['message'] = title
+                    content = ''
+                    send_mail(title=title, content=content)
+                else:
+                    pass
+                args = {"$set": args}
+                r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=True)
+                print(r)
+            elif op == 'data_update':
+                """修改用户关系，有记录就修改，没记录就插入"""
+                f = {"mt4_account": args.pop("mt4_account")}
+                r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
+                if r is None:
+                    """没有对应客户，发送警告消息，修改变添加"""
+                    title = "修改客户时没有发现对应客户！mt4账户：{}".format(mt4_account)
+                    mes['message'] = title
+                    content = ''
+                    send_mail(title=title, content=content)
+                else:
+                    pass
+                args = {"$set": args}
+                r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=True)
+                print(r)
+            elif op == "data_remove":
+                """删除用户关系"""
+                f = {"record_id": record_id}
+                r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
+                if r is None:
+                    title = "无法删除，因为没有对应的客户！_id：{}".format(record_id)
+                    mes['message'] = title
+                    content = ''
+                    send_mail(title=title, content=content)
+                else:
+                    """有客户，可以删除"""
+                    args = {"$set": {"delete_date": delete_date}}
+                    r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=False)
+                    print(r)
+            else:
+                pass
     else:
         mes['message'] = '错误的path'
     return json.dumps(mes)
@@ -362,6 +391,8 @@ def my_register():
 @app.route("/xd_login", methods=['post', 'get'])
 def login_func():
     """管理登录页"""
+    ip = get_real_ip(request)
+    print("ip is {}".format(ip))
     if request.method.lower() == 'get':
         return render_template("login.html")
     elif request.method.lower() == 'post':

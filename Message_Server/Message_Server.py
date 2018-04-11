@@ -80,7 +80,6 @@ def listen_func(key):
     return json.dumps(mes)
 
 
-
 @app.before_request
 def logger_request_info():
     """

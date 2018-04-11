@@ -14,7 +14,7 @@ import time
 import json
 import datetime
 import mongo_db
-from module.send_moudle import send_signal
+from module import send_moudle
 from module.spread_module import SpreadChannel
 from gevent.queue import JoinableQueue
 from selenium.webdriver.support.ui import WebDriverWait
@@ -35,6 +35,7 @@ from gevent.queue import JoinableQueue
 from threading import Lock
 
 
+send_signal = send_moudle.send_signal
 ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
 logger = get_logger()
@@ -52,10 +53,11 @@ class CustomerManagerRelation(mongo_db.BaseDoc):
     _table_name = 'customer_manager_relation'
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['record_id'] = str  # 简道云提交过来的_id，仅仅在删除信息的时候做对应的判断。
     type_dict['create_date'] = datetime.datetime  # 记录的创建时间
     type_dict['update_date'] = datetime.datetime  # 记录的最近一次修改时间
     type_dict['delete_date'] = datetime.datetime  # 记录的删除时间
-    type_dict['mt4_account'] = str
+    type_dict['mt4_account'] = str         # 唯一，但不建立对应的索引，目的是容错。
     type_dict['platform'] = str   # 平台名称
     type_dict['customer_name'] = str
     type_dict['sales_name'] = str
@@ -69,8 +71,12 @@ class CustomerManagerRelation(mongo_db.BaseDoc):
         :param mt4_account:
         :return:
         """
-        f = {"mt4_account": mt4_account}
-        r = cls.find_one_plus(filter_dict=f, instance=False, can_json=False)
+        f = {
+            "mt4_account": mt4_account,
+            "delete_date": {"$exists": False}
+        }
+        s = {"update_date": -1}   # 可能有重复的对象，所以要排序
+        r = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False, can_json=False)
         res = dict()
         if r is None:
             res['director_name'] = ''
@@ -2039,27 +2045,42 @@ if __name__ == "__main__":
     # gc.collect()
     # print(gc.garbage)
     """测试发出金申请消息"""
-    a = {
-        "_id" : ObjectId("5acd6160a7a75167a9272566"),
-        "account" : 8300091,
-        "account_balance" : 133.1,
-        "send_signal" : 1,
-        "nick_name" : "周文庆",
-        "amount_usd" : "133.1",
-        "commission_cny" : 0.0,
-        "code_id" : "6228412300245481616",
-        "open_interest" : 0.0,
-        "amount_cny" : "905.08",
-        "channel" : "银联",
-        "ticket" : 44,
-        "blank_name" : "农业银行安庆市周潭支行",
-        "system" : "office.shengfxchina.com:8443",
-        "commission_usd" : 0.0,
-        "account_value" : 133.1,
-        "account_margin" : 133.1,
-        "status" : "审核中",
-        "apply_time" : get_datetime_from_str("2018-04-11T09:13:04.000Z"),
-        "upload" : 1
-    }
-    send_withdraw_signal(a)
+    # a = {
+    #     "_id" : ObjectId("5acd6160a7a75167a9272566"),
+    #     "account" : 8300091,
+    #     "account_balance" : 133.1,
+    #     "send_signal" : 1,
+    #     "nick_name" : "周文庆",
+    #     "amount_usd" : "133.1",
+    #     "commission_cny" : 0.0,
+    #     "code_id" : "6228412300245481616",
+    #     "open_interest" : 0.0,
+    #     "amount_cny" : "905.08",
+    #     "channel" : "银联",
+    #     "ticket" : 44,
+    #     "blank_name" : "农业银行安庆市周潭支行",
+    #     "system" : "office.shengfxchina.com:8443",
+    #     "commission_usd" : 0.0,
+    #     "account_value" : 133.1,
+    #     "account_margin" : 133.1,
+    #     "status" : "审核中",
+    #     "apply_time" : get_datetime_from_str("2018-04-11T09:13:04.000Z"),
+    #     "upload" : 1
+    # }
+    # send_withdraw_signal(a)
+    """测试获取客户归属"""
+    # i_dict = {
+    #         "_id" : ObjectId("5ace114bc69abbd345bfa6c2"),
+    #         "mt4_account" : 8300144,
+    #         "record_id" : "5ace114b214d2c0a6b376269",
+    #         "sales_name" : "黄腾飞",
+    #         "customer_name" : "赵刚刚",
+    #         "platform" : "shengfxchina",
+    #         "director_name" : "倪丽娜",
+    #         "manager_name" : "吴峰",
+    #         "update_date" : get_datetime_from_str("2018-04-12T02:37:10.522Z"),
+    #         "create_date" : get_datetime_from_str("2018-04-11T21:44:43.543Z")
+    #     }
+    # c = CustomerManagerRelation(**i_dict)
+    print(CustomerManagerRelation.get_relation('8300144'))
     pass

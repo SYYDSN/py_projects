@@ -2030,6 +2030,6 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 
 if __name__ == "__main__":
-    print(get_datetime_from_str(" 2018-04-10T22:53:29.270Z "))
+    print(get_datetime_from_str("2018-04-10T22:53:29.270Z"))
     pass
 
