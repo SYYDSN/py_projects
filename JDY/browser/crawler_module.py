@@ -952,7 +952,7 @@ def extend_data(data1: list, data2: list, ticket_limit: int = None) -> dict:
                 for x in data2:
                     the_time = x.get('time')
                     the_time = x.get('close_time') if the_time is None else the_time
-                    print("extend_data function  {} : {} {}".format(x['ticket'], ticket_limit, the_time))
+                    print("query_withdraw  {} : {} {}".format(x['ticket'], ticket_limit, the_time))
                     if the_time is not None and the_time <= time_limit:
                         stop = True
                         break
@@ -1975,7 +1975,7 @@ if __name__ == "__main__":
     #     upload_and_update_transaction(browser=browser, **x)  # 上传balance和credit
     # browser.quit()
     # del browser
-    gc.collect()
+    # gc.collect()
     """全套测试结束"""
     """测试一条假的交易记录"""
     # browser = get_browser(0)
@@ -2082,5 +2082,11 @@ if __name__ == "__main__":
     #         "create_date" : get_datetime_from_str("2018-04-11T21:44:43.543Z")
     #     }
     # c = CustomerManagerRelation(**i_dict)
-    print(CustomerManagerRelation.get_relation('8300144'))
+    # print(CustomerManagerRelation.get_relation('8300144'))
+    """测试终止条件问题"""
+    b = get_browser(1, 1)
+    draw_transaction(b)
+    b.quit()
+    del b
+    gc.collect()
     pass
