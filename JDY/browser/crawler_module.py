@@ -147,6 +147,7 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
     :return:
     """
     """
+    firefox的headless浏览器
     因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,
     这里必须设置浏览器的初始化参数,
     注意，使用headless必须先安装对应浏览器正常的版本,然后再安装headless版本
@@ -155,6 +156,11 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
     https://github.com/mozilla/geckodriver/releases
     下载后解压是一个geckodriver 文件。拷贝到/usr/local/bin目录下，然后加上可执行的权限
     sudo chmod +x /usr/local/bin/geckodriver
+    chrome的headless浏览器
+    https://chromedriver.storage.googleapis.com/index.html?path=2.35/
+    你也可以自行搜索chromedriver的下载地址,解压是个可执行文件,放到chrome的目录即可.
+    一般ubuntu下面,chrome的目录是/opt/google/chrome/
+    据说使用root权限运行的话,chrome的headless浏览器会报异常.而firefox的headless浏览器不会!
     """
     if browser_class == 1:
         profile = FirefoxProfile()
@@ -1197,18 +1203,17 @@ def send_withdraw_signal(reg_info: dict):
     apply_time = apply_time.strftime("%Y年%m月%d日 %H:%M:%S")
     mt4_account = reg_info['account']
     relation = CustomerManagerRelation.get_relation(mt4_account)
-    customer_name = relation['customer_name']
+    customer_name = reg_info['nick_name']
     sales_name = relation['sales_name']
     manager_name = relation['manager_name']
     director_name = relation['director_name']
     amount_usd = reg_info['amount_usd']
     open_interest = reg_info['open_interest']
     account_balance = reg_info['account_balance']
-    markdown['text'] = """> 出金申请 \n\r >提交时间：{} \n\r > 所属平台：{} \n\r > MT帐号：{} \n\r > 客户姓名：{} \n\r 
-                          > 出金金额:{} \n\r > 目前持仓手数:{} \n\r > 目前余额：{} \n\r > 所属员工:{} \n\r 
-                          > 所属经理：{} \n\r > 所属总监:{} """.format(apply_time, system_info, mt4_account,
-                                                              customer_name, amount_usd, open_interest, account_balance,
-                                                              sales_name, manager_name, director_name)
+    markdown['text'] = "> 出金申请 \r\n >提交时间：{} \r\n > 所属平台：{} \r\n > MT帐号：{} \r\n > 客户姓名：{} \r\n > " \
+                       "出金金额:{} \r\n > 目前持仓手数:{} \r\n > 目前余额：{} \r\n > 所属员工:{} \r\n > 所属经理：{} \r\n " \
+                       "> 所属总监:{}".format(apply_time, system_info, mt4_account, customer_name, amount_usd,
+                                          open_interest, account_balance, sales_name, manager_name, director_name)
     out_put['markdown'] = markdown
     out_put['at'] = {'atMobiles': [], 'isAtAll': False}
     res = send_signal(out_put, token_name=token_name)
@@ -1942,28 +1947,28 @@ def do_jobs():
 if __name__ == "__main__":
     """全套测试开始"""
     """draw"""
-    browser = get_browser(1, 1)
-    for key in type_dict.keys():
-        s2 = parse_page(browser, domain2, key)  # 平台2
-        save_transaction_data(s2)
-        s1 = parse_page(browser, domain1, key)  # 平台1
-        save_transaction_data(s1)
-
-    s = parse_page(browser, domain2, None)  # 出金申请
-    save_withdraw_data(s)
-    """upload"""
-    transaction = query_transaction(True)
-    for x in transaction:
-        upload_and_update_transaction(browser=browser, **x)
-    data = query_withdraw(True)
-    withdraw = data['withdraw']
-    other = data['other']
-    for x in withdraw:
-        upload_and_update_withdraw(browser=browser, **x)  # 上传出金申请
-    for x in other:
-        upload_and_update_transaction(browser=browser, **x)  # 上传balance和credit
-    browser.quit()
-    del browser
+    # browser = get_browser(1, 1)
+    # for key in type_dict.keys():
+    #     s2 = parse_page(browser, domain2, key)  # 平台2
+    #     save_transaction_data(s2)
+    #     s1 = parse_page(browser, domain1, key)  # 平台1
+    #     save_transaction_data(s1)
+    #
+    # s = parse_page(browser, domain2, None)  # 出金申请
+    # save_withdraw_data(s)
+    # """upload"""
+    # transaction = query_transaction(True)
+    # for x in transaction:
+    #     upload_and_update_transaction(browser=browser, **x)
+    # data = query_withdraw(True)
+    # withdraw = data['withdraw']
+    # other = data['other']
+    # for x in withdraw:
+    #     upload_and_update_withdraw(browser=browser, **x)  # 上传出金申请
+    # for x in other:
+    #     upload_and_update_transaction(browser=browser, **x)  # 上传balance和credit
+    # browser.quit()
+    # del browser
     gc.collect()
     """全套测试结束"""
     """测试一条假的交易记录"""
@@ -2033,4 +2038,28 @@ if __name__ == "__main__":
     # del b
     # gc.collect()
     # print(gc.garbage)
+    """测试发出金申请消息"""
+    a = {
+        "_id" : ObjectId("5acd6160a7a75167a9272566"),
+        "account" : 8300091,
+        "account_balance" : 133.1,
+        "send_signal" : 1,
+        "nick_name" : "周文庆",
+        "amount_usd" : "133.1",
+        "commission_cny" : 0.0,
+        "code_id" : "6228412300245481616",
+        "open_interest" : 0.0,
+        "amount_cny" : "905.08",
+        "channel" : "银联",
+        "ticket" : 44,
+        "blank_name" : "农业银行安庆市周潭支行",
+        "system" : "office.shengfxchina.com:8443",
+        "commission_usd" : 0.0,
+        "account_value" : 133.1,
+        "account_margin" : 133.1,
+        "status" : "审核中",
+        "apply_time" : get_datetime_from_str("2018-04-11T09:13:04.000Z"),
+        "upload" : 1
+    }
+    send_withdraw_signal(a)
     pass

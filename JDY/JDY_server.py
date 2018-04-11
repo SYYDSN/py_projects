@@ -23,6 +23,7 @@ from module import user_module
 import os
 from mail_module import send_mail
 from browser.crawler_module import CustomerManagerRelation
+from pdb import set_trace
 
 
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
@@ -90,15 +91,18 @@ def get_signature(nonce, payload, secret, timestamp):
 def validate_signature(req, secret, signature) -> bool:
     """验证简道云发来的消息的签名是否正确？"""
     payload = req.data.decode('utf-8')
-    nonce = req.args['nonce']
-    timestamp = req.args['timestamp']
-    if signature != get_signature(nonce, payload, secret, timestamp):
+    nonce = req.args.get('nonce')
+    timestamp = req.args.get('timestamp')
+    if nonce is None or timestamp is None:
         return False
     else:
-        return True
+        if signature != get_signature(nonce, payload, secret, timestamp):
+            return False
+        else:
+            return True
 
 
-@app.route("/listen_<key>", methods=['post'])
+@app.route("/listen_<key>", methods=['get', 'post'])
 def listen_func(key):
     """
     监听简道云发送过来的消息,绑定在39.108.67.178上运行。
@@ -176,6 +180,7 @@ def listen_func(key):
           }
         }
         """
+        set_trace()
         op = data['op']
         data = data['data']
         record_id = data['_id']

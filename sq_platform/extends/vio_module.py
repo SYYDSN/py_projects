@@ -12,6 +12,7 @@ from log_module import get_logger
 import datetime
 from mail_module import send_mail
 from urllib.request import quote
+import warnings
 
 
 """违章查询相关类和函数"""
@@ -136,6 +137,20 @@ class ValidCity(mongo_db.BaseDoc):
         return res
 
     @classmethod
+    def augment_plate_city_map(cls, prefix: str, city_code: str) -> None:
+        """
+        向车牌前缀和归属地的映射中增加一个读应关系.
+        : param prefix:  车牌前两位 比如 沪A /  沪A_new  (新能源车)
+        : param city_code:  城市代码,用于违章查询
+        :return:
+        """
+        key = "plate_number_and_city_code_map"
+        the_map = cls.get_plate_city_map()
+        the_map[prefix] = city_code
+        timeout = 86400  # 缓存一天
+        cache.set(key=key, value=the_map, timeout=timeout)
+
+    @classmethod
     def validate_city_code(cls, city_code: str) -> bool:
         """
         验证一个城市是否可以查询?
@@ -149,12 +164,16 @@ class ValidCity(mongo_db.BaseDoc):
             return True
 
     @classmethod
-    def validate_plate_number(cls, plate_number: str) -> bool:
+    def get_city_code_by_plate_number(cls, plate_number: str) -> dict:
         """
-        验证一个车牌是否能查询?,逻辑如下:
+        根据车牌获取对应的城市码
+        逻辑如下:
         1. 车牌长度确认是不是新能源车?
+        2. 缓存中有就冲缓存取,返回,否则继续下一步.
+        3. 从互联网查询.如果查询失败,抛出异常.查询成功,下一步.
+        4. 更新数据库,更新缓存. 返回city_code
         :param plate_number: 车牌
-        :return:
+        :return:{"city_code": city_code,"new_power": True/False}  or dict()
         """
         s_map = [
             "京", "津", "沪", "渝", "蒙", "新", "藏", "宁", "桂", "澳", "港", "黑", "吉",
@@ -172,19 +191,39 @@ class ValidCity(mongo_db.BaseDoc):
             logger.exception(ms)
             raise ValueError(ms)
         prefix = plate_number[0: 2]
+        new_power = False
         if len(plate_number) > 7:
             """新能源车"""
             cache_key = prefix + "_new"
+            new_power = True
         else:
             cache_key = prefix
         the_map = cls.get_plate_city_map()
         city_code = the_map.get(cache_key)
+        res = dict()
         if city_code is None:
-            """没有对应的数据,需要从接口查询"""
+            """
+            没有对应的数据,需要从接口查询, 注意,有可能有不支持的城市或者查询失败.
+            目前没有处理这种意外.
+            """
+            ms = "从聚合数据接口查询车牌前缀和城市代码的对应关系,有可能有不支持的城市或者查询失败的情况.目前没有处理这种意外."
+            warnings.warn(ms)
             info = cls.query_city_by_plate_number(plate_number)
-            city_code = info['city_code']
+            """这里应该有一个异常处理的逻辑和处理"""
+            city_code = info.pop('city_code')
             f = {"city_code": city_code}
-            u = {"$set": {}}
+            u = {"$set": info}
+            r = cls.find_one_and_update(filter_dict=f, update=u, upsert=False)
+            """修改cache里面的map"""
+            cls.augment_plate_city_map(prefix=cache_key, city_code=city_code)
+        else:
+            pass
+        if city_code is not None:
+            res['city_code'] = city_code
+            res['new_power'] = new_power
+        else:
+            pass
+        return city_code
 
     @classmethod
     def query_city_by_plate_number(cls, plate_number: str) -> dict:
@@ -358,13 +397,27 @@ class ValidCity(mongo_db.BaseDoc):
             u = {"$set": {"can_use": False}}
             cls.update_many_plus(filter_dict=f, update_dict=u, upsert=False)
 
-    @classmethod
-    def get_city_info(cls, plate_number: str) -> str:
+
+class TrafficViolationHandler:
+    """
+    违章查询处理器,这是一个非持久化类
+    """
+    def __init__(self, plate_num: str, vin: str, engine_id: str):
         """
-        根据车牌获取城市的city_info
-        :param plate_number:
-        :return:
+        构造器
+        :param plate_num:   车牌
+        :param vin:         车架号,尽量长
+        :param engine_id:   发动机号
         """
+        r = ValidCity.get_city_code_by_plate_number(plate_number=plate_num)
+        if len(r) == 0:
+            ms = "{} 对应的地区不明".format(plate_num)
+            logger.exception(ms)
+            raise ValueError(ms)
+        else:
+            new_power = r['new_power']
+            city_code = r['city_code']
+            if not ValidCity.validate_city_code(city_code)
 
 
 
