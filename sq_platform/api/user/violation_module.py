@@ -296,7 +296,7 @@ class ViolationRecode(mongo_db.BaseDoc):
             a_dict['real_value'] = pos.real_value
         return a_dict
 
-    def exist(self):
+    def exists(self):
         """
         检查一条违章记录是否已存在？
         1. 存在且完全相同就不做更新。
@@ -506,7 +506,7 @@ class ViolationQueryResult(mongo_db.BaseDoc):
                 for vio in data_vio_list:
                     vio['user_id'] = user_id
                     obj = ViolationRecode.instance(**vio)
-                    dbref = obj.exist()
+                    dbref = obj.exists()
                     vio_list.append(dbref)
                 kwargs['violations'] = vio_list
             return cls.insert_one(**kwargs)
@@ -646,7 +646,6 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             object_id = ref.id
             license_obj = CarLicense.find_by_id(object_id)
             data = license_obj.get_vio_query_info()
-            data['city'] = "" if self.__dict__.get("city") is None else self.city
             return data
         else:
             raise TypeError("{} 不是一个有效的DBRef对象".format(ref))

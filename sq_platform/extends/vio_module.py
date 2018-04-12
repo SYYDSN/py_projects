@@ -41,9 +41,9 @@ class ValidCity(mongo_db.BaseDoc):
     type_dict['province_name'] = str   # 省份名称,
     type_dict['province_code'] = str   # 省份
     type_dict['need_vin'] = bool  # 是否需要车架号?
-    type_dict['vin_length'] = int  # 需要几位车架号? 需要不需要车架号,这里是-1
+    type_dict['vin_length'] = int  # 需要几位车架号? 0是全部
     type_dict['need_engine'] = bool  # 是否需要发动机号?
-    type_dict['engine_length'] = int  # 需要几位发动机号? 需要不需要车架号,这里是-1
+    type_dict['engine_length'] = int  # 需要几位发动机号? 0是全部
     type_dict['valid_date'] = datetime.datetime  # 验证日期
     type_dict['new_power'] = bool  # 是否新能源车?  车牌多一位 翠绿牌
     type_dict['can_use'] = bool  # 此城市是否能查询?
@@ -76,9 +76,9 @@ class ValidCity(mongo_db.BaseDoc):
             s = {"valid_date": 1}
             res = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
             if len(res) > 0:
-                delta = now - cities[0]['valid_date']
-                if delta < 600:
-                    """还有十分钟就过期了,那就直接刷新"""
+                delta = now - res[0]['valid_date']
+                if delta.total_seconds() > 86400:
+                    """用了一天了,那就直接刷新"""
                     cls.refresh()
                     res = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
                 else:
@@ -108,13 +108,27 @@ class ValidCity(mongo_db.BaseDoc):
                 short_name = x['short_name']
                 city_code = x['city_code']
                 city_name = x['city_name']
+                need_engine = x['need_engine']
+                engine_length = x['engine_length']
+                need_vin = x['need_vin']
+                vin_length = x['vin_length']
+                new_power = x['new_power']
                 flag = True if city_name.endswith("新能源") else False  # 是否是新能源车?
                 if flag:
                     for y in first_letter:
-                        res[short_name + y + "_new"] = city_code
+                        k = short_name + y + "_new"
                 else:
                     for y in first_letter:
-                        res[short_name + y] = city_code
+                        k = short_name + y
+                temp = dict()
+                temp['city_code'] = city_code
+                temp['city_name'] = city_name
+                temp['need_engine'] = need_engine
+                temp['engine_length'] = engine_length
+                temp['need_vin'] = need_vin
+                temp['vin_length'] = vin_length
+                temp['new_power'] = new_power
+                res[k] = temp
         if len(res) == 0:
             timeout = 60
         else:
@@ -137,16 +151,16 @@ class ValidCity(mongo_db.BaseDoc):
         return res
 
     @classmethod
-    def augment_plate_city_map(cls, prefix: str, city_code: str) -> None:
+    def augment_plate_city_map(cls, prefix: str, city_info: dict) -> None:
         """
         向车牌前缀和归属地的映射中增加一个读应关系.
         : param prefix:  车牌前两位 比如 沪A /  沪A_new  (新能源车)
-        : param city_code:  城市代码,用于违章查询
+        : param city_info:  信息字典,包含城市代码,用于违章查询
         :return:
         """
         key = "plate_number_and_city_code_map"
         the_map = cls.get_plate_city_map()
-        the_map[prefix] = city_code
+        the_map[prefix] = city_info
         timeout = 86400  # 缓存一天
         cache.set(key=key, value=the_map, timeout=timeout)
 
@@ -159,9 +173,9 @@ class ValidCity(mongo_db.BaseDoc):
         """
         cities = cls.get_cities()
         if city_code in cities:
-            return False
-        else:
             return True
+        else:
+            return False
 
     @classmethod
     def get_city_code_by_plate_number(cls, plate_number: str) -> dict:
@@ -173,7 +187,7 @@ class ValidCity(mongo_db.BaseDoc):
         3. 从互联网查询.如果查询失败,抛出异常.查询成功,下一步.
         4. 更新数据库,更新缓存. 返回city_code
         :param plate_number: 车牌
-        :return:{"city_code": city_code,"new_power": True/False}  or dict()
+        :return:  or dict()
         """
         s_map = [
             "京", "津", "沪", "渝", "蒙", "新", "藏", "宁", "桂", "澳", "港", "黑", "吉",
@@ -191,17 +205,15 @@ class ValidCity(mongo_db.BaseDoc):
             logger.exception(ms)
             raise ValueError(ms)
         prefix = plate_number[0: 2]
-        new_power = False
         if len(plate_number) > 7:
             """新能源车"""
             cache_key = prefix + "_new"
-            new_power = True
         else:
             cache_key = prefix
         the_map = cls.get_plate_city_map()
-        city_code = the_map.get(cache_key)
+        result = the_map.get(cache_key)
         res = dict()
-        if city_code is None:
+        if result is None:
             """
             没有对应的数据,需要从接口查询, 注意,有可能有不支持的城市或者查询失败.
             目前没有处理这种意外.
@@ -209,24 +221,34 @@ class ValidCity(mongo_db.BaseDoc):
             ms = "从聚合数据接口查询车牌前缀和城市代码的对应关系,有可能有不支持的城市或者查询失败的情况.目前没有处理这种意外."
             warnings.warn(ms)
             info = cls.query_city_by_plate_number(plate_number)
+            """
+            info's example:
+                            temp['city_code'] = city_code
+                            temp['city_name'] = city_name
+                            temp['need_engine'] = need_engine
+                            temp['engine_length'] = engine_length
+                            temp['need_vin'] = need_vin
+                            temp['vin_length'] = vin_length
+                            temp['new_power'] = new_power
+            """
             """这里应该有一个异常处理的逻辑和处理"""
-            city_code = info.pop('city_code')
-            f = {"city_code": city_code}
-            u = {"$set": info}
-            r = cls.find_one_and_update(filter_dict=f, update=u, upsert=False)
-            """修改cache里面的map"""
-            cls.augment_plate_city_map(prefix=cache_key, city_code=city_code)
+            if isinstance(info, dict):
+                res = info.copy()
+                """保存进缓存"""
+                cls.augment_plate_city_map(prefix=cache_key, city_info=info)
+                """保存进数据库"""
+                city_code = info.pop('city_code')
+                f = {"city_code": city_code}
+                u = {"$set": info}
+                r = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+            else:
+                pass
         else:
-            pass
-        if city_code is not None:
-            res['city_code'] = city_code
-            res['new_power'] = new_power
-        else:
-            pass
-        return city_code
+            res = result
+        return res
 
     @classmethod
-    def query_city_by_plate_number(cls, plate_number: str) -> dict:
+    def query_city_by_plate_number(cls, plate_number: str) -> (dict, None):
         """
         根据车牌,从聚合数据查询归属地的信息.
         :param plate_number:
@@ -271,6 +293,7 @@ class ValidCity(mongo_db.BaseDoc):
                 res['need_engine'] = bool(int(temp['engine']))
                 res['vin_length'] = int(temp['classno'])
                 res['engine_length'] = int(temp['engineno'])
+                res['new_power'] = bool(is_new)
                 return res
             else:
                 ms = "询直连接口的车牌和城市的对应关系时返回了出错信息:{}".format(r)
@@ -402,24 +425,269 @@ class TrafficViolationHandler:
     """
     违章查询处理器,这是一个非持久化类
     """
-    def __init__(self, plate_num: str, vin: str, engine_id: str):
+    def __init__(self, plate_number: str, vin: str, engine_id: str, car_type: str):
         """
         构造器
-        :param plate_num:   车牌
+        :param plate_number:   车牌
         :param vin:         车架号,尽量长
         :param engine_id:   发动机号
+        :param car_type:   车辆类型? 01:大型车,02:小型车, 51:新能源大型车 52:新能源小型车
         """
-        r = ValidCity.get_city_code_by_plate_number(plate_number=plate_num)
+        self.error = ''
+        r = ValidCity.get_city_code_by_plate_number(plate_number=plate_number)
         if len(r) == 0:
-            ms = "{} 对应的地区不明".format(plate_num)
+            ms = "{} 对应的地区不明".format(plate_number)
             logger.exception(ms)
-            raise ValueError(ms)
+            print(ms)
+            self.error = ms
         else:
             new_power = r['new_power']
+            """识别车辆类型. 默认是大型车"""
+            if car_type is None:
+                type_id = "01"
+            elif isinstance(car_type, str):
+                if car_type.find("大型") != -1:
+                    if new_power:
+                        type_id = "51"
+                    else:
+                        type_id = "01"
+                else:
+                    if new_power:
+                        type_id = "52"
+                    else:
+                        type_id = "02"
+            else:
+                type_id = "01"
             city_code = r['city_code']
-            if not ValidCity.validate_city_code(city_code)
+            city_name = r['city_name']
+            self.car_type = type_id
+            self.new_power = new_power
+            self.city_code = city_code
+            self.city_name = city_name
+            self.plate_number = plate_number
+            need_engine = r['need_engine']
+            need_vin = r['need_vin']
+            engine_length = r['engine_length']
+            vin_length = r['vin_length']
+            if not ValidCity.validate_city_code(city_code):
+                ms = "{}对应的地区{}目前无法查询违章记录".format(plate_number, city_name)
+                logger.exception(ms)
+                print(ms)
+                self.error = ms
+            else:
+                if need_engine:
+                    """需要发动机号码"""
+                    if engine_length == 0:
+                        self.engine_id = engine_id
+                    elif len(engine_id) >= engine_length:
+                        self.engine_id = engine_id[-engine_length:]
+                    else:
+                        ms = "发动机号码需要后{}位".format(engine_length)
+                        logger.exception(ms)
+                        print(ms)
+                        self.error = ms
+                if need_vin:
+                    """需要车架号码"""
+                    if vin_length == 0:
+                        self.vin = vin
+                    elif len(vin) >= vin_length:
+                        self.vin = vin[-vin_length:]
+                    else:
+                        ms = "车架号码需要后{}位".format(vin_length)
+                        logger.exception(ms)
+                        print(ms)
+                        self.error = ms
 
+    @classmethod
+    def query_vio(cls,  plate_number: str, vin: str, engine_id: str, car_type: str = None) -> dict:
+        """
+        查询交通违章信息.
+        :param plate_number:
+        :param vin:
+        :param engine_id:
+        :param car_type: 车辆类型? 01:大型车,02:小型车, 51:新能源大型车 52:新能源小型车
+        :return:
+        """
+        mes = {'message': 'success'}
+        obj = cls(plate_number=plate_number, vin=vin, engine_id=engine_id, car_type=car_type)
+        if obj.error != "":
+            mes['message'] = obj.error
+        else:
+            r = cls.query_vio_from_api(obj.plate_number, obj.vin, obj.engine_id, obj.city_code, obj.car_type)
+            print(r)
+
+    @staticmethod
+    def query_vio_from_api(plate_number: str, vin: str, engine_id: str, city_code: str, car_type: str) -> dict:
+        """
+        从聚合数据的接口查询违章信息.
+        :param plate_number:
+        :param vin:
+        :param engine_id:
+        :param city_code:
+        :param car_type: 车辆类型? 01:大型车,02:小型车, 51:新能源大型车 52:新能源小型车
+        :return:
+        """
+        mes = {"message": "success"}
+        u = "http://v.juhe.cn/sweizhang/query?dtype=&callback=&city={}&hphm={}&hpzl={}&engineno={}&classno={}&key={}".\
+            format(city_code, quote(plate_number, encoding='utf-8'), car_type, engine_id, vin, app_key)
+        r = requests.get(url=u)
+        status_code = r.status_code
+        if status_code != 200:
+            ms = "查询聚合数据的违章查询直连接口的车牌和城市的对应关系时出错,服务器返回了错误代码:{}".format(status_code)
+            logger.exception(ms)
+            print(ms)
+            title = "{}聚合数据接口出错".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            send_mail(title=title, content=ms)
+            mes['message'] = ms
+        else:
+            r = r.json()
+            """
+            查询成功的示范
+            r = {
+                 'reason': '查询成功', 
+                 'resultcode': '200', 
+                 'error_code': 0, 
+                 'result': {
+                            'lists': [
+                                       {
+                                       'archiveno': '', 
+                                       'date': '2018-03-17 15:12:00', 
+                                       'act': '驾驶中型以上载货汽车在高速公路、城市快速路以外的道路上行驶超过规定时速10%未达20%的', 
+                                       'wzcity': '广东深圳', 
+                                       'handled': '0', 
+                                       'money': '0', 
+                                       'fen': '3', 
+                                       'code': '13501', 
+                                       'area': '省道22179公里500米'
+                                       }, 
+                                       {
+                                       'archiveno': '',                              # 文书编号
+                                       'date': '2017-11-25 15:42:00',                # 违章时间
+                                       'act': '违反禁令标志指示',                       # 违章行为
+                                       'wzcity': '',                                 # 违章行为发生的城市
+                                       'handled': '0',                               # 是否处理,1处理 0未处理 空未知
+                                       'money': '0',                                 # 违章罚款(仅供参考，不一定有值)
+                                       'fen': '3',                                   #　违章扣分(仅供参考，不一定有值)
+                                       'code': '1344', 　　　　　　　　　　　　　　　　　　# 违章代码(仅供参考，不一定有值)
+                                       'area': '沪昆高速1073公里600米处东往西'           # 违章地点
+                                       }
+                                    ], 
+                            'city': 'JX_YICHUN_J', 
+                            'hphm': '赣CX3706', 
+                            'province': 'JX', 
+                            'hpzl': '01'
+                            }
+                }
+            """
+            if r['error_code'] != 0:
+                mes['message'] = r['reason']
+            else:
+                result = r['result']
+                """
+                class ViolationQueryResult(mongo_db.BaseDoc):
+                    _table_name = "violation_query_result_info"
+                    type_dict = dict()
+                    type_dict["_id"] = ObjectId  # id 唯一
+                    type_dict['user_id'] = ObjectId  # 关联用户的id
+                    type_dict['generator_id'] = ObjectId  # 关联查询器的id
+                    type_dict['amount'] = int  # 截止到目前一共多少次违章？
+                    type_dict['total_fine'] = float  # 未处理违章总罚款
+                    type_dict['total_points'] = int  # 未处理违章总扣分
+                    type_dict['untreated'] = int  # 未处理违章条数
+                    type_dict['create_date'] = datetime.datetime  # 查询结果创建时间
+                    type_dict['violations'] = list  # 违章记录，是DBRef的数组
+                class ViolationRecode(mongo_db.BaseDoc):
+                    _table_name = "violation_info"
+                    type_dict = dict()
+                    type_dict["_id"] = ObjectId  # id 唯一
+                    type_dict['user_id'] = ObjectId  # 关联用户的id
+                    type_dict['plate_number'] = str  # 违章时的车牌号
+                    type_dict["code"] = str  # 违章编码,唯一，非违章条例码
+                    type_dict["time"] = datetime.datetime  # 违章时间
+                    type_dict["update_time"] = datetime.datetime  # 记录变更时间
+                    type_dict["fine"] = float  # 罚款金额
+                    type_dict["address"] = str  # 违章地址
+                    type_dict["reason"] = str  # 违章处理原因
+                    type_dict["point"] = int  # 违章扣分
+                    type_dict["province"] = str  # 省份
+                    type_dict["city"] = str  # 城市
+                    type_dict["service_fee"] = float  # 服务费
+                    type_dict["violation_num"] = str  # 违章编码
+                    type_dict["can_select"] = int  # 能否勾选办理：0不可勾选, 1可勾选。
+                    type_dict["process_status"] = str  # 违章处理状态：1：未处理，2：处理中，3：已处理，4：不支持
+                    type_dict["payment_status"] = str  # 违章缴费状态 不返回表示无法获取该信息，1-未缴费 2-已缴
+                    type_dict['position_id'] = ObjectId  # 违章地址的经纬度信息的id，指向Position类
+                """
+                if "lists" in result:
+                    data = dict()                  # 最后返回的数据
+                    amount = 0                     # 违章总数
+                    untreated = 0                  # 未处理违章条数
+                    total_fine = 0.0               # 未处理违章总罚款
+                    total_points = 0               # 未处理违章总扣分
+                    violations = list()            # 违章记录
+                    vio_list = result['list']
+                    for vio in vio_list:
+                        """
+                        vio = {
+                                'archiveno': '',                              # 文书编号
+                                'date': '2017-11-25 15:42:00',                # 违章时间
+                                'act': '违反禁令标志指示',                       # 违章行为
+                                'wzcity': '',                                 # 违章行为发生的城市
+                                'handled': '0',                               # 是否处理,1处理 0未处理 空未知
+                                'money': '0',                                 # 违章罚款(仅供参考，不一定有值)
+                                'fen': '3',                                   #　违章扣分(仅供参考，不一定有值)
+                                'code': '1344', 　　　　　　　　　　　　　　　　　　# 违章代码(仅供参考，不一定有值)
+                                'area': '沪昆高速1073公里600米处东往西'           # 违章地点
+                              }
+                        """
+                        amount += 1
+                        handled = vio['handled']
+                        code = vio.get('code')
+                        money = vio.get("money")
+                        try:
+                            money = float(money)
+                        except Exception as e:
+                            logger.exception(e)
+                            money = None
+                        fen = vio.get("fen")
+                        try:
+                            fen = int(fen)
+                        except Exception as e:
+                            logger.exception(e)
+                            fen = None
+
+                        if handled == "0":
+                            """未处理"""
+                            handled = "未处理"
+                            untreated += 1
+                            if money is not None:
+                                total_fine += money
+                            if fen is not None:
+                                total_points += fen
+                        elif handled == "1":
+                            handled = "已处理"
+                        else:
+                            handled = "未知"
+                        temp = {
+                            "time": mongo_db.get_datetime_from_str(vio['date']),
+                            "city": vio['wzcity'],
+                            "plate_number": plate_number,
+                            "code": code,
+                            "fine": money,
+                            "point": fen,
+                            "reason": vio['act'],
+                            "address": vio['area'],
+                            "process_status": handled
+                        }
+                        temp = {k: v for k, v in temp.items()}
+                        """继续"""
+                else:
+                    pass
 
 
 if __name__ == "__main__":
-    ValidCity.refresh_from_file()
+    q = {
+        'vin': 'LFNFVXPXXG1F32315',  'engine_id': '52701239', 'plate_number': '赣CX3706'
+    }
+    TrafficViolationHandler.query_vio(**q)
+    pass

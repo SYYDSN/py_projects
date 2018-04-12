@@ -91,8 +91,8 @@ def query_transaction(*args, **kwargs):
     add_job("query_transaction", dict())  # 提取交易信息并上传
     ms = "beat task add query_transaction success"
     recode(ms)
-    add_job("query_withdraw", dict())    # 提取出金申请并上传。
-    ms = "beat task add query_withdraw success"
+    # add_job("query_withdraw", dict())    # 提取出金申请并上传。 query_transaction一并上传了.
+    # ms = "beat task add query_withdraw success"
     recode(ms)
     return "celery query_transaction ok"
 

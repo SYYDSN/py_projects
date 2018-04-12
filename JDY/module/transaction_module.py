@@ -137,9 +137,11 @@ class Transaction(mongo_db.BaseDoc):
         获取数据库中，还在持仓的记录
         :return:
         """
-        filter_dict = {"command": {"$in": ['buy', 'sell']}, "close_time": {"$in": ['', None]}}
+        filter_dict = {"command": {"$in": ['buy', 'sell']}, "$or": [
+            {"close_time": {"$exists": False}}, {"close_time": {"$eq": None}}
+        ]}
         sort_dict = {"ticket": -1}
-        holdings = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
+        holdings = cls.find_plus(filter_dict={}, sort_dict=sort_dict, to_dict=True)
         return holdings
 
     @classmethod
@@ -245,5 +247,5 @@ class Withdraw(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    print(Transaction.sum_commission('2018-02-01 0:0:0', "2018-3-1 0:0:0"))
+    print(Transaction.last_ticket(['office.shengfxchina.com:8443']))
     pass

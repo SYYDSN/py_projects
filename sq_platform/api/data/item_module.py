@@ -1155,10 +1155,9 @@ class CarLicense(mongo_db.BaseDoc):
         engineNo = "" if data_dict.get("engine_id") is None else data_dict['engine_id']
         vin = "" if data_dict.get("vin_id") is None else data_dict['vin_id']
         vin = vin[-6:] if len(vin) > 6 else vin
-        carType = "" if data_dict.get("car_type") is None else data_dict['car_type']
-        carType = "02" if carType.find("小") != -1 or carType == "" else "01"
-        args = {"plateNumber": plateNumber, "engineNo": engineNo, "vin": vin,
-                "carType": carType}
+        carType = data_dict.get("car_type")
+        args = {"plate_number": plateNumber, "engine_id": engineNo, "vin": vin,
+                "car_type": carType}
         return args
 
 

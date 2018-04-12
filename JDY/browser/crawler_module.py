@@ -32,6 +32,7 @@ from werkzeug.contrib.cache import RedisCache
 from module.transaction_module import Transaction
 from module.transaction_module import Withdraw
 from gevent.queue import JoinableQueue
+from mail_module import send_mail
 from threading import Lock
 
 
@@ -1907,7 +1908,13 @@ def do_jobs():
                 elif job_type == "draw_withdraw":
                     draw_withdraw(browser)  # 从平台查询并写入数据库
                 elif job_type == "query_transaction":
-                    transaction = query_transaction(True)  # 只查询数据库，没有上传动作。
+                    # transaction = query_transaction(True)  # 只查询数据库，没有上传动作。
+                    transaction = query_transaction(upload=True, only_transaction=False)  # 查四种交易的的数据库，没有上传动作。
+                    now = datetime.datetime.now()
+                    ms = "{}开始检查交易记录,交易记录的长度为{}".format(now, len(transaction))
+                    send_mail(title=ms)
+                    recode(ms)
+                    print(ms)
                     if len(transaction) == 0:
                         print("query transaction success")
                     else:
@@ -2083,10 +2090,6 @@ if __name__ == "__main__":
     #     }
     # c = CustomerManagerRelation(**i_dict)
     # print(CustomerManagerRelation.get_relation('8300144'))
-    """测试终止条件问题"""
-    b = get_browser(1, 1)
-    draw_transaction(b)
-    b.quit()
-    del b
-    gc.collect()
+    r = query_transaction(upload=True, only_transaction=False)
+    print(r)
     pass
