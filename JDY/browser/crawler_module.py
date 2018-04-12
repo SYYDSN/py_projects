@@ -380,7 +380,7 @@ def login_platform(browser, domain: str):
         user_password = user_password2
 
     browser.get(url=url)
-    recode("html= {}".format(browser.page_source))
+    # recode("html= {}".format(browser.page_source))
     # 用户名输入
     input_user_name = WebDriverWait(browser, 10).until(
         ec.presence_of_element_located((By.CSS_SELECTOR, "form .uname")))

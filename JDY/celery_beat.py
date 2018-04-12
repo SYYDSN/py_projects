@@ -21,7 +21,7 @@ app.conf.CELERYBEAT_SCHEDULE = {
     """增加每日检查平台1/2交易信息的作业"""
     'add_check_transaction': {
         'task': 'celery_module.query_transaction',
-        'schedule': crontab(minute="10", hour="22"),  # 爬虫服务器没时区问题。由于时区问题实际是临晨6:10点执行
+        'schedule': crontab(minute="25", hour="23"),  # 爬虫服务器没时区问题。由于时区问题实际是临晨6:10点执行
         'args': (2, 3)
     },
     """添加每5分钟在平台服务器检查一下出金申请的作业"""
