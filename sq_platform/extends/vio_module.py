@@ -31,7 +31,7 @@ class ValidCity(mongo_db.BaseDoc):
     有效的查询城市,由于并非所有的城市都可以进行违章查询.
     所以需要维护一个无效的查询城市的列表,避免过度的浪费查询资源.
     """
-    _table_name = "valid_city_list"
+    _table_name = "valid_city_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['short_name'] = str         # 区域简称,车牌第一位,汉字.沪,京,赣等
@@ -514,7 +514,8 @@ class TrafficViolationHandler:
             mes['message'] = obj.error
         else:
             r = cls.query_vio_from_api(obj.plate_number, obj.vin, obj.engine_id, obj.city_code, obj.car_type)
-            print(r)
+            mes = r
+        return mes
 
     @staticmethod
     def query_vio_from_api(plate_number: str, vin: str, engine_id: str, city_code: str, car_type: str) -> dict:
@@ -525,7 +526,7 @@ class TrafficViolationHandler:
         :param engine_id:
         :param city_code:
         :param car_type: 车辆类型? 01:大型车,02:小型车, 51:新能源大型车 52:新能源小型车
-        :return:
+        :return:{'message': '发动机号错误','data';{''violations}: [violation1,....], amount:2,....}
         """
         mes = {"message": "success"}
         u = "http://v.juhe.cn/sweizhang/query?dtype=&callback=&city={}&hphm={}&hpzl={}&engineno={}&classno={}&key={}".\
@@ -618,14 +619,14 @@ class TrafficViolationHandler:
                     type_dict["payment_status"] = str  # 违章缴费状态 不返回表示无法获取该信息，1-未缴费 2-已缴
                     type_dict['position_id'] = ObjectId  # 违章地址的经纬度信息的id，指向Position类
                 """
-                if "lists" in result:
+                if "lists" in result and len(result['lists']) > 0:
                     data = dict()                  # 最后返回的数据
                     amount = 0                     # 违章总数
                     untreated = 0                  # 未处理违章条数
                     total_fine = 0.0               # 未处理违章总罚款
                     total_points = 0               # 未处理违章总扣分
-                    violations = list()            # 违章记录
-                    vio_list = result['list']
+                    violations = list()            # 违章记录容器
+                    vio_list = result['lists']
                     for vio in vio_list:
                         """
                         vio = {
@@ -680,12 +681,26 @@ class TrafficViolationHandler:
                             "process_status": handled
                         }
                         temp = {k: v for k, v in temp.items()}
-                        """继续"""
+                        violations.append(temp)
+                    data['amount'] = amount
+                    data['untreated'] = untreated
+                    data['total_fine'] = total_fine
+                    data['total_points'] = total_points
+                    data['violations'] = violations
+                    mes['data'] = data
                 else:
                     pass
+        return mes
 
 
 if __name__ == "__main__":
+    """
+    可被查询到违章记录的
+    [
+    {vin': 'LGAX5D652F8021160',  'engine_id': 'F2003733', 'plate_number': '赣CX0975'},
+    {vin': 'LG6ZDCNHXFY200347',  'engine_id': '1415B004539', 'plate_number': '赣CX0431'}
+    ]
+    """
     q = {
         'vin': 'LFNFVXPXXG1F32315',  'engine_id': '52701239', 'plate_number': '赣CX3706'
     }

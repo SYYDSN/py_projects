@@ -57,7 +57,7 @@ def test_get_vio_query_shortcuts():
     测试获取违章查询器列表
     :return:
     """
-    auth_token = "f40bc71e130c48f4bcebff1169dfe22a"  # app段登录标识 me
+    auth_token = "a98d8bb4840c42e3993ccc6d6c79d431"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     # url = "http://safego.org:5000/api/get_vio_query_shortcuts"
     url = "http://127.0.0.1:5000/api/get_vio_query_shortcuts"
@@ -70,9 +70,11 @@ def test_query_violation():
     测试违章查询
     :return:
     """
-    auth_token = "f40bc71e130c48f4bcebff1169dfe22a"  # app段登录标识 me
+    auth_token = "a98d8bb4840c42e3993ccc6d6c79d431"  # app段登录标识 me
+    # auth_token = "92cf9b0b956946b7b4fad8e49c0ac1e1"  # app段登录标识 me
     headers = {"auth_token": auth_token}
-    args = {"_id": "5ac400a409d20f32d731b6e2"}   #
+    args = {"_id": "5ac49aa74660d356cce9df9f"}   #
+    # args = {"_id": "5acf2de4e39a7b6194d2321a"}   #
     # url = "http://safego.org:5000/api/query_violation"
     url = "http://127.0.0.1:5000/api/query_violation"
     res = requests.post(url, data=args, headers=headers)
@@ -264,7 +266,7 @@ if __name__ == "__main__":
     """测试获取每日报告"""
     # test_get_daily_info()
     """测试违章查询"""
-    # test_query_violation()
+    test_query_violation()
     # test_req(**args)
     """测试获取违章查询器列表"""
     # test_get_vio_query_shortcuts()
@@ -281,7 +283,7 @@ if __name__ == "__main__":
     """测试更新用户驾驶证信息"""
     # test_update_user_driving_license()
     """测试获取用户驾驶证信息"""
-    test_get_user_driving_license()
+    # test_get_user_driving_license()
     """测试用户安全指数排名接口"""
     # test_get_security_rank_list()
     """测试用户上传行车数据的压缩文件"""

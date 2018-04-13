@@ -434,6 +434,9 @@ def query_violation(user_id):
             print(e)
         finally:
             pass
+    ms = "违章查询的结果是:{}".format(message)
+    logger.info(ms)
+    print(ms)
     return json.dumps(message)
 
 

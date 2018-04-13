@@ -6,7 +6,6 @@ if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 from log_module import get_logger
 from log_module import recode
-from mail_module import send_mail
 import requests
 import re
 import gc
@@ -1671,13 +1670,25 @@ def query_transaction(upload: bool = True, only_transaction: bool = False) ->lis
     """
     types = ['sell', 'buy'] if only_transaction else ['sell', 'buy', 'balance', 'credit']
     if upload:
-        filter_dict = {
-            "$or": [{"upload": {"$ne": 1}}, {"upload": {"$exists": False}}],
-            "close_time": {"$exists": True},
-            "command": {"$in": types}
-        }
+        if only_transaction:
+            filter_dict = {
+                "close_time": {"$exists": True}, 'command': {'$in': ['sell', 'buy']},
+                "$or": [{"upload": {"$ne": 1}}, {"upload": {"$exists": False}}]
+            }
+        else:
+            filter_dict = {"$and": [
+                {"$or": [{"upload": {"$ne": 1}}, {"upload": {"$exists": False}}]},
+                {"$or": [
+                    {"close_time": {"$exists": True}, 'command': {'$in': ['sell', 'buy']}},
+                    {"time": {"$exists": True}, 'command': {'$in': ['balance', 'credit']}},
+                ]}
+              ]
+            }
     else:
-        filter_dict = dict()
+        if only_transaction:
+            filter_dict = {'command': {'$in': ['sell', 'buy']}}
+        else:
+            filter_dict = dict()
     sort_dict = {"close_time": 1, "time": 1}
     r = Transaction.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=True)
     ms = "query transaction success"
@@ -1909,10 +1920,11 @@ def do_jobs():
                     draw_withdraw(browser)  # 从平台查询并写入数据库
                 elif job_type == "query_transaction":
                     # transaction = query_transaction(True)  # 只查询数据库，没有上传动作。
-                    transaction = query_transaction(upload=True, only_transaction=False)  # 查四种交易的的数据库，没有上传动作。
+                    transaction = query_transaction(upload=True, only_transaction=True)  # 查四种交易的的数据库，没有上传动作。
                     now = datetime.datetime.now()
-                    ms = "{}开始检查交易记录,交易记录的长度为{}".format(now, len(transaction))
-                    send_mail(title=ms)
+                    ms = "{}当前任务{},交易记录的长度为{}".format(now, job_type, len(transaction))
+                    content = "{}".format(jobs)
+                    send_mail(title=ms, content=content)
                     recode(ms)
                     print(ms)
                     if len(transaction) == 0:
