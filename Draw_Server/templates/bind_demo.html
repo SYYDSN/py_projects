@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>外站页面绑定注册脚本示范</title>
+		<style type="text/css">
+			* {
+				padding: 0;
+				margin: 0;
+				list-style: none;
+			}
+			
+			li {
+				margin-bottom: 10px;
+			}
+			
+			.inputtext {
+				height: 26px;
+				width: 300px;
+			}
+			
+			button {
+				width: 150px;
+				padding: 10px 0;
+			}
+			
+			.pr15 {
+				padding-right: 15px;
+			}
+		</style>
+		<script src="http://www.91master.cn/zj-jg-zg/js/jquery.js"></script>
+	</head>
+
+	<body>
+		<div class="reg_div">
+			<ul style="margin: 30px auto; width: 500px;">
+				<li><input type="text" id="search_input" placeholder="搜索" class="search_keyword inputtext" /></li>
+				<li><input type="text" placeholder="姓名" class="user_name inputtext" /></li>
+				<li><input type="text" placeholder="手机号" class="user_phone inputtext" /></li>
+				<li><input type="text" placeholder="验证码" class="sms_code inputtext" /></li>
+				<li><button type="text" class="sms_btn" />获取验证码</button>
+				</li>
+				<li>
+					<select id="my_select" class="budget" name="budget">
+						<option value="0">选择预算</option>
+						<option value="$5000">$5000</option>
+						<option value="$5000 - $10000">$5000 - $10000</option>
+						<option value="$10000">$10000</option>
+					</select>
+
+				</li>
+				<li> <label>
+                        <input class="sale" type="radio" checked="checked" name="sendRule"  value="营销1">
+                        营销1 </label>
+					<label>
+                        <input class="sale" type="radio" name="sendRule"  value="营销2">
+                       营销2 </label>
+					<label>
+                        <input class="sale" type="radio" name="sendRule"  value="营销3">
+                        营销3 </label>
+				</li>
+				<li>
+					<input class="fruit" type="checkbox" name="fruit" value="梨子" />梨子
+					<input class="fruit" type="checkbox" name="fruit" value="李子" />李子
+					<input class="fruit" type="checkbox" name="fruit" value="栗子" />栗子
+					<input class="fruit" type="checkbox" name="fruit" value="荔枝" />荔枝
+				</li>
+				<li>
+					<label class="cd-label" for="cd-textarea">项目描述</label>
+					<textarea id="comment"  class="messageText" name="cd-textarea" ></textarea>
+
+				</li>
+				<li><button type="button" class="submit_btn">注册</button></li>
+
+			</ul>
+			<div class="customer_description" style="display:none"></div>
+		</div>
+
+	</body>
+	<script>
+		$(function() {
+		    var get_info = function(){
+		        // 定义一个收集信息的函数
+				/*
+				* 假设元素已添加好对应的id和类.
+				* 本页面需要手机的信息如下:
+				* 1.  #search_input  搜索输入框的内容
+				* 2.  #my_select     预算选择
+				* 3.  .sale          营销选择
+				* 4.  .fruit         水果选择
+				* 5.  #comment       项目描述
+				* */
+				var desc = '';
+				// 取搜索字段
+				var search = $.trim($("#search_input").val());
+				search = "搜索内容: " + search +"  ";
+				desc += search;
+				// 取预算
+				var sel = $('#my_select').val();
+				sel = "预算: "+ sel +"  ";
+				desc += sel;
+				// 取营销
+				var sale = $(".sale:checked").val();
+				sale = "营销: "+ sale +"  ";
+				desc += sale;
+				// 取水果
+				var fruits = $(".fruit:checked");
+				var fruit_str = '';
+				for(var fruit of fruits){
+				    fruit_str += fruit.value;
+				}
+				fruit_str = "水果: "+ fruit_str +"  ";
+				desc += fruit_str;
+				// 取项目描述
+				var comm = $.trim($("#comment").val());
+				comm = "项目描述: " + comm +" ";
+				desc += comm;
+
+				// 赋值到约定的div中.
+				$(".reg_div .customer_description").text(desc);
+			};
+
+		    // 绑定事件,所有需要记录信息的dom都需要做相关绑定
+			$("#search_input, my_select,#comment,.fruit,.sale").blur(function(){
+			    console.log("binding...");
+				get_info();
+			});
+		});
+	</script>
+	<!--保持在</body>下面-->
+	<script src="http://39.108.67.178:9000/register.js"></script>
+</html>
