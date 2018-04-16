@@ -2,13 +2,8 @@
 import datetime
 
 from celery import Celery
-
+from module.mail_excel import EveryDayExcel
 from browser.firefox_module import to_jiandao_cloud
-from browser.firefox_module import ShengFX888
-from browser.crawler_module import do_jobs
-from browser.crawler_module import send_excel_everyday
-from log_module import get_logger
-from log_module import recode
 from mail_module import send_mail
 
 
@@ -74,6 +69,7 @@ def test(self, *args, **kwargs):
 
 @app.task(bind=True)
 def to_jiandao_cloud_and_send_mail(*args, **kwargs):
+    """这个方法在本项目中无效"""
     print(kwargs)
     res = to_jiandao_cloud(**kwargs)
     if not res:
@@ -83,34 +79,22 @@ def to_jiandao_cloud_and_send_mail(*args, **kwargs):
     return res
 
 
-@app.task(bind=True)
-def query_transaction(*args, **kwargs):
-    add_job("draw_transaction", dict())  # 抓取交易信息
-    ms = "beat task add draw_transaction success"
-    recode(ms)
-    add_job("query_transaction", dict())  # 提取交易信息并上传
-    ms = "beat task add query_transaction success"
-    recode(ms)
-    # add_job("query_withdraw", dict())    # 提取出金申请并上传。 query_transaction一并上传了.
-    # ms = "beat task add query_withdraw success"
-    recode(ms)
-    return "celery query_transaction ok"
-
-
-@app.task(bind=True)
-def do_works(self, *args, **kwargs):
-    """每5分钟抓取站点数据，并检查是否需要发送"""
-    do_jobs()
-    ms = "beat task do_works success"
-    recode(ms)
-    return "do_works success"
-
-
-@app.task(bind=True)
-def send_excel_everyday(self, *args, **kwargs):
-    """每天发送excel"""
-    send_excel_everyday()
-    return "send_excel success"
+@app.tasks(bind=True)
+def send_everyday_excel(*args, **kwargs):
+    """
+    每天凌晨5点把交易信息发送excel到指定的邮箱
+    :param args:
+    :param kwargs:
+    :return:
+    """
+    e = None
+    try:
+        EveryDayExcel.send_excel("583736361@qq.com")
+    except Exception as e:
+        print(e)
+    finally:
+        e = "send_everyday_excel success" if e is None else e
+        return e
 
 
 if __name__ == "__main__":

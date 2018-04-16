@@ -1080,6 +1080,8 @@ def save_transaction_data(raw_data: list) -> list:
     :param raw_data: 从平台抓取来的数据。包含平仓和持仓的数据。
     :return: 需要插入的数据
     """
+    insert_count = 0
+    update_count = 0
     if len(raw_data) == 0:
         pass
     else:
@@ -1114,41 +1116,61 @@ def save_transaction_data(raw_data: list) -> list:
                 tickets = db_holdings.keys()
                 for x in raw_data:
                     t = x['ticket']
-                    close_time = x.get('close_time')  # 抓取到的数据的平仓时间
                     """检查抓取到的数据是否有平仓记录并且是持仓变平仓的状态，"""
-                    if t in tickets and isinstance(close_time, datetime.datetime):
-                        """持仓变平仓的记录"""
-                        _id = db_holdings[t]
-                        f_dict = {"_id": _id}
-                        u_dict = {
-                            "$set":
-                                {
-                                    "close_time": close_time,   # 平仓时间
-                                    "profit": x.get("profit"),  # 盈亏
-                                    "exit_price": x.get("exit_price"),
-                                    "swap": x.get("swap"),
-                                    "spread_profit": x.get("spread_profit"),
-                                    "description": x.get("description")
+                    if t in tickets:
+                        """以前是持仓的记录"""
+                        close_time = x.get('close_time')  # 抓取到的数据的平仓时间
+                        if isinstance(close_time, datetime.datetime):
+                            """以前是持仓现在变平仓的,update"""
+                            update_count += 1
+                            _id = db_holdings[t]
+                            f_dict = {"_id": _id}
+                            u_dict = {
+                                "$set":
+                                    {
+                                        "close_time": close_time,   # 平仓时间
+                                        "profit": x.get("profit"),  # 盈亏
+                                        "exit_price": x.get("exit_price"),
+                                        "swap": x.get("swap"),
+                                        "spread_profit": x.get("spread_profit"),
+                                        "description": x.get("description")
+                                }
                             }
-                        }
-                        """update持仓变平仓的记录"""
-                        r = Transaction.find_one_and_update_plus(filter_dict=f_dict, update_dict=u_dict)
-                        if r is None:
-                            ms = "更新平仓信息失败,_id:{}  close_time:{}".format(_id, close_time)
-                            logger.exception(ms)
-                            print(ms)
+                            """update持仓变平仓的记录"""
+                            r = Transaction.find_one_and_update_plus(filter_dict=f_dict, update_dict=u_dict)
+                            if r is None:
+                                ms = "更新平仓信息失败,_id:{}  close_time:{}".format(_id, close_time)
+                                logger.exception(ms)
+                                print(ms)
+                            else:
+                                pass
                         else:
+                            """以前是持仓现在仍然持仓的,pass"""
                             pass
                     else:
                         insert_list.append(x)
         if len(insert_list) > 0:
+            """这些都是需要插入的内容,检查数据库是否有重复的数据?"""
+            insert_list.sort(key=lambda obj: obj['ticket'], reverse=False)
+            first = insert_list[0]
+            system_str = first['system']
+            command = first['command']
+            ticket = first['ticket']
+            f = {"system": system_str, "command": command, "ticket": {"$gte": ticket}}
+            s = {"ticket": 1}
+            p = ['ticket']
+            in_db = Transaction.find_plus(filter_dict=f, sort_dict=s, projection=p, to_dict=True)
+            db_tickets = [x['ticket'] for x in in_db]
+            insert_list = [x for x in insert_list if x['ticket'] not in db_tickets]
             """保存抓取到的四种交易的订单信息"""
+            insert_count = len(insert_list)
             r = Transaction.insert_many(insert_list)
             ms = "save_transaction_data success"
             recode(ms)
-            return r
         else:
             pass
+    res = {"update": update_count, "insert": insert_count}
+    return res
 
 
 def save_withdraw_data(raw_data: list) -> list:
@@ -1157,20 +1179,28 @@ def save_withdraw_data(raw_data: list) -> list:
     :param raw_data: 从平台抓取来的出金申请数据。
     :return:
     """
+    insert_count = 0
     if len(raw_data) == 0:
-        return raw_data
+        pass
     else:
-        last = Withdraw.last_record(domain2)
-        if last is not None:
-            raw_data = [x for x in raw_data if x['ticket'] > last['ticket']]
-        else:
-            pass
+        """这些都是需要插入的内容,检查数据库是否有重复的数据?"""
+        raw_data.sort(key=lambda obj: obj['ticket'], reverse=False)
+        first = raw_data[0]
+        system_str = first['system']
+        ticket = first['ticket']
+        f = {"system": system_str, "ticket": {"$gte": ticket}}
+        s = {"ticket": 1}
+        p = ['ticket']
+        in_db = Withdraw.find_plus(filter_dict=f, sort_dict=s, projection=p, to_dict=True)
+        db_tickets = [x['ticket'] for x in in_db]
+        raw_data = [x for x in raw_data if x['ticket'] not in db_tickets]
+        insert_count = len(raw_data)
         r = Withdraw.insert_many(raw_data)
         """向机器人消息服务器发送出金申请消息"""
         send_all_withdraw_signal()
         ms = "save_withdraw_data success"
         recode(ms)
-        return r
+    return insert_count
 
 
 def send_all_withdraw_signal():
@@ -1526,8 +1556,8 @@ def upload_transaction(browser, **kwargs) -> bool:
         try:
             msg_span = WebDriverWait(browser, 10).until(ec.presence_of_element_located((
                 By.CLASS_NAME, "msg-title")))
-            print(msg_span.get_attribute("class"))
-            print(msg_span.text)
+            # print(msg_span.get_attribute("class"))
+            # print(msg_span.text)
             if msg_span.get_attribute("class") == "msg-title":
                 """操作成功"""
                 browser.refresh()  # 刷新页面
@@ -1690,8 +1720,8 @@ def upload_withdraw(browser, **kwargs) -> bool:
     try:
         msg_span = WebDriverWait(browser, 10).until(ec.presence_of_element_located((
             By.CLASS_NAME, "msg-title")))
-        print(msg_span.get_attribute("class"))
-        print(msg_span.text)
+        # print(msg_span.get_attribute("class"))
+        # print(msg_span.text)
         if msg_span.get_attribute("class") == "msg-title":
             """操作成功"""
             browser.refresh()  # 刷新页面
@@ -1947,6 +1977,10 @@ lock = Lock()
 
 def do_jobs():
     """批量做工作"""
+    begin = datetime.datetime.now()
+    ms = "{} 开始批量作业".format(begin.strftime("%Y-%m-%d %H:%M:%S"))
+    print(ms)
+    logger.info(ms)
     browser = get_browser(1, 1)
     draw_on_all(browser=browser)
     draw_withdraw_on_p2(browser)
@@ -1954,6 +1988,11 @@ def do_jobs():
     gc.collect()
     send_all_balance_signal()
     send_all_withdraw_signal()
+    end = datetime.datetime.now()
+    ts = (end - begin).total_seconds()
+    ms = "{} 批量作业完成,耗时:{}秒".format(end.strftime("%Y-%m-%d %H:%M:%S"), ts)
+    logger.info(ms)
+    print(ms)
     return True
 
 
@@ -1963,8 +2002,8 @@ def draw_withdraw_on_p2(browser):
     :return:
     """
     s = parse_page(browser, domain2, None)  # 出金申请
-    save_withdraw_data(s)
-    ms = "平台2 withdraw数据抓取完毕,可插入数据长度{}".format(len(s))
+    c = save_withdraw_data(s)
+    ms = "平台2 withdraw数据抓取完毕,可插入数据长度{}".format(c)
     logger.info(ms)
     recode(ms)
     print(ms)
@@ -1980,14 +2019,14 @@ def draw_on_all(browser):
     limits = Transaction.last_ticket(names)
     for key in ['buy', 'sell', 'balance', 'credit']:
         s2 = parse_page(browser, domain2, key, limits[domain2]['last_ticket'])  # 平台2
-        save_transaction_data(s2)
-        ms = "平台2 {}数据抓取完毕,可插入数据长度{}".format(key, len(s2))
+        res2 = save_transaction_data(s2)
+        ms = "平台2 {}数据抓取完毕,分析结果{}".format(key, res2)
         recode(ms)
         logger.info(ms)
         print(ms)
         s1 = parse_page(browser, domain1, key, limits[domain1]['last_ticket'])  # 平台1
-        save_transaction_data(s1)
-        ms = "平台1 {}数据抓取完毕,可插入数据长度{}".format(key, len(s1))
+        res1 = save_transaction_data(s1)
+        ms = "平台1 {}数据抓取完毕,分析结果{}".format(key, res1)
         recode(ms)
         logger.info(ms)
         print(ms)
@@ -2001,5 +2040,7 @@ def send_excel_everyday():
 
 if __name__ == "__main__":
     """全套测试开始"""
-    do_jobs()
+    while 1:
+        do_jobs()
+        time.sleep(300)
     pass

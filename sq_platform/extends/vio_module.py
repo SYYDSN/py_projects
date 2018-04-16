@@ -656,29 +656,35 @@ class TrafficViolationHandler:
                         except Exception as e:
                             logger.exception(e)
                             fen = None
-
+                        """
+                        聚合返回:是否处理,1处理 0未处理 空未知
+                        接口要求,违章处理状态：1：未处理，2：处理中，3：已处理，4：不支持
+                        """
+                        payment_status = 1
                         if handled == "0":
                             """未处理"""
-                            handled = "未处理"
+                            handled = 1
                             untreated += 1
                             if money is not None:
                                 total_fine += money
                             if fen is not None:
                                 total_points += fen
                         elif handled == "1":
-                            handled = "已处理"
+                            handled = 0
+                            payment_status = 2
                         else:
-                            handled = "未知"
+                            handled = 4
                         temp = {
                             "time": mongo_db.get_datetime_from_str(vio['date']),
-                            "city": vio['wzcity'],
+                            "city": '' if vio.get('wzcity') else vio['wzcity'],
                             "plate_number": plate_number,
                             "code": code,
                             "fine": money,
                             "point": fen,
                             "reason": vio['act'],
                             "address": vio['area'],
-                            "process_status": handled
+                            "process_status": handled,
+                            "payment_status": payment_status
                         }
                         temp = {k: v for k, v in temp.items()}
                         violations.append(temp)

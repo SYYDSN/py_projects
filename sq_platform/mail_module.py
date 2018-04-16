@@ -8,6 +8,8 @@ if project_dir not in sys.path:
 from log_module import get_logger
 import smtplib
 from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
 from werkzeug.contrib.cache import RedisCache
 import datetime
 
@@ -21,7 +23,8 @@ cache = RedisCache()
 logger = get_logger(os.path.split(__file__)[-1].split(".", 1)[0])
 
 
-def send_mail(to_email: str = "583736361@qq.com", title: str='hello', content: str = '') -> bool:
+def send_mail(to_email: str = "583736361@qq.com", title: str='hello', content: str = '', file_path: str = None,
+              file_name: str = None) -> bool:
     """
     发送邮件,
     :param to_email: 目的邮件地址
@@ -29,10 +32,19 @@ def send_mail(to_email: str = "583736361@qq.com", title: str='hello', content: s
     :param content: 正文
     :return: 是否发送成功
     """
-    msg = MIMEText(content)
+    msg = MIMEMultipart()
     msg["Subject"] = title
     msg["From"] = my_email
     msg["To"] = to_email
+    """添加附件"""
+    if isinstance(file_path, str) and os.path.isfile(file_path):
+        with open(file_path, 'rb') as f:
+            att1 = MIMEApplication(f.read())
+        if file_name is None or file_name == "":
+            file_name = os.path.split(file_path)[-1]
+        att1.add_header('Content-Disposition', 'attachment', filename=file_name)
+        msg.attach(att1)
+    """添加附件结束"""
     flag = True
     try:
         s = smtplib.SMTP_SSL("smtp.qq.com", 465)
@@ -98,5 +110,5 @@ def send_warning_email(title: str, content: str, interval: int = 900, to_mail: s
 
 
 if __name__ == '__main__':
-    print(__file__)
-    # send_mail("583736361@qq.com", "我是主题", "你好!\n我是正文!")
+    send_mail(file_path="log_module.py")
+    pass

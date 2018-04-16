@@ -18,16 +18,14 @@ app.conf.CELERYBEAT_SCHEDULE = {
     注意时区问题,ubuntu没有修正过的时区,和我们真正的时区相差8小时,win不受此影响
     在此影响下,程序会比预订的时间晚8个小时运行.
     """
-    """增加每日检查平台1/2交易信息的作业"""
-    'add_check_transaction': {
+    # 'every_file_minutes_check_withdraw': {  # 添加每5分钟在平台服务器检查信息
+    #     'task': 'celery_module.do_works',
+    #     'schedule': datetime.timedelta(seconds=300)  # 每5分钟检查一次
+    # },
+    'add_check_transaction': {  # 增加每日检查平台1/2交易信息的作业
         'task': 'celery_module.send_excel_everyday',
         'schedule': crontab(minute="15", hour="23"),  # 爬虫服务器没时区问题。由于时区问题实际是临晨6:10点执行
         'args': (2, 3)
-    },
-    """添加每5分钟在平台服务器检查信息"""
-    'every_file_minutes_check_withdraw': {
-        'task': 'celery_module.do_works',
-        'schedule': datetime.timedelta(seconds=300)  # 每5分钟检查一次
     }
 }
 

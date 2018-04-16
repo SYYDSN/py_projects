@@ -255,8 +255,8 @@ class ViolationRecode(mongo_db.BaseDoc):
     type_dict["service_fee"] = float  # 服务费
     type_dict["violation_num"] = str  # 违章编码
     type_dict["can_select"] = int  # 能否勾选办理：0不可勾选, 1可勾选。
-    type_dict["process_status"] = str  # 违章处理状态：1：未处理，2：处理中，3：已处理，4：不支持
-    type_dict["payment_status"] = str  # 违章缴费状态 不返回表示无法获取该信息，1-未缴费 2-已缴
+    type_dict["process_status"] = int  # 违章处理状态：1：未处理，2：处理中，3：已处理，4：不支持
+    type_dict["payment_status"] = int  # 违章缴费状态 不返回表示无法获取该信息，1-未缴费 2-已缴
     type_dict['position_id'] = ObjectId  # 违章地址的经纬度信息的id，指向Position类
 
     def check_position(self):
@@ -802,12 +802,12 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 if l_id not in got_ids:
                     """可以保留,检查是否有城市信息?那是是旧版的快捷方式特有的字段"""
                     city = g.get("city")
-                    if city is None:
+                    if city == "全国已开通城市":
                         """新版查询器"""
                         pass
                     else:
                         """旧版查询器"""
-                        g.pop("city")
+                        g["city"] = "全国已开通城市"
                         args = g.copy()
                         f = {"_id": args.pop("_id")}
                         u = {"$set": args}
@@ -848,7 +848,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                     plate_map[g_id] = license_dict[x].get("plate_number")
         else:
             pass
-        res = [{"_id": str(x['_id']), "plate_number": plate_map[x['_id']]} for x in res]
+        res = [{"_id": str(x['_id']), "plate_number": plate_map[x['_id']], "city": x['city']} for x in res]
         return res
 
     def update_count_online(self, last_query_result_id):
@@ -1099,8 +1099,10 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             """更新查询器信息"""
             obj.update_count_online(last_query_result_id)
         else:
+            ms = "在线违章查询结果:{}, args:{}".format(result, args)
+            logger.info(ms)
             message['message'] = result['message']
-            message['error_code'] = result['errCode']
+            message['error_code'] = 0 if result.get('error_code') is None else result.get('error_code')
             message['args'] = str({"generator_id": object_id})
         return message
 
@@ -1184,6 +1186,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                         ms = "查询违章接口发生错误error_code类型出错,error_code:{}".format(error_code)
                         city = generator.get_attr("city")
                         logger.exception(msg=ms, stack_info=True, exc_info=True)
+                        error_code = int(error_code)
                         if isinstance(error_code, int) and error_code >= 1000:
                             """包装过的message"""
                             pass
