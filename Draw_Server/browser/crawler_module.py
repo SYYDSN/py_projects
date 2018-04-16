@@ -85,10 +85,10 @@ class CustomerManagerRelation(mongo_db.BaseDoc):
             res['manager_name'] = ''
             res['customer_name'] = ''
         else:
-            res['director_name'] = r['director_name']
-            res['sales_name'] = r['sales_name']
-            res['manager_name'] = r['manager_name']
-            res['customer_name'] = r['customer_name']
+            res['director_name'] = '' if r.get('director_name') is None else r['director_name']
+            res['sales_name'] = '' if r.get('sales_name') is None else r['sales_name']
+            res['manager_name'] = '' if r.get('manager_name') is None else r['manager_name']
+            res['customer_name'] = '' if r.get('customer_name') is None else r['customer_name']
         return res
 
 
@@ -1936,56 +1936,14 @@ def draw_withdraw(browser):
     return True
 
 
-def add_job(job_type: str, job_dict: dict) -> None:
-    """
-    增加一个任务到工作队列
-    :param job_type:
-    :param job_dict: 参数字典/None
-    共计5种任务
-    1. job_type=‘reg' job_dict=reg_dict
-    注册
-    2. job_type=‘draw_transaction' job_dict=None
-    从平台查询buy和sell信息并写入数据库，每天凌晨一次。
-    3. job_type=‘draw_withdraw' job_dict=None
-    从平台查询withdraw，credit， balance数据并写入数据库，5分钟一次。
-    4. job_type=‘query_transaction' job_dict=None
-    从数据库查询是否有新的buy和sell数据，有的话就写入云，五分钟一次。
-    5. job_type=‘query_withdraw' job_dict=None
-    从数据库查询是否有新的withdraw，credit， balance数据，有的话就写入云，五分钟一次。
-    :return:
-    """
-    job = {"job_type": job_type, "job_dict": job_dict}
-    jobs = cache.get(job_key)
-    if jobs is None:
-        jobs = list()
-    else:
-        pass
-    types = [x['job_type'] for x in jobs]
-    if job_type in types:
-        ms = "重复的任务：{}，放弃".format(job_type)
-    else:
-        ms = "加入新的任务：{}".format(job_type)
-        jobs.append(job)
-    cache.set(job_key, jobs, timeout=24*3600)
-    recode(ms)
-    recode(str(jobs))
-    logger.info(ms)
-
-
-lock = Lock()
-
-
-def do_jobs():
+def do_jobs(browser):
     """批量做工作"""
     begin = datetime.datetime.now()
     ms = "{} 开始批量作业".format(begin.strftime("%Y-%m-%d %H:%M:%S"))
     print(ms)
     logger.info(ms)
-    browser = get_browser(1, 1)
     draw_on_all(browser=browser)
     draw_withdraw_on_p2(browser)
-    del browser
-    gc.collect()
     send_all_balance_signal()
     send_all_withdraw_signal()
     end = datetime.datetime.now()
@@ -2040,7 +1998,8 @@ def send_excel_everyday():
 
 if __name__ == "__main__":
     """全套测试开始"""
+    b = get_browser(1, 1)
     while 1:
-        do_jobs()
+        do_jobs(b)
         time.sleep(300)
     pass

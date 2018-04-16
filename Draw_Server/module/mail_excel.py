@@ -128,6 +128,7 @@ class EveryDayExcel(mongo_db.BaseDoc):
                 x['director'] = relation['director_name']
                 temp = {t_map[k]: v for k, v in x.items() if k in col_keys}
                 ts.append(temp)
+            ts.sort(key=lambda obj: (obj['总监'], obj['经理'], obj['销售'],  obj['指令'], obj['平仓时间']), reverse=False)
             s = MySheet(sheet_name="综合", col_names=col_names, rows=ts)
             self.add_sheet(s)
         else:
@@ -159,12 +160,14 @@ class EveryDayExcel(mongo_db.BaseDoc):
         return f_path
 
     @classmethod
-    def send_excel(cls, email_address: (str, list)):
+    def send_excel(cls, email_address: (str, list) = None):
         """
         发送每日的交易信息到指定的邮箱
         :param email_address:
         :return:
         """
+        if email_address is None:
+            email_address = ["583736361@qq.com", "xbs0831@dingtalk.com"]
         excel = EveryDayExcel.instance()
         excel.get_transaction_records()
         excel.create_excel()
@@ -178,4 +181,5 @@ class EveryDayExcel(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
+    EveryDayExcel.send_excel()
     pass

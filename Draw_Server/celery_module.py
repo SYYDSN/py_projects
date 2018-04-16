@@ -3,7 +3,7 @@ import datetime
 
 from celery import Celery
 from module.mail_excel import EveryDayExcel
-from browser.firefox_module import to_jiandao_cloud
+from browser.crawler_module import do_jobs
 from mail_module import send_mail
 
 
@@ -68,18 +68,12 @@ def test(self, *args, **kwargs):
 
 
 @app.task(bind=True)
-def to_jiandao_cloud_and_send_mail(*args, **kwargs):
-    """这个方法在本项目中无效"""
-    print(kwargs)
-    res = to_jiandao_cloud(**kwargs)
-    if not res:
-        title = "{} 发送数据到简道云失败".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        content = str(kwargs)
-        send_mail("583736361@qq.com", title, content)
-    return res
+def draw_platform(*args, **kwargs):
+    """检查平台1和平台2的交易信息,此方法暂时不用，用crawler.conf方式替代。"""
+    pass
 
 
-@app.tasks(bind=True)
+@app.task(bind=True)
 def send_everyday_excel(*args, **kwargs):
     """
     每天凌晨5点把交易信息发送excel到指定的邮箱
@@ -87,14 +81,15 @@ def send_everyday_excel(*args, **kwargs):
     :param kwargs:
     :return:
     """
-    e = None
+    res = None
     try:
-        EveryDayExcel.send_excel("583736361@qq.com")
+        EveryDayExcel.send_excel()
     except Exception as e:
+        res = str(e)
         print(e)
     finally:
-        e = "send_everyday_excel success" if e is None else e
-        return e
+        res = "send_everyday_excel success" if res is None else res
+        return res
 
 
 if __name__ == "__main__":
