@@ -502,8 +502,6 @@ class Company(mongo_db.BaseDoc):
                 cls.transfer_post(company_id, oid, post1['_id'])
                 cls.transfer_dept(company_id, oid, dept1['_id'])
 
-
-
     @classmethod
     def add_dept_admin(cls, company_id: (str, ObjectId), dept_id: (str, ObjectId), employee_id: (str, ObjectId)) -> bool:
         """
@@ -1186,17 +1184,6 @@ class Post(mongo_db.BaseDoc):
         return res
 
 
-class EmployeePostRelation(mongo_db.BaseDoc):
-    """关系表,记录员工和职务的对应关系"""
-    _table_name = "employee_post_relation"
-    type_dict = dict()
-    type_dict["_id"] = ObjectId  # id 唯一
-    type_dict['employee_id'] = DBRef  # 员工id,指向user_info表,
-    type_dict['post_id'] = DBRef   # 职务id,指向post_info表
-    type_dict['create_date'] = datetime.datetime  # 关系的建立时间
-    type_dict['end_date'] = datetime.datetime  # 关系的终结时间
-
-
 class Dept(mongo_db.BaseDoc):
     """部门/团队类"""
     _table_name = "dept_info"
@@ -1484,7 +1471,126 @@ class Dept(mongo_db.BaseDoc):
             return obj.dept_path()
 
 
-class EmployeeCompanyRelation(mongo_db.BaseDoc):
+class EmployeeBaseRelation(mongo_db.BaseDoc):
+    """
+    员工相关的关系基础类
+    类对象的属性至少包含下列属性
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['employee_id'] = DBRef  # 员工id,指向user_info表,
+    type_dict['create_date'] = datetime.datetime  # 关系的建立时间
+    type_dict['end_date'] = datetime.datetime  # 关系的终结时间
+    """
+
+    @classmethod
+    def add_relation(cls, e_dbref: DBRef, dbref_name: str, dbref_val: DBRef):
+        """
+        添加一个关系记录.
+        :param e_dbref: Employee.dbref
+        :param dbref_name: 关联对象的属性名
+        :param dbref_val: 关联对象的DBRef
+        :return:
+        """
+
+    @classmethod
+    def get_relation_by_employee(cls, e_dbref: DBRef, instance: bool = False):
+        """
+        根据Employee实例的dbref对象查询对应的EmployeeCompanyRelation,注意,只会返回
+        一个有效的EmployeeCompanyRelation对象的实例.一定会验证可用性
+        :param e_dbref: Employee.dbref
+        :param instance: 返回的EmployeeCompanyRelation是实例还是doc?
+        :return: EmployeeCompanyRelation对象的实例(或doc)/None
+        """
+        now = datetime.datetime.now()
+        f = {
+            'employee_id': e_dbref,
+            'create_date': {"$lte": now},
+            '$or': [
+                {'end_date': {'$exists': False}},
+                {"end_date": {"$eq": None}},
+                {"end_date": {"$gte": now}}
+            ]
+        }
+        s = {'create_date': -1}
+        r = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=instance)
+        return r
+
+    @classmethod
+    def get_relations_by_employee(cls, e_dbref: DBRef, validate: int = 1, to_dict: bool = False,
+                                  can_json: bool = False):
+        """
+        根据Employee实例的dbref对象查询对应的EmployeeCompanyRelation,注意,会返回
+        一个EmployeeCompanyRelation对象的实例的list.
+        :param e_dbref: Employee.dbref
+        :param validate: 是否只返回可用的对象?1只返回有效的,0全部返回,-1只返回无效的
+        :param to_dict: 返回的EmployeeCompanyRelation是实例还是doc?
+        :param can_json: (返回的是doc的时候),是否做to_flat_dict转换?
+        :return: EmployeeCompanyRelation对象的实例(或doc)的list
+        """
+        now = datetime.datetime.now()
+        if not isinstance(validate, int):
+            try:
+                validate = int()
+            except Exception as e:
+                validate = 1
+                print(e)
+            finally:
+                pass
+        validate = 1 if validate >= 1 else (-1 if validate <= -1 else validate)
+        if validate == 1:
+            """只查有效的"""
+            f = {
+                'employee_id': e_dbref,
+                'create_date': {"$lte": now},
+                '$or': [
+                    {'end_date': {'$exists': False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$gte": now}}
+                ]
+            }
+        elif validate == -1:
+            """只查无效的"""
+            f = {
+                'employee_id': e_dbref,
+                '$or': [
+                    {'create_date': {"$gte": now}},
+                    {'create_date': {"$eq": None}},
+                    {"create_date": {"$exists": False}},
+                    {'end_date': {'$exists': False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$lte": now}}
+                ]
+            }
+        else:
+            """全部都查"""
+            f = {'employee_id': e_dbref}
+        s = {'create_date': -1}
+        r = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=to_dict, can_json=can_json)
+        return r
+
+    @classmethod
+    def clear_invalid_relation(cls, e_dbref: DBRef) -> None:
+        """
+        清除指定用户的无效关系记录
+        :param e_dbref: Employee.dbref
+        :return:
+        """
+        f = {'employee_id': e_dbref}
+        cls.delete_many(filter_dict=f)
+
+
+class EmployeePostRelation(EmployeeBaseRelation):
+    """关系表,记录员工和职务的对应关系"""
+    _table_name = "employee_post_relation"
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['employee_id'] = DBRef  # 员工id,指向user_info表,
+    type_dict['post_id'] = DBRef   # 职务id,指向post_info表
+    type_dict['create_date'] = datetime.datetime  # 关系的建立时间
+    type_dict['end_date'] = datetime.datetime  # 关系的终结时间
+
+
+class EmployeeCompanyRelation(EmployeeBaseRelation):
     """关系表,记录员工和公司的对应关系"""
     _table_name = "employee_company_relation"
     type_dict = dict()
@@ -1495,7 +1601,7 @@ class EmployeeCompanyRelation(mongo_db.BaseDoc):
     type_dict['end_date'] = datetime.datetime  # 关系的终结时间
 
 
-class EmployeeDeptRelation(mongo_db.BaseDoc):
+class EmployeeDeptRelation(EmployeeBaseRelation):
     """关系表,记录员工和部门的对应关系"""
     _table_name = "employee_dept_relation"
     type_dict = dict()
@@ -1535,6 +1641,13 @@ class Employee(User):
         self.type_dict['block_list'] = list  # 不想显示的用户的DBRef组成的list，Employee
         self.type_dict['scheduling'] = list   # 排班的DBRef的list,对应于员工的排班,默认早9点到晚17点.（考虑加班和替班的情况）
         super(Employee, self).__init__(**kwargs)
+
+    def get_company(self) -> Company:
+        """
+        获取所属的公司对象
+        :return:
+        """
+        """查询可用的EmployeeCompanyRelation对象"""
 
     def get_dept(self, to_dict: bool = True) -> (None, Dept, dict):
         """
@@ -1644,6 +1757,28 @@ class Employee(User):
         if isinstance(raw_dict, dict):
             extend_dict.update(raw_dict)
         return extend_dict
+
+    @classmethod
+    def get_archives_cls(cls, e_id: (str, ObjectId)) -> (None, dict, list):
+        """
+        可以看作是Employee.get_archives的类方法.自2018-4-17起,要求获取更详细的个人资料.包括
+        1. 用户信息.(含驾照信息)
+        2. 相关行车证信息
+        3. 部门信息.
+        4. 岗位信息
+        5. 公司信息
+        :param e_id: 员工id或者员工id的list.
+        :return: 如果是e_id参数是员工id,这里返回的是None/dict,否则返回list对象
+        """
+        emp = cls.find_by_id(e_id)
+        if isinstance(emp, cls):
+            e_dbref = emp.get_dbref()
+            """查询公司信息"""
+
+        else:
+            ms = "{}不是有效的用户id".format(e_id)
+            logger.exception(ms)
+            raise ValueError(ms)
 
     @classmethod
     def get_block_id_list(cls, my_id: (str, ObjectId), to_str: bool = False) -> list:
@@ -1959,72 +2094,7 @@ def rebuild_test_team() -> None:
 
 
 if __name__ == "__main__":
-    # """创建一批员工和新振兴公司之间的雇佣关系"""
-    # company = Company.find_by_id(ObjectId("5aab48ed4660d32b752a7ee9"))
-    # company_dbref = company.get_dbref()
-    # post = Post.find_by_id(ObjectId("5ab21fc74660d376c982ee27"))
-    # post_dbref = post.get_dbref()
-    # dept = Dept.find_by_id(ObjectId("5ab21b2a4660d3745e53adfa"))
-    # dept_dbref = dept.get_dbref()
-    # now = datetime.datetime.now()
-    # f = {"description": {"$exists": True}}
-    # es = Employee.find_plus(filter_dict=f, to_dict=True)
-    # for e in es:
-    #     post_relation_id = e['post_relation_id']
-    #     post_relation_dbref = DBRef(database="platform_db", collection="employee_post_relation", id=post_relation_id)
-    #     e["post_relation_id"] = post_relation_dbref
-    #     dept_relation_id = e['dept_relation_id']
-    #     dept_relation_dbref = DBRef(database="platform_db", collection="employee_dept_relation", id=dept_relation_id)
-    #     e["dept_relation_id"] = dept_relation_dbref  # 设置用户和职务的关系id
-    #     e = Employee(**e)
-    #     e.save()
-    """测试批量添加employee的方法"""
-    # company_id = "5aab48ed4660d32b752a7ee9"
-    # company_id = "5aab5db852d59ccd9a300dee"
-    # e1 = {
-    #     "phone_num": "15618318888", "real_name": "管理员",
-    #     "user_name": "xzx_admin",
-    #     "dept_id": "5ab21b2a4660d3745e53adfa", "post_id": "5ab21fc74660d376c982ee27"
-    # }
-    # e2 = {
-    #     "phone_num": "15618318889", "real_name": "李四",
-    #     "dept_id": "5ab21b2a4660d3745e53adfa", "post_id": "5ab21fc74660d376c982ee27"
-    # }
-    # admin = {
-    #     "phone_num": "19999998888", "real_name": "管理员",
-    #     "user_password": "024a65d035a96a7402eec9c1533851bc",
-    #     "user_name": "xzx_admin",
-    #     "dept_id": "5ab21b2a4660d3745e53adfa", "post_id": "5ab4922c52d59ccd9a35fc8b"  # 公司管理员职务
-    # }
-    # es = [admin]
-    # Company.add_employee(company_id, es)
-    # Company.dismiss_employee(company_id, ["5ab3533e4660d34126213654", "5ab3516c4660d34002f8e178"])
-    """查询某公司旗下所有的员工"""
-    xzx_id = ObjectId("5aab48ed4660d32b752a7ee9")
-    sf_id = ObjectId("59a671a0de713e3db34de8bf")
-    # es = Company.all_employee(xzx_id, filter_dict={"description": {"$eq": "物联网卡用户"}})
-    # for e in es:
-    #     print(e['user_name'])
-    """解除新振兴和上面一步查询到的员工的雇佣关系"""
-    # Company.dismiss_employee(xzx_id, [x['_id'] for x in es])
-    """添加默认管理员的职务"""
-    # p = Company.add_admin_post(sf_id)
-    # print(p)
-    """创建一个默认的部门"""
-    # d = Dept.root_dept(sf_id)
-    """重建sf的员工关系"""
-    driver_post_id = ObjectId("59a67348de713e3f43dcf0d7")  # 司机的post_id
-    group_post_id = ObjectId("59a67341de713e3f32ae659f")  # 组长的post_id
-    sf_dept_id = ObjectId("5abcac4b4660d3599207fe18")   # 顺丰的华新分部
-    Company.rebuild_relation(sf_id, sf_dept_id, driver_post_id)
-    # """添加顺丰公司的华新分部"""
-    # hua_dict = {
-    #     "dept_name": "华新分部",
-    #     "company_id": DBRef(database="platform_db", collection=Company.get_table_name(), id=sf_id),
-    #     "higher_dept": sf_dept.get_dbref(),
-    #     "root_dept": False,
-    #     "description": "顺丰公司的华新分部"
-    # }
-    # dept_hua = Dept(**hua_dict)
-    # dept_hua.save_plus()
+    """查询所有公司"""
+    zxz_id = ObjectId('5aab48ed4660d32b752a7ee9')  # 新振兴公司id
+    Employee.get_archives_cls()
     pass

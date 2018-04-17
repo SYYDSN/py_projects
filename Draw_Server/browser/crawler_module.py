@@ -1316,7 +1316,7 @@ def send_balance_signal(balance: dict):
     """换行必须在一行后面有2个以上空格然后在\n"""
     markdown = {
         "title": "Balance",
-        "text": "> 时间：{}  \n > 所属平台：{}  \n > MT帐号：{}  \n > 客户姓名：{}  \n > 盈亏:{}  \n > 所属员工:{}  \n "
+        "text": "> #### Balance  \n > 时间：{}  \n > 所属平台：{}  \n > MT帐号：{}  \n > 客户姓名：{}  \n > 盈亏:{}  \n > 所属员工:{}  \n "
                 "> 所属经理：{}  \n > 所属总监：{}  \n > 发送时间:{}  ".format(apply_time, system_info, mt4_account,
                                                                  customer_name, amount_usd, sales_name,
                                                                  manager_name, director_name, now)

@@ -259,6 +259,11 @@ class ViolationRecode(mongo_db.BaseDoc):
     type_dict["payment_status"] = int  # 违章缴费状态 不返回表示无法获取该信息，1-未缴费 2-已缴
     type_dict['position_id'] = ObjectId  # 违章地址的经纬度信息的id，指向Position类
 
+    def __init__(self, **kwargs):
+        if "create_time" not in kwargs:
+            kwargs['create_time'] = datetime.datetime.now()
+        super(ViolationRecode, self).__init__(**kwargs)
+
     def check_position(self):
         """检查一条记录是否有违章记录的经纬度信息？
         如果没有，则查询经纬度信息，并将对应的经纬度信息的id填入self的

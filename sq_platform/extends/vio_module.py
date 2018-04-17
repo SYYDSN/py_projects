@@ -643,6 +643,7 @@ class TrafficViolationHandler:
                         """
                         amount += 1
                         handled = vio['handled']
+                        _id = vio.get('archiveno')  # 文书编号,页就是以前的违章唯一编号,不一定有
                         code = vio.get('code')
                         money = vio.get("money")
                         try:
@@ -675,16 +676,17 @@ class TrafficViolationHandler:
                         else:
                             handled = 4
                         temp = {
-                            "time": mongo_db.get_datetime_from_str(vio['date']),
-                            "city": '' if vio.get('wzcity') else vio['wzcity'],
-                            "plate_number": plate_number,
-                            "code": code,
-                            "fine": money,
-                            "point": fen,
-                            "reason": vio['act'],
-                            "address": vio['area'],
-                            "process_status": handled,
-                            "payment_status": payment_status
+                            "time": mongo_db.get_datetime_from_str(vio['date']),    # 违章时间
+                            "city": '' if vio.get('wzcity') else vio['wzcity'],     # 违章城市
+                            "plate_number": plate_number,                           # 车牌
+                            "_id": _id,                                             # 文书编号,就是以前的违章唯一编号,不一定有
+                            "code": code,                                           # 违章代码,不一定有
+                            "fine": money,                                          # 罚款,不一定有
+                            "point": fen,                                           # 扣分,不一定有
+                            "reason": vio['act'],                                   # 违章原因
+                            "address": vio['area'],                                 # 违章地址
+                            "process_status": handled,                              # 违章状态,是否处理,int类型
+                            "payment_status": payment_status                        # 支付状态,是否支付,int类型
                         }
                         temp = {k: v for k, v in temp.items()}
                         violations.append(temp)

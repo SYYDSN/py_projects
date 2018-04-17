@@ -7,6 +7,7 @@ item_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__fi
 if item_dir not in sys.path:
     sys.path.append(item_dir)
 import mongo_db
+import warnings
 from bson.objectid import ObjectId
 import datetime
 from log_module import get_logger
@@ -409,6 +410,8 @@ class User(mongo_db.BaseDoc):
         :param user_id:一个用户id或者一组用户id
         :return: 一个用户的字典或者一组用户的字典的list
         """
+        ms = "此方法不建议对Employee对象使用,而以Employee.get_archives_cls类方法替代,后者提供的信息更详细2018-4-17"
+        warnings.warn(message=ms)
         if isinstance(user_id, list):
             """一组用户id"""
             result = list()
