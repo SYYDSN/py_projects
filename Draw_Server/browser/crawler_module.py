@@ -65,31 +65,90 @@ class CustomerManagerRelation(mongo_db.BaseDoc):
     type_dict['director_name'] = str  # 总监
 
     @classmethod
-    def get_relation(cls, mt4_account: str) -> dict:
+    def get_relation(cls, mt4_account: str, customer_name: str) -> dict:
         """
         根据用户的mt4帐号,查询用户的归属关系
         :param mt4_account:
+        :param customer_name:
         :return:
         """
         mt4_account = mt4_account if isinstance(mt4_account, str) else str(mt4_account)
-        f = {
-            "mt4_account": mt4_account,
-            "delete_date": {"$exists": False}
-        }
-        s = {"update_date": -1}   # 可能有重复的对象，所以要排序
-        r = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False, can_json=False)
+        key = cls.get_table_name()
+        the_map = cache.get(key)
         res = dict()
-        if r is None:
-            res['director_name'] = ''
-            res['sales_name'] = ''
-            res['manager_name'] = ''
-            res['customer_name'] = ''
+        res['director_name'] = ''
+        res['sales_name'] = ''
+        res['manager_name'] = ''
+        res['customer_name'] = ''
+        query_flag = False
+        if isinstance(the_map, dict) and mt4_account not in the_map:
+            query_flag = True
+        elif the_map is None:
+            the_map = dict()
+            query_flag = True
+        elif isinstance(the_map, dict) and mt4_account in the_map:
+            res = the_map[mt4_account]
         else:
-            res['director_name'] = '' if r.get('director_name') is None else r['director_name']
-            res['sales_name'] = '' if r.get('sales_name') is None else r['sales_name']
-            res['manager_name'] = '' if r.get('manager_name') is None else r['manager_name']
-            res['customer_name'] = '' if r.get('customer_name') is None else r['customer_name']
+            ms = "未预料的情况the_map={}, mt4_account={}".format(the_map, mt4_account)
+            logger.exception(ms)
+        if query_flag:
+            f = {
+                "mt4_account": mt4_account,
+                "delete_date": {"$exists": False}
+            }
+            s = {"update_date": -1}   # 可能有重复的对象，所以要排序
+            r = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False, can_json=False)
+            if r is None:
+                pass
+            else:
+                res['director_name'] = '' if r.get('director_name') is None else r['director_name']
+                res['sales_name'] = '' if r.get('sales_name') is None else r['sales_name']
+                res['manager_name'] = '' if r.get('manager_name') is None else r['manager_name']
+                res['customer_name'] = '' if r.get('customer_name') is None else r['customer_name']
+                the_map[mt4_account] = res
+                cache.set(key, the_map, timeout=7200)
+        else:
+            pass
+        warn_flag = False  # 是否发送客户无归属信号？
+        director_name = res['director_name']
+        if director_name == '':
+            warn_flag = True
+        else:
+            if director_name != "倪妮娜":
+                pass
+            else:
+                sales_name = res['sales_name']
+                if sales_name == "":
+                    warn_flag = True
+                else:
+                    pass
+        if warn_flag:
+            cls.send_mes(mt4_account, customer_name)
         return res
+
+    @staticmethod
+    def send_mes(mt4_account: str, customer_name: str):
+        """
+        当某个用户没有总监归属的时候，可以调用此方法发送警告信息
+        :param mt4_account:
+        :param customer_name:
+        :return:
+        """
+        mt4_account = str(mt4_account) if not isinstance(mt4_account, str) else mt4_account
+        out_put = dict()
+        markdown = dict()
+        token_name = "钉订小助手"
+        out_put['msgtype'] = 'markdown'
+        title = "客户{}没有归属的总监".format(customer_name)
+        markdown['title'] = title
+        a_time = datetime.datetime.now().strftime("%y年%m月%d日 %H:%M:%S")
+
+        markdown['text'] = "#### {}  \n > MT4帐号：{}   \n > 客户名：{}  \n > 时间： {}".format(
+            title, mt4_account, customer_name, a_time
+        )
+        out_put['markdown'] = markdown
+        out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+        res = send_signal(out_put, token_name=token_name)
 
 
 chrome_driver = "/opt/google/chrome/chromedriver"  # chromedriver的路径
@@ -1239,8 +1298,8 @@ def send_withdraw_signal(reg_info: dict):
     apply_time = reg_info['apply_time']
     apply_time = apply_time.strftime("%y年%m月%d日 %H:%M:%S")
     mt4_account = reg_info['account']
-    relation = CustomerManagerRelation.get_relation(mt4_account)
     customer_name = reg_info['nick_name']
+    relation = CustomerManagerRelation.get_relation(mt4_account, customer_name)
     sales_name = relation['sales_name']
     manager_name = relation['manager_name']
     director_name = relation['director_name']
@@ -1305,8 +1364,8 @@ def send_balance_signal(balance: dict):
     apply_time = balance['time']
     apply_time = apply_time.strftime("%y年%m月%d日 %H:%M:%S")
     mt4_account = balance['login']
-    relation = CustomerManagerRelation.get_relation(mt4_account)
     customer_name = balance['real_name']
+    relation = CustomerManagerRelation.get_relation(mt4_account, customer_name)
     sales_name = relation['sales_name']
     manager_name = relation['manager_name']
     director_name = relation['director_name']
@@ -1989,11 +2048,6 @@ def draw_on_all(browser):
         logger.info(ms)
         print(ms)
     return True
-
-
-def send_excel_everyday():
-    """发送每日邮件到指定的邮箱"""
-    send_mail(title="hello")
 
 
 if __name__ == "__main__":

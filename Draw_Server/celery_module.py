@@ -2,7 +2,7 @@
 import datetime
 
 from celery import Celery
-from module.mail_excel import EveryDayExcel
+from module.mail_excel import EveryWeekExcel
 from browser.crawler_module import do_jobs
 from mail_module import send_mail
 
@@ -74,21 +74,21 @@ def draw_platform(*args, **kwargs):
 
 
 @app.task(bind=True)
-def send_everyday_excel(*args, **kwargs):
+def send_every_week_excel(*args, **kwargs):
     """
-    每天凌晨5点把交易信息发送excel到指定的邮箱
+    每周一凌晨5点把交易信息发送excel到指定的邮箱
     :param args:
     :param kwargs:
     :return:
     """
     res = None
     try:
-        EveryDayExcel.send_excel()
+        EveryWeekExcel.send_excel()
     except Exception as e:
         res = str(e)
         print(e)
     finally:
-        res = "send_everyday_excel success" if res is None else res
+        res = "send_every_week_excel success" if res is None else res
         return res
 
 

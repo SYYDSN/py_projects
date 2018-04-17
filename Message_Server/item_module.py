@@ -12,6 +12,7 @@ DBRef = mongo_db.DBRef
 class Signal(mongo_db.BaseDoc):
     """交易信号"""
     """
+    以create_time字段排序
     数据示范
     data = {'op': 'data_create',
             'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
@@ -31,6 +32,27 @@ class Signal(mongo_db.BaseDoc):
     _table_name = "signal_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['receive_time'] = datetime.datetime  # 接收消息时间
+    type_dict['create_time'] = datetime.datetime  # 创建时间
+    type_dict['update_time'] = datetime.datetime  # 修改时间
+    type_dict['delete_time'] = datetime.datetime  # 删除时间
+    type_dict['record_id'] = str  # 事件唯一id,用于判断是不是同一个交易?
+    type_dict['app_name'] = str  # 表单名称，重要区别依据，应该是唯一的
+    type_dict['the_type'] = str  # 订单类型
+    type_dict['updater_name'] = str  # 修改者
+    type_dict['updater_id'] = str  # 修改者id
+    type_dict['deleter_name'] = str  # 删除者
+    type_dict['deleter_id'] = str  # 删除者id
+    type_dict['creator_name'] = str  # 创建者
+    type_dict['creator_id'] = str  # 创建者id
+    type_dict['product'] = str  # 产品名称
+    type_dict['direction'] = str  # 方向
+    type_dict['exit_reason'] = str  # 离场理由
+    type_dict['enter_price'] = float  # 建仓价
+    type_dict['exit_price'] = float  # 平仓价
+    type_dict['profit'] = float  # 获利
+    type_dict['each_profit'] = float  # 每手获利
+    type_dict['token_name'] = str  # 固定  "策略助手 小迅"
 
     def __init__(self, **kwargs):
         op = kwargs.pop('op', None)
@@ -62,8 +84,16 @@ class Signal(mongo_db.BaseDoc):
             event_date = datetime.datetime.now()
             if isinstance(event_date, datetime.datetime):
                 arg_dict['event_date'] = event_date
-
-            arg_dict['record_id'] = data.pop('_id', None)   # 事件唯一id,用于判断是不是同一个交易?
+            t_s = data.pop("_widget_1514518782603", dict())  # 止盈止损
+            if "_widget_1514518782614" in t_s:
+                take_profit = t_s['_widget_1514518782614']
+                if isinstance(take_profit, (int, float)):
+                    arg_dict['take_profit'] = take_profit  # 止盈
+            if "_widget_1514518782632" in t_s:
+                stop_losses = t_s['_widget_1514518782632']
+                if isinstance(stop_losses, (int, float)):
+                    arg_dict['stop_losses'] = stop_losses   # 止损
+            # arg_dict['record_id'] = data.pop('_id', None)   # 事件唯一id,用于判断是不是同一个交易?
             arg_dict['app_name'] = data.pop('formName', None)  # 表单名称，重要区别依据，应该是唯一的
             updater = data.pop('updater', None)
             if updater is not None:
@@ -77,6 +107,30 @@ class Signal(mongo_db.BaseDoc):
             if creator is not None:
                 arg_dict['creator_name'] = creator['name']
                 arg_dict['creator_id'] = creator['_id']
+            each_profit = data.pop("_widget_1522117404041")
+            if isinstance(each_profit, (int, float)):
+                arg_dict['each_profit'] = each_profit
+            profit = data.pop("_widget_1514518782842")
+            if isinstance(profit, (int, float)):
+                arg_dict['profit'] = profit
+            enter_price = data.pop("_widget_1514518782592")
+            if isinstance(enter_price, (int, float)):
+                arg_dict['enter_price'] = enter_price
+            exit_price = data.pop("_widget_1514887799231")
+            if isinstance(exit_price, (int, float)):
+                arg_dict['exit_price'] = exit_price
+            product = data.pop("_widget_1514518782514")
+            if isinstance(exit_price, str) and product.strip() != "":
+                arg_dict['product'] = product
+            direction = data.pop("_widget_1514518782557")
+            if isinstance(direction, str) and direction.strip() != "":
+                arg_dict['direction'] = direction
+            exit_reason = data.pop("_widget_1514887799261")
+            if isinstance(exit_reason, str) and exit_reason.strip() != "":
+                arg_dict['exit_reason'] = exit_reason
+            the_type = data.pop("_widget_1516245169208")
+            if isinstance(the_type, str) and the_type.strip() != "":
+                arg_dict['the_type'] = the_type
             arg_dict['token_name'] = "策略助手 小迅"
             for k, v in data.items():
                 if v is not None:

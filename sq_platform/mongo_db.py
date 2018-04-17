@@ -307,6 +307,7 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
     if isinstance(date_str, (datetime.datetime, datetime.date)):
         return date_str
     elif isinstance(date_str, str):
+        date_str.strip()
         search = re.search(r'\d{4}.\d{1,2}.*\d', date_str)
         if search:
             date_str = search.group()

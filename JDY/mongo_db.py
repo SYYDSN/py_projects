@@ -18,6 +18,7 @@ import re
 import math
 from pymongo import errors
 from werkzeug.contrib.cache import RedisCache
+from pymongo.client_session import ClientSession
 from log_module import get_logger
 from pymongo import ReturnDocument
 from pymongo.errors import *
@@ -869,12 +870,22 @@ class BaseDoc:
         """
         cache = MyCache(cls.get_table_name())
         o_id = o_id if isinstance(o_id, str) else str(o_id)
+        r = default
         if attr_name not in cls.type_dict:
             pass
         else:
             r = cache.get_value("{}.{}".format(o_id, attr_name))
-            return r
+        return r
 
+    @classmethod
+    def save_attr_to_cache(cls, o_id: (ObjectId, str), attr_name: str, attr_val: object)-> (object, None):
+        """
+        保存属性值到缓存
+        :param o_id:
+        :param attr_name:
+        :param attr_val:
+        :return:
+        """
 
     @classmethod
     def get_attr_cls(cls, o_id: ObjectId, attr_name: str, default=None) -> object:
@@ -1047,12 +1058,12 @@ class BaseDoc:
             raise ValueError(mes)
         return inserted_id
 
-    def save_plus(self, ignore: list = None, upsert: bool = True) -> bool:
+    def save_plus(self, ignore: list = None, upsert: bool = True) -> (None, ObjectId):
         """
         更新
         :param ignore: 忽略的更新的字段,一般是有唯一性验证的字段
         :param upsert:
-        :return:
+        :return: ObjectId
         """
         ignore = ["_id"] if ignore is None else ignore
         ses = get_conn(self.table_name())
@@ -1064,7 +1075,8 @@ class BaseDoc:
         if res is None:
             return res
         else:
-            return res.upserted_id
+            """如果是upsert的对象,res.upserted_id就是对象的_id,否则,res.upserted_id对象为空"""
+            return _id if res.upserted_id is None else res.upserted_id
 
     def save(self, obj=None)->ObjectId:
         """更新
@@ -1351,6 +1363,16 @@ class BaseDoc:
             return self.get_dbref()
 
     @classmethod
+    def get_collection(cls):
+        """
+        获取一个collection对象,这个对象可以执行绝大多数对数据库的操作.
+        可以看作这是一个万能的数据库操作handler.只是略微复杂点而已.
+        """
+        table_name = cls.get_table_name()
+        conn = get_conn(table_name)
+        return conn
+
+    @classmethod
     def get_instance_from_dbref(cls, dbref):
         """
         根据dbref返回一个实例对象
@@ -1541,7 +1563,7 @@ class BaseDoc:
         return result
 
     @classmethod
-    def count(cls, filter_dict: dict, session = None, **kwargs):
+    def count(cls, filter_dict: dict, session: ClientSession = None, **kwargs):
         """统计
         :param filter_dict: 过滤器字典
         :param session: pymongo.client_session.ClientSession 实例
