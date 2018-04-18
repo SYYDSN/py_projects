@@ -120,7 +120,7 @@ class Signal(mongo_db.BaseDoc):
             if isinstance(exit_price, (int, float)):
                 arg_dict['exit_price'] = exit_price
             product = data.pop("_widget_1514518782514")
-            if isinstance(exit_price, str) and product.strip() != "":
+            if isinstance(product, str) and product.strip() != "":
                 arg_dict['product'] = product
             direction = data.pop("_widget_1514518782557")
             if isinstance(direction, str) and direction.strip() != "":
