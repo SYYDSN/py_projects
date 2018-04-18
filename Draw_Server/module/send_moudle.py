@@ -1,19 +1,30 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
+import datetime
+from mail_module import send_mail
 from log_module import get_logger
 
-
 """发送消息给钉订机器人"""
-
 
 logger = get_logger()
 # 钉订机器人的链接的token
 url_map = {
-    "钉订小助手": "f346ad6b04dec14dfee9298f9e34aca4605efe4deb20b1ee8b18adfc54af5ca3",
+    "钉订小助手": "f346ad6b04dec14dfee9298f9e34aca4605efe4deb20b1ee8b18adfc54af5ca3",  # 这个实际上是 报表核算群的钉订小助手
+    "财务 钉订小助手": "ffec4541136ac31d597f128761e84ae84152d0a196cf7f89c5ae303a6d07f052",
     "策略助手 小迅": "f007c608f52b78620a52372764d17b42367e22bef78d6966925fee4fe7f715f6",
     "推广助手": "9028ccfe1733a13ae6fe97d0f519ba9a53431709231a9bfa33a413f125d8cb56"
 }
+
+
+def already_sent(token_name: str) -> bool:
+    """
+    检查一个某个token_name缺失的警告邮件是否已发送？
+    如果在24小时内已发送过一次，那就不用再次发送。否则就发送
+    警告邮件
+    :param token_name:
+    :return:
+    """
 
 
 def send_signal(send_data: dict, token_name: str = None) -> bool:
@@ -28,6 +39,11 @@ def send_signal(send_data: dict, token_name: str = None) -> bool:
         token = url_map['钉订小助手']
     else:
         token = url_map.get(token_name)
+        if token_name not in url_map:
+            """发送警告邮件"""
+            title = "没有找到对应的token_name: {}".format(token_name)
+            content = "{} send_data={}".format(datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S"), send_data)
+            send_mail(title=title, content=content)
     token = url_map['钉订小助手'] if token is None else token
     data = json.dumps(send_data)
     headers = {'Content-Type': 'application/json'}
@@ -83,7 +99,7 @@ def add_money(group_name: str, sales_name: str, customer_name: str, money: (str,
     out_put['msgtype'] = 'markdown'
     title = "恭喜加金"
     text = "{}-{}-客户-{}xx,成功入近{}美金。[胜利][胜利][胜利]，继续加油！[加油][加油][加油] <br> ".format(group_name, sales_name,
-                                                                          customer_name[0], money)
+                                                                                customer_name[0], money)
     markdown = dict()
     markdown['title'] = title
     markdown['text'] = text

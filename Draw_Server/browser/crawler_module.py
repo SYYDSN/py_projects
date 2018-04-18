@@ -1396,6 +1396,10 @@ def send_balance_signal(balance: dict):
      }
     out_put['markdown'] = markdown
     out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+    if director_name == "倪妮娜":
+        token_name = "财务 钉订小助手"
+    else:
+        token_name = "钉订小助手"
     res = send_signal(out_put, token_name=token_name)
     print(res)
     return res
