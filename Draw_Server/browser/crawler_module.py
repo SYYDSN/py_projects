@@ -122,8 +122,22 @@ class CustomerManagerRelation(mongo_db.BaseDoc):
                     warn_flag = True
                 else:
                     pass
+
+        sent_flag_key = "no_director_mt4_{}".format(mt4_account)
+        if mt4_account == '8300040':
+            """张先胜的不发警告"""
+            warn_flag = False
+        else:
+            c_name = cache.get(sent_flag_key)
+            if c_name is None:
+                pass
+            else:
+                """发送过警告消息了"""
+                warn_flag = False
         if warn_flag:
+            """发送警戒消息"""
             cls.send_mes(mt4_account, customer_name)
+            cache.set(sent_flag_key, customer_name, timeout=86400)
         return res
 
     @staticmethod

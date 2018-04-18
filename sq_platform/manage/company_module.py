@@ -1483,14 +1483,72 @@ class EmployeeBaseRelation(mongo_db.BaseDoc):
     """
 
     @classmethod
-    def add_relation(cls, e_dbref: DBRef, dbref_name: str, dbref_val: DBRef):
+    def add_relation(cls, emp_dbref: DBRef, dbref_name: str, dbref_val: DBRef) -> DBRef:
         """
         添加一个关系记录.
-        :param e_dbref: Employee.dbref
+        :param emp_dbref: Employee.dbref
         :param dbref_name: 关联对象的属性名
         :param dbref_val: 关联对象的DBRef
-        :return:
+        :return:  关系实例的DBRef对象
         """
+        res = None
+        if isinstance(emp_dbref, DBRef) and isinstance(dbref_val, DBRef) and isinstance(dbref_name, str):
+            init_dict = {
+                "employee_id": emp_dbref,
+                dbref_name: dbref_val,
+                "create_date": datetime.datetime.now()
+            }
+            """插入之前,需要检查是否已存在相同的可用的关系?如果存在只修改其中的一个,其他的作废?"""
+            now = datetime.datetime.now()
+            f = {
+                "employee_id": emp_dbref,
+                dbref_name: dbref_val,
+                "create_date": {"$lte": now},
+                "$or": [
+                    {"end_date": {"$exists": False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$gte": now}}
+                ]
+            }
+            s = {"create_date": -1}
+            exists_doc = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
+            if len(exists_doc) > 0:
+                """有重复的关系"""
+                old = exists_doc.pop(0)
+                f = {"_id": old['_id']}
+                r = cls.find_one_and_update_plus(filter_dict=f, update_dict=init_dict, upsert=True)
+                if r is None:
+                    ms = "修改已存在的关系失败,old={},new={}".format(old, init_dict)
+                    logger.exception(ms)
+                    raise ValueError(ms)
+                else:
+                    dbref = DBRef(database="platform_db", collection=cls.get_table_name(), id=r['_id'])
+                    res = dbref
+                """修改过一个后,是否还有剩余的多余关系?有的话,删除"""
+                if len(exists_doc) > 0:
+                    ids = [x['_id'] for x in exists_doc]
+                    f = {"_id": {"$in": ids}}
+                    u = {'end_date': now}
+                    cls.update_many_plus(filter_dict=f, update_dict=u)
+                else:
+                    pass
+            else:
+                """没有重复的关系,直接插入一个新的"""
+                r = cls.insert_one(**init_dict)
+                if isinstance(r, ObjectId):
+                    """插入成功"""
+                    dbref = DBRef(database="platform_db", collection=cls.get_table_name(), id=r['_id'])
+                    res = dbref
+                else:
+                    ms = "插入新的关系失败,init={}".format(init_dict)
+                    logger.exception(ms)
+                    raise ValueError(ms)
+        else:
+            ms = "参数类型错误:emp_dbref:{},dbref_name:{},dbref_val:{}".format(type(emp_dbref), type(dbref_name),
+                                                                         type(dbref_val))
+            logger.exception(ms)
+            raise TypeError(ms)
+        return res
 
     @classmethod
     def get_relation_by_employee(cls, e_dbref: DBRef, instance: bool = False):
@@ -1761,6 +1819,7 @@ class Employee(User):
     @classmethod
     def get_archives_cls(cls, e_id: (str, ObjectId)) -> (None, dict, list):
         """
+        未完成  2018-4-18
         可以看作是Employee.get_archives的类方法.自2018-4-17起,要求获取更详细的个人资料.包括
         1. 用户信息.(含驾照信息)
         2. 相关行车证信息
@@ -1774,7 +1833,7 @@ class Employee(User):
         if isinstance(emp, cls):
             e_dbref = emp.get_dbref()
             """查询公司信息"""
-
+            未完成 2018 - 4 - 18
         else:
             ms = "{}不是有效的用户id".format(e_id)
             logger.exception(ms)
