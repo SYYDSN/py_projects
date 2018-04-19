@@ -4,13 +4,13 @@ import json
 from log_module import get_logger
 
 
-"""发送消息给钉订机器人"""
+"""发送消息给钉钉机器人"""
 
 
 logger = get_logger()
-# 钉订机器人的链接的token
+# 钉钉机器人的链接的token
 url_map = {
-    "钉订小助手": "f346ad6b04dec14dfee9298f9e34aca4605efe4deb20b1ee8b18adfc54af5ca3",
+    "钉钉小助手": "f346ad6b04dec14dfee9298f9e34aca4605efe4deb20b1ee8b18adfc54af5ca3",
     "策略助手 小迅": "f007c608f52b78620a52372764d17b42367e22bef78d6966925fee4fe7f715f6",
     "推广助手": "9028ccfe1733a13ae6fe97d0f519ba9a53431709231a9bfa33a413f125d8cb56"
 }
@@ -25,10 +25,10 @@ def send_signal(send_data: dict, token_name: str = None) -> bool:
     """
     res = False
     if token_name is None:
-        token = url_map['钉订小助手']
+        token = url_map['钉钉小助手']
     else:
         token = url_map.get(token_name)
-    token = url_map['钉订小助手'] if token is None else token
+    token = url_map['钉钉小助手'] if token is None else token
     data = json.dumps(send_data)
     headers = {'Content-Type': 'application/json'}
     base_url = "https://oapi.dingtalk.com/robot/send?access_token="
@@ -41,11 +41,11 @@ def send_signal(send_data: dict, token_name: str = None) -> bool:
             """success"""
             res = True
         else:
-            ms = '发送消息到钉订机器人失败，错误原因：{}， 参数{}'.format(res['errmsg'], data)
+            ms = '发送消息到钉钉机器人失败，错误原因：{}， 参数{}'.format(res['errmsg'], data)
             logger.exception(ms)
             raise ValueError(ms)
     else:
-        ms = '钉订机器人没有返回正确的响应，错误代码：{}'.format(status_code)
+        ms = '钉钉钉机器人没有返回正确的响应，错误代码：{}'.format(status_code)
         logger.exception(ms)
         raise ValueError(ms)
     return res

@@ -34,17 +34,20 @@ def send_mail(to_email: str = "583736361@qq.com", title: str='hello', content: s
     """
     msg = MIMEMultipart()
     msg["Subject"] = title
+    msg["content"] = content
     msg["From"] = my_email
     msg["To"] = to_email
     """添加附件"""
     if isinstance(file_path, str) and os.path.isfile(file_path):
         with open(file_path, 'rb') as f:
-            att1 = MIMEApplication(f.read())
+            att1 = MIMEApplication(f.read())  # 附件的容器
             att1.set_charset("utf-8")  # 保证中文文件名不乱码
         if file_name is None or file_name == "":
             file_name = os.path.split(file_path)[-1]
         att1.add_header('Content-Disposition', 'attachment', filename=file_name)
+        att2 = MIMEText(content, _charset="utf-8")  # 正文的容器
         msg.attach(att1)
+        msg.attach(att2)
     """添加附件结束"""
     flag = True
     try:
@@ -111,5 +114,5 @@ def send_warning_email(title: str, content: str, interval: int = 900, to_mail: s
 
 
 if __name__ == '__main__':
-    send_mail(to_email="583736361@qq.com", file_path="log_module.py")
+    send_mail(to_email="583736361@qq.com", file_path="log_module.py", title="title", content="你好")
     pass

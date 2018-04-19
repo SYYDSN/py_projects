@@ -1196,13 +1196,13 @@ def send_all_withdraw_signal():
 
 def send_withdraw_signal(reg_info: dict):
     """
-    发送出金信息到钉订机器人的消息服务器
+    发送出金信息到钉钉机器人的消息服务器
     :param reg_info:
     :return:
     """
     out_put = dict()
     markdown = dict()
-    token_name = "钉订小助手"
+    token_name = "钉钉小助手"
     out_put['msgtype'] = 'markdown'
     markdown['title'] = "出金申请"
     system_info = reg_info['system']

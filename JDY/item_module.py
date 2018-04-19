@@ -131,7 +131,7 @@ class Customer(mongo_db.BaseDoc):
     @classmethod
     def send_signal(cls, reg_info: dict):
         """
-        发送注册信息到钉订机器人的消息服务器
+        发送注册信息到钉钉机器人的消息服务器
         :param reg_info:
         :return:
         """

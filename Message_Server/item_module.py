@@ -299,7 +299,7 @@ class Signal(mongo_db.BaseDoc):
             out_put['markdown'] = markdown
             out_put['at'] = {'atMobiles': [], 'isAtAll': False}
 
-            """发送消息到钉订群"""
+            """发送消息到钉钉群"""
             res = send_signal(out_put, token_name=self.get_attr("token_name"))
             if res:
                 if the_type == "删除订单":

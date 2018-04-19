@@ -118,7 +118,7 @@ class IgnoreInvalidRelationCustomer(mongo_db.BaseDoc):
         mt4_account = str(mt4_account) if not isinstance(mt4_account, str) else mt4_account
         out_put = dict()
         markdown = dict()
-        token_name = "财务群钉订小助手"
+        token_name = "财务群钉钉小助手"
         out_put['msgtype'] = 'markdown'
         title = "客户{}没有归属的总监".format(customer_name)
         markdown['title'] = title
@@ -1343,7 +1343,7 @@ def send_all_withdraw_signal():
 
 def send_withdraw_signal(reg_info: dict):
     """
-    发送出金信息到钉订机器人的消息服务器
+    发送出金信息到钉钉机器人的消息服务器
     :param reg_info:
     :return:
     """
@@ -1369,7 +1369,7 @@ def send_withdraw_signal(reg_info: dict):
                                           open_interest, account_balance, sales_name, manager_name, director_name)
     out_put['markdown'] = markdown
     out_put['at'] = {'atMobiles': [], 'isAtAll': False}
-    res = send_signal(out_put, token_name="钉订小助手")
+    res = send_signal(out_put, token_name="钉钉小助手")
     if not res:
         ms = "发送消息到钉钉小助手失败,消息:{}".format(markdown)
         logger.exception(ms)
@@ -1416,13 +1416,12 @@ def send_all_balance_signal():
 
 def send_balance_signal(balance: dict):
     """
-    发送balance到钉订机器人的消息服务器
+    发送balance到钉钉机器人的消息服务器
     :param balance:
     :return:
     """
     out_put = dict()
     markdown = dict()
-    token_name = "钉订小助手"
     out_put['msgtype'] = 'markdown'
     markdown['title'] = "balance申请"
     system_info = balance['system']
@@ -1447,7 +1446,7 @@ def send_balance_signal(balance: dict):
      }
     out_put['markdown'] = markdown
     out_put['at'] = {'atMobiles': [], 'isAtAll': False}
-    res = send_signal(out_put, token_name="钉订小助手")
+    res = send_signal(out_put, token_name="钉钉小助手")
     if not res:
         ms = "发送消息到钉钉小助手失败,消息:{}".format(markdown)
         logger.exception(ms)
@@ -2137,4 +2136,21 @@ if __name__ == "__main__":
     # ]
     # for x in v_s:
     #     CustomerManagerRelation.get_relation(**x)
+    """测试发送balance"""
+    # dd = {
+    #     "_id" : ObjectId("5ad86f4fa7a75103612182c3"),
+    #     "send_signal" : 1,
+    #     "nick_name" : "张铭",
+    #     "time" : get_datetime_from_str("2018-04-19T18:24:09.000Z"),
+    #     "system" : "office.shengfxchina.com:8443",
+    #     "real_name" : "张铭",
+    #     "description" : "入金/加金",
+    #     "ticket" : 49734,
+    #     "login" : 8300150,
+    #     "profit" : 700.0,
+    #     "command" : "balance",
+    #     "comment" : "Deposit maxib#1220",
+    #     "create_date" : get_datetime_from_str("2018-04-19T18:28:31.688Z")
+    # }
+    # send_balance_signal(dd)
     pass

@@ -100,7 +100,7 @@ def query_transaction(*args, **kwargs):
 @app.task(bind=True)
 def query_withdraw(self, *args, **kwargs):
     """每5分钟检查一下出金申请,出入金记录和赠金"""
-    add_job("draw_withdraw", dict())  # 查询出金申请并发消息给钉订机器人。
+    add_job("draw_withdraw", dict())  # 查询出金申请并发消息给钉钉机器人。
     ms = "beat task add draw_withdraw success"
     recode(ms)
     return "celery query_withdraw ok"
