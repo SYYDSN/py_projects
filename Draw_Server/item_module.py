@@ -131,7 +131,7 @@ class Customer(mongo_db.BaseDoc):
     @classmethod
     def send_signal(cls, reg_info: dict):
         """
-        发送注册信息到钉订机器人的消息服务器
+        发送注册信息到钉订机器人的消息服务器,JDY项目才会发送此消息,本项目此方法不会被使用
         :param reg_info:
         :return:
         """

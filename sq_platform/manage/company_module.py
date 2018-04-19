@@ -1473,7 +1473,7 @@ class Dept(mongo_db.BaseDoc):
 
 class EmployeeBaseRelation(mongo_db.BaseDoc):
     """
-    员工相关的关系基础类
+    员工相关的关系基础类,这个类和UserBaseRelation的很相似,但由于关系类的简单,没有做成子类的样子
     类对象的属性至少包含下列属性
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
@@ -1485,7 +1485,7 @@ class EmployeeBaseRelation(mongo_db.BaseDoc):
     @classmethod
     def add_relation(cls, emp_dbref: DBRef, dbref_name: str, dbref_val: DBRef) -> DBRef:
         """
-        添加一个关系记录.
+        添加一个关系记录.此方法会清除之前的有效关系,
         :param emp_dbref: Employee.dbref
         :param dbref_name: 关联对象的属性名
         :param dbref_val: 关联对象的DBRef
@@ -1498,7 +1498,7 @@ class EmployeeBaseRelation(mongo_db.BaseDoc):
                 dbref_name: dbref_val,
                 "create_date": datetime.datetime.now()
             }
-            """插入之前,需要检查是否已存在相同的可用的关系?如果存在只修改其中的一个,其他的作废?"""
+            """插入之前,需要检查是否已存在相同的可用的关系?如果存在只修改其中的一个,其他的作废"""
             now = datetime.datetime.now()
             f = {
                 "employee_id": emp_dbref,
@@ -1553,11 +1553,11 @@ class EmployeeBaseRelation(mongo_db.BaseDoc):
     @classmethod
     def get_relation_by_employee(cls, e_dbref: DBRef, instance: bool = False):
         """
-        根据Employee实例的dbref对象查询对应的EmployeeCompanyRelation,注意,只会返回
-        一个有效的EmployeeCompanyRelation对象的实例.一定会验证可用性
+        根据Employee实例的dbref对象查询对应的EmployeeXxxRelation,注意,只会返回
+        一个有效的EmployeeXxxRelation对象的实例.一定会验证可用性
         :param e_dbref: Employee.dbref
-        :param instance: 返回的EmployeeCompanyRelation是实例还是doc?
-        :return: EmployeeCompanyRelation对象的实例(或doc)/None
+        :param instance: 返回的EmployeeXxxRelation是实例还是doc?
+        :return: EmployeeXxxRelation对象的实例(或doc)/None
         """
         now = datetime.datetime.now()
         f = {
@@ -1577,13 +1577,13 @@ class EmployeeBaseRelation(mongo_db.BaseDoc):
     def get_relations_by_employee(cls, e_dbref: DBRef, validate: int = 1, to_dict: bool = False,
                                   can_json: bool = False):
         """
-        根据Employee实例的dbref对象查询对应的EmployeeCompanyRelation,注意,会返回
-        一个EmployeeCompanyRelation对象的实例的list.
+        根据Employee实例的dbref对象查询对应的EmployeeXxxRelation,注意,会返回
+        一个EmployeeXxxRelation对象的实例的list.
         :param e_dbref: Employee.dbref
         :param validate: 是否只返回可用的对象?1只返回有效的,0全部返回,-1只返回无效的
-        :param to_dict: 返回的EmployeeCompanyRelation是实例还是doc?
+        :param to_dict: 返回的EmployeeXxxRelation是实例还是doc?
         :param can_json: (返回的是doc的时候),是否做to_flat_dict转换?
-        :return: EmployeeCompanyRelation对象的实例(或doc)的list
+        :return: EmployeeXxxRelation对象的实例(或doc)的list
         """
         now = datetime.datetime.now()
         if not isinstance(validate, int):
@@ -1633,8 +1633,10 @@ class EmployeeBaseRelation(mongo_db.BaseDoc):
         :param e_dbref: Employee.dbref
         :return:
         """
-        f = {'employee_id': e_dbref}
-        cls.delete_many(filter_dict=f)
+        invalid_relations = cls.get_relations_by_employee(e_dbref=e_dbref, validate=-1, to_dict=True)
+        if len(invalid_relations) > 0:
+            f = {"_id": {"$in": [x['_id'] for x in invalid_relations]}}
+            cls.delete_many(filter_dict=f)
 
 
 class EmployeePostRelation(EmployeeBaseRelation):
@@ -1700,12 +1702,38 @@ class Employee(User):
         self.type_dict['scheduling'] = list   # 排班的DBRef的list,对应于员工的排班,默认早9点到晚17点.（考虑加班和替班的情况）
         super(Employee, self).__init__(**kwargs)
 
-    def get_company(self) -> Company:
+    def get_company(self, to_dict: bool = True) -> dict:
         """
         获取所属的公司对象
+        :param to_dict: 返回的是实例还是doc对象? 默认是doc
         :return:
         """
         """查询可用的EmployeeCompanyRelation对象"""
+        company_relation_id = self.get_attr("company_relation_id")
+        res = dict()
+        if not isinstance(company_relation_id, DBRef):
+            real_name = ('' if self.get_attr("official_name") is None else self.get_attr("official_name")) \
+                if self.get_attr("real_name") is None else self.get_attr("real_name")
+            ms = "用户{}({})没有有效的公司关系".format(str(self.get_id()), real_name)
+            logger.info(ms)
+            warnings.warn(ms)
+        else:
+            """检查关系是否有效?"""
+            now = datetime.datetime.now()
+            f = {"employee_id": self.get_dbref(), "create_date": {"$lte": now},
+                 "$or": [
+                     {"end_date": {"$exists": False}},
+                     {"end_date": {"$eq": None}},
+                     {"end_date": {"$gte": now}}
+                 ]}
+            s = {"create_date": -1}
+            relation = EmployeeCompanyRelation.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+            if isinstance(dict, relation):
+                company = Company.find_by_id(relation.get_attr("company_id").id, to_dict=to_dict)
+                res = company
+            else:
+                pass
+        return res
 
     def get_dept(self, to_dict: bool = True) -> (None, Dept, dict):
         """
@@ -1713,22 +1741,32 @@ class Employee(User):
         :param to_dict: 返回的是实例还是字典
         :return:
         """
-        employee_dbref = self.get_dbref()
-        now = datetime.datetime.now()
-        f = {"employee_id": employee_dbref, "create_date": {"$lte": now},
-             "$or": [
-                 {"end_date": {"$exists": False}},
-                 {"end_date": {"$eq": None}},
-                 {"end_date": {"$gte": now}}
-             ]}
-        s = {"create_date": -1}
-        relation = EmployeeDeptRelation.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
-        if relation is None:
-            pass
+        """查询可用的EmployeeDeptRelation对象"""
+        dept_relation_id = self.get_attr("dept_relation_id")
+        res = dict()
+        if not isinstance(dept_relation_id, DBRef):
+            real_name = ('' if self.get_attr("official_name") is None else self.get_attr("official_name")) \
+                if self.get_attr("real_name") is None else self.get_attr("real_name")
+            ms = "用户{}({})没有有效的部门关系".format(str(self.get_id()), real_name)
+            logger.info(ms)
+            warnings.warn(ms)
         else:
-            """寻找对应的post信息"""
-            d = Dept.find_one_plus(filter_dict={"_id": relation['dept_id'].id}, instance=(not to_dict))
-            return d
+            """检查关系是否有效?"""
+            now = datetime.datetime.now()
+            f = {"employee_id": self.get_dbref(), "create_date": {"$lte": now},
+                 "$or": [
+                     {"end_date": {"$exists": False}},
+                     {"end_date": {"$eq": None}},
+                     {"end_date": {"$gte": now}}
+                 ]}
+            s = {"create_date": -1}
+            relation = EmployeeDeptRelation.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+            if isinstance(dict, relation):
+                dept = Dept.find_by_id(relation.get_attr("dept_id").id, to_dict=to_dict)
+                res = dept
+            else:
+                pass
+        return res
 
     def get_post(self, to_dict: bool = True) -> (None, Dept, dict):
         """
@@ -1736,22 +1774,32 @@ class Employee(User):
         :param to_dict: 返回的是实例还是字典
         :return:
         """
-        employee_dbref = self.get_dbref()
-        now = datetime.datetime.now()
-        f = {"employee_id": employee_dbref, "create_date": {"$lte": now},
-             "$or": [
-                 {"end_date": {"$exists": False}},
-                 {"end_date": {"$eq": None}},
-                 {"end_date": {"$gte": now}}
-             ]}
-        s = {"create_date": -1}
-        relation = EmployeePostRelation.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
-        if relation is None:
-            pass
+        """查询可用的EmployeePostRelation对象"""
+        post_relation_id = self.get_attr("post_relation_id")
+        res = dict()
+        if not isinstance(post_relation_id, DBRef):
+            real_name = ('' if self.get_attr("official_name") is None else self.get_attr("official_name")) \
+                if self.get_attr("real_name") is None else self.get_attr("real_name")
+            ms = "用户{}({})没有有效的职务关系".format(str(self.get_id()), real_name)
+            logger.info(ms)
+            warnings.warn(ms)
         else:
-            """寻找对应的post信息"""
-            p = Post.find_one_plus(filter_dict={"_id": relation['post_id'].id}, instance=(not to_dict))
-            return p
+            """检查关系是否有效?"""
+            now = datetime.datetime.now()
+            f = {"employee_id": self.get_dbref(), "create_date": {"$lte": now},
+                 "$or": [
+                     {"end_date": {"$exists": False}},
+                     {"end_date": {"$eq": None}},
+                     {"end_date": {"$gte": now}}
+                 ]}
+            s = {"create_date": -1}
+            relation = EmployeePostRelation.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+            if isinstance(dict, relation):
+                post = Post.find_by_id(relation.get_attr("post_id").id, to_dict=to_dict)
+                res = post
+            else:
+                pass
+        return res
 
     def get_archives(self) -> dict:
         """
@@ -1833,7 +1881,7 @@ class Employee(User):
         if isinstance(emp, cls):
             e_dbref = emp.get_dbref()
             """查询公司信息"""
-            未完成 2018 - 4 - 18
+            emp.get_company()
         else:
             ms = "{}不是有效的用户id".format(e_id)
             logger.exception(ms)

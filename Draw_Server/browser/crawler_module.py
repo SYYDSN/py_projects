@@ -32,7 +32,6 @@ from module.transaction_module import Transaction
 from module.transaction_module import Withdraw
 from gevent.queue import JoinableQueue
 from mail_module import send_mail
-from threading import Lock
 
 
 send_signal = send_moudle.send_signal
@@ -46,6 +45,92 @@ cache.delete(job_key)
 
 
 """爬虫模块"""
+
+
+class IgnoreInvalidRelationCustomer(mongo_db.BaseDoc):
+    """被忽略的无效关系的用户,在本类中的对象,无需再发送无效总监归属的警告"""
+    _table_name = "ignore_invalid_relation_customer_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['mt4_account'] = str
+    type_dict['customer_name'] = str
+    type_dict['create_date'] = datetime.datetime
+
+    def __init__(self, **kwargs):
+        if 'mt4_account' in kwargs:
+            mt4_account = kwargs['mt4_account']
+            if not isinstance(mt4_account, str):
+                mt4_account = str(mt4_account)
+                kwargs['mt4_account'] = mt4_account
+            else:
+                pass
+        if "create_date" not in kwargs:
+            kwargs['create_date'] = datetime.datetime.now()
+        super(IgnoreInvalidRelationCustomer, self).__init__(**kwargs)
+
+    @classmethod
+    def include(cls, mt4_account: str, customer_name: str, send_warning: bool = False, auto_insert: bool = False) -> bool:
+        """
+        检测一个账户是否处于本类的表中.如果存在,表示属于被忽视的用户.
+        :param mt4_account:
+        :param customer_name:
+        :param send_warning: 如果是被忽视的用户,是否发送警告信息?默认不发送
+        :param auto_insert: 是否自动把不在表中的被检测的mt4_account加入到表中?默认不加.
+        :return: 是否是被忽视的用户? 是被忽视的返回True/不是返回False
+        """
+        f = dict()
+        rs = cls.find_plus(filter_dict=f, projection=['mt4_account'], to_dict=True)
+        if len(rs) > 0:
+            rs = [x['mt4_account'] for x in rs]
+        if mt4_account in rs:
+            """是被忽视的用户"""
+            res = True
+        else:
+            res = False
+            """检查是否发送警告消息?"""
+            if send_warning:
+                cls.send_mes(mt4_account, customer_name)  # 这个方法会抛出异常
+            else:
+                pass
+            """检查是否自动加入?"""
+            if auto_insert:
+                init = {
+                    "mt4_account": mt4_account,
+                    "customer_name": customer_name
+                }
+                r = cls.insert_one(**init)
+                if isinstance(r, ObjectId):
+                    pass
+                else:
+                    ms = "插入IgnoreInvalidRelationCustomer实例失败,init={}".format(init)
+                    logger.exception(ms)
+                    raise ValueError(ms)
+        return res
+
+    @staticmethod
+    def send_mes(mt4_account: str, customer_name: str) -> bool:
+        """
+        发送无总监归属警告信息
+        :param mt4_account:
+        :param customer_name:
+        :return: 是否发送成功
+        """
+        mt4_account = str(mt4_account) if not isinstance(mt4_account, str) else mt4_account
+        out_put = dict()
+        markdown = dict()
+        token_name = "财务群钉订小助手"
+        out_put['msgtype'] = 'markdown'
+        title = "客户{}没有归属的总监".format(customer_name)
+        markdown['title'] = title
+        a_time = datetime.datetime.now().strftime("%y年%m月%d日 %H:%M:%S")
+
+        markdown['text'] = "#### {}  \n > MT4帐号：{}   \n > 客户名：{}  \n > 时间： {}".format(
+            title, mt4_account, customer_name, a_time
+        )
+        out_put['markdown'] = markdown
+        out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+        res = send_signal(out_put, token_name=token_name)
+        return res
 
 
 class CustomerManagerRelation(mongo_db.BaseDoc):
@@ -67,102 +152,61 @@ class CustomerManagerRelation(mongo_db.BaseDoc):
     @classmethod
     def get_relation(cls, mt4_account: str, customer_name: str) -> dict:
         """
-        根据用户的mt4帐号,查询用户的归属关系
+        根据用户的mt4帐号,查询用户的归属关系,
+        1. 如果查询到,返回用户的归属字典.
+        2. 如果查询不到,返回一个值都为空字符的归属字典,并且.
+            1. 如果客户的账户在IgnoreInvalidRelationCustomer对象中,那就不用发送警告消息.
+            2. 如果客户的账户不在IgnoreInvalidRelationCustomer对象中,那就发送警告消息
         :param mt4_account:
         :param customer_name:
         :return:
         """
         mt4_account = mt4_account if isinstance(mt4_account, str) else str(mt4_account)
-        key = cls.get_table_name()
-        the_map = cache.get(key)
         res = dict()
         res['director_name'] = ''
         res['sales_name'] = ''
         res['manager_name'] = ''
         res['customer_name'] = ''
-        query_flag = False
-        if isinstance(the_map, dict) and mt4_account not in the_map:
-            query_flag = True
-        elif the_map is None:
-            the_map = dict()
-            query_flag = True
-        elif isinstance(the_map, dict) and mt4_account in the_map:
-            res = the_map[mt4_account]
+        f = {
+            "mt4_account": mt4_account,
+            "delete_date": {"$exists": False}
+        }
+        s = {"update_date": -1}   # 可能有重复的对象，所以要排序
+        rs = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
+        if len(rs) == 0:
+            warn_flag = True  # 是否发送客户无归属信号？
         else:
-            ms = "未预料的情况the_map={}, mt4_account={}".format(the_map, mt4_account)
-            logger.exception(ms)
-        if query_flag:
-            f = {
-                "mt4_account": mt4_account,
-                "delete_date": {"$exists": False}
-            }
-            s = {"update_date": -1}   # 可能有重复的对象，所以要排序
-            r = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False, can_json=False)
-            if r is None:
-                pass
-            else:
-                res['director_name'] = '' if r.get('director_name') is None else r['director_name']
-                res['sales_name'] = '' if r.get('sales_name') is None else r['sales_name']
-                res['manager_name'] = '' if r.get('manager_name') is None else r['manager_name']
-                res['customer_name'] = '' if r.get('customer_name') is None else r['customer_name']
-                the_map[mt4_account] = res
-                cache.set(key, the_map, timeout=7200)
+            r = rs[0]
+            res['customer_name'] = customer_name
+            res['sales_name'] = '' if r.get('sales_name') is None else r['sales_name']
+            res['manager_name'] = '' if r.get('manager_name') is None else r['manager_name']
+            director_name = '' if r.get('director_name') is None else r['director_name']
+            res['director_name'] = director_name
+            warn_flag = True if director_name == "" else False   # 是否发送客户无归属信号？
+        """检查是否有重复的用户"""
+        if len(rs) > 1:
+            repeat = True
         else:
-            pass
-        warn_flag = False  # 是否发送客户无归属信号？
-        director_name = res['director_name']
-        if director_name == '':
-            warn_flag = True
-        else:
-            if director_name != "倪妮娜":
-                pass
-            else:
-                sales_name = res['sales_name']
-                if sales_name == "":
-                    warn_flag = True
+            repeat = False
+        if warn_flag:
+            """本方法检测没有获取到对应的关系,下一步交给IgnoreInvalidRelationCustomer检查是否有必要发送警告信息"""
+            sent_flag = IgnoreInvalidRelationCustomer.include(mt4_account=mt4_account, customer_name=customer_name,
+                                                              auto_insert=True, send_warning=True)
+            if not sent_flag:
+                """不是被忽视的用户,已经发送了无归属警告消息"""
+                if repeat:
+                    """是否发现了多重用户?"""
+                    repeat_list = [{"mt4_account": x.get('mt4_account'), "customer_name": x.get("customer_name")} for x
+                                   in rs]
+                    title = "customer_manager_relation表中有重复的用户"
+                    content = "{}".format(repeat_list)
+                    send_mail(title=title, content=content)
                 else:
                     pass
-
-        sent_flag_key = "no_director_mt4_{}".format(mt4_account)
-        if mt4_account == '8300040':
-            """张先胜的不发警告"""
-            warn_flag = False
-        else:
-            c_name = cache.get(sent_flag_key)
-            if c_name is None:
-                pass
             else:
-                """发送过警告消息了"""
-                warn_flag = False
-        if warn_flag:
-            """发送警戒消息"""
-            cls.send_mes(mt4_account, customer_name)
-            cache.set(sent_flag_key, customer_name, timeout=86400)
+                """被忽略的用户"""
+                pass
         return res
-
-    @staticmethod
-    def send_mes(mt4_account: str, customer_name: str):
-        """
-        当某个用户没有总监归属的时候，可以调用此方法发送警告信息
-        :param mt4_account:
-        :param customer_name:
-        :return:
-        """
-        mt4_account = str(mt4_account) if not isinstance(mt4_account, str) else mt4_account
-        out_put = dict()
-        markdown = dict()
-        token_name = "钉订小助手"
-        out_put['msgtype'] = 'markdown'
-        title = "客户{}没有归属的总监".format(customer_name)
-        markdown['title'] = title
-        a_time = datetime.datetime.now().strftime("%y年%m月%d日 %H:%M:%S")
-
-        markdown['text'] = "#### {}  \n > MT4帐号：{}   \n > 客户名：{}  \n > 时间： {}".format(
-            title, mt4_account, customer_name, a_time
-        )
-        out_put['markdown'] = markdown
-        out_put['at'] = {'atMobiles': [], 'isAtAll': False}
-        res = send_signal(out_put, token_name=token_name)
 
 
 chrome_driver = "/opt/google/chrome/chromedriver"  # chromedriver的路径
@@ -1305,7 +1349,6 @@ def send_withdraw_signal(reg_info: dict):
     """
     out_put = dict()
     markdown = dict()
-    token_name = "钉订小助手"
     out_put['msgtype'] = 'markdown'
     markdown['title'] = "出金申请"
     system_info = reg_info['system']
@@ -1326,7 +1369,15 @@ def send_withdraw_signal(reg_info: dict):
                                           open_interest, account_balance, sales_name, manager_name, director_name)
     out_put['markdown'] = markdown
     out_put['at'] = {'atMobiles': [], 'isAtAll': False}
-    res = send_signal(out_put, token_name=token_name)
+    res = send_signal(out_put, token_name="钉订小助手")
+    if not res:
+        ms = "发送消息到钉钉小助手失败,消息:{}".format(markdown)
+        logger.exception(ms)
+    if director_name == "倪妮娜":
+        res2 = send_signal(out_put, token_name='财务群钉钉小助手')
+        if not res2:
+            ms = "发送消息到财务群钉钉小助手失败,消息:{}".format(markdown)
+            logger.exception(ms)
     print(res)
     return res
 
@@ -1396,11 +1447,15 @@ def send_balance_signal(balance: dict):
      }
     out_put['markdown'] = markdown
     out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+    res = send_signal(out_put, token_name="钉订小助手")
+    if not res:
+        ms = "发送消息到钉钉小助手失败,消息:{}".format(markdown)
+        logger.exception(ms)
     if director_name == "倪妮娜":
-        token_name = "财务 钉订小助手"
-    else:
-        token_name = "钉订小助手"
-    res = send_signal(out_put, token_name=token_name)
+        res2 = send_signal(out_put, token_name='财务群钉钉小助手')
+        if not res2:
+            ms = "发送消息到财务群钉钉小助手失败,消息:{}".format(markdown)
+            logger.exception(ms)
     print(res)
     return res
 
@@ -2069,9 +2124,17 @@ def draw_on_all(browser):
 
 
 if __name__ == "__main__":
-    """全套测试开始"""
+    """全套测试开始,这也是celery的任务"""
     b = get_browser(1, 1)
     while 1:
         do_jobs(b)
         time.sleep(300)
+    """全套测试结束"""
+    """测试无效用户的提醒"""
+    # v_s = [
+    #     {"mt4_account": "8300150", "customer_name": "张铭"},
+    #     {"mt4_account": 8300040, "customer_name": "张先胜"}
+    # ]
+    # for x in v_s:
+    #     CustomerManagerRelation.get_relation(**x)
     pass

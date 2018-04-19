@@ -1031,6 +1031,13 @@ class BaseDoc:
                         warnings.warn("{}的值{}的类型与设定不符，原始的设定为{}，实际类型为{}".format(k, v, self.type_dict[k], type(v)),
                                       RuntimeWarning)
 
+    def get_dict(self) -> dict:
+        """
+        获取self.__dict__
+        :return:
+        """
+        return self.__dict__
+
     def insert(self, obj=None):
         """插入数据库,单个对象,返回ObjectId的实例"""
         obj = self if obj is None else obj
@@ -1370,14 +1377,13 @@ class BaseDoc:
     @classmethod
     def get_instance_from_dbref(cls, dbref):
         """
-        根据dbref返回一个实例对象
+        根据dbref返回一个本类的实例对象
         :param dbref: 一个dbref对象
         :return: dbref对象的collection对应的class的一个实例
         """
         if dbref is None:
             return None
         else:
-            table_name = dbref.collection
             object_id = dbref.id
             obj = cls.find_by_id(object_id)
             return obj

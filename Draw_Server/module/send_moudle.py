@@ -11,20 +11,10 @@ logger = get_logger()
 # 钉订机器人的链接的token
 url_map = {
     "钉订小助手": "f346ad6b04dec14dfee9298f9e34aca4605efe4deb20b1ee8b18adfc54af5ca3",  # 这个实际上是 报表核算群的钉订小助手
-    "财务 钉订小助手": "ffec4541136ac31d597f128761e84ae84152d0a196cf7f89c5ae303a6d07f052",
-    "策略助手 小迅": "f007c608f52b78620a52372764d17b42367e22bef78d6966925fee4fe7f715f6",
-    "推广助手": "9028ccfe1733a13ae6fe97d0f519ba9a53431709231a9bfa33a413f125d8cb56"
+    "财务群钉订小助手": "ffec4541136ac31d597f128761e84ae84152d0a196cf7f89c5ae303a6d07f052",  # 财务群
+    "策略助手 小迅": "f007c608f52b78620a52372764d17b42367e22bef78d6966925fee4fe7f715f6",     # 直播操作建议群
+    "推广助手": "9028ccfe1733a13ae6fe97d0f519ba9a53431709231a9bfa33a413f125d8cb56"           # 资源群
 }
-
-
-def already_sent(token_name: str) -> bool:
-    """
-    检查一个某个token_name缺失的警告邮件是否已发送？
-    如果在24小时内已发送过一次，那就不用再次发送。否则就发送
-    警告邮件
-    :param token_name:
-    :return:
-    """
 
 
 def send_signal(send_data: dict, token_name: str = None) -> bool:

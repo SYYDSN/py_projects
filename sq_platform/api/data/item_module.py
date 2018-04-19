@@ -123,6 +123,8 @@ class User(mongo_db.BaseDoc):
     type_dict['user_status'] = int  # 用户状态，1表示可以登录，0表示禁止登录
     type_dict['online_time'] = float  # 在线时长的统计.单位分钟
     type_dict['description'] = str  # 备注
+    """私人车辆/公司车辆行车证的对应关系,不一定有,指向UserLicenseRelation类的DBRef的list"""
+    type_dict['license_relation_id'] = list()
     """
     驾驶证信息部分,驾驶证和用户有一一对应的关系.所以需要直接存储在对象中.
     """
@@ -193,7 +195,7 @@ class User(mongo_db.BaseDoc):
 
     def get_driving_license(self) -> dict:
         """
-        获取驾照相关信息.返回的字段格式是参考App端的要求决定的.
+        获取驾驶证相关信息.返回的字段格式是参考App端的要求决定的.
         :return: 数据字典,没有经过json转换.
         """
         data = {
@@ -280,6 +282,40 @@ class User(mongo_db.BaseDoc):
             print(e)
         finally:
             return message
+
+    @classmethod
+    def get_usable_license(cls, user_id: (str, ObjectId, DBRef, MyDBRef), to_dict: bool = True,
+                           can_json: bool = True) -> list:
+        """
+        获取指定用户的可用行车证,行车证的可用状态是指行车证对应的UserLicenseRelation实例存在,并且
+        其end_date为null,不存在或者比现在的时间更靠后的状态.
+        :param user_id: 用户id
+        :param to_dict: 是否转换为dict?这个参数容易被can_json覆盖,请注意
+        :param can_json: 是否做json序列化转换?
+        :return:
+        """
+        if isinstance(user_id, (str, ObjectId)):
+            user = cls.find_by_id(user_id)
+            if isinstance(user, cls):
+                """正确的user_id"""
+                user_dbref = user.get_dbref()
+            else:
+                ms = "错误的用户id: {}".format(user_id)
+                logger.exception(ms)
+                raise ValueError(ms)
+        elif isinstance(user_id, DBRef):
+            user_dbref = user_id
+        else:
+            user_dbref = None
+            ms = "用户id:{}类型不合法,期望一个str/ObjectId,得到一个{}".format(user_id, type(user_id))
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        res = list()
+        if user_dbref is None:
+            pass
+        else:
+            """查询可用的UserLicenseRelation对象"""
+            还未完成
 
     @classmethod
     def find_driving_license(cls, user_id: (str, ObjectId)) -> dict:
@@ -954,7 +990,175 @@ class ThroughCity(mongo_db.BaseDoc):
             raise ValueError(ms)
 
 
-class UserLicenseRelation(mongo_db.BaseDoc):
+class UserBaseRelation(mongo_db.BaseDoc):
+    """
+    用户相关的关系基础类
+    类对象的属性至少包含下列属性
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['user_id'] = DBRef  # 员工id,指向user_info表,
+    type_dict['create_date'] = datetime.datetime  # 关系的建立时间
+    type_dict['end_date'] = datetime.datetime  # 关系的终结时间
+    """
+
+    @classmethod
+    def add_relation(cls, user_dbref: DBRef, dbref_name: str, dbref_val: DBRef) -> DBRef:
+        """
+        添加一个关系记录.此方法会清除之前的有效关系,
+        :param user_dbref: Employee.dbref
+        :param dbref_name: 关联对象的属性名
+        :param dbref_val: 关联对象的DBRef
+        :return:  关系实例的DBRef对象
+        """
+        res = None
+        if isinstance(user_dbref, DBRef) and isinstance(dbref_val, DBRef) and isinstance(dbref_name, str):
+            init_dict = {
+                "user_id": user_dbref,
+                dbref_name: dbref_val,
+                "create_date": datetime.datetime.now()
+            }
+            """插入之前,需要检查是否已存在相同的可用的关系?如果存在只修改其中的一个,其他的作废"""
+            now = datetime.datetime.now()
+            f = {
+                "user_id": user_dbref,
+                dbref_name: dbref_val,
+                "create_date": {"$lte": now},
+                "$or": [
+                    {"end_date": {"$exists": False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$gte": now}}
+                ]
+            }
+            s = {"create_date": -1}
+            exists_doc = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
+            if len(exists_doc) > 0:
+                """有重复的关系"""
+                old = exists_doc.pop(0)
+                f = {"_id": old['_id']}
+                r = cls.find_one_and_update_plus(filter_dict=f, update_dict=init_dict, upsert=True)
+                if r is None:
+                    ms = "修改已存在的关系失败,old={},new={}".format(old, init_dict)
+                    logger.exception(ms)
+                    raise ValueError(ms)
+                else:
+                    dbref = DBRef(database="platform_db", collection=cls.get_table_name(), id=r['_id'])
+                    res = dbref
+                """修改过一个后,是否还有剩余的多余关系?有的话,删除"""
+                if len(exists_doc) > 0:
+                    ids = [x['_id'] for x in exists_doc]
+                    f = {"_id": {"$in": ids}}
+                    u = {'end_date': now}
+                    cls.update_many_plus(filter_dict=f, update_dict=u)
+                else:
+                    pass
+            else:
+                """没有重复的关系,直接插入一个新的"""
+                r = cls.insert_one(**init_dict)
+                if isinstance(r, ObjectId):
+                    """插入成功"""
+                    dbref = DBRef(database="platform_db", collection=cls.get_table_name(), id=r['_id'])
+                    res = dbref
+                else:
+                    ms = "插入新的关系失败,init={}".format(init_dict)
+                    logger.exception(ms)
+                    raise ValueError(ms)
+        else:
+            ms = "参数类型错误:user_dbref:{},dbref_name:{},dbref_val:{}".format(type(user_dbref), type(dbref_name),
+                                                                         type(dbref_val))
+            logger.exception(ms)
+            raise TypeError(ms)
+        return res
+
+    @classmethod
+    def get_relation_by_user(cls, user_dbref: DBRef, instance: bool = False):
+        """
+        根据User实例的dbref对象查询对应的UserXxxRelation,注意,只会返回
+        一个有效的UserXxxRelation对象的实例.一定会验证可用性
+        :param user_dbref: User.dbref
+        :param instance: 返回的UserXxxRelation是实例还是doc?
+        :return: UserXxxRelation对象的实例(或doc)/None
+        """
+        now = datetime.datetime.now()
+        f = {
+            'user_id': user_dbref,
+            'create_date': {"$lte": now},
+            '$or': [
+                {'end_date': {'$exists': False}},
+                {"end_date": {"$eq": None}},
+                {"end_date": {"$gte": now}}
+            ]
+        }
+        s = {'create_date': -1}
+        r = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=instance)
+        return r
+
+    @classmethod
+    def get_relations_by_user(cls, user_dbref: DBRef, validate: int = 1, to_dict: bool = False,
+                                  can_json: bool = False):
+        """
+        根据User实例的dbref对象查询对应的UserXxxRelation,注意,会返回
+        一个UserXxxRelation对象的实例的list.
+        :param user_dbref: User.dbref
+        :param validate: 是否只返回可用的对象?1只返回有效的,0全部返回,-1只返回无效的
+        :param to_dict: 返回的UserXxxRelation是实例还是doc的list?
+        :param can_json: (返回的是doc的时候),是否做to_flat_dict转换?
+        :return: UserXxxRelation对象的实例(或doc)的list
+        """
+        now = datetime.datetime.now()
+        if not isinstance(validate, int):
+            try:
+                validate = int()
+            except Exception as e:
+                validate = 1
+                print(e)
+            finally:
+                pass
+        validate = 1 if validate >= 1 else (-1 if validate <= -1 else validate)
+        if validate == 1:
+            """只查有效的"""
+            f = {
+                'user_id': user_dbref,
+                'create_date': {"$lte": now},
+                '$or': [
+                    {'end_date': {'$exists': False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$gte": now}}
+                ]
+            }
+        elif validate == -1:
+            """只查无效的"""
+            f = {
+                'user_id': user_dbref,
+                '$or': [
+                    {'create_date': {"$gte": now}},
+                    {'create_date': {"$eq": None}},
+                    {"create_date": {"$exists": False}},
+                    {'end_date': {'$exists': False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$lte": now}}
+                ]
+            }
+        else:
+            """全部都查"""
+            f = {'user_id': user_dbref}
+        s = {'create_date': -1}
+        r = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=to_dict, can_json=can_json)
+        return r
+
+    @classmethod
+    def clear_invalid_relation(cls, user_dbref: DBRef) -> None:
+        """
+        清除指定用户的无效关系记录,注意是删除记录
+        :param user_dbref: User.dbref
+        :return:
+        """
+        invalid_relations = cls.get_relations_by_user(user_dbref=user_dbref, validate=-1, to_dict=True)
+        if len(invalid_relations) > 0:
+            f = {"_id": {"$in": [x['_id'] for x in invalid_relations]}}
+            cls.delete_many(filter_dict=f)
+
+
+class UserLicenseRelation(UserBaseRelation):
     """关系表,记录用户和行车证/车辆的对应关系"""
     _table_name = "user_license_relation"
     type_dict = dict()
@@ -975,6 +1179,66 @@ class UserLicenseRelation(mongo_db.BaseDoc):
         } for car in cars]
         cls.insert_many(relations)
 
+    @classmethod
+    def get_usable_license(cls, user_id: (str, ObjectId, DBRef, MyDBRef), to_dict: bool = True,
+                           can_json: bool = True) -> list:
+        """
+        获取指定用户的可用行车证,行车证的可用状态是指行车证对应的UserLicenseRelation实例存在,并且
+        其end_date为null,不存在或者比现在的时间更靠后的状态.本方法一般只会北User.get_usable_license类方法
+        的调用.用于在User对象没有license_relation_id属性,或者此属性没有有效值的时候调用.
+        此属性实际上替代了CarLicense.get_usable_license的功能.后者被声明为不建议使用.
+        :param user_id: 用户id
+        :param to_dict: 是否转换为dict?这个参数容易被can_json覆盖,请注意
+        :param can_json: 是否做json序列化转换?
+        :return: CarLisence的doc的数组. (经过to_json序列化化处理.)
+        """
+        to_dict = True if can_json else to_dict
+        if isinstance(user_id, (MyDBRef, DBRef)):
+            pass
+        elif isinstance(user_id, ObjectId):
+            user_id = DBRef(collection=User.get_table_name(), id=user_id, database=mongo_db.db_name)
+        elif isinstance(user_id, str):
+            user_id = mongo_db.get_obj_id(user_id)
+            user_id = DBRef(collection=User.get_table_name(), id=user_id, database=mongo_db.db_name)
+        else:
+            ms = "UserLicenseRelation.get_usable_license Error,错误的user_id类型: {}".format(type(user_id))
+            logger.exception(ms)
+        if isinstance(user_id, (DBRef, MyDBRef)):
+            result = []
+            filter_dict = {
+                "user_id": user_id,
+                "$or": [
+                    {"end_date": {"$exists": False}},
+                    {"end_date": None},
+                    {"end_date": {"$gte": datetime.datetime.now()}}
+                ]
+            }
+            sort_dict = {"create_date": -1}
+            projection = ['license_id']
+            """查询可用的行车证的id"""
+            res = UserLicenseRelation.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, projection=projection)
+            license_ids = [x.get_attr("license_id").id for x in res]
+            if len(license_ids) == 0:
+                pass
+            else:
+                filter_dict = {
+                    "_id": {"$in": license_ids},
+                    "vin_id": {
+                        "$exists": True,  # vin_id 字段存在
+                        "$type": 2,  # vin_id 字段是字符串
+                    },
+                    "plate_number": {
+                        "$exists": True,  # plate_nuber 字段存在
+                        "$type": 2,  # plate_nuber 字段是字符串
+                    },
+                    "$where": "this.vin_id.length >= 6 && this.plate_number.length == 7"  # 车架号长度大于6,车牌长度等于7
+                }
+                sort_dict = {"create_date": -1}
+                result = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, to_dict=to_dict, can_json=can_json)
+            return result
+        else:
+            return None
+
 
 class CarLicense(mongo_db.BaseDoc):
     """行车证"""
@@ -987,7 +1251,7 @@ class CarLicense(mongo_db.BaseDoc):
     2.app在上传行车证图片的时候会先创建一个临时行车证记录,这和时候的和plate_number为空.而且这种记录可能有多个.
     所以用户id 和plate_number的联合主键因该删除
     """
-    type_dict["user_id"] = ObjectId  # 注意,这里是创建者的id
+    type_dict["user_id"] = ObjectId  # 注意,驾驶员,对应的User对象的license_relation_id,必须属性
     type_dict["permit_image_url"] = str  # 车辆照片url
     type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
     type_dict["car_type"] = str  # 车辆类型  比如 重型箱式货车
@@ -1001,6 +1265,10 @@ class CarLicense(mongo_db.BaseDoc):
     type_dict["register_date"] = datetime.date  # 注册日期
     type_dict["issued_date"] = datetime.date  # 发证日期
     type_dict["create_date"] = datetime.datetime  # 创建日期
+    """
+    车辆分公车和私人车辆的,都统一都对应, 公司依赖车辆资产进行管理(额外的列表)
+    UserLicenseRelation
+    """
 
     def __init__(self, **kwargs):
         """因为牵扯到和用户的关系,此方法不应该直接调用"""
@@ -1027,34 +1295,76 @@ class CarLicense(mongo_db.BaseDoc):
         :param kwargs:
         :return: 返回实例或者None
         """
-        try:
-            obj = cls(**kwargs)
-            license_id = obj.save()
-        except Exception as e:
-            ms = "instance Error! args={}".format(kwargs)
-            logger.exception(ms)
-        finally:
-            result = None
-            if isinstance(license_id, ObjectId):
-                """行车证创建成功,可以创建用户和行车证的关系了"""
-                relation = {
-                    "license_id": DBRef(collection="car_license_info", id=license_id, database="platform_db"),
-                    "user_id": DBRef(collection="user_info", id=obj.get_attr("user_id"), database="platform_db")
-                }
-                """检查是否已有对象"""
-                find_obj = UserLicenseRelation.find_one_plus(filter_dict=relation)
-                if find_obj is None:
-                    relation['create_date'] = datetime.datetime.now()
-                    find_obj = UserLicenseRelation.insert_one(**relation)
-                else:
-                    pass
-                result = obj
-                return result
+        if user_id in kwargs:
+            user_id = kwargs['user_id']  # 注意CarLicense.user_id是ObjectId对象
+            user = User.find_by_id(user_id, to_dict=False)
+            if isinstance(user, User):
+                try:
+                    obj = cls(**kwargs)
+                    license_id = obj.save()
+                except Exception as e:
+                    ms = "instance Error! args={}".format(kwargs)
+                    logger.exception(ms)
+                finally:
+                    result = None
+                    if isinstance(license_id, ObjectId):
+                        """行车证创建成功,可以创建用户和行车证的关系了"""
+                        relation = {
+                            "license_id": DBRef(collection="car_license_info", id=license_id, database="platform_db"),
+                            "user_id": DBRef(collection="user_info", id=obj.get_attr("user_id"), database="platform_db")
+                        }
+                        """检查是否已有对象"""
+                        find_obj = UserLicenseRelation.find_one_plus(filter_dict=relation)
+                        if find_obj is None:
+                            relation['create_date'] = datetime.datetime.now()
+                            oid = UserLicenseRelation.insert_one(**relation)
+                            if isinstance(oid, ObjectId):
+                                """修改User.license_relation_id属性"""
+                                license_list = user.get_attr("license_relation_id")
+                                if license_list is None or isinstance(license_list, list):
+                                    license_list = list() if license_list is None else license_list
+                                    dbref = DBRef(database="platform_db",
+                                                  collection=UserLicenseRelation.get_table_name(), id=oid)
+                                    if dbref in license_list:
+                                        ms = "UserLicenseRelation的实例已存在:{},关联用户:{}".format(oid, user_id)
+                                        logger.exception(msg=ms)
+                                        raise ValueError(ms)
+                                    else:
+                                        license_list.append(dbref)
+                                        user.set_attr('license_relation_id', license_list)
+                                        r = user.save_plus()
+                                        if r is None:
+                                            ms = "保存User对象失败,user:{}".format(user.__dict__)
+                                            logger.exception(msg=ms)
+                                            raise ValueError(ms)
+                                else:
+                                    ms = "用户:{}的license_relation_id:{}属性不合法,期待一个list,得到一个{}".\
+                                        format(user_id, license_list, type(license_list))
+                                    logger.exception(msg=ms)
+                                    raise ValueError(ms)
+                            else:
+                                "插入UserLicenseRelation对象失败,args={}".format(relation)
+                                logger.exception(msg=ms)
+                                raise ValueError(ms)
+                        else:
+                            pass
+                        result = obj
+                        return result
+            else:
+                ms = "参数user_id:{}错误,找不到对应的实例".format(user_id)
+                logger.exception(msg=ms)
+                raise ValueError(ms)
+        else:
+            ms = "必须参数user_id缺失"
+            logger.exception(msg=ms)
+            raise ValueError(me)
 
     @classmethod
     def get_usable_license(cls, user_id: (str, ObjectId, DBRef, MyDBRef), to_dict: bool = True,
                            can_json: bool = True) -> list:
         """
+        此方法的实际功能已被UserLicenseRelation.get_usable_license替代.如果只是为了获取可用的
+        行车证信息,请使用User.get_usable_license类方法.
         获取指定用户的可用行车证,行车证的可用状态是指行车证对应的UserLicenseRelation实例存在,并且
         其end_date为null,不存在或者比现在的时间更靠后的状态.
         :param user_id: 用户id
@@ -1062,6 +1372,10 @@ class CarLicense(mongo_db.BaseDoc):
         :param can_json: 是否做json序列化转换?
         :return: CarLisence的doc的数组. (经过to_json序列化化处理.)
         """
+        ms = "出于逻辑合理性的问题,此方法不再建议使用," \
+             "推荐使用User.get_usable_license或者UserLicenseRelation.get_usable_license类方法替代," \
+             "2018-4-19"
+        warnings.warn(ms)
         to_dict = True if can_json else to_dict
         if isinstance(user_id, (MyDBRef, DBRef)):
             pass
@@ -1113,7 +1427,9 @@ class CarLicense(mongo_db.BaseDoc):
     def find_one_and_delete(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
                             instance: bool = False):
         """
-        找到并删除一个对象,这是重写了父类的方法.用于在删除的时候同步终止司机和行车证的对应关系.
+        找到并删除一个行车证对象,这是重写了父类的方法.用于在删除的时候同步终止司机和行车证的对应关系.
+        并从User.license_relation_id属性中移除对应的UserLicenseRelation的DBRef对象.
+        修改的行车证信息的时候不用如此麻烦.
         :param filter_dict:  查询的条件，
         :param sort_dict: 排序的条件  比如: {"time": -1}  # -1表示倒序
         :param projection:    投影数组,决定输出哪些字段?
@@ -1121,6 +1437,10 @@ class CarLicense(mongo_db.BaseDoc):
         :return: None, 实例或者doc对象。
         """
         result = False
+        if "_id" not in projection:
+            projection.append("_id")
+        if "user_id" not in projection:
+            projection.append("user_id")
         table_name = cls._table_name
         ses = mongo_db.get_conn(table_name=table_name)
         if sort_dict is not None:
@@ -1133,22 +1453,57 @@ class CarLicense(mongo_db.BaseDoc):
             "projection": projection
         }
         args = {k: v for k, v in args.items() if v is not None}
-        res = ses.find_one_and_delete(**args)
-        if res is None:
+        cls_obj = ses.find_one_and_delete(**args)
+        if cls_obj is None:
             """删除失败"""
-            pass
+            ms = "删除CarLicense对象失败,args:{}".format(args)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
         else:
             """删除成功,接着删除对应的UserLicenseRelation实例"""
-            license_id = DBRef(id=res['_id'], collection=table_name, database="platform_db")
-            user_id = DBRef(id=res['user_id'], collection=User.get_table_name(), database="platform_db")
-            filter_dict = {"license_id": license_id, "user_id": user_id}
+            oid = cls_obj['_id']
+            license_dbref = DBRef(id=oid, collection=table_name, database="platform_db")
+            user_id = cls_obj['user_id']
+            user_dbref = DBRef(id=user_id, collection=User.get_table_name(), database="platform_db")
+            filter_dict = {"license_id": license_dbref, "user_id": user_dbref}
             update_dict = {"$set": {"end_date": datetime.datetime.now()}}
             res = UserLicenseRelation.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
             if res is None:
                 """删除关系失败"""
-                pass
+                ms = "删除UserLicenseRelation对象失败,filter_dict:{}, update_dict:{}".format(filter_dict, update_dict)
+                logger.exception(msg=ms)
+                raise ValueError(ms)
             else:
-                result = True
+                """修改User.license_relation_id"""
+                user = User.find_by_id(user_id)
+                if isinstance(user, User):
+                    license_list = user.get_attr("license_relation_id")
+                    if not isinstance(license_list, list):
+                        ms = "用户:{} 没有license_relation_id属性"
+                        logger.exception(msg=ms)
+                        warnings.warn(ms)
+                    else:
+                        if license_dbref not in license_list:
+                            ms = "UserLicenseRelation的dbref:{}不在user:{}的license_relation_id属性中".\
+                                format(license_dbref, user_id)
+                            logger.exception(msg=ms)
+                            warnings.warn(ms)
+                        else:
+                            license_list.pop(license_dbref)
+                            user.set_attr("license_relation_id", license_list)
+                            r = user.save_plus()
+                            if isinstance(r, ObjectId):
+                                """修改成功"""
+                                pass
+                            else:
+                                ms = "用户:{} 修改license_relation_id属性失败".user.get_dict()
+                                logger.exception(msg=ms)
+                                warnings.warn(ms)
+                else:
+                    ms = "删除CarLicense对象时发现错误的用户id:{}".format(user_id)
+                    logger.exception(msg=ms)
+                    warnings.warn(ms)
+                    result = True
         return result
 
     def get_vio_query_info(self):
@@ -1163,18 +1518,152 @@ class CarLicense(mongo_db.BaseDoc):
                 "car_type": carType}
         return args
 
-
-def rebuild_car_license() -> None:
-    """重建行车证信息，去掉重复的键值，为创建plate_number和user_id的联合唯一主键提供前提条件
+    @staticmethod
+    def rebuild_car_license() -> None:
+        """
+        重建行车证信息，去掉重复的键值，为创建plate_number和user_id的联合唯一主键提供前提条件
         db.car_license_info.ensureIndex({"user_id":1,"plate_number":1}, {"unique":1})
+        这个函数很少使用
+        """
+        from api.user.violation_module import VioQueryGenerator
+        vios = VioQueryGenerator.find()
+        for vio in vios:
+            car_license = CarLicense.find_by_id(vio.get_attr("car_license").id)
+            user_id = vio.get_attr("user_id")
+            car_license.user_id = user_id
+            car_license.save()
+
+
+class LicenseBaseRelation(mongo_db.BaseDoc):
     """
-    from api.user.violation_module import VioQueryGenerator
-    vios = VioQueryGenerator.find()
-    for vio in vios:
-        car_license = CarLicense.find_by_id(vio.get_attr("car_license").id)
-        user_id = vio.get_attr("user_id")
-        car_license.user_id = user_id
-        car_license.save()
+    车辆(行车证)相关的关系基础类
+    类对象的属性至少包含下列属性
+    type_dict = dict()
+    type_dict["_id"] = ObjectId  # id 唯一
+    type_dict['license_id'] = DBRef  # 车辆id,指向car_license_info表,
+    type_dict['create_date'] = datetime.datetime  # 关系的建立时间
+    type_dict['end_date'] = datetime.datetime  # 关系的终结时间
+    """
+
+    @classmethod
+    def add_relation(cls, l_dbref: DBRef, dbref_name: str, dbref_val: DBRef) -> DBRef:
+        """
+        添加一个关系记录.因为一个人可以拥有多辆车,一辆车页可以被多人驾驶.所以此方法不会会清除之前的有效关系!!!
+        :param l_dbref: CarLicense.dbref
+        :param dbref_name: 关联对象的属性名
+        :param dbref_val: 关联对象的DBRef
+        :return:  关系实例的DBRef对象
+        """
+        res = None
+        if isinstance(user_dbref, DBRef) and isinstance(dbref_val, DBRef) and isinstance(dbref_name, str):
+            init_dict = {
+                "license_id": user_dbref,
+                dbref_name: dbref_val,
+                "create_date": datetime.datetime.now()
+            }
+            r = cls.insert_one(**init_dict)
+            if isinstance(r, ObjectId):
+                """插入成功"""
+                dbref = DBRef(database="platform_db", collection=cls.get_table_name(), id=r['_id'])
+                res = dbref
+            else:
+                ms = "插入新的关系失败,init={}".format(init_dict)
+                logger.exception(ms)
+                raise ValueError(ms)
+        else:
+            ms = "参数类型错误:l_dbref:{},dbref_name:{},dbref_val:{}".format(type(user_dbref), type(dbref_name),
+                                                                         type(dbref_val))
+            logger.exception(ms)
+            raise TypeError(ms)
+        return res
+
+    @classmethod
+    def get_relation_by_license(cls, l_dbref: DBRef, instance: bool = False):
+        """
+        根据CarLicense实例的dbref对象查询对应的LicenseXxxRelation,注意,只会返回
+        一个有效的LicenseXxxRelation对象的实例.一定会验证可用性
+        :param l_dbref: CarLicense.dbref
+        :param instance: 返回的LicenseXxxRelation是实例还是doc?
+        :return: LicenseXxxRelation对象的实例(或doc)/None
+        """
+        now = datetime.datetime.now()
+        f = {
+            'license_id': l_dbref,
+            'create_date': {"$lte": now},
+            '$or': [
+                {'end_date': {'$exists': False}},
+                {"end_date": {"$eq": None}},
+                {"end_date": {"$gte": now}}
+            ]
+        }
+        s = {'create_date': -1}
+        r = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=instance)
+        return r
+
+    @classmethod
+    def get_relations_by_license(cls, l_dbref: DBRef, validate: int = 1, to_dict: bool = False,
+                                  can_json: bool = False):
+        """
+        根据CarLicense实例的dbref对象查询对应的LicenseXxxRelation,注意,会返回
+        一个LicenseXxxRelation对象的实例的list.
+        :param l_dbref: CarLicense.dbref
+        :param validate: 是否只返回可用的对象?1只返回有效的,0全部返回,-1只返回无效的
+        :param to_dict: 返回的UserXxxRelation是实例还是doc的list?
+        :param can_json: (返回的是doc的时候),是否做to_flat_dict转换?
+        :return: LicenseXxxRelation对象的实例(或doc)的list
+        """
+        now = datetime.datetime.now()
+        if not isinstance(validate, int):
+            try:
+                validate = int()
+            except Exception as e:
+                validate = 1
+                print(e)
+            finally:
+                pass
+        validate = 1 if validate >= 1 else (-1 if validate <= -1 else validate)
+        if validate == 1:
+            """只查有效的"""
+            f = {
+                'license_id': l_dbref,
+                'create_date': {"$lte": now},
+                '$or': [
+                    {'end_date': {'$exists': False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$gte": now}}
+                ]
+            }
+        elif validate == -1:
+            """只查无效的"""
+            f = {
+                'license_id': l_dbref,
+                '$or': [
+                    {'create_date': {"$gte": now}},
+                    {'create_date': {"$eq": None}},
+                    {"create_date": {"$exists": False}},
+                    {'end_date': {'$exists': False}},
+                    {"end_date": {"$eq": None}},
+                    {"end_date": {"$lte": now}}
+                ]
+            }
+        else:
+            """全部都查"""
+            f = {'license_id': l_dbref}
+        s = {'create_date': -1}
+        r = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=to_dict, can_json=can_json)
+        return r
+
+    @classmethod
+    def clear_invalid_relation(cls, l_dbref: DBRef) -> None:
+        """
+        清除指定车辆的无效关系记录,注意是删除记录
+        :param l_dbref: CarLicense.dbref
+        :return:
+        """
+        invalid_relations = cls.get_relations_by_license(l_dbref=l_dbref, validate=-1, to_dict=True)
+        if len(invalid_relations) > 0:
+            f = {"_id": {"$in": [x['_id'] for x in invalid_relations]}}
+            cls.delete_many(filter_dict=f)
 
 
 class TrafficRoute(mongo_db.BaseDoc):
