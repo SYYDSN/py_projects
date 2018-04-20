@@ -124,7 +124,7 @@ class User(mongo_db.BaseDoc):
     type_dict['online_time'] = float  # 在线时长的统计.单位分钟
     type_dict['description'] = str  # 备注
     """私人车辆/公司车辆行车证的对应关系,不一定有,指向UserLicenseRelation类的DBRef的list"""
-    type_dict['license_relation_id'] = list()
+    type_dict['license_relation_id'] = list
     """
     驾驶证信息部分,驾驶证和用户有一一对应的关系.所以需要直接存储在对象中.
     """
@@ -292,7 +292,7 @@ class User(mongo_db.BaseDoc):
         :param user_id: 用户id
         :param to_dict: 是否转换为dict?这个参数容易被can_json覆盖,请注意
         :param can_json: 是否做json序列化转换?
-        :return:
+        :return: CarLicense的实例/doc/dict
         """
         if isinstance(user_id, (str, ObjectId)):
             user = cls.find_by_id(user_id)
@@ -315,7 +315,30 @@ class User(mongo_db.BaseDoc):
             pass
         else:
             """查询可用的UserLicenseRelation对象"""
-            还未完成
+            relation_dbref_list = user.get_attr("license_relation_id")
+            if relation_dbref_list is None:
+                """没有设置此属性,应该是旧的数据格式"""
+                relations = UserLicenseRelation.get_relations_by_user(user_dbref, to_dict=False)
+                if len(relations) == 0:
+                    relation_dbref_list = list()
+                else:
+                    relation_dbref_list = [x.get_dbref() for x in relations]
+                user.set_attr("license_relation_id", relation_dbref_list)
+                oid = user.save_plus()
+                if isinstance(oid, ObjectId):
+                    """保存成功"""
+                    pass
+                else:
+                    ms = "更新用户:{}的license_relation_id属性失败:{}".format(user_id, user.get_dict())
+                    logger.exception(msg=ms)
+                    raise ValueError(ms)
+            else:
+                f = {"_id": {"$in": [x.id for x in relation_dbref_list]}}
+                relations = UserLicenseRelation.find_plus(filter_dict=f, to_dict=True)
+            car_ids = [x['license_id'].id for x in relations if x.get("license_id") is not None]
+            cars = CarLicense.find_plus(filter_dict={"_id": {"$in": car_ids}}, to_dict=to_dict, can_json=can_json)
+            res = cars
+        return res
 
     @classmethod
     def find_driving_license(cls, user_id: (str, ObjectId)) -> dict:
@@ -1184,14 +1207,15 @@ class UserLicenseRelation(UserBaseRelation):
                            can_json: bool = True) -> list:
         """
         获取指定用户的可用行车证,行车证的可用状态是指行车证对应的UserLicenseRelation实例存在,并且
-        其end_date为null,不存在或者比现在的时间更靠后的状态.本方法一般只会北User.get_usable_license类方法
-        的调用.用于在User对象没有license_relation_id属性,或者此属性没有有效值的时候调用.
-        此属性实际上替代了CarLicense.get_usable_license的功能.后者被声明为不建议使用.
+        其end_date为null,不存在或者比现在的时间更靠后的状态.此方法仅作测试使用,获取用户的可用行车证,
+        推荐推荐使用User.get_usable_license类方法
         :param user_id: 用户id
         :param to_dict: 是否转换为dict?这个参数容易被can_json覆盖,请注意
         :param can_json: 是否做json序列化转换?
         :return: CarLisence的doc的数组. (经过to_json序列化化处理.)
         """
+        ms = "此方法仅作测试使用,获取用户的可用行车证,推荐推荐使用User.get_usable_license类方法"
+        warnings.warn(ms)
         to_dict = True if can_json else to_dict
         if isinstance(user_id, (MyDBRef, DBRef)):
             pass
@@ -2656,5 +2680,6 @@ if __name__ == "__main__":
     # the_date = mongo_db.get_datetime_from_str("2017-01-01 0:0:0")
     # ThroughCity.get_cities(ObjectId("59895177de713e304a67d30c"))
     """查询制定用户的有效行车证列表"""
-    print(CarLicense.get_usable_license(u_id))
+    # print(User.get_usable_license(u_id))
+    # print(CarLicense.get_usable_license(u_id))
     pass

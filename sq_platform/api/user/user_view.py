@@ -505,7 +505,7 @@ def process_vehicle_info(user_id, key):
         host_url = request.host_url
         if _id is None:
             """返回行车证信息的列表"""
-            obj_list = CarLicense.get_usable_license(user_id=user_id)
+            obj_list = User.get_usable_license(user_id=user_id)
             for obj in obj_list:
                 """按照app段需求整理转换字段名"""
                 if 'permit_image_url' in obj:

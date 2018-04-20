@@ -570,6 +570,7 @@ def get_page_platform(browser, page_url: str) -> (PyQuery, None):
     """
     try:
         browser.get(page_url)
+        raise ValueError("则和是")
     except TimeoutException as e:
         title = "{} 打开页面失败".format(datetime.datetime.now())
         content = "错误原因：{}".format(e)

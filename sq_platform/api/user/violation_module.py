@@ -724,7 +724,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         res = list()
         user_id = mongo_db.get_obj_id(user_id)
         """先取用户的行车证"""
-        license_list = CarLicense.get_usable_license(user_id)
+        license_list = User.get_usable_license(user_id)
         if len(license_list) == 0:
             """用户没有行车证信息,忽视"""
             pass
@@ -782,7 +782,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         """
         user_id = mongo_db.get_obj_id(user_id)
         """查询行车证"""
-        license_list = CarLicense.get_usable_license(user_id, to_dict=True, can_json=False)  # [doc]
+        license_list = User.get_usable_license(user_id, to_dict=True, can_json=False)  # [doc]
         """查询已有的违章查询器"""
         f = {"user_id": user_id}
         generator_list = cls.find_plus(filter_dict=f, to_dict=True)  # [doc]

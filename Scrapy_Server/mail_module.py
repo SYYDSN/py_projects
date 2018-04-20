@@ -45,10 +45,12 @@ def send_mail(to_email: str = "583736361@qq.com", title: str='hello', content: s
         if file_name is None or file_name == "":
             file_name = os.path.split(file_path)[-1]
         att1.add_header('Content-Disposition', 'attachment', filename=file_name)
-        att2 = MIMEText(content, _charset="utf-8")  # 正文的容器
         msg.attach(att1)
-        msg.attach(att2)
-    """添加附件结束"""
+    else:
+        pass
+    """添加附件结束,添加邮件正文"""
+    att2 = MIMEText(content, _charset="utf-8")  # 正文的容器
+    msg.attach(att2)
     flag = True
     try:
         s = smtplib.SMTP_SSL("smtp.qq.com", 465)
