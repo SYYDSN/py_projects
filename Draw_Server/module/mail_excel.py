@@ -361,7 +361,10 @@ class EveryMonthExcel(mongo_db.BaseDoc):
 
     def __init__(self, **kwargs):
         end_date = kwargs['end_date']
-        end_date = mongo_db.get_datetime_from_str("{} 00:00:00".format(end_date))
+        if isinstance(end_date, datetime.datetime):
+            pass
+        else:
+            end_date = mongo_db.get_datetime_from_str("{} 00:00:00".format(end_date))
         begin_date = kwargs['begin_date']
         begin_date = mongo_db.get_datetime_from_str("{} 00:00:00".format(begin_date))
         if "create_date" not in kwargs:
@@ -370,7 +373,6 @@ class EveryMonthExcel(mongo_db.BaseDoc):
         if "begin_date" not in kwargs:
             kwargs['begin_date'] = begin_date
         if "end_date" not in kwargs:
-
             kwargs['end_date'] = end_date
         if "excel_name" not in kwargs:
             kwargs['excel_name'] = "{}至{}交易报表".format(begin_date.strftime("%F"), end_date.strftime("%F"))
@@ -475,7 +477,7 @@ class EveryMonthExcel(mongo_db.BaseDoc):
         return f_path
 
     @classmethod
-    def send_excel(cls, begin_date: str, end_date: str, email_address: (str, list) = None):
+    def send_excel(cls, begin_date: str, end_date: str = None, email_address: (str, list) = None):
         """
         发送每周的交易信息到指定的邮箱
         :param begin_date:
@@ -486,6 +488,7 @@ class EveryMonthExcel(mongo_db.BaseDoc):
         if email_address is None:
             email_address = ["583736361@qq.com", "kaiyang@dingtalk.com"]
             # email_address = ["583736361@qq.com"]
+        end_date = datetime.datetime.now()
         excel = cls.instance(begin_date=begin_date, end_date=end_date)
         excel.get_transaction_records()
         excel.create_excel()
@@ -499,6 +502,6 @@ class EveryMonthExcel(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    EveryMonthExcel.send_excel(begin_date="2018-3-1", end_date='2018-4-1')
+    EveryMonthExcel.send_excel(begin_date="2018-4-1", end_date='2018-4-1')
     # EveryWeekExcel.send_excel()
     pass

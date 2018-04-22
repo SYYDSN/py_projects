@@ -32,6 +32,7 @@ class Signal(mongo_db.BaseDoc):
     _table_name = "signal_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['datetime'] = datetime.datetime  # 表单的日期时间字段。
     type_dict['receive_time'] = datetime.datetime  # 接收消息时间
     type_dict['create_time'] = datetime.datetime  # 创建时间
     type_dict['update_time'] = datetime.datetime  # 修改时间
@@ -51,7 +52,11 @@ class Signal(mongo_db.BaseDoc):
     type_dict['enter_price'] = float  # 建仓价
     type_dict['exit_price'] = float  # 平仓价
     type_dict['profit'] = float  # 获利
-    type_dict['each_profit'] = float  # 每手获利
+    type_dict['each_profit'] = float  # 每手实际获利
+    type_dict['each_profit_dollar'] = float  # 每手获利/美金
+    type_dict['each_cost'] = float  # 每手成本
+    type_dict['t_coefficient'] = float  # （交易）系数
+    type_dict['p_coefficient'] = float  # （点值）系数
     type_dict['token_name'] = str  # 固定  "策略助手 小迅"
 
     def __init__(self, **kwargs):
@@ -86,12 +91,12 @@ class Signal(mongo_db.BaseDoc):
                 arg_dict['event_date'] = event_date
             t_s = data.pop("_widget_1514518782603", dict())  # 止盈止损
             if "_widget_1514518782614" in t_s:
-                take_profit = t_s['_widget_1514518782614']
-                if isinstance(take_profit, (int, float)):
+                take_profit = t_s.get('_widget_1514518782614')
+                if take_profit is not None and isinstance(take_profit, (int, float)):
                     arg_dict['take_profit'] = take_profit  # 止盈
             if "_widget_1514518782632" in t_s:
-                stop_losses = t_s['_widget_1514518782632']
-                if isinstance(stop_losses, (int, float)):
+                stop_losses = t_s.get('_widget_1514518782632')
+                if stop_losses is not None and isinstance(stop_losses, (int, float)):
                     arg_dict['stop_losses'] = stop_losses   # 止损
             # arg_dict['record_id'] = data.pop('_id', None)   # 事件唯一id,用于判断是不是同一个交易?
             arg_dict['app_name'] = data.pop('formName', None)  # 表单名称，重要区别依据，应该是唯一的
@@ -107,30 +112,44 @@ class Signal(mongo_db.BaseDoc):
             if creator is not None:
                 arg_dict['creator_name'] = creator['name']
                 arg_dict['creator_id'] = creator['_id']
-            each_profit = data.pop("_widget_1522117404041")
+            each_profit = data.pop("_widget_1522117404041", None)
             if isinstance(each_profit, (int, float)):
                 arg_dict['each_profit'] = each_profit
-            profit = data.pop("_widget_1514518782842")
+            profit = data.pop("_widget_1514518782842", None)
             if isinstance(profit, (int, float)):
                 arg_dict['profit'] = profit
-            enter_price = data.pop("_widget_1514518782592")
+            enter_price = data.pop("_widget_1514518782592", None)
             if isinstance(enter_price, (int, float)):
                 arg_dict['enter_price'] = enter_price
-            exit_price = data.pop("_widget_1514887799231")
+            exit_price = data.pop("_widget_1514887799231", None)
             if isinstance(exit_price, (int, float)):
                 arg_dict['exit_price'] = exit_price
-            product = data.pop("_widget_1514518782514")
+            product = data.pop("_widget_1514518782514", None)
             if isinstance(product, str) and product.strip() != "":
                 arg_dict['product'] = product
-            direction = data.pop("_widget_1514518782557")
+            direction = data.pop("_widget_1514518782557", None)
             if isinstance(direction, str) and direction.strip() != "":
                 arg_dict['direction'] = direction
-            exit_reason = data.pop("_widget_1514887799261")
+            exit_reason = data.pop("_widget_1514887799261", None)
             if isinstance(exit_reason, str) and exit_reason.strip() != "":
                 arg_dict['exit_reason'] = exit_reason
-            the_type = data.pop("_widget_1516245169208")
+            date_time = data.pop("_widget_1514518782504", None)
+            date_time = mongo_db.get_datetime_from_str(date_time)
+            if isinstance(date_time, datetime.datetime):
+                arg_dict['datetime'] = date_time
+            the_type = data.pop("_widget_1516245169208", None)
             if isinstance(the_type, str) and the_type.strip() != "":
                 arg_dict['the_type'] = the_type
+            each_cost = data.pop("_widget_1522134222811", None)  # 每手成本
+            if isinstance(each_cost, (int, float)):
+                arg_dict['each_cost'] = each_cost
+            each_profit_dollar = data.pop("_widget_1520843763126", None)  # 每手盈利/美金
+            if isinstance(each_profit_dollar, (int, float)):
+                arg_dict['each_profit_dollar'] = each_profit_dollar
+            t_coefficient = data.pop("_widget_1514887799459", None)  # （交易）系数
+            if isinstance(t_coefficient, (int, float)):
+                arg_dict['t_coefficient'] = t_coefficient
+
             arg_dict['token_name'] = "策略助手 小迅"
             for k, v in data.items():
                 if v is not None:

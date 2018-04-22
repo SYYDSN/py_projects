@@ -1037,6 +1037,13 @@ class BaseDoc:
                         warnings.warn("{}的值{}的类型与设定不符，原始的设定为{}，实际类型为{}".format(k, v, self.type_dict[k], type(v)),
                                       RuntimeWarning)
 
+    def get_dict(self) -> dict:
+        """
+        获取self.__dict__
+        :return:
+        """
+        return self.__dict__
+
     def insert(self, obj=None):
         """插入数据库,单个对象,返回ObjectId的实例"""
         obj = self if obj is None else obj

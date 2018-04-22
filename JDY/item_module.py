@@ -7,7 +7,7 @@ if __project_dir__ not in sys.path:
 import mongo_db
 from log_module import get_logger
 from celery_module import to_jiandao_cloud_and_send_mail
-from browser.crawler_module import add_job
+from werkzeug.contrib.cache import SimpleCache
 import datetime
 from module.send_moudle import send_signal
 from module.spread_module import SpreadChannel
@@ -19,6 +19,7 @@ from module.spread_module import SpreadChannel
 logger = get_logger()
 ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
+cache = SimpleCache()
 
 
 class CsrfError(mongo_db.BaseDoc):
@@ -116,6 +117,8 @@ class Customer(mongo_db.BaseDoc):
                     if isinstance(save, mongo_db.ObjectId):
                         message['user_id'] = str(save)
                         """发送到钉钉机器人"""
+                        today_count = cls.today_register_count()
+                        reg_dict['today_count'] = today_count
                         cls.send_signal(reg_dict)
                         """转发到简道云"""
                         ms = "用户已保存,开始调用to_jiandao_cloud_and_send_mail, arg={}".format(reg_dict)
@@ -146,7 +149,9 @@ class Customer(mongo_db.BaseDoc):
             "%Y年%m月%d日 %H:%M:%S")
         n = "" if reg_info.get("user_name") is None else reg_info.get("user_name")
         p = "" if reg_info.get("phone") is None else reg_info.get("phone")
-        markdown['text'] = "> 用户注册 \n\r > {} \n\r > 注册通道：{} \n\r > 用户姓名：{} \n\r > 手机号码:{} ".format(d, channel_str, n, p)
+        c = 0 if reg_info.get("today_count") is None else reg_info.get("today_count")
+        markdown['text'] = "#### 用户注册  \n > {}  \n > 注册通道：{}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 计数：{}".\
+            format(d, channel_str, n, p, c)
         out_put['markdown'] = markdown
         out_put['at'] = {'atMobiles': [], 'isAtAll': False}
         res = send_signal(out_put, token_name=token_name)
@@ -185,8 +190,55 @@ class Customer(mongo_db.BaseDoc):
         data = {"count": count, "data": res}
         return data
 
+    @classmethod
+    def today_register_count(cls) -> int:
+        """
+        以每日早上6点计算，当前的注册用户是本日的第几个用户 ？ 以1开始基数，
+        :return:
+        """
+        key = "today_register_count"
+        count_dict = cache.get(key=key)
+        """计算查询条件"""
+        now = datetime.datetime.now()
+        current_hour = now.hour
+        if current_hour >= 6:
+            days = 0
+        else:
+            days = 1
+        day_str = (now - datetime.timedelta(days=days)).strftime("%F")
+        need_query = True
+        if count_dict is None:
+            pass
+        else:
+            prev_day_str = count_dict.get("day_str")
+            if prev_day_str != day_str:
+                pass
+            else:
+                count = count_dict.get("count")
+                if isinstance(count, int):
+                    need_query = False
+                else:
+                    pass
+        if need_query:
+            begin_str = "{} 06:00:00".format(day_str)
+            begin = mongo_db.get_datetime_from_str(begin_str)
+            f = {"time": {"$gte": begin}}
+            """从数据库查询"""
+            r = cls.count(filter_dict=f)
+            count = r - 1  # -1 是应为cls.reg方法先保存了用户信息
+        else:
+            count = count_dict['count']
+
+        count += 1
+        new_dict = dict()
+        new_dict['day_str'] = day_str
+        new_dict['count'] = count
+        cache.set(key=key, value=new_dict, timeout=86400)
+        return count
+
 
 if __name__ == "__main__":
+    """注册测试"""
     args = {
     "phone" :  "37665103177"
     ,
@@ -195,7 +247,7 @@ if __name__ == "__main__":
     "search_keyword" : "",
     "page_url" : "http://touzi.jyschaxun.com/20180314jiaoyi/index.html?channel=bd-pc-qhrj-015848",
     "referrer" : "https://www.baidu.com/baidu.php?sc.K000000fJeHuq9k1805tenXpjI-L9X01DZ9Gb7mvaucTyhluRm0aVNCfp9KV32wkz2gBOrMZELcrXrWfyZNoXB_pplwGqQqRnKVFuVZ6UNSp84r17q5gSjeLCFYlPO2v4EaHufRdhr58uLhUwKw8dAzH1OpIL10_bavezPY4SPxufMkYi0.7b_iRZmr7O--YwsdnqAaFDAizEuukoenovgpZsUXxXAGh2FP7BSe5W91SzJUQM_oLUr1m_HAeG_lUQr1uzqMQWdQjPakk3tUrkf.U1Y10ZDq1_ieJoQAEJY-nWjQ4_MVYP00TA-W5HD0IjLrkQ8JzSUFeIjf1tQRv0KGUHYznWR0u1ddugK1nfKdpHdBmy-bIykV0ZKGujYY0APGujY3P0KVIjYknjD4g1DsnHIxnW0vn-t1PW0k0AVG5H00TMfqPH630ANGujYkPjnsg1cknjbd0AFG5HcsP7tkPHR0UynqP1c3nWnknWfYg1TzrjTdrjmsn7tzPWb3rjnzP1mvg100TgKGujYs0Z7Wpyfqn0KzuLw9u1Ys0A7B5HKxn0K-ThTqn0KsTjYkPWTLnW6kn1fY0A4vTjYsQW0snj0snj0s0AdYTjYs0AwbUL0qn0KzpWYs0Aw-IWdsmsKhIjYs0ZKC5H00ULnqn0KBI1Yv0A4Y5H00TLCq0ZwdT1Ykn16knjmdP1TknW6knWcYPjDsrfKzug7Y5HDdnWDkrjT3Pj0vP1D0Tv-b5yf4nHTYnW99nj0snHwBmHT0mLPV5HPDnWmdfWfzPWcvrH0vfWT0mynqnfKsUWYs0Z7VIjYs0Z7VT1Ys0ZGY5H00UyPxuMFEUHYsg1Kxn7ts0Aw9UMNBuNqsUA78pyw15HKxn7tsg100TA7Ygvu_myTqn0Kbmv-b5H00ugwGujYVnfK9TLKWm1Ys0ZNspy4Wm1Ys0Z7VuWYkP6KhmLNY5H00uMGC5H00uh7Y5H00XMK_Ignqn0K9uAu_myTqnfK_uhnqn0KWThnqPHbzPs&ck=2223.13.131.233.208.535.523.133&shh=www.baidu.com&sht=56060048_4_pg&us=2.139972.2.0.2.810.0&ie=utf-8&f=1&ch=4&tn=56060048_4_pg&wd=%E6%96%87%E5%8D%8E%E8%B4%A2%E7%BB%8F%20%E9%9A%8F%E8%BA%AB%E8%A1%8C&oq=%E6%96%87%E5%8D%8E%E8%B4%A2%E7%BB%8F&rqlang=cn&rsf=9&rsp=0&usm=1&rs_src=0&bc=110101",
-    "user_name" : "测试人员",
+    "user_name" : "测试人员1",
     "time" : datetime.datetime.now()
 }
     customer = Customer.reg(**args)
@@ -203,4 +255,6 @@ if __name__ == "__main__":
     # do_jobs()
     """测试发送注册信号给机器人服务器"""
     # Customer.send_signal(args)
+    """测试注册人数计数系统"""
+    # Customer.today_register_count()
     pass
