@@ -98,13 +98,13 @@ class EveryDayExcel(mongo_db.BaseDoc):
         end = self.get_attr("end_date") if end is None else mongo_db.get_datetime_from_str(end)
         if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
             col_keys = [
-                "ticket", "login", "system", "real_name", "command", "symbol", "open_time", "enter_price",
-                "close_time", "exit_price", "take_profit", "stop_losses", "swap", "commission", "profit",
-                "spread_profit", "description", "sales", "manager", "director"
+                "ticket", "login", "system", "real_name", "command", "symbol", "lot", "open_time",
+                "close_time", "swap", "commission", "profit",
+                "spread_profit", "sales", "manager", "director"
             ]
             col_names = [
-                "订单号", "MT4账户", "平台", "姓名", "指令", "商品", "建仓时间", "建仓价", "平仓时间",  "平仓价", "止盈", "止损",
-                "利息/过夜费", "佣金/手续费", "盈亏/利润", "点差", "备注", "销售", "经理", "总监"
+                "订单号", "MT4账户", "平台", "姓名", "指令", "商品", "手数", "建仓时间", "平仓时间",
+                "利息/过夜费", "佣金/手续费", "盈亏/利润", "点差", "销售", "经理", "总监"
             ]
             t_map = dict(zip(col_keys, col_names))
             f = {"$or": [
@@ -252,13 +252,13 @@ class EveryWeekExcel(mongo_db.BaseDoc):
         end = self.get_attr("end_date") if end is None else mongo_db.get_datetime_from_str(end)
         if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
             col_keys = [
-                "ticket", "login", "system", "real_name", "command", "symbol", "open_time", "enter_price",
-                "close_time", "exit_price", "take_profit", "stop_losses", "swap", "commission", "profit",
-                "spread_profit", "description", "sales", "manager", "director"
+                "ticket", "login", "system", "real_name", "command", "symbol", "lot", "open_time",
+                "close_time", "swap", "commission", "profit",
+                "spread_profit", "sales", "manager", "director"
             ]
             col_names = [
-                "订单号", "MT4账户", "平台", "姓名", "指令", "商品", "建仓时间", "建仓价", "平仓时间",  "平仓价", "止盈", "止损",
-                "利息/过夜费", "佣金/手续费", "盈亏/利润", "点差", "备注", "销售", "经理", "总监"
+                "订单号", "MT4账户", "平台", "姓名", "指令", "商品", "手数", "建仓时间", "平仓时间",
+                "利息/过夜费", "佣金/手续费", "盈亏/利润", "点差", "销售", "经理", "总监"
             ]
             t_map = dict(zip(col_keys, col_names))
             f = {"$or": [
@@ -502,6 +502,6 @@ class EveryMonthExcel(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    EveryMonthExcel.send_excel(begin_date="2018-4-1", end_date='2018-4-1')
+    # EveryMonthExcel.send_excel(begin_date="2018-4-1", end_date='2018-4-1')
     # EveryWeekExcel.send_excel()
     pass
