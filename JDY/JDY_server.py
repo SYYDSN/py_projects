@@ -238,7 +238,7 @@ def listen_func(key):
                     """有重复客户，发送警告消息，仍然添加"""
                     title = "重复的添加客户！mt4账户：{}".format(mt4_account)
                     mes['message'] = title
-                    content = ''
+                    content = '{}'.format(args)
                     send_mail(title=title, content=content)
                 else:
                     pass
@@ -267,7 +267,7 @@ def listen_func(key):
                 if r is None:
                     title = "无法删除，因为没有对应的客户！_id：{}".format(record_id)
                     mes['message'] = title
-                    content = ''
+                    content = '{}'.format(args)
                     send_mail(title=title, content=content)
                 else:
                     """有客户，可以删除"""
