@@ -51,7 +51,7 @@ def read_sheet_01(sh) -> list:
             t = tt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
             init = {
                 "op": "data_update",
-                "_widget_1514518782504": t,
+                "datetime": tt,
                 "create_time": tt,
                 "update_time": tt,
                 "product": tr[1].value,
@@ -60,22 +60,27 @@ def read_sheet_01(sh) -> list:
                 "enter_price": tr[4].value,
                 "exit_price": tr[5].value,
                 "profit": tr[6].value,
-                "each_profit": tr[7].value,
-                "creator_name": tr[8].value,
-                "updater_name": tr[8].value,
+                "each_profit_dollar": tr[7].value,
+                "each_profit": tr[8].value,
+                "each_cost": tr[9].value,
+                "creator_name": tr[10].value,
+                "updater_name": tr[11].value,
                 "from": "excel"
             }
             if tr[8].value != "徐立杰":
                 res.append(init)
     f = {"creator_name": {"$ne": "徐立杰"}}
     s = {'receive_time': 1}
-    al = Signal.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
-    last = get_datetime_from_str(al['_widget_1514518782504'])
     insert = list()
-    for x in res:
-        create_time = x['create_time']
-        if create_time < last:
-            insert.append(x)
+    al = Signal.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+    if isinstance(al, dict):
+        last = get_datetime_from_str(al['datetime'])
+        for x in res:
+            create_time = x['create_time']
+            if create_time < last:
+                insert.append(x)
+    else:
+        insert = res
     print(len(insert))
     conn = Signal.get_collection()
     conn.insert_many(insert)

@@ -51,7 +51,7 @@ class Signal(mongo_db.BaseDoc):
     type_dict['exit_reason'] = str  # 离场理由
     type_dict['enter_price'] = float  # 建仓价
     type_dict['exit_price'] = float  # 平仓价
-    type_dict['profit'] = float  # 获利
+    type_dict['profit'] = float  # 获利/盈亏
     type_dict['each_profit'] = float  # 每手实际获利
     type_dict['each_profit_dollar'] = float  # 每手获利/美金
     type_dict['each_cost'] = float  # 每手成本
@@ -86,9 +86,6 @@ class Signal(mongo_db.BaseDoc):
             if isinstance(delete_time, datetime.datetime):
                 delete_time = self.transform_time_zone(delete_time)  # 调整时区
                 arg_dict['delete_time'] = delete_time
-            event_date = datetime.datetime.now()
-            if isinstance(event_date, datetime.datetime):
-                arg_dict['event_date'] = event_date
             t_s = data.pop("_widget_1514518782603", dict())  # 止盈止损
             if "_widget_1514518782614" in t_s:
                 take_profit = t_s.get('_widget_1514518782614')
@@ -149,6 +146,9 @@ class Signal(mongo_db.BaseDoc):
             t_coefficient = data.pop("_widget_1514887799459", None)  # （交易）系数
             if isinstance(t_coefficient, (int, float)):
                 arg_dict['t_coefficient'] = t_coefficient
+            p_coefficient = data.pop("_widget_1520843228626", None)  # （点值）系数
+            if isinstance(p_coefficient, (int, float)):
+                arg_dict['p_coefficient'] = p_coefficient
 
             arg_dict['token_name'] = "策略助手 小迅"
             for k, v in data.items():
@@ -361,8 +361,21 @@ class Signal(mongo_db.BaseDoc):
         res = send_signal(out_put, token_name=self.get_attr("token_name"))
         print(res)
 
+    @classmethod
+    def pickle_json(cls) -> str:
+        """
+        根据现有的老师喊单信息，腌制一个json文件并返回json文件的绝对路径
+        :return:
+        """
+        f = dict()
+        records = cls.find_plus(filter_dict=f, to_dict=True)
+        for record in records:
+            cls.normalization(record)
+
+
 
 if __name__ == "__main__":
+    """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
     data = {'op': 'data_create',
             'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
                      'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
@@ -377,7 +390,9 @@ if __name__ == "__main__":
                      'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
                      }
             }
-    d = Signal(**data)
-    d.send()
-    # d.welcome()
+    """初始化喊单信号并发送"""
+    # d = Signal(**data)
+    # d.send()
+    """腌制一个json数据，此数据包含了全部的喊单信息"""
+    Signal.pickle_json()
     pass
