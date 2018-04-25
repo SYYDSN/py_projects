@@ -215,10 +215,11 @@ if __name__ == "__main__":
         "59cda886ad01be237680e28e"
     ]
     a_dict = dict(zip(user_ids, ("刘成刚", "栾新军", "薛飞")))
+    a_dict = dict(zip(user_ids, ("栾新军")))
     for user_id in user_ids:
         if str(user_id) == "59cda886ad01be237680e28e":
-            now = mongo_db.get_datetime_from_str("2017-12-19")
-            for i in range(3):
+            now = mongo_db.get_datetime_from_str("2017-10-18")
+            for i in range(10):
                 delta = datetime.timedelta(days=i + 1)
                 d = (now - delta).strftime("%F")
                 draw_speed_contrast(user_id, d, "{} on {}".format(a_dict[user_id], d))

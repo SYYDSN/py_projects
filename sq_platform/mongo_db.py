@@ -39,6 +39,7 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
 """
 mongodb_setting = {
+    # "host": "127.0.0.1:27017",   # 数据库服务器地址            mongos 1
     "host": "safego.org:20000",   # 数据库服务器地址            mongos 1
     # "host": "pltf.safego.org:7171",   # 数据库服务器地址          mongos 2
     # "host": "pltf.safego.org:8181",   # 数据库服务器地址        mongos 3
