@@ -222,7 +222,7 @@ class Signal(mongo_db.BaseDoc):
 
     def send(self):
         """
-        输出发送到丁丁机器人的消息字典，此函数应该被覆盖
+        输出发送到钉钉机器人的消息字典，此函数应该被子类覆盖
         :return:
         """
         self.replace_column()
@@ -394,5 +394,5 @@ if __name__ == "__main__":
     # d = Signal(**data)
     # d.send()
     """腌制一个json数据，此数据包含了全部的喊单信息"""
-    Signal.pickle_json()
+    # Signal.pickle_json()
     pass
