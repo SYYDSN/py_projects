@@ -48,7 +48,7 @@ def read_sheet_01(sh) -> list:
             pass
         else:
             tt = tr[0].value
-            t = tt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            t = tr[10].value
             init = {
                 "op": "data_update",
                 "datetime": tt,
@@ -63,8 +63,8 @@ def read_sheet_01(sh) -> list:
                 "each_profit_dollar": tr[7].value,
                 "each_profit": tr[8].value,
                 "each_cost": tr[9].value,
-                "creator_name": tr[10].value,
-                "updater_name": tr[11].value,
+                "creator_name": t,
+                "updater_name": t,
                 "from": "excel"
             }
             if tr[8].value != "徐立杰":

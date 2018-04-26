@@ -3,6 +3,7 @@ from log_module import get_logger
 from send_moudle import *
 import mongo_db
 import datetime
+from mail_module import send_mail
 
 logger = get_logger()
 ObjectId = mongo_db.ObjectId
@@ -95,7 +96,7 @@ class Signal(mongo_db.BaseDoc):
                 stop_losses = t_s.get('_widget_1514518782632')
                 if stop_losses is not None and isinstance(stop_losses, (int, float)):
                     arg_dict['stop_losses'] = stop_losses   # 止损
-            # arg_dict['record_id'] = data.pop('_id', None)   # 事件唯一id,用于判断是不是同一个交易?
+            arg_dict['record_id'] = data.pop('_id', None)   # 事件唯一id,用于判断是不是同一个交易?
             arg_dict['app_name'] = data.pop('formName', None)  # 表单名称，重要区别依据，应该是唯一的
             updater = data.pop('updater', None)
             if updater is not None:
@@ -225,7 +226,7 @@ class Signal(mongo_db.BaseDoc):
         输出发送到钉钉机器人的消息字典，此函数应该被子类覆盖
         :return:
         """
-        self.replace_column()
+        # self.replace_column()
         print(self.__dict__)
         create_time = self.get_attr("create_time")
         update_time = self.get_attr("update_time")
@@ -320,6 +321,7 @@ class Signal(mongo_db.BaseDoc):
 
             """发送消息到钉钉群"""
             res = send_signal(out_put, token_name=self.get_attr("token_name"))
+            # res = 1
             if res:
                 if the_type == "删除订单":
                     self.__dict__['send_time_delete'] = datetime.datetime.now()
@@ -333,11 +335,15 @@ class Signal(mongo_db.BaseDoc):
                     pass
                 u = self.__dict__
                 u.pop("_id", None)
-                record_id = u.pop("record_id", None)
-                if record_id is None:
-                    pass
+                date_time = u.pop("datetime", None)
+                creator_name = u.pop("creator_name", None)
+                if date_time is None or creator_name is None:
+                    ms = "不合法的喊单信号：{}".format(u)
+                    logger.exception(ms)
+                    title = "喊单信号不符合规范"
+                    send_mail(title=title, content=ms)
                 else:
-                    f = {"record_id": record_id}
+                    f = {"datetime": date_time, "creator_name": creator_name}
                     u = {"$set": u}
                     conn = mongo_db.get_conn(self._table_name)
                     r = conn.find_one_and_update(filter=f, update=u, upsert=True)
@@ -361,18 +367,6 @@ class Signal(mongo_db.BaseDoc):
         res = send_signal(out_put, token_name=self.get_attr("token_name"))
         print(res)
 
-    @classmethod
-    def pickle_json(cls) -> str:
-        """
-        根据现有的老师喊单信息，腌制一个json文件并返回json文件的绝对路径
-        :return:
-        """
-        f = dict()
-        records = cls.find_plus(filter_dict=f, to_dict=True)
-        for record in records:
-            cls.normalization(record)
-
-
 
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
@@ -391,8 +385,6 @@ if __name__ == "__main__":
                      }
             }
     """初始化喊单信号并发送"""
-    # d = Signal(**data)
-    # d.send()
-    """腌制一个json数据，此数据包含了全部的喊单信息"""
-    # Signal.pickle_json()
+    d = Signal(**data)
+    d.send()
     pass

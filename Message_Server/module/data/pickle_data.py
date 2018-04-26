@@ -19,7 +19,7 @@ cache = mongo_db.RedisCache()
 logger = get_logger()
 
 
-def draw_data_from_db(begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
+def draw_data_dict_from_db(begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
     """
     从数据库获取分析师的喊单信号。以老师名为一级key,产品名为二级key打包成dict并返回
     :param begin: 开始时间
@@ -29,7 +29,7 @@ def draw_data_from_db(begin: datetime.datetime = None, end: datetime.datetime = 
     records = dict()
     now = datetime.datetime.now()
     f = {
-        "each_profit": {"$exists": True},
+        "each_profit": {"$exists": True, "$ne": None},
         "exit_price": {"$exists": True},
         "update_time": {"$exists": True, "$type": 9, "$lte": now}
     }
@@ -69,7 +69,49 @@ def draw_data_from_db(begin: datetime.datetime = None, end: datetime.datetime = 
     return records
 
 
-def calculate(begin: str = None, end: str = None) -> dict:
+def draw_data_list_from_db(begin: datetime.datetime = None, end: datetime.datetime = None) -> list:
+    """
+    从数据库获取分析师的喊单信号。返回数据的list对象
+    :param begin: 开始时间
+    :param end:  截至时间
+    :return:
+    """
+    records = list()
+    now = datetime.datetime.now()
+    f = {
+        "each_profit": {"$exists": True, "$ne": None},
+        "exit_price": {"$exists": True},
+        "update_time": {"$exists": True, "$type": 9, "$lte": now}
+    }
+    if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
+        if end <= begin:
+            pass
+        else:
+            f['update_time'] = {
+                "$exists": True, "$type": 9,
+                "$lte": end, "$gte": begin
+            }
+    elif isinstance(begin, datetime.datetime) and end is None:
+        f['update_time'] = {
+            "$exists": True, "$type": 9,
+            "$lte": now, "$gte": begin
+        }
+    elif isinstance(end, datetime.datetime) and begin is None:
+        f['update_time'] = {"$exists": True, "$type": 9, "$lte": end}
+    else:
+        pass
+    p_list = ['加元', '白银', '澳元', '日元', '英镑', '欧元', '恒指', '原油', '黄金']
+    ses = mongo_db.get_conn("signal_info")
+    signals = ses.find(filter=f)
+    if signals.count() > 0:
+        records = [x for x in signals if x.get("product") in p_list]
+    else:
+        pass
+    print("共计{}条记录".format(len(records)))
+    return records
+
+
+def calculate_win_per(begin: str = None, end: str = None) -> dict:
     """
     计算老师的胜率
     :param begin: 开始时间
@@ -78,13 +120,28 @@ def calculate(begin: str = None, end: str = None) -> dict:
     """
     begin = mongo_db.get_datetime_from_str(begin)
     end = mongo_db.get_datetime_from_str(end)
-    raw = draw_data_from_db(begin, end)
+    raw = draw_data_dict_from_db(begin, end)
     res = dict()
-    for k, v in raw.items():
-        """开始计算胜率"""
-        for p_name, p_records in v.items():
-            win = [x for x in p_records]
+    for t_name, t_value in raw.items():
+        t_dict = dict()
+        for p_name, p_value in t_value.items():
+            """计算单个产品的胜率"""
+            p_dict = dict()
+            p_win_count = 0
+            for record in p_value:
+                if record['each_profit'] >= 0:
+                    p_win_count += 1
+                else:
+                    pass
+            p_count = len(p_value)
+            p_win_per = p_win_count / p_count
+
+            p_dict["per"] = p_win_per
+            p_dict['count'] = p_count
+            t_dict[p_name] = p_dict
+        res[t_name] = t_dict
+    return res
 
 if __name__ == "__main__":
-    calculate()
+    calculate_win_per()
 
