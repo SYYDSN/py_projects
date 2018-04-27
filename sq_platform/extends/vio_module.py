@@ -77,7 +77,7 @@ class ValidCity(mongo_db.BaseDoc):
             res = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
             if len(res) > 0:
                 delta = now - res[0]['valid_date']
-                if delta.total_seconds() > 86400:
+                if delta.total_seconds() > 3600:
                     """用了一天了,那就直接刷新"""
                     cls.refresh()
                     res = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
@@ -387,7 +387,7 @@ class ValidCity(mongo_db.BaseDoc):
             else:
                 f = {"city_code": {"$in": ids}}
                 u = {"$set": {"can_use": False}}
-                cls.update_many_plus(filter_dict=f, update_dict=u, upsert=False)
+                cls.update_many_plus(filter_dict=f, update_dict=u, upsert=True)
 
     @classmethod
     def refresh_from_file(cls):

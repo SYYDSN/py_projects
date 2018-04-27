@@ -334,7 +334,9 @@ class ViolationRecode(mongo_db.BaseDoc):
                         self.set_attr("update_time", mongo_db.get_datetime(to_str=False))
                         self._id = query_obj.get_id()
                         query_obj = query_obj.check_position()  # 检查位置信息
-                        self.set_attr("position_id", query_obj.position_id)
+                        position_id = query_obj.get_attr("query_obj")
+                        if position_id is not None:
+                            self.set_attr("position_id", query_obj.position_id)
                         break
             if flag:
                 """有差异"""
@@ -518,6 +520,7 @@ class ViolationQueryResult(mongo_db.BaseDoc):
                 vio_list = list()
                 for vio in data_vio_list:
                     vio['user_id'] = user_id
+                    vio.pop("_id", None)  # 这个_id可能是空字符,要去掉,让系统自行添加_id
                     obj = ViolationRecode.instance(**vio)
                     dbref = obj.exists()
                     vio_list.append(dbref)
@@ -829,11 +832,16 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 f = {"_id": g_id}
                 cls.find_one_and_delete(filter_dict=f)
         """检查是否所有的行车证都有对应的查询器了?"""
-        need_create = [x['_id'] for x in license_list if x['_id'] not in got_ids]
+        need_create = [x for x in license_list if x['_id'] not in got_ids]
         if len(need_create) > 0:
             for x in need_create:
-                l_dbref = DBRef(database="platform_db", collection=CarLicense.get_table_name(), id=x)
+                l_dbref = DBRef(database="platform_db", collection=CarLicense.get_table_name(), id=x['_id'])
                 init = {
+                    "plate_number": x.get("plate_number"),
+                    "car_type": x.get("car_type"),
+                    "vin_id": x.get("vin_id"),
+                    "engine_id": x.get("engine_id"),
+                    "city": "全国已开通城市" if x.get("city") is None else x['city'],  # 聚合数据不需要此字段
                     "user_id": user_id,
                     "car_license": l_dbref,
                     "create_date": now,
@@ -842,6 +850,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                     "today_online_query_count": 0,
                     "today_offline_query_count": 0
                 }
+                init = {k: v for k, v in init.items() if v is not None}
                 g_id = cls.insert_one(**init)
                 if g_id is None:
                     ms = "违章查询器插入失败,args={}".format(init)
@@ -850,7 +859,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 else:
                     init["_id"] = g_id
                     res.append(init)
-                    plate_map[g_id] = license_dict[x].get("plate_number")
+                    plate_map[g_id] = license_dict[x["_id"]].get("plate_number")
         else:
             pass
         res = [{"_id": str(x['_id']), "plate_number": plate_map[x['_id']], "city": x['city']} for x in res]
@@ -916,30 +925,21 @@ class VioQueryGenerator(mongo_db.BaseDoc):
     @classmethod
     def insert_one(cls, **kwargs):
         """插入一个查询器对象，此方法覆盖了父类的方法,返回ObjectId"""
-        plate_number = kwargs.get("plate_number")
-        engine_id = kwargs.get("engine_id")
-        city = kwargs.get("city")
-        user_id = kwargs.get("user_id")
-        vin_id = "" if kwargs.get("vin_id") is None else kwargs.get("vin_id")
-        car_type = "02" if kwargs.get("car_type") is None else kwargs.get("car_type")
+        plate_number = kwargs.pop("plate_number", None)
+        engine_id = kwargs.pop("engine_id", None)
+        vin_id = kwargs.pop("vin_id", None)
+        car_type = kwargs.pop("car_type", None)
         result = None
-        if plate_number is None or len(plate_number) != 6:
-            logger.info("参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
+        if plate_number is None or len(plate_number) < 7:
+            logger.info("行车证信息参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
         elif engine_id is None or len(engine_id) < 6:
-            logger.info("参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
-        elif city is None or len(city) < 2:
-            logger.info("参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
-        elif not isinstance(user_id, ObjectId):
-            logger.info("参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
+            logger.info("行车证信息参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
+        elif car_type is None or len(car_type) < 2:
+            logger.info("行车证信息参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
+        elif vin_id is None or len(vin_id) < 6:
+            logger.info("行车证信息参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
         else:
-            arg = {"user_id": user_id, "plate_number": plate_number}
-            obj_id = CarLicense.find_one_and_insert(**arg)
-            if obj_id is None:
-                pass
-            else:
-                dbref = CarLicense.create_dbref(obj_id)
-                arg = {"user_id": user_id, "city": city, "car_license": dbref}
-                result = cls(**arg).insert()
+            result = cls(**kwargs).save_plus()
         return result
 
     @classmethod
@@ -1184,11 +1184,12 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                     3. 过是str类型的,那就是违章查询接口返回的错误码
                     """
                     error_code = message.get("error_code")
-                    if error_code is None:
+                    if error_code is None or error_code == 0:
                         """正常的返回.没有错误信息"""
                         pass
                     else:
                         ms = "查询违章接口发生错误error_code类型出错,error_code:{}".format(error_code)
+                        print(ms)
                         city = generator.get_attr("city")
                         logger.exception(msg=ms, stack_info=True, exc_info=True)
                         error_code = int(error_code)
@@ -1200,6 +1201,8 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                             违章查询接口返回了错误的状态码
                             """
                             desc = "服务器返回了错误的状态码:{}".format(error_code)
+                            ms = "{}, 查询器id:{}".format(desc, object_id)
+                            logger.exception(ms)
                             message = pack_message(message, 7001, desc=desc, city=city)
                         else:
                             error_map = {
@@ -1320,12 +1323,14 @@ if __name__ == "__main__":
         'vin': 'LGGX5D659GL327051', 'carType': '01', 'engineNo': 'L6AL3G00185', 'plateNumber': '赣CX3469', 'city': "宜春市"
     }
     """获取用户的违章查询器列表"""
-    r2 = VioQueryGenerator.generator_list(u_id)
+    # print(VioQueryGenerator.generator_list(user_id=u_id))
     """利用违章查询器查询违章记录"""
-    # vios = VioQueryGenerator.get_prev_query_result(user_id=u_id, object_id=g_id)
+    # vios = VioQueryGenerator.get_prev_query_result(user_id=u_id, object_id=ObjectId("5ae2ad74e39a7b41bd6d4100"))
     # print(vios)
     """测试直接调用查询接口的方法"""
     # print(VioQueryGenerator.query(g_id))
     # print(VioQueryGenerator.query(object_id=None, arg_dict=q))
+    r = ViolationQueryResult.find_by_id("5ae2b8c2e39a7b4cf7d7cc27")
+    print(r)
     pass
 

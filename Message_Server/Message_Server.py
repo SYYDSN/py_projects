@@ -11,6 +11,7 @@ from flask_session import Session
 from log_module import get_logger
 import sms_module
 import json
+from module.data.pickle_data import calculate_win_per
 from tools_module import *
 from item_module import *
 import os
@@ -78,6 +79,25 @@ def listen_func(key):
     else:
         mes['message'] = '错误的path'
     return json.dumps(mes)
+
+
+@app.route("/teacher_charts/<key>", methods=['get', 'post'])
+def teacher_charts_func(key):
+    """
+    查看老师喊单成功率的页面
+    key: 用于区分图标分组的标准.比如是以老师未分组依据还是以产品为分组依据?
+    """
+    if request.method.lower() == "get":
+        return render_template("teacher_charts.html", key=key)
+    elif request.method.lower() == "post":
+        """查询老师的喊单数据"""
+        begin = get_arg(request, "begin")
+        end = get_arg(request, "end")
+        data = calculate_win_per(begin=begin, end=end)
+        mes = {"message": "success", "data": data}
+        return json.dumps(mes)
+    else:
+        return abort(405)
 
 
 @app.before_request

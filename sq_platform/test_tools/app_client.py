@@ -71,12 +71,12 @@ def test_query_violation():
     :return:
     """
     auth_token = "a98d8bb4840c42e3993ccc6d6c79d431"  # app段登录标识 me
-    auth_token = "47a55e628931458fb70773badbe063ba"  # app段登录标识 me
+    # auth_token = "47a55e628931458fb70773badbe063ba"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     args = {"_id": "5ac49aa74660d356cce9df9f"}   #
-    args = {"_id": "5acb2e61e39a7b6194cae4f3"}   #
-    # url = "http://safego.org:5000/api/query_violation"
-    url = "http://127.0.0.1:5000/api/query_violation"
+    args = {"_id": "5ae2b45ae39a7b45d3fa9d6e"}   #
+    url = "http://safego.org:5000/api/query_violation"
+    # url = "http://127.0.0.1:5000/api/query_violation"
     res = requests.post(url, data=args, headers=headers)
     print(res.json())
 

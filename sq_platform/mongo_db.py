@@ -49,9 +49,8 @@ mongodb_setting = {
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
-    # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
-    # "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
-    "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
+    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
+    # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
     "username": user,       # 用户名
     "password": password    # 密码
 }

@@ -142,6 +142,25 @@ def calculate_win_per(begin: str = None, end: str = None) -> dict:
         res[t_name] = t_dict
     return res
 
+
+def query_chart_data(chart_type: str = "bar", begin: str = None, end: str = None) -> dict:
+    """
+    查询分析老师胜率的图表的数据
+    :param chart_type: 图表的类型,默认是 bar(柱状图)
+    :param begin: 开始时间
+    :param end:  截至时间
+    :return:
+    """
+    raw = calculate_win_per(begin=begin, end=end)
+    res = dict()
+    if chart_type == "bar":
+        """柱状图,解析成x轴和y轴的数据"""
+        res = raw
+    else:
+        pass
+    return res
+
+
 if __name__ == "__main__":
-    calculate_win_per()
+    query_chart_data()
 

@@ -1,0 +1,16 @@
+html{
+    font-size: 14px;
+}
+#main_title{
+    font-size: 2rem;
+    text-align: center;
+}
+.main_div{
+}
+#my_nav{
+
+}
+.chart_div{
+    min-height: 400px;
+    min-width: 800px;
+}
