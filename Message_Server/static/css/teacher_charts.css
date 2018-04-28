@@ -7,10 +7,19 @@ html{
 }
 .main_div{
 }
-#my_nav{
+#chart_zone{
 
 }
 .chart_div{
-    min-height: 400px;
+    position: relative;
+    display: block;
+    min-height: 480px;
     min-width: 800px;
+}
+.my_col{
+    margin-top:2rem;
+    margin-bottom: 2rem;
+}
+#select_date_div{
+    padding: 1rem 2rem;
 }

@@ -7,6 +7,7 @@ if __project_dir__ not in sys.path:
 import datetime
 from item_module import Signal
 from mongo_db import get_datetime_from_str
+from mongo_db import get_conn
 import openpyxl
 
 
@@ -47,13 +48,14 @@ def read_sheet_01(sh) -> list:
         if i == 0:
             pass
         else:
-            tt = tr[0].value
-            t = tr[10].value
+            create_time = tr[0].value
+            name = tr[10].value
+            update_time = tr[11].value
             init = {
                 "op": "data_update",
-                "datetime": tt,
-                "create_time": tt,
-                "update_time": tt,
+                "datetime": create_time,
+                "create_time": create_time,
+                "update_time": update_time,
                 "product": tr[1].value,
                 "the_type": tr[2].value,
                 "direction": tr[3].value,
@@ -63,8 +65,8 @@ def read_sheet_01(sh) -> list:
                 "each_profit_dollar": tr[7].value,
                 "each_profit": tr[8].value,
                 "each_cost": tr[9].value,
-                "creator_name": t,
-                "updater_name": t,
+                "creator_name": name,
+                "updater_name": name,
                 "from": "excel"
             }
             if tr[8].value != "徐立杰":
@@ -82,8 +84,10 @@ def read_sheet_01(sh) -> list:
     else:
         insert = res
     print(len(insert))
-    conn = Signal.get_collection()
-    conn.insert_many(insert)
+    conn = get_conn("signal_info")
+    for i in insert:
+        f = {"datetime": i.pop("datetime"), "creator_name": i.pop("creator_name")}
+        conn.update_one(filter=f, update={"$set": i}, upsert=True)
     return res
 
 

@@ -1071,13 +1071,13 @@ $(function() {
 
     // 初始化日期选择器
     (function (last_date_str) {
-        // 日期插件文档 http://www.bootcss.com/p/bootstrap-datetimepicker/
+        // 日期插件文档 http://www.bootcss.com/p/bootstrap-datetimepicker/index.htm
         // 参数last_date_str是最后一个可用的日期
         $("#date_picker").datetimepicker({
             language: "zh-CN",
             weekStart:1,  // 星期一作为一周的开始
             minView: 2,  // 不显示小时和分
-            autoclose: true,  // 选定日期后理解关闭选择器
+            autoclose: true,  // 选定日期后立即关闭选择器
             format: "yyyy-mm-dd"
         }).on("show", function(ev){
             // 当选择器显示时被触发.示范,无实际意义.

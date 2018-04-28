@@ -11,7 +11,7 @@ from flask_session import Session
 from log_module import get_logger
 import sms_module
 import json
-from module.data.pickle_data import calculate_win_per
+from module.data.pickle_data import query_chart_data
 from tools_module import *
 from item_module import *
 import os
@@ -87,13 +87,22 @@ def teacher_charts_func(key):
     查看老师喊单成功率的页面
     key: 用于区分图标分组的标准.比如是以老师未分组依据还是以产品为分组依据?
     """
+    begin = get_arg(request, "begin", None)
+    end = get_arg(request, "end", None)
     if request.method.lower() == "get":
-        return render_template("teacher_charts.html", key=key)
+        url_args = {"begin": begin, "end": end}
+        url_args = {k: v for k, v in url_args.items() if v is not None}
+        url_path = ""
+        for k, v in url_args.items():
+            if url_path.find("?") == -1:
+                url_path += "?"
+            else:
+                url_path += "&"
+            url_path += "{}={}".format(k, v)
+        return render_template("teacher_charts.html", key=key, url_args=url_args, url_path=url_path)
     elif request.method.lower() == "post":
         """查询老师的喊单数据"""
-        begin = get_arg(request, "begin")
-        end = get_arg(request, "end")
-        data = calculate_win_per(begin=begin, end=end)
+        data = query_chart_data(chart_type=key, begin=begin, end=end)
         mes = {"message": "success", "data": data}
         return json.dumps(mes)
     else:
