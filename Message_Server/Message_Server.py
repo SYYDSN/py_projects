@@ -11,6 +11,7 @@ from flask_session import Session
 from log_module import get_logger
 import sms_module
 import json
+from user_module import User
 from module.data.pickle_data import query_chart_data
 from tools_module import *
 from item_module import *
@@ -82,6 +83,7 @@ def listen_func(key):
 
 
 @app.route("/teacher_charts/<key>", methods=['get', 'post'])
+@check_platform_session
 def teacher_charts_func(key):
     """
     查看老师喊单成功率的页面
@@ -108,6 +110,27 @@ def teacher_charts_func(key):
     else:
         return abort(405)
 
+
+@app.route("/teacher_login", methods=['post', 'get'])
+def teacher_login_func():
+    """登录页"""
+    if request.method.lower() == "get":
+        login_title = "Login"
+        return render_template("teacher_login.html", login_title=login_title)
+    elif request.method.lower() == "post":
+        user_name = get_arg(request, "user_name")
+        user_password = get_arg(request, "user_password")
+        """teacher_admin/2018@0429"""
+        mes = {"message": "success"}
+        if User.login(user_name, user_password):
+            """登录成功"""
+            save_platform_session(user_name=user_name, user_password=user_password)
+        else:
+            mes['message'] = "用户名或密码错误"
+            clear_platform_session()
+        return json.dumps(mes)
+    else:
+        return abort(405)
 
 @app.before_request
 def logger_request_info():

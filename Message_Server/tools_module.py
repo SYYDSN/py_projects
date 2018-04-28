@@ -18,6 +18,7 @@ from uuid import uuid4
 import base64
 import urllib.request
 import os
+import user_module
 from uuid import uuid4
 from log_module import get_logger
 from werkzeug.contrib.cache import RedisCache
@@ -61,10 +62,9 @@ def save_platform_session(**kwargs) -> bool:
     :kwargs 必须包含 user_id user_name user_password三个参数
     return True代表保存成功，False代表保存失败
     """
-    user_id = kwargs.get('_id')
-    user_name = kwargs.get('phone')
-    user_password = kwargs.get('password')
-    if not (user_id and user_name and user_password):
+    user_name = kwargs.get('user_name')
+    user_password = kwargs.get('user_password')
+    if not (user_name and user_password):
         """去掉session中的内容"""
         keys = list(session.keys())
         [session.pop(x) for x in keys]
@@ -132,21 +132,17 @@ def check_platform_session(f):
     def decorated_function(*args, **kwargs):
 
         """本域用户"""
-        phone = session.get("phone")  # 检测session中的user_name
-        password = session.get("password")  # user_password
-        user_id = session.get("_id")  # 检测session中的user_id
-        if not (phone and password and user_id):
-            return redirect(url_for("login_func"))
+        user_name = session.get("user_name")  # 检测session中的user_name
+        user_password = session.get("user_password")  # user_password
+        if not (user_name and user_password):
+            return redirect(url_for("teacher_login_func"))
         else:
-            checked_user_obj = user_module.User.login(phone=phone, password=password)
-            if checked_user_obj is None:
+            checked_user_obj = user_module.User.login(user_name=user_name, user_password=user_password)
+            if not checked_user_obj:
                 """用户名和密码不正确"""
-                return redirect(url_for("login_func"))
+                return redirect(url_for("teacher_login_func"))
             else:
-                if checked_user_obj['data']['_id'] == user_id:
-                    return f(*args, **kwargs)
-                else:
-                    return redirect(url_for("login_func"))
+                return f(*args, **kwargs)
     return decorated_function
 
 

@@ -8,6 +8,7 @@ import mongo_db
 import datetime
 from log_module import get_logger
 from item_module import Signal
+import re
 import pandas as pd
 
 
@@ -17,6 +18,7 @@ ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
 cache = mongo_db.RedisCache()
 logger = get_logger()
+p_list = ['加元', '白银', '澳元', '日元', '英镑', '欧元', '恒指', '原油', '黄金']
 
 
 def draw_data_dict_from_db(begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
@@ -31,26 +33,26 @@ def draw_data_dict_from_db(begin: datetime.datetime = None, end: datetime.dateti
     f = {
         "each_profit": {"$exists": True, "$ne": None},
         "exit_price": {"$exists": True, "$ne": None},
-        "update_time": {"$exists": True, "$type": 9, "$lte": now}
+        "update_time": {"$exists": True, "$type": 9}
     }
     if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
         if end <= begin:
             pass
         else:
-            f['update_time'] = {
+            f['datetime'] = {
                 "$exists": True, "$type": 9,
                 "$lte": end, "$gte": begin
             }
     elif isinstance(begin, datetime.datetime) and end is None:
-        f['update_time'] = {
+        f['datetime'] = {
             "$exists": True, "$type": 9,
             "$lte": now, "$gte": begin
         }
     elif isinstance(end, datetime.datetime) and begin is None:
-        f['update_time'] = {"$exists": True, "$type": 9, "$lte": end}
+        f['datetime'] = {"$exists": True, "$type": 9, "$lte": end}
     else:
         pass
-    p_list = ['加元', '白银', '澳元', '日元', '英镑', '欧元', '恒指', '原油', '黄金']
+
     ses = mongo_db.get_conn("signal_info")
     signals = ses.find(filter=f)
     count = 0
@@ -83,26 +85,26 @@ def draw_data_list_from_db(begin: datetime.datetime = None, end: datetime.dateti
     f = {
         "each_profit": {"$exists": True, "$ne": None},
         "exit_price": {"$exists": True, "$ne": None},
-        "update_time": {"$exists": True, "$type": 9, "$lte": now}
+        "update_time": {"$exists": True, "$type": 9}
     }
     if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
         if end <= begin:
             pass
         else:
-            f['update_time'] = {
+            f['datetime'] = {
                 "$exists": True, "$type": 9,
                 "$lte": end, "$gte": begin
             }
     elif isinstance(begin, datetime.datetime) and end is None:
-        f['update_time'] = {
+        f['datetime'] = {
             "$exists": True, "$type": 9,
             "$lte": now, "$gte": begin
         }
     elif isinstance(end, datetime.datetime) and begin is None:
-        f['update_time'] = {"$exists": True, "$type": 9, "$lte": end}
+        f['datetime'] = {"$exists": True, "$type": 9, "$lte": end}
     else:
         pass
-    p_list = ['加元', '白银', '澳元', '日元', '英镑', '欧元', '恒指', '原油', '黄金']
+
     ses = mongo_db.get_conn("signal_info")
     signals = ses.find(filter=f)
     if signals.count() > 0:
@@ -120,6 +122,8 @@ def draw_data_list_from_db(begin: datetime.datetime = None, end: datetime.dateti
             temp['each_profit'] = each_profit  # 每手实际盈利
             temp['enter_date'] = enter_time.strftime("%F")  # 进场日
             temp['exit_date'] = exit_time.strftime("%F")  # 出场日
+            week_list = exit_time.isocalendar()
+            temp['week'] = "{}年{}周".format(week_list[0], week_list[1])
             temp['win'] = win
             records.append(temp)
     else:
@@ -193,6 +197,84 @@ def calculate_win_per_by_product(begin: str = None, end: str = None) -> dict:
     return res
 
 
+def calculate_win_per_by_month(begin: str = None, end: str = None) -> dict:
+    """
+    以时间（月）切分，以老师为分组依据， 以产品分类计算的胜率
+    :param begin: 开始时间
+    :param end:  截至时间
+    :return:
+    """
+    begin = mongo_db.get_datetime_from_str(begin)
+    end = mongo_db.get_datetime_from_str(end)
+    raw = draw_data_list_from_db(begin, end)
+    res = dict()
+    pattern = re.compile(r'^20\d{2}-\d{2}')
+    for record in raw:
+        p_name = record['product']
+        t_name = record['teacher']
+
+        p_dict = res.get(p_name)
+        p_dict = dict() if p_dict is None else p_dict
+        t_dict = p_dict.get(t_name)
+        t_dict = dict() if t_dict is None else t_dict
+        month = re.match(pattern, record['enter_date']).group()
+        m_dict = dict() if t_dict.get(month) is None else t_dict[month]
+
+        win_count = 0 if m_dict.get("win_count") is None else m_dict['win_count']
+        all_count = 0 if m_dict.get("all_count") is None else m_dict['all_count']
+        all_count += 1
+        if record['win'] == 1:
+            win_count += 1
+        else:
+            pass
+        m_dict['win_count'] = win_count
+        m_dict['all_count'] = all_count
+        t_dict[month] = m_dict
+        p_dict[t_name] = t_dict
+        res[p_name] = p_dict
+
+    return res
+
+
+def calculate_win_per_by_week(begin: str = None, end: str = None) -> dict:
+    """
+    以时间（周）切分，以老师为分组依据， 以产品分类计算的胜率
+    :param begin: 开始时间
+    :param end:  截至时间
+    :return:
+    """
+    begin = mongo_db.get_datetime_from_str(begin)
+    end = mongo_db.get_datetime_from_str(end)
+    raw = draw_data_list_from_db(begin, end)
+    res = dict()
+    pattern = re.compile(r'^20\d{2}-\d{2}')
+    for record in raw:
+        p_name = record['product']
+        t_name = record['teacher']
+
+        p_dict = res.get(p_name)
+        p_dict = dict() if p_dict is None else p_dict
+        t_dict = p_dict.get(t_name)
+        t_dict = dict() if t_dict is None else t_dict
+        week = record['week']
+        w_dict = dict() if t_dict.get(week) is None else t_dict[week]
+
+        win_count = 0 if w_dict.get("win_count") is None else w_dict['win_count']
+        all_count = 0 if w_dict.get("all_count") is None else w_dict['all_count']
+        all_count += 1
+        if record['win'] == 1:
+            win_count += 1
+        else:
+            pass
+        w_dict['win_count'] = win_count
+        w_dict['all_count'] = all_count
+        t_dict[week] = w_dict
+        p_dict[t_name] = t_dict
+        res[p_name] = p_dict
+
+    return res
+
+
 def query_chart_data(chart_type: str = "teacher", begin: str = None, end: str = None) -> dict:
     """
     查询分析老师胜率的图表的数据
@@ -208,9 +290,12 @@ def query_chart_data(chart_type: str = "teacher", begin: str = None, end: str = 
     elif chart_type == "product":
         """以产品分组"""
         res = calculate_win_per_by_product(begin=begin, end=end)
-    elif chart_type == "summary":
-        """返回原始数组,让前端自己分组"""
-        res = draw_data_list_from_db(begin=begin, end=end)
+    elif chart_type == "month":
+        """以时间（月）切分，以老师为分组依据， 以产品分类"""
+        res = calculate_win_per_by_month(begin=begin, end=end)
+    elif chart_type == "week":
+        """以时间（周）切分，以老师为分组依据， 以产品分类"""
+        res = calculate_win_per_by_week(begin=begin, end=end)
     else:
         pass
     return res
@@ -218,6 +303,6 @@ def query_chart_data(chart_type: str = "teacher", begin: str = None, end: str = 
 
 if __name__ == "__main__":
     # calculate_win_per_by_product()
-    draw_data_list_from_db()
+    calculate_win_per_by_month()
     pass
 
