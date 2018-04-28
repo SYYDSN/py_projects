@@ -8,7 +8,7 @@
 
 
 ### 约定
->返回消息的格式为json格式:
+* 返回消息的格式为json格式:
 ```
 response = {"message": "success", "data": data};
 /*
@@ -17,5 +17,13 @@ response = {"message": "success", "data": data};
 * response['data']  代表返回的数据.根据事情需要,可能是字典或者数组形式.
 */
 ```
+* 本文档中出现的ajax的url都是相对地址,主机指向后端服务器.
 
 
+### 页面讲解
+* 登录页面
+![登录页面效果图](layout/登录.jpg "登录页")
+>讲解
+输入用户名/手机号和密码.点击登录按钮. 提交用户名和密码的md5值到 /check_login 
+正确返回{"message": "success"}
+错误返回{"message": "错误原因"}
