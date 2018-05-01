@@ -132,6 +132,7 @@ def teacher_login_func():
     else:
         return abort(405)
 
+
 @app.before_request
 def logger_request_info():
     """

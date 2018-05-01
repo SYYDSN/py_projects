@@ -1391,7 +1391,6 @@ class BaseDoc:
         if dbref is None:
             return None
         else:
-            table_name = dbref.collection
             object_id = dbref.id
             obj = cls.find_by_id(object_id)
             return obj

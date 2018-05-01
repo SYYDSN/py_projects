@@ -5,7 +5,9 @@ import datetime
 from mail_module import send_mail
 from log_module import get_logger
 
+
 """发送消息给钉钉机器人"""
+
 
 logger = get_logger()
 # 钉钉机器人的链接的token

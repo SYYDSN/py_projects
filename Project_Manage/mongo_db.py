@@ -17,8 +17,8 @@ import numpy as np
 import re
 import math
 from pymongo import errors
-from pymongo.client_session import ClientSession
 from werkzeug.contrib.cache import RedisCache
+from pymongo.client_session import ClientSession
 from log_module import get_logger
 from pymongo import ReturnDocument
 from pymongo.errors import *
@@ -28,9 +28,9 @@ from pymongo.errors import DuplicateKeyError
 
 cache = RedisCache()
 logger = get_logger()
-user = "eroot"              # 数据库用户名
-password = "Try@Ex68769"       # 数据库密码
-db_name = "platform_db"        # 库名称
+user = "p_root"              # 数据库用户名
+password = "Prject@0429"       # 数据库密码
+db_name = "project_db"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 
 """mongodb配置信息"""
@@ -39,30 +39,19 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
 """
 mongodb_setting = {
-    # "host": "127.0.0.1:27017",   # 数据库服务器地址            mongos 1
-    "host": "safego.org:20000",   # 数据库服务器地址            mongos 1
-    # "host": "pltf.safego.org:7171",   # 数据库服务器地址          mongos 2
-    # "host": "pltf.safego.org:8181",   # 数据库服务器地址        mongos 3
+    "host": "47.97.174.221:27017",   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
-    "maxPoolSize": 800,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
+    "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
+    # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
     "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
     "username": user,       # 用户名
     "password": password    # 密码
 }
-
-
-"""副本集机器,留给异步队列监控健康状况的"""
-replica_hosts = [
-    {"host": "safego.org", "port": 27017},
-    {"host": "safego.org", "port": 20000},
-    {"host": "pltf.safego.org", "port": 7174},
-    {"host": "pltf.safego.org", "port": 8184}
-    ]
 
 
 class DBCommandListener(monitoring.CommandListener):
@@ -360,6 +349,24 @@ def round_datetime(the_datetime: datetime.datetime) -> datetime.datetime:
         return datetime.datetime.strptime(the_datetime.strftime("%F"), "%Y-%m-%d")
     else:
         raise TypeError("期待一个datetime.datetime类型,的到一个{}类型".format(type(the_datetime)))
+
+
+def check_repeat(table_name: str, filter_dict: dict) -> (None, dict):
+    """
+    根据filter_dict条件检查table_name是否有符合条件的记录?
+    filter_dict 必须是扁平化字典,value不能是dict和list
+    注意,如果filter_dict字典属性的值是数组/字典,请按照pymongodb查询的要求构建filter_dict,
+    举例说明:
+    如果user_phone属性是字符串 filter_dict = {"user_phone":'15618317376'}
+    如果user_phone属性是字符串的数组 filter_dict = {"user_phone":{$all:['15618317376']}}
+    filter_dict允许多个字典键值对,但是符合类型的键值对需要自己构建成扁平化字典
+    :param table_name: 表名
+    :param filter_dict: 条件字典
+    :return: 找到符合条件的记录就返回doc,否则返回None
+    """
+    ses = get_conn(table_name=table_name)
+    result = ses.find_one(filter=filter_dict)
+    return result
 
 
 def reduce_list(resource_list: list, max_length: int = 100) -> (list, None):
@@ -2053,5 +2060,6 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 
 if __name__ == "__main__":
+    print(get_datetime_from_str("2018-04-10T22:53:29.270Z"))
     pass
 
