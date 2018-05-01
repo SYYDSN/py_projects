@@ -74,9 +74,18 @@ def listen_func(key):
         """分析师发信号测试"""
         secret_str = 'P5lxNPYgF6cylkMBUenhkOE7'
         check = validate_signature(request, secret_str, signature)
-        print("signal_test check is {}".format(check))
+        ms = "signal_test check secret is {}".format(check)
+        logger.info(ms)
+        print(ms)
         signal = Signal(**data)
         signal.send()
+    elif key == "virtual_teacher":
+        """虚拟老师的增删改"""
+        secret_str = 'xRJKhty0IxbP5uBKotyDOS7r'
+        check = validate_signature(request, secret_str, signature)
+        ms = "signal_test check secret is {}".format(check)
+        logger.info(ms)
+        print(ms)
     else:
         mes['message'] = '错误的path'
     return json.dumps(mes)

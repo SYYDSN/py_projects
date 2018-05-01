@@ -668,7 +668,7 @@ class EveryCustomExcel(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    # EveryMonthExcel.send_excel(begin_date="2018-4-1", end_date='2018-4-1')
+    EveryMonthExcel.send_excel(begin_date="2018-4-1", end_date='2018-5-1')
     # EveryWeekExcel.send_excel()
-    EveryCustomExcel.send_excel(end_date='2018-4-1')
+    # EveryCustomExcel.send_excel(end_date='2018-4-1')
     pass

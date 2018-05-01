@@ -368,6 +368,101 @@ class Signal(mongo_db.BaseDoc):
         print(res)
 
 
+class VirtualTeacher(mongo_db.BaseDoc):
+    """
+    虚拟老师
+    修改信号：
+    {
+    'op': 'data_update',
+    'data': {
+        'deleteTime': None,
+        'updater': {'_id': '5a684c9b42f8c1bffc68f4b4', 'name': '徐立杰'},
+        'updateTime': '2018-05-01T22:50:21.470Z',
+        'creator': {'_id': '5a684c9b42f8c1bffc68f4b4', 'name': '徐立杰'},
+        'createTime': '2018-05-01T22:49:07.372Z',
+        'deleter': None,
+        'entryId': '5ae81d8bdd481029da358eaf',
+        '_widget_1525161353498': 'robot01',
+        '_id': '5ae8eee3c8d18711bf2b0e8b',
+        'label': '',
+        'appId': '5a446c355a8c99236975be09',
+        '_widget_1525161353511': [
+                                    {
+                                    '_widget_1525161353525': '恒指',
+                                    '_widget_1525161353522':
+                                                            {
+                                                            '_id': '5a1e680642f8c1bffc5dbd69',
+                                                            'name': '常阳'
+                                                            },
+                                    '_widget_1525161353528': '正向'
+                                    }
+                                ],
+        'formName': '机器人分析师控制台',
+        'submitPrompt': {'content': ''}
+        }
+    }
+    删除信号：
+    {
+    'op': 'data_remove',
+    'data': {
+            'deleteTime': '2018-05-01T22:54:27.124Z',
+            '_id': '5ae8eee3c8d18711bf2b0e8b',
+            'deleter': {
+                        '_id': '5a684c9b42f8c1bffc68f4b4',
+                        'name': '徐立杰'
+                        },
+            'entryId': '5ae81d8bdd481029da358eaf',
+            'formName': '机器人分析师控制台',
+            'appId': '5a446c355a8c99236975be09'
+            }
+    }
+    添加信号：
+    {
+    'op': 'data_create',
+    'data': {
+            'deleteTime': None,
+            'updater': {
+                        '_id': '5a684c9b42f8c1bffc68f4b4',
+                        'name': '徐立杰'
+                        },
+            'creator': {
+                        '_id': '5a684c9b42f8c1bffc68f4b4',
+                        'name': '徐立杰'
+                        },
+            'createTime': '2018-05-01T22:56:31.941Z',
+            'updateTime': '2018-05-01T22:56:31.941Z',
+            'deleter': None,
+            'entryId': '5ae81d8bdd481029da358eaf',
+            '_widget_1525161353498': 'robot',
+            '_id': '5ae8f09fb8f1c151e52e8585',
+            'label': '',
+            'appId': '5a446c355a8c99236975be09',
+            '_widget_1525161353511': [
+                                        {
+                                        '_widget_1525161353525': '黄金',
+                                        '_widget_1525161353522': {
+                                                                    '_id': '5a1e680642f8c1bffc5dbd6f',
+                                                                    'name': '语昂'
+                                                                    },
+                                        '_widget_1525161353528': '反向'
+                                        },
+                                        {
+                                        '_widget_1525161353525': '原油',
+                                        '_widget_1525161353522': {
+                                                                    '_id': '5a1e680642f8c1bffc5dbd6b',
+                                                                    'name': '高特'
+                                                                    },
+                                        '_widget_1525161353528': '反向'
+                                        }
+                                    ],
+            'formName': '机器人分析师控制台',
+            'submitPrompt': {'content': ''}
+            }
+    }
+
+    """
+
+
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
     data = {'op': 'data_create',
