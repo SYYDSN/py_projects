@@ -39,7 +39,7 @@ body{
 .sign-in .border .inp{
     padding-left: 15px;
     padding-right: 15px;
-
+    position: relative;
 }
 .sign-in .border .inp input{
     text-indent: 6px;
@@ -68,6 +68,7 @@ body{
     border-radius: 4px;
     margin-bottom: 34px;
 }
-#submit_btn:hover{
-    cursor:pointer;
+.tis{
+    color: #E25727;
+    position: absolute;
 }

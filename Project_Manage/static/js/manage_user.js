@@ -2,6 +2,7 @@ $(function(){
     const url = location.pathname.replace("/view","");
     // 添加用户
     $("#add_user").click(function(){
+        let nick_name = $.trim($("#nick_name").val());
         let user_name = $.trim($("#user_name").val());
         let user_password = $.trim($("#user_password").val());
         let repeat_password = $.trim($("#repeat_password").val());
@@ -29,11 +30,18 @@ $(function(){
         }
         else{
             let args = {
+                "nick_name": nick_name,
                 "user_name": user_name,
-                "user_password": $.md5(user_password),
+                "user_password": user_password,
                 "allow_view": JSON.stringify(allow_view),
                 "allow_edit": JSON.stringify(allow_edit)
             };
+            $.post(`${url}/add`, args, function(resp){
+                let json = JSON.parse(resp);
+                console.log(json);
+                alert(json['message']);
+                location.reload();
+            });
         }
 
     });

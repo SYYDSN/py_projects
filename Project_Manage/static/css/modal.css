@@ -1,0 +1,225 @@
+/* 模态框  添加任务 样式 */
+.tasks .inp{
+    width: 100%;
+    margin: 15px 0;
+    height: 34px;
+}
+.tasks .jiaose{
+    margin: 20px 0;
+}
+.tasks .jiaose span{
+    display: inline-block;
+    width: 48px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    border: 1px solid #ccc;;
+}
+.tasks .jiaose .xuanz{
+    border: 1px solid #FF7352;
+}
+.tasks .bjtitle img{
+    width: 15px;
+}
+.tasks .box .boxs{
+    height: 300px;
+    border: 1px solid #ccc;
+}
+.tasks .box  .texta{
+    width: 100%;
+    height: 300px;
+    resize: none;
+}
+.tasks .box .anniu{
+    text-align: center
+}
+.tasks .box .anniu span{
+    display: inline-block;
+    width: 388px;
+    padding: 10px 0;
+    text-align: center;
+    background: #5D8FFF;
+    color: #fff;
+    margin: 10px 0;
+}
+
+#xam .p{
+    margin: 20px 0;
+}
+
+/* 自定义模态框 */
+.model-custom{
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    background:rgba(0,0,0,.5);
+}
+.model-custom{
+    display: none;
+}
+.model-custom .modal-content{
+    width: 60%;
+    margin: 0 auto;
+    position: relative;
+    top: 8vw;
+    border-radius:10px; 
+}
+.model-custom .header{
+    background: #E0F0FF;
+    border-radius:10px 10px 0  0 ; 
+    padding-left: 35px; 
+}
+.model-custom .header p{
+    margin: 10px  0
+}
+.model-custom .header span{
+    font-weight: bold;
+}
+.model-custom .inp{
+    width: 100%;
+    height: 30px;
+    margin: 10px 0;
+}
+.model-custom .box{
+    padding: 10px ;
+    border: 1px solid #f5f5f5;
+}
+.model-custom .box p{
+   margin: 8px 0;
+   margin-left: 10px;
+}
+.model-custom  .anniu{
+    text-align: center
+}
+.model-custom .anniu span{
+    display: inline-block;
+    width: 388px;
+    padding: 10px 0;
+    text-align: center;
+    background: #5D8FFF;
+    color: #fff;
+    margin: 10px 0;
+}
+
+.model-custom .modal-content-custom{
+    /* display: none; */
+}
+/* 模态框 修改页  */
+.modifys{
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    background:rgba(0,0,0,.5);
+}
+.modal-modifys .jiaose{
+    margin: 20px 0;
+}
+.model-custom  .modal-modifys{
+    display: none;
+}
+.model-custom  .modal-modifys .bjtitle img{
+    width: 15px;
+}
+.modal-modifys .jiaose span{
+    display: inline-block;
+    width: 48px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    border: 1px solid #ccc;
+}
+.modal-modifys .jiaose .xuanz{
+    border: 1px solid #FF7352;
+}
+.modal-modifys .mokuai p:nth-child(2){
+    margin: 20px 0;
+}
+.modal-modifys .mks p:nth-child(2){
+    margin: 20px 0;
+}
+
+.modal-modifys .bjtitle img{
+    width: 15px;
+}
+.modifys{
+    display: none;
+}
+.modifys .box  .texta{
+    width: 100%;
+    height: 300px;
+    resize: none;
+}
+/* 拷贝进度条 */
+#popups .spjind{
+    margin-right: 12px;
+    position: relative;
+    top: -25px;
+}
+#popups .spjinds{
+   float: right;
+   position: relative;
+   top: 5px;
+}
+.progress{
+    width: 83%;
+    display: inline-block;
+}
+.pgs{
+    color: #33F487;
+    background: #33F487;
+    border-radius: 69px;
+    width: 84%;
+    margin: 0 10px;
+}
+.pgst{
+	width: 66%;
+}
+.jindu{
+    margin: 15px;
+}
+.conten{
+	padding: 6px;
+	text-align: center;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	}
+.conten .divs{
+    padding-top: 20px;
+    width: 25%;
+	border: 1px solid #ccc;
+}
+.conten .divs .progress{
+    width: 73%;
+	border: 1px solid #ccc;
+}
+.conten .divs .num{
+    position: relative;
+    /* margin-right: 10px; */
+    top: -26px;
+}
+.conten div p{
+	margin-bottom: 5px;
+}
+#popup .p{
+	margin: 10px 0;
+}
+.spjian img{
+width: 12px;
+}

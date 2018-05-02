@@ -7,6 +7,7 @@ if __project_path not in sys.path:
 import mongo_db
 from hashlib import md5
 import datetime
+from bson.objectid import ObjectId
 from module.project_module import Category
 import jwt
 from log_module import get_logger
@@ -33,10 +34,9 @@ class User(mongo_db.BaseDoc):
     type_dict['nick_name'] = str
     type_dict['user_password'] = str
     """
-    用户组 分为 admin(管理员)/worker(操作者)/guest(来宾) 3类
+    用户组 分为 admin(管理员)/worker(操作者) 2类
     admin: 除拥有所有worker的操作权限外，还能管理账户和Category
-    worker： 能操作Project，Module和Task
-    guest： 只有查看的权限，
+    worker： 视权限设定，能操作Project，Module和Task,也有查看的权限
     """
     type_dict['group'] = str
     """
@@ -159,6 +159,30 @@ class User(mongo_db.BaseDoc):
             raise ValueError(ms)
 
     @classmethod
+    def update_user(cls, user_id: (str, ObjectId), update_dict: dict) -> (None, mongo_db.BaseDoc):
+        """
+        编辑一个对象
+        :param user_id:
+        :param update_dict:
+        :return:
+        """
+        instance = cls.find_by_id(user_id)
+        if isinstance(instance, cls):
+            for k, v in update_dict.items():
+                instance.set_attr(k, v)
+            r = instance.save_plus()
+            if isinstance(r, ObjectId):
+                return instance
+            else:
+                ms = "保存用户失败：instance = {}".format(instance.to_flat_dict())
+                print(ms)
+                logger.exception(ms)
+        else:
+            ms = "错误的user_id：{}".format(user_id)
+            print(ms)
+            logger.exception(ms)
+
+    @classmethod
     def change_password(cls, user_id: (str, ObjectId), new_password: str) -> bool:
         """
         修改密码
@@ -248,7 +272,7 @@ class User(mongo_db.BaseDoc):
         :param can_json:
         :return:
         """
-        f = {"user_name": {"ne": "proot"}}
+        f = {"user_name": {"$ne": "proot"}}
         users = cls.find_plus(filter_dict=f, can_json=can_json)
         return users
 

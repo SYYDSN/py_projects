@@ -4,6 +4,7 @@
 {% endblock %}
 {% block extend_js %}
     <!--页面专属js脚本-->
+    <script src="../static/js/jquery.md5.js"></script>
     <script src="../static/js/manage_user.js"></script>
 {% endblock %}
 
@@ -21,7 +22,18 @@
                     {% endfor %}
                     <th>操作</th>
                 </tr>
-
+                {% for user in users %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ user['user_name'] }}</td>
+                        <td>{{ user['nick_name'] }}</td>
+                        {% for c in user['category_list'] %}
+                            <td data-id="{{ c['_id'] }}">
+                            {{ "浏览&编辑" if c['status'][1] == 1 else ( "" if c['status'][0] == 0 else '浏览') }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
                 <tr>
                     <td colspan="{{ column_length }}">
                         <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#add_user_modal">添加</button>
@@ -40,9 +52,13 @@
           </div>
           <div class="modal-body my_modal_body">
             <div>
+            <div class="form-group">
+                <label for="nick_name">姓名/昵称</label>
+                <input type="text" class="form-control" id="nick_name" placeholder="请输入姓名/昵称">
+              </div>
               <div class="form-group">
                 <label for="user_name">用户名</label>
-                <input type="email" class="form-control" id="user_name" placeholder="请输入用户名">
+                <input type="text" class="form-control" id="user_name" placeholder="请输入用户名">
               </div>
               <div class="form-group">
                 <label for="user_password">用户密码</label>

@@ -66,7 +66,12 @@
                     }
                     else {
                         $("#handler_name,#handler_password").val("");
-                        location.href = "/manage_user";
+                        if(data['data']['group'] === "admin"){
+                            location.href = "/manage_user/view";
+                        }
+                        else{
+                            location.href = "/home_all/view";
+                        }
                     }
                 });
             }

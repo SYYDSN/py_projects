@@ -1,0 +1,148 @@
+.content  .dv-left{
+    padding: 15px;
+    width: 30%;
+    display: inline-block;
+    height: 49vw;
+    box-shadow: 2px 0 5px #ccc;
+    position: relative;
+}
+.content  .dv-left .spn{
+    font-size: 30px;
+    margin-right: 25px;
+}
+.content  .dv-left .active{
+    color: #4e7af5;
+}
+.content  .dv-left .title{
+    padding: 20px 0;
+}
+.content  .dv-left table tr{
+    text-align: center;
+}
+.content  .dv-left table th{
+    text-align: center;
+    
+}
+.content  .dv-left table th span{
+    text-align: center;
+       
+}
+.content .dv-left table thead tr th{
+    font-size: 14px;
+}
+.content .dv-left table tbody tr td{
+    font-size: 12px;
+}
+.content .dv-left .gundt{
+	width: 102%;
+    overflow-y: auto;
+    height: 34vw;
+    margin-top: -22px;
+    margin-left: -7px;
+}
+.content .dv-left table tbody tr td .spn{
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+}
+.content .list {
+    position: relative;
+}
+.content .list .xian{
+    width: 108%;
+    height: 1px;
+    display: inline-block;
+    background-color: #CCC; 
+    position: absolute;
+    top: 52px;
+    left: -15px;
+}
+
+.content .dibu .tuichu img{
+    width: 20px;
+    transform: rotate(180deg)
+}
+.content .dibu .tianjia{
+    display: inline-block;
+    width: 78%;
+    text-align: center;
+    color: #8698FD;
+}
+.content .dibu{
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+.actives{
+    background: #00E07F;
+    border-radius: 50%;
+}
+
+
+/*右边样式  */
+.content .dv-right{
+    display: inline-block;
+    width: 69.99%;
+    margin: 21px 0;
+    float: right;
+}
+.content .dv-right .top ul{
+    height: 27px;
+    border-bottom: 1px solid #CCC;
+    padding-left: 15px;
+}
+.content .dv-right .top ul li{
+    float: left;
+    font-size: 14px;
+    margin-right: 50px;
+
+}
+.content .dv-right .top ul  .xian{
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4C79FF;
+}
+.content .dv-right .top ul li:hover{
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4C79FF; 
+}
+.content .dv-right .top .time-title{
+    text-align: center;
+    padding: 20px 0;
+    font-size: 18px;
+}
+.content .dv-right table thead tr span{
+    display: inline-block;
+    width: 100%;
+    background: #DCEBFF;
+    padding: 5px;
+    font-weight: 100;
+    text-align: center;
+}
+.span{
+    background: darkblue;
+}
+.content .dv-right table tbody tr td{
+    border: 1px solid #ccc;
+    /* display: inline-block; */
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+.content .dv-right table tbody tr span{
+    display: inline-block;
+    width: 100%;
+    height: 30px;
+}
+.content .dv-right table {
+    margin-top: 12px;
+}
+.content .dv-right .gundong{
+    overflow-x: auto;
+    overflow-y:hidden;
+}
+.content .dv-right .coll{
+    width: 300%;
+}
+.content .dv-right .coll .tab{
+    width: 33.3%;
+}
