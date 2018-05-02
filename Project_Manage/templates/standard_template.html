@@ -9,8 +9,16 @@
     <script src="../static/js/jquery-3.2.1.min.js"></script>
     <script src="../static/js/bootstrap.min.js"></script>
     <script src="../static/js/common.js"></script>
+    <!-- 某一类页面的专属css脚本-->
+    {% block class_css %}
+
+    {% endblock %}
     <!-- 页面专属css脚本-->
     {% block extend_css %}
+
+    {% endblock %}
+    <!-- 某一类页面的专属js脚本-->
+    {% block class_js %}
 
     {% endblock %}
     <!--页面专属js脚本-->
@@ -22,6 +30,9 @@
 </head>
 <body>
 <div class="container-fluid">
+    <!--导航区域-->
+    {% block nav %}
+    {% endblock %}
     <!--正文区-->
     {% block main %}
     {% endblock %}

@@ -1,0 +1,25 @@
+html{
+    font-size: 14px;
+}
+#table_container{
+    padding-top: 1rem;
+}
+
+table td{
+    text-align: left;
+}
+.flat_btn:hover{
+    cursor: pointer;
+}
+.my_modal_content{
+    height: 560px !important;
+}
+.my_modal_body{
+    height: 78% !important;
+}
+.my_group{
+    border: 1px solid lightgray;
+    border-radius: 0.5rem;
+    width: 100%;
+    min-height: 4rem;
+}

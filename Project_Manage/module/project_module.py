@@ -15,13 +15,19 @@ DBRef = mongo_db.DBRef
 BaseDoc = mongo_db.BaseDoc
 
 
+class RepeatInstanceError(ValueError):
+    """自定义一个异常,用于提醒错误的种类"""
+    pass
+
+
 class Category(BaseDoc):
     """项目的类别，比如前端？后端？app？"""
     _table_name = "category_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['name'] = str
-    type_dict['path'] = str
+    type_dict['path'] = str  # url的path
+    type_dict['status'] = str  # 状态 normal/stop/invalid  正常/停用/无效(相当于删除一个记录)
 
     def __init__(self, **kwargs):
         if "name" not in kwargs:
@@ -40,21 +46,47 @@ class Category(BaseDoc):
                 raise ValueError(ms)
             else:
                 pass
+        if 'status' not in kwargs:
+            kwargs['status'] = "normal"
         super(Category, self).__init__(**kwargs)
 
     @classmethod
     def add_instance(cls, **kwargs) -> (None, BaseDoc):
         """
         添加一个实例
+        此方法需要被子类重写.
         :param kwargs:
         :return:
         """
-        instance = cls(**kwargs)
-        r = instance.insert()
-        if isinstance(r, ObjectId):
-            return instance
+        the_path = kwargs.get("path")
+        if the_path is None:
+            raise ValueError("path参数必须")
         else:
-            return None
+            condition_dict = {"path": the_path}
+            if cls.exists(condition_dict=condition_dict):
+                raise RepeatInstanceError("重复的对象")
+            else:
+                instance = cls(**kwargs)
+                r = instance.insert()
+                if isinstance(r, ObjectId):
+                    return instance
+                else:
+                    return None
+
+    @classmethod
+    def exists(cls, condition_dict: dict) -> bool:
+        """
+        添加实例之前,用于判断是否有重复的实例存在?
+        :param condition_dict: 判断是否重复的条件字典
+        :return:
+        """
+        f = {"status": {"$ne": "invalid"}}
+        f.update(condition_dict)
+        r = cls.find_one_plus(filter_dict=f)
+        if r is None:
+            return False
+        else:
+            return True
 
     @classmethod
     def update_instance(cls, o_id: (str, ObjectId), update_dict: dict) -> (None, BaseDoc):
@@ -91,6 +123,114 @@ class Category(BaseDoc):
         if isinstance(instance, cls):
             r = instance.delete_self()
             return r
+        else:
+            ms = "找不到对应的实例，o_id:{}".format(o_id)
+            logger.exception(ms)
+            print(ms)
+            return False
+
+    @classmethod
+    def get_all(cls, ignore: list = ['invalid'], can_json: bool = False) -> list:
+        """
+        查询所有记录,
+        :param ignore:  ignore 数组,哪些status可以忽略?
+        :param can_json:
+        :return:
+        """
+        f = {"status": {"$nin": ignore}}
+        return cls.find_plus(filter_dict=f, can_json=can_json)
+
+    @classmethod
+    def drop(cls, o_id) -> bool:
+        """
+        修改一个实例的状态为invalid（无效） ，这相当与删除一个对象
+        :param o_id:
+        :return:
+        """
+        instance = cls.find_by_id(o_id)
+        if isinstance(instance, cls):
+            instance.set_attr("status", "invalid")
+            r = instance.save_plus()
+            if isinstance(r, ObjectId):
+                return True
+            else:
+                ms = "删除失败，o_id:{}".format(o_id)
+                logger.exception(ms)
+                print(ms)
+                return False
+        else:
+            ms = "找不到对应的实例，o_id:{}".format(o_id)
+            logger.exception(ms)
+            print(ms)
+            return False
+
+    @classmethod
+    def up(cls, o_id) -> bool:
+        """
+        修改一个实例的状态为normal（正常） ，这相当与启用一个对象
+        :param o_id:
+        :return:
+        """
+        instance = cls.find_by_id(o_id)
+        if isinstance(instance, cls):
+            instance.set_attr("status", "normal")
+            r = instance.save_plus()
+            if isinstance(r, ObjectId):
+                return True
+            else:
+                ms = "删除失败，o_id:{}".format(o_id)
+                logger.exception(ms)
+                print(ms)
+                return False
+        else:
+            ms = "找不到对应的实例，o_id:{}".format(o_id)
+            logger.exception(ms)
+            print(ms)
+            return False
+
+    @classmethod
+    def down(cls, o_id) -> bool:
+        """
+        修改一个实例的状态为stop（正常） ，这相当与停用一个对象
+        :param o_id:
+        :return:
+        """
+        instance = cls.find_by_id(o_id)
+        if isinstance(instance, cls):
+            instance.set_attr("status", "stop")
+            r = instance.save_plus()
+            if isinstance(r, ObjectId):
+                return True
+            else:
+                ms = "删除失败，o_id:{}".format(o_id)
+                logger.exception(ms)
+                print(ms)
+                return False
+        else:
+            ms = "找不到对应的实例，o_id:{}".format(o_id)
+            logger.exception(ms)
+            print(ms)
+            return False
+
+    @classmethod
+    def change_status(cls, o_id, status: str) -> bool:
+        """
+        修改一个实例的状态,作为drop/up/stop三种方法的补充.
+        :param o_id:
+        :param status:
+        :return:
+        """
+        instance = cls.find_by_id(o_id)
+        if isinstance(instance, cls):
+            instance.set_attr("status", status)
+            r = instance.save_plus()
+            if isinstance(r, ObjectId):
+                return True
+            else:
+                ms = "修改失败，o_id:{}，status:{}".format(o_id, status)
+                logger.exception(ms)
+                print(ms)
+                return False
         else:
             ms = "找不到对应的实例，o_id:{}".format(o_id)
             logger.exception(ms)
@@ -160,77 +300,30 @@ class Project(Category):
         super(Project, self).__init__(**kwargs)
 
     @classmethod
-    def invalidate(cls, o_id) -> bool:
+    def add_instance(cls, **kwargs) -> (None, BaseDoc):
         """
-        修改一个实例的状态为invalid（无效） ，这相当与删除一个对象
-        :param o_id:
+        添加一个实例
+        此方法需要被子类重写.
+        :param kwargs:
         :return:
         """
-        instance = cls.find_by_id(o_id)
-        if isinstance(instance, cls):
-            instance.set_attr("status", "invalid")
-            r = instance.save_plus()
-            if isinstance(r, ObjectId):
-                return True
-            else:
-                ms = "删除失败，o_id:{}".format(o_id)
-                logger.exception(ms)
-                print(ms)
-                return False
+        category_id = kwargs.get("category_id")
+        name = kwargs.get("name")
+        if not isinstance(category_id, DBRef):
+            raise ValueError("category_id参数错误")
+        elif name == "" or name is None:
+            raise ValueError("name参数错误")
         else:
-            ms = "找不到对应的实例，o_id:{}".format(o_id)
-            logger.exception(ms)
-            print(ms)
-            return False
-
-    @classmethod
-    def validate(cls, o_id) -> bool:
-        """
-        修改一个实例的状态为normal（正常） ，这相当与启用一个对象
-        :param o_id:
-        :return:
-        """
-        instance = cls.find_by_id(o_id)
-        if isinstance(instance, cls):
-            instance.set_attr("status", "normal")
-            r = instance.save_plus()
-            if isinstance(r, ObjectId):
-                return True
+            f = {"name": name, "category_id": category_id}
+            if cls.exists(condition_dict=f):
+                raise RepeatInstanceError("重复的对象")
             else:
-                ms = "删除失败，o_id:{}".format(o_id)
-                logger.exception(ms)
-                print(ms)
-                return False
-        else:
-            ms = "找不到对应的实例，o_id:{}".format(o_id)
-            logger.exception(ms)
-            print(ms)
-            return False
-
-    @classmethod
-    def change_status(cls, o_id, status: str) -> bool:
-        """
-        修改一个实例的状态
-        :param o_id:
-        :param status:
-        :return:
-        """
-        instance = cls.find_by_id(o_id)
-        if isinstance(instance, cls):
-            instance.set_attr("status", status)
-            r = instance.save_plus()
+                instance = cls(**kwargs)
+            r = instance.insert()
             if isinstance(r, ObjectId):
-                return True
+                return instance
             else:
-                ms = "修改失败，o_id:{}，status:{}".format(o_id, status)
-                logger.exception(ms)
-                print(ms)
-                return False
-        else:
-            ms = "找不到对应的实例，o_id:{}".format(o_id)
-            logger.exception(ms)
-            print(ms)
-            return False
+                return None
 
     @classmethod
     def get_tasks(cls, o_id: (str, ObjectId), task_type: str = None, task_status: (str, list) = None,
@@ -474,6 +567,32 @@ class Module(Project):
         ms = "此方法只能在Project类中被调用"
         logger.exception(ms)
         raise AttributeError(ms)
+
+    @classmethod
+    def add_instance(cls, **kwargs) -> (None, BaseDoc):
+        """
+        添加一个实例
+        此方法需要被子类重写.
+        :param kwargs:
+        :return:
+        """
+        project_id = kwargs.get("project_id")
+        name = kwargs.get("name")
+        if not isinstance(project_id, DBRef):
+            raise ValueError("project_id参数错误")
+        elif name == "" or name is None:
+            raise ValueError("name参数错误")
+        else:
+            f = {"name": name, "project_id": project_id}
+            if cls.exists(condition_dict=f):
+                raise RepeatInstanceError("重复的对象")
+            else:
+                instance = cls(**kwargs)
+            r = instance.insert()
+            if isinstance(r, ObjectId):
+                return instance
+            else:
+                return None
 
     @classmethod
     def add_task(cls, o_id: (str, ObjectId), task_dbref: DBRef) -> bool:
@@ -781,6 +900,59 @@ class Task(Project):
         ms = "此方法只能在Project类中被调用"
         logger.exception(ms)
         raise AttributeError(ms)
+
+    @classmethod
+    def drop(cls, o_id) -> None:
+        """
+        废弃父类的方法
+        """
+        ms = "此方法在Task类中被废弃,请用Task.change_status方法"
+        logger.exception(ms)
+        raise AttributeError(ms)
+
+    @classmethod
+    def up(cls, o_id) -> None:
+        """
+        废弃父类的方法
+        """
+        ms = "此方法在Task类中被废弃,请用Task.change_status方法"
+        logger.exception(ms)
+        raise AttributeError(ms)
+
+    @classmethod
+    def down(cls, o_id) -> None:
+        """
+        废弃父类的方法
+        """
+        ms = "此方法在Task类中被废弃,请用Task.change_status方法"
+        logger.exception(ms)
+        raise AttributeError(ms)
+
+    @classmethod
+    def add_instance(cls, **kwargs) -> (None, BaseDoc):
+        """
+        添加一个实例
+        此方法需要被子类重写.
+        :param kwargs:
+        :return:
+        """
+        project_id = kwargs.get("project_id")
+        name = kwargs.get("name")
+        if not isinstance(project_id, DBRef):
+            raise ValueError("project_id参数错误")
+        elif name == "" or name is None:
+            raise ValueError("name参数错误")
+        else:
+            f = {"name": name, "project_id": project_id}
+            if cls.exists(condition_dict=f):
+                raise RepeatInstanceError("重复的对象")
+            else:
+                instance = cls(**kwargs)
+            r = instance.insert()
+            if isinstance(r, ObjectId):
+                return instance
+            else:
+                return None
 
 
 if __name__ == "__main__":

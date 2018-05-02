@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>上海苏秦网络科技有限公司</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/public.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <script src="../static/js/jquery-3.2.1.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.md5.js"></script>
+</head>
+<body>
+<div class="sign-in">
+    <!-- <img src="./images/img_ditu.jpg" alt=""> -->
+    <div class="sign">
+        <p class="title"><img src="../static/images/icon_logo.svg" alt=""> 苏秦网络</p>
+        <div class="border">
+            <p>登录</p>
+            <p>请输入您的手机号和密码</p>
+            <p class="inp"><input id="handler_name" type="text" placeholder="输入手机号"></p>
+            <p class="inp inps"><input id="handler_password" type="password" placeholder="输入密码"></p>
+            <div class="anniu">
+                <span id="submit_btn">登录</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+
+        // 提交前检查表单
+        function check_form() {
+            if ($.trim($("#handler_name").val()) == "") {
+                alert("用户名错误");
+                $("#submit_btn").removeAttr("disabled");
+                return false;
+            }
+            else if ($.trim($("#handler_password").val()) == 0 || $.trim($("#handler_password").val()).length < 6) {
+                alert("密码至少6位");
+                $("#submit_btn").removeAttr("disabled");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        // 提交事件
+        $("#submit_btn").click(function () {
+            if (check_form()) {
+                var user_name = $.trim($("#handler_name").val());
+                var user_password = $.md5($.trim($("#handler_password").val()));
+                // var referrer = document.referrer;
+                var args = {
+                    "user_name": user_name, "user_password": user_password
+                };
+                $.post("/login", args, function (resp) {
+                    $("#submit_btn").removeAttr("disabled");
+                    let data = JSON.parse(resp);
+                    if (data['message'] !== 'success') {
+                        alert(data['message']);
+                        location.reload();
+                    }
+                    else {
+                        $("#handler_name,#handler_password").val("");
+                        location.href = "/manage_user";
+                    }
+                });
+            }
+        });
+
+
+        //end!
+    });
+</script>
+</body>
+</html>

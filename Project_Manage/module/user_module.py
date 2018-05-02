@@ -47,6 +47,7 @@ class User(mongo_db.BaseDoc):
     可以编辑的类别组。默认为空，不能操作任何类别
     """
     type_dict['allow_edit'] = list
+    type_dict['status'] = int  # 0表示不可用,1表示可用
     type_dict['create_date'] = datetime.datetime
 
     def __init__(self, **kwargs):
@@ -80,6 +81,8 @@ class User(mongo_db.BaseDoc):
             kwargs['allow_view'] = list()
         if "allow_edit" not in kwargs:
             kwargs['allow_edit'] = list()
+        if "status" not in kwargs:
+            kwargs['status'] = 1
         if "create_date" not in kwargs:
             kwargs['create_date'] = datetime.datetime.now()
         super(User, self).__init__(**kwargs)
@@ -101,7 +104,13 @@ class User(mongo_db.BaseDoc):
                     user_password_db = user['user_password']
                     if user_password.lower() == user_password_db.lower():
                         nick_name = '' if user.get("nick_name") is None else user['nick_name']
-                        mes['data'] = {"_id": str(user['_id']), "nick_name": nick_name}
+                        user_id = user['_id']
+                        group = user['group']
+                        data = {"_id": str(user_id), "nick_name": nick_name, "group": group}
+                        """获取访问规则"""
+                        rule_dict = cls.access_rule(user_id=user_id)
+                        data.update(rule_dict)
+                        mes['data'] = data
                     else:
                         mes['message'] = "密码错误"
                 else:
@@ -212,24 +221,36 @@ class User(mongo_db.BaseDoc):
         res = dict()
         user = cls.find_by_id(user_id)
         if isinstance(user, cls):
-            key = "user_rule_{}".format(str(user_id))
-            rule_dict = cache.get(key)
-            if rule_dict is None:
-                """第一次访问"""
-                view_ids = user.get_attr("allow_access")
+            view_ids = user.get_attr("allow_access")
+            if view_ids is None or len(view_ids) == 0:
+                v_rules = dict()
+            else:
                 f = {"_id": {"$in": view_ids}}
                 views = Category.find_plus(filter_dict=f, to_dict=True)
                 v_rules = {x['path']: x['name'] for x in views}
-                edit_ids = user.get_attr("allow_edit")
+            edit_ids = user.get_attr("allow_edit")
+            if edit_ids is None or len(edit_ids) == 0:
+                e_rules = dict()
+            else:
                 f = {"_id": {"$in": edit_ids}}
                 edits = Category.find_plus(filter_dict=f, to_dict=True)
                 e_rules = {x['path']: x['name'] for x in edits}
-                res['view'] = v_rules
-                res['edit'] = e_rules
-                cache.set(key=key, value=res, timeout=86400)
-            else:
-                res = rule_dict
+            res['view'] = v_rules
+            res['edit'] = e_rules
+        else:
+            pass
         return res
+
+    @classmethod
+    def get_all(cls, can_json: bool = False) -> list:
+        """
+        获取不包括管理员(proot)在内的全部用户,
+        :param can_json:
+        :return:
+        """
+        f = {"user_name": {"ne": "proot"}}
+        users = cls.find_plus(filter_dict=f, can_json=can_json)
+        return users
 
 
 class Identity:

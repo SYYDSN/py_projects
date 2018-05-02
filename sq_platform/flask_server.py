@@ -17,6 +17,9 @@ from mongo_db import cache
 keystr = os.urandom(24)  # 生成密钥，为session服务。
 app = Flask(__name__)
 app.config['SECRET_KEY'] = keystr  # 配置会话密钥
+app.config['SESSION_TYPE'] = "redis"  # session类型为redis
+app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
+# app.config['SERVER_NAME'] = "127.0.0.1:8001"  此域名下的所有子域名的session都会接受
 app.register_blueprint(api_user_blueprint)
 app.register_blueprint(api_data_blueprint)
 app.register_blueprint(manage_blueprint)

@@ -10,16 +10,17 @@ from werkzeug.contrib.cache import RedisCache
 from flask_session import Session
 from log_module import get_logger
 import json
-from module.user_module import Identity
+from json import JSONDecodeError
+from module.user_module import *
+from module.project_module import *
 from tools_module import *
 import os
 
 
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
 app = Flask(__name__)
-SESSION_TYPE = "redis"
 app.config['SECRET_KEY'] = secret_key  # 配置会话密钥
-app.config['SESSION_TYPE'] = SESSION_TYPE  # session类型为redis
+app.config['SESSION_TYPE'] = "redis"  # session类型为redis
 app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
 # app.config['SERVER_NAME'] = "127.0.0.1:8001"  此域名下的所有子域名的session都会接受
 Session(app)
@@ -65,6 +66,7 @@ def verify_token(f):
 
 
 @app.route("/index", methods=['get'])
+@check_platform_session
 def index_func():
     """首页"""
     return "hello world"
@@ -82,15 +84,124 @@ def login_func():
     """登录页"""
     if request.method.lower() == "get":
         login_title = "Login"
-        return render_template("login.html", login_title=login_title)
+        return render_template("login_new.html", login_title=login_title)
     elif request.method.lower() == "post":
         user_name = get_arg(request, "user_name")
         user_password = get_arg(request, "user_password")
         """管理员用户 proot/P@root1234"""
-        mes = Identity.user_login(user_name, user_password)
+        mes = User.login(user_name, user_password)
+        if mes['message'] == "success":
+            save_dict = mes['data']
+            save_dict['user_name'] = user_name
+            save_dict['user_password'] = user_password
+            save_platform_session(**save_dict)
+
+        else:
+            clear_platform_session()
         resp = make_response(json.dumps(mes))
-        resp.headers.set("Access-Control-Allow-Origin", "*")
+        # resp.headers.set("Access-Control-Allow-Origin", "*")
         return resp
+    else:
+        return abort(405)
+
+
+@app.route("/manage_<key1>/<key2>", methods=['post', 'get'])
+def manage_user_func(key1, key2):
+    """
+    管理页面,只有proot用户能访问
+    key1 是页面的类别,key2是不同的操作,其中get请求不需要key2
+    """
+    if request.method.lower() == "get":
+        """获取全部category"""
+        categories = Category.get_all(ignore=["invalid"], can_json=True)
+        categories.sort(key=lambda obj: obj['name'])
+        if key1 == "user":
+            """用户管理界面"""
+            category_names = [x['name'] for x in categories]
+            column_length = 4 + len(category_names)
+            return render_template("manage_user.html", category_names=category_names, key=key1,
+                                   column_length=column_length, categories=categories)
+        elif key1 == "category":
+            """类别管理"""
+            return render_template("manage_category.html", key=key1, categories=categories)
+        else:
+            return abort(404)
+    elif request.method.lower() == "post":
+        if key1 == "user":
+            """用户管理"""
+            mes = {"message": "success"}
+            if key2 == "add":
+                """添加用户"""
+                args = get_args(request)
+                r = None
+                try:
+                    r = Category.add_instance(**args)
+                except Exception as e:
+                    mes['message'] = str(e)
+                finally:
+                    if r is None and mes['message'] == "success":
+                        mes['message'] = "添加失败"
+                    else:
+                        pass
+            else:
+                return abort(401)  # 未授权
+            return json.dumps(mes)
+        elif key1 == "category":
+            """类别管理"""
+            mes = {"message": "success"}
+            if key2 == "add":
+                """添加"""
+                args = get_args(request)
+                r = None
+                try:
+                    r = Category.add_instance(**args)
+                except Exception as e:
+                    mes['message'] = str(e)
+                finally:
+                    if r is None and mes['message'] == "success":
+                        mes['message'] = "添加失败"
+                    else:
+                        pass
+            elif key2 == "edit":
+                """编辑"""
+                o_id = get_arg(request, "o_id")
+                update_dict = None
+                try:
+                    update_dict = json.loads(get_arg(request, "update_dict"))
+                except JSONDecodeError as e:
+                    print(e)
+                finally:
+                    if update_dict is None:
+                        mes['message'] = 'update字典不能为空'
+                    else:
+                        r = None
+                        try:
+                            r = Category.update_instance(o_id=o_id, update_dict=update_dict)
+                        except Exception as e:
+                            mes['message'] = str(e)
+                        finally:
+                            if r is None and mes['message'] == "success":
+                                mes['message'] = "添加失败"
+                            else:
+                                pass
+            elif key2 == "delete":
+                """删除类别"""
+                o_id = get_arg(request, "o_id")
+                r = None
+                try:
+                    r = Category.delete_instance(o_id=o_id)
+                except Exception as e:
+                    mes['message'] = str(e)
+                finally:
+                    if r is None and mes['message'] == "success":
+                        mes['message'] = "删除失败"
+                    else:
+                        pass
+            else:
+                return abort(401)  # 未授权
+            return json.dumps(mes)
+        else:
+            return abort(403)  # 禁止访问
     else:
         return abort(405)
 
