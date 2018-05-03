@@ -106,7 +106,11 @@ class User(mongo_db.BaseDoc):
                         nick_name = '' if user.get("nick_name") is None else user['nick_name']
                         user_id = user['_id']
                         group = user['group']
-                        data = {"_id": str(user_id), "nick_name": nick_name, "group": group}
+                        data = {
+                            "_id": str(user_id), "nick_name": nick_name, "group": group,
+                            "allow_view": [str(x) for x in user['allow_view']],
+                            "allow_edit": [str(x) for x in user['allow_edit']]
+                        }
                         """获取访问规则"""
                         rule_dict = cls.access_rule(user_id=user_id)
                         data.update(rule_dict)

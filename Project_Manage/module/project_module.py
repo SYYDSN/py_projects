@@ -249,6 +249,8 @@ class Project(Category):
     type_dict['status'] = str    # 状态 normal/stop/suspend/invalid
     type_dict['module_list'] = list  # 模块的列表
     type_dict['create_date'] = datetime.datetime
+    type_dict['begin_date'] = datetime.datetime
+    type_dict['end_date'] = datetime.datetime
 
     def __init__(self, **kwargs):
         if "name" not in kwargs:
@@ -297,7 +299,7 @@ class Project(Category):
                 raise ValueError(ms)
             else:
                 pass
-        super(Project, self).__init__(**kwargs)
+        mongo_db.BaseDoc.__init__(self, **kwargs)
 
     @classmethod
     def add_instance(cls, **kwargs) -> (None, BaseDoc):
@@ -542,7 +544,7 @@ class Module(Project):
                 raise ValueError(ms)
             else:
                 pass
-        super(Project, self).__init__(**kwargs)
+        mongo_db.BaseDoc.__init__(self, **kwargs)
 
     @classmethod
     def add_module(cls, o_id: (str, ObjectId), module_dbref: DBRef) -> bool:
@@ -773,7 +775,7 @@ class Task(Project):
     """
     type_dict['status'] = str
     type_dict['type'] = str  # 任务类型 feature（功能）/debug（除虫），默认feature
-    type_dict['task_list'] = list  # 任务的列表
+    # type_dict['task_list'] = list  # 任务的列表
     type_dict['create_date'] = datetime.datetime
     type_dict['begin_date'] = datetime.datetime  # 计划的开始日期 2018-4-10 00：00：00
     type_dict['end_date'] = datetime.datetime   # 计划的结束日期 2018-4-10 00：00：00
@@ -875,7 +877,7 @@ class Task(Project):
                 raise ValueError(ms)
             else:
                 pass
-        super(Project, self).__init__(**kwargs)
+        mongo_db.BaseDoc.__init__(self, **kwargs)
 
     @classmethod
     def add_module(cls, o_id: (str, ObjectId), module_dbref: DBRef) -> None:

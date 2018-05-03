@@ -146,3 +146,28 @@
 .content .dv-right .coll .tab{
     width: 33.3%;
 }
+.work{
+    border: 1px solid #ccc;
+}
+.work>span{
+    background-color: #4EEE94 !important;
+}
+.rest{
+    border: 1px solid #ccc;
+}
+.rest>span{
+     background-color: 	#ADADAD !important;
+}
+.select_category:hover, .select_category_active:hover{
+    cursor: pointer;
+}
+.select_category_active{
+    background-color: #8470FF;
+    color: white;
+}
+#project_list{
+    display: none;
+}
+.modal input[type='radio']{
+    margin-left:1rem;
+}

@@ -3,6 +3,7 @@ from flask import Flask
 from flask import abort
 from flask import make_response
 from flask import render_template
+from flask_debugtoolbar import DebugToolbarExtension
 from flask import render_template_string
 from flask import send_file
 from flask import request
@@ -14,6 +15,7 @@ from json import JSONDecodeError
 from module.user_module import *
 from module.project_module import *
 from tools_module import *
+import calendar
 import os
 
 
@@ -94,6 +96,8 @@ def login_func():
             save_dict = mes['data']
             save_dict['user_name'] = user_name
             save_dict['user_password'] = user_password
+            save_dict['allow_view'] = mes['data']['allow_view']
+            save_dict['allow_edit'] = mes['data']['allow_edit']
             save_platform_session(**save_dict)
 
         else:
@@ -305,15 +309,113 @@ def home_func(key1, key2):
     :param key2:
     :return:
     """
-    cur_method = request.method.lower()
-    if cur_method == "get":
-        if key1 == "all":
-            """登录后的主页，所有用户都能查看"""
-            return render_template("home.html")
-    elif cur_method == "post":
-        pass
+    categories = Category.get_all(can_json=True)
+    category_dict = {x['_id']: x for x in categories}
+    group = get_platform_session_arg("group")
+    allow_view_ids = get_platform_session_arg("allow_view")
+    allow_view = [category_dict[x]['path'] for x in allow_view_ids]
+    allow_edit_ids = get_platform_session_arg("allow_edit")
+    allow_edit = [category_dict[x]['path'] for x in allow_edit_ids]
+    all_projects = Project.get_all(can_json=True)
+    allow_edit_projects = dict()  # 允许编辑的项目的字典,key是category的id
+    allow_edit_pid_name = list()     # 允许编辑的项目的id和name组成的字典的数组
+    allow_edit_pids = list()     # 允许编辑的项目的id组成的数组
+    for x in allow_edit_ids:
+        p_list = list()
+        for y in all_projects:
+            category_id = y['category_id']
+            if category_id == x:
+                p_id = y['_id']
+                allow_edit_pids.append(p_id)
+                allow_edit_pid_name.append({"_id": p_id, "name": y['name']})
+                p_list.append(y)
+        allow_edit_projects[x] = p_list
+    modules = Module.get_all(can_json=True)
+    allow_edit_modules = dict()  # 允许编辑的模块的字典,key是project的id
+    """写到这里"""
+    today = datetime.datetime.today()
+    year = today.year
+    month = today.month
+    current_month_str = "{}年{}月".format(year, month)
+    first_day, last_day = calendar.monthrange(year, month)
+    days = list()
+    week_dict = {0: "一", 1: "二", 2: "三", 3: "四", 4: "五", 5: "六", 6: "日"}
+    weeks = list()
+    for i in range(first_day, last_day + 1):
+        days.append(i)
+        day = datetime.date(year=year, month=month, day=i)
+        weeks.append(week_dict[day.weekday()])
+    if group != "worker":
+        """管理员不能访问此页面"""
+        return redirect(url_for("login_func"))
     else:
-        return abort(405)
+        cur_method = request.method.lower()
+        if cur_method == "get":
+            if key1 == "all":
+                """登录后的主页，所有用户都能查看"""
+                f = {"status": {"$nin": ['invalid']}}
+                s = {"project_id": -1, "module_id": -1, "status": -1, "type": -1}
+                tasks = Task.find_plus(filter_dict=f, sort_dict=s, can_json=True)
+                return render_template("home.html", tasks=tasks, allow_edit=allow_edit, categories=categories,
+                                       allow_view=allow_view, cur_method=cur_method, days=days, weeks=weeks,
+                                       current_month=current_month_str, projects=allow_edit_projects)
+        elif cur_method == "post":
+            mes = {"message": "success"}
+            if key1 == "project":
+                """项目"""
+                if key2 == "add":
+                    """添加"""
+                    args = get_args(request)
+                    category_id = args.get("category_id")
+                    if category_id is None or len(category_id) != 24:
+                        mes['message'] = "category_id参数错误"
+                    else:
+                        category_dbref = DBRef(collection=Category.get_table_name(), id=ObjectId(category_id))
+                        args['category_id'] = category_dbref
+                        r = None
+                        try:
+                            r = Project.add_instance(**args)
+                        except Exception as e:
+                            mes['message'] = str(e)
+                        finally:
+                            if r is None and mes['message'] == "success":
+                                mes['message'] = "添加失败"
+                            else:
+                                pass
+                elif key2 == "edit":
+                    """编辑"""
+                else:
+                    return abort(401)
+            elif key1 == "module":
+                """模块"""
+                if key2 == "add":
+                    """添加"""
+                    args = get_args(request)
+                    project_id = args.get("project_id")
+                    if project_id is None or len(project_id) != 24:
+                        mes['message'] = "project_id参数错误"
+                    else:
+                        project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id))
+                        args['project_id'] = project_dbref
+                        r = None
+                        try:
+                            r = Module.add_instance(**args)
+                        except Exception as e:
+                            mes['message'] = str(e)
+                        finally:
+                            if r is None and mes['message'] == "success":
+                                mes['message'] = "添加失败"
+                            else:
+                                pass
+                elif key2 == "edit":
+                    """编辑"""
+                else:
+                    return abort(401)
+            else:
+                return abort(403)
+            return json.dumps(mes)
+        else:
+            return abort(405)
 
 
 @app.after_request
@@ -329,4 +431,7 @@ def allow_cross_domain(response):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=port, debug=True, threaded=True)
+    # app.debug = True  # 这一行必须在toolbar = DebugToolbarExtension(app)前面,否则不生效
+    # toolbar = DebugToolbarExtension(app)  # 开启html调试toolbar
+    # app.run(host="0.0.0.0", port=port, threaded=True)  # 开启DebugToolbar的调试模式. 对应app.debug = True
+    app.run(host="0.0.0.0", port=port, debug=True, threaded=True)  # 一般调试模式

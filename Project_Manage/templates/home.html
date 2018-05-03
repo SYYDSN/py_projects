@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="../static/css/public.css">
     <link rel="stylesheet" href="../static/css/modal.css">
     <link href="../static/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <script>
+        allow_view = {{ allow_view | safe }};
+        allow_edit = {{ allow_edit | safe }};
+        projects = {{ projects | safe }};
+    </script>
 </head>
 <body>
     <div class="content">
@@ -20,7 +25,7 @@
 
             </div>
             <div id="tbyone">
-                <div class="list" id="tbyones">
+                <div class="list"  id="task_list">
                     <i class="xian"></i>
                     <table style="border-collapse:separate; border-spacing:0px 24px;">
                         <thead>
@@ -40,12 +45,18 @@
                     	<tbody class="tby" onclick="clicks()" >
                             <!--
                             <tr id="details">
-                                <td> <span class="actives spn"></span> 施工准备</td>
+                                <td> <span class="actives spn"></span> 任务准备</td>
                                 <td>15天</td>
                                 <td>2018-4-10</td>
                                 <td>2018-4-25<span class="spjian"><img src="../images/icon_er.svg"/></span></td>
                             </tr>
                             -->
+                            <tr class="task_detail">
+                                <td> <span class="actives spn"></span> 任务准备</td>
+                                <td>15天</td>
+                                <td>2018-4-10</td>
+                                <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
+                            </tr>
 
                         </tbody>
                     </table>
@@ -53,7 +64,7 @@
                     </div>
                 </div>
             </div>
-            <div class="tbytwo" id="tbytwo">
+            <div class="tbytwo" id="project_list">
                 <div class="list" id="tbytwos">
                         <i class="xian"></i>
                         <table style="border-collapse:separate; border-spacing:0px 24px;">
@@ -71,79 +82,22 @@
 
 
                     <table style="border-collapse:separate; border-spacing:0px 24px;">
-                    	<tbody class="tby" onclick="clicks()" >
+                    	<tbody class="tby"onclick="clicks()" >
+                            <!--
                             <tr id="details">
                                 <td> <span class="actives spn"></span> 施工准备</td>
                                 <td>15天</td>
                                 <td>2018-4-10</td>
                                 <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
                             </tr>
-                            <tr>
-                                <td><span class="spn"></span> 施工准备</td>
+                            -->
+                        <tr id="details">
+                                <td> <span class="actives spn"></span> 项目准备</td>
                                 <td>15天</td>
                                 <td>2018-4-10</td>
                                 <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
                             </tr>
-                            <tr>
-                                    <td><span class="spn"></span>施工准备</td>
-                                    <td>15天</td>
-                                    <td>2018-4-10</td>
-                                    <td>2018-4-25 <span class="spjian"><img src="../static/images/icon_er.svg"/></span> </td>
-                                </tr>
-                                <tr>
-                                    <td><span class="spn"></span>施工准备</td>
-                                    <td>15天</td>
-                                    <td>2018-4-10</td>
-                                    <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                                </tr>
-                            <tr>
-                                <td><span class="spn"></span>施工准备</td>
-                                <td>15天</td>
-                                <td>2018-4-10</td>
-                                <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="spn"></span>施工准备</td>
-                                <td>15天</td>
-                                <td>2018-4-10</td>
-                                <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                            </tr>
-                            <tr>
-                                    <td><span class="spn"></span>施工准备</td>
-                                    <td>15天</td>
-                                    <td>2018-4-10</td>
-                                    <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                            </tr>
-                                <tr>
-                                    <td><span class="spn"></span>施工准备</td>
-                                    <td>15天</td>
-                                    <td>2018-4-10</td>
-                                    <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                                </tr>
-                            <tr>
-                                <td><span class="spn"></span>施工准备</td>
-                                <td>15天</td>
-                                <td>2018-4-10</td>
-                                <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="spn"></span>施工准备</td>
-                                <td>15天</td>
-                                <td>2018-4-10</td>
-                                <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                            </tr>
-                            <tr>
-                                    <td><span class="spn"></span>施工准备</td>
-                                    <td>15天</td>
-                                    <td>2018-4-10</td>
-                                    <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                            </tr>
-                            <tr>
-                                    <td><span class="spn"></span>施工准备</td>
-                                    <td>15天</td>
-                                    <td>2018-4-10</td>
-                                    <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                           </tr>
+
                         </tbody>
                     </table>
 
@@ -152,7 +106,7 @@
             </div>
                 <div class="dibu">
                     <span class="tuichu"><a href="../index.html"><img src="../static/images/icon_er.svg" alt=""></a></span>
-                    <span class="tianjia" data-toggle="modal" data-target=".bs-example-modal-lg">添加任务</span>
+                    <span class="tianjia" id="add_item" data-toggle="modal" data-target=".bs-example-modal-lg">添加项目</span>
                     <span>删除</span>
                 </div>
         </div>
@@ -160,533 +114,36 @@
         <div class="dv-right">
             <div class="top">
                 <ul>
-                    <li class="xian">全部</li>
-                    <li>开发</li>
-                    <li>安卓</li>
-                    <li>UI</li>
-                    <li>前端</li>
+                    <li class="xian"><a href="/home_all/view">全部</a></li>
+                    {% for category in categories %}
+                        <li><a href="/home_{{ category['path'] }}/view">{{ category['name'] }}</a></li>
+                    {% endfor %}
                 </ul>
-                <p class="time-title">2018年4月</p>
+                <p class="time-title">{{ current_month }}</p>
                 <div class="gundong">
                     <div class="coll">
                         <div class="tab">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th><span>1</span></th>
-                                        <th><span>2</span></th>
-                                        <th><span>3</span></th>
-                                        <th><span>4</span></th>
-                                        <th><span>5</span></th>
-                                        <th><span>6</span></th>
-                                        <th><span>7</span></th>
-                                        <th><span>8</span></th>
-                                        <th><span>9</span></th>
-                                        <th><span>10</span></th>
-                                        <th><span>11</span></th>
-                                        <th><span>12</span></th>
-                                        <th><span>13</span></th>
-                                        <th><span>14</span></th>
-                                        <th><span>15</span></th>
-                                        <th><span>16</span></th>
-                                        <th><span>17</span></th>
-                                        <th><span>18</span></th>
-                                        <th><span>19</span></th>
-                                        <th><span>20</span></th>
-                                        <th><span>21</span></th>
-                                        <th><span>22</span></th>
-                                        <th><span>23</span></th>
-                                        <th><span>24</span></th>
-                                        <th><span>25</span></th>
-                                        <th><span>26</span></th>
-                                        <th><span>27</span></th>
-                                        <th><span>28</span></th>
-                                        <th><span>29</span></th>
-                                        <th><span>30</span></th>
+                                        {% for day in days %}
+                                            <th><span>{{ day }}</span></th>
+                                        {% endfor %}
+                                    </tr>
+                                <tr>
+                                        {% for week in weeks %}
+                                            <th class="{{ "rest" if week == "六" or week == "日" else "work" }}"><span>{{ week }}</span></th>
+                                        {% endfor %}
                                     </tr>
                                 </thead>
                                 <tbody id="jindu">
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                        <td><span></span></td>
-                                    </tr>
+                                    {% for i in range(20) %}
+                                        <tr>
+                                             {% for day in days %}
+                                                 <td><span></span></td>
+                                             {% endfor %}
+                                        </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -700,7 +157,7 @@
     <!-- 模态框 添加任务  -->
 
     <div id="tinjone">
-        <div class="modal fade bs-example-modal-lg tasks" id="tinj"   tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+        <div class="modal fade bs-example-modal-lg tasks add_task_modal" id="tinj"   tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
                 <div class="modal-dialog modal-lg"  role="document">
                 <div class="modal-content">
                         <div class="modal-header">
@@ -713,7 +170,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12"><input type="text" class="inp"></div>
+                                <div class="col-md-12"><input type="text" class="inp item_class"></div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -724,7 +181,7 @@
                                     <div class='col-md-3'>
                                             <div class="form-group">
                                                 <div class='input-group date datetimepicker1' id='datetimepicker1'>
-                                                    <input type='text' class="form-control" />
+                                                    <input type='text' class="form-control begin_date" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -734,7 +191,7 @@
                                         <div class='col-md-3'>
                                             <div class="form-group">
                                                 <div class='input-group date datetimepicker2' id='datetimepicker2'>
-                                                    <input type='text' class="form-control" />
+                                                    <input type='text' class="form-control end_date" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -748,11 +205,30 @@
                                 </div>
                             </div>
                             <div class="row ">
-                                <div class="col-md-12 jiaose">
-                                    <span>开发</span>
-                                    <span>安卓</span>
-                                    <span>UI</span>
-                                    <span>前端</span>
+                                <div class="col-md-12 jiaose select_category_div">
+                                    {% for category in categories if category['path'] in allow_edit %}
+                                        <span class="{{"select_category_active" if category['path'] == allow_edit[0] else "select_category" }}" data-id="{{ category['_id'] }}" data-path="{{ category['path'] }}" data-selected="">{{ category['name'] }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>项目选择</p>
+                                </div>
+                            </div>
+                            <div class="row ">
+                                <div class="col-md-12 jiaose select_project_div">
+                                    <input type="radio" name="mokgs" value="c">xx项目
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>模块选择</p>
+                                </div>
+                            </div>
+                            <div class="row ">
+                                <div class="col-md-12 jiaose select_module_div">
+                                    <input type="radio" name="mokgs" value="c">xx模块
                                 </div>
                             </div>
                             <div class="row">
@@ -765,10 +241,10 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 box">
-                                        <textarea class="texta" name="" id="" cols="" rows=""></textarea>
+                                        <textarea class="texta create_desc" name="" id="" cols="" rows=""></textarea>
 
                                     <div class="anniu">
-                                        <a href="../html/home.html"><span> 发布</span></a>
+                                        <a id="add_task" href="javascript:;"><span> 发布</span></a>
                                     </div>
                                 </div>
                             </div>
@@ -780,7 +256,7 @@
     </div>
 <!-- 模态框 添加项目 -->
 <div id="xamone">
-        <div class="modal fade bs-example-modal-lg tasks" id="xam"  tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+        <div class="modal fade bs-example-modal-lg tasks add_project_modal" id="xam"  tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
             <div class="modal-dialog modal-lg"  role="document">
                   <div class="modal-content">
                         <div class="modal-header">
@@ -789,11 +265,11 @@
                         <div class="modal-body" style="padding:0 50px;padding-top: 24px;">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p>项目名称</p>
+                                    <p class="modal_title">项目名称</p>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12"><input type="text" class="inp"></div>
+                                <div class="col-md-12"><input type="text" class="inp item_class"></div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -804,7 +280,7 @@
                                     <div class='col-md-3'>
                                             <div class="form-group">
                                                 <div class='input-group date datetimepicker1' id='datetimepicker1'>
-                                                    <input type='text' class="form-control" />
+                                                    <input type='text' class="form-control begin_date" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -814,7 +290,7 @@
                                         <div class='col-md-3'>
                                             <div class="form-group">
                                                 <div class='input-group date datetimepicker2' id='datetimepicker2'>
-                                                    <input type='text' class="form-control" />
+                                                    <input type='text' class="form-control end_date" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -828,31 +304,32 @@
                                 </div>
                             </div>
                             <div class="row ">
-                                <div class="col-md-12 jiaose">
-                                    <span>开发</span>
-                                    <span>安卓</span>
-                                    <span>UI</span>
-                                    <span>前端</span>
+                                <div class="col-md-12 jiaose select_category_div">
+                                    {% for category in categories if category['path'] in allow_edit  %}
+                                        <span class="{{"select_category_active" if category['path'] == allow_edit[0] else "select_category" }}" data-id="{{ category['_id'] }}" data-path="{{ category['path'] }}" data-selected="">{{ category['name'] }}</span>
+                                    {% endfor %}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p >参与人数</p>
-                                    <p class="p">
-                                        <input type="radio" name="rens" value="1">1人&nbsp;&nbsp;
-                                        <input type="radio" name="rens" value="2">2人&nbsp;&nbsp;
-                                        <input type="radio" name="rens" value="3">3人&nbsp;&nbsp;
-                                        <input type="radio" name="rens" value="4">4人&nbsp;&nbsp;
-                                    </p>
+{#                                    <p >参与人数</p>#}
+{#                                    <p class="p">#}
+{#                                        <input type="radio" name="rens" value="1">1人&nbsp;&nbsp;#}
+{#                                        <input type="radio" name="rens" value="2">2人&nbsp;&nbsp;#}
+{#                                        <input type="radio" name="rens" value="3">3人&nbsp;&nbsp;#}
+{#                                        <input type="radio" name="rens" value="4">4人&nbsp;&nbsp;#}
+{#                                    </p>#}
                                     <p>选择类别</p>
-                                    <p class="p">
-                                        <input type="radio" name="leibie" value="a">项目
-                                        <input type="radio" name="leibie" value="b">模块
+                                    <p class="p create_type">
+                                        <input type="radio" checked name="leibie" value="项目">项目
+                                        <input type="radio" name="leibie" value="模块">模块
                                     </p>
-                                    <p>模块归属</p>
-                                    <p class="p">
+                                    <p class="select_module_title">模块归属</p>
+                                    <p class="p select_module">
+                                        <!--
                                         <input type="radio" name="mokgs" value="c">xx项目
                                         <input type="radio" name="mokgs" value="e">web页面视觉优化
+                                        -->
                                     </p>
                                 </div>
                             </div>
@@ -866,10 +343,10 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 box">
-                                        <textarea class="texta" name="" id="" cols="" rows=""></textarea>
+                                        <textarea class="texta create_desc" name="" id="" cols="" rows=""></textarea>
 
                                     <div class="anniu">
-                                        <a href="../html/home.html"><span> 发布</span></a>
+                                        <a id="add_project_or_module" href="javascript:;"><span> 发布</span></a>
                                     </div>
                                 </div>
                             </div>
@@ -997,7 +474,7 @@
                                             <span><input type="text"></span>
                                         </p>
                                         <div class="anniu">
-                                                <span id="baoc"onclick="baocun()">保存</span>
+                                                <span id="baoc" onclick="baocun()">保存</span>
                                             </div>
                                 </div>
                             </div>
@@ -1262,142 +739,146 @@
 </div>
     <script src="../static/js/jquery-3.2.1.min.js"></script>
     <script src="../static/js/bootstrap.min.js"></script>
-    <script src="../static/js/script.js"></script>
+    <script src="../static/js/home.js"></script>
     <script src="../static/js/bootstrap-datetimepicker.min.js"></script>
     <script src="../static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
     <script src="../static/js/moment-with-locales.js"></script>
     <script>
-        var temp = $('#tinj');
-        var temps = $('#xam');
-
-        var tab = $("#tbyones");
-        var tabs = $("#tbytwos");
-
-        var pup = $('#popupones');
-        var pups = $('#popups');
-
-        $('#xam').remove();
-
-        $("#tbytwos").remove();
-
-        $('#popups').remove();
-
-        $(".title .spn").click(function(){
-            $(".title span").removeClass('active');
-            $(this).addClass('active');
-
-            if($(this)[0].innerHTML == "项目"){
-
-                $('.tianjia').text("添加项目");
-
-                $('#tinj').remove();
-
-                $("#xamone").html(temps);
-
-                $("#tbyones").remove();
-
-                $("#tbytwo").html(tabs);
-
-                $("#popupones").remove();
-
-                $("#popup").html(pups);
-
-                // $.get('url',function(data, status){
-
-                // })
-
-
-                console.log($("#tbytwo"));
-                // var pg = document.getElementById('pgs');
-                // setInterval(function(e){
-                // if(pg.value!=100) pg.value++;
-                // else pg.value = 0;
-                //  },100);
-
-            }else{
-                $("#tinjone").html(temp);
-
-                $('.tianjia').text("添加任务");
-
-                $('#xam').remove();
-
-                $("#tbytwos").remove();
-
-                $("#tbyone").html(tab);
-
-                $("#popups").remove();
-
-                $("#popupone").html(pup);
-            }
-        });
-
-
-        function clicks(){
-            console.log("输出");
-        $('.modal-modifys').css('display','none');
-        $(".model-customs").css('display','block');
-        $('.modal-content-custom').css('display','block');
-            // $('model-custom').fadeOut(1000);
-        }
-
-        // $(".tby tr").click(function(){
-        //     console.log("输出");
-        // $(".model-customs").css('display','block');
-        // $('.modal-content-custom').css('display','block');
-        //     // $('model-custom').fadeOut(1000);
-        // });
-        function btn(){
-            $('.model-customs').css('display','none');
-        };
-        function xiugai(){
-            $('.modal-content-custom').css('display','none');
-            $('.modal-modifys').css('display','block');
-        };
-        function baocun(){
-            $('.model-customs').css('display','none');
-            $('.modal-modifys').css('display','none');
-        };
-
-        //设置日期时间控件
-        setInterval(function(){
-            $(function () {
-            var picker1 = $('.datetimepicker1').datetimepicker({
-                format: 'yyyy-mm-dd',
-                locale: moment.locale('zh-cn'),
-                language: 'zh-CN',//中文，需要引用zh-CN.js包
-            });
-            var picker2 = $('.datetimepicker2').datetimepicker({
-                format: 'yyyy-mm-dd',
-                locale: moment.locale('zh-cn'),
-                language: 'zh-CN',//中文，需要引用zh-CN.js包
-            });
-            //动态设置最小值
-            picker1.on('dp.change', function (e) {
-                picker2.data('DateTimePicker').minDate(e.date);
-            });
-            //动态设置最大值
-            picker2.on('dp.change', function (e) {
-                picker1.data('DateTimePicker').maxDate(e.date);
-            });
-            $('.jiaose span').click(function (e) {
-                $('.jiaose span').removeClass();
-                $(this).addClass('xuanz');
-                if($(this).index() == 0){
-                    $('.xm1').html('<input type="radio" name="xm">k1<input type="radio" name="xm">k2');
-                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">km1</option><option value="2">km2</option><option value="3">km3</option></select><span><input type="text"></span>');
-                }else if($(this).index() == 1){
-                    $('.xm1').html('<input type="radio" name="xm">a1<input type="radio" name="xm">a2');
-                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">am1</option><option value="2">am2</option><option value="3">am3</option></select><span><input type="text"></span>');
-                }else if($(this).index() == 2){
-                    $('.xm1').html('<input type="radio" name="xm">u1<input type="radio" name="xm">u2');
-                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">um1</option><option value="2">um2</option><option value="3">um3</option></select><span><input type="text"></span>');
-                }else if($(this).index() == 3){
-                    $('.xm1').html('<input type="radio" name="xm">p1<input type="radio" name="xm">p2');
-                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">pm1</option><option value="2">pm2</option><option value="3">pm3</option></select><span><input type="text"></span>');
-                }
-            })
-        });
-        },10);
+{#    $(function(){#}
+{#        allow_view = {{ allow_view | safe }};#}
+{#        allow_edit = {{ allow_edit | safe }};#}
+{#        var temp = $('#tinj');#}
+{#        var temps = $('#xam');#}
+{##}
+{#        var tab = $("#tbyones");#}
+{#        var tabs = $("#tbytwos");#}
+{##}
+{#        var pup = $('#popupones');#}
+{#        var pups = $('#popups');#}
+{##}
+{#        $('#xam').remove();#}
+{##}
+{#        $("#tbytwos").remove();#}
+{##}
+{#        $('#popups').remove();#}
+{##}
+{#        $(".title .spn").click(function(){#}
+{#            $(".title span").removeClass('active');#}
+{#            $(this).addClass('active');#}
+{##}
+{#            if($(this)[0].innerHTML == "项目"){#}
+{##}
+{#                $('.tianjia').text("添加项目");#}
+{##}
+{#                $('#tinj').remove();#}
+{##}
+{#                $("#xamone").html(temps);#}
+{##}
+{#                $("#tbyones").remove();#}
+{##}
+{#                $("#tbytwo").html(tabs);#}
+{##}
+{#                $("#popupones").remove();#}
+{##}
+{#                $("#popup").html(pups);#}
+{##}
+{#                // $.get('url',function(data, status){#}
+{##}
+{#                // })#}
+{##}
+{##}
+{#                console.log($("#tbytwo"));#}
+{#                // var pg = document.getElementById('pgs');#}
+{#                // setInterval(function(e){#}
+{#                // if(pg.value!=100) pg.value++;#}
+{#                // else pg.value = 0;#}
+{#                //  },100);#}
+{##}
+{#            }else{#}
+{#                $("#tinjone").html(temp);#}
+{##}
+{#                $('.tianjia').text("添加任务");#}
+{##}
+{#                $('#xam').remove();#}
+{##}
+{#                $("#tbytwos").remove();#}
+{##}
+{#                $("#tbyone").html(tab);#}
+{##}
+{#                $("#popups").remove();#}
+{##}
+{#                $("#popupone").html(pup);#}
+{#            }#}
+{#        });#}
+{##}
+{##}
+{#        function clicks(){#}
+{#            console.log("输出");#}
+{#        $('.modal-modifys').css('display','none');#}
+{#        $(".model-customs").css('display','block');#}
+{#        $('.modal-content-custom').css('display','block');#}
+{#            // $('model-custom').fadeOut(1000);#}
+{#        }#}
+{##}
+{#        // $(".tby tr").click(function(){#}
+{#        //     console.log("输出");#}
+{#        // $(".model-customs").css('display','block');#}
+{#        // $('.modal-content-custom').css('display','block');#}
+{#        //     // $('model-custom').fadeOut(1000);#}
+{#        // });#}
+{#        function btn(){#}
+{#            $('.model-customs').css('display','none');#}
+{#        };#}
+{#        function xiugai(){#}
+{#            $('.modal-content-custom').css('display','none');#}
+{#            $('.modal-modifys').css('display','block');#}
+{#        };#}
+{#        function baocun(){#}
+{#            $('.model-customs').css('display','none');#}
+{#            $('.modal-modifys').css('display','none');#}
+{#        };#}
+{##}
+{#        //设置日期时间控件#}
+{#        setInterval(function(){#}
+{#            $(function () {#}
+{#            var picker1 = $('.datetimepicker1').datetimepicker({#}
+{#                format: 'yyyy-mm-dd',#}
+{#                locale: moment.locale('zh-cn'),#}
+{#                language: 'zh-CN',//中文，需要引用zh-CN.js包#}
+{#            });#}
+{#            var picker2 = $('.datetimepicker2').datetimepicker({#}
+{#                format: 'yyyy-mm-dd',#}
+{#                locale: moment.locale('zh-cn'),#}
+{#                language: 'zh-CN',//中文，需要引用zh-CN.js包#}
+{#            });#}
+{#            //动态设置最小值#}
+{#            picker1.on('dp.change', function (e) {#}
+{#                picker2.data('DateTimePicker').minDate(e.date);#}
+{#            });#}
+{#            //动态设置最大值#}
+{#            picker2.on('dp.change', function (e) {#}
+{#                picker1.data('DateTimePicker').maxDate(e.date);#}
+{#            });#}
+{#            $('.jiaose span').click(function (e) {#}
+{#                $('.jiaose span').removeClass();#}
+{#                $(this).addClass('xuanz');#}
+{#                if($(this).index() == 0){#}
+{#                    $('.xm1').html('<input type="radio" name="xm">k1<input type="radio" name="xm">k2');#}
+{#                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">km1</option><option value="2">km2</option><option value="3">km3</option></select><span><input type="text"></span>');#}
+{#                }else if($(this).index() == 1){#}
+{#                    $('.xm1').html('<input type="radio" name="xm">a1<input type="radio" name="xm">a2');#}
+{#                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">am1</option><option value="2">am2</option><option value="3">am3</option></select><span><input type="text"></span>');#}
+{#                }else if($(this).index() == 2){#}
+{#                    $('.xm1').html('<input type="radio" name="xm">u1<input type="radio" name="xm">u2');#}
+{#                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">um1</option><option value="2">um2</option><option value="3">um3</option></select><span><input type="text"></span>');#}
+{#                }else if($(this).index() == 3){#}
+{#                    $('.xm1').html('<input type="radio" name="xm">p1<input type="radio" name="xm">p2');#}
+{#                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">pm1</option><option value="2">pm2</option><option value="3">pm3</option></select><span><input type="text"></span>');#}
+{#                }#}
+{#            })#}
+{#        });#}
+{#        },10);#}
+{#    });#}
     </script>
 </body>
 </html>
