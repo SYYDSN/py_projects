@@ -14,6 +14,7 @@
         allow_view = {{ allow_view | safe }};
         allow_edit = {{ allow_edit | safe }};
         projects = {{ projects | safe }};
+        allow_edit_modules = {{ allow_edit_modules | safe }};
     </script>
 </head>
 <body>
@@ -137,7 +138,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="jindu">
-                                    {% for i in range(20) %}
+                                    {% for task in tasks %}
                                         <tr>
                                              {% for day in days %}
                                                  <td><span></span></td>
@@ -207,28 +208,28 @@
                             <div class="row ">
                                 <div class="col-md-12 jiaose select_category_div">
                                     {% for category in categories if category['path'] in allow_edit %}
-                                        <span class="{{"select_category_active" if category['path'] == allow_edit[0] else "select_category" }}" data-id="{{ category['_id'] }}" data-path="{{ category['path'] }}" data-selected="">{{ category['name'] }}</span>
+                                        <span class="select_category" data-id="{{ category['_id'] }}" data-path="{{ category['path'] }}" data-selected="">{{ category['name'] }}</span>
                                     {% endfor %}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p>项目选择</p>
+                                    <p class="select_project_title">项目选择</p>
                                 </div>
                             </div>
                             <div class="row ">
                                 <div class="col-md-12 jiaose select_project_div">
-                                    <input type="radio" name="mokgs" value="c">xx项目
+{#                                    <input type="radio" name="mokgs" value="c">xx项目#}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p>模块选择</p>
+                                    <p class="select_module_title">模块选择</p>
                                 </div>
                             </div>
                             <div class="row ">
                                 <div class="col-md-12 jiaose select_module_div">
-                                    <input type="radio" name="mokgs" value="c">xx模块
+{#                                    <input type="radio" name="mokgs" value="c">xx模块#}
                                 </div>
                             </div>
                             <div class="row">
@@ -324,8 +325,8 @@
                                         <input type="radio" checked name="leibie" value="项目">项目
                                         <input type="radio" name="leibie" value="模块">模块
                                     </p>
-                                    <p class="select_module_title">模块归属</p>
-                                    <p class="p select_module">
+                                    <p class="select_project_title">模块归属</p>
+                                    <p class="p select_project_div">
                                         <!--
                                         <input type="radio" name="mokgs" value="c">xx项目
                                         <input type="radio" name="mokgs" value="e">web页面视觉优化

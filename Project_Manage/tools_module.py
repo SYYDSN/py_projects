@@ -135,12 +135,12 @@ def check_platform_session(f):
         user_name = session.get("user_name")  # 检测session中的user_name
         user_password = session.get("user_password")  # user_password
         if not (user_name and user_password):
-            return redirect(url_for("teacher_login_func"))
+            return redirect(url_for("login_func"))
         else:
             checked_user_obj = user_module.User.login(user_name=user_name, user_password=user_password)
             if not checked_user_obj:
                 """用户名和密码不正确"""
-                return redirect(url_for("teacher_login_func"))
+                return redirect(url_for("login_func"))
             else:
                 return f(*args, **kwargs)
     return decorated_function

@@ -152,12 +152,22 @@ if __name__ == "__main__":
     p2 = "/home/walle/work/projects/Draw_Server/module/temp_file/交易记录2018-05-03 12_02_52.xlsx"
     r1 = calculate(p1)
     r2 = calculate2(p2)
+    r1 = [x for x in r1 if x['platform'] == "office.shengfxchina.com:8443"]
     print(len(r1))
     print(len(r2))
     print(len(r1) - len(r2))
-    r2_keys = [x['ticket'] for x in r2]
-    aa = [x for x in r1 if x['ticket'] not in r2_keys]
+    r1_keys = [x['ticket'] for x in r1]
+    aa = [x for x in r2 if x['ticket'] not in r1_keys]
     print(len(aa))
+    res = dict()
     for x in aa:
-        print(x)
+        command = x['command']
+        temp = res.get(command)
+        if temp is None:
+            temp = list()
+        temp.append(x)
+        res[command] = temp
+    for k, v in res.items():
+        ids = ",".join([str(x['ticket']) for x in v])
+        print("{}类型,共计{}单, 订单号为:{}".format(k, len(v), ids))
     pass

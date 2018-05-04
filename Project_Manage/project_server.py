@@ -297,7 +297,7 @@ def manage_user_func(key1, key2):
         else:
             return abort(405)
     else:
-        return url_for("login_func")
+        return redirect(url_for("login_func"))
 
 
 @app.route("/home_<key1>/<key2>", methods=['post', 'get'])
@@ -332,10 +332,16 @@ def home_func(key1, key2):
         allow_edit_projects[x] = p_list
     modules = Module.get_all(can_json=True)
     allow_edit_modules = dict()  # 允许编辑的模块的字典,key是project的id
-    """写到这里"""
-    today = datetime.datetime.today()
-    year = today.year
-    month = today.month
+    for m in modules:
+        p_id = m['project_id']
+        m_list = allow_edit_modules.get(p_id)
+        if m_list is None:
+            m_list = list()
+        m_list.append(m)
+        allow_edit_modules[p_id] = m_list
+    now = datetime.datetime.now()
+    year = now.year
+    month = now.month
     current_month_str = "{}年{}月".format(year, month)
     first_day, last_day = calendar.monthrange(year, month)
     days = list()
@@ -352,13 +358,14 @@ def home_func(key1, key2):
         cur_method = request.method.lower()
         if cur_method == "get":
             if key1 == "all":
-                """登录后的主页，所有用户都能查看"""
+                """登录后的主页，所有用户都能查看所有任务"""
                 f = {"status": {"$nin": ['invalid']}}
-                s = {"project_id": -1, "module_id": -1, "status": -1, "type": -1}
+                s = {"project_id": -1, "module_id": -1, "status": -1, "type": -1, "begin_date": -1}
                 tasks = Task.find_plus(filter_dict=f, sort_dict=s, can_json=True)
                 return render_template("home.html", tasks=tasks, allow_edit=allow_edit, categories=categories,
                                        allow_view=allow_view, cur_method=cur_method, days=days, weeks=weeks,
-                                       current_month=current_month_str, projects=allow_edit_projects)
+                                       current_month=current_month_str, projects=allow_edit_projects,
+                                       allow_edit_modules=allow_edit_modules)
         elif cur_method == "post":
             mes = {"message": "success"}
             if key1 == "project":
@@ -400,6 +407,36 @@ def home_func(key1, key2):
                         r = None
                         try:
                             r = Module.add_instance(**args)
+                        except Exception as e:
+                            mes['message'] = str(e)
+                        finally:
+                            if r is None and mes['message'] == "success":
+                                mes['message'] = "添加失败"
+                            else:
+                                pass
+                elif key2 == "edit":
+                    """编辑"""
+                else:
+                    return abort(401)
+            elif key1 == "task":
+                """模块"""
+                if key2 == "add":
+                    """添加"""
+                    args = get_args(request)
+                    project_id = args.get("project_id")
+                    module_id = args.get("module_id")
+                    if project_id is None or len(project_id) != 24:
+                        mes['message'] = "project_id参数错误"
+                    elif module_id is None or len(module_id) != 24:
+                        mes['message'] = "module_id参数错误"
+                    else:
+                        project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id))
+                        module_dbref = DBRef(collection=Module.get_table_name(), id=ObjectId(module_id))
+                        args['project_id'] = project_dbref
+                        args['module_id'] = module_dbref
+                        r = None
+                        try:
+                            r = Task.add_instance(**args)
                         except Exception as e:
                             mes['message'] = str(e)
                         finally:

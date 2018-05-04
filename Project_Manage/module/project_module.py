@@ -28,6 +28,7 @@ class Category(BaseDoc):
     type_dict['name'] = str
     type_dict['path'] = str  # url的path
     type_dict['status'] = str  # 状态 normal/stop/invalid  正常/停用/无效(相当于删除一个记录)
+    type_dict['create_date'] = datetime.datetime
 
     def __init__(self, **kwargs):
         if "name" not in kwargs:
@@ -48,6 +49,8 @@ class Category(BaseDoc):
                 pass
         if 'status' not in kwargs:
             kwargs['status'] = "normal"
+        if "create_date" not in kwargs:
+            kwargs['create_date'] = datetime.datetime.now()
         super(Category, self).__init__(**kwargs)
 
     @classmethod
