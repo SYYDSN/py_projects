@@ -304,6 +304,45 @@ class Project(Category):
                 pass
         mongo_db.BaseDoc.__init__(self, **kwargs)
 
+    def get_date_range(self) -> int:
+        """
+        计算工期
+        :return:
+        """
+        count = 0
+        d1 = self.get_attr("begin_date")
+        d2 = self.get_attr("end_date")
+        delta = (d2 - d1).days
+        for i in range(delta + 1):
+            day = d1 + datetime.timedelta(days=i)
+            weekday = day.weekday()
+            if weekday == 6 or weekday == 5:
+                pass
+            else:
+                count += 1
+        return count
+
+    @classmethod
+    def calculate_date_range(cls, begin_date: datetime.datetime, end_date: datetime.datetime) -> int:
+        """
+        计算工期.self.get_date_range的类方法
+        :param begin_date:
+        :param end_date:
+        :return:
+        """
+        count = 0
+        d1 = begin_date
+        d2 = end_date
+        delta = (d2 - d1).days
+        for i in range(delta + 1):
+            day = d1 + datetime.timedelta(days=i)
+            weekday = day.weekday()
+            if weekday == 6 or weekday == 5:
+                pass
+            else:
+                count += 1
+        return count
+
     @classmethod
     def add_instance(cls, **kwargs) -> (None, BaseDoc):
         """
@@ -498,6 +537,7 @@ class Module(Project):
     type_dict['description'] = str
     type_dict['status'] = str  # 状态 normal/stop/suspend/invalid
     type_dict['task_list'] = list  # 任务的列表
+    type_dict['mission_list'] = list  # 功能的列表
     type_dict['create_date'] = datetime.datetime
 
     def __init__(self, **kwargs):
@@ -756,6 +796,283 @@ class Module(Project):
             rs = None
         return rs
 
+    @classmethod
+    def add_mission(cls, o_id: (str, ObjectId), mission_dbref: DBRef) -> bool:
+        """
+        添加一个功能
+        :param o_id:
+        :param mission_dbref:
+        :return:
+        """
+        res = False
+        instance = cls.find_by_id(o_id)
+        if isinstance(instance, cls):
+            if isinstance(mission_dbref, DBRef):
+                mission_list = instance.get_attr("mission_list")
+                if not isinstance(mission_list, list):
+                    mission_list = list()
+                else:
+                    pass
+                if mission_dbref in mission_list:
+                    ms = "被添加的功能已存在，o_id:{}, mission:{}".format(o_id, mission_dbref)
+                    print(ms)
+                    logger.exception(ms)
+                else:
+                    mission_list.append(mission_dbref)
+                    instance.set_attr("mission_list", mission_list)
+                    r = instance.save_plus()
+                    if isinstance(r, ObjectId):
+                        res = True
+                    else:
+                        ms = "保存实例失败,instance={}".format(instance.to_flat_dict())
+                        logger.exception(ms)
+                        print(ms)
+            else:
+                ms = "mission_dbref类型错误，mission_dbref:{}".format(type(mission_dbref))
+                logger.exception(ms)
+                print(ms)
+        else:
+            ms = "找不到对应的实例，o_id:{}".format(o_id)
+            logger.exception(ms)
+            print(ms)
+        return res
+
+    @classmethod
+    def remove_mission(cls, o_id: (str, ObjectId), mission_dbref: DBRef) -> bool:
+        """
+        移除一个功能
+        :param o_id:
+        :param mission_dbref:
+        :return:
+        """
+        res = False
+        instance = cls.find_by_id(o_id)
+        if isinstance(instance, cls):
+            if isinstance(mission_dbref, DBRef):
+                mission_list = instance.get_attr("mission_list")
+                if not isinstance(mission_list, list):
+                    ms = "task_list不存在，o_id:{}, module:{}".format(o_id, mission_dbref)
+                    print(ms)
+                    logger.exception(ms)
+                else:
+                    if mission_dbref not in mission_list:
+                        ms = "功能不存在，o_id:{}, mission:{}".format(o_id, mission_dbref)
+                        print(ms)
+                        logger.exception(ms)
+                    else:
+                        mission_list.remove(mission_dbref)
+                        instance.set_attr("mission_list", mission_list)
+                        r = instance.save_plus()
+                        if isinstance(r, ObjectId):
+                            res = True
+                        else:
+                            ms = "保存实例失败,instance={}".format(instance.to_flat_dict())
+                            logger.exception(ms)
+                            print(ms)
+            else:
+                ms = "mission_dbref类型错误，mission_dbref:{}".format(type(mission_dbref))
+                logger.exception(ms)
+                print(ms)
+        else:
+            ms = "找不到对应的实例，o_id:{}".format(o_id)
+            logger.exception(ms)
+            print(ms)
+        return res
+
+    @classmethod
+    def get_missions(cls, o_id: (str, ObjectId), mission_status: str = None, can_json: bool = True) -> (None, list):
+        """
+        获取模块的所有功能，返回的是doc的list
+        :param o_id: 模块的_id, ObjectId
+        :param mission_status: 任务状态。任务的状态有： developing/complete/ready
+                          ready: 新建功能，但还未开发的状态，一般新建功能都处于这个状态。默认值
+                          complete: 相关功能已开发完成
+                          developing:  开发中
+                          None表示查询所有状态的任务
+                          str 表示查询某一种状态的任务
+                          list 是类型的数组，可以查询多种状态的任务
+        :param can_json: doc对象是否可以直接转为json？
+        :return: Mission类的doc的list
+        """
+        records = list()
+        module = cls.find_by_id(o_id)
+        if isinstance(module, cls):
+            m_dbref = module.get_dbref()
+            status_list = []
+            if mission_status is None:
+                status_list = ['developing', 'complete', 'ready']
+            elif isinstance(mission_status, str):
+                status_list.append(mission_status)
+            elif isinstance(mission_status, list):
+                status_list = mission_status
+            else:
+                ms = "mission_status参数类型错误，{}".format(type(mission_status))
+                logger.exception(ms)
+                raise ValueError(ms)
+            f = {
+                "module_id": m_dbref,
+                "status": {"$in": status_list}
+            }
+            s = {"begin_date": 1}
+            records = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=can_json)
+        else:
+            pass
+        return records
+
+
+class Mission(Project):
+    """具体的功能要求"""
+    _table_name = "mission_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['project_id'] = DBRef
+    type_dict['module_id'] = DBRef
+    type_dict['name'] = str
+    type_dict['description'] = str
+    type_dict['status'] = str  # ready/developing/complete  就绪未开始（默认）/开发中。/完成
+    type_dict['create_date'] = datetime.datetime
+
+    def __init__(self, **kwargs):
+        if "name" not in kwargs:
+            ms = "name必须"
+            logger.exception(ms)
+            raise ValueError(ms)
+        else:
+            name = kwargs['name']
+            if not isinstance(name, str):
+                ms = "name类型错误，期待str，得到：{}".format(type(name))
+                logger.exception(ms)
+                raise ValueError(ms)
+            else:
+                pass
+        if "status" not in kwargs:
+            kwargs['status'] = "ready"
+        else:
+            status = kwargs['status']
+            if status not in ['ready', 'complete', 'developing']:
+                ms = "status错误，必须是'ready', 'complete', 'developing'，得到：{}".format(status)
+                logger.exception(ms)
+                raise ValueError(ms)
+            else:
+                pass
+        if "project_id" not in kwargs:
+            ms = "project_id必须"
+            logger.exception(ms)
+            raise ValueError(ms)
+        else:
+            project_id = kwargs['project_id']
+            if not isinstance(project_id, DBRef):
+                ms = "project_id类型错误，期待DBRef，得到：{}".format(type(project_id))
+                logger.exception(ms)
+                raise ValueError(ms)
+            else:
+                pass
+        if "module_id" not in kwargs:
+            ms = "module_id必须"
+            logger.exception(ms)
+            raise ValueError(ms)
+        else:
+            module_id = kwargs['module_id']
+            if not isinstance(module_id, DBRef):
+                ms = "module_id类型错误，期待DBRef，得到：{}".format(type(module_id))
+                logger.exception(ms)
+                raise ValueError(ms)
+            else:
+                pass
+        if "create_date" not in kwargs:
+            kwargs['create_date'] = datetime.datetime.now()
+        else:
+            create_date = kwargs['create_date']
+            create_date = create_date if isinstance(create_date, datetime.datetime) else \
+                mongo_db.get_datetime_from_str(create_date)
+            if not isinstance(create_date, datetime.datetime):
+                ms = "create_date类型错误，期待datetime，得到：{}".format(type(create_date))
+                logger.exception(ms)
+                raise ValueError(ms)
+            else:
+                pass
+        mongo_db.BaseDoc.__init__(self, **kwargs)
+
+    @classmethod
+    def add_module(cls, o_id: (str, ObjectId), module_dbref: DBRef) -> None:
+        """
+        废弃父类的方法
+        :param o_id:
+        :param module_dbref:
+        :return:
+        """
+        ms = "此方法只能在Project类中被调用"
+        logger.exception(ms)
+        raise AttributeError(ms)
+
+    @classmethod
+    def remove_module(cls, o_id: (str, ObjectId), module_dbref: DBRef) -> None:
+        """
+        废弃父类的方法
+        :param o_id:
+        :param module_dbref:
+        :return:
+        """
+        ms = "此方法只能在Project类中被调用"
+        logger.exception(ms)
+        raise AttributeError(ms)
+
+    @classmethod
+    def drop(cls, o_id) -> None:
+        """
+        废弃父类的方法
+        """
+        ms = "此方法在Task类中被废弃,请用cls.change_status方法"
+        logger.exception(ms)
+        raise AttributeError(ms)
+
+    @classmethod
+    def up(cls, o_id) -> None:
+        """
+        废弃父类的方法
+        """
+        ms = "此方法在Task类中被废弃,请用cls.change_status方法"
+        logger.exception(ms)
+        raise AttributeError(ms)
+
+    @classmethod
+    def down(cls, o_id) -> None:
+        """
+        废弃父类的方法
+        """
+        ms = "此方法在Task类中被废弃,请用cls.change_status方法"
+        logger.exception(ms)
+        raise AttributeError(ms)
+
+    @classmethod
+    def add_instance(cls, **kwargs) -> (None, BaseDoc):
+        """
+        添加一个实例
+        此方法需要被子类重写.
+        :param kwargs:
+        :return:
+        """
+        project_id = kwargs.get("project_id")
+        module_id = kwargs.get("module_id")
+        name = kwargs.get("name")
+        if not isinstance(project_id, DBRef):
+            raise ValueError("project_id参数错误")
+        elif not isinstance(module_id, DBRef):
+            raise ValueError("module_id参数错误")
+        elif name == "" or name is None:
+            raise ValueError("name参数错误")
+        else:
+            f = {"name": name, "project_id": project_id, "module_id": module_id}
+            if cls.exists(condition_dict=f):
+                raise RepeatInstanceError("重复的对象")
+            else:
+                instance = cls(**kwargs)
+            r = instance.insert()
+            if isinstance(r, ObjectId):
+                return instance
+            else:
+                return None
+
 
 class Task(Project):
     """任务信息"""
@@ -942,13 +1259,16 @@ class Task(Project):
         :return:
         """
         project_id = kwargs.get("project_id")
+        module_id = kwargs.get("module_id")
         name = kwargs.get("name")
         if not isinstance(project_id, DBRef):
             raise ValueError("project_id参数错误")
+        elif not isinstance(module_id, DBRef):
+            raise ValueError("module_id参数错误")
         elif name == "" or name is None:
             raise ValueError("name参数错误")
         else:
-            f = {"name": name, "project_id": project_id}
+            f = {"name": name, "project_id": project_id, "module_id": module_id}
             if cls.exists(condition_dict=f):
                 raise RepeatInstanceError("重复的对象")
             else:
@@ -961,13 +1281,16 @@ class Task(Project):
 
 
 if __name__ == "__main__":
-    """添加项目"""
-    c_id = DBRef(id=ObjectId("5ae5992409d20f1079d86b75"), collection=Category.get_table_name())  # 前端
-    # Project.add_instance(category_id=c_id, name="保驾犬平台管理页面")
-    """添加模块"""
-    p_id = DBRef(id=ObjectId("5ae5d89709d20f36f19d90d4"), collection=Project.get_table_name())  # 保驾犬平台管理页面
-    # Module.add_instance(project_id=p_id, name="电子地图")
-    """查询模块的任务"""
-    m_id = ObjectId("5ae5d94209d20f378cb5999f")
-    Module.get_tasks(o_id=m_id)
+    # """添加项目"""
+    # c_id = DBRef(id=ObjectId("5ae5992409d20f1079d86b75"), collection=Category.get_table_name())  # 前端
+    # # Project.add_instance(category_id=c_id, name="保驾犬平台管理页面")
+    # """添加模块"""
+    # p_id = DBRef(id=ObjectId("5ae5d89709d20f36f19d90d4"), collection=Project.get_table_name())  # 保驾犬平台管理页面
+    # # Module.add_instance(project_id=p_id, name="电子地图")
+    # """查询模块的任务"""
+    # m_id = ObjectId("5ae5d94209d20f378cb5999f")
+    # Module.get_tasks(o_id=m_id)
+    """计算工期"""
+    p = Project.find_by_id(ObjectId("5aebc5bd4660d317c6f5707e"))
+    print(p.get_date_range())
     pass

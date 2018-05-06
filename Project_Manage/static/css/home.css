@@ -7,7 +7,7 @@
     position: relative;
 }
 .content  .dv-left .spn{
-    font-size: 30px;
+    font-size: 24px;
     margin-right: 25px;
 }
 .content  .dv-left .active{
@@ -44,6 +44,12 @@
     display: inline-block;
     width: 6px;
     height: 6px;
+}
+.spn:hover {
+    cursor: pointer;
+}
+.p_nav{
+    cursor:pointer;
 }
 .content .list {
     position: relative;
@@ -128,6 +134,9 @@
     height: 100%;
     text-align: center;
 }
+.hidden_overflow{
+    overflow: hidden;
+}
 .content .dv-right table tbody tr span{
     display: inline-block;
     width: 100%;
@@ -165,9 +174,19 @@
     background-color: #8470FF;
     color: white;
 }
-#project_list{
+#project_list,#module_list,#mission_list{
     display: none;
 }
 .modal input[type='radio']{
     margin-left:1rem;
+}
+.my_nav{
+    margin-bottom:1.5rem;
+}
+.my_plan{
+    /*工作计划样式*/
+    font-size:1rem;
+    background-color: cornflowerblue;
+    line-height: 2em;
+    text-align: center;
 }

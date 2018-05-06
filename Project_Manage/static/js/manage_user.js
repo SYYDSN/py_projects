@@ -40,7 +40,12 @@ $(function(){
                 let json = JSON.parse(resp);
                 console.log(json);
                 alert(json['message']);
-                location.reload();
+                if(json['message'] === "success"){
+                    location.reload()
+                }
+                else{
+                    // nothing ...
+                }
             });
         }
 

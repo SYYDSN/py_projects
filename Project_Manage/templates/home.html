@@ -15,6 +15,7 @@
         allow_edit = {{ allow_edit | safe }};
         projects = {{ projects | safe }};
         allow_edit_modules = {{ allow_edit_modules | safe }};
+        module_mission_dict = {{ module_mission_dict | safe }};
     </script>
 </head>
 <body>
@@ -23,7 +24,8 @@
             <div class="title">
                 <span class="spn active">任务</span>
                 <span class="spn">项目</span>
-
+                <span class="spn">模块</span>
+                <span class="spn">功能</span>
             </div>
             <div id="tbyone">
                 <div class="list"  id="task_list">
@@ -43,22 +45,15 @@
 
 
                     <table style="border-collapse:separate; border-spacing:0px 24px;">
-                    	<tbody class="tby" onclick="clicks()" >
-                            <!--
-                            <tr id="details">
-                                <td> <span class="actives spn"></span> 任务准备</td>
-                                <td>15天</td>
-                                <td>2018-4-10</td>
-                                <td>2018-4-25<span class="spjian"><img src="../images/icon_er.svg"/></span></td>
-                            </tr>
-                            -->
-                            <tr class="task_detail">
-                                <td> <span class="actives spn"></span> 任务准备</td>
-                                <td>15天</td>
-                                <td>2018-4-10</td>
-                                <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                            </tr>
-
+                    	<tbody class="tby"  >
+                            {% for t in tasks %}
+                                <tr class="p_nav">
+                                    <td> <span class="spn"></span>{{ t['name'] }}</td>
+                                    <td>{{ t['date_range'] }}天</td>
+                                    <td>{{ t['begin_date_str'] }}</td>
+                                    <td>{{ t['end_date_str'] }}<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
 
@@ -67,49 +62,96 @@
             </div>
             <div class="tbytwo" id="project_list">
                 <div class="list" id="tbytwos">
-                        <i class="xian"></i>
-                        <table style="border-collapse:separate; border-spacing:0px 24px;">
-                        <thead>
-                            <tr>
-                                <th>任务名称</th>
-                                <th>工期</th>
-                                <th>开始时间</th>
-                                <th>结束时间</th>
-                            </tr>
-
-                        </thead>
-                       </table>
-                        <div class="gundt">
-
-
+                    <i class="xian"></i>
                     <table style="border-collapse:separate; border-spacing:0px 24px;">
-                    	<tbody class="tby"onclick="clicks()" >
-                            <!--
-                            <tr id="details">
-                                <td> <span class="actives spn"></span> 施工准备</td>
-                                <td>15天</td>
-                                <td>2018-4-10</td>
-                                <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                            </tr>
-                            -->
-                        <tr id="details">
-                                <td> <span class="actives spn"></span> 项目准备</td>
-                                <td>15天</td>
-                                <td>2018-4-10</td>
-                                <td>2018-4-25<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
-                            </tr>
-
-                        </tbody>
+                        <thead>
+                        <tr>
+                            <th>项目名称</th>
+                            <th>工期</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                        </tr>
+                        </thead>
                     </table>
-
+                    <div class="gundt">
+                        <table id="p_navs" style="border-collapse:separate; border-spacing:0px 24px;">
+                            <tbody class="tby" >
+                            {% for p in nav_projects %}
+                                <tr class="p_nav">
+                                    <td> <span class="spn"></span>{{ p['name'] }}</td>
+                                    <td>{{ p['date_range'] }}天</td>
+                                    <td>{{ p['begin_date'] }}</td>
+                                    <td>{{ p['end_date'] }}<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    </div>
-            </div>
-                <div class="dibu">
-                    <span class="tuichu"><a href="../index.html"><img src="../static/images/icon_er.svg" alt=""></a></span>
-                    <span class="tianjia" id="add_item" data-toggle="modal" data-target=".bs-example-modal-lg">添加项目</span>
-                    <span>删除</span>
                 </div>
+            </div>
+            <div class="tbythree" id="module_list">
+                <div class="list" id="tbythrees">
+                    <i class="xian"></i>
+                    <table style="border-collapse:separate; border-spacing:0px 24px;">
+                        <thead>
+                        <tr>
+                            <th>模块名称</th>
+                            <th>工期</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="gundt">
+                        <table id="p_navs" style="border-collapse:separate; border-spacing:0px 24px;">
+                            <tbody class="tby" >
+                            {% for m in nav_modules %}
+                                <tr class="p_nav">
+                                    <td> <span class="spn"></span>{{ m['name'] }}</td>
+                                    <td>{{ m['date_range'] }}天</td>
+                                    <td>{{ m['begin_date'] }}</td>
+                                    <td>{{ m['end_date'] }}<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="tbyfour" id="mission_list">
+                <div class="list" id="tbyfours">
+                    <i class="xian"></i>
+                    <table style="border-collapse:separate; border-spacing:0px 24px;">
+                        <thead>
+                        <tr>
+                            <th>功能名称</th>
+                            <th>工期</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="gundt">
+                        <table id="p_navs" style="border-collapse:separate; border-spacing:0px 24px;">
+                            <tbody class="tby" >
+                            {% for m in nav_missions %}
+                                <tr class="p_nav">
+                                    <td> <span class="spn"></span>{{ m['name'] }}</td>
+                                    <td>{{ m['date_range'] }}天</td>
+                                    <td>{{ m['begin_date'] }}</td>
+                                    <td>{{ m['end_date'] }}<span class="spjian"><img src="../static/images/icon_er.svg"/></span></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="dibu">
+                <span class="tuichu"><a href="../index.html"><img src="../static/images/icon_er.svg" alt=""></a></span>
+                <span class="tianjia" id="add_item" data-toggle="modal" data-target=".bs-example-modal-lg">添加项目</span>
+                <span>删除</span>
+            </div>
         </div>
         <!-- 右边内容 -->
         <div class="dv-right">
@@ -138,10 +180,16 @@
                                     </tr>
                                 </thead>
                                 <tbody id="jindu">
-                                    {% for task in tasks %}
+                                    {% for tr in trs %}
                                         <tr>
-                                             {% for day in days %}
+                                             {% for td in tr %}
+                                                 {% if td == "" %}
                                                  <td><span></span></td>
+                                                 {% else %}
+                                                     <td title="{{ td['category_name'] }}{{ td['project_name'] }}项目,{{ td['name'] }} {{ td['status'] }}" class="my_plan" colspan="{{ td['colspan'] }}">
+                                                         <span class="hidden_overflow">{{ td['name'] }}</span>
+                                                     </td>
+                                                 {% endif %}
                                              {% endfor %}
                                         </tr>
                                     {% endfor %}
@@ -233,6 +281,16 @@
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="col-md-12">
+                                    <p class="select_mission_title">对应功能</p>
+                                </div>
+                            </div>
+                            <div class="row ">
+                                <div class="col-md-12 jiaose select_mission_div">
+{#                                    <input type="radio" name="mokgs" value="c">xx模块#}
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-12 bjtitle">
                                     <span>正文</span>
                                     <span> <img src="../static/images/icon_fujian.svg" alt=""> 添加附件</span>
@@ -255,7 +313,7 @@
                 </div>
             </div>
     </div>
-<!-- 模态框 添加项目 -->
+<!-- 模态框 添加项目/模块 -->
 <div id="xamone">
         <div class="modal fade bs-example-modal-lg tasks add_project_modal" id="xam"  tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
             <div class="modal-dialog modal-lg"  role="document">
@@ -266,7 +324,16 @@
                         <div class="modal-body" style="padding:0 50px;padding-top: 24px;">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="modal_title">项目名称</p>
+                                    <ul class="nav nav-pills my_nav">
+                                      <li role="presentation" class="active"><a href="javascript:;">添加项目</a></li>
+                                      <li role="presentation"><a href="javascript:;">添加模块</a></li>
+                                      <li role="presentation"><a href="javascript:;">添加功能</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p class="modal_title">名称</p>
                                 </div>
                             </div>
                             <div class="row">
@@ -307,31 +374,28 @@
                             <div class="row ">
                                 <div class="col-md-12 jiaose select_category_div">
                                     {% for category in categories if category['path'] in allow_edit  %}
-                                        <span class="{{"select_category_active" if category['path'] == allow_edit[0] else "select_category" }}" data-id="{{ category['_id'] }}" data-path="{{ category['path'] }}" data-selected="">{{ category['name'] }}</span>
+                                        <span class= "select_category" data-id="{{ category['_id'] }}" data-path="{{ category['path'] }}" data-selected="">{{ category['name'] }}</span>
                                     {% endfor %}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-{#                                    <p >参与人数</p>#}
-{#                                    <p class="p">#}
-{#                                        <input type="radio" name="rens" value="1">1人&nbsp;&nbsp;#}
-{#                                        <input type="radio" name="rens" value="2">2人&nbsp;&nbsp;#}
-{#                                        <input type="radio" name="rens" value="3">3人&nbsp;&nbsp;#}
-{#                                        <input type="radio" name="rens" value="4">4人&nbsp;&nbsp;#}
-{#                                    </p>#}
-                                    <p>选择类别</p>
-                                    <p class="p create_type">
-                                        <input type="radio" checked name="leibie" value="项目">项目
-                                        <input type="radio" name="leibie" value="模块">模块
-                                    </p>
-                                    <p class="select_project_title">模块归属</p>
-                                    <p class="p select_project_div">
-                                        <!--
-                                        <input type="radio" name="mokgs" value="c">xx项目
-                                        <input type="radio" name="mokgs" value="e">web页面视觉优化
-                                        -->
-                                    </p>
+                                    <p class="select_project_title">项目选择</p>
+                                </div>
+                            </div>
+                            <div class="row ">
+                                <div class="col-md-12 jiaose select_project_div">
+{#                                    <input type="radio" name="mokgs" value="c">xx项目#}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p class="select_module_title">模块选择</p>
+                                </div>
+                            </div>
+                            <div class="row ">
+                                <div class="col-md-12 jiaose select_module_div">
+{#                                    <input type="radio" name="mokgs" value="c">xx模块#}
                                 </div>
                             </div>
                             <div class="row">
@@ -744,142 +808,5 @@
     <script src="../static/js/bootstrap-datetimepicker.min.js"></script>
     <script src="../static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
     <script src="../static/js/moment-with-locales.js"></script>
-    <script>
-{#    $(function(){#}
-{#        allow_view = {{ allow_view | safe }};#}
-{#        allow_edit = {{ allow_edit | safe }};#}
-{#        var temp = $('#tinj');#}
-{#        var temps = $('#xam');#}
-{##}
-{#        var tab = $("#tbyones");#}
-{#        var tabs = $("#tbytwos");#}
-{##}
-{#        var pup = $('#popupones');#}
-{#        var pups = $('#popups');#}
-{##}
-{#        $('#xam').remove();#}
-{##}
-{#        $("#tbytwos").remove();#}
-{##}
-{#        $('#popups').remove();#}
-{##}
-{#        $(".title .spn").click(function(){#}
-{#            $(".title span").removeClass('active');#}
-{#            $(this).addClass('active');#}
-{##}
-{#            if($(this)[0].innerHTML == "项目"){#}
-{##}
-{#                $('.tianjia').text("添加项目");#}
-{##}
-{#                $('#tinj').remove();#}
-{##}
-{#                $("#xamone").html(temps);#}
-{##}
-{#                $("#tbyones").remove();#}
-{##}
-{#                $("#tbytwo").html(tabs);#}
-{##}
-{#                $("#popupones").remove();#}
-{##}
-{#                $("#popup").html(pups);#}
-{##}
-{#                // $.get('url',function(data, status){#}
-{##}
-{#                // })#}
-{##}
-{##}
-{#                console.log($("#tbytwo"));#}
-{#                // var pg = document.getElementById('pgs');#}
-{#                // setInterval(function(e){#}
-{#                // if(pg.value!=100) pg.value++;#}
-{#                // else pg.value = 0;#}
-{#                //  },100);#}
-{##}
-{#            }else{#}
-{#                $("#tinjone").html(temp);#}
-{##}
-{#                $('.tianjia').text("添加任务");#}
-{##}
-{#                $('#xam').remove();#}
-{##}
-{#                $("#tbytwos").remove();#}
-{##}
-{#                $("#tbyone").html(tab);#}
-{##}
-{#                $("#popups").remove();#}
-{##}
-{#                $("#popupone").html(pup);#}
-{#            }#}
-{#        });#}
-{##}
-{##}
-{#        function clicks(){#}
-{#            console.log("输出");#}
-{#        $('.modal-modifys').css('display','none');#}
-{#        $(".model-customs").css('display','block');#}
-{#        $('.modal-content-custom').css('display','block');#}
-{#            // $('model-custom').fadeOut(1000);#}
-{#        }#}
-{##}
-{#        // $(".tby tr").click(function(){#}
-{#        //     console.log("输出");#}
-{#        // $(".model-customs").css('display','block');#}
-{#        // $('.modal-content-custom').css('display','block');#}
-{#        //     // $('model-custom').fadeOut(1000);#}
-{#        // });#}
-{#        function btn(){#}
-{#            $('.model-customs').css('display','none');#}
-{#        };#}
-{#        function xiugai(){#}
-{#            $('.modal-content-custom').css('display','none');#}
-{#            $('.modal-modifys').css('display','block');#}
-{#        };#}
-{#        function baocun(){#}
-{#            $('.model-customs').css('display','none');#}
-{#            $('.modal-modifys').css('display','none');#}
-{#        };#}
-{##}
-{#        //设置日期时间控件#}
-{#        setInterval(function(){#}
-{#            $(function () {#}
-{#            var picker1 = $('.datetimepicker1').datetimepicker({#}
-{#                format: 'yyyy-mm-dd',#}
-{#                locale: moment.locale('zh-cn'),#}
-{#                language: 'zh-CN',//中文，需要引用zh-CN.js包#}
-{#            });#}
-{#            var picker2 = $('.datetimepicker2').datetimepicker({#}
-{#                format: 'yyyy-mm-dd',#}
-{#                locale: moment.locale('zh-cn'),#}
-{#                language: 'zh-CN',//中文，需要引用zh-CN.js包#}
-{#            });#}
-{#            //动态设置最小值#}
-{#            picker1.on('dp.change', function (e) {#}
-{#                picker2.data('DateTimePicker').minDate(e.date);#}
-{#            });#}
-{#            //动态设置最大值#}
-{#            picker2.on('dp.change', function (e) {#}
-{#                picker1.data('DateTimePicker').maxDate(e.date);#}
-{#            });#}
-{#            $('.jiaose span').click(function (e) {#}
-{#                $('.jiaose span').removeClass();#}
-{#                $(this).addClass('xuanz');#}
-{#                if($(this).index() == 0){#}
-{#                    $('.xm1').html('<input type="radio" name="xm">k1<input type="radio" name="xm">k2');#}
-{#                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">km1</option><option value="2">km2</option><option value="3">km3</option></select><span><input type="text"></span>');#}
-{#                }else if($(this).index() == 1){#}
-{#                    $('.xm1').html('<input type="radio" name="xm">a1<input type="radio" name="xm">a2');#}
-{#                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">am1</option><option value="2">am2</option><option value="3">am3</option></select><span><input type="text"></span>');#}
-{#                }else if($(this).index() == 2){#}
-{#                    $('.xm1').html('<input type="radio" name="xm">u1<input type="radio" name="xm">u2');#}
-{#                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">um1</option><option value="2">um2</option><option value="3">um3</option></select><span><input type="text"></span>');#}
-{#                }else if($(this).index() == 3){#}
-{#                    $('.xm1').html('<input type="radio" name="xm">p1<input type="radio" name="xm">p2');#}
-{#                    $('.mokmd').html('<select name="mokuai" id=""><option value="1">pm1</option><option value="2">pm2</option><option value="3">pm3</option></select><span><input type="text"></span>');#}
-{#                }#}
-{#            })#}
-{#        });#}
-{#        },10);#}
-{#    });#}
-    </script>
 </body>
 </html>

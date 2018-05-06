@@ -8,7 +8,12 @@ $(function(){
         $.post(`${url}/add`, args, function(resp){
             let json = JSON.parse(resp);
             alert(json['message']);
-            location.reload();
+            if(json['message'] === "success"){
+                location.reload()
+            }
+            else{
+                // nothing ...
+            }
         });
     });
 
@@ -41,7 +46,12 @@ $(function(){
                 $.post(`${url}/delete`, args, function (resp) {
                     let json = JSON.parse(resp);
                     alert(json['message']);
-                    location.reload();
+                    if(json['message'] === "success"){
+                        location.reload()
+                    }
+                    else{
+                        // nothing ...
+                    }
                 })
             }else{}
         });

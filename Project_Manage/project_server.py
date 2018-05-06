@@ -14,6 +14,7 @@ import json
 from json import JSONDecodeError
 from module.user_module import *
 from module.project_module import *
+from mongo_db import get_datetime_from_str
 from tools_module import *
 import calendar
 import os
@@ -309,12 +310,19 @@ def home_func(key1, key2):
     :param key2:
     :return:
     """
+    now = datetime.datetime.now()
     categories = Category.get_all(can_json=True)
     category_dict = {x['_id']: x for x in categories}
     group = get_platform_session_arg("group")
     allow_view_ids = get_platform_session_arg("allow_view")
+    if allow_view_ids is None:
+        clear_platform_session()
+        return redirect(url_for("login_func"))
     allow_view = [category_dict[x]['path'] for x in allow_view_ids]
     allow_edit_ids = get_platform_session_arg("allow_edit")
+    if allow_edit_ids is None:
+        clear_platform_session()
+        return redirect(url_for("login_func"))
     allow_edit = [category_dict[x]['path'] for x in allow_edit_ids]
     all_projects = Project.get_all(can_json=True)
     allow_edit_projects = dict()  # 允许编辑的项目的字典,key是category的id
@@ -334,16 +342,21 @@ def home_func(key1, key2):
     allow_edit_modules = dict()  # 允许编辑的模块的字典,key是project的id
     for m in modules:
         p_id = m['project_id']
+        begin_date = get_datetime_from_str(m['begin_date'])
+        end_date = get_datetime_from_str(m['end_date']) if m.get("end_date") is not None else now
+        date_range = Module.calculate_date_range(begin_date, end_date)  # 计算工期
+        m['date_range'] = date_range
+        m['begin_date'] = begin_date.strftime("%F")
+        m['end_date'] = end_date.strftime("%F")
         m_list = allow_edit_modules.get(p_id)
         if m_list is None:
             m_list = list()
         m_list.append(m)
         allow_edit_modules[p_id] = m_list
-    now = datetime.datetime.now()
-    year = now.year
-    month = now.month
+    year = int(get_arg(request, "y")) if get_arg(request, "y", "").isdecimal() else now.year
+    month = int(get_arg(request, "m")) if get_arg(request, "m", "").isdecimal() else now.month
     current_month_str = "{}年{}月".format(year, month)
-    first_day, last_day = calendar.monthrange(year, month)
+    first_day, last_day = 1, calendar.monthrange(year, month)[-1]
     days = list()
     week_dict = {0: "一", 1: "二", 2: "三", 3: "四", 4: "五", 5: "六", 6: "日"}
     weeks = list()
@@ -351,6 +364,10 @@ def home_func(key1, key2):
         days.append(i)
         day = datetime.date(year=year, month=month, day=i)
         weeks.append(week_dict[day.weekday()])
+    """取项目和category的对应关系"""
+    project_map = {x['_id']: x['name'] for x in all_projects}
+    project_category_map = {x["_id"]: category_dict[x['category_id']]['name'] for x in all_projects if x['category_id'] in
+                     category_dict}
     if group != "worker":
         """管理员不能访问此页面"""
         return redirect(url_for("login_func"))
@@ -358,14 +375,118 @@ def home_func(key1, key2):
         cur_method = request.method.lower()
         if cur_method == "get":
             if key1 == "all":
+                first_day_in_month =  get_datetime_from_str("{}-{}-{} 0:0:0".format(year, month, first_day))
+                last_day_in_month =  get_datetime_from_str("{}-{}-{} 23:59:59".format(year, month, last_day))
                 """登录后的主页，所有用户都能查看所有任务"""
-                f = {"status": {"$nin": ['invalid']}}
+                f = {
+                    "status": {"$nin": ['invalid']},
+                    "begin_date": {"$lte": last_day_in_month},
+                    "end_date": {"$gte": first_day_in_month}
+                }
                 s = {"project_id": -1, "module_id": -1, "status": -1, "type": -1, "begin_date": -1}
-                tasks = Task.find_plus(filter_dict=f, sort_dict=s, can_json=True)
-                return render_template("home.html", tasks=tasks, allow_edit=allow_edit, categories=categories,
+                tasks = Task.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
+                """将查询到的本月数据进行整理，以方便页面显示"""
+                min_line_count = 20 if len(tasks) < 20 else len(tasks)  # 最小行数
+                rows = list()  # 干特图的行组成的数组
+                """任务状态字典,注意normal需要判断是否已开始任务？"""
+                status_dict = {"normal": "正常",
+                               "complete": "完成",
+                               "fail":  "失败",
+                               "drop":  "放弃",
+                               "suspend": "暂停",
+                               "delay": "超期"}
+                for line in range(min_line_count + 1):
+                    task = None
+                    try:
+                        task = tasks[line]
+                        """计算任务工期"""
+                        begin_date = get_datetime_from_str(m['begin_date'])
+                        end_date = get_datetime_from_str(m['end_date']) if task.get("end_date") is not None else now
+                        date_range = Task.calculate_date_range(begin_date, end_date)
+                        task['date_range'] = date_range
+                        task['begin_date_str'] = begin_date.strftime("%F")  # 注意，只有task的字段名不同
+                        task['end_date_str'] = end_date.strftime("%F")  # 注意，只有task的字段名不同
+                    except IndexError as e:
+                        print(e)
+                    finally:
+                        pass
+                    row = list()
+                    if task is None:
+                        row = [""] * last_day
+                    else:
+                        """截取任务处于本月时间区间内的你部分，计算这一部分的开始和结束的day"""
+                        begin_data_task = task['begin_date']
+                        begin_data_task = first_day_in_month if begin_data_task < first_day_in_month else begin_data_task
+                        end_data_task = task['end_date']
+                        end_data_task = last_day_in_month if end_data_task > last_day_in_month else end_data_task
+                        begin_day = begin_data_task.day
+                        end_day = end_data_task.day
+                        for day in range(first_day, last_day + 1):
+                            if begin_day <= day <= end_day:
+                                if day == end_day:
+                                    status = status_dict[task['status']]
+                                    project_id = str(task['project_id'].id)
+                                    project_name = project_map[project_id]
+                                    category_name = project_category_map[project_id]
+                                    the_begin_date = task['begin_date']
+                                    if status == "正常":
+                                        if the_begin_date <= now:
+                                            status = "推进中"
+                                        else:
+                                            status = "未开始"
+                                    temp = {
+                                        "_id": str(task['_id']),
+                                        "category_name": category_name,
+                                        "project_name": project_name,
+                                        "begin_date": the_begin_date.strftime("%F"),
+                                        "end_date": task['end_date'].strftime("%F"),
+                                        "type": task['type'],
+                                        "status": status,
+                                        "name": task['name'],
+                                        "colspan": (end_day - begin_day) + 1
+                                    }
+                                    row.append(temp)
+                                else:
+                                    pass
+                            else:
+                                row.append("")
+                    rows.append(row)
+                """左侧导航部分的项目列表,计算项目工期"""
+                for p in all_projects:
+                    begin_date = get_datetime_from_str(p['begin_date'])
+                    end_date = get_datetime_from_str(p['end_date']) if p.get("end_date") is not None else now
+                    date_range = Project.calculate_date_range(begin_date, end_date)
+                    p['date_range'] = date_range
+                    p['begin_date'] = begin_date.strftime("%F")
+                    p['end_date'] = end_date.strftime("%F")
+                """左侧导航部分的模块列表,模块工期在前面求allow_edit_modules时已计算"""
+                """左侧导航部分的功能列表,计算功能工期"""
+                missions = Mission.get_all(can_json=True)
+                module_mission_dict = dict()  # 模块和功能的对应字典
+                for m in missions:
+                    m_id = m['module_id']
+                    m_list = module_mission_dict.get(m_id)
+                    if m_list is None:
+                        m_list = list()
+                    m_list.append(m)
+                    module_mission_dict[m_id] = m_list
+                    begin_date = get_datetime_from_str(m['begin_date'])
+                    end_date = get_datetime_from_str(m['end_date']) if m.get("end_date") is not None else now
+                    date_range = Project.calculate_date_range(begin_date, end_date)
+                    m['date_range'] = date_range
+                    m['begin_date'] = begin_date.strftime("%F")
+                    m['end_date'] = end_date.strftime("%F")
+                return render_template("home.html", trs=rows, allow_edit=allow_edit, categories=categories,
                                        allow_view=allow_view, cur_method=cur_method, days=days, weeks=weeks,
                                        current_month=current_month_str, projects=allow_edit_projects,
-                                       allow_edit_modules=allow_edit_modules)
+                                       allow_edit_modules=allow_edit_modules, nav_projects=all_projects,
+                                       nav_modules=modules, nav_missions=missions, tasks=tasks,
+                                       module_mission_dict=module_mission_dict)
+            elif key1 in ['web', 'app', 'platform']:
+                part = get_arg(request, "part", "chart")  # url参数，用于确认处于哪一个子导航下？
+                return render_template("category_chart.html", key1=key1, key2=key2, part=part)
+            else:
+                return abort(404)
         elif cur_method == "post":
             mes = {"message": "success"}
             if key1 == "project":
@@ -437,6 +558,36 @@ def home_func(key1, key2):
                         r = None
                         try:
                             r = Task.add_instance(**args)
+                        except Exception as e:
+                            mes['message'] = str(e)
+                        finally:
+                            if r is None and mes['message'] == "success":
+                                mes['message'] = "添加失败"
+                            else:
+                                pass
+                elif key2 == "edit":
+                    """编辑"""
+                else:
+                    return abort(401)
+            elif key1 == "mission":
+                """功能"""
+                if key2 == "add":
+                    """添加"""
+                    args = get_args(request)
+                    project_id = args.get("project_id")
+                    module_id = args.get("module_id")
+                    if project_id is None or len(project_id) != 24:
+                        mes['message'] = "project_id参数错误"
+                    elif module_id is None or len(module_id) != 24:
+                        mes['message'] = "module_id参数错误"
+                    else:
+                        project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id))
+                        module_dbref = DBRef(collection=Module.get_table_name(), id=ObjectId(module_id))
+                        args['project_id'] = project_dbref
+                        args['module_id'] = module_dbref
+                        r = None
+                        try:
+                            r = Mission.add_instance(**args)
                         except Exception as e:
                             mes['message'] = str(e)
                         finally:
