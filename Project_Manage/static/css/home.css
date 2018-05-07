@@ -113,7 +113,7 @@
 }
 .content .dv-right .top .time-title{
     text-align: center;
-    padding: 20px 0;
+    padding: 10px 0 20px;
     font-size: 18px;
 }
 .content .dv-right table thead tr span{
@@ -189,4 +189,44 @@
     background-color: cornflowerblue;
     line-height: 2em;
     text-align: center;
+}
+.change_show{
+    margin-top:5px;
+    margin-left:1rem;
+}
+.change_show span:hover{
+    cursor:pointer;
+}
+#chart_title,#my_chart{
+    display: none;
+}
+#my_chart{
+    /*background-color: cadetblue;*/
+ }
+#launch_view_modal{
+    /*通用查看模态框的触发按钮*/
+    display: none;
+}
+#view_modal .my_item{
+    /*通用查看模态框的内容主体*/
+    padding: 2rem;
+}
+#view_modal .my_item {
+
+}
+.user_info{
+    /*用户信息区*/
+    font-size: 1rem;
+    float: right;
+    margin-top: 1em;
+    margin-right:1em;
+}
+.user_info span{
+    border: 1px solid #fff;
+    padding: 0.15em 0.6em;
+    border-radius: 0.4em;
+}
+.user_info span:hover{
+    cursor: pointer;
+    border-color:#666;
 }

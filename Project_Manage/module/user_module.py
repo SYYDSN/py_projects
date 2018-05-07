@@ -40,11 +40,11 @@ class User(mongo_db.BaseDoc):
     """
     type_dict['group'] = str
     """
-    可以查看的类别组,默认是空，不可以查看所有类别
+    可以查看的类别组,默认是空，不可以查看所有类别[ObectId]
     """
     type_dict['allow_view'] = list
     """
-    可以编辑的类别组。默认为空，不能操作任何类别
+    可以编辑的类别组。默认为空，不能操作任何类别[ObectId]
     """
     type_dict['allow_edit'] = list
     type_dict['status'] = int  # 0表示不可用,1表示可用
@@ -249,7 +249,7 @@ class User(mongo_db.BaseDoc):
         res = dict()
         user = cls.find_by_id(user_id)
         if isinstance(user, cls):
-            view_ids = user.get_attr("allow_access")
+            view_ids = user.get_attr("allow_view")
             if view_ids is None or len(view_ids) == 0:
                 v_rules = dict()
             else:

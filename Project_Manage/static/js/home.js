@@ -1,6 +1,35 @@
 $(function(){
     const url = location.pathname.replace("/view","");
 
+    // 启动页面时,初始化#my_chart的大小
+    let resize_chart = function(){
+        let obj = $("#my_bar");
+        let w = obj.width();
+        let h = obj.height();
+        $("#my_chart").css({"min-width": w, "min-height": h});
+    };
+    resize_chart();
+    $(window).resize(function(){resize_chart();});
+
+    // 切换甘特图和架构图
+    $(".change_show span").each(function(){
+        let $this = $(this);
+        $this.click(function(){
+            let text = $this.text();
+            if(text.indexOf("甘特") !== -1){
+                $(".dv-right #chart_title, .dv-right #my_chart").hide();
+               $(".dv-right #bar_title, .dv-right #my_bar").show();
+            }
+            else{
+                $(".dv-right #bar_title, .dv-right #my_bar").hide();
+                $(".dv-right #chart_title, .dv-right #my_chart").show();
+                if(!chart_visual){
+                    draw_chart(); // 绘制图表
+                }
+            }
+        });
+    });
+
     //左侧导航的hover事件
     $(".p_nav").hover(function(){
         let spn = $(this).find(".spn");
@@ -12,9 +41,6 @@ $(function(){
         if(spn.hasClass("actives")){
              spn.removeClass("actives");
         }
-    }).dblclick(function(){
-        // 双击事件。
-        alert();
     });
 
     // 日期选择器初始化函数
@@ -23,6 +49,7 @@ $(function(){
         * 日期插件文档 http://www.bootcss.com/p/bootstrap-datetimepicker/index.htm
         * id_str参数是日期input的id/class
         */
+        console.log(`a_str is ${a_str}`);
         $(`${a_str}`).datetimepicker({
             language: "zh-CN",
             weekStart: 1,  // 星期一作为一周的开始
@@ -107,7 +134,7 @@ $(function(){
     // 启动时,调整左侧底部按钮为添加项目
     $("#add_item").attr("data-target", ".add_task_modal").text("添加任务");
 
-    // 添加 项目/任务 切换
+    // 添加 项目/模块/功能/任务 切换
     $(".dv-left .title .spn").each(function(){
         let $this = $(this);
         $this.click(function(){
@@ -326,13 +353,337 @@ $(function(){
             console.log(json);
             alert(json['message']);
             if(json['message'] === "success"){
-                location.reload()
+                location.reload();
             }
             else{
                 // nothing ...
             }
         });
     });
+
+    // 查看 任务/项目/模块/功能的通用函数
+    view_item = function(obj){
+        let $this = $(obj);
+        // 当前类别是?
+        let class_text = $(".dv-left .title .active").text();
+        let html = "";
+        let the_class = "project";
+        let the_class_name = "项目";
+        let _id = $this.attr("data-id");
+        if(class_text.indexOf("功能") !== -1){
+            // 查看功能
+            the_class = "mission";
+            the_class_name = "功能";
+        }
+        else if(class_text.indexOf("模块") !== -1){
+            // 查看功能
+            the_class = "module";
+            the_class_name = "模块";
+        }
+        else if(class_text.indexOf("项目") !== -1){
+            // 查看功能
+            the_class = "project";
+            the_class_name = "项目";
+        }
+        else if(class_text.indexOf("任务") !== -1){
+            // 查看功能
+            the_class = "task";
+            the_class_name = "任务";
+        }
+        else{}
+        let url = `/home_${the_class}/get`;
+        $.post(url, {"_id": _id}, function(resp){
+            let json = JSON.parse(resp);
+            console.log(json);
+            if(json['message'] !== "success"){
+                alert(json['message']);
+            }
+            else{
+                let cur_project_id = undefined;
+                let cur_module_id = undefined;
+                let data = json['data'];
+                $("#view_modal .modal-title").attr("data-class", the_class).text(`查看${the_class_name}`);
+                let outer = $("#view_modal .my_item");
+                outer.empty();
+
+                // id
+                let id = $(`<div style="display: none" class="form-group"><label>id</label>
+                                     <input type="text" data-key="_id" class="form-control my_arg" value="${data['_id']}">
+                                  </div>`);
+                outer.append(id);
+                // name
+                let name = $(`<div class="form-group"><label>功能说明</label>
+                                     <input type="text" data-key="name"  class="form-control my_arg" value="${data['name']}">
+                                  </div>`);
+                outer.append(name);
+                // Category.path
+                let c_path = data['path'];
+                if(c_path === undefined){
+                    // nothing ...
+                }
+                else{
+                    let path = $(`<div class="form-group"><label>url_path</label>
+                                     <input type="text" data-key="path"  class="form-control my_arg" value="${c_path}">
+                                  </div>`);
+                    outer.append(path);
+                }
+                // Task.type
+                let t_type = data['type'];
+                if(t_type === undefined){
+                    // nothing ...
+                }
+                else{
+                    let type = $(`<div class="form-group"><label>任务类型</label>
+                                     <select data-key="type" class="my_arg">
+                                        <option value="feature">功能</option>
+                                        <option value="debug">debug</option>
+                                     </select>
+                                  </div>`);
+                    outer.append(type);
+                }
+                // project
+                if(the_class === "project"){
+                    // nothing...  项目本身没这个属性
+                }
+                else{
+                    let project_opts = "";
+                    for(let x of all_projects){
+                        project_opts += `<option value="${x['_id']}">${x['name']}</option>"`;
+                    }
+                    let project = $(`<div class="form-group"><label>项目</label>
+                                         <select data-key="project_id" class="my_arg my_project">
+                                            ${project_opts}
+                                         </select>
+                                      </div>`);
+                    outer.append(project);
+                    cur_project_id = data['project_id'];
+                    cur_module_id = data['module_id'];
+                    $("#view_modal .my_item .my_project").val(cur_project_id).change(function(){
+                        // 选择事件
+                        console.log("my_project change");
+                        let p_id = $(this).val();
+                        let m_html = "";
+                        let ms = allow_edit_modules[p_id];
+                        if(ms === undefined){
+                            // nothing ...
+                        }
+                        else{
+                            for(let m of ms){
+                                m_html += `<option value="${m['_id']}">${m['name']}</option>`;
+                            }
+                        }
+                        $("#view_modal .my_item .my_module").empty().html(m_html);
+                    });
+
+                }
+                // module
+                if(the_class === "project" || the_class === "module"){
+                    // nothing  项目和模块没有module_id属性
+                }
+                else{
+                    let module_opts = "";
+                    for(let x of all_modules){
+                        module_opts += `<option value="${x['_id']}">${x['name']}</option>"`;
+                    }
+                    let module = $(`<div class="form-group"><label>模块</label>
+                                         <select data-key="module_id" class="my_arg my_module">
+                                            ${module_opts}
+                                         </select>
+                                      </div>`);
+                    outer.append(module);
+                    $("#view_modal .my_item .my_module").val(cur_module_id);
+                }
+                // begin_date
+                let date = $(`<div class="form-group"><label>起止时间</label>
+                                     <div class="">
+                                     <input data-key="begin_date" class="my_arg begin_date col-lg-6 col-md-6 col-sm-6">
+                                     <input data-key="end_date" class="my_arg end_date col-lg-6 col-md-6 col-sm-6">
+                                     </div>
+                                  </div>`);
+                outer.append(date);
+                date_picker("#view_modal .my_item .begin_date");
+                date_picker("#view_modal .my_item .end_date");
+                $("#view_modal .my_item .begin_date").val(data['begin_date']);
+                $("#view_modal .my_item .end_date").val(data['end_date']);
+                // status
+                let status = $(`<div class="form-group"><label>状态</label>
+                                     <select data-key="status" class="my_arg">
+                                        <option value="normal">正常</option>
+                                        <option value="stop">停止</option>
+                                        <option value="suspend">暂停</option>
+                                     </select>
+                                  </div>`);
+                if(the_class === "mission"){
+                    status = $(`<div class="form-group"><label>状态</label>
+                                     <select data-key="status" class="my_arg">
+                                        <option value="ready">准备</option>
+                                        <option value="developing">开发中</option>
+                                        <option value="complete">完成</option>
+                                     </select>
+                                  </div>`);
+                }
+                else if(the_class === "task"){
+                    status = $(`<div class="form-group"><label>状态</label>
+                                     <select data-key="status" class="my_arg">
+                                        <option value="normal">正常</option>
+                                        <option value="fail">失败</option>
+                                        <option value="drop">放弃</option>
+                                        <option value="suspend">暂停</option>
+                                        <option value="delay">超期</option>
+                                        <option value="complete">完成</option>
+                                     </select>
+                                  </div>`);
+                }
+                else{}
+                outer.append(status);
+                $("#view_modal .my_item .my_status").val(data['status']);
+                // description
+                let desc = $(`<div class="form-group">
+                                     <label>备注</label>
+                                     <input data-key="description" class="form-control my_arg" value="${data['description']}">
+                                  </div>`);
+                outer.append(desc);
+
+                // 判断权限
+                let can_edit = false;
+                let cur_category = data['category_path'];
+                if(cur_category !== undefined){
+                    if(allow_edit.indexOf(cur_category) !== -1){
+                        can_edit = true;
+                    }
+                    else{
+                        can_edit = false;
+                    }
+                }else{}
+                if(cur_project_id !== undefined){
+                    if(allow_edit_pids.indexOf(cur_project_id) !== -1){
+                        can_edit = true;
+                    }
+                    else{
+                        can_edit = false;
+                    }
+                }else{}
+                if(cur_module_id !== undefined){
+                    if(allow_edit_mids.indexOf(cur_module_id) !== -1){
+                        can_edit = true;
+                    }
+                    else{
+                        can_edit = false;
+                    }
+                }else{}
+
+                if(can_edit){
+                    $("#view_modal .only_read").hide();
+                    $("#view_modal .can_edit").show();
+                }else{
+                    $("#view_modal .can_edit").hide();
+                    $("#view_modal .only_read").show();
+                }
+
+                $("#launch_view_modal").click();
+            }
+
+        });
+    };
+
+    // 模态框的编辑提交按钮
+    $("#edit_submit").click(function(){
+        let text = $(this).text();
+        if(text === "编辑"){
+            $(this).text("保存");
+        }
+        else{
+            let modal = $("#view_modal");
+            let the_class = $("#view_modal .modal-title").attr("data-class");
+            let url = `/home_${the_class}/edit`;
+            // 取参数,
+            let inputs = $("#view_modal .form-group .my_arg");
+            let args = {};
+            for(let input of inputs){
+                let cur = $(input);
+                let key = cur.attr("data-key");
+                let val = cur.val();
+                args[key] = val;
+            }
+            $.post(url, args, function(resp){
+                let json = JSON.parse(resp);
+                if(json['message'] === "success"){
+                    alert("修改成功");
+                    location.reload();
+                }
+                else{
+                    alert(json['message']);
+                    return false;
+                }
+            });
+        }
+    });
+
+    // 绘制树状图
+    let chart_visual = false;  // 图标是否处于可见状态?
+    let draw_chart = function(){
+        let my = echarts.init($("#my_chart")[0]);
+        // let ss = {"type": "tree", "name": tree_dict['name'], data:tree_dict['children']};
+        let ss = [
+            {
+                type: 'tree',
+                name: tree_dict['name'],
+                data: [tree_dict],
+
+                top: '1%',
+                left: '7%',
+                bottom: '1%',
+                right: '20%',
+
+                symbolSize: 7,
+
+                label: {
+                    normal: {
+                        position: 'left',
+                        verticalAlign: 'middle',
+                        align: 'right',
+                        fontSize: 9
+                    }
+                },
+
+                leaves: {
+                    label: {
+                        normal: {
+                            position: 'right',
+                            verticalAlign: 'middle',
+                            align: 'left'
+                        }
+                    }
+                },
+
+                expandAndCollapse: true,
+                animationDuration: 550,
+                animationDurationUpdate: 750
+            }
+        ];
+        let opt = {tooltip: {
+            trigger: 'item',
+            triggerOn: 'mousemove'
+        },
+            legend: {
+                top: '2%',
+                left: '3%',
+                orient: 'vertical',
+                data: [{
+                    name: 'tree1',
+                    icon: 'rectangle'
+                } ,
+                    {
+                        name: 'tree2',
+                        icon: 'rectangle'
+                    }],
+                borderColor: '#c23531'
+            },
+            series:ss
+        };
+        my.setOption(opt);
+        chart_visual = true;
+    };
 
 //end!!!
 });

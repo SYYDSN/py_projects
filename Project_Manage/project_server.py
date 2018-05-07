@@ -310,6 +310,7 @@ def home_func(key1, key2):
     :param key2:
     :return:
     """
+    user_name = get_platform_session_arg("user_name")
     now = datetime.datetime.now()
     categories = Category.get_all(can_json=True)
     category_dict = {x['_id']: x for x in categories}
@@ -340,7 +341,12 @@ def home_func(key1, key2):
         allow_edit_projects[x] = p_list
     modules = Module.get_all(can_json=True)
     allow_edit_modules = dict()  # 允许编辑的模块的字典,key是project的id
+    module_map = dict()  # 模块的id和name的字典
+    allow_edit_mids = list()  # 允许编辑的模块的id组成的数组
     for m in modules:
+        m_id = m['_id']
+        allow_edit_mids.append(m_id)
+        module_map[m_id] = m['name']
         p_id = m['project_id']
         begin_date = get_datetime_from_str(m['begin_date'])
         end_date = get_datetime_from_str(m['end_date']) if m.get("end_date") is not None else now
@@ -366,8 +372,8 @@ def home_func(key1, key2):
         weeks.append(week_dict[day.weekday()])
     """取项目和category的对应关系"""
     project_map = {x['_id']: x['name'] for x in all_projects}
-    project_category_map = {x["_id"]: category_dict[x['category_id']]['name'] for x in all_projects if x['category_id'] in
-                     category_dict}
+    project_category_map = {x["_id"]: {"name": category_dict[x['category_id']]['name'], "_id": x['category_id']}
+                            for x in all_projects if x['category_id'] in category_dict}
     if group != "worker":
         """管理员不能访问此页面"""
         return redirect(url_for("login_func"))
@@ -375,8 +381,8 @@ def home_func(key1, key2):
         cur_method = request.method.lower()
         if cur_method == "get":
             if key1 == "all":
-                first_day_in_month =  get_datetime_from_str("{}-{}-{} 0:0:0".format(year, month, first_day))
-                last_day_in_month =  get_datetime_from_str("{}-{}-{} 23:59:59".format(year, month, last_day))
+                first_day_in_month = get_datetime_from_str("{}-{}-{} 0:0:0".format(year, month, first_day))
+                last_day_in_month = get_datetime_from_str("{}-{}-{} 23:59:59".format(year, month, last_day))
                 """登录后的主页，所有用户都能查看所有任务"""
                 f = {
                     "status": {"$nin": ['invalid']},
@@ -427,7 +433,7 @@ def home_func(key1, key2):
                                     status = status_dict[task['status']]
                                     project_id = str(task['project_id'].id)
                                     project_name = project_map[project_id]
-                                    category_name = project_category_map[project_id]
+                                    category_name = project_category_map[project_id]['name']
                                     the_begin_date = task['begin_date']
                                     if status == "正常":
                                         if the_begin_date <= now:
@@ -476,15 +482,32 @@ def home_func(key1, key2):
                     m['date_range'] = date_range
                     m['begin_date'] = begin_date.strftime("%F")
                     m['end_date'] = end_date.strftime("%F")
-                return render_template("home.html", trs=rows, allow_edit=allow_edit, categories=categories,
+                """获取全部类别的树状图数据"""
+                m_mi_dict = get_dict(missions, key="module_id", value_keys=["_id", "name", "status"])
+                p_m_dict = get_dict(modules, key="project_id", value_keys=["_id", "name", "status"])
+                for k, v in p_m_dict.items():
+                    for x in v:
+                        item = list() if m_mi_dict.get(x['_id']) is None else m_mi_dict[x['_id']]
+                        x['children'] = item
+                c_p_dict = get_dict(all_projects, key='category_id', value_keys=["_id", "name", "status"])
+                for k, v in c_p_dict.items():
+                    for x in v:
+                        item = list() if p_m_dict.get(x['_id']) is None else p_m_dict[x['_id']]
+                        x['children'] = item
+                c_list = [{"_id": x['_id'], "name": x['name'], "children": list() if c_p_dict.get(x['_id']) is None
+                else c_p_dict[x['_id']]} for x in categories]
+                tree_dict = {"name": "苏秦网络", "children": c_list}
+                return render_template("home_template.html", trs=rows, allow_edit=allow_edit, categories=categories,
                                        allow_view=allow_view, cur_method=cur_method, days=days, weeks=weeks,
-                                       current_month=current_month_str, projects=allow_edit_projects,
+                                       current_month=current_month_str, allow_edit_projects=allow_edit_projects,
                                        allow_edit_modules=allow_edit_modules, nav_projects=all_projects,
-                                       nav_modules=modules, nav_missions=missions, tasks=tasks,
-                                       module_mission_dict=module_mission_dict)
+                                       nav_modules=modules, nav_missions=missions, tasks=tasks, tree_dict=tree_dict,
+                                       module_mission_dict=module_mission_dict, allow_edit_pids=allow_edit_pids,
+                                       allow_edit_mids=allow_edit_mids, user_name=user_name)
             elif key1 in ['web', 'app', 'platform']:
                 part = get_arg(request, "part", "chart")  # url参数，用于确认处于哪一个子导航下？
-                return render_template("category_chart.html", key1=key1, key2=key2, part=part)
+                return redirect("/home_all/view")
+                # return render_template("category_chart.html", key1=key1, key2=key2, part=part)
             else:
                 return abort(404)
         elif cur_method == "post":
@@ -512,6 +535,32 @@ def home_func(key1, key2):
                                 pass
                 elif key2 == "edit":
                     """编辑"""
+                    args = get_args(request)
+                    if "_id" in args:
+                        o_id = args.pop("_id")
+                        r = Project.update_instance(o_id, args)
+                        if r is None:
+                            mes['message'] = "保存失败,请检查错误日志"
+                        else:
+                            pass
+                    else:
+                        mes['message'] = "id必须"
+                elif key2 == "get":
+                    """查询"""
+                    o_id = get_arg(request, "_id", None)
+                    if isinstance(o_id, str) and len(o_id) == 24:
+                        o_id = mongo_db.get_obj_id(o_id)
+                        pro = Project.find_one_plus(filter_dict={"_id": o_id}, instance=False, can_json=True)
+                        if pro is None:
+                            mes['message'] = "找不到对应的记录"
+                        else:
+                            category = category_dict.get(pro['category_id'])
+                            if category is not None:
+                                pro['category_name'] = category['name']
+                                pro['category_path'] = category['path']
+                            mes['data'] = pro
+                    else:
+                        mes['message'] = "id不合法错误"
                 else:
                     return abort(401)
             elif key1 == "module":
@@ -537,6 +586,31 @@ def home_func(key1, key2):
                                 pass
                 elif key2 == "edit":
                     """编辑"""
+                    args = get_args(request)
+                    if "_id" in args:
+                        o_id = args.pop("_id")
+                        r = Module.update_instance(o_id, args)
+                        if r is None:
+                            mes['message'] = "保存失败,请检查错误日志"
+                        else:
+                            pass
+                    else:
+                        mes['message'] = "id必须"
+                elif key2 == "get":
+                    """查询"""
+                    o_id = get_arg(request, "_id", None)
+                    if isinstance(o_id, str) and len(o_id) == 24:
+                        o_id = mongo_db.get_obj_id(o_id)
+                        mod = Module.find_one_plus(filter_dict={"_id": o_id}, instance=False, can_json=True)
+                        if mod is None:
+                            mes['message'] = "找不到对应的记录"
+                        else:
+                            project_name = project_map.get(mod['project_id'])
+                            if project_name is not None:
+                                mod['project_name'] = project_name
+                            mes['data'] = mod
+                    else:
+                        mes['message'] = "id不合法错误"
                 else:
                     return abort(401)
             elif key1 == "task":
@@ -567,6 +641,34 @@ def home_func(key1, key2):
                                 pass
                 elif key2 == "edit":
                     """编辑"""
+                    args = get_args(request)
+                    if "_id" in args:
+                        o_id = args.pop("_id")
+                        r = Task.update_instance(o_id, args)
+                        if r is None:
+                            mes['message'] = "保存失败,请检查错误日志"
+                        else:
+                            pass
+                    else:
+                        mes['message'] = "id必须"
+                elif key2 == "get":
+                    """查询"""
+                    o_id = get_arg(request, "_id", None)
+                    if isinstance(o_id, str) and len(o_id) == 24:
+                        o_id = mongo_db.get_obj_id(o_id)
+                        task = Task.find_one_plus(filter_dict={"_id": o_id}, instance=False, can_json=True)
+                        if task is None:
+                            mes['message'] = "找不到对应的记录"
+                        else:
+                            module_name = module_map.get(task['module_id'])
+                            if module_name is not None:
+                                task['module_name'] = module_name
+                            project_name = project_map.get(task['project_id'])
+                            if project_name is not None:
+                                task['project_name'] = project_name
+                            mes['data'] = task
+                    else:
+                        mes['message'] = "id不合法错误"
                 else:
                     return abort(401)
             elif key1 == "mission":
@@ -596,7 +698,33 @@ def home_func(key1, key2):
                             else:
                                 pass
                 elif key2 == "edit":
-                    """编辑"""
+                    args = get_args(request)
+                    if "_id" in args:
+                        o_id = args.pop("_id")
+                        r = Mission.update_instance(o_id, args)
+                        if r is None:
+                            mes['message'] = "保存失败,请检查错误日志"
+                        else:
+                            pass
+                    else:
+                        mes['message'] = "id必须"
+                elif key2 == "get":
+                    o_id = get_arg(request, "_id", None)
+                    if isinstance(o_id, str) and len(o_id) == 24:
+                        o_id = mongo_db.get_obj_id(o_id)
+                        mis = Mission.find_one_plus(filter_dict={"_id": o_id}, instance=False, can_json=True)
+                        if mis is None:
+                            mes['message'] = "找不到对应的记录"
+                        else:
+                            module_name = module_map.get(mis['module_id'])
+                            if module_name is not None:
+                                mis['module_name'] = module_name
+                            project_name = project_map.get(mis['project_id'])
+                            if project_name is not None:
+                                mis['project_name'] = project_name
+                            mes['data'] = mis
+                    else:
+                        mes['message'] = "id不合法错误"
                 else:
                     return abort(401)
             else:
