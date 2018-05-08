@@ -822,14 +822,14 @@ def home_func(key1, key2):
                             """检查是否有对应的task"""
                             f = {"mission_id": mis.get_dbref(), "status": {"$nin": ['invalid']}}
                             ts = Task.find_plus(filter_dict=f, can_json=True)
-                            l = len(ts)
-                            if l == 0:
+                            length = len(ts)
+                            if length == 0:
                                 if mis.delete_self():
                                     pass
                                 else:
                                     mes['message'] = "删除失败,请检查错误日志"
                             else:
-                                ms = "有{}个有效的任务和本功能,故无法删除本功能.".format(l)
+                                ms = "有{}个有效的任务和本功能,故无法删除本功能.".format(length)
                                 mes['message'] = ms
                         else:
                             mes['message'] = "没有找到对应的实例"
