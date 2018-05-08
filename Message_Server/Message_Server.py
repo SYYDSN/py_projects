@@ -88,6 +88,11 @@ def listen_func(key):
         ms = "signal_test check secret is {}".format(check)
         logger.info(ms)
         print(ms)
+        """注意初始化方法不同了"""
+        args = data['data']
+        args['op'] = data['op']
+        teacher = VirtualTeacher(**args)
+        teacher.save_plus()
     else:
         mes['message'] = '错误的path'
     return json.dumps(mes)

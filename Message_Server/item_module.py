@@ -368,99 +368,232 @@ class Signal(mongo_db.BaseDoc):
         print(res)
 
 
+def create_teacher(**kwargs):
+    """
+    生成真实的老师的字典
+    """
+    d = dict()
+    d['direction'] = kwargs['_widget_1525161353528']
+    d['product'] = kwargs['_widget_1525161353525']
+    d['teacher_id'] = kwargs['_widget_1525161353522']['_id']
+    d['teacher_name'] = kwargs['_widget_1525161353522']['name']
+    return d
+
+
 class VirtualTeacher(mongo_db.BaseDoc):
     """
     虚拟老师
-    修改信号：
     {
-    'op': 'data_update',
-    'data': {
+      'op': 'data_create',
+      'data': {
+        'creator': {
+          'name': '徐立杰',
+          '_id': '5a684c9b42f8c1bffc68f4b4'
+        },
         'deleteTime': None,
-        'updater': {'_id': '5a684c9b42f8c1bffc68f4b4', 'name': '徐立杰'},
-        'updateTime': '2018-05-01T22:50:21.470Z',
-        'creator': {'_id': '5a684c9b42f8c1bffc68f4b4', 'name': '徐立杰'},
-        'createTime': '2018-05-01T22:49:07.372Z',
-        'deleter': None,
-        'entryId': '5ae81d8bdd481029da358eaf',
-        '_widget_1525161353498': 'robot01',
-        '_id': '5ae8eee3c8d18711bf2b0e8b',
-        'label': '',
+        'updater': {
+          'name': '徐立杰',
+          '_id': '5a684c9b42f8c1bffc68f4b4'
+        },
         'appId': '5a446c355a8c99236975be09',
         '_widget_1525161353511': [
-                                    {
-                                    '_widget_1525161353525': '恒指',
-                                    '_widget_1525161353522':
-                                                            {
-                                                            '_id': '5a1e680642f8c1bffc5dbd69',
-                                                            'name': '常阳'
-                                                            },
-                                    '_widget_1525161353528': '正向'
-                                    }
-                                ],
+          {
+            '_widget_1525161353528': '正向',
+            '_widget_1525161353525': '黄金',
+            '_widget_1525161353522': {
+              'name': '高特',
+              '_id': '5a1e680642f8c1bffc5dbd6b'
+            }
+          },
+          {
+            '_widget_1525161353528': '反向',
+            '_widget_1525161353525': '恒指',
+            '_widget_1525161353522': {
+              'name': '常阳',
+              '_id': '5a1e680642f8c1bffc5dbd69'
+            }
+          },
+          {
+            '_widget_1525161353528': '正向',
+            '_widget_1525161353525': '全部',
+            '_widget_1525161353522': {
+              'name': '高巍',
+              '_id': '5aab3ea4340c1749505a2819'
+            }
+          }
+        ],
+        'createTime': '2018-05-08T22:13:32.952Z',
+        'label': '',
+        '_widget_1525161353498': 'robot1',
         'formName': '机器人分析师控制台',
-        'submitPrompt': {'content': ''}
-        }
+        '_id': '5af2210c58b42122eba5abf0',
+        'submitPrompt': {
+          'content': ''
+        },
+        'deleter': None,
+        'updateTime': '2018-05-08T22:13:32.952Z',
+        'entryId': '5ae81d8bdd481029da358eaf'
+      }
     }
-    删除信号：
+
     {
-    'op': 'data_remove',
-    'data': {
-            'deleteTime': '2018-05-01T22:54:27.124Z',
-            '_id': '5ae8eee3c8d18711bf2b0e8b',
-            'deleter': {
-                        '_id': '5a684c9b42f8c1bffc68f4b4',
-                        'name': '徐立杰'
-                        },
-            'entryId': '5ae81d8bdd481029da358eaf',
-            'formName': '机器人分析师控制台',
-            'appId': '5a446c355a8c99236975be09'
+      'op': 'data_update',
+      'data': {
+        'creator': {
+          'name': '徐立杰',
+          '_id': '5a684c9b42f8c1bffc68f4b4'
+        },
+        'deleteTime': None,
+        'updater': {
+          'name': '徐立杰',
+          '_id': '5a684c9b42f8c1bffc68f4b4'
+        },
+        'appId': '5a446c355a8c99236975be09',
+        '_widget_1525161353511': [
+          {
+            '_widget_1525161353528': '正向',
+            '_widget_1525161353525': '原油',
+            '_widget_1525161353522': {
+              'name': '语昂',
+              '_id': '5a1e680642f8c1bffc5dbd6f'
             }
+          },
+          {
+            '_widget_1525161353528': '反向',
+            '_widget_1525161353525': '恒指',
+            '_widget_1525161353522': {
+              'name': '常阳',
+              '_id': '5a1e680642f8c1bffc5dbd69'
+            }
+          },
+          {
+            '_widget_1525161353528': '正向',
+            '_widget_1525161353525': '全部',
+            '_widget_1525161353522': {
+              'name': '高巍',
+              '_id': '5aab3ea4340c1749505a2819'
+            }
+          }
+        ],
+        'createTime': '2018-05-08T22:13:32.952Z',
+        'label': '',
+        '_widget_1525161353498': 'robot1',
+        'formName': '机器人分析师控制台',
+        '_id': '5af2210c58b42122eba5abf0',
+        'submitPrompt': {
+          'content': ''
+        },
+        'deleter': None,
+        'updateTime': '2018-05-08T22:15:53.546Z',
+        'entryId': '5ae81d8bdd481029da358eaf'
+      }
     }
-    添加信号：
     {
-    'op': 'data_create',
-    'data': {
-            'deleteTime': None,
-            'updater': {
-                        '_id': '5a684c9b42f8c1bffc68f4b4',
-                        'name': '徐立杰'
-                        },
-            'creator': {
-                        '_id': '5a684c9b42f8c1bffc68f4b4',
-                        'name': '徐立杰'
-                        },
-            'createTime': '2018-05-01T22:56:31.941Z',
-            'updateTime': '2018-05-01T22:56:31.941Z',
-            'deleter': None,
-            'entryId': '5ae81d8bdd481029da358eaf',
-            '_widget_1525161353498': 'robot',
-            '_id': '5ae8f09fb8f1c151e52e8585',
-            'label': '',
-            'appId': '5a446c355a8c99236975be09',
-            '_widget_1525161353511': [
-                                        {
-                                        '_widget_1525161353525': '黄金',
-                                        '_widget_1525161353522': {
-                                                                    '_id': '5a1e680642f8c1bffc5dbd6f',
-                                                                    'name': '语昂'
-                                                                    },
-                                        '_widget_1525161353528': '反向'
-                                        },
-                                        {
-                                        '_widget_1525161353525': '原油',
-                                        '_widget_1525161353522': {
-                                                                    '_id': '5a1e680642f8c1bffc5dbd6b',
-                                                                    'name': '高特'
-                                                                    },
-                                        '_widget_1525161353528': '反向'
-                                        }
-                                    ],
-            'formName': '机器人分析师控制台',
-            'submitPrompt': {'content': ''}
-            }
+      'op': 'data_remove',
+      'data': {
+        'formName': '机器人分析师控制台',
+        '_id': '5af2210c58b42122eba5abf0',
+        'appId': '5a446c355a8c99236975be09',
+        'deleter': {
+          'name': '徐立杰',
+          '_id': '5a684c9b42f8c1bffc68f4b4'
+        },
+        'deleteTime': '2018-05-08T22:16:13.417Z',
+        'entryId': '5ae81d8bdd481029da358eaf'
+      }
     }
 
     """
+    _table_name = "virtual_teacher_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId  # 此id从信号获得
+    type_dict['creator_name'] = str
+    type_dict['creator_id'] = str
+    type_dict['create_time'] = datetime.datetime
+    type_dict['updater_name'] = str
+    type_dict['updater_id'] = str
+    type_dict['update_time'] = datetime.datetime
+    type_dict['deleter_name'] = str
+    type_dict['deleter_id'] = str
+    type_dict['delete_time'] = datetime.datetime
+    type_dict['teachers'] = list()
+
+    def __init__(self, **kwargs):
+        super(VirtualTeacher, self).__init__(**kwargs)
+
+    @classmethod
+    def instance(cls, **kwargs):
+        """接收简道云的信号时，请用此方法替代init"""
+        if "_id" in kwargs:
+            kwargs['_id'] = ObjectId(kwargs['_id'])
+        if "createTime" in kwargs:
+            create_time = cls.transform_time_zone(kwargs.pop('createTime', None))
+            if create_time is not None:
+                kwargs['create_time'] = create_time
+        if "updateTime" in kwargs:
+            update_time = cls.transform_time_zone(kwargs.pop('updateTime', None))
+            if update_time is not None:
+                kwargs['update_time'] = update_time
+        if "deleteTime" in kwargs:
+            delete_time = cls.transform_time_zone(kwargs.pop('deleteTime', None))
+            if delete_time is not None:
+                kwargs['delete_time'] = delete_time
+        creator = kwargs.pop("creator", None)
+        if creator is not None:
+            creator_name = creator.pop('name', None)
+            if creator_name is not None:
+                kwargs['creator_name'] = creator_name
+            creator_id = creator.pop('_id', None)
+            if creator_id is not None:
+                kwargs['creator_id'] = creator_id
+        updater = kwargs.pop("updater", None)
+        if updater is not None:
+            updater_name = updater.pop('name', None)
+            if updater_name is not None:
+                kwargs['updater_name'] = updater_name
+            updater_id = updater.pop('_id', None)
+            if updater_id is not None:
+                kwargs['updater_id'] = updater_id
+        deleter = kwargs.pop("deleter", None)
+        if deleter is not None:
+            deleter_name = creator.pop('name', None)
+            if deleter_name is not None:
+                kwargs['deleter_name'] = deleter_name
+            deleter_id = creator.pop('_id', None)
+            if deleter_id is not None:
+                kwargs['deleter_id'] = deleter_id
+        if "_widget_1525161353511" in kwargs:
+            teachers = kwargs.pop("_widget_1525161353511", None)
+            if teachers is not None:
+                teachers = [create_teacher(**x) for x in teachers]
+                kwargs['teachers'] = teachers
+        return cls(**kwargs)
+
+    @staticmethod
+    def create_teacher(**kwargs):
+        """
+        生成喊单的老师的字典
+        """
+        d = dict()
+        d['direction'] = kwargs['_widget_1525161353528']
+        d['product'] = kwargs['_widget_1525161353525']
+        d['teacher_id'] = kwargs['_widget_1525161353522']['_id']
+        d['teacher_name'] = kwargs['_widget_1525161353522']['name']
+        return d
+
+    @staticmethod
+    def transform_time_zone(a_time: (str, datetime.datetime)) -> (datetime.datetime, None):
+        """
+        转换时区，把时间+8个小时
+        :param a_time:
+        :return:
+        """
+        if isinstance(a_time, str):
+            a_time = mongo_db.get_datetime_from_str(a_time)
+        if not isinstance(a_time, datetime.datetime):
+            return None
+        else:
+            return a_time + datetime.timedelta(hours=8)  # 调整时区
 
 
 if __name__ == "__main__":
