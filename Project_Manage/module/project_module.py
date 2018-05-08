@@ -16,7 +16,12 @@ BaseDoc = mongo_db.BaseDoc
 
 
 class RepeatInstanceError(ValueError):
-    """自定义一个异常,用于提醒错误的种类"""
+    """自定义一个异常,用于有重复的对象的时候抛出异常"""
+    pass
+
+
+class HasChildren(ValueError):
+    """自定义一个异常,用于在删除一个实例之前,如果检查到实例有被引用dbref的情况时,抛出异常"""
     pass
 
 
@@ -929,7 +934,7 @@ class Mission(Project):
     type_dict['module_id'] = DBRef
     type_dict['name'] = str
     type_dict['description'] = str
-    type_dict['status'] = str  # ready/developing/complete  就绪未开始（默认）/开发中。/完成
+    type_dict['status'] = str  # ready/developing/complete/invalid  就绪未开始（默认）/开发中。/完成/删除
     type_dict['create_date'] = datetime.datetime
 
     def __init__(self, **kwargs):
@@ -1081,6 +1086,7 @@ class Task(Project):
     type_dict['_id'] = ObjectId
     type_dict['project_id'] = DBRef
     type_dict['module_id'] = DBRef
+    type_dict['mission_id'] = DBRef
     type_dict['name'] = str
     type_dict['description'] = str
     """

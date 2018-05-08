@@ -73,7 +73,7 @@ $(function(){
     date_picker(".begin_date");
     date_picker(".end_date");
 
-    //  示选择项目的单选框的函数,在添加模块时调用,以提供选择项目的功能
+    //  显示选择项目的单选框的函数,在添加模块时调用,以提供选择项目的功能
     let show_projects = function(project_list){
         let outer = $(".select_project_div");
         outer.empty();
@@ -113,7 +113,7 @@ $(function(){
             for(let m of mission_list){
                 outer.append(`<input type="radio" name="ss_mission" data-id="${m['_id']}"  value="">${m['name']}`);
             }
-            if(module_list.length > 0){
+            if(mission_list.length > 0){
                 $(".mission_list").show();
             }
             else{
@@ -313,6 +313,7 @@ $(function(){
         // let category_id = $(".add_task_modal .select_category_div .select_category_active").attr("data-id");
         let project_id = $(".add_task_modal .select_project_div input[type='radio']:checked").attr("data-id");
         let module_id = $(".add_task_modal .select_module_div input[type='radio']:checked").attr("data-id");
+        let mission_id = $(".add_task_modal .select_mission_div input[type='radio']:checked").attr("data-id");
         let desc = $.trim($(".add_task_modal .create_desc").val());
         let args = {};
         let post_url = "/home_task/add";
@@ -343,6 +344,9 @@ $(function(){
             args['name'] = name;
             args['project_id'] = project_id;
             args['module_id'] = module_id;
+            if(mission_id !== undefined){
+                args['mission_id'] = mission_id;
+            }else{}
             args['begin_date'] = begin_date;
             args['end_date'] = end_date;
             args['description'] = desc;
@@ -362,35 +366,40 @@ $(function(){
     });
 
     // 查看 任务/项目/模块/功能的通用函数
-    view_item = function(obj){
+    view_item = function(obj, the_class, the_class_name){
         let $this = $(obj);
         // 当前类别是?
         let class_text = $(".dv-left .title .active").text();
         let html = "";
-        let the_class = "project";
-        let the_class_name = "项目";
         let _id = $this.attr("data-id");
-        if(class_text.indexOf("功能") !== -1){
-            // 查看功能
-            the_class = "mission";
-            the_class_name = "功能";
-        }
-        else if(class_text.indexOf("模块") !== -1){
-            // 查看功能
-            the_class = "module";
-            the_class_name = "模块";
-        }
-        else if(class_text.indexOf("项目") !== -1){
-            // 查看功能
+        if(the_class === undefined || the_class_name === undefined){
             the_class = "project";
             the_class_name = "项目";
+            if(class_text.indexOf("功能") !== -1){
+                // 查看功能
+                the_class = "mission";
+                the_class_name = "功能";
+            }
+            else if(class_text.indexOf("模块") !== -1){
+                // 查看功能
+                the_class = "module";
+                the_class_name = "模块";
+            }
+            else if(class_text.indexOf("项目") !== -1){
+                // 查看功能
+                the_class = "project";
+                the_class_name = "项目";
+            }
+            else if(class_text.indexOf("任务") !== -1){
+                // 查看功能
+                the_class = "task";
+                the_class_name = "任务";
+            }
+            else{}
+        }else{
+            console.log("无需设置the_class, the_class_name");
         }
-        else if(class_text.indexOf("任务") !== -1){
-            // 查看功能
-            the_class = "task";
-            the_class_name = "任务";
-        }
-        else{}
+
         let url = `/home_${the_class}/get`;
         $.post(url, {"_id": _id}, function(resp){
             let json = JSON.parse(resp);
@@ -492,6 +501,26 @@ $(function(){
                                       </div>`);
                     outer.append(module);
                     $("#view_modal .my_item .my_module").val(cur_module_id);
+                    // 检查是不是有mission_id,
+                    let cur_mission_id = data['mission_id'];
+                    if(cur_mission_id !== undefined){
+                        $.post("/home_module/children", {"module_id": cur_module_id}, function(resp){
+                            let ms = JSON.parse(resp)['data'];
+                            if(ms.length > 0){
+                                let mission_opts = "";
+                                for(let x of ms){
+                                    mission_opts += `<option value="${x['_id']}">${x['name']}</option>"`;
+                                }
+                                let mission = $(`<div class="form-group"><label>功能</label>
+                                         <select data-key="mission_id" class="my_arg my_mission">
+                                            ${mission_opts}
+                                         </select>
+                                      </div>`);
+                                outer.append(mission);
+                                $("#view_modal .my_item .my_mission").val(cur_mission_id);
+                            }
+                        });
+                    }
                 }
                 // begin_date
                 let date = $(`<div class="form-group"><label>起止时间</label>
@@ -586,37 +615,66 @@ $(function(){
         });
     };
 
+    // 双击甘特图的任务,弹出查看/编辑模态框
+    $(".my_plan").each(function(){
+        let $this = $(this);
+        $this.dblclick(function(){
+            view_item(this, "task", "任务");
+        });
+    });
+
+    // 双击甘特图的空白,检查用户权限, 弹出添加任务模态框
+    $(".no_plan").dblclick(function(){
+        if(allow_edit.length > 0){
+            $(".dv-left .title .spn:first").click();
+            $("#add_item").click();
+        }else{}
+
+    });
+
     // 模态框的编辑提交按钮
     $("#edit_submit").click(function(){
-        let text = $(this).text();
-        if(text === "编辑"){
-            $(this).text("保存");
+
+        let the_class = $("#view_modal .modal-title").attr("data-class");
+        let url = `/home_${the_class}/edit`;
+        // 取参数,
+        let inputs = $("#view_modal .form-group .my_arg");
+        let args = {};
+        for(let input of inputs){
+            let cur = $(input);
+            let key = cur.attr("data-key");
+            args[key] = cur.val();
         }
-        else{
-            let modal = $("#view_modal");
-            let the_class = $("#view_modal .modal-title").attr("data-class");
-            let url = `/home_${the_class}/edit`;
-            // 取参数,
-            let inputs = $("#view_modal .form-group .my_arg");
-            let args = {};
-            for(let input of inputs){
-                let cur = $(input);
-                let key = cur.attr("data-key");
-                let val = cur.val();
-                args[key] = val;
+        $.post(url, args, function(resp){
+            let json = JSON.parse(resp);
+            if(json['message'] === "success"){
+                alert("修改成功");
+                location.reload();
             }
-            $.post(url, args, function(resp){
-                let json = JSON.parse(resp);
-                if(json['message'] === "success"){
-                    alert("修改成功");
-                    location.reload();
-                }
-                else{
-                    alert(json['message']);
-                    return false;
-                }
-            });
-        }
+            else{
+                alert(json['message']);
+                return false;
+            }
+        });
+    });
+
+    // 模态框的删除按钮
+    $("#delete_submit").click(function(){
+        let the_class = $("#view_modal .modal-title").attr("data-class");
+        let url = `/home_${the_class}/delete`;
+        let _id = $("#view_modal .form-group .my_arg[data-key='_id']").val();
+        let args = {"_id": _id}
+        $.post(url, args, function(resp){
+            let json = JSON.parse(resp);
+            if(json['message'] === "success"){
+                alert("删除成功");
+                location.reload();
+            }
+            else{
+                alert(json['message']);
+                return false;
+            }
+        });
     });
 
     // 绘制树状图

@@ -200,10 +200,10 @@
                                         <tr>
                                              {% for td in tr %}
                                                  {% if td == "" %}
-                                                 <td><span></span></td>
+                                                 <td class="no_plan"><span></span></td>
                                                  {% else %}
-                                                     <td title="{{ td['category_name'] }}{{ td['project_name'] }}项目,{{ td['name'] }} {{ td['status'] }}" class="my_plan" colspan="{{ td['colspan'] }}">
-                                                         <span class="hidden_overflow">{{ td['name'] }}</span>
+                                                     <td data-id="{{ td['_id'] }}" title="{{ td['category_name'] }}{{ td['project_name'] }}项目,{{ td['name'] }} {{ td['status'] }}" class="my_plan" colspan="{{ td['colspan'] }}">
+                                                         <span class="hidden_overflow task_td">{{ td['name'] }}</span>
                                                      </td>
                                                  {% endif %}
                                              {% endfor %}
@@ -464,7 +464,8 @@
       </div>
       <div class="modal-footer can_edit">
           <div class="center-block">
-            <button type="button" id="edit_submit" class="btn btn-primary">编辑</button>
+            <button type="button" id="delete_submit" class="btn btn-default" data-dismiss="modal">删除</button>
+            <button type="button" id="edit_submit" class="btn btn-primary">修改</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
           </div>
       </div>

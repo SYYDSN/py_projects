@@ -18,6 +18,7 @@ from mongo_db import get_datetime_from_str
 from tools_module import *
 import calendar
 import os
+from mongo_db import db_name
 
 
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
@@ -521,7 +522,8 @@ def home_func(key1, key2):
                     if category_id is None or len(category_id) != 24:
                         mes['message'] = "category_id参数错误"
                     else:
-                        category_dbref = DBRef(collection=Category.get_table_name(), id=ObjectId(category_id))
+                        category_dbref = DBRef(collection=Category.get_table_name(), id=ObjectId(category_id),
+                                               database=db_name)
                         args['category_id'] = category_dbref
                         r = None
                         try:
@@ -538,11 +540,24 @@ def home_func(key1, key2):
                     args = get_args(request)
                     if "_id" in args:
                         o_id = args.pop("_id")
-                        r = Project.update_instance(o_id, args)
-                        if r is None:
-                            mes['message'] = "保存失败,请检查错误日志"
+                        category_id = args.get("category_id")
+                        if category_id is None or len(category_id) != 24:
+                            mes['message'] = "category_id参数错误"
                         else:
-                            pass
+                            category_dbref = DBRef(collection=Category.get_table_name(), id=ObjectId(category_id),
+                                                   database=db_name)
+                            args['category_id'] = category_dbref
+                            begin_date = get_datetime_from_str(args.get("begin_date"))
+                            if isinstance(begin_date, datetime.datetime):
+                                args['begin_date'] = begin_date
+                            end_date = get_datetime_from_str(args.get("end_date"))
+                            if isinstance(end_date, datetime.datetime):
+                                args['end_date'] = end_date
+                            r = Project.update_instance(o_id, args)
+                            if r is None:
+                                mes['message'] = "保存失败,请检查错误日志"
+                            else:
+                                pass
                     else:
                         mes['message'] = "id必须"
                 elif key2 == "get":
@@ -572,7 +587,8 @@ def home_func(key1, key2):
                     if project_id is None or len(project_id) != 24:
                         mes['message'] = "project_id参数错误"
                     else:
-                        project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id))
+                        project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id),
+                                              database=db_name)
                         args['project_id'] = project_dbref
                         r = None
                         try:
@@ -589,11 +605,24 @@ def home_func(key1, key2):
                     args = get_args(request)
                     if "_id" in args:
                         o_id = args.pop("_id")
-                        r = Module.update_instance(o_id, args)
-                        if r is None:
-                            mes['message'] = "保存失败,请检查错误日志"
+                        project_id = args.get("project_id")
+                        if project_id is None or len(project_id) != 24:
+                            mes['message'] = "project_id参数错误"
                         else:
-                            pass
+                            project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id),
+                                                  database=db_name)
+                            args['project_id'] = project_dbref
+                            begin_date = get_datetime_from_str(args.get("begin_date"))
+                            if isinstance(begin_date, datetime.datetime):
+                                args['begin_date'] = begin_date
+                            end_date = get_datetime_from_str(args.get("end_date"))
+                            if isinstance(end_date, datetime.datetime):
+                                args['end_date'] = end_date
+                            r = Module.update_instance(o_id, args)
+                            if r is None:
+                                mes['message'] = "保存失败,请检查错误日志"
+                            else:
+                                pass
                     else:
                         mes['message'] = "id必须"
                 elif key2 == "get":
@@ -611,6 +640,16 @@ def home_func(key1, key2):
                             mes['data'] = mod
                     else:
                         mes['message'] = "id不合法错误"
+                elif key2 == "children":
+                    """查询所属的mission"""
+                    module_id = get_arg(request, "module_id", None)
+                    if isinstance(module_id, str) and len(module_id) == 24:
+                        dbref = DBRef(database=db_name, collection=Module.get_table_name(), id=ObjectId(module_id))
+                        f = {"module_id": dbref, "status": {"$nin": ['invalid']}}
+                        ms = Mission.find_plus(filter_dict=f, can_json=True)
+                        mes['data'] = ms
+                    else:
+                        mes['message'] = "id不合法错误"
                 else:
                     return abort(401)
             elif key1 == "task":
@@ -620,13 +659,20 @@ def home_func(key1, key2):
                     args = get_args(request)
                     project_id = args.get("project_id")
                     module_id = args.get("module_id")
+                    mission_id = args.pop("mission_id", None)
                     if project_id is None or len(project_id) != 24:
                         mes['message'] = "project_id参数错误"
                     elif module_id is None or len(module_id) != 24:
                         mes['message'] = "module_id参数错误"
                     else:
-                        project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id))
-                        module_dbref = DBRef(collection=Module.get_table_name(), id=ObjectId(module_id))
+                        project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id),
+                                              database=db_name)
+                        module_dbref = DBRef(collection=Module.get_table_name(), id=ObjectId(module_id),
+                                             database=db_name)
+                        if mission_id is not None:
+                            mission_dbref = DBRef(collection=Mission.get_table_name(), id=ObjectId(mission_id),
+                                                 database=db_name)
+                            args['mission_id'] = mission_dbref
                         args['project_id'] = project_dbref
                         args['module_id'] = module_dbref
                         r = None
@@ -644,13 +690,51 @@ def home_func(key1, key2):
                     args = get_args(request)
                     if "_id" in args:
                         o_id = args.pop("_id")
-                        r = Task.update_instance(o_id, args)
-                        if r is None:
-                            mes['message'] = "保存失败,请检查错误日志"
+                        project_id = args.get("project_id")
+                        module_id = args.get("module_id")
+                        mission_id = args.pop("mission_id", None)
+                        if project_id is None or len(project_id) != 24:
+                            mes['message'] = "project_id参数错误"
+                        elif module_id is None or len(module_id) != 24:
+                            mes['message'] = "module_id参数错误"
                         else:
-                            pass
+                            project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id),
+                                                  database=db_name)
+                            module_dbref = DBRef(collection=Module.get_table_name(), id=ObjectId(module_id),
+                                                 database=db_name)
+                            if mission_id is not None:
+                                mission_dbref = DBRef(collection=Mission.get_table_name(), id=ObjectId(mission_id),
+                                                      database=db_name)
+                                args['mission_id'] = mission_dbref
+                            args['project_id'] = project_dbref
+                            args['module_id'] = module_dbref
+                            begin_date = get_datetime_from_str(args.get("begin_date"))
+                            if isinstance(begin_date, datetime.datetime):
+                                args['begin_date'] = begin_date
+                            end_date = get_datetime_from_str(args.get("end_date"))
+                            if isinstance(end_date, datetime.datetime):
+                                args['end_date'] = end_date
+                            r = Task.update_instance(o_id, args)
+                            if r is None:
+                                mes['message'] = "保存失败,请检查错误日志"
+                            else:
+                                pass
                     else:
                         mes['message'] = "id必须"
+                elif key2 == "delete":
+                    """删除"""
+                    o_id = get_arg(request, "_id", None)
+                    if isinstance(o_id, str) and len(o_id) == 24:
+                        t = Task.find_by_id(o_id)
+                        if isinstance(t, Task):
+                            if t.delete_self():
+                                pass
+                            else:
+                                mes['message'] = "删除失败,请检查错误日志"
+                        else:
+                            mes['message'] = "没有找到对应的实例"
+                    else:
+                        mes['message'] = "id不合法错误"
                 elif key2 == "get":
                     """查询"""
                     o_id = get_arg(request, "_id", None)
@@ -683,8 +767,10 @@ def home_func(key1, key2):
                     elif module_id is None or len(module_id) != 24:
                         mes['message'] = "module_id参数错误"
                     else:
-                        project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id))
-                        module_dbref = DBRef(collection=Module.get_table_name(), id=ObjectId(module_id))
+                        project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id),
+                                              database=db_name)
+                        module_dbref = DBRef(collection=Module.get_table_name(), id=ObjectId(module_id),
+                                             database=db_name)
                         args['project_id'] = project_dbref
                         args['module_id'] = module_dbref
                         r = None
@@ -701,14 +787,56 @@ def home_func(key1, key2):
                     args = get_args(request)
                     if "_id" in args:
                         o_id = args.pop("_id")
-                        r = Mission.update_instance(o_id, args)
-                        if r is None:
-                            mes['message'] = "保存失败,请检查错误日志"
+                        project_id = args.get("project_id")
+                        module_id = args.get("module_id")
+                        if project_id is None or len(project_id) != 24:
+                            mes['message'] = "project_id参数错误"
+                        elif module_id is None or len(module_id) != 24:
+                            mes['message'] = "module_id参数错误"
                         else:
-                            pass
+                            project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id),
+                                                  database=db_name)
+                            module_dbref = DBRef(collection=Module.get_table_name(), id=ObjectId(module_id),
+                                                 database=db_name)
+                            args['project_id'] = project_dbref
+                            args['module_id'] = module_dbref
+                            begin_date = get_datetime_from_str(args.get("begin_date"))
+                            if isinstance(begin_date, datetime.datetime):
+                                args['begin_date'] = begin_date
+                            end_date = get_datetime_from_str(args.get("end_date"))
+                            if isinstance(end_date, datetime.datetime):
+                                args['end_date'] = end_date
+                            r = Mission.update_instance(o_id, args)
+                            if r is None:
+                                mes['message'] = "保存失败,请检查错误日志"
+                            else:
+                                pass
                     else:
                         mes['message'] = "id必须"
+                elif key2 == "delete":
+                    """删除"""
+                    o_id = get_arg(request, "_id", None)
+                    if isinstance(o_id, str) and len(o_id) == 24:
+                        mis = Mission.find_by_id(o_id)
+                        if isinstance(mis, Mission):
+                            """检查是否有对应的task"""
+                            f = {"mission_id": mis.get_dbref(), "status": {"$nin": ['invalid']}}
+                            ts = Task.find_plus(filter_dict=f, can_json=True)
+                            l = len(ts)
+                            if l == 0:
+                                if mis.delete_self():
+                                    pass
+                                else:
+                                    mes['message'] = "删除失败,请检查错误日志"
+                            else:
+                                ms = "有{}个有效的任务和本功能,故无法删除本功能.".format(l)
+                                mes['message'] = ms
+                        else:
+                            mes['message'] = "没有找到对应的实例"
+                    else:
+                        mes['message'] = "id不合法错误"
                 elif key2 == "get":
+                    """查询"""
                     o_id = get_arg(request, "_id", None)
                     if isinstance(o_id, str) and len(o_id) == 24:
                         o_id = mongo_db.get_obj_id(o_id)
@@ -725,6 +853,7 @@ def home_func(key1, key2):
                             mes['data'] = mis
                     else:
                         mes['message'] = "id不合法错误"
+
                 else:
                     return abort(401)
             else:
