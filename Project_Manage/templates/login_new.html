@@ -48,6 +48,15 @@
             }
         }
 
+        // 输入框回车事件
+        $("#handler_password").keyup(function(e){
+            if(e.keyCode === 13){
+                if($.trim( $("#handler_password").val()) !== ""){
+                    $("#submit_btn").click();
+                }
+            }else{}
+        });
+
         // 提交事件
         $("#submit_btn").click(function () {
             if (check_form()) {

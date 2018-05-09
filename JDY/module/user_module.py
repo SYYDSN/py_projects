@@ -23,7 +23,7 @@ class User(mongo_db.BaseDoc):
     def login(cls, phone: str, password: str) -> dict:
         """
         用户登录
-        {"phone": "15026826913", "password": "xundie@789"}
+        {"phone": "18640375070", "password": "Kaiyang@9856"}
         :param phone: 手机号
         :param password: 密码
         :return:

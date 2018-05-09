@@ -1,6 +1,31 @@
 $(function(){
     const url = location.pathname.replace("/view","");
-    // 添加用户
+
+    // 弹出添加类别的模态框前,修改模态框标题未添加类别
+    $("#pop_add_user_modal").mousedown(function(){
+        $("#add_user_modal .modal-title").text("添加用户").removeAttr("data-id");
+    });
+
+    // 弹出修改类别对话框
+    $(".edit_btn").each(function(){
+        let $this = $(this);
+        $this.click(function(){
+            $("#add_category_modal .modal-title").text("编辑用户");
+            let _id = $this.attr("data-id");
+            let id_str = "#" + _id;
+            let user_name = $(`${id_str} td:eq(1)`).text();
+            let nick_name = $(`${id_str} td:eq(2)`).text();
+            // 获取用户权限设置.
+            let tds = $()
+
+            $("#category_name").val(category_name);
+            $("#category_path").val(category_path);
+            $("#add_user_modal .modal-title").attr("data-id", _id);
+        });
+    });
+
+
+    // 添加/编辑用户
     $("#add_user").click(function(){
         let nick_name = $.trim($("#nick_name").val());
         let user_name = $.trim($("#user_name").val());

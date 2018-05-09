@@ -46,6 +46,7 @@ def get_token() -> (None, str):
 
 def verify_token(f):
     """
+    此方法目前无效,没有使用
     检测跨域用户的token，是否拥有此功能的权限？,和本域的不同，跨域的只能对post请求数据的行为进行限制。
     限制的方法如下：
     首先，post请求的url包含如下的方式：
@@ -74,6 +75,13 @@ def verify_token(f):
 def index_func():
     """首页"""
     return "hello world"
+
+
+@app.route("/", methods=['get'])
+@check_platform_session
+def index_func2():
+    """首页2,跳转到登录页"""
+    return redirect("/login")
 
 
 @app.route("/check_token", methods=['post', 'get'])
@@ -109,6 +117,14 @@ def login_func():
         return resp
     else:
         return abort(405)
+
+
+@app.route("/login_out", methods=['post'])
+@check_platform_session
+def login_out_func():
+    """注销"""
+    clear_platform_session()
+    return json.dumps({"message": "success"})
 
 
 @app.route("/manage_<key1>/<key2>", methods=['post', 'get'])
@@ -258,26 +274,18 @@ def manage_user_func(key1, key2):
                             pass
                 elif key2 == "edit":
                     """编辑"""
-                    o_id = get_arg(request, "o_id")
-                    update_dict = None
+                    args = get_args(request)
+                    o_id = args.pop("_id", None)
+                    r = None
                     try:
-                        update_dict = json.loads(get_arg(request, "update_dict"))
-                    except JSONDecodeError as e:
-                        print(e)
+                        r = Category.update_instance(o_id=o_id, update_dict=args)
+                    except Exception as e:
+                        mes['message'] = str(e)
                     finally:
-                        if update_dict is None:
-                            mes['message'] = 'update字典不能为空'
+                        if r is None and mes['message'] == "success":
+                            mes['message'] = "编辑失败"
                         else:
-                            r = None
-                            try:
-                                r = Category.update_instance(o_id=o_id, update_dict=update_dict)
-                            except Exception as e:
-                                mes['message'] = str(e)
-                            finally:
-                                if r is None and mes['message'] == "success":
-                                    mes['message'] = "编辑失败"
-                                else:
-                                    pass
+                            pass
                 elif key2 == "delete":
                     """删除类别"""
                     o_id = get_arg(request, "o_id")
@@ -344,9 +352,11 @@ def home_func(key1, key2):
     allow_edit_modules = dict()  # 允许编辑的模块的字典,key是project的id
     module_map = dict()  # 模块的id和name的字典
     allow_edit_mids = list()  # 允许编辑的模块的id组成的数组
+    cur_user_allow_edit_category_list = get_platform_session_arg("allow_edit")
     for m in modules:
         m_id = m['_id']
-        allow_edit_mids.append(m_id)
+        if m['category_id'] in cur_user_allow_edit_category_list:
+            allow_edit_mids.append(m_id)
         module_map[m_id] = m['name']
         p_id = m['project_id']
         begin_date = get_datetime_from_str(m['begin_date'])
@@ -407,8 +417,8 @@ def home_func(key1, key2):
                     try:
                         task = tasks[line]
                         """计算任务工期"""
-                        begin_date = get_datetime_from_str(m['begin_date'])
-                        end_date = get_datetime_from_str(m['end_date']) if task.get("end_date") is not None else now
+                        begin_date = get_datetime_from_str(task['begin_date'])
+                        end_date = get_datetime_from_str(task['end_date']) if task.get("end_date") is not None else now
                         date_range = Task.calculate_date_range(begin_date, end_date)
                         task['date_range'] = date_range
                         task['begin_date_str'] = begin_date.strftime("%F")  # 注意，只有task的字段名不同
@@ -526,15 +536,24 @@ def home_func(key1, key2):
                                                database=db_name)
                         args['category_id'] = category_dbref
                         r = None
-                        try:
-                            r = Project.add_instance(**args)
-                        except Exception as e:
-                            mes['message'] = str(e)
-                        finally:
-                            if r is None and mes['message'] == "success":
-                                mes['message'] = "添加失败"
-                            else:
-                                pass
+                        begin_date = get_datetime_from_str(args.pop('begin_date', None))
+                        end_date = get_datetime_from_str(args.pop('end_date', None))
+                        if not isinstance(begin_date, datetime.datetime) or not isinstance(end_date, datetime.datetime):
+                            mes['message'] = "开始和结束时间不能为空"
+                        elif begin_date > end_date:
+                            mes['message'] = "开始时间不能晚于结束时间"
+                        else:
+                            args['begin_date'] = begin_date
+                            args['end_date'] = end_date
+                            try:
+                                r = Project.add_instance(**args)
+                            except Exception as e:
+                                mes['message'] = str(e)
+                            finally:
+                                if r is None and mes['message'] == "success":
+                                    mes['message'] = "添加失败"
+                                else:
+                                    pass
                 elif key2 == "edit":
                     """编辑"""
                     args = get_args(request)
@@ -547,19 +566,47 @@ def home_func(key1, key2):
                             category_dbref = DBRef(collection=Category.get_table_name(), id=ObjectId(category_id),
                                                    database=db_name)
                             args['category_id'] = category_dbref
-                            begin_date = get_datetime_from_str(args.get("begin_date"))
-                            if isinstance(begin_date, datetime.datetime):
-                                args['begin_date'] = begin_date
-                            end_date = get_datetime_from_str(args.get("end_date"))
-                            if isinstance(end_date, datetime.datetime):
-                                args['end_date'] = end_date
-                            r = Project.update_instance(o_id, args)
-                            if r is None:
-                                mes['message'] = "保存失败,请检查错误日志"
+                            begin_date = get_datetime_from_str(args.pop('begin_date', None))
+                            end_date = get_datetime_from_str(args.pop('end_date', None))
+                            if not isinstance(begin_date, datetime.datetime) or not isinstance(end_date,
+                                                                                               datetime.datetime):
+                                mes['message'] = "开始和结束时间不能为空"
+                            elif begin_date > end_date:
+                                mes['message'] = "开始时间不能晚于结束时间"
                             else:
-                                pass
+                                args['begin_date'] = begin_date
+                                args['end_date'] = end_date
+                                r = Project.update_instance(o_id, args)
+                                if r is None:
+                                    mes['message'] = "保存失败,请检查错误日志"
+                                else:
+                                    pass
                     else:
                         mes['message'] = "id必须"
+                elif key2 == "delete":
+                    """删除"""
+                    o_id = get_arg(request, "_id", None)
+                    if isinstance(o_id, str) and len(o_id) == 24:
+                        pro = Project.find_by_id(o_id)
+                        if isinstance(pro, Project):
+                            """检查是否有对应的module"""
+                            f = {"project_id": pro.get_dbref(), "status": {"$nin": ['invalid']}}
+                            mods = Module.find_plus(filter_dict=f, can_json=True)
+                            mod_l = len(mods)
+                            if mod_l == 0:
+                                pro.set_attr("status", "invalid")
+                                result = pro.save_plus()
+                                if result:
+                                    pass
+                                else:
+                                    mes['message'] = "删除失败,请检查错误日志"
+                            else:
+                                ms = "多个有效的模块/任务和此项目相关,无法删除."
+                                mes['message'] = ms
+                        else:
+                            mes['message'] = "没有找到对应的实例"
+                    else:
+                        mes['message'] = "id不合法错误"
                 elif key2 == "get":
                     """查询"""
                     o_id = get_arg(request, "_id", None)
@@ -590,16 +637,25 @@ def home_func(key1, key2):
                         project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id),
                                               database=db_name)
                         args['project_id'] = project_dbref
-                        r = None
-                        try:
-                            r = Module.add_instance(**args)
-                        except Exception as e:
-                            mes['message'] = str(e)
-                        finally:
-                            if r is None and mes['message'] == "success":
-                                mes['message'] = "添加失败"
-                            else:
-                                pass
+                        begin_date = get_datetime_from_str(args.pop('begin_date', None))
+                        end_date = get_datetime_from_str(args.pop('end_date', None))
+                        if not isinstance(begin_date, datetime.datetime) or not isinstance(end_date, datetime.datetime):
+                            mes['message'] = "开始和结束时间不能为空"
+                        elif begin_date > end_date:
+                            mes['message'] = "开始时间不能晚于结束时间"
+                        else:
+                            args['begin_date'] = begin_date
+                            args['end_date'] = end_date
+                            r = None
+                            try:
+                                r = Module.add_instance(**args)
+                            except Exception as e:
+                                mes['message'] = str(e)
+                            finally:
+                                if r is None and mes['message'] == "success":
+                                    mes['message'] = "添加失败"
+                                else:
+                                    pass
                 elif key2 == "edit":
                     """编辑"""
                     args = get_args(request)
@@ -612,19 +668,50 @@ def home_func(key1, key2):
                             project_dbref = DBRef(collection=Project.get_table_name(), id=ObjectId(project_id),
                                                   database=db_name)
                             args['project_id'] = project_dbref
-                            begin_date = get_datetime_from_str(args.get("begin_date"))
-                            if isinstance(begin_date, datetime.datetime):
-                                args['begin_date'] = begin_date
-                            end_date = get_datetime_from_str(args.get("end_date"))
-                            if isinstance(end_date, datetime.datetime):
-                                args['end_date'] = end_date
-                            r = Module.update_instance(o_id, args)
-                            if r is None:
-                                mes['message'] = "保存失败,请检查错误日志"
+                            begin_date = get_datetime_from_str(args.pop('begin_date', None))
+                            end_date = get_datetime_from_str(args.pop('end_date', None))
+                            if not isinstance(begin_date, datetime.datetime) or not isinstance(end_date,
+                                                                                               datetime.datetime):
+                                mes['message'] = "开始和结束时间不能为空"
+                            elif begin_date > end_date:
+                                mes['message'] = "开始时间不能晚于结束时间"
                             else:
-                                pass
+                                args['begin_date'] = begin_date
+                                args['end_date'] = end_date
+                                r = Module.update_instance(o_id, args)
+                                if r is None:
+                                    mes['message'] = "保存失败,请检查错误日志"
+                                else:
+                                    pass
                     else:
                         mes['message'] = "id必须"
+                elif key2 == "delete":
+                    """删除"""
+                    o_id = get_arg(request, "_id", None)
+                    if isinstance(o_id, str) and len(o_id) == 24:
+                        mod = Module.find_by_id(o_id)
+                        if isinstance(mod, Module):
+                            """检查是否有对应的task"""
+                            f = {"module_id": mod.get_dbref(), "status": {"$nin": ['invalid']}}
+                            ts = Task.find_plus(filter_dict=f, can_json=True)
+                            ts_l = len(ts)
+                            """检查是否有对应的mission"""
+                            mis = Mission.find_plus(filter_dict=f, can_json=True)
+                            mis_l = len(mis)
+                            if mis_l == 0 and ts_l == 0:
+                                mod.set_attr("status", "invalid")
+                                result = mod.save_plus()
+                                if result:
+                                    pass
+                                else:
+                                    mes['message'] = "删除失败,请检查错误日志"
+                            else:
+                                ms = "有{}个有效的任务,{}个有效的功能和本模块相关,故无法删除本模块.".format(ts_l, mis_l)
+                                mes['message'] = ms
+                        else:
+                            mes['message'] = "没有找到对应的实例"
+                    else:
+                        mes['message'] = "id不合法错误"
                 elif key2 == "get":
                     """查询"""
                     o_id = get_arg(request, "_id", None)
@@ -675,16 +762,25 @@ def home_func(key1, key2):
                             args['mission_id'] = mission_dbref
                         args['project_id'] = project_dbref
                         args['module_id'] = module_dbref
-                        r = None
-                        try:
-                            r = Task.add_instance(**args)
-                        except Exception as e:
-                            mes['message'] = str(e)
-                        finally:
-                            if r is None and mes['message'] == "success":
-                                mes['message'] = "添加失败"
-                            else:
-                                pass
+                        begin_date = get_datetime_from_str(args.pop('begin_date', None))
+                        end_date = get_datetime_from_str(args.pop('end_date', None))
+                        if not isinstance(begin_date, datetime.datetime) or not isinstance(end_date, datetime.datetime):
+                            mes['message'] = "开始和结束时间不能为空"
+                        elif begin_date > end_date:
+                            mes['message'] = "开始时间不能晚于结束时间"
+                        else:
+                            args['begin_date'] = begin_date
+                            args['end_date'] = end_date
+                            r = None
+                            try:
+                                r = Task.add_instance(**args)
+                            except Exception as e:
+                                mes['message'] = str(e)
+                            finally:
+                                if r is None and mes['message'] == "success":
+                                    mes['message'] = "添加失败"
+                                else:
+                                    pass
                 elif key2 == "edit":
                     """编辑"""
                     args = get_args(request)
@@ -708,17 +804,21 @@ def home_func(key1, key2):
                                 args['mission_id'] = mission_dbref
                             args['project_id'] = project_dbref
                             args['module_id'] = module_dbref
-                            begin_date = get_datetime_from_str(args.get("begin_date"))
-                            if isinstance(begin_date, datetime.datetime):
-                                args['begin_date'] = begin_date
-                            end_date = get_datetime_from_str(args.get("end_date"))
-                            if isinstance(end_date, datetime.datetime):
-                                args['end_date'] = end_date
-                            r = Task.update_instance(o_id, args)
-                            if r is None:
-                                mes['message'] = "保存失败,请检查错误日志"
+                            begin_date = get_datetime_from_str(args.pop('begin_date', None))
+                            end_date = get_datetime_from_str(args.pop('end_date', None))
+                            if not isinstance(begin_date, datetime.datetime) or not isinstance(end_date,
+                                                                                               datetime.datetime):
+                                mes['message'] = "开始和结束时间不能为空"
+                            elif begin_date > end_date:
+                                mes['message'] = "开始时间不能晚于结束时间"
                             else:
-                                pass
+                                args['begin_date'] = begin_date
+                                args['end_date'] = end_date
+                                r = Task.update_instance(o_id, args)
+                                if r is None:
+                                    mes['message'] = "保存失败,请检查错误日志"
+                                else:
+                                    pass
                     else:
                         mes['message'] = "id必须"
                 elif key2 == "delete":
@@ -727,7 +827,9 @@ def home_func(key1, key2):
                     if isinstance(o_id, str) and len(o_id) == 24:
                         t = Task.find_by_id(o_id)
                         if isinstance(t, Task):
-                            if t.delete_self():
+                            t.set_attr("status", "invalid")
+                            result = t.save_plus()
+                            if result:
                                 pass
                             else:
                                 mes['message'] = "删除失败,请检查错误日志"
@@ -773,16 +875,25 @@ def home_func(key1, key2):
                                              database=db_name)
                         args['project_id'] = project_dbref
                         args['module_id'] = module_dbref
-                        r = None
-                        try:
-                            r = Mission.add_instance(**args)
-                        except Exception as e:
-                            mes['message'] = str(e)
-                        finally:
-                            if r is None and mes['message'] == "success":
-                                mes['message'] = "添加失败"
-                            else:
-                                pass
+                        begin_date = get_datetime_from_str(args.pop('begin_date', None))
+                        end_date = get_datetime_from_str(args.pop('end_date', None))
+                        if not isinstance(begin_date, datetime.datetime) or not isinstance(end_date, datetime.datetime):
+                            mes['message'] = "开始和结束时间不能为空"
+                        elif begin_date > end_date:
+                            mes['message'] = "开始时间不能晚于结束时间"
+                        else:
+                            args['begin_date'] = begin_date
+                            args['end_date'] = end_date
+                            r = None
+                            try:
+                                r = Mission.add_instance(**args)
+                            except Exception as e:
+                                mes['message'] = str(e)
+                            finally:
+                                if r is None and mes['message'] == "success":
+                                    mes['message'] = "添加失败"
+                                else:
+                                    pass
                 elif key2 == "edit":
                     args = get_args(request)
                     if "_id" in args:
@@ -800,17 +911,21 @@ def home_func(key1, key2):
                                                  database=db_name)
                             args['project_id'] = project_dbref
                             args['module_id'] = module_dbref
-                            begin_date = get_datetime_from_str(args.get("begin_date"))
-                            if isinstance(begin_date, datetime.datetime):
-                                args['begin_date'] = begin_date
-                            end_date = get_datetime_from_str(args.get("end_date"))
-                            if isinstance(end_date, datetime.datetime):
-                                args['end_date'] = end_date
-                            r = Mission.update_instance(o_id, args)
-                            if r is None:
-                                mes['message'] = "保存失败,请检查错误日志"
+                            begin_date = get_datetime_from_str(args.pop('begin_date', None))
+                            end_date = get_datetime_from_str(args.pop('end_date', None))
+                            if not isinstance(begin_date, datetime.datetime) or not isinstance(end_date,
+                                                                                               datetime.datetime):
+                                mes['message'] = "开始和结束时间不能为空"
+                            elif begin_date > end_date:
+                                mes['message'] = "开始时间不能晚于结束时间"
                             else:
-                                pass
+                                args['begin_date'] = begin_date
+                                args['end_date'] = end_date
+                                r = Mission.update_instance(o_id, args)
+                                if r is None:
+                                    mes['message'] = "保存失败,请检查错误日志"
+                                else:
+                                    pass
                     else:
                         mes['message'] = "id必须"
                 elif key2 == "delete":
@@ -824,12 +939,14 @@ def home_func(key1, key2):
                             ts = Task.find_plus(filter_dict=f, can_json=True)
                             length = len(ts)
                             if length == 0:
-                                if mis.delete_self():
+                                mis.set_attr("status", "invalid")
+                                result = mis.save_plus()
+                                if result:
                                     pass
                                 else:
                                     mes['message'] = "删除失败,请检查错误日志"
                             else:
-                                ms = "有{}个有效的任务和本功能,故无法删除本功能.".format(length)
+                                ms = "有{}个有效的任务和本功能有关,故无法删除本功能.".format(length)
                                 mes['message'] = ms
                         else:
                             mes['message'] = "没有找到对应的实例"

@@ -3,6 +3,7 @@ from log_module import get_logger
 from send_moudle import *
 import mongo_db
 import datetime
+import calendar
 from mail_module import send_mail
 
 logger = get_logger()
@@ -367,17 +368,131 @@ class Signal(mongo_db.BaseDoc):
         res = send_signal(out_put, token_name=self.get_attr("token_name"))
         print(res)
 
+    @classmethod
+    def supplement_teacher_id(cls) -> None:
+        """
+        把记录中,缺乏老师id的部分补上.
+        :return:
+        """
+        f = {"creator_name": {"$exists": True}}
+        all_record = cls.find_plus(filter_dict=f, to_dict=True, can_json=False)
+        teacher_dict = dict()
+        for record in all_record:
+            name = record['creator_name']
+            t_id = record.get('creator_id')
+            if name not in teacher_dict and t_id is not None:
+                teacher_dict[name] = t_id
+            else:
+                pass
+        for record in all_record:
+            name = record['creator_name']
+            t_id = record.get('creator_id')
+            if name in teacher_dict and t_id is None:
+                t_id = teacher_dict[name]
+                f = {"_id": record['_id']}
+                u = {"$set": {"creator_id": t_id}}
+                cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
 
-def create_teacher(**kwargs):
+
+class MonthEstimate(mongo_db.BaseDoc):
     """
-    生成真实的老师的字典
+    老师的喊单成绩评估按月评估的记录
     """
-    d = dict()
-    d['direction'] = kwargs['_widget_1525161353528']
-    d['product'] = kwargs['_widget_1525161353525']
-    d['teacher_id'] = kwargs['_widget_1525161353522']['_id']
-    d['teacher_name'] = kwargs['_widget_1525161353522']['name']
-    return d
+    _table_name = "Month_estimate_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['teacher_id'] = str
+    type_dict['teacher_name'] = str
+    type_dict['date_str'] = str  # 评估的年月 2018-04格式
+    type_dict['info_dict'] = dict
+    """
+    info_dict是信息字典 ,包含以下多类信息
+    {
+        "all": {"win_per": "所有产品月总胜率,百浮点,直接加%即可", "profit": "所有产品总盈利,美元,浮点"},
+        "黄金": {"win_per": "黄金月胜率,浮点,直接加%即可", "profit": "黄金月总盈利,美元,浮点"},
+        ....
+    }
+    """
+    type_dict['create_date'] = datetime.datetime
+
+    @classmethod
+    def get_instance(cls, teacher_id: str, date_str: str, return_type: str = "doc") -> object:
+        """
+        获取实例,是在查询老师的月评估时推荐替代init的方法
+        :param teacher_id: 老师id
+        :param date_str:  2018-04
+        :param return_type: 返回类型 instance/doc/json  实例/doc/可以json的dict
+        :return:
+        """
+        dates = date_str.split("-")
+        the_year = int(dates[0])
+        the_month = int(dates[-1])
+        now = datetime.datetime.now()
+        cur_year = now.year
+        cur_month = now.month
+        flag = -1
+        if the_year < cur_year:
+            flat = 1
+        elif the_year == cur_year and the_month < cur_month:
+            flag = 1
+        else:
+            flag = -1
+        res = dict()
+        if flag != 1:
+            pass
+        else:
+            """先从数据库查,查不到再计算"""
+            f = {"teacher_id": teacher_id, "date_str": date_str}
+            estimate = cls.find_one_plus(filter_dict=f, instance=False, can_json=False)
+            if isinstance(estimate, dict):
+                """查询成功"""
+                pass
+            else:
+                """查询失败,生成一下"""
+                begin = mongo_db.get_datetime_from_str("{}-{}-01 0:0:0".format(the_year, the_month))
+                max_day = calendar.monthrange(the_year, the_month)[-1]
+                end = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59.999".format(the_year, the_month, max_day))
+                f = {"creator_id": teacher_id, "update_time": {"$gte": begin, "$lte": end}}
+                rs = Signal.find_plus(filter_dict=f, to_dict=True, can_json=False)
+                p_dict = dict()
+                for r in rs:
+                    p_name = r['product']
+                    each_profit = r['each_profit'] if isinstance(r['each_profit'], (int, float)) else float(r['each_profit'])
+                    p = p_dict.get(p_name)
+                    if p is None:
+                        p = list()
+                    p.append(each_profit)
+                    p_dict[p_name] = p
+                """计算产品胜率"""
+                res = dict()
+                all_win_count = 0
+                all_count = 0
+                all_profit = 0
+                for p_name, v in p_dict.items():
+                    l1 = len(v)
+                    wins = [x for x in v if x >= 0]
+                    l2 = len(wins)
+                    p_win_per = round((l2 / l1) * 100, 1)
+                    profit = sum(wins)
+                    all_count += l1
+                    all_win_count += l2
+                    all_profit += profit
+                    p = res.get(p_name)
+                    if p is None:
+                        p = dict()
+                    p['win_per'] = p_win_per
+                    p['profit'] = profit
+                    res[p_name] = p
+                res['all'] = {"win_per": round((all_win_count / all_count) * 100, 1), "profit": all_profit}
+                init = dict()
+                init['_id'] = ObjectId()
+                init['teacher_id'] = teacher_id
+                init['date_str'] = date_str
+                init['create_date'] = now
+                init['info_dict'] = res
+                cls.insert_one(**init)
+                estimate = init
+            return estimate
 
 
 class VirtualTeacher(mongo_db.BaseDoc):
@@ -598,21 +713,25 @@ class VirtualTeacher(mongo_db.BaseDoc):
 
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
-    data = {'op': 'data_create',
-            'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
-                     'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
-                     '_widget_1520843763126': 1190, 'formName': '发信号测试',
-                     '_widget_1514518782504': '2018-03-29T21:40:19.000Z', 'label': '', '_widget_1514518782592': 120,
-                     'createTime': '2018-03-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
-                     '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
-                     'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'}, '_widget_1520843228626': 1000,
-                     '_id': '7abd5d81493acc231b27af1c', 'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
-                     '_widget_1514518782603': [{'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
-                     'updateTime': '2018-03-29T21:41:21.491Z', '_widget_1514518782514': '原油',
-                     'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
-                     }
-            }
-    """初始化喊单信号并发送"""
-    d = Signal(**data)
-    d.send()
+    # data = {'op': 'data_create',
+    #         'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
+    #                  'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
+    #                  '_widget_1520843763126': 1190, 'formName': '发信号测试',
+    #                  '_widget_1514518782504': '2018-03-29T21:40:19.000Z', 'label': '', '_widget_1514518782592': 120,
+    #                  'createTime': '2018-03-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
+    #                  '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
+    #                  'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'}, '_widget_1520843228626': 1000,
+    #                  '_id': '7abd5d81493acc231b27af1c', 'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
+    #                  '_widget_1514518782603': [{'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
+    #                  'updateTime': '2018-03-29T21:41:21.491Z', '_widget_1514518782514': '原油',
+    #                  'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
+    #                  }
+    #         }
+    # """初始化喊单信号并发送"""
+    # d = Signal(**data)
+    # d.send()
+    """补全老师的id"""
+    # Signal.supplement_teacher_id()
+    """查看老师的月胜率"""
+    print(MonthEstimate.get_instance("5a1e680642f8c1bffc5dbd6f", "2018-04"))
     pass

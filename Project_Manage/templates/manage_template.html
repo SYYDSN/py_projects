@@ -4,6 +4,10 @@
     <!-- 某一类页面的专属css脚本-->
     <link rel="stylesheet" href="../static/css/manage_family.css">
 {% endblock %}
+{% block class_js %}
+    <!-- 某一类页面的专属js脚本-->
+    <script src="../static/js/manage_family.js"></script>
+{% endblock %}
 
 {% block extend_css %}
     <!-- 页面专属css脚本-->
@@ -16,6 +20,9 @@
 {% block nav %}
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="user_info">
+                    <span id="login_out">注销</span>
+            </div>
             <h2>用户管理</h2>
         </div>
     </div>

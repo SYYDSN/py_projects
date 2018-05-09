@@ -584,7 +584,7 @@ $(function(){
                         can_edit = false;
                     }
                 }else{}
-                if(cur_project_id !== undefined){
+                if(cur_project_id !== undefined && allow_edit_pids.length > 0){
                     if(allow_edit_pids.indexOf(cur_project_id) !== -1){
                         can_edit = true;
                     }
@@ -592,7 +592,7 @@ $(function(){
                         can_edit = false;
                     }
                 }else{}
-                if(cur_module_id !== undefined){
+                if(cur_module_id !== undefined  && allow_edit_mids.length > 0){
                     if(allow_edit_mids.indexOf(cur_module_id) !== -1){
                         can_edit = true;
                     }
@@ -686,6 +686,7 @@ $(function(){
             {
                 type: 'tree',
                 name: tree_dict['name'],
+                initialTreeDepth: 4,  // 初始展开是深度
                 data: [tree_dict],
 
                 top: '1%',
@@ -742,6 +743,51 @@ $(function(){
         my.setOption(opt);
         chart_visual = true;
     };
+
+    // 注销登录
+    $("#login_out").click(function(){
+        $.post("/login_out", function(){
+            location.href = "/login";
+        });
+    });
+
+    function getMousePos(event) {
+       var e = event || window.event;
+       var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+       var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+       var x = e.pageX || e.clientX + scrollX;
+       var y = e.pageY || e.clientY + scrollY;
+       //alert('x: ' + x + '\ny: ' + y);
+       return { 'x': x, 'y': y };
+}
+
+    // 甘特图td的hover事件
+    $(".my_plan").hover(function(event){
+        console.log(event);
+        console.log(event.clientX, event.clientY);
+        console.log(event.offsetX, event.offsetY);
+        console.log(event.pageX, event.pageY);
+        console.log(event.screenX, event.screenY);
+        let x = getMousePos(event);
+
+        let $this = $(this);
+        console.log($this.text());
+        let prompt = $("<div class='prompt'></div>").text("提示内容");
+        let top = $this.position().top;
+        let left = $this.position().top;
+        console.log(top, left);
+        let style = {
+            'position':'absolute',
+            'top': x['x'],
+            'left': x['y'],
+            'z-index': 100,
+            'width':'auto',
+            'height':'auto',
+            'border':1+'px'+ 'solid' +'#00CC66',
+        };
+        prompt.css(style);
+        $("body").append(prompt);
+    }, function(){$("body .prompt").remove()});
 
 //end!!!
 });
