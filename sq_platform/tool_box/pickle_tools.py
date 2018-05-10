@@ -324,6 +324,149 @@ def create_excel():
         wb.save(f2_path)
 
 
+class GPS:
+    def __index__(self, **kwargs):
+        self._id = kwargs['_id']
+        self.speed = kwargs['speed']
+        self.date = kwargs['date']
+        self.status = kwargs['status']
+
+
+class GPSCache:
+    def __new__(cls):
+        if not hasattr(cls, "instance"):
+            obj = super(GPSCache, cls).__new__(cls)
+            obj.cache = list()
+            obj.event = dict()
+            obj.speed_dict = dict()
+            cls.instance = obj
+        return cls.instance
+
+    def add_gps(self, gps: dict):
+        speed = gps['speed'] * 3.6
+        gps['speed'] = speed
+        if speed > 150:
+            pass
+        else:
+            if speed > 0:
+                user_id = gps['user_id']
+                sp_l = self.speed_dict.get(user_id)
+                if sp_l is None:
+                    sp_l = list()
+                sp_l.append(speed)
+                self.speed_dict[user_id] = sp_l
+            self.cache.append(gps)
+
+    def get_status(self):
+        if len(self.cache) > 1:
+            s = self.cache[-1]
+            e = self.cache[0]
+            if e['user_id'] != s['user_id']:
+                self.cache.clear()
+            else:
+                t_delta = (e['time'] - s['time']).total_seconds()
+                s_delta = (e['speed'] - s['speed'])
+                av_speed = sum([x['speed'] for x in self.cache]) / t_delta
+                if t_delta > 1 and av_speed > 90:
+                    """超速"""
+                    event_list = self.event.get(e['user_id'])
+                    if event_list is None:
+                        event_list = list()
+                    temp = {
+                        "type": "超速",
+                        'user_id': e['user_id'],
+                        "begin": s['time'].strftime("%Y-%m-%d %H:%M:%S"),
+                        "end": e['time'].strftime("%Y-%m-%d %H:%M:%S"),
+                        "begin_speed": s['speed'],
+                        "end_speed": e['speed'],
+                        "av_speed": av_speed
+                    }
+                    event_list.append(temp)
+                    self.event[e['user_id']] = event_list
+                    print(temp)
+
+                delta = (s_delta / t_delta)
+                if delta == 0 and t_delta > 300:
+                    self.cache.clear()
+                elif delta < 10 and t_delta > 2:
+                    self.cache.pop(0)
+                elif delta >= 10:
+                    print(delta)
+                    event_list = self.event.get(e['user_id'])
+                    if event_list is None:
+                        event_list = list()
+                    temp = {
+                        "type": "急加速",
+                        'user_id': e['user_id'],
+                        "begin": s['time'].strftime("%Y-%m-%d %H:%M:%S"),
+                        "end": e['time'].strftime("%Y-%m-%d %H:%M:%S"),
+                        "begin_speed": s['speed'],
+                        "end_speed": e['speed'],
+                        "altitude": e['altitude'],
+                        "longitude": e['longitude'],
+                        "speed_delta": delta
+                    }
+                    event_list.append(temp)
+                    self.event[e['user_id']] = event_list
+                    print(temp)
+                elif delta <= -10:
+                    print(delta)
+                    event_list = self.event.get(e['user_id'])
+                    if event_list is None:
+                        event_list = list()
+                    temp = {
+                        "type": "急减速",
+                        'user_id': e['user_id'],
+                        "begin": s['time'].strftime("%Y-%m-%d %H:%M:%S"),
+                        "end": e['time'].strftime("%Y-%m-%d %H:%M:%S"),
+                        "begin_speed": s['speed'],
+                        "end_speed": e['speed'],
+                        "altitude": e['altitude'],
+                        "longitude": e['longitude'],
+                        "speed_delta": delta
+                    }
+                    event_list.append(temp)
+                    self.event[e['user_id']] = event_list
+                    print(temp)
+                else:
+                    pass
+
+    def get_result(self):
+        result = dict()
+        rs = self.event
+        for k, v in rs.items():
+            temp = dict()
+            speed_list = self.speed_dict[k]
+            av_speed = sum(speed_list) / len(speed_list)
+            temp['av_speed'] = av_speed
+            temp['events'] = v
+            result[k] = temp
+        return result
+
+def analysis_gps():
+    id_map = {
+        "59cda964ad01be237680e29d": "栾新军",
+        "5aaf2f3ee39a7b6f4b6ce26f": "刘江鹏",
+        "5ab0ae831315e00e3cb61db8": "童小平"
+    }
+    dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "pkl")
+    f_path = os.path.join(dir_path, "top_20.pkl")
+    with open(f_path, "rb") as f:
+        all_gps = pickle.load(f)
+    cache = GPSCache()
+    for gps_data in all_gps:
+        user_id = gps_data['user_id']
+        gps_list = gps_data['data']
+        for gps in gps_list:
+            speed = gps['speed']
+            if speed > 150:
+                print("speed : {}".format(speed))
+            else:
+                cache.add_gps(gps)
+                cache.get_status()
+    print(cache.get_result())
+
+
 if __name__ == "__main__":
     # draw_user_gps(day_range=None)
     # read_pkl()
@@ -331,4 +474,5 @@ if __name__ == "__main__":
     # save_top1()
     # test_calculate()
     # create_excel()
+    analysis_gps()
     pass
