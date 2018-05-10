@@ -10,7 +10,7 @@ from mail_module import send_mail
 import requests
 from werkzeug.contrib.cache import RedisCache
 
-"""使用requests的爬取模块"""
+"""使用requests的爬取模块,此模块工作有问题"""
 
 logger = get_logger()
 cache = RedisCache()

@@ -237,6 +237,54 @@ class Customer(mongo_db.BaseDoc):
         return count
 
 
+class DistributionScheme(mongo_db.BaseDoc):
+        """用户资源分配方案"""
+        _table_name = "distribution_scheme_info"
+        type_dict = dict()
+        type_dict['_id'] = ObjectId
+        type_dict['groups'] = list()  # 分组标志
+        """创建时间，也是分配时，计算已分配数量的起点标志"""
+        type_dict['create_date'] = datetime.datetime
+
+        @classmethod
+        def get_group(cls) -> (None, str, int):
+            """
+            获取下一个分配的标志位
+            :return:
+            """
+            gs = cls.last_group()
+            if groups is None:
+                pass
+            else:
+                groups = gs['groups']
+                the_time = gs['create_date']
+                f = {"group": {"$in": groups}, "time": {"$gte": the_time}}
+                projection = ['group']
+                rs = Customer.find_plus(filter_dict=f, projection=projection, to_dict=True)
+                """groupby"""
+
+        @classmethod
+        def last_group(cls) -> (None, dict):
+            """
+            获取最新的groups
+            :return:
+            """
+            f = {"groups": {"$exists": True, "$type": "array"}}
+            s = {"create_date": -1}
+            r = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+            if r is None:
+                return r
+            else:
+                res = dict()
+                res['create_date'] = r['create_date']
+                res['groups'] = r['groups']
+                return res
+
+        @staticmethod
+        def get_scheme():
+            pass
+
+
 if __name__ == "__main__":
     """注册测试"""
     args = {
