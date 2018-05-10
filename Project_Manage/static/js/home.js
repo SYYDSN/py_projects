@@ -762,32 +762,7 @@ $(function(){
 }
 
     // 甘特图td的hover事件
-    $(".my_plan").hover(function(event){
-        console.log(event);
-        console.log(event.clientX, event.clientY);
-        console.log(event.offsetX, event.offsetY);
-        console.log(event.pageX, event.pageY);
-        console.log(event.screenX, event.screenY);
-        let x = getMousePos(event);
-
-        let $this = $(this);
-        console.log($this.text());
-        let prompt = $("<div class='prompt'></div>").text("提示内容");
-        let top = $this.position().top;
-        let left = $this.position().top;
-        console.log(top, left);
-        let style = {
-            'position':'absolute',
-            'top': x['x'],
-            'left': x['y'],
-            'z-index': 100,
-            'width':'auto',
-            'height':'auto',
-            'border':1+'px'+ 'solid' +'#00CC66',
-        };
-        prompt.css(style);
-        $("body").append(prompt);
-    }, function(){$("body .prompt").remove()});
+    
 
 //end!!!
 });
