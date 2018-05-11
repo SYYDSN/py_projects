@@ -20,7 +20,6 @@ import calendar
 import os
 from mongo_db import db_name
 
-
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
 app = Flask(__name__)
 app.config['SECRET_KEY'] = secret_key  # 配置会话密钥
@@ -28,7 +27,6 @@ app.config['SESSION_TYPE'] = "redis"  # session类型为redis
 app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
 # app.config['SERVER_NAME'] = "127.0.0.1:8001"  此域名下的所有子域名的session都会接受
 Session(app)
-
 
 cache = RedisCache()
 logger = get_logger()
@@ -51,6 +49,7 @@ def verify_token(f):
     限制的方法如下：
     首先，post请求的url包含如下的方式：
     """
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         """验证token"""
@@ -67,6 +66,7 @@ def verify_token(f):
                 return redirect(url_for("teacher_login_func"))
             else:
                 return f(*args, **kwargs)
+
     return decorated_function
 
 
@@ -166,7 +166,8 @@ def manage_user_func(key1, key2):
                             status2 = 1
                         else:
                             status2 = 0
-                        category_list.append({"_id": category_id, "name": category['name'], "status": (status1, status2)})
+                        category_list.append(
+                            {"_id": category_id, "name": category['name'], "status": (status1, status2)})
                     temp['category_list'] = category_list
                     new_users.append(temp)
 
@@ -336,8 +337,8 @@ def home_func(key1, key2):
     allow_edit = [category_dict[x]['path'] for x in allow_edit_ids]
     all_projects = Project.get_all(can_json=True)
     allow_edit_projects = dict()  # 允许编辑的项目的字典,key是category的id
-    allow_edit_pid_name = list()     # 允许编辑的项目的id和name组成的字典的数组
-    allow_edit_pids = list()     # 允许编辑的项目的id组成的数组
+    allow_edit_pid_name = list()  # 允许编辑的项目的id和name组成的字典的数组
+    allow_edit_pids = list()  # 允许编辑的项目的id组成的数组
     for x in allow_edit_ids:
         p_list = list()
         for y in all_projects:
@@ -408,8 +409,8 @@ def home_func(key1, key2):
                 """任务状态字典,注意normal需要判断是否已开始任务？"""
                 status_dict = {"normal": "正常",
                                "complete": "完成",
-                               "fail":  "失败",
-                               "drop":  "放弃",
+                               "fail": "失败",
+                               "drop": "放弃",
                                "suspend": "暂停",
                                "delay": "超期"}
                 for line in range(min_line_count + 1):
@@ -758,7 +759,7 @@ def home_func(key1, key2):
                                              database=db_name)
                         if mission_id is not None:
                             mission_dbref = DBRef(collection=Mission.get_table_name(), id=ObjectId(mission_id),
-                                                 database=db_name)
+                                                  database=db_name)
                             args['mission_id'] = mission_dbref
                         args['project_id'] = project_dbref
                         args['module_id'] = module_dbref
@@ -978,6 +979,44 @@ def home_func(key1, key2):
             return json.dumps(mes)
         else:
             return abort(405)
+
+
+@app.route("/sf_chart")
+def sf_chart_func():
+    """顺丰演示"""
+    title = "行车事件"
+    events = [{'type': '超速', 'user_id': '59cda964ad01be237680e29d', 'end_speed': 100.224,
+               'end': '2017-12-21 01:12:58', 'altitude': 15.0, 'av_speed': 97.0188679245283,
+               'longitude': 121.24908854166667, 'begin': '2017-12-21 01:12:56',
+               "user_name": "栾新军",
+               'latitude': 31.282752278645834, 'begin_speed': 73.152},
+              {'type': '急加速', 'user_id': '59cda964ad01be237680e29d', 'end_speed': 100.224,
+               'end': '2017-12-21 01:12:58', 'altitude': 15.0, 'speed_delta': 10.641509433962264,
+               "user_name": "栾新军",
+               'longitude': 121.24908854166667, 'begin': '2017-12-21 01:12:56',
+               'latitude': 31.282752278645834, 'begin_speed': 73.152},
+              {'type': '超速', 'user_id': '59cda964ad01be237680e29d', 'end_speed': 74.772,
+               'end': '2017-12-12 00:11:51', 'altitude': 14.0, 'av_speed': 93.31432114073156,
+               "user_name": "栾新军",
+               'longitude': 119.54578396267361, 'begin': '2017-12-12 00:11:50',
+               'latitude': 32.042974175347226, 'begin_speed': 75.744},
+              {'type': '超速', 'user_id': '5ab0ae831315e00e3cb61db8', 'end_speed': 80.64,
+               "user_name": "童小平",
+               'end': '2018-05-09 15:19:49', 'altitude': 139.69, 'av_speed': 121.806,
+               'longitude': 112.34155490451388, 'begin': '2018-05-09 15:19:47',
+               'latitude': 28.62666232638889, 'begin_speed': 81.756},
+              {'type': '急加速', 'user_id': '5ab0ae831315e00e3cb61db8', 'end_speed': 13.536,
+               "user_name": "童小平",
+               'end': '2018-04-16 16:10:31', 'altitude': -0.6, 'speed_delta': 13.536,
+               'longitude': 113.1507630750868, 'begin': '2018-04-16 16:10:30',
+               'latitude': 28.128487141927085, 'begin_speed': 0.0},
+              {'type': '急加速', 'user_id': '5aaf2f3ee39a7b6f4b6ce26f', 'end_speed': 30.852,
+               'end': '2018-04-17 18:38:36', 'altitude': 26.0, 'speed_delta': 30.852,
+               'longitude': 115.3997252061632, 'begin': '2018-04-17 18:38:35',
+               "user_name": "刘江鹏",
+               'latitude': 28.435247395833333, 'begin_speed': 0.0}]
+
+    return render_template("sf_chart.html", title=title, events=events)
 
 
 @app.after_request

@@ -156,8 +156,8 @@ def process_error_code(key):
     return "ok"
 
 
-@manage_blueprint.route("/login", methods=['post', 'get'])
-def login_func():
+@manage_blueprint.route("/<prefix>/login", methods=['post', 'get'])
+def login_func(prefix):
     """
     登录页,
     针对新振兴项目,现在决定需求如下:
@@ -165,20 +165,17 @@ def login_func():
     2. 权限为基于方法的权限,不再推进基于角色的权限.(基于角色的权限管理暂停)
     3. 不考虑跨域用户
     """
-    """先获取域名,根据域名判断公司"""
-    company = get_company_from_req(request)  # 调试状态,默认会返回新振兴
-    if request.method.lower() == "get":
-        if company:
-            login_title = '登录'
-            return render_template("manage/login.html", login_title=login_title)
-        else:
-            return abort(400, "validate fail, access refused!")
-    elif request.method.lower() == "post":
-        """验证用户身份"""
-        message = {"message": "success"}
-        if not company:
-            message['message'] = '访问地址错误'
-        else:
+    company = Company.find_by_prefix(prefix)
+    if company is None:
+        html = "<html><head><style>h1{font-size:400px;text-align:center;}</style></head>" \
+               "<body><h1>404</h1></body></html>"
+        return html
+    else:
+        if request.method.lower() == "get":
+            return render_template("manage/login.html")
+        elif request.method.lower() == "post":
+            """验证用户身份"""
+            message = {"message": "success"}
             """取登录参数"""
             user_name = get_arg(request, "user_name", None)
             user_password = get_arg(request, "user_password", None)
@@ -188,42 +185,25 @@ def login_func():
                 user_password = user_password.lower()
                 """登录参数合法,开始验证"""
                 args = {"user_name": user_name}
-                employee = Employee.find_one_plus(filter_dict=args, instance=False)
-                if employee is None:
+                admin = CompanyAdmin.find_one_plus(filter_dict=args, instance=False)
+                if admin is None:
                     message['message'] = "用户名不存在或手机未注册"
                 else:
-                    if user_password != employee['user_password']:
+                    if user_password != admin['user_password']:
                         message['message'] = "密码错误"
-                    elif employee.get("user_status") != 1:
+                    elif admin.get("user_status") != 1:
                         message['message'] = "账户未启用"
                     else:
-                        """员工身份验证成功,需要验证公司是否有这个员工?"""
-                        company_id = company['_id']
-                        employee_id = employee['_id']
-                        short_name = company['short_name']
-                        employee_name = employee.get("real_name", employee['user_name'])
-                        post = Company.validate_employee(company_id, employee_id)
-                        if post is not None:
-                            """登录成功,写入会话"""
-                            args['user_id'] = str(employee['_id'])  # 写入用户id的str格式.
-                            args['real_name'] = employee_name
-                            args['user_name'] = user_name
-                            args['user_password'] = user_password
-                            head_img_url = employee.get("head_img_url", "/static/image/head_img/default_01.png")
-                            args['head_img_url'] = head_img_url
-                            employee_number = employee.get("employee_number", "")  # 工号
-                            args['employee_number'] = employee_number
-                            """写入用户所在公司的信息"""
-                            args['prefix'] = company.get("prefix")
-                            args['company_id'] = str(company_id)
-                            save_platform_session(**args)
-                        else:
-                            """公司没这个员工"""
-                            ms = "当前用户不在{}就职.".format(short_name)
-                            message['message'] = ms
-        return json.dumps(message)
-    else:
-        return abort(400, "unknown request")
+                        """登录成功,写入会话"""
+                        args['user_id'] = str(admin['_id'])  # 写入用户id的str格式.
+                        args['user_password'] = user_password
+                        args['company_id'] = str(company['_id'])
+                        args['prefix'] = prefix
+                        save_platform_session(**args)
+
+            return json.dumps(message)
+        else:
+            return abort(400, "unknown request")
 
 
 @manage_blueprint.route("/register", methods=['post', 'get'])
@@ -266,7 +246,6 @@ def logout_func():
 @check_platform_session
 def track_page_func():
     """展示用户轨迹页面"""
-    user_id = get_platform_session_arg("user_id")
     head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     real_name = get_platform_session_arg("real_name")
     if request.method.lower() == "get":
@@ -291,31 +270,26 @@ def subordinates_base_info_func():
 
 
 @manage_blueprint.route("/last_positions", methods=['post'])
+@check_platform_session
 def last_positions_func()->dict:
     """
-    根据用户id，获取他所能查看的员工的最后的位置信息，
+    根据用户id，获取他所能查看的员工的最后的位置信息，注意这里的用户指的是公司管理员
     """
     res = {"message": "success"}
-    user_id = get_platform_session_arg("user_id")
-    user_id = user_id  # user_id = "debug" 是调试用，查看所有的人的位置
-    subordinate_id_list = Employee.subordinates_id(user_id)  # 获取下属/能查看的用户列表。
-    if subordinate_id_list is None:
-        """user_id错误"""
-        mes = "user_id错误"
-        res['message'] = mes
-    else:
-        if len(subordinate_id_list) == 0:
-            """没有下属，只能查看自己的位置了"""
-            subordinate_id_list = [mongo_db.get_obj_id(user_id)]
-        key = "all_last_position_{}".format(user_id)
-        user_position_dict = cache.get(key)
-        if user_position_dict is None:
-            user_position_dict = Track.get_last_position(subordinate_id_list)  # 获取最后的点信息
-            cache.set(key, user_position_dict, timeout=60)
-        else:
+    company_id = get_platform_session_arg("company_id")
+    employees = Company.all_employee(company_id=company_id)
+    data = list()
+    if len(employees) > 0:
+        data = cache.get("last_position_cache")  # 调试用
+        if data is not None:
             pass
-        user_position_list = list(user_position_dict.values())
-        res['data'] = user_position_list
+        else:
+            data = Track.get_last_position([x['_id'] for x in employees])  # 获取最后的点信息
+            data = list(data.values())
+            cache.set("last_position_cache", data, timeout=7200)  # 调试用
+    else:
+        pass
+    res['data'] = data
     return json.dumps(res)
 
 
@@ -338,7 +312,7 @@ def track_info():
             end_date = None  # 结束时间
             begin_date = None  # 开始时间
             if len(date_list) == 1:
-                end_date = get_datetime_from_str(date_list[0])
+                begin_date = get_datetime_from_str(date_list[0])
             elif len(date_list) > 1:
                 end_date = get_datetime_from_str(date_list[1])
                 begin_date = get_datetime_from_str(date_list[0])
@@ -418,7 +392,9 @@ def index_func():
         """返回页面"""
         head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png") # 用户头像
         real_name = get_platform_session_arg("real_name")
-        return render_template("manage/index_light.html", head_img_url=head_img_url, real_name=real_name)
+        company_id = get_platform_session_arg("company_id")
+        return render_template("manage/index_light.html", head_img_url=head_img_url,
+                               real_name=real_name, company_id=company_id)
     else:
         return abort(405)
 
@@ -517,33 +493,13 @@ def get_driver_list_func() -> str:
     注意,这里返回的都是简要信息,用于创建列表和侧边栏,详细信息用get_employee_archives接口获取.
     :return: 消息字典的json,其中包含下属身份信息的的列表
     """
-    user_id = get_platform_session_arg("user_id")
-    raw_user_id = user_id
-    message = {"message": "success"}
-    if user_id is None:
-        message['message'] = "没有检测到用户id存在"
-    else:
-        #此方式虽然合理,但速度太慢,改为从缓存获取
-        # try:
-        #     user_id = mongo_db.get_obj_id(user_id)
-        # except Exception:
-        #     user_id = None
-        # finally:
-        #     if user_id is None:
-        #         message['message'] = "错误的user_id:{}".format(raw_user_id)
-        #     else:
-        #         team = Employee.subordinates_id(user_id)
-        #         if len(team) == 0:
-        #             team = [user_id]
-        #         else:
-        #             pass
-        #         # 获取用户的档案.
-        #         team_info = Employee.get_archives_cls(team)
-        """从缓存获取信息"""
-        team_info = get_archives_from_cache(user_id)
-        team_info = [{"_id": x['_id'], "real_name": x['real_name'] if x.get('real_name') else x.get('phone_num'),
-                      "head_img_url": x['head_img_url']} for x in team_info.values()]
-        message['data'] = team_info
+    company_id = get_platform_session_arg("company_id")
+    employees = Company.all_employee(company_id=company_id)
+    message = dict()
+    message['message'] = "success"
+    team_info = [{"_id": str(x['_id']), "real_name": x['real_name'],
+                  "head_img_url": x['head_img_url']} for x in employees]
+    message['data'] = team_info
     return json.dumps(message)
 
 

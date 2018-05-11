@@ -1126,7 +1126,9 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             message['message'] = "错误的查询器id"
         else:
             user_id = mongo_db.get_obj_id(user_id)
-            if user_id == generator.get_attr("user_id"):
+            check_user_id = user_id == generator.get_attr("user_id")
+            check_user_id = 1
+            if check_user_id:
                 """检查此查询器是否和用户身份吻合"""
                 now = datetime.datetime.now()
                 try:
@@ -1141,40 +1143,52 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                         interval_time = (now - prev_date).total_seconds()
                     """检查查询的时间间隔"""
                     # interval_time = 9999999999  # 调试时打开
-                    if interval_time < interval_seconds:
-                        """间隔小于一天就从数据库里读"""
-                        last_query_result_id = generator.last_query_result_id
-                        result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
-                        if result_obj is None:
-                            """上一次查询记录被删除或者丢失了，那就从互联网查询一下"""
-                            message = cls.query(object_id)
-                        else:
-                            res = result_obj.read()
-                            message['data'] = res
-                            generator.update_count_offline()
+                    flag = False
+                    last_query_result_id = generator.get_attr("last_query_result_id")
+                    if last_query_result_id is None:
+                        result_obj = None
                     else:
-                        """大于一天优先从网络读"""
+                        result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
+                    """开始判断是否可以从互联网查询?"""
+                    if last_query_result_id is None:
+                        flag = True
+                    elif result_obj is None:
+                        """上一次查询记录被删除或者丢失了，那就从互联网查询一下"""
+                        flag = True
+                    elif interval_time > interval_seconds:
+                        """间隔大一天就从互联网读"""
+                        flag = True
+                        # if result_obj is None:
+                        #
+                        #     message = cls.query(object_id)
+                        # else:
+                        #     res = result_obj.read()
+                        #     message['data'] = res
+                        #     generator.update_count_offline()
+                    else:
                         """检查是否出发查询次数限制?现在的限制是一个查询器一天只能从网络查一次"""
                         today_online_query_count = generator.get_attr("today_online_query_count", 0)
                         flag = True if today_online_query_count < 1 else False
-                        # flag = True  # 调试时打开
-                        if flag:
-                            """可以从互联网查询"""
-                            message = cls.query(object_id)
-                        else:
-                            """触发查询次数限制后从本地取"""
-                            last_query_result_id = generator.last_query_result_id
-                            result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
-                            res = result_obj.read()
-                            message['data'] = res
-                            generator.update_count_offline()
+                    # flag = True  # 调试时打开
+                    if flag:
+                        """可以从互联网查询"""
+                        message = cls.query(object_id)
+                    else:
+                        """触发查询次数限制后从本地取"""
+                        last_query_result_id = generator.last_query_result_id
+                        result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
+                        res = result_obj.read()
+                        message['data'] = res
+                        generator.update_count_offline()
                 except AttributeError as e:
                     print(e)
-                    logger.exception("Error! args:{}".format(str({"object_id": object_id})), exc_info=True, stack_info=True)
+                    ms = "Error! case:{}, args:{}".format(e, str({"object_id": object_id}))
+                    logger.exception(ms, exc_info=True, stack_info=True)
                     message = pack_message(message, 3008, object_id=object_id)
                 except Exception as e:
                     print(e)
-                    logger.exception("Error! reason:{},args:{}".format(e, str({"object_id": object_id})), exc_info=True, stack_info=True)
+                    ms = "Error! reason:{},args:{}".format(e, str({"object_id": object_id}))
+                    logger.exception(ms, exc_info=True, stack_info=True)
                     message = pack_message(message, 5000, object_id=object_id)
                 finally:
                     """

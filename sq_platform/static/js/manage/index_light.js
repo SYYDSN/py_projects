@@ -306,7 +306,7 @@ AMapUI.loadUI(['overlay/AwesomeMarker'], function (AwesomeMarker) {
             '<hr>'+
             '</li>';
 
-        $("#driver_list").empty().append(right_bar_html_str);
+        $("#driver_list").append(right_bar_html_str);
     };
 
     func_dict['add_right_side_bar_item'] = add_right_side_bar_item;  // 加入函数集
@@ -344,6 +344,7 @@ last_positions = function(){
             $("#right_bar_handler_bottom>ul").empty();  // 清除i司机姓氏筛选区域
             global_markers = {};  // 全局自定义标记点容器.用于后继对全局自定义标记点的操作.
             // 添加右侧边栏和自定义标记
+            $("#driver_list").empty();  // 清除旧的右侧导航
             for(let i=0;i<l;i++){
                 let data = data_list[i];
                 console.log(data);
@@ -400,36 +401,28 @@ update_custom_markers = function(debug){
 };
 
 
-// 全局循环刷新最后位置的事件
-// const interval = window.setInterval(function(){
-//     let debug = get_url_arg("debug");
-//     console.log("debug is " + debug);
-//     update_custom_markers(debug);
-// }, 1000 * 20);
-
-
 // 右侧边滑动栏收放事件.
 $("#right_side_bar_handler").click(function(e){
     var class_str = $("#right_side_bar").attr("class");
     if(class_str === undefined || class_str === ""){
         // 第一次
         $("#right_side_bar").addClass("bar_to_right");
-        $("#right_side_bar_handler i").removeClass("fa fa-1 fa-angle-double-left fa-flip-horizontal")
-        $("#right_side_bar_handler i").addClass("fa fa-1 fa-angle-double-right fa-flip-horizontal")
+        $("#right_side_bar_handler i").removeClass("fa fa-1 fa-angle-double-left fa-flip-horizontal");
+        $("#right_side_bar_handler i").addClass("fa fa-1 fa-angle-double-right fa-flip-horizontal");
     }
     else if(class_str === 'bar_to_right'){
         // 已经滑动到左边了。
         $("#right_side_bar").removeClass("bar_to_right");
         $("#right_side_bar").addClass("bar_to_left");
-        $("#right_side_bar_handler i").removeClass("fa fa-1 fa-angle-double-right fa-flip-horizontal")
-        $("#right_side_bar_handler i").addClass("fa fa-1 fa-angle-double-left fa-flip-horizontal")
+        $("#right_side_bar_handler i").removeClass("fa fa-1 fa-angle-double-right fa-flip-horizontal");
+        $("#right_side_bar_handler i").addClass("fa fa-1 fa-angle-double-left fa-flip-horizontal");
     }
     else if(class_str === 'bar_to_left'){
         // 已经滑动到右边了。
         $("#right_side_bar").removeClass("bar_to_left");
         $("#right_side_bar").addClass("bar_to_right");
-        $("#right_side_bar_handler i").removeClass("fa fa-1 fa-angle-double-left fa-flip-horizontal")
-        $("#right_side_bar_handler i").addClass("fa fa-1 fa-angle-double-right fa-flip-horizontal")
+        $("#right_side_bar_handler i").removeClass("fa fa-1 fa-angle-double-left fa-flip-horizontal");
+        $("#right_side_bar_handler i").addClass("fa fa-1 fa-angle-double-right fa-flip-horizontal");
     }
     else{
         console.log(class_str);

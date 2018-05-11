@@ -294,7 +294,7 @@ def get_date_from_str(date_str: str) -> datetime.date:
         the_date = datetime.datetime.strptime(the_str, "%Y-%m-%d").date()
     else:
         ms = "错误的日期格式:{}".format(date_str)
-        logger.exception(ms)
+        logger.info(ms)
     return the_date
 
 

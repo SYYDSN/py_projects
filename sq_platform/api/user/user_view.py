@@ -272,7 +272,7 @@ def update_image(user_id, key):
                     if _id is None or _id == "":
                         """这是上传图片添加行车证的情况"""
                         permit_image_url = request.host_url + part_url
-                        car_license_kwargs = {"permit_image_url": permit_image_url,
+                        car_license_kwargs = {"permit_image_url": part_url,
                                               "user_id": user_id}
                         print("new permit_image args: {}".format(_id))
                         r = CarLicense.instance(**car_license_kwargs)  # 插入一个行车证信息
@@ -339,11 +339,11 @@ def update_image(user_id, key):
                 message = pack_message(message, 3001, file_name=raw_file_name, allow_file_suffix=ALLOWED_EXTENSIONS)
         except KeyError as e:
             print(e)
-            logger.exception("Error! ")
+            logger.exception("Error! case: {}".format(e))
             message = pack_message(message, 3000, avatar=str(None))
         except Exception as e:
             print(e)
-            logger.exception("Error! ")
+            logger.exception("Error! case: {}".format(e))
             message = pack_message(message, 5000, avatar=str(None))
         finally:
             print("update_image function : ", end="")

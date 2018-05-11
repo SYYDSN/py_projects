@@ -619,14 +619,14 @@ class TrafficViolationHandler:
                     type_dict["payment_status"] = str  # 违章缴费状态 不返回表示无法获取该信息，1-未缴费 2-已缴
                     type_dict['position_id'] = ObjectId  # 违章地址的经纬度信息的id，指向Position类
                 """
-                if "lists" in result and len(result['lists']) > 0:
+                vio_list = result.get('lists')
+                if isinstance(vio_list, list):
                     data = dict()                  # 最后返回的数据
                     amount = 0                     # 违章总数
                     untreated = 0                  # 未处理违章条数
                     total_fine = 0.0               # 未处理违章总罚款
                     total_points = 0               # 未处理违章总扣分
                     violations = list()            # 违章记录容器
-                    vio_list = result['lists']
                     for vio in vio_list:
                         """
                         vio = {

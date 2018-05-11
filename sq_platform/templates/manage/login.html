@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <!--移动页面优化：页面宽度=设备宽度，初始化缩放为1，最大缩放1，禁用放大 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/skins/dneglu.css') }}">
-    <script src="{{ url_for('static', filename='../static/js/jquery-1.11.3.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='../static/js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='../static/js/denglu.js') }}"></script>
-    <script src="../static/js/common.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skins/dneglu.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery-1.11.3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/denglu.js') }}"></script>
+    <script src="/static/js/common.js"></script>
     <!-- 页面专属css脚本-->
     {% block extend_css %}
-        <link rel="stylesheet" href="../static/css/particles.css">
-        <link rel="stylesheet" href="../static/css/login.css">
+        <link rel="stylesheet" href="/static/css/particles.css">
+        <link rel="stylesheet" href="/static/css/login.css">
     {% endblock %}
     <!--页面专属js脚本-->
     {% block extend_js %}
-        <script src="../static/js/jquery.base64.js"></script>
-        <script src="../static/js/jquery.md5.js"></script>
-        <script src="../static/js/login.js"></script>
+        <script src="/static/js/jquery.base64.js"></script>
+        <script src="/static/js/jquery.md5.js"></script>
+        <script src="/static/js/login.js"></script>
     {% endblock %}
     <!-- 页面标题-->
     <title>{{ page_title }}</title>
@@ -35,10 +35,10 @@
                     <div class="my_main-left col-lg-6 col-md-6 hidden-sm hidden-xs">
                         <div class="content">
                             <div class="login">
-                            <img src="../../static/image/head_img/tubiao.png" alt="">
+                            <img src="/static/image/head_img/tubiao.png" alt="">
                             </div>
                             <!--<div class="login-text">
-                                <img src="../../static/image/head_img/安全管理平台.png" alt="">
+                                <img src="/static/image/head_img/安全管理平台.png" alt="">
                             </div>-->
                         </div>
                     </div>
@@ -88,7 +88,7 @@
 </body>
 <!--粒子特效脚本-->
 <!--
-<script src="../static/js/particles.min.js"></script>
+<script src="/static/js/particles.min.js"></script>
 <script>
     particlesJS('particles-js',
         {

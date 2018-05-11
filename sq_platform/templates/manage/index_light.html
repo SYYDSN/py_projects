@@ -2,6 +2,9 @@
 {% block extend_css %}
 <link rel="stylesheet" href="../static/css/manage/index_light.css">
 {% endblock %}
+<script>
+    company_id = {{ company_id | safe }};
+</script>
 {% block main %}
 
     <div id="main_zone" class="main_zone col-lg-12 col-md-12 col-sm-12 col-xs-12">

@@ -691,6 +691,24 @@ class User(mongo_db.BaseDoc):
             message['data'] = obj.to_flat_dict()
         return message
 
+    def get_last_position(self) -> dict:
+        """
+        获取用户的最后的轨迹
+        :return: Track的doc对象
+        """
+        track = Track.get_last_position(self.get_id())
+        return track
+
+    @classmethod
+    def get_last_position_by_id(cls, id: (str, ObjectId, list)) -> (None, dict, list):
+        """
+        获取一个/一组用户
+        :param id: 一个/一组用户的id,id可以是str类型,也可以是ObjectId类型
+        :return:
+        """
+        res = Track.get_last_position(self.get_id())
+        return res
+
 
 class EventRecord(mongo_db.BaseDoc):
     """事件记录,用于记录用户的各种重要事件，比如登录，注册，注销"""
@@ -1319,7 +1337,7 @@ class CarLicense(mongo_db.BaseDoc):
         :param kwargs:
         :return: 返回实例或者None
         """
-        if user_id in kwargs:
+        if "user_id" in kwargs:
             user_id = kwargs['user_id']  # 注意CarLicense.user_id是ObjectId对象
             user = User.find_by_id(user_id, to_dict=False)
             if isinstance(user, User):
@@ -1995,17 +2013,18 @@ class Track(mongo_db.BaseDoc):
         if (end - begin).total_seconds() < 0:
             raise ValueError("开始时间不能晚于结束时间：begin={}, end={}".format(begin, end))
         else:
+            """检查user_id"""
             if isinstance(user_id, str) and len(user_id) == 24:
                 user_id = mongo_db.get_obj_id(user_id)
             elif isinstance(user_id, (DBRef, MyDBRef)):
-                user_id = user_id.id
-            elif isinstance(user_id, ObjectId):
                 pass
+            elif isinstance(user_id, ObjectId):
+                user_id = DBRef(database=mongo_db.db_name, collection=User.get_table_name(), id=user_id)
             else:
                 raise TypeError("非法的user_id, user_id={}".format(user_id))
             """可以查询数据了"""
             filter_dict = {
-                "user_id.$id": user_id,
+                "user_id": user_id,
                 "time": {"$gte": begin, "$lte": end}
             }
             sort_dict = {"time": 1}
@@ -2039,7 +2058,7 @@ class Track(mongo_db.BaseDoc):
             sort_dict = {"time": -1}
             result = cls.find_one_plus(filter_dict=filter_dict, sort_dict=sort_dict, instance=False)
             if result is not None:
-                result['real_name'] = user.get_attr("user_name") if user.get_attr("real_name") else user.get_attr(
+                result['real_name'] = user.get_attr("user_name") if user.get_attr("real_name") is None else user.get_attr(
                     "real_name")
                 result['gender'] = user.get_attr("gender")
                 result['phone_num'] = user.get_attr("phone_num")

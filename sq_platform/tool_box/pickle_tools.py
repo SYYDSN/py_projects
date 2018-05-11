@@ -366,8 +366,10 @@ class GPSCache:
             else:
                 t_delta = (e['time'] - s['time']).total_seconds()
                 s_delta = (e['speed'] - s['speed'])
-                av_speed = sum([x['speed'] for x in self.cache]) / t_delta
+                temp_speed_list = [x['speed'] for x in self.cache]
+                av_speed = sum(temp_speed_list) / t_delta
                 if t_delta > 1 and av_speed > 90:
+                # if t_delta > 1 and av_speed > 90 and min(temp_speed_list) > 90:
                     """超速"""
                     event_list = self.event.get(e['user_id'])
                     if event_list is None:
@@ -379,6 +381,9 @@ class GPSCache:
                         "end": e['time'].strftime("%Y-%m-%d %H:%M:%S"),
                         "begin_speed": s['speed'],
                         "end_speed": e['speed'],
+                        "altitude": e['altitude'],
+                        "latitude": e['latitude'],
+                        "longitude": e['longitude'],
                         "av_speed": av_speed
                     }
                     event_list.append(temp)
@@ -403,6 +408,7 @@ class GPSCache:
                         "begin_speed": s['speed'],
                         "end_speed": e['speed'],
                         "altitude": e['altitude'],
+                        "latitude": e['latitude'],
                         "longitude": e['longitude'],
                         "speed_delta": delta
                     }
@@ -422,6 +428,7 @@ class GPSCache:
                         "begin_speed": s['speed'],
                         "end_speed": e['speed'],
                         "altitude": e['altitude'],
+                        "latitude": e['latitude'],
                         "longitude": e['longitude'],
                         "speed_delta": delta
                     }

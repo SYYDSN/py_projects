@@ -51,5 +51,14 @@ const event_dict = {
     },
     '5aaf2f3ee39a7b6f4b6ce26f': {
         'av_speed': 66.39874951456326,
-        'events': [{'altitude': 26.0, 'speed_delta': 30.852, 'begin_speed': 0.0, 'user_id': '5aaf2f3ee39a7b6f4b6ce26f', 'end_speed': 30.852, 'end': '2018-04-17 18:38:36', 'longitude': 115.3997252061632, 'begin': '2018-04-17 18:38:35', 'type': '急加速'}]}
+        'events': [
+            {
+                'altitude': 26.0, 'speed_delta': 30.852, 'begin_speed': 0.0,
+                'user_id': '5aaf2f3ee39a7b6f4b6ce26f',
+                'end_speed': 30.852, 'end': '2018-04-17 18:38:36',
+                'longitude': 115.3997252061632, 'begin': '2018-04-17 18:38:35',
+                'type': '急加速'
+            }
+            ]
+    }
 };

@@ -2,6 +2,8 @@
  * Created by walle on 2017/1/28.
  */
 $(function () {
+    let path = location.pathname;
+
     $(".content-r form input[type='password']").attr("test","aaa");
     var flag = true;
     $(".content-r form i").click(function(){
@@ -87,7 +89,7 @@ $(function () {
                     $("#submit_btn").removeProp("disabled");
                 }
             }, 1200);
-            $.post("/manage/login", args, function (data) {
+            $.post(path, args, function (data) {
                  $("#submit_btn").removeAttr("disabled");
                  var data = JSON.parse(data);
                 if (data['message'] != 'success') {
@@ -98,7 +100,7 @@ $(function () {
                 else {
                     // 登录成功
                     $("#handler_name,#handler_password").val("");
-                    location.href = "/manage/index";
+                    location.href = `/manage/index`;
                 }
             });
         }

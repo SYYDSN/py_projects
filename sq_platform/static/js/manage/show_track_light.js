@@ -193,7 +193,7 @@ query_track_info = function () {
                         }
                         global_track_time_list.push(time_list);  //  时序点数组入全局变量 。
                         global_track_data_list.push({
-                            "name": $(`#right_bar>div[data-id='${user_id}'] .driver_name`).text(),
+                            "name": $(`#right_bar div[data-id='${user_id}'] .driver_name`).text(),
                             "path": path_list
                         });  //  轨迹点数组入全局变量 。
                     } else {
@@ -455,11 +455,11 @@ $("#submit_query").click(function () {
         let flag = true;
         let interval = setInterval(function () {
             if (flag) {
-                if ($("#right_bar>div").length > 0) {
+                if ($("#right_bar .nav_item").length > 0) {
                     flag = false;
                 }
             } else {
-                $("#right_bar>div").each(function () {
+                $("#right_bar .nav_item").each(function () {
                     let $this = $(this);
                     if (user_id_list.indexOf($this.attr("data-id")) !== -1) {
                         $this.click();

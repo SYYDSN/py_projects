@@ -73,8 +73,8 @@ def test_query_violation():
     auth_token = "a98d8bb4840c42e3993ccc6d6c79d431"  # app段登录标识 me
     # auth_token = "47a55e628931458fb70773badbe063ba"  # app段登录标识 me
     headers = {"auth_token": auth_token}
-    args = {"_id": "5ac49aa74660d356cce9df9f"}   #
-    args = {"_id": "5ae2b45ae39a7b45d3fa9d6e"}   #
+    # args = {"_id": "5af55414e39a7b7691355f41"}   #
+    args = {"_id": "5ae2bc45e39a7b4d8239aa8e"}   #
     url = "http://safego.org:5000/api/query_violation"
     # url = "http://127.0.0.1:5000/api/query_violation"
     res = requests.post(url, data=args, headers=headers)
@@ -83,7 +83,7 @@ def test_query_violation():
 
 def test_upload_user_permit_image():
     """测试用户上传行车证图片"""
-    auth_token = "f40bc71e130c48f4bcebff1169dfe22a"  # app段登录标识 me
+    auth_token = "a98d8bb4840c42e3993ccc6d6c79d431"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     img_path = "/home/walle/图片/img_mingcheng.png"
     # img_path = "/home/walle/图片/general_dict.png"
@@ -97,7 +97,7 @@ def test_upload_user_permit_image():
 
 def test_edit_user_permit_image():
     """测试用户编辑行车证图片"""
-    auth_token = "f40bc71e130c48f4bcebff1169dfe22a"  # app段登录标识 me
+    auth_token = "a98d8bb4840c42e3993ccc6d6c79d431"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     img_path = "/home/walle/图片/img_mingcheng.png"
     # img_path = "/home/walle/图片/general_dict.png"
@@ -265,11 +265,10 @@ if __name__ == "__main__":
     # }
     """测试获取每日报告"""
     # test_get_daily_info()
-    """测试违章查询"""
-    test_query_violation()
-    # test_req(**args)
     """测试获取违章查询器列表"""
     # test_get_vio_query_shortcuts()
+    """测试违章查询"""
+    test_query_violation()
     """测试获取用户行车证信息"""
     # test_get_car_license()
     """测试用户上传行车证图片"""

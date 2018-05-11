@@ -227,7 +227,7 @@ fill_right_bar = function (func_name) {
             console.log(data);
             let l = data.length;
             if (l > 0) {
-                let bar = $("#right_bar");
+                let bar = $("#right_bar .my_nav");
                 bar.empty();
                 for (let i = 0; i < l; i++) {
                     let driver = data[i];

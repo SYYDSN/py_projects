@@ -228,7 +228,7 @@ def batch_send_sms(spread: Spread, max_count: int = 50):
 
 
 if __name__ == "__main__":
-    """批量发送"""
+    """批量发送短信"""
     spread = Spread.find_by_id(ObjectId("5ab9f0324660d34e9f4328fa"))  # 发送下载app的短信
     batch_send_sms(spread=spread, max_count=500)
     # SpreadRecord.rebuild_event_date()
