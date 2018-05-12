@@ -7,6 +7,7 @@ from flask import render_template_string
 from flask import send_file
 from flask import request
 from mongo_db import get_datetime_from_str
+from mongo_db import ObjectId
 from flask_session import Session
 from log_module import get_logger
 import sms_module
@@ -20,6 +21,7 @@ import item_module
 from module.spread_module import AllowOrigin
 from uuid import uuid4
 from module import user_module
+from item_module import *
 import os
 from mail_module import send_mail
 from browser.crawler_module import CustomerManagerRelation
@@ -119,6 +121,8 @@ def listen_func(key):
     print(event_id)
     print(signature)
     print(data)
+    raw = RawSignal(**data)
+    raw.save_plus()  # 保存原始数据
     if key == "customermanagerrelation":
         """更新客户和管理者之间的关系"""
         secret_str = 'n63tPGK9e7TvrAqPXnUTwiGG'  # 不同的消息定义的secret不同，用来验证消息的合法性
@@ -278,6 +282,83 @@ def listen_func(key):
                     print(r)
             else:
                 pass
+    elif key == "distribution_scheme":
+        """资源分配方案"""
+        secret_str = 'lYLaLKgFX9Mi6ij19tpZELlt'  # 不同的消息定义的secret不同，用来验证消息的合法性
+        check = validate_signature(request, secret_str, signature)
+        print("signal_test check is {}".format(check))
+        if not check:
+            return abort(404)
+        else:
+            """
+            {
+                "_id" : ObjectId("5af626224513533cc34ea6e3"),
+                "data" : {
+                    "updateTime" : "2018-05-11T23:24:18.813Z",
+                    "_widget_1525903100391" : [ 
+                        "1", 
+                        "3", 
+                        "4", 
+                        "6"
+                    ],
+                    "_id" : "5af62604c281e01263b74981",
+                    "formName" : "今日分配方案",
+                    "entryId" : "5af36ea9a618d61e69243ad7",
+                    "deleteTime" : null,
+                    "appId" : "5a658ca3b2596932dab31f0c",
+                    "updater" : {
+                        "name" : "徐立杰",
+                        "_id" : "5a684c9b42f8c1bffc68f4b4"
+                    },
+                    "deleter" : null,
+                    "submitPrompt" : {
+                        "content" : ""
+                    },
+                    "createTime" : "2018-05-11T23:23:48.445Z",
+                    "label" : "",
+                    "creator" : {
+                        "name" : "徐立杰",
+                        "_id" : "5a684c9b42f8c1bffc68f4b4"
+                    }
+                },
+                "op" : "data_update"
+            }
+            """
+            op = data["op"]
+            data = data['data']
+            args = dict()
+            _id = data['_id']
+            _id = _id if isinstance(_id, ObjectId) else ObjectId(_id)
+            args['groups'] = data['_widget_1525903100391']
+            if op == "data_update":
+                op = "update"
+            elif op == "data_create":
+                op = "insert"
+            else:
+                op = "other"
+            if op == "insert":
+                """添加分配方案"""
+                create_date = mongo_db.get_datetime_from_str(data['createTime'])
+                create_date = transform_time_zone(create_date)
+                args["_id"] = _id
+                args['create_date'] = create_date
+                scheme = DistributionScheme(**args)
+                r = scheme.save_plus()
+                ms = "插入结果:{}".format((str(r)))
+                logger.info(ms)
+            if op == "update":
+                """修改分配方案"""
+                create_date = mongo_db.get_datetime_from_str(data['updateTime'])
+                create_date = transform_time_zone(create_date)
+                f = {"_id": _id}
+                args['create_date'] = create_date
+                u = {"$set": args}
+                r = DistributionScheme.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+                ms = "插入结果:{}".format((str(r)))
+                logger.info(ms)
+            else:
+                pass
+
     else:
         mes['message'] = '错误的path'
     return json.dumps(mes)

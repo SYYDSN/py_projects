@@ -181,7 +181,7 @@ def to_jiandao_cloud(**kwargs) -> bool:
     js_desc_8 = """let d = $(".widget-wrapper>ul>li:eq(9) input"); d.val("{}");""".format(desc8)
     browser.execute_script(js_desc_8)  # 搜索关键字
 
-    desc10 = kwargs.get('group')
+    desc10 = kwargs.get('group_by')
     if desc10 is not None:
         js_desc_10 = """let d = $(".widget-wrapper>ul>li:eq(11) input"); d.val("{}");""".format(desc10)
         browser.execute_script(js_desc_10)  # 搜索关键字

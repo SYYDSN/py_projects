@@ -67,7 +67,6 @@ class CustomerManagerRelation(mongo_db.BaseDoc):
     @classmethod
     def get_relation(cls, mt4_account: str) -> dict:
         """
-        JDY的这个方法不会被使用
         根据用户的mt4帐号,查询用户的归属关系
         :param mt4_account:
         :return:

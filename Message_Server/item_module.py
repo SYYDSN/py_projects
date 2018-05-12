@@ -11,6 +11,15 @@ ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
 
 
+class RawSignal(mongo_db.BaseDoc):
+    """
+    原始信号的记录
+    """
+    _table_name = "raw_signal_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+
+
 class Signal(mongo_db.BaseDoc):
     """交易信号"""
     """

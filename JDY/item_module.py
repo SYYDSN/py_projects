@@ -22,6 +22,15 @@ DBRef = mongo_db.DBRef
 cache = SimpleCache()
 
 
+def transform_time_zone(a_time) -> datetime.datetime:
+    """
+    转换时区，把时间+8个小时
+    :param a_time:
+    :return:
+    """
+    return a_time + datetime.timedelta(hours=8)  # 调整时区
+
+
 class CsrfError(mongo_db.BaseDoc):
     """csrf错误记录"""
     _table_name = "csrf_error_info"
@@ -57,6 +66,8 @@ class Customer(mongo_db.BaseDoc):
     type_dict['referrer'] = str    # referrer
     type_dict['user_agent'] = str    # user_agent
     type_dict['time'] = datetime.datetime  # 注册时间
+    type_dict['group_by'] = str        # 分组标志位
+    type_dict['group_count'] = int        # 当前分组标志的下分配的第几个分组资源？
 
     @classmethod
     def reg(cls, **kwargs):
@@ -105,6 +116,14 @@ class Customer(mongo_db.BaseDoc):
             logger.exception(exc_info=True, stack_info=True)
         finally:
             if message['message'] == "success":
+                group_by_dict = DistributionScheme.next_group()  # 获取分组标志
+                if isinstance(group_by_dict, dict) and "group" in group_by_dict and "count" in group_by_dict:
+                    group_by = group_by_dict['group']
+                    group_count = group_by_dict['count']
+                    kwargs['group_by'] = group_by
+                    kwargs['group_count'] = group_count
+                    reg_dict['group_by'] = group_by
+                    reg_dict['group_count'] = group_count
                 customer = cls(**kwargs)
                 save = None
                 try:
@@ -150,8 +169,10 @@ class Customer(mongo_db.BaseDoc):
         n = "" if reg_info.get("user_name") is None else reg_info.get("user_name")
         p = "" if reg_info.get("phone") is None else reg_info.get("phone")
         c = 0 if reg_info.get("today_count") is None else reg_info.get("today_count")
-        markdown['text'] = "#### 用户注册  \n > {}  \n > 注册通道：{}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 计数：{}".\
-            format(d, channel_str, n, p, c)
+        title = "用户注册"
+        markdown['title'] = title
+        markdown['text'] = "#### {}  \n > {}  \n > 注册通道：{}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 分组：{}  \n > 计数：{}/{}".\
+            format(title, d, channel_str, n, p, reg_info['group_by'], reg_info['group_count'] + 1, c)
         out_put['markdown'] = markdown
         out_put['at'] = {'atMobiles': [], 'isAtAll': False}
         res = send_signal(out_put, token_name=token_name)
@@ -237,39 +258,69 @@ class Customer(mongo_db.BaseDoc):
         return count
 
 
+class RawSignal(mongo_db.BaseDoc):
+    """
+    原始信号的记录
+    """
+    _table_name = "raw_signal_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+
+
 class DistributionScheme(mongo_db.BaseDoc):
         """用户资源分配方案"""
         _table_name = "distribution_scheme_info"
         type_dict = dict()
-        type_dict['_id'] = ObjectId
-        type_dict['groups'] = list()  # 分组标志
+        type_dict['_id'] = ObjectId  # 这个id使用客户端发过来的id"
+        type_dict['groups'] = list   # 分组标志
         """创建时间，也是分配时，计算已分配数量的起点标志"""
         type_dict['create_date'] = datetime.datetime
 
         @classmethod
-        def get_group(cls) -> (None, str, int):
+        def instance(cls, **kwargs):
+            """
+            接受信号并生成实例， 这个在接受信号时替代init方法。
+            会提前把数据整理成适合init的方式。
+            :param kwargs:
+            :return:
+            """
+            pass
+
+        @classmethod
+        def next_group(cls) -> (None, str, int):
             """
             获取下一个分配的标志位
             :return:
             """
-            gs = cls.last_group()
-            if groups is None:
+            gs = cls.last_groups()
+            res = None
+            if gs is None:
                 pass
             else:
                 groups = gs['groups']
                 the_time = gs['create_date']
-                f = {"group": {"$in": groups}, "time": {"$gte": the_time}}
-                projection = ['group']
-                rs = Customer.find_plus(filter_dict=f, projection=projection, to_dict=True)
-                """groupby"""
+                if len(groups) == 0:
+                    pass
+                else:
+                    allotted = cls.get_allotted(the_groups=groups, the_time=the_time)
+                    if len(allotted) > 0:
+                        temp = list()
+                        for x in groups:
+                            c = allotted.get(x, 0)
+                            temp.append({"group": x, "count": c})
+                        temp.sort(key=lambda obj: obj['count'], reverse=False)
+                        res = temp[0]
+                    else:
+                        res = {"group": groups[0], "count": 0}
+            return res
 
         @classmethod
-        def last_group(cls) -> (None, dict):
+        def last_groups(cls) -> (None, dict):
             """
             获取最新的groups
             :return:
             """
-            f = {"groups": {"$exists": True, "$type": "array"}}
+            f = {"groups": {"$exists": True}}
             s = {"create_date": -1}
             r = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
             if r is None:
@@ -280,29 +331,76 @@ class DistributionScheme(mongo_db.BaseDoc):
                 res['groups'] = r['groups']
                 return res
 
-        @staticmethod
-        def get_scheme():
-            pass
+        @classmethod
+        def get_allotted(cls, the_time: datetime.datetime, the_groups: list) -> dict:
+            """
+            获取已分配用户的分布情况，。
+            返回一个由group,用户计数组成的字典组成的数据，
+            :param the_time:
+            :param the_groups:
+            :return:
+
+            {
+             group1: count1,
+            group2: count2,
+            group3: count3,
+            ....
+            }
+            """
+            """
+            聚合查询示范
+            ses = mongo_db.get_conn(Customer.get_table_name())
+            the_groups = [
+                '页面标题:MT4交易管家'
+            ]
+            the_time = datetime.datetime.now()
+            pipeline = [
+                {"$match": {"description": {"$in": the_groups}, "time": {"$lte": the_time}}},  # 匹配
+                {"$group": {"_id": "$description", "count": {"$sum": 1}}}  # 分组统计
+            ]
+            res = ses.aggregate(pipeline=pipeline)
+            res = [{"group": x['_id'], "count": x['count']} for x in res]
+            """
+            ses = mongo_db.get_conn(Customer.get_table_name())
+            pipeline = [
+                {"$match": {"group_by": {"$in": the_groups}, "time": {"$gte": the_time}}},  # 匹配
+                {"$group": {"_id": "$group_by", "count": {"$sum": 1}}}  # 分组统计
+            ]
+            res = ses.aggregate(pipeline=pipeline)
+            res = {x['_id']: x['count'] for x in res}
+            return res
 
 
 if __name__ == "__main__":
     """注册测试"""
-    args = {
-    "phone" :  "37665103177"
-    ,
-    "user_agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36 LBBROWSER",
-    "description" : "页面标题:智能行情交易系统",
-    "search_keyword" : "",
-    "page_url" : "http://touzi.jyschaxun.com/20180314jiaoyi/index.html?channel=bd-pc-qhrj-015848",
-    "referrer" : "https://www.baidu.com/baidu.php?sc.K000000fJeHuq9k1805tenXpjI-L9X01DZ9Gb7mvaucTyhluRm0aVNCfp9KV32wkz2gBOrMZELcrXrWfyZNoXB_pplwGqQqRnKVFuVZ6UNSp84r17q5gSjeLCFYlPO2v4EaHufRdhr58uLhUwKw8dAzH1OpIL10_bavezPY4SPxufMkYi0.7b_iRZmr7O--YwsdnqAaFDAizEuukoenovgpZsUXxXAGh2FP7BSe5W91SzJUQM_oLUr1m_HAeG_lUQr1uzqMQWdQjPakk3tUrkf.U1Y10ZDq1_ieJoQAEJY-nWjQ4_MVYP00TA-W5HD0IjLrkQ8JzSUFeIjf1tQRv0KGUHYznWR0u1ddugK1nfKdpHdBmy-bIykV0ZKGujYY0APGujY3P0KVIjYknjD4g1DsnHIxnW0vn-t1PW0k0AVG5H00TMfqPH630ANGujYkPjnsg1cknjbd0AFG5HcsP7tkPHR0UynqP1c3nWnknWfYg1TzrjTdrjmsn7tzPWb3rjnzP1mvg100TgKGujYs0Z7Wpyfqn0KzuLw9u1Ys0A7B5HKxn0K-ThTqn0KsTjYkPWTLnW6kn1fY0A4vTjYsQW0snj0snj0s0AdYTjYs0AwbUL0qn0KzpWYs0Aw-IWdsmsKhIjYs0ZKC5H00ULnqn0KBI1Yv0A4Y5H00TLCq0ZwdT1Ykn16knjmdP1TknW6knWcYPjDsrfKzug7Y5HDdnWDkrjT3Pj0vP1D0Tv-b5yf4nHTYnW99nj0snHwBmHT0mLPV5HPDnWmdfWfzPWcvrH0vfWT0mynqnfKsUWYs0Z7VIjYs0Z7VT1Ys0ZGY5H00UyPxuMFEUHYsg1Kxn7ts0Aw9UMNBuNqsUA78pyw15HKxn7tsg100TA7Ygvu_myTqn0Kbmv-b5H00ugwGujYVnfK9TLKWm1Ys0ZNspy4Wm1Ys0Z7VuWYkP6KhmLNY5H00uMGC5H00uh7Y5H00XMK_Ignqn0K9uAu_myTqnfK_uhnqn0KWThnqPHbzPs&ck=2223.13.131.233.208.535.523.133&shh=www.baidu.com&sht=56060048_4_pg&us=2.139972.2.0.2.810.0&ie=utf-8&f=1&ch=4&tn=56060048_4_pg&wd=%E6%96%87%E5%8D%8E%E8%B4%A2%E7%BB%8F%20%E9%9A%8F%E8%BA%AB%E8%A1%8C&oq=%E6%96%87%E5%8D%8E%E8%B4%A2%E7%BB%8F&rqlang=cn&rsf=9&rsp=0&usm=1&rs_src=0&bc=110101",
-    "user_name" : "测试人员1",
-    "time" : datetime.datetime.now()
-}
-    customer = Customer.reg(**args)
+    for i in range(2):
+        args = {
+            "phone": "3{}665103177".format(i)
+            ,
+            "user_agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36 LBBROWSER",
+            "description": "页面标题:智能行情交易系统",
+            "search_keyword": "",
+            "page_url": "http://touzi.jyschaxun.com/20180314jiaoyi/index.html?channel=bd-pc-qhrj-015848",
+            "referrer": "https://www.baidu.com/baidu.php?sc.K000000fJeHuq9k1805tenXpjI-L9X01DZ9Gb7mvaucTyhluRm0aVNCfp9KV32wkz2gBOrMZELcrXrWfyZNoXB_pplwGqQqRnKVFuVZ6UNSp84r17q5gSjeLCFYlPO2v4EaHufRdhr58uLhUwKw8dAzH1OpIL10_bavezPY4SPxufMkYi0.7b_iRZmr7O--YwsdnqAaFDAizEuukoenovgpZsUXxXAGh2FP7BSe5W91SzJUQM_oLUr1m_HAeG_lUQr1uzqMQWdQjPakk3tUrkf.U1Y10ZDq1_ieJoQAEJY-nWjQ4_MVYP00TA-W5HD0IjLrkQ8JzSUFeIjf1tQRv0KGUHYznWR0u1ddugK1nfKdpHdBmy-bIykV0ZKGujYY0APGujY3P0KVIjYknjD4g1DsnHIxnW0vn-t1PW0k0AVG5H00TMfqPH630ANGujYkPjnsg1cknjbd0AFG5HcsP7tkPHR0UynqP1c3nWnknWfYg1TzrjTdrjmsn7tzPWb3rjnzP1mvg100TgKGujYs0Z7Wpyfqn0KzuLw9u1Ys0A7B5HKxn0K-ThTqn0KsTjYkPWTLnW6kn1fY0A4vTjYsQW0snj0snj0s0AdYTjYs0AwbUL0qn0KzpWYs0Aw-IWdsmsKhIjYs0ZKC5H00ULnqn0KBI1Yv0A4Y5H00TLCq0ZwdT1Ykn16knjmdP1TknW6knWcYPjDsrfKzug7Y5HDdnWDkrjT3Pj0vP1D0Tv-b5yf4nHTYnW99nj0snHwBmHT0mLPV5HPDnWmdfWfzPWcvrH0vfWT0mynqnfKsUWYs0Z7VIjYs0Z7VT1Ys0ZGY5H00UyPxuMFEUHYsg1Kxn7ts0Aw9UMNBuNqsUA78pyw15HKxn7tsg100TA7Ygvu_myTqn0Kbmv-b5H00ugwGujYVnfK9TLKWm1Ys0ZNspy4Wm1Ys0Z7VuWYkP6KhmLNY5H00uMGC5H00uh7Y5H00XMK_Ignqn0K9uAu_myTqnfK_uhnqn0KWThnqPHbzPs&ck=2223.13.131.233.208.535.523.133&shh=www.baidu.com&sht=56060048_4_pg&us=2.139972.2.0.2.810.0&ie=utf-8&f=1&ch=4&tn=56060048_4_pg&wd=%E6%96%87%E5%8D%8E%E8%B4%A2%E7%BB%8F%20%E9%9A%8F%E8%BA%AB%E8%A1%8C&oq=%E6%96%87%E5%8D%8E%E8%B4%A2%E7%BB%8F&rqlang=cn&rsf=9&rsp=0&usm=1&rs_src=0&bc=110101",
+            "user_name": "测试人员{}".format(i + 1),
+            "time": datetime.datetime.now()
+        }
+        customer = Customer.reg(**args)
     # from browser.crawler_module import do_jobs
     # do_jobs()
     """测试发送注册信号给机器人服务器"""
     # Customer.send_signal(args)
     """测试注册人数计数系统"""
     # Customer.today_register_count()
+    """新建一个分组标准"""
+    # scheme_init = {
+    #     "_id": "5ac49e8309d20f5e28015c69",
+    #     "create_date": datetime.datetime.now(),
+    #     "groups": ["1", '2', '3', '6']
+    # }
+    # scheme = DistributionScheme(**scheme_init)
+    # scheme.save_plus()
+    """测试分组统计方法"""
+    # r = DistributionScheme.next_group()
+    # print(r)
     pass

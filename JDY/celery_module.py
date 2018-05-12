@@ -1,10 +1,7 @@
 # -*- coding:utf-8 -*-
 import datetime
-
 from celery import Celery
-
 from browser.firefox_module import to_jiandao_cloud
-from browser.firefox_module import ShengFX888
 from browser.crawler_module import do_jobs
 from browser.crawler_module import add_job
 from log_module import get_logger

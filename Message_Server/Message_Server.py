@@ -68,6 +68,8 @@ def listen_func(key):
     print(event_id)
     print(signature)
     print(data)
+    raw = RawSignal(**data)
+    raw.save_plus()  # 保存原始数据
     if key == "test":
         """测试消息"""
         secret_str = "ckFqpdtIr45aXwPkSITuW2iY"  # 不同的消息定义的secret不同，用来验证消息的合法性
