@@ -100,7 +100,14 @@ $(function () {
                 else {
                     // 登录成功
                     $("#handler_name,#handler_password").val("");
-                    location.href = `/manage/index`;
+                    let only_view = data['only_view'];
+                    if(only_view){
+                        location.href = `/manage/online_report`;
+                    }
+                    else{
+                        location.href = `/manage/index`;
+                    }
+
                 }
             });
         }

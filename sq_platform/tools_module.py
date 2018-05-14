@@ -90,13 +90,23 @@ def log_request_args(func):
     def my_wrapper(*args, **kwargs):
         """记录函数传入的参数"""
         func_name = func.__name__
-        req_args = args
-        req_kwargs = kwargs
         info = dict()
+        try:
+            req_args = request.args
+            req_form = request.form
+            req_json = request.json
+            info['request_args'] = req_args
+            info['request_form'] = req_form
+            info['request_json'] = req_json
+        except RuntimeError as e:
+            print(e)
+
+        func_args = str(args)
+        func_kwargs = str(kwargs)
         info['func_name'] = func_name
         info['process_status'] = "before"
-        info['req_args'] = req_args
-        info['req_kwargs'] = req_kwargs
+        info['func_args'] = func_args
+        info['func_kwargs'] = func_kwargs
         info['event_date'] = datetime.datetime.now()
         obj = Log(**info)
         obj.save_plus()
@@ -108,7 +118,7 @@ def log_request_args(func):
             """记录函数出错信息"""
             info.pop("_id", None)
             info['process_status'] = "error"
-            info['error_cause'] = e
+            info['error_cause'] = str(e)
             info['event_date'] = datetime.datetime.now()
             obj = Log(**info)
             obj.save_plus()
@@ -116,6 +126,7 @@ def log_request_args(func):
         info['process_status'] = "after"
         info.pop("error_cause", None)
         info.pop("_id", None)
+        res = res if isinstance(res, str) else str(res)
         info['resp'] = res
         info['event_date'] = datetime.datetime.now()
         obj = Log(**info)
@@ -580,5 +591,15 @@ def expand_list(set_list: (list, tuple)) -> list:
         else:
             res.append(arg)
     return res
+
+
+if __name__ == "__main__":
+    @log_request_args
+    def xx(*args, **kwargs):
+        return {"args": args, "kwargs": kwargs}
+    class A:
+        pass
+
+    xx("a", A(), name="jack", fun=dict())
 
 

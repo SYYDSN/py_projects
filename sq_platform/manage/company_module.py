@@ -109,6 +109,13 @@ class Company(mongo_db.BaseDoc):
         """
         return self.get_attr("prefix")
 
+    def online_report(self):
+        """
+        统计公司在线人数
+        :return:
+        """
+        """未完成"""
+
     @classmethod
     def get_prefix_by_id(cls, company_id: (str, ObjectId)) -> (None, str):
         """

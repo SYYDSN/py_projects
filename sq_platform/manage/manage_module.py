@@ -74,6 +74,18 @@ def app_version_table_func():
         return abort(405)
 
 
+@manage_blueprint.route("/online_report")
+@check_platform_session
+@log_request_args
+def online_report_func():
+    company_id = get_platform_session_arg("company_id", None)
+    prefix = get_platform_session_arg("prefix", "sf")
+    if company_id is None:
+        return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+    else:
+        return render_template("manage/online_report.html")
+
+
 @manage_blueprint.route("/block_employee_list", methods=['get', 'post'])
 @check_platform_session
 def block_employee_list_func():
@@ -199,6 +211,9 @@ def login_func(prefix):
                         args['user_password'] = user_password
                         args['company_id'] = str(company['_id'])
                         args['prefix'] = prefix
+                        only_view = admin.get("only_view", "True")
+                        args['only_view'] = only_view
+                        message['only_view'] = only_view
                         save_platform_session(**args)
 
             return json.dumps(message)
