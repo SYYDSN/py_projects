@@ -72,12 +72,13 @@ class Company(mongo_db.BaseDoc):
             pass
         return company
 
-    def add_admin(self, admin_name: str, admin_password: str, desc: int = '') -> bool:
+    def add_admin(self, admin_name: str, admin_password: str, desc: int = '', only_view: bool = False) -> bool:
         """
         添加一个管理员
         :param admin_name:
         :param admin_password:
-        :param desc:
+        :param desc: 说明
+        :param only_view:是否是只读管理员?
         :return:
         """
         f = {"user_name": admin_name, "company_id": self.get_dbref()}
@@ -90,6 +91,7 @@ class Company(mongo_db.BaseDoc):
             init = {
                 "user_password": admin_password,
                 "md5": True,
+                "only_view": only_view,
                 "description": desc
             }
             init.update(f)
@@ -969,6 +971,7 @@ class CompanyAdmin(mongo_db.BaseDoc):
     公司管理员,只有这个类的实例才能登录后台
     新振兴的管理员 xzx_root  密码 xzx@1588
     顺丰的管理员   sf_root   密码 Sf@123567
+    顺丰的查看员   sf_view   密码 123456
     """
     _table_name = "company_admin_info"
     type_dict = dict()
@@ -977,6 +980,7 @@ class CompanyAdmin(mongo_db.BaseDoc):
     type_dict['user_password'] = str  # 用户密码
     type_dict['company_id'] = DBRef  # 指向company_id 是哪个公司的管理员?
     type_dict['description'] = str  # 说明
+    type_dict['only_view'] = bool  # 是否是只读管理员?(只能查看页面?)这种管理员目前只给查看在线情况信息的功能
     type_dict['user_status'] = int  # 1 为启用,0为停用
 
     def __init__(self, **kwargs):
@@ -2135,5 +2139,7 @@ if __name__ == "__main__":
     """添加公司管理员"""
     sf_id = ObjectId("59a671a0de713e3db34de8bf")
     sf = Company.find_by_id(sf_id)
-    sf.add_admin(admin_name="sf_root", admin_password="Sf@123567")
+    sf.add_admin(admin_name="sf_view", admin_password="123456",
+                 only_view=True,
+                 desc="只有查看本公司在线人数权限")
     pass

@@ -190,7 +190,6 @@ def batch_insert_gps(*args, **kwargs):
     res = item_module.GPS.async_insert_many()
     log_type = "celery_module.batch_insert_gps"
     info = {"return": res}
-    item_module.Log.record(log_type, info)
     print(res)
 
 

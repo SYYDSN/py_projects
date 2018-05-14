@@ -100,7 +100,7 @@ def to_jiandao_cloud(**kwargs) -> bool:
     # """因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,这里必须设置浏览器的初始化参数"""
     # profile.set_preference("intl.accept_languages", "zh-cn")
     # browser = webdriver.Firefox(profile)
-    browser = get_browser(0)
+    browser = get_browser()
     wait = WebDriverWait(browser, 10)
 
     url_1 = "https://www.jiandaoyun.com/f/5a658cbc7b87e86216236cb3"

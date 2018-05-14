@@ -230,7 +230,10 @@ def other_can_json(obj):
     elif isinstance(obj, (DBRef, MyDBRef)):
         return str(obj.id)
     elif isinstance(obj, datetime.datetime):
-        return obj.strftime("%Y-%m-%d %H:%M:%S")
+        if obj.hour == 0 and obj.minute == 0 and obj.second ==0 and obj.microsecond == 0:
+            return obj.strftime("%F")
+        else:
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
     elif isinstance(obj, datetime.date):
         return obj.strftime("%F")
     elif isinstance(obj, list):
@@ -1072,7 +1075,14 @@ class BaseDoc:
         _id = doc.pop("_id", None)
         doc = {k: v for k, v in doc.items() if k not in ignore}
         f = {"_id": _id}
-        res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
+        res = None
+        try:
+            res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
+        except Exception as e:
+            ms = "error_cause:{},filter:{}, replacement:{}".format(e, f, doc)
+            print(ms)
+            logger.exception(ms)
+            raise e
         if res is None:
             return res
         else:
@@ -1680,13 +1690,16 @@ class BaseDoc:
         if result is None:
             return result
         else:
-            if to_dict:
-                if can_json:
-                    result = [to_flat_dict(x) for x in result]
+            if result.count() > 0:
+                if to_dict:
+                    if can_json:
+                        result = [to_flat_dict(x) for x in result]
+                    else:
+                        result = [x for x in result]
                 else:
-                    result = [x for x in result]
+                    result = [cls(**x) for x in result]
             else:
-                result = [cls(**x) for x in result]
+                result = list()
             return result
 
     @classmethod

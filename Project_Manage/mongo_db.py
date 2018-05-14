@@ -283,7 +283,7 @@ def get_date_from_str(date_str: str) -> datetime.date:
         the_date = datetime.datetime.strptime(the_str, "%Y-%m-%d").date()
     else:
         ms = "错误的日期格式:{}".format(date_str)
-        logger.exception(ms)
+        logger.info(ms)
     return the_date
 
 
@@ -1687,13 +1687,16 @@ class BaseDoc:
         if result is None:
             return result
         else:
-            if to_dict:
-                if can_json:
-                    result = [to_flat_dict(x) for x in result]
+            if result.count() > 0:
+                if to_dict:
+                    if can_json:
+                        result = [to_flat_dict(x) for x in result]
+                    else:
+                        result = [x for x in result]
                 else:
-                    result = [x for x in result]
+                    result = [cls(**x) for x in result]
             else:
-                result = [cls(**x) for x in result]
+                result = list()
             return result
 
     @classmethod

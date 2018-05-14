@@ -36,6 +36,7 @@ def get_img_dir_path(dir_name):
 
 
 @api_user_blueprint.route("/reg", methods=['get', 'post'])
+@log_request_args
 def app_user_reg():
     """app端用户注册"""
     message = {"message": "success"}
@@ -88,6 +89,7 @@ def app_user_reg():
 
 
 @api_user_blueprint.route("/login", methods=['get', 'post'])
+@log_request_args
 def app_user_login():
     """app端用户登录"""
     message = {"message": "success"}
@@ -144,6 +146,7 @@ def app_user_login():
 
 @api_user_blueprint.route("/logout", methods=['get', 'post'])
 @login_required_app
+@log_request_args
 def app_user_logout(user_id):
     """app端用户登出"""
     message = {"message": "success"}
@@ -157,6 +160,7 @@ def app_user_logout(user_id):
 
 
 @api_user_blueprint.route("/get_sms", methods=['get', 'post'])
+@log_request_args
 def api_send_sms():
     """用户发送短信"""
     message = {"message": "success"}
@@ -178,6 +182,7 @@ def get_verify_code():
 
 
 @api_user_blueprint.route("/check_version", methods=['get', 'post'])
+@log_request_args
 def check_version():
     """检查版本信息"""
     os_type = get_arg(request, "os_type", "android")
@@ -190,6 +195,7 @@ def check_version():
 
 @api_user_blueprint.route("/<key>_user_info", methods=['get', 'post'])
 @login_required_app
+@log_request_args
 def process_user_info(key, user_id):
     """根据token获取/编辑用户信息"""
     message = {"message": "success"}
@@ -226,6 +232,7 @@ def process_user_info(key, user_id):
 
 @api_user_blueprint.route("/upload_<key>", methods=['post'])
 @login_required_app
+@log_request_args
 def update_image(user_id, key):
     """用户上传文件"""
     if request.method.lower() == "post":
@@ -295,7 +302,7 @@ def update_image(user_id, key):
                         filter_dict = {"_id": _id}
                         permit_image_url = request.host_url + part_url
                         update = {"$set": {"permit_image_url": part_url}}
-                        r = CarLicense.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update)
+                        r = CarLicense.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update, upsert=False)
                         if r is not None:
                             res = dict()
                             res['_id'] = str(_id)
@@ -305,7 +312,7 @@ def update_image(user_id, key):
                             ms = "CarLicense.find_one_and_update_plus函数没有正确的返回,参数:{} {}".format(filter_dict, update)
                             logger.exception(ms)
                             print(ms)
-                            message = pack_message(message, 5000, _id=_id, permit_image_url=permit_image_url)
+                            message = pack_message(message, 3004, _id=_id, error_cause=ms, permit_image_url=permit_image_url)
                 elif key == "license_image":
                     """上传驾驶证照片信息,驾驶证的照片地址是User的直接属性"""
                     part_url = "static/image/{}/{}".format(key, file_name)
@@ -355,6 +362,7 @@ def update_image(user_id, key):
 
 @api_user_blueprint.route("/<key>_violation_shortcut", methods=['get', 'post'])
 @login_required_app
+@log_request_args
 def process_vio_query_generator(user_id, key):
     """创建一个违章查询器,token是身份检查装饰器传来的值"""
     message = {"message": "success"}
@@ -401,6 +409,7 @@ def process_vio_query_generator(user_id, key):
 
 @api_user_blueprint.route("/get_vio_query_shortcuts", methods=['get', 'post'])
 @login_required_app
+@log_request_args
 def get_vio_query_shortcuts(user_id):
     """查询当前用户的所有的查询器"""
     message = {"message": "success"}
@@ -417,10 +426,12 @@ def get_vio_query_shortcuts(user_id):
 
 @api_user_blueprint.route("/query_violation", methods=['post', 'get'])
 @login_required_app
+@log_request_args
 def query_violation(user_id):
     """查询违章记录"""
     message = {"message": "success"}
     args = get_args(request)
+    """记录违章查询参数"""
     if args is None:
         message = pack_message(message, 3000, args=args)
     else:
@@ -442,6 +453,7 @@ def query_violation(user_id):
 
 @api_user_blueprint.route("/<key>_license_info", methods=['post'])
 @login_required_app
+@log_request_args
 def process_license_info(user_id, key):
     """
     查询/编辑驾驶证信息
@@ -484,6 +496,7 @@ def process_license_info(user_id, key):
 
 @api_user_blueprint.route("/<key>_vehicle_info", methods=['post', 'get'])
 @login_required_app
+@log_request_args
 def process_vehicle_info(user_id, key):
     """获取/编辑行车证信息"""
     message = {"message": "success"}
@@ -512,6 +525,7 @@ def process_vehicle_info(user_id, key):
                     obj['permit_image_url'] = host_url + obj['permit_image_url']
             message['data'] = obj_list
         else:
+            """返回单个行车证信息"""
             obj = CarLicense.find_by_id(_id, can_json=True)
             obj = obj.to_flat_dict()
             if obj is None:
@@ -540,18 +554,28 @@ def process_vehicle_info(user_id, key):
                 pass
     elif key == "delete":
         """删除行车证信息"""
-        filter_dict = {
-            "_id": mongo_db.get_obj_id(get_arg(request, "_id")),
-            "user_id": user_id
-        }
-        res = CarLicense.find_one_and_delete(filter_dict=filter_dict)
-        if res:
-            pass
+        l_id = get_arg(request, "_id")
+        user = User.find_by_id(user_id)
+        if isinstance(user, User):
+            res = None
+            try:
+                res = user.delete_car_license(l_id=l_id)
+            except Exception as e:
+                # 删除失败
+                ms = "删除行车证失败,l_id:{},错误原因:{}".format(l_id, e)
+                logger.exception(ms)
+                filter_dict = dict()
+                filter_dict['l_id'] = l_id
+                filter_dict['error_cause'] = str(e)
+                message = pack_message(message, 5000, **filter_dict)
+            finally:
+                if not res:
+                    error_cause = "没有返回正确的结果,请查询系统日志"
+                    logger.exception(error_cause)
+                    message = pack_message(message, 5000, error_cause=error_cause)
         else:
-            # 删除失败
-            ms = "删除行车证失败,参数:{}".format(filter_dict)
-            logger.exception(ms)
-            message = pack_message(message, 5000, **filter_dict)
+            e = "错误的用户id:{}".format_map(user_id)
+            message = pack_message(message, 3000, error_cause=e)
     else:
         message = pack_message(message, 3012, key=key)
     print(message)
@@ -560,6 +584,7 @@ def process_vehicle_info(user_id, key):
 
 @api_user_blueprint.route("/get_vio_query_history", methods=['post', 'get'])
 @login_required_app
+@log_request_args
 def get_vio_query_history_func(user_id):
     """获取行车证中，和违章查询器有关的输入字段的历史"""
     message = {"message": "success"}

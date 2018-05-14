@@ -20,7 +20,6 @@ from error_module import MongoDeleteError
 from api.data.item_module import CarLicense
 from api.data.item_module import Position
 from api.data.item_module import ThroughCity
-from api.data.item_module import UserLicenseRelation
 from amap_module import get_position_by_address
 from extends.car_city import CarCity
 from extends.vio_module import TrafficViolationHandler
@@ -535,7 +534,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
     """car_license和city组成唯一性index"""
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
-    type_dict['user_id'] = ObjectId  # 关联用户的id
+    type_dict['user_id'] = DBRef  # 关联用户的id
     type_dict['car_license'] = DBRef  # 关联的行车证（上的有关信息）
     type_dict['city'] = str  # 查询的城市  聚合数据不需要这个字段
     type_dict['create_date'] = datetime.datetime  # 查询器的创建时间
@@ -585,7 +584,13 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         city： 查询城市。
         """
         user_id = kwargs.pop("user_id")
-        user_id = mongo_db.get_obj_id(user_id)
+        user = User.find_by_id(user_id)
+        if not isinstance(user, User):
+            ms = "错误的用户id:{}".format(user_id)
+            logger.exception(ms)
+            raise ValueError(ms)
+        else:
+            kwargs['user_id'] = user.get_dbref()
         plate_number = kwargs.pop("plate_number")
         engine_id = kwargs.pop("engine_id")
         vin_id = kwargs.pop("vin_id")
@@ -595,17 +600,14 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             raise KeyError("city 参数必须")
         else:
             """检查唯一性"""
-            if VioQueryGenerator.is_only(user_id, plate_number, city):
+            if VioQueryGenerator.is_only(user_id, plate_number):
                 car_type = "小车" if str(car_type) == "02" else "大车"
                 """插入行车证/车牌信息"""
                 car_license = CarLicense.insert_and_return_dbref(plate_number=plate_number, car_type=car_type,
                                                                  vin_id=vin_id, engine_id=engine_id, user_id=user_id)
-                """"检查此car_license是否已在user的cars属性中？"""
-                user = User.find_by_id(user_id)
-                user.in_list("car_license", CarLicense.get_instance_from_dbref(car_license))
+
                 kwargs["car_license"] = car_license
                 kwargs["user_id"] = user_id
-                kwargs['create_date'] = datetime.datetime.now()
                 keys = kwargs.keys()
                 if "create_date" not in keys:
                     kwargs['create_date'] = datetime.datetime.now()
@@ -625,26 +627,20 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 raise RepeatError(**kwargs)
 
     @classmethod
-    def is_only(cls, user_id, plate_number, city):
+    def is_only(cls, user_id, plate_number):
         """
-        检查是否有相同车牌和城市的违章查询器,
-        :param user_id:  用户id
+        检查是否有相同车牌的违章查询器, 没有返回True
+        :param user_id:  用户dbref
         :param plate_number:  车牌
-        :param city: 城市
         :return: boolean
         """
-        user_id = mongo_db.get_obj_id(user_id)
-        result_query = cls.find(city=city, user_id=user_id)
+        f = {"user_id": user_id, "plate_number": plate_number.upper()}
+        result_query = cls.find_one_plus(filter_dict=f)
         flag = True
-        for x in result_query:
-            _id = x.car_license.id
-            if _id is None:
-                pass
-            else:
-                temp = CarLicense.find_by_id(_id)
-                if temp is not None and temp.plate_number.upper() == plate_number.upper():
-                    flag = False
-                    break
+        if result_query is None:
+            pass
+        else:
+            flag = False
         return flag
 
     def my_car_license(self) -> DBRef:
@@ -787,7 +783,8 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         """查询行车证"""
         license_list = User.get_usable_license(user_id, to_dict=True, can_json=False)  # [doc]
         """查询已有的违章查询器"""
-        f = {"user_id": user_id}
+        user_dbref = DBRef(database=mongo_db.db_name, collection=User.get_table_name(), id=user_id)
+        f = {"user_id": user_dbref}
         generator_list = cls.find_plus(filter_dict=f, to_dict=True)  # [doc]
         """
         将行车证列表整理成字典对象
@@ -842,7 +839,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                     "vin_id": x.get("vin_id"),
                     "engine_id": x.get("engine_id"),
                     "city": "全国已开通城市" if x.get("city") is None else x['city'],  # 聚合数据不需要此字段
-                    "user_id": user_id,
+                    "user_id": user_dbref,
                     "car_license": l_dbref,
                     "create_date": now,
                     "all_count": 0,
@@ -931,13 +928,13 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         car_type = kwargs.pop("car_type", None)
         result = None
         if plate_number is None or len(plate_number) < 7:
-            logger.info("行车证信息参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
+            logger.info("行车证信息plate_number参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
         elif engine_id is None or len(engine_id) < 6:
-            logger.info("行车证信息参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
+            logger.info("行车证信息engine_id参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
         elif car_type is None or len(car_type) < 2:
-            logger.info("行车证信息参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
+            logger.info("行车证信息car_type参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
         elif vin_id is None or len(vin_id) < 6:
-            logger.info("行车证信息参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
+            logger.info("行车证信息vin_id参数错误:{}".format(str(kwargs)), exc_info=True, stack_info=True)
         else:
             result = cls(**kwargs).save_plus()
         return result
@@ -1095,7 +1092,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             """查询成功"""
             # data = result['data']
             """记录查询结果"""
-            last_query_result_id = ViolationQueryResult.record(obj.user_id, object_id, result)
+            last_query_result_id = ViolationQueryResult.record(obj.user_id.id, object_id, result)
             """序列化"""
             result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
             res = result_obj.read()
@@ -1126,8 +1123,10 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             message['message'] = "错误的查询器id"
         else:
             user_id = mongo_db.get_obj_id(user_id)
-            check_user_id = user_id == generator.get_attr("user_id")
-            check_user_id = 1
+            user_dbref = generator.get_attr("user_id")
+
+            check_user_id = False if user_dbref is None else user_id == user_dbref.id
+            # check_user_id = 1
             if check_user_id:
                 """检查此查询器是否和用户身份吻合"""
                 now = datetime.datetime.now()
@@ -1148,6 +1147,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                     if last_query_result_id is None:
                         result_obj = None
                     else:
+                        """上一次查询记录"""
                         result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
                     """开始判断是否可以从互联网查询?"""
                     if last_query_result_id is None:

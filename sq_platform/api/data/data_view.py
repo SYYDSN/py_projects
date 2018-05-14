@@ -58,7 +58,6 @@ def gps_push(user_id):
         args['user_id'] = DBRef(collection="user_info", database="platform_db", id=user_id)
         info_dict = args.copy()
         info_dict['result'] = 'before begin'
-        item_module.Log.record(log_type, info_dict)
         info_dict['result'] = 'unknown error'
         try:
             result = item_module.GPS.insert_queue(args)
@@ -78,12 +77,10 @@ def gps_push(user_id):
             message = error_module.pack_message(message, 5000, **args)
             info_dict['result'] = str(e)
         finally:
-            item_module.Log.record(log_type, info_dict)
             return json.dumps(message)
     else:
         message = pack_message(message, 3009, auth_token=token, user_id=args.get('user_id'))
         info_dict['result'] = message['message']
-        item_module.Log.record(log_type, info_dict)
         return json.dumps(message)
 
 

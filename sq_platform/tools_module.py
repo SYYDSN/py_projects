@@ -3,7 +3,7 @@ from flask import session, request
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms import PasswordField
-from functools import wraps
+import functools
 from flask import redirect, url_for
 from wtforms import SubmitField
 from wtforms.validators import DataRequired
@@ -23,7 +23,9 @@ import urllib.request
 import os
 from manage.company_module import Company
 from uuid import uuid4
-from api.data.item_module import AppLoginToken, User
+from api.data.item_module import AppLoginToken
+from api.data.item_module import User
+from api.data.item_module import Log
 from werkzeug.contrib.cache import RedisCache
 from log_module import get_logger
 from log_module import recode
@@ -83,42 +85,43 @@ def save_platform_session(**kwargs) -> bool:
         return True
 
 
-def get_company_from_req(req: request) -> (dict, None):
-    """
-    根据request的host参数判断是哪个公司登录?
-    :param req: flask的request对象
-    :return:
-    """
-    domain = req.host.split(":")[0]
-    default_company = {
-                "_id": ObjectId("5aab48ed4660d32b752a7ee9"),
-                "full_name": " 江西新振兴投资集团有限公司",
-                "domain": "xzx.safego.org",
-                "description": "用于高安项目的公司",
-                "prefix": "xzx",
-                "short_name": "新振兴"
-            }
-    key = 'domain_company_{}'.format(domain)
-    company = cache.get(key)
-    if company is None:
-        f_dict = {"domain": domain}
-        if domain.startswith("192.168.") or domain == "127.0.0.1":
-            """开发调试状态,当前项目是新振兴"""
-            company = default_company
-        else:
-            company = Company.find_one_plus(filter_dict=f_dict, instance=False)
-        """写缓存"""
-        if company is not None:
-            cache.set(key=key, value=company, timeout=900)  # 15分钟
-        else:
-            pass
-    else:
-        pass
-    """调试状态下,默认是新振兴公司"""
-    if company is None:
-        return default_company
-    else:
-        return company
+def log_request_args(func):
+    @functools.wraps(func)
+    def my_wrapper(*args, **kwargs):
+        """记录函数传入的参数"""
+        func_name = func.__name__
+        req_args = args
+        req_kwargs = kwargs
+        info = dict()
+        info['func_name'] = func_name
+        info['process_status'] = "before"
+        info['req_args'] = req_args
+        info['req_kwargs'] = req_kwargs
+        info['event_date'] = datetime.datetime.now()
+        obj = Log(**info)
+        obj.save_plus()
+        """执行函数"""
+        res = "{}"
+        try:
+            res = func(*args, **kwargs)
+        except Exception as e:
+            """记录函数出错信息"""
+            info.pop("_id", None)
+            info['process_status'] = "error"
+            info['error_cause'] = e
+            info['event_date'] = datetime.datetime.now()
+            obj = Log(**info)
+            obj.save_plus()
+        """记录函数的返回"""
+        info['process_status'] = "after"
+        info.pop("error_cause", None)
+        info.pop("_id", None)
+        info['resp'] = res
+        info['event_date'] = datetime.datetime.now()
+        obj = Log(**info)
+        obj.save_plus()
+        return res
+    return my_wrapper
 
 
 def save_platform_cors_session(**kwargs) -> (str, None):
@@ -172,7 +175,7 @@ def clear_platform_cors_session(sid: str) -> bool:
 
 def check_platform_session(f):
     """检测管操作员是否登录的装饰器,本域和跨域用户共用"""
-    @wraps(f)
+    @functools.wraps(f)
     def decorated_function(*args, **kwargs):
         cors = get_arg(request, "cors", default_value=None)  # 跨域标志
         if cors == 'cors':
@@ -245,7 +248,7 @@ def get_platform_cors_session_dict(session_id: str) -> (dict, None):
 
 def login_required_app(f):
     """检测管app用户是否登录的装饰器"""
-    @wraps(f)
+    @functools.wraps(f)
     def decorated_function(*args, **kwargs):
         req_args = get_args(request)
         headers = request.headers
