@@ -1,5 +1,7 @@
+recode/*.txt
 webui/*
 *.pyc
+*.pkl
 *.log
 static/data_file/*
 static/thumbs/*
