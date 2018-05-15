@@ -226,7 +226,18 @@ def check_platform_session(f):
                     return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
                 else:
                     if str(checked_user_obj.get_id()) == user_id:
-                        return f(*args, **kwargs)
+                        """检查时不是只读管理员,如果是,进行path检查,只允许访问规定的path"""
+                        if get_platform_session_arg("only_view"):
+                            """是只读管理员,检查当前访问大的path"""
+                            allow_paths = ["/manage/online_report"]
+                            cur_path = request.path
+                            if cur_path in allow_paths:
+                                return f(*args, **kwargs)
+                            else:
+                                """不在许可路径列表内"""
+                                return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+                        else:
+                            return f(*args, **kwargs)
                     else:
                         return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
     return decorated_function

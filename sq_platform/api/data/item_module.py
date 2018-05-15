@@ -19,8 +19,10 @@ import re
 import math
 import json
 import random
+from flask import session
 from uuid import uuid4
 import amap_module
+from api.data.base_item_extends import UseHandlerRecord
 from error_module import RepeatError, pack_message
 from amap_module import *
 import mail_module
@@ -80,23 +82,27 @@ class Log(mongo_db.BaseDoc):
                 req_args = request.args
                 req_form = request.form
                 req_json = request.json
-                info['request_args'] = req_args
-                info['request_form'] = req_form
+                headers = request.headers
+                info['request_args'] = list(req_args)
+                info['request_form'] = dict(req_form)
                 info['request_json'] = req_json
+                info['request_headers'] = {k: v for k, v in headers.items()}
             except RuntimeError as e:
                 print(e)
 
             func_args = args
             func_kwargs = kwargs
             info['func_name'] = func_name
-            info['process_status'] = "before"
             info['func_args'] = str(func_args)
             if "user_id" in func_kwargs:
                 info['user_id'] = func_kwargs['user_id']
+            else:
+                user_id = session.get("user_id")
+                if isinstance(user_id, str) and len(user_id) == 24:
+                    user_id = ObjectId(user_id)
+                info['user_id'] = user_id
             info['func_kwargs'] = str(func_kwargs)
-            info['event_date'] = datetime.datetime.now()
-            obj = Log(**info)
-            obj.save_plus()
+            info['req_date'] = datetime.datetime.now()
             """执行函数"""
             res = "{}"
             try:
@@ -104,22 +110,45 @@ class Log(mongo_db.BaseDoc):
             except Exception as e:
                 """记录函数出错信息"""
                 info.pop("_id", None)
-                info['process_status'] = "error"
+                info['return'] = "error"
                 info['error_cause'] = str(e)
-                info['event_date'] = datetime.datetime.now()
+                info['error_date'] = datetime.datetime.now()
                 obj = Log(**info)
-                obj.save_plus()
+                obj.save_plus()  # 记录出错的
             """记录函数的返回"""
-            info['process_status'] = "after"
+            info['return'] = "success"  # 返回状态
             info.pop("error_cause", None)
             info.pop("_id", None)
             res = res if isinstance(res, str) else str(res)
             info['resp'] = res
-            info['event_date'] = datetime.datetime.now()
+            info['resp_date'] = datetime.datetime.now()
             obj = Log(**info)
-            obj.save_plus()
+            obj.save_plus()   # 记录成功返回的
             return res
         return my_wrapper
+
+    def save_plus(self, ignore: list = None, upsert: bool = True) -> (None, ObjectId):
+        """
+        覆盖父类的方法,主要目的是接这个动作进行操作计数统计.
+        备注: 所有的对用户的操作的统计都由此方法完成.
+        :param ignore: 忽略的更新的字段,一般是有唯一性验证的字段
+        :param upsert:
+        :return
+        """
+        func_name = self.get_attr("func_name")
+        user_id = self.get_attr("user_id")
+        if func_name is None or user_id is None or (isinstance(user_id, str) and len(user_id) != 24):
+            ms = "异常的Log实例: {}".format(str(self.__dict__))
+            logger.exception(ms)
+            print(ms)
+            pass
+        else:
+            """
+            统计事件
+            query_violation: 统计违章查询
+            """
+            UseHandlerRecord.record(user_id=user_id, func_name=func_name)
+        super(Log, self).save_plus(ignore=ignore, upsert=upsert)
 
 
 class LoginRecord(mongo_db.BaseDoc):
@@ -202,12 +231,15 @@ class User(mongo_db.BaseDoc):
     在车牌信息用，有一个user_id参数。用于确认车牌信息的使用者。
     车牌号码和使用者id构成了联合唯一主键。  
     """
+    # phones 属性准备废除 2018-5-15 phone_model来替代
     type_dict['phones'] = list  # 名下手机的的id，是一个DBRef的List对象，默认为空  对应phone_device_info表
     type_dict['wx_id'] = str  # 微信id
     type_dict['weibo_id'] = str  # 微博id
     type_dict['create_date'] = datetime.datetime  # 用户的注册/创建日期
     type_dict['app_version'] = str  # 用户当前的app信息
-    type_dict['last_update'] = datetime.datetime  # 用户当前的app信息
+    type_dict['os_version'] = str  # 用户使用的设备的版本号
+    type_dict['phone_model'] = str  # 用户当前使用的手机型号.phones属性废除. 2018-5-15
+    type_dict['last_update'] = datetime.datetime  # 用户最后一次上传gps数据的时间.
 
     def __init__(self, **kwargs):
         if "phone_num" not in kwargs:

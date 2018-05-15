@@ -18,10 +18,11 @@
         all_projects = {{ nav_projects | safe }};   // 所有的项目列表
         allow_edit_pids = {{ allow_edit_pids| safe }};  // 允许编辑的项目的id的数组,用于判断权限
         all_modules = {{ nav_modules | safe }};  // 所有的模块列表
-        allow_edit_modules = {{ allow_edit_modules | safe }};
+        allow_edit_modules = {{ allow_edit_modules | safe }};  // 允许编辑的模块,key是project的id
         allow_edit_mids = {{ allow_edit_mids | safe }}; // 允许编辑的模块的id的数组,用于判断权限
-        module_mission_dict = {{ module_mission_dict | safe }};
-        tree_dict = {{ tree_dict | safe }};
+        module_mission_dict = {{ module_mission_dict | safe }};  // 模块_idkey, mission_list的字典
+        tree_dict = {{ tree_dict | safe }};                     // 产品架构图字典
+        task_dict = {{ task_dict | safe }};     // 所有任务的字典,用于向悬浮框传值
     </script>
     {% endblock %}
 </head>
@@ -155,9 +156,9 @@
                 </div>
             </div>
             <div class="dibu">
-                <span class="tuichu"><a href="../index.html"><img src="../static/images/icon_er.svg" alt=""></a></span>
+                <span class="tuichu"><a href="../templates/login.html"><img src="../static/images/icon_er.svg" alt=""></a></span>
                 <span class="tianjia" id="add_item" data-toggle="modal" data-target=".bs-example-modal-lg">添加项目</span>
-                <span>删除</span>
+                <span></span>
             </div>
         </div>
         <!-- 右边内容 -->
@@ -178,7 +179,7 @@
                 <span>甘特图</span>
                 <span>架构图</span>
             </div>
-                <p class="time-title" id="bar_title">{{ current_month }}</p>
+                <p class="time-title" id="bar_title"><span class="glyphicon  glyphileft  glyphicon-chevron-left"></span>{{ current_month }}<span class="glyphicon glyphiright glyphicon-chevron-right"></span></p>
                 <div class="gundong" id="my_bar">
                     <div class="coll">
                         <div class="tab">
@@ -202,8 +203,8 @@
                                                  {% if td == "" %}
                                                  <td class="no_plan"><span></span></td>
                                                  {% else %}
-                                                     <td data-id="{{ td['_id'] }}" title="{{ td['category_name'] }}{{ td['project_name'] }}项目,{{ td['name'] }} {{ td['status'] }}" class="my_plan" colspan="{{ td['colspan'] }}">
-                                                         <span class="hidden_overflow task_td">{{ td['name'] }}</span>
+                                                     <td data-id="{{ td['_id'] }}" class="my_plan" colspan="{{ td['colspan'] }}">
+                                                         <span data-id="{{ td['_id'] }}"  class="hidden_overflow task_td">{{ td['name'] }}</span>
                                                      </td>
                                                  {% endif %}
                                              {% endfor %}
@@ -254,7 +255,7 @@
                                                 <div class='input-group date datetimepicker1' id='datetimepicker1'>
                                                     <input type='text' class="form-control begin_date" />
                                                     <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                        <span class="glyphicon glyphicon-cog"></span>
                                                     </span>
                                                 </div>
                                             </div>
@@ -264,7 +265,7 @@
                                                 <div class='input-group date datetimepicker2' id='datetimepicker2'>
                                                     <input type='text' class="form-control end_date" />
                                                     <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                        <span class="glyphicon glyphicon-cog"></span>
                                                     </span>
                                                 </div>
                                             </div>
@@ -862,5 +863,6 @@
     <script src="../static/js/bootstrap-datetimepicker.min.js"></script>
     <script src="../static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
     <script src="../static/js/moment-with-locales.js"></script>
+    <script src="../static/js/suspending.js"></script>
 </body>
 </html>

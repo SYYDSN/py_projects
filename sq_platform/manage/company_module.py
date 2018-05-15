@@ -8,6 +8,7 @@ if __project_dir not in sys.path:
     sys.path.append(__project_dir)
 import mongo_db
 from api.data.item_module import User, Track
+from api.data.base_item_extends import UseHandlerRecord
 import hashlib
 import datetime
 from threading import Lock
@@ -109,12 +110,79 @@ class Company(mongo_db.BaseDoc):
         """
         return self.get_attr("prefix")
 
-    def online_report(self):
+    def online_report(self, filter_online: int = 0, sort_dict: dict = None) -> dict:
         """
-        统计公司在线人数
+        统计公司在线情况,返回的是一个list文件.
+        :param filter_online: 过滤条件:是否在线? 0/全部,1/在线,-1/离线
+        :param sort_dict: 排序字典
         :return:
         """
-        """未完成"""
+        """默认最后一次登录时间倒序"""
+        if sort_dict is None:
+            sort_dict = {"last_update": -1}
+        filter_online_list = [0, 1, -1]
+        if filter_online == 0:
+            pass
+        elif filter_online == 1:
+            filter_online_list = [1]
+        else:
+            filter_online_list = [-1]
+        company_dbref = self.get_dbref()
+        company_id = company_dbref.id
+        employees = Company.all_employee(company_id=company_id, sort_dict=sort_dict)
+        func_name = "query_violation"  # 查询违章的函数名
+        res = list()
+        now = datetime.datetime.now()
+        year = now.year
+        month = now.month
+        day = now.day
+        all_count = len(employees)
+        today_reg_count = 0  # 今日注册统计
+        vio_count = 0  # 违章查询统计
+        hours = 0  # 在线时长统计
+        for x in employees:
+            user_dbref = DBRef(database=mongo_db.db_name, collection="user_info", id=x['_id'])
+            vio = UseHandlerRecord.get_count(user_dbref, func_name)  # 查违章使用次数
+            x['query_violation'] = vio
+            vio_count += vio
+            """检查在线情况?"""
+            last_update = x['last_update']
+            online = -1 if (now - last_update).total_seconds() > 1500 else 1
+            x['online'] = online
+            """最后登录时间"""
+            x['last_update_str'] = last_update.strftime("%y年%m月%d日%H点%M分")
+            x['os_version'] = "未知" if x.get("os_version") is None else x['os_version']
+            """注册时间"""
+            reg_date = x['create_date']
+            cur_year = reg_date.year
+            cur_month = reg_date.month
+            cur_day = reg_date.day
+            if cur_month == month and cur_year == year and cur_day == day:
+                today_reg_count += 1
+            x['create_date_str'] = reg_date.strftime("%y年%m月%d日%H点%M分")
+            """在线时长"""
+            online_time = 0.0 if x.get("online_time") is None else x['online_time']
+            try:
+                online_time = float(online_time)
+            except TypeError as e:
+                print(e)
+                online_time = 0.0
+            finally:
+                online_time = int(online_time / 60)
+                hours += online_time
+                x['online_time'] = "{}小时".format(online_time)
+            if online in filter_online_list:
+                """过滤条件"""
+                res.append(mongo_db.to_flat_dict(x))
+        if sort_dict is None:
+            """默认最后登录时间倒序"""
+        resp = dict()
+        resp["all"] = all_count
+        resp['today_reg'] = today_reg_count
+        resp['mean'] = round((hours / all_count), 1)
+        resp['vio_count'] = vio_count
+        resp['employees'] = res
+        return resp
 
     @classmethod
     def get_prefix_by_id(cls, company_id: (str, ObjectId)) -> (None, str):
@@ -756,11 +824,12 @@ class Company(mongo_db.BaseDoc):
         return res
 
     @classmethod
-    def all_employee(cls, company_id: (str, ObjectId), filter_dict: dict = None) -> list:
+    def all_employee(cls, company_id: (str, ObjectId), filter_dict: dict = None, sort_dict: dict = None) -> list:
         """
         获取公司的全部employee
         :param company_id:
         :param filter_dict: 附加的过滤条件
+        :param sort_dict: 附加的排序条件
         :return: doc的list
         """
         company = cls.find_by_id(company_id)
@@ -786,7 +855,8 @@ class Company(mongo_db.BaseDoc):
                 f = {"_id": {"$in": ids}}
                 if filter_dict is not None:
                     f.update(filter_dict)
-                employees = Employee.find_plus(filter_dict=f, to_dict=True)
+                s = {"_id": 1} if sort_dict is None else sort_dict
+                employees = Employee.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
                 if len(employees) == 0:
                     pass
                 else:
@@ -2146,7 +2216,9 @@ if __name__ == "__main__":
     """添加公司管理员"""
     sf_id = ObjectId("59a671a0de713e3db34de8bf")
     sf = Company.find_by_id(sf_id)
-    sf.add_admin(admin_name="sf_view", admin_password="123456",
-                 only_view=True,
-                 desc="只有查看本公司在线人数权限")
+    # sf.add_admin(admin_name="sf_view", admin_password="123456",
+    #              only_view=True,
+    #              desc="只有查看本公司在线人数权限")
+    """获取公司职员在线情况"""
+    sf.online_report()
     pass

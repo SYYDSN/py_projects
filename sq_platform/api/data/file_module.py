@@ -227,6 +227,8 @@ def read_zip(file_path: str) -> dict:
             else:
                 user_id = user.get_dbref()  # 用户id
                 app_version = None  # app版本信息
+                phone_model = None  # 当前手机型号
+                os_version = None  # 当前手机操作系统
                 """检查是否有设备信息文件，如果有，就把设备信息文件中的app版本信息写入各种传感器/gps记录中"""
                 device_file_name = 'device_info.txt'
                 if device_file_name in name_list:
@@ -237,14 +239,15 @@ def read_zip(file_path: str) -> dict:
                     file_content = obj.decode()
                     try:
                         dev_list = parse_content(file_content, user_id)
+                        _version = None
+
                         """检查是否有app的版本信息？"""
                         for dev in dev_list:
-                            _version = dev.get('AppVersion')
-                            if _version is not None:
-                                app_version = _version
+                            app_version = dev.get('AppVersion')
+                            phone_model = dev.get('model')
+                            os_version = dev.get('os_version')
+                            if app_version is not None and phone_model is not None and os_version is not None:
                                 break
-                            else:
-                                pass
                         result_dict[device_file_name] = dev_list
                     except json.decoder.JSONDecodeError as e:
                         print(e)
@@ -254,18 +257,23 @@ def read_zip(file_path: str) -> dict:
                 else:
                     """如果没有设备信息文件，n那就忽略，保持app版本号为None"""
                     pass
-                """检查用户版本信息是否一致？"""
+                """检查用户版本信息/ 手机设备是否一致？"""
                 print(user)
-                user_app_version = user.get_attr("app_version")
-                if user_app_version is None or user_app_version != app_version:
-                    if app_version is None:
-                        pass
-                    else:
+                if app_version is not None:
+                    user_app_version = user.get_attr("app_version")
+                    if user_app_version != app_version:
+                        """更新app版本信息"""
                         user.set_attr("app_version", app_version)
-                        user.set_attr("last_update", datetime.datetime.now())
-                        user.save()
-                else:
-                    pass
+                if phone_model is not None:
+                    user_phone_model = user.get_attr('phone_model')
+                    if user_phone_model != phone_model:
+                        user.set_attr("phone_model", phone_model)
+                if os_version is not None:
+                    user_os_version = user.get_attr('os_version')
+                    if user_os_version != os_version:
+                        user.set_attr("os_version", os_version)
+                user.set_attr("last_update", datetime.datetime.now())  # 更新最后接收数据的时间
+                user.save_plus()
                 """向zip文件读取结果集中加入版本信息"""
                 for name in name_list:
                     print("inner file name is {}".format(name))
@@ -612,5 +620,6 @@ def unzip_all_user_file() -> None:
 
 
 if __name__ == "__main__":
-    files_to_mongodb_bak({})
+    # files_to_mongodb_bak({})
+    process_all_zipfile(user_id=ObjectId("59895177de713e304a67d30c"))
     pass

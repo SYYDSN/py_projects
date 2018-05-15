@@ -83,7 +83,12 @@ def online_report_func():
     if company_id is None:
         return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
     else:
-        return render_template("manage/online_report.html")
+        filter_online = get_arg(request, "filter_online", 0)
+        if isinstance(filter_online, str) and filter_online.isdigit():
+            filter_online = int(filter_online)
+        company = Company.find_by_id(company_id)
+        resp = company.online_report(filter_online=filter_online)
+        return render_template("manage/online_report.html", data=resp)
 
 
 @manage_blueprint.route("/block_employee_list", methods=['get', 'post'])

@@ -230,7 +230,7 @@ def other_can_json(obj):
     elif isinstance(obj, (DBRef, MyDBRef)):
         return str(obj.id)
     elif isinstance(obj, datetime.datetime):
-        if obj.hour == 0 and obj.minute == 0 and obj.second ==0 and obj.microsecond == 0:
+        if obj.hour == 0 and obj.minute == 0 and obj.second == 0 and obj.microsecond == 0:
             return obj.strftime("%F")
         else:
             return obj.strftime("%Y-%m-%d %H:%M:%S")

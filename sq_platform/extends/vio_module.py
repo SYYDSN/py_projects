@@ -704,13 +704,13 @@ class TrafficViolationHandler:
 if __name__ == "__main__":
     """
     可被查询到违章记录的
-    [
-    {vin': 'LGAX5D652F8021160',  'engine_id': 'F2003733', 'plate_number': '赣CX0975'},
-    {vin': 'LG6ZDCNHXFY200347',  'engine_id': '1415B004539', 'plate_number': '赣CX0431'}
-    ]
     """
-    q = {
-        'vin': 'LFNFVXPXXG1F32315',  'engine_id': '52701239', 'plate_number': '赣CX3706'
-    }
-    TrafficViolationHandler.query_vio(**q)
+    q = [
+    {'vin': 'LGAX5D652F8021160',  'engine_id': 'F2003733', 'plate_number': '赣CX0975'},
+    {'vin': 'LG6ZDCNHXFY200347',  'engine_id': '1415B004539', 'plate_number': '赣CX0431'},
+    {'vin': 'LFNFVXPXXG1F32315',  'engine_id': '52701239', 'plate_number': '赣CX3706'},
+    {'vin': '263510',  'engine_id': '312604', 'plate_number': '川A49H3W'}
+    ]
+
+    print(TrafficViolationHandler.query_vio(**q[-1]))
     pass

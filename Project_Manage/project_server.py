@@ -20,6 +20,7 @@ import calendar
 import os
 from mongo_db import db_name
 
+
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
 app = Flask(__name__)
 app.config['SECRET_KEY'] = secret_key  # 配置会话密钥
@@ -27,6 +28,7 @@ app.config['SESSION_TYPE'] = "redis"  # session类型为redis
 app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
 # app.config['SERVER_NAME'] = "127.0.0.1:8001"  此域名下的所有子域名的session都会接受
 Session(app)
+
 
 cache = RedisCache()
 logger = get_logger()
@@ -49,7 +51,6 @@ def verify_token(f):
     限制的方法如下：
     首先，post请求的url包含如下的方式：
     """
-
     @wraps(f)
     def decorated_function(*args, **kwargs):
         """验证token"""
@@ -66,7 +67,6 @@ def verify_token(f):
                 return redirect(url_for("teacher_login_func"))
             else:
                 return f(*args, **kwargs)
-
     return decorated_function
 
 
@@ -413,6 +413,8 @@ def home_func(key1, key2):
                                "drop": "放弃",
                                "suspend": "暂停",
                                "delay": "超期"}
+                task_dict = dict()  # 任务字典,用于向前端传递任务信息
+                print_error = True
                 for line in range(min_line_count + 1):
                     task = None
                     try:
@@ -425,7 +427,10 @@ def home_func(key1, key2):
                         task['begin_date_str'] = begin_date.strftime("%F")  # 注意，只有task的字段名不同
                         task['end_date_str'] = end_date.strftime("%F")  # 注意，只有task的字段名不同
                     except IndexError as e:
-                        print(e)
+                        if print_error:
+                            ms = "计算任务工期出现错误,{}, 一般情况下可忽略".format(e)
+                            print(ms)
+                            print_error = False
                     finally:
                         pass
                     row = list()
@@ -452,8 +457,9 @@ def home_func(key1, key2):
                                             status = "推进中"
                                         else:
                                             status = "未开始"
+                                    task_id = str(task['_id'])
                                     temp = {
-                                        "_id": str(task['_id']),
+                                        "_id": task_id,
                                         "category_name": category_name,
                                         "project_name": project_name,
                                         "begin_date": the_begin_date.strftime("%F"),
@@ -463,6 +469,7 @@ def home_func(key1, key2):
                                         "name": task['name'],
                                         "colspan": (end_day - begin_day) + 1
                                     }
+                                    task_dict[task_id] = temp
                                     row.append(temp)
                                 else:
                                     pass
@@ -515,7 +522,7 @@ def home_func(key1, key2):
                                        allow_edit_modules=allow_edit_modules, nav_projects=all_projects,
                                        nav_modules=modules, nav_missions=missions, tasks=tasks, tree_dict=tree_dict,
                                        module_mission_dict=module_mission_dict, allow_edit_pids=allow_edit_pids,
-                                       allow_edit_mids=allow_edit_mids, user_name=user_name)
+                                       allow_edit_mids=allow_edit_mids, user_name=user_name, task_dict=task_dict)
             elif key1 in ['web', 'app', 'platform']:
                 part = get_arg(request, "part", "chart")  # url参数，用于确认处于哪一个子导航下？
                 return redirect("/home_all/view")
@@ -1036,3 +1043,7 @@ if __name__ == '__main__':
     # toolbar = DebugToolbarExtension(app)  # 开启html调试toolbar
     # app.run(host="0.0.0.0", port=port, threaded=True)  # 开启DebugToolbar的调试模式. 对应app.debug = True
     app.run(host="0.0.0.0", port=port, debug=True, threaded=True)  # 一般调试模式
+    """socketIO启动方式,不能进入调试模式"""
+    # from flask_socketio import SocketIO
+    # socketio = SocketIO(app)
+    # socketio.run(app=app, host="0.0.0.0", port=port, threaded=True)

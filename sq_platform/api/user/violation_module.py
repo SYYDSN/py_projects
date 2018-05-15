@@ -1274,7 +1274,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         object_id = mongo_db.get_obj_id(object_id)
         generator = cls.find_by_id(object_id)
         user_id = mongo_db.get_obj_id(user_id)
-        if user_id == generator.get_attr("user_id"):
+        if user_id == generator.get_attr("user_id").id:
             """检查此查询器是否和用户身份吻合"""
             ses = mongo_db.get_conn(ViolationQueryResult.get_table_name())
             query = {"generator_id": object_id}

@@ -234,7 +234,11 @@ def process_user_info(key, user_id):
 @login_required_app
 @log_request_args
 def update_image(user_id, key):
-    """用户上传文件"""
+    """
+    用户上传文件
+    注意!!!!
+    其他路由都不能以upload_开头了,这是个历史问题
+    """
     if request.method.lower() == "post":
         message = {"message": "success"}
         upload_files = request.files
@@ -965,30 +969,35 @@ def process_alert_message_func(user_id, key):
     return json.dumps(mes)
 
 
-@api_user_blueprint.route("/<key>_online_surplus", methods=['post', 'get'])
+@api_user_blueprint.route("/online_surplus", methods=['post', 'get'])
 @login_required_app
-def process__online_surplus_func(user_id, key):
+@log_request_args
+def process_online_surplus_func(user_id):
     """在线时长的接口"""
     mes = {"message": "success"}
-    if key == "upload":
-        """上传在线时常.单位:分钟"""
-        online_time = get_arg(request, "duration", None)
-        if online_time is None:
-            pass
+    """上传在线时常.单位:分钟"""
+    online_time = get_arg(request, "duration", None)
+    if online_time is None:
+        """获取在线时间"""
+        f = {"_id": user_id}
+        r = User.find_one_plus(filter_dict=f, projection=['online_time'], instance=False)
+        if r is None:
+            mes['data'] = 0
         else:
-            try:
-                online_time = float(online_time)
-            except ValueError as e:
-                print(e)
-                logger.exception("错误的在线时长:{}".format(online_time))
-                mes = pack_message(mes, 3001, duration=online_time)
-            finally:
-                if isinstance(online_time, float):
-                    f = {"_id": user_id}
-                    u = {"$set": {"online_time": online_time}}
-                    User.find_one_and_update_plus(filter_dict=f, update_dict=u)
-                else:
-                    mes = pack_message(mes, 5000, duration=online_time)
+            mes['data'] = 0 if r.get("online_time") is None else r['online_time']
     else:
-        mes = pack_message(mes, 3014, url="{}_online_surplus".format(key))
+        """上传在线时间"""
+        try:
+            online_time = float(online_time)
+        except ValueError as e:
+            print(e)
+            logger.exception("错误的在线时长:{}".format(online_time))
+            mes = pack_message(mes, 3001, duration=online_time)
+        finally:
+            if isinstance(online_time, float):
+                f = {"_id": user_id}
+                u = {"$set": {"online_time": online_time}}
+                User.find_one_and_update_plus(filter_dict=f, update_dict=u)
+            else:
+                mes = pack_message(mes, 5000, duration=online_time)
     return json.dumps(mes)
