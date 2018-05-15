@@ -570,9 +570,8 @@ def get_page_platform(browser, page_url: str) -> (PyQuery, None):
     """
     try:
         browser.get(page_url)
-        raise ValueError("则和是")
     except TimeoutException as e:
-        title = "{} 打开页面失败".format(datetime.datetime.now())
+        title = "{} 打开页面失败, url:{}".format(datetime.datetime.now(), page_url)
         content = "错误原因：{}".format(e)
         send_mail(title=title, content=content)
         print(page_url)
@@ -580,7 +579,7 @@ def get_page_platform(browser, page_url: str) -> (PyQuery, None):
         recode(ms)
         raise e
     except Exception as e:
-        title = "{} 打开页面失败".format(datetime.datetime.now())
+        title = "{} 打开页面失败".format(datetime.datetime.now(), page_url)
         content = "错误原因：{}".format(e)
         send_mail(title=title, content=content)
         print(e)
@@ -2140,7 +2139,7 @@ def draw_on_all(browser):
 
 if __name__ == "__main__":
     """全套测试开始,这也是celery的任务"""
-    b = get_browser(1, 1)
+    b = get_browser(1)
     while 1:
         do_jobs(b)
         time.sleep(300)
