@@ -282,11 +282,11 @@ if __name__ == "__main__":
     """测试获取每日报告"""
     # test_get_daily_info()
     """测试获取违章查询器列表"""
-    # test_get_vio_query_shortcuts()
+    test_get_vio_query_shortcuts()
     """测试违章查询"""
     # test_query_violation()
     """测试获取用户行车证信息"""
-    test_get_car_license()
+    # test_get_car_license()
     """测试用户上传行车证图片"""
     # test_upload_user_permit_image()
     """测试用户删除行车证"""

@@ -14,6 +14,7 @@ import datetime
 from log_module import get_logger
 from bson.son import SON
 import time
+import functools
 import re
 import math
 import json
@@ -42,7 +43,10 @@ image_patch = "static/image/head_img/"
 
 
 class Log(mongo_db.BaseDoc):
-    """记录日志信息"""
+    """
+    记录日志信息
+    注意,本类的字段并非如定义的那样.而是由具体的方法来决定
+    """
     _table_name = "log_record_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId  # 记录，是一个ObjectId对象，唯一
@@ -64,6 +68,58 @@ class Log(mongo_db.BaseDoc):
         }
         log = cls(**kw)
         log.save()
+
+    @staticmethod
+    def record_function_args(func):
+        @functools.wraps(func)
+        def my_wrapper(*args, **kwargs):
+            """记录函数传入的参数"""
+            func_name = func.__name__
+            info = dict()
+            try:
+                req_args = request.args
+                req_form = request.form
+                req_json = request.json
+                info['request_args'] = req_args
+                info['request_form'] = req_form
+                info['request_json'] = req_json
+            except RuntimeError as e:
+                print(e)
+
+            func_args = args
+            func_kwargs = kwargs
+            info['func_name'] = func_name
+            info['process_status'] = "before"
+            info['func_args'] = str(func_args)
+            if "user_id" in func_kwargs:
+                info['user_id'] = func_kwargs['user_id']
+            info['func_kwargs'] = str(func_kwargs)
+            info['event_date'] = datetime.datetime.now()
+            obj = Log(**info)
+            obj.save_plus()
+            """执行函数"""
+            res = "{}"
+            try:
+                res = func(*args, **kwargs)
+            except Exception as e:
+                """记录函数出错信息"""
+                info.pop("_id", None)
+                info['process_status'] = "error"
+                info['error_cause'] = str(e)
+                info['event_date'] = datetime.datetime.now()
+                obj = Log(**info)
+                obj.save_plus()
+            """记录函数的返回"""
+            info['process_status'] = "after"
+            info.pop("error_cause", None)
+            info.pop("_id", None)
+            res = res if isinstance(res, str) else str(res)
+            info['resp'] = res
+            info['event_date'] = datetime.datetime.now()
+            obj = Log(**info)
+            obj.save_plus()
+            return res
+        return my_wrapper
 
 
 class LoginRecord(mongo_db.BaseDoc):
