@@ -1447,10 +1447,25 @@ def send_balance_signal(balance: dict):
      }
     out_put['markdown'] = markdown
     out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+    # 发送balance提醒
     res = send_signal(out_put, token_name="钉钉小助手")
     if not res:
         ms = "发送消息到钉钉小助手失败,消息:{}".format(markdown)
         logger.exception(ms)
+    if amount_usd > 1000:
+        """发送战报"""
+        title = "战报"
+        markdown['title'] = title
+        first_name = customer_name[0:1]
+        text = "> ##### {}  \n 恭喜-{}-客户{}xx,加金{}美元![胜利][胜利][胜利],继续加油[加油][加油][加油]".format(title,
+                                                                                         sales_name, first_name,
+                                                                                         amount_usd)
+        markdown['text'] = text
+        out_put['markdown'] = markdown
+        res = send_signal(out_put, token_name="战报")
+        if not res:
+            ms = "发送消息到战报失败,消息:{}".format(markdown)
+            logger.exception(ms)
     if director_name == "倪妮娜":
         res2 = send_signal(out_put, token_name='财务群钉钉小助手')
         if not res2:
@@ -2148,7 +2163,7 @@ if __name__ == "__main__":
     #     "description" : "入金/加金",
     #     "ticket" : 49734,
     #     "login" : 8300150,
-    #     "profit" : 700.0,
+    #     "profit" : 1700.0,
     #     "command" : "balance",
     #     "comment" : "Deposit maxib#1220",
     #     "create_date" : get_datetime_from_str("2018-04-19T18:28:31.688Z")
