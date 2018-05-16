@@ -33,23 +33,29 @@ def check_file(sub_dir_name="apk")->dict:
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     name_list = os.listdir(dir_path)
-    a_list = [{"name": name, "version": name.split("_")[1][1:].split(".")} for name in name_list if name.lower().endswith(".apk") and name.lower().find("_") != -1]
-    a_list.sort(key=lambda obj: (int(obj['version'][0]), int(obj['version'][1]), int(obj['version'][2])), reverse=True)
-    temp = a_list[0]
-    file_name = temp['name']
-    version = ".".join(temp['version'])
-    full_path_raw = os.path.join(client_dir, sub_dir_name, file_name)
-    full_path_new = os.path.join(client_dir, sub_dir_name, "downloads", "safego.apk")
-    if os.path.exists(full_path_new):
-        md5_01 = hashlib.md5(open(full_path_raw, "rb").read()).hexdigest()
-        md5_02 = hashlib.md5(open(full_path_new, "rb").read()).hexdigest()
-        if md5_01 == md5_02:
-            pass
+    if len(name_list) == 0:
+        return None
+    else:
+        a_list = [{"name": name, "version": name.split("_")[1][1:].split(".")} for name in name_list if name.lower().endswith(".apk") and name.lower().find("_") != -1]
+        a_list.sort(key=lambda obj: (int(obj['version'][0]), int(obj['version'][1]), int(obj['version'][2])), reverse=True)
+        temp = a_list[0]
+        file_name = temp['name']
+        version = ".".join(temp['version'])
+        full_path_raw = os.path.join(client_dir, sub_dir_name, file_name)
+        full_path_dir = os.path.join(client_dir, sub_dir_name, "downloads")
+        if not os.path.exists(full_path_dir):
+            os.makedirs(full_path_dir)
+        full_path_new = os.path.join(full_path_dir, "safego.apk")
+        if os.path.exists(full_path_new):
+            md5_01 = hashlib.md5(open(full_path_raw, "rb").read()).hexdigest()
+            md5_02 = hashlib.md5(open(full_path_new, "rb").read()).hexdigest()
+            if md5_01 == md5_02:
+                pass
+            else:
+                shutil.copy(full_path_raw, full_path_new)
         else:
             shutil.copy(full_path_raw, full_path_new)
-    else:
-        shutil.copy(full_path_raw, full_path_new)
-    return {"version": version, "url": "static/{}/{}/{}".format(sub_dir_name, "downloads", "safego.apk")}
+        return {"version": version, "url": "static/{}/{}/{}".format(sub_dir_name, "downloads", "safego.apk")}
 
 
 def check_version(os_type="android"):

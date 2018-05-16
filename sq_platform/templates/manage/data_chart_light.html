@@ -1,0 +1,124 @@
+{% extends "manage/base_template_light.html" %}
+{% block extend_css %}
+    <link rel="stylesheet" href="../static/css/manage/data_chart_light.css">
+
+{% endblock %}
+{% block main %}
+    <div id="app">
+
+        <div class="sijib">
+            <div class="content-right pull-right">
+                    <div class="container-fluid pull-left  personal-data">
+                        <div class="row">
+                            <p class="p1">
+                                <span>周报表</span><span>月报表</span> 
+                                <span>  开始时间：<input type="text" id="date_picker" class=""></span>
+                                <span>  结束时间：<input type="text" id="date_picker_end" class=""></span>
+                                <img class="dayin" src="/static/image/icon/ic_guanbishigu.svg" alt="">
+                            </p>
+                            <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_liebiao.svg" alt=""><p class="sijib-p">全队人数</p><p class="sijib-p sijib-p2">18人</p></div>
+                            <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_naozhong.svg" alt=""><p class="sijib-p">全队车辆</p><p class="sijib-p sijib-p2">18辆</p></div>
+                            <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_naozhong.svg" alt=""><p class="sijib-p">行使时长</p><p class="sijib-p sijib-p2">450小时45分钟</p></div>
+                            <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_naozhong.svg" alt=""><p class="sijib-p">行使公里</p><p class="sijib-p sijib-p2">8200公里</p></div>
+                        </div>
+                    </div>
+                    <!-- 第二个板块 -->
+                    <div class="container-fluid pull-left  personal-data personal-datas   container-fluidtwo">
+                        <div class="row">
+                            <div class="col-xs-6 data-img">
+                                <div id="data_img" style="width: 100%;height: 260px;"></div>
+                            </div>
+                            <div class="col-xs-6 data-img pull-right">
+                                <div id="data_imgtwo" style="width: 100%;height: 260px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 第三个板块 -->
+                    <div class="container-fluid pull-left  personal-data personal-datas personal-datatop container-fluidtwo">
+                        <div class="row">
+                            <div class="col-xs-4 data-img data-imgs">
+                                <p>安全评估</p>
+                                <div id="" style="width: 100%;height: 320px;"></div>
+                            </div>
+                            <div class="col-xs-8 data-img data-imgtwo pull-right">
+                                <p class="title">生理状况汇总</p>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>类别</th>
+                                            <th>流程刚</th>
+                                            <th>流程刚</th>
+                                            <th>流程刚</th>
+                                            <th>流程刚</th>
+                                            <th>流程刚</th>
+                                            <th>流程刚</th>
+                                            <th>流程刚</th>
+                                        </tr>
+                                    </thead>
+                                    
+                                </table>
+                                <div class="overhie">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>健康</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                            </tr>
+                                            <tr>
+                                                <td>情绪</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                            </tr>
+                                            <tr>
+                                                <td>睡眠</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                                <td>优</td>
+                                            </tr>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 底部不良驾驶行为 -->
+                    <div class="container-fluid pull-left   personal-dibu  container-fluidtwo">
+                       <div class="row diburow">
+                           <div class="col-xs-12">
+                               <div id="myxw"  style="width: 100%;height: 300px;"></div>
+                           </div>
+                       </div>
+                    </div>
+                </div>
+        </div>
+
+    </div>
+{% endblock %}
+{% block extend_js %}
+<!--百度图表-->
+<script src="/static/js/echarts.min.js"></script>
+<script src="/static/js/echarts.common.min.js"></script>
+<!--日期选择器样式-->
+<link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
+<!--日期选择器-->
+<script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+<!--日期选择器本地化语言-->
+<script src="/static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="/static/js/manage/data_chart_light.js"></script>
+{% endblock %}

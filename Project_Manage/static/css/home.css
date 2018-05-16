@@ -232,3 +232,12 @@
     cursor: pointer;
     border-color:#666;
 }
+/*td悬浮框样式*/
+#Prompt h5{
+    text-align: center;
+    color: #8470FF;
+}
+#Prompt .table{
+    font-size:1rem;
+    width:12em;
+}

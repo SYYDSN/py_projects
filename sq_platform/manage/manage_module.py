@@ -77,7 +77,8 @@ def app_version_table_func():
 @manage_blueprint.route("/online_report")
 @check_platform_session
 @log_request_args
-def online_report_func():
+def online_report_view_func():
+    """观察员的在线报告页面"""
     company_id = get_platform_session_arg("company_id", None)
     prefix = get_platform_session_arg("prefix", "sf")
     if company_id is None:
@@ -89,6 +90,25 @@ def online_report_func():
         company = Company.find_by_id(company_id)
         resp = company.online_report(filter_online=filter_online)
         return render_template("manage/online_report.html", data=resp)
+
+
+@manage_blueprint.route("/online")
+@check_platform_session
+@log_request_args
+def online_report_func():
+    """管理员的在线报告页面"""
+    company_id = get_platform_session_arg("company_id", None)
+    prefix = get_platform_session_arg("prefix", "sf")
+    if company_id is None:
+        return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+    else:
+        head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
+        filter_online = get_arg(request, "filter_online", 0)
+        if isinstance(filter_online, str) and filter_online.isdigit():
+            filter_online = int(filter_online)
+        company = Company.find_by_id(company_id)
+        resp = company.online_report(filter_online=filter_online)
+        return render_template("manage/online_report_light.html", data=resp, head_img_url=head_img_url)
 
 
 @manage_blueprint.route("/block_employee_list", methods=['get', 'post'])
@@ -256,8 +276,9 @@ def logout_func():
             clear_platform_cors_session(sid)
             return json.dumps({"message": "success"})
         else:
+            prefix = get_platform_session_arg("prefix", 'sf')
             clear_platform_session()
-            return redirect(url_for("manage_blueprint.login_func"))
+            return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
     else:
         return abort(400, "unknown request")
 
@@ -430,15 +451,16 @@ def driver_list_func():
         return abort(405)
 
 
-# @manage_blueprint.route("/employee_list", methods=["get"])
-# @check_platform_session
-# def employee_list_func():
-#     if request.method.lower() == "get":
-#         """员工/司机列表页,旧，要被废止"""
-#         page_title = "员工列表"
-#         return render_template("manage/employee_list.html", page_title=page_title)
-#     else:
-#         return abort(405)
+@manage_blueprint.route("/data_chart", methods=["get"])
+@check_platform_session
+def data_chart_func():
+    if request.method.lower() == "get":
+        """数据报表"""
+        page_title = "数据报表"
+        head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")  # 用户头像
+        return render_template("manage/data_chart_light.html", page_title=page_title, head_img_url=head_img_url)
+    else:
+        return abort(405)
 
 
 @manage_blueprint.route("/driver_detail", methods=["get", "post"])

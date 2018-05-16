@@ -27,15 +27,16 @@ function get_offset_for_nav() {
     }
 }
 
-// 把司机的姓提取出来填入筛选司机区域
-let add_first_name = function(name){
-    // 参数是名字
-    let l = name.length;
-    if(l>0){
-        let first_name_container = $("#right_bar_handler_bottom>ul");
-        let html = `<li onclick="show_cur_first_name($(this))">${name[0]}</li>`;
-        first_name_container.append(html);
-    }else{}
+// 把司机们的姓填入筛选司机区域
+let add_first_name = function(first_names){
+    // 参数是姓的数组
+    let first_name_container = $("#right_bar_handler_bottom>ul");
+    first_name_container.empty();
+    let html = "";
+    for(let first_name of first_names){
+        html += `<li onclick="show_cur_first_name($(this))">${first_name}</li>`;
+    }
+    first_name_container.append(html);
 };
 
 // 隐藏除给定姓氏之外的司机
@@ -224,10 +225,6 @@ AMapUI.loadUI(['overlay/AwesomeMarker'], function (AwesomeMarker) {
         });
         custom_maker_hover(custom_marker);
         custom_marker.setMap(map);
-        if(isNaN(real_name)){
-            // 如果用户没有真名,那就不做此项操作
-            add_first_name(real_name);  // 填充姓氏筛选区域
-        }
         return custom_marker;
     };
 
@@ -246,7 +243,7 @@ AMapUI.loadUI(['overlay/AwesomeMarker'], function (AwesomeMarker) {
     // 定义一个追加右侧边栏元素的函数
     let add_right_side_bar_item = function(arg_dict){
         // 用户id
-        let user_id = arg_dict['user_id'];
+        let user_id = arg_dict['_id'] !== undefined? arg_dict['_id']: arg_dict['user_id'];
         // 用户头像
         let head_img_url = arg_dict['head_img_url'] === undefined ? "/static/image/head_img/default_01.png": "/"+arg_dict['head_img_url'];
         // 用户手机
@@ -283,35 +280,44 @@ AMapUI.loadUI(['overlay/AwesomeMarker'], function (AwesomeMarker) {
         else{
             name_color = color_danger_16;
         }
-        let right_bar_html_str = '<li class="my_li" data-id='+user_id+'>'+
-            '<div class="item_main" data-position='+position+'>'+
-            '<div class="left_side">'+
-            '<img title="最后通信时间:'+time+'\napp版本'+':'+app_version+'" onclick="to_map_center($(this))" class="side_bar_img"'+'src='+head_img_url+'>'+
-            '</div>'+
-            '<ul class="my_ul">'+
-            '<li class="my_li real_name my_flex">'+
-            '<span  style="color:'+name_color+'">'+real_name+'</span>'+
-            '<a target="_blank" href="show_track?phone_num='+phone_num+'">'+
-            '<i title="查看轨迹" class="fa fa-dot-circle-o icon_mouse_leave"'+ 'aria-hidden="true"></i>'+
-            '</a>'+
-            '</li>'+
-            '<li class="my_li my_flex"><span>车型:</span><span>'+car_model+'</span><span'+ 'class="margin-right">驾驶时长:</span><span>'+drive_time+'</span></li>'+
-            '<li class="my_li my_flex"><span>里程:</span><span>'+mileage+'</span><span'+ 'class="margin-right">不良记录:</span><span>'+event_count+'</span></li>'+
-            '</ul>'+
-            '</div>'+
-            '<div class="item_bottom">'+
-            '<svg style="margin-bottom:2px" class="xs_icon yujing_mian normal_status"'+ 'aria-hidden="true"><use xlink:href="#icon-yujing_mian"></use></svg>'+
-            '<span class="current_message">当前路况良好</span>'+
-            '</div>'+
-            '<hr>'+
-            '</li>';
+
+        let right_bar_html_str = `<li class="my_li" data-id="${user_id}">
+            <div class="item_main" data-position="${position}">
+            <div class="left_side">
+                <img title="最后通信时间:${time}\napp版本:${app_version}" onclick="to_map_center($(this))" class="side_bar_img"src="${head_img_url}">
+            </div>
+            <ul class="my_ul">
+                <li class="my_li real_name my_flex">
+                    <span  style="color:${name_color}">${real_name}</span>
+                    <a target="_blank" href='/manage/track?ids=["${user_id}"]'>
+                        <i title="查看轨迹" class="fa fa-dot-circle-o icon_mouse_leave" aria-hidden="true"></i>
+                    </a>
+                </li>
+                <li class="my_li my_flex">
+                    <span>车型:</span><span>${car_model}</span>
+                    <span class="margin-right">驾驶时长:</span><span>${drive_time}</span>
+                </li>
+                <li class="my_li my_flex">
+                    <span>里程:</span><span>${mileage}</span>
+                    <span class="margin-right">不良记录:</span><span>${event_count}</span>
+                </li>
+            </ul>
+            </div>
+            <div class="item_bottom">
+                <svg style="margin-bottom:2px" class="xs_icon yujing_mian normal_status" aria-hidden="true">
+                    <use xlink:href="#icon-yujing_mian"></use>
+                </svg>
+                <span class="current_message">当前路况良好</span>
+            </div>
+            <hr>
+            </li>`;
 
         $("#driver_list").append(right_bar_html_str);
     };
 
     func_dict['add_right_side_bar_item'] = add_right_side_bar_item;  // 加入函数集
 
-    check_map_init(last_positions); // 启动时检查map,并加载一次
+    check_map_init([init_right_bar, last_positions]); // 启动时检查map,并加载一次
 
 });
 console.log("end init AwesomeMarker...");
@@ -324,11 +330,89 @@ check_map_init = function(func){
             // waiting....
         }
         else{
-            func();
+            if(typeof(func) === "function"){
+                func();
+            }
+            else{
+                for(let f of func){
+                    f();
+                }
+            }
             clearInterval(interval);
         }
     }, 200);
 };
+
+
+// 一个按照人数多少排序的函数,用于只选择人数最多的前20个姓氏排序显示
+let compare_name = function(obj1, obj2){
+    let count1 = obj1['count'];
+    let count2 = obj2['count'];
+    if(count2 > count1){
+        return 1;
+    }
+    else if(count2 < count1){
+        return -1;
+    }
+    else{
+        return 0;
+    }
+};
+
+// 从司机姓氏字典中取出人数最多的前20个,然后组成数组返回
+let top_20 = function(name_dict){
+    let list = [];
+    for(let k in name_dict){
+        let temp = {"name": k, "count": name_dict[k]};
+        list.push(temp);
+    }
+    list.sort(compare_name);
+    let res = [];
+    let l = list.length;
+    l = l > 20? 20: l;
+    for(let i=0;i<l;i++){
+        console.log(i);
+        let temp = list[i];
+        res.push(temp['name']);
+    }
+    return res;
+};
+
+
+// 初始化右边栏
+let init_right_bar = function() {
+    $.post("/manage/get_driver_list", function (resp) {
+        let data = JSON.parse(resp)['data'];
+        console.log(data);
+        $("#driver_list").empty();  // 清除旧的右侧导航
+        $("#driver_count").text(data.length);
+        let name_dict = {};
+        let add_right_side_bar_item_func = func_dict['add_right_side_bar_item'];
+        for (let p of data) {
+            add_right_side_bar_item_func(p);  // 添加右侧边栏
+            let real_name = p['real_name'];
+            if(isNaN(real_name) && real_name !== ""){
+                // 如果用户没有真名,那就不做此项操作
+                if(real_name.length > 0){
+                    let first_name = real_name[0];
+                    let count = name_dict[first_name];
+                    if(count === undefined){
+                        count = 1
+                    }
+                    else{
+                        count += 1;
+                    }
+                    name_dict[first_name] = count;
+                }
+            }
+        }
+        console.log(name_dict);
+        //从司机姓氏字典中取出人数最多的前20个姓氏的数组
+        let first_names = top_20(name_dict);
+        add_first_name(first_names); // 把司机们的姓填入筛选司机区域
+    });
+};
+
 
 // 从数据库请求最后的位置
 last_positions = function(){
@@ -337,19 +421,18 @@ last_positions = function(){
         console.log(response);
         let data_list = response['data'];
         let l = data_list.length;
-        $("#driver_count").text(l);
         if(l > 0){
             map.clearMap();  // 清除覆盖物
-            $("#driver_list").empty();  // 清除右侧边栏
-            $("#right_bar_handler_bottom>ul").empty();  // 清除i司机姓氏筛选区域
             global_markers = {};  // 全局自定义标记点容器.用于后继对全局自定义标记点的操作.
-            // 添加右侧边栏和自定义标记
-            $("#driver_list").empty();  // 清除旧的右侧导航
+            // 添加自定义标记
             for(let i=0;i<l;i++){
                 let data = data_list[i];
                 console.log(data);
+                update_last_date(data['user_id'], data['last_update']);  // 更新最后的通讯时间
+                /*
                 let add_right_side_bar_item_func = func_dict['add_right_side_bar_item'];
                 add_right_side_bar_item_func(data);  // 添加右侧边栏
+                */
                 let get_awe_marker_func = func_dict['get_awe_marker'];
                 let custom_marker = get_awe_marker_func(data);       // 自定义标记点重置
                 let user_id = data['user_id'];
@@ -367,9 +450,14 @@ let update_last_date = function(user_id, update_date){
     let finder = `.my_li[data-id='${user_id}']`;
     console.log("update_last_date function's finder is " + finder);
     $(finder).find("img").first().attr("title", a_str);
+    let a = $(`.my_li[data-id='${user_id}'] a`);
+    console.log(a);
+    let raw_href = a.attr("href");
+    let href = `${raw_href}&date=["${update_date.split(" ")[0]}"]`;
+    a.attr("href", href);
 };
 
-// 修改自定义标记点
+// 修改自定义标记点, 此函数目前未被调用  2018-5-16
 update_custom_markers = function(debug){
     $.post(server + "/manage/last_positions",function(json) {
         let response = JSON.parse(json);

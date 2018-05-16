@@ -1,0 +1,111 @@
+@charset "utf-8";  
+  
+/* reset  重置样式*/  
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,textarea,p,blockquote,th,td,input,select,textarea,button {margin:0;padding:0}  /* 初始化标签在所有浏览器中的margin、padding值 */  
+fieldset,img {border:0 none}  /* 重置fieldset（表单分组）、图片的边框为0*/  
+dl,ul,ol,menu,li {list-style:none}   /* 重置类表前导符号为onne,menu在HTML5中有效 */  
+blockquote, q {quotes: none}   /* 重置嵌套引用的引号类型 */  
+blockquote:before, blockquote:after,q:before, q:after {content:'';content:none}  /* 重置嵌套引用*/  
+input,select,textarea,button {vertical-align:middle}  /* 重置表单控件垂直居中*/  
+button {border:0 none;background-color:transparent;cursor:pointer}  /* 重置表单button按钮效果 */  
+body {background:#fff}   /* 重置body 页面背景为白色 */  
+body,th,td,input,select,textarea,button {font-size:12px;line-height:1 ;font-family:"微软雅黑", "黑体","宋体";color:#666} /* 重置页面文字属性 */  
+a {color:#666;text-decoration:none}  /* 重置链接a标签 */  
+a:active, a:hover {text-decoration:none}   /* 重置链接a标签的鼠标滑动效果 */  
+address,caption,cite,code,dfn,em,var {font-style:normal;font-weight:normal}  /* 重置样式标签的样式 */  
+caption {display:none;}    /* 重置表格标题为隐藏 */  
+table {width:100%;border-collapse:collapse;border-spacing:0;table-layout:fixed;}    /* 重置table属性 */  
+img{vertical-align:top}  /* 图片在当前行内的垂直位置 */  
+   
+/* 页面设置 */  
+   
+  /* 取消a标签点击后的虚线框 */  
+a {outline: none;}    
+/* a:active {star:expression(this.onFocus=this.blur());}   */
+   
+ /* 设置页面文字等在拖动鼠标选中情况下的背景色与文字颜色 */  
+/*   
+::selection {color: #fff;background-color: #4C6E78;}      
+::-moz-selection {color: #fff;background-color: #4C6E78;}   
+*/  
+  
+/*清除浮动*/  
+.clear{clear: both;}  
+  
+/*清除浮动--推荐使用*/  
+.clearfix:before,.clearfix:after{content: '';display: table;}  
+.clearfix:after{clear: both;}
+html{
+  min-width: 1250px;
+}
+
+/* 页面样式 */
+#main_zone{
+    position: relative;
+}
+body{
+    font-size:14px;
+    background: #eaedf2;
+}
+.Prompts-column{
+    padding: 0 30px;
+    height: 68px;
+    line-height: 68px;
+}
+.Prompts-column ul{
+    /* margin-left: 30px; */
+    display: flex;
+    justify-content: space-between;
+}
+.Prompts-column ul li{
+    color: #373b3e;
+    font-size: 18px;
+}
+.Prompts-column ul li span{
+    color: #000000;
+}
+.my-table table{
+    border-collapse: separate;
+    /* border-spacing: 0 20px; */
+    text-align: center;
+}
+.my-table table thead th{
+    color: #373b3e;
+    padding-bottom: 14px;
+    text-align: center;
+    /* color: aquamarine */
+}
+.my-table{
+    padding:0 1em;
+    height: 100%;
+    overflow-y: scroll;
+}
+.my-table tbody tr img{
+    text-align: center;
+}
+.my-table tbody tr td{
+    padding: 8px 0;
+    color: #252525;
+}
+.my-table tbody tr td img{
+    width: 30px;
+    left: 45%;
+}
+
+@font-face {font-family: "iconfont";
+  src: url('iconfont.eot?t=1525940722203'); /* IE9*/
+  src: url('iconfont.eot?t=1525940722203#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('data:application/x-font-woff;charset=utf-8;base64,d09GRgABAAAAAAUMAAsAAAAAB2AAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABHU1VCAAABCAAAADMAAABCsP6z7U9TLzIAAAE8AAAARAAAAFZW7kb1Y21hcAAAAYAAAABeAAABhpWEBr5nbHlmAAAB4AAAATUAAAFEJzh4hmhlYWQAAAMYAAAALwAAADYRU4nzaGhlYQAAA0gAAAAcAAAAJAfeA4RobXR4AAADZAAAAAwAAAAMC9EAAGxvY2EAAANwAAAACAAAAAgAdgCibWF4cAAAA3gAAAAfAAAAIAESAF1uYW1lAAADmAAAAUUAAAJtPlT+fXBvc3QAAATgAAAAKwAAADy6WcRheJxjYGRgYOBikGPQYWB0cfMJYeBgYGGAAJAMY05meiJQDMoDyrGAaQ4gZoOIAgCKIwNPAHicY2Bk/sA4gYGVgYOpk+kMAwNDP4RmfM1gxMjBwMDEwMrMgBUEpLmmMDgwVDwVZm7438AQw9zA0AAUZgTJAQAiGQx2eJzFkMENgDAMAy9t6QPx6xI8GIgXc3ThzlFMKA8mqCXHimMpUYAFiOIhJrAL48Ep19yPrO4nz2SpEait9K7+U0U0y65BJTMNNm/1H5vXfXT6CnVQJ7byknADe2sL1wAAeJwVz71OwlAYxvH3Pcd+IbRyTj8PILRHWg1KQq0YY6SLi8bBxMEwOhtdWRxYTBwcvAZjYrwHdiZcvAKjl+BqlT75b8/0AwXg75POqA8cNmEAx3AOgGoPI5O0MEyyPumhEyqOZ5s0kUmoyahPj9CLVNtNh1nsqZpqoYnruBumw6RPEtzLRuQQU7eFGDTEBes2GX3Cip+s3xen5Bmdtmxao53iZDu30w7XJ1XGAsYedVVRdEJWLBNvPNdQjIpavCiWcGbtLdLGapCIs3Gt02BXD9ltq+sZiNMp8kbHfM3ror7sTricBdpaTfdFTW7YOPle9Xm1FX/Bcri0ftBrmoMHYGAcaVgicuQlZZ96JYiOizlPeTFn8cBeoBxKxHd7EOMPHjBWfjFf/L4JKQW5XPA4hX8MCTc4AAAAeJxjYGRgYADiaXWTEuL5bb4ycLMwgMB1KaVPCPr/ZRYGZnsgl4OBCSQKACAQCeMAeJxjYGRgYG7438AQw8IAAkCSkQEVMAMARwkCbAQAAAAD6QAAA+gAAAAAAAAAdgCieJxjYGRgYGBmCGRgZQABJiDmAkIGhv9gPgMAEPcBcAB4nGWPTU7DMBCFX/oHpBKqqGCH5AViASj9EatuWFRq911036ZOmyqJI8et1ANwHo7ACTgC3IA78EgnmzaWx9+8eWNPANzgBx6O3y33kT1cMjtyDRe4F65TfxBukF+Em2jjVbhF/U3YxzOmwm10YXmD17hi9oR3YQ8dfAjXcI1P4Tr1L+EG+Vu4iTv8CrfQ8erCPuZeV7iNRy/2x1YvnF6p5UHFockikzm/gple75KFrdLqnGtbxCZTg6BfSVOdaVvdU+zXQ+ciFVmTqgmrOkmMyq3Z6tAFG+fyUa8XiR6EJuVYY/62xgKOcQWFJQ6MMUIYZIjK6Og7VWb0r7FDwl57Vj3N53RbFNT/c4UBAvTPXFO6stJ5Ok+BPV8bUnV0K27LnpQ0kV7NSRKyQl7WtlRC6gE2ZVeOEXpc0Yk/KGdI/wAJWm7IAAAAeJxjYGKAAC4G7ICZkYmRmZGFgbGCL7GoKL9ctyS/QDc5v6CSgQEAQncGNgA=') format('woff'),
+  url('iconfont.ttf?t=1525940722203') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=1525940722203#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family:"iconfont" !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-arrow-top-copy:before { content: "\e513"; }

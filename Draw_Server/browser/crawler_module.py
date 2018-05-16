@@ -572,18 +572,18 @@ def get_page_platform(browser, page_url: str) -> (PyQuery, None):
         browser.get(page_url)
     except TimeoutException as e:
         title = "{} 打开页面失败, url:{}".format(datetime.datetime.now(), page_url)
-        content = "错误原因：{}".format(e)
+        content = "错误原因：{}".format(str(e))
         send_mail(title=title, content=content)
         print(page_url)
-        ms = "Error {} on {}".format(page_url, e)
+        ms = "Error {} on {}".format(page_url, str(e))
         recode(ms)
         raise e
     except Exception as e:
         title = "{} 打开页面失败".format(datetime.datetime.now(), page_url)
-        content = "错误原因：{}".format(e)
+        content = "错误原因：{}".format(str(e))
         send_mail(title=title, content=content)
         print(e)
-        ms = "Error {} on {}".format(page_url, e)
+        ms = "Error {} on {}".format(page_url, str(e))
         recode(ms)
         raise e
     source = browser.page_source
@@ -1456,7 +1456,7 @@ def send_balance_signal(balance: dict):
         title = "战报"
         markdown['title'] = title
         first_name = customer_name[0:1]
-        text = "> ##### {}  \n 恭喜-{}-客户{}xx,加金{}美元![胜利][胜利][胜利],继续加油[加油][加油][加油]".format(title,
+        text = "> ##### {}  \n 恭喜-{}-客户{}xx,入金{}美元![胜利][胜利][胜利],继续加油[加油][加油][加油]".format(title,
                                                                                          sales_name, first_name,
                                                                                          amount_usd)
         markdown['text'] = text
@@ -2088,10 +2088,10 @@ def do_jobs(browser):
     ms = "{} 开始批量作业".format(begin.strftime("%Y-%m-%d %H:%M:%S"))
     print(ms)
     logger.info(ms)
-    draw_on_all(browser=browser)
-    draw_withdraw_on_p2(browser)
-    send_all_balance_signal()
-    send_all_withdraw_signal()
+    draw_on_all(browser=browser)  # 从互联网查询四种数据
+    draw_withdraw_on_p2(browser)  # 从互联网查询平台2出金申请
+    send_all_balance_signal()     # 从数据库查询balance并send信号
+    send_all_withdraw_signal()    # 从数据库查询出金申请并send信号
     end = datetime.datetime.now()
     ts = (end - begin).total_seconds()
     ms = "{} 批量作业完成,耗时:{}秒".format(end.strftime("%Y-%m-%d %H:%M:%S"), ts)

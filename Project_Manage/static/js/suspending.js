@@ -4,22 +4,22 @@ var suspending  = $('.gundong .tab tbody .hidden_overflow'); //获取操作的�
 var Prompt = $("<div id='Prompt'></div>");//添加标签
 console.log($(Prompt));
 
+
 $(Prompt).append('<p>!项目提示</p>');
 $(Prompt).append('<p>后台保驾犬安全平台项目,生成顺丰测试人员报告excel 推进中</p>');
 $(Prompt).append('<p>注意事项</p>');
 $(Prompt).append("<span class='chat'></span>");
 
+
 // td的悬浮事件发生时,填充悬浮的信息框
 let fill_td = function(data){
 	Prompt.empty();
-	let html = "<table class='table' style='width: 360px'>";
-    // for(let name in data){
-	 //    html += `<p>${name}: ${data[name]}</p>`;
-    // }
-    // Prompt.html(html);
-    for(let name in data){
-	    html += `<tr><td style="width:120px">${name}</td><td>${data[name]}</td></tr>`;
-    }
+	let html = `<h5>${data['name']}</h5><table class='table' style='width: 220px'>`;
+	html += `<tr><td style="width:70px">开始日期:</td><td>${data['begin_date']}</td></tr>`;
+	html += `<tr><td style="width:70px">结束日期:</td><td>${data['end_date']}</td></tr>`;
+	html += `<tr><td style="width:70px">任务工期:</td><td>${data['date_range']}天</td></tr>`;
+	html += `<tr><td style="width:70px">任务归属:</td><td>${data['category_name']}.${data['project_name']}</td></tr>`;
+    html += `<tr><td style="width:70px">任务状态:</td><td>${data['status']}</td></tr>`;
     html += "</table>";
     Prompt.html(html);
 };

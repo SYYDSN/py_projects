@@ -182,14 +182,16 @@ def get_verify_code():
 
 
 @api_user_blueprint.route("/check_version", methods=['get', 'post'])
-@log_request_args
 def check_version():
     """检查版本信息"""
     os_type = get_arg(request, "os_type", "android")
     message = {"message": "success"}
     result = check_client_version(os_type)
-    result['url'] = "{}{}".format(request.host_url, result['url'])
-    message.update(result)
+    if result is None:
+        pass
+    else:
+        result['url'] = "{}{}".format(request.host_url, result['url'])
+        message.update(result)
     return json.dumps(message)
 
 

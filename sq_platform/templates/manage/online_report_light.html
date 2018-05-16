@@ -1,0 +1,70 @@
+{% extends "manage/base_template_light.html" %}
+{% block extend_css %}
+<link rel="stylesheet" href="/static/css/manage/online_report_light.css">
+{% endblock %}
+
+{% block main %}
+<div id="main_zone" class="box">
+    <!-- 提示栏 -->
+    <div class="Prompts-column">
+        <ul>
+            <li>总用户量 <span>{{ data.all }}</span></li>
+            <li>新增用户 <span>{{ data.today_reg }}</span></li>
+            <li>在线平均时长 <span>{{ data.mean }}h</span></li>
+            <li>常用功能 违章查询<span>{{ data.vio_count }}</span>次 违章代缴<span>0</span>次</li>
+            <li>选择用户
+                <input class="filter_online" data-filter="0" type="radio" name="use">全部
+                <input class="filter_online" data-filter="1" type="radio" name="use">在线
+                <input class="filter_online" data-filter="-1" type="radio" name="use">离线
+            </li>
+        </ul>
+    </div>
+    <div class="my-table">
+        <table class="stable-condensed">
+            <thead>
+            <tr>
+                <th>头像</th>
+                <th>姓名</th>
+                <th>手机号</th>
+                <th>手机版本号</th>
+                <th>app版本</th>
+                <th>最近一次登录时间</th>
+                <th>在线时长</th>
+                <th>状态</th>
+                <th>注册时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for emp in data.employees %}
+                <tr>
+                    <td><img src="/{{ emp.head_img_url }}" alt="头像"></td>
+                    <td>{{ emp.real_name }}</td>
+                    <td>{{ emp.phone_num }}</td>
+                    <td>{{ emp.os_version }}</td>
+                    <td>{{ emp.app_version }}</td>
+                    <td>{{ emp.last_update_str }}</td>
+                    <td>{{ emp.online_time }}</td>
+                    <td>{{ "在线" if emp.online == 1 else "离线" }}</td>
+                    <td>{{ emp.create_date_str }}</td>
+                </tr>
+            {% endfor %}
+            <!--
+                <tr>
+                    <td><img src="/static/image/head_img/default_01.png" alt="无图片"></td>
+                    <td>18577684225</td>
+                    <td>5.1.1</td>
+                    <td>V.5.1.1</td>
+                    <td>2018-4-12 7：02：35</td>
+                    <td>3小时</td>
+                    <td>在线</td>
+                    <td>2018-4-12 7：02：35</td>
+                </tr>
+                -->
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block extend_js %}
+<script src="/static/js/manage/online_report.js"></script>
+{% endblock %}

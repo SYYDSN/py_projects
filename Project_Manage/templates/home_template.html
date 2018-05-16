@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>苏秦网络</title>
+    <link rel="icon" href="{{ url_for('static', filename='../static/images/favicon.ico') }}">
     <link rel="stylesheet" href="../static/css/bootstrap.min.css">
     <link rel="stylesheet" href="../static/css/home.css">
     <link rel="stylesheet" href="../static/css/public.css">
@@ -165,10 +166,13 @@
         <div class="dv-right">
             <div class="top">
                 <ul>
-                    <li class="xian"><a href="/home_all/view">全部</a></li>
+                    <li class="xian"><a href="/home_all/view">首页</a></li>
+                    <!--目前用不上,注销
                     {% for category in categories %}
                         <li><a href="/home_{{ category['path'] }}/view">{{ category['name'] }}</a></li>
                     {% endfor %}
+                    -->
+                <li><a target="_blank" href="/online_report">在线情况</a></li>
                 </ul>
                 <div class="user_info">
                     <span id="user_name">{{ user_name }}</span>

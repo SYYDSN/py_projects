@@ -42,3 +42,6 @@ a {outline: none;}
 /*清除浮动--推荐使用*/  
 .clearfix:before,.clearfix:after{content: '';display: table;}  
 .clearfix:after{clear: both;}
+body{
+    font-size:14px;
+}

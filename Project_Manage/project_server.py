@@ -127,6 +127,13 @@ def login_out_func():
     return json.dumps({"message": "success"})
 
 
+@app.route("/online_report")
+@check_platform_session
+def online_report_func():
+    """在线人数报告页面"""
+    return render_template("online_report.html")
+
+
 @app.route("/manage_<key1>/<key2>", methods=['post', 'get'])
 @check_platform_session
 def manage_user_func(key1, key2):
@@ -466,6 +473,7 @@ def home_func(key1, key2):
                                         "end_date": task['end_date'].strftime("%F"),
                                         "type": task['type'],
                                         "status": status,
+                                        "date_range": task['date_range'],
                                         "name": task['name'],
                                         "colspan": (end_day - begin_day) + 1
                                     }

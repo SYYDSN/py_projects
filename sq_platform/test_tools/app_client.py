@@ -12,6 +12,13 @@ from mongo_db import get_obj_id
 from api.data import item_module
 
 
+def test_check_version():
+    """测试检查新版本"""
+    url = "http://127.0.0.1:5000/api/check_version"
+    r = requests.post(url)
+    print(r.json())
+
+
 def test_get_security_rank_list():
     """测试用户安全指数排名接口"""
     auth_token = "f40bc71e130c48f4bcebff1169dfe22a" # app段登录标识 me
@@ -277,12 +284,14 @@ if __name__ == "__main__":
     #     "method": "post",
     #     "user_id": "59cda886ad01be237680e28e"
     # }
+    """测试检查新版本"""
+    test_check_version()
     """测试获取用户信息"""
     # test_get_user_info()
     """测试获取每日报告"""
     # test_get_daily_info()
     """测试获取违章查询器列表"""
-    test_get_vio_query_shortcuts()
+    # test_get_vio_query_shortcuts()
     """测试违章查询"""
     # test_query_violation()
     """测试获取用户行车证信息"""
