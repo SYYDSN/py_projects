@@ -1718,7 +1718,7 @@ class Track(mongo_db.BaseDoc):
         :return: 精简过的doc
         """
         ignore_columns = ["_id", "pos_type", "speed"] if ignore_columns is None else ignore_columns
-        result = mongo_db.doc_to_dict(doc_dict, ignore_columns)
+        result = mongo_db.to_flat_dict(doc_dict, ignore_columns)
         if for_app:
             loc = result['loc']
             lo = loc[0]

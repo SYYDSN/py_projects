@@ -79,9 +79,9 @@
                         <tr id="{{ vio._id }}">
                             <td>{{ vio.code }}</td>
                             <td>{{ vio.plate_number }}</td>
-                            <td>{{ vio.address }}</td>
+                            <td title="vio.address">{{ vio.address }}</td>
                             <td>{{ vio.time.split(" ")[0] }}</td>
-                            <td class="blue fix_width">{{ vio.reason }}</td>
+                            <td title="{{ vio.reason }}" class="blue fix_width">{{ vio.reason }}</td>
                             <td>{{ vio.city }}</td>
                             <td class="driver_name">
                                 <span class="span show" data-id="{{ vio.user_id }}">
@@ -97,7 +97,7 @@
                             <td>{{ vio.point }}</td>
                             <td class="blue">{{ vio.fine }}</td>
                             <td>
-                                <span class="my_status {{ 'status_1' if vio.process_status == "3" else 'status_0' }}">{{ vio_dict[vio.process_status] }}</span>
+                                <span class="my_status {{ 'status_1' if vio.process_status == "3" else 'status_0' }}">{{ "未知" if vio.process_status is none else vio_dict[vio.process_status | string ] }}</span>
                             </td>
                             <td class="blue">
                                 <div class="my_btn_group">

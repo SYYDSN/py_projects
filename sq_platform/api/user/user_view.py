@@ -613,6 +613,12 @@ def query_geo_coordinate_func():
     return json.dumps(message)
 
 
+@api_user_blueprint.route("/privacy_policy")
+def privacy_policy_func():
+    """app端隐私条款"""
+    return render_template("app/privacy_policy.html")
+
+
 @api_user_blueprint.route("/get_security_index", methods=['post', 'get'])
 @login_required_app
 def get_security_index_func(user_id) -> str:

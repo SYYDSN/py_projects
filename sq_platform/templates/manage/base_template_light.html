@@ -13,7 +13,7 @@
     <link rel="icon" href="{{ url_for('static', filename='../static/image/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/manage/base_template_light.css') }}">
     {% block extend_css %}
-        <!--扩展的css写在这里-->
+    <!--扩展的css写在这里-->
     {% endblock %}
     <script src="{{ url_for('static', filename='../static/js/responsive-nav.min.js') }}"></script>
     <script src="{{ url_for('static', filename='../static/js/jquery-3.2.1.min.js') }}"></script>
@@ -43,8 +43,7 @@
 <div role="navigation" id="left_main_nav" class="nav-collapse">
     <ul>
         <li>
-            <a href="javascript:;">
-            <!--<a href="driver_list">-->
+            <a href="driver">
             <svg class="nav_icon" aria-hidden="true">
               <use xlink:href="#icon-icon_liebiao"></use>
             </svg>
@@ -113,7 +112,7 @@
 <div role="main" class="main">
     <a href="#nav" class="nav-toggle">Menu</a>
     <div class="container-fluid height_100">
-        <div class="main_row">
+        <div class="main_row now">
             <!--<div class="title_info_row"></div>-->
             {% block main %}
                 <div id="main_zone" class="main_zone col-lg-12 col-md-12 col-sm-12 col-xs-12">

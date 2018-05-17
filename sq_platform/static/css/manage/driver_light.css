@@ -1,0 +1,438 @@
+@charset "utf-8";
+*{
+	margin: 0;
+	padding: 0;
+}
+html{
+	width: 100%;
+	height: 100%;
+}
+body{
+	height: 100%;
+	width: 100%;
+	background: url(/static/image/bgimg.png);
+}
+#app{
+	width: 100%;
+	height: 100%;
+}
+#common{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+}
+p{
+	text-align: left;
+}
+.header{
+	height: 82px;
+}
+.header .logo{
+	margin-top: 10px;
+	width: 43px;
+	height: 35px;
+}
+.header .img_zi{
+	text-align: center;
+}
+.icon_zhuxiao{
+	margin-top: 26px;
+	margin-bottom: 30px;
+}
+.icon_zhuxiao .zhuxiaotou{
+	width: 28px;
+	margin-right: 3px;
+}
+.icon_zhuxiao .zhuxiao{
+	width: 26px;
+	margin-left: 6px;
+}
+.icon_zhuxiao span{
+	font-size: 18px;
+	color: #999;
+	display: inline-block;
+	position: relative;
+	top: 4px;
+}
+
+
+.list-left{
+	width: 10%;
+}
+.list-left ul{
+	width: 100%;
+}
+.contents{
+	width: 100%;
+	/*height: 100%;*/
+}
+
+.list-left ul li{
+	width: 100%;
+	color: #979EAA;
+	padding: 10px 0;
+	margin: 0;
+}
+.list-left ul li img{
+	width: 26px;
+	height: 22px;
+	margin-right: 10px;
+}
+.list-left ul li:hover{
+	background: #D8E5F6;
+	border-right: 1px solid #7CA4FA;
+
+}
+.list-left ul li a{
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	color: #979EAA;
+	text-decoration: none;
+}
+.list-left ul li:hover a{
+	color: #8F90FD;
+}
+.content-right{
+	width: 100%;
+	border: 1px solid #DAE3EA;
+	background: #EAEFF5;
+	/* height: 100%; */
+	padding: 8px;
+	position: relative;
+	top: 0;
+}
+.content-right ul li{
+	list-style: none;
+	float: left;
+    white-space:nowrap;
+}
+.conter-ziliao .my_label{
+    margin-right:2em;
+    width: 4em;
+}
+.conter-ziliao li img{
+	width: 16px;
+}
+.personal-data{
+	background: #fff;
+	width: 93%;
+	height: 240px;
+	color: #767676;
+}
+.personal-data>.row{
+    margin-left: 0 !important;
+}
+.personal-data .touxiang{
+	width: 90px;
+}
+.personal-data .p1{
+	text-indent: 10px;
+	margin-top: 30px;
+}
+.personal-data .p2{
+	color: #0BF9D2;
+	text-align: center;
+}
+.personal-data .p3{
+	color:#FF4F62;
+	text-align: center;
+	border: 1px solid #FF4F62;
+	border-radius: 5px;
+}
+.full-name{
+	background: #fff;
+	color: #999999;
+	width: 6%;
+	height: 100%;
+	position: absolute;
+	right: 0;
+}
+.full-name ul li{
+	width: 100%;
+    text-align: center;
+    line-height: 2.5em;
+}
+.personal-data ul{
+	text-align: left;
+	width: 100%;
+	margin-top: 20px;
+}
+.personal-data ul li{
+	list-style: none;
+	float: left;
+	width: 22%;
+	/* margin-right: 30px; */
+}
+.personal-data .ulrt li{
+	/* margin-right: 35px; */
+}
+.container-fluidtwo{
+	margin-top: 30px;
+}
+.active{
+	background: #0BF9D2;
+}
+/* 司机列表页 样式 */
+.container-fluidtwo input{
+    width: 40px;
+}
+.container-fluidtwo .btn-primary{
+    width:56px;
+}
+.p1{
+    border-bottom: 1px solid #EBEFF5;
+}
+.p1 span{
+    display: inline-block;
+    padding: 8px 15px;
+}
+.active{
+    color: #87AAFB;
+}
+.ptwo{
+    border-bottom: none;
+}
+.personal-dasj{
+    height: 1245px;
+    padding-bottom:5px !important;
+}
+.personal-data1{
+    height: 316px;
+}
+.personal-data-div{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+/* 驾驶状态样式 */
+.personal-data-div div{
+    width: 50%;
+    padding: 28px 12px;
+    position: relative;
+    box-shadow: -1px 1px 8px #ccc;
+    margin-top: 5px;
+}
+.personal-data-div div img{
+    width: 40px;
+    display: inline-block;
+    position: absolute;
+    left: 18px;
+}
+.personal-data-div div p{
+    /* display: inline-block; */
+    /* width: 0%; */
+    text-align: center
+}
+.title-tb table{
+    width: 100%;
+    background: #FCFDFF;
+}
+.title-tb table td{
+    width: 25%;
+    padding: 8px 0;
+    text-align: center;
+}
+.title-tb .p4 span{
+    margin-right: 20px;
+}
+.personal-dasj .martop{
+    margin-top: 120px;
+}
+.personal-dibu {
+    height: 360px;
+
+}
+.safety{
+    padding: 8px 0;
+}
+.container-hig{
+    height: 100px;
+}
+.active-font{
+    color: #87AAFB;
+}
+#xuka span:hover{
+    color: #87AAFB;
+}
+
+.tim span{
+    display: inline-block;
+    padding: 0 12px;
+    border: 1px solid #87AAFB;
+    margin-right: 10px;
+    text-align: center;
+    border-radius: 3px;
+}
+.tim{
+    display: none;
+    padding: 0 30px;
+    padding-bottom: 6px;
+    background: #fff;
+}
+#form_date{
+    width: 200px;
+
+}
+#form_date_end{
+    width: 200px;
+}
+/* 历史 */
+.container-lishi .title-tb table td{
+    width: 3%;
+    padding: 20px 0;
+}
+ .container-lishi{
+    height: 310px !important;
+    /* display: none; */
+}
+
+#lishi{
+    display: none;
+}
+#lishi canvas{
+    width: 100% !important;
+}
+
+/* 事故统计 */
+#shigu{
+    display: none;
+}
+#shigu .container-shigu{
+    height: 120px !important;
+}
+#shigu .title-tb table{
+    background: #fff;
+    text-align: center;
+    font-size: 12px;
+}
+#shigu .title-tb table th{
+    text-align: center;
+}
+#shigu .container-shibiao{
+    height: 558px !important;
+}
+#shigu .inp input{
+    margin-right: 40px;
+}
+#shigu .inp .rad{
+    margin-right: 0;
+}
+#shigu .inp span{
+    margin-left: 40px;
+}
+#shigu .inp input:last-child{
+    margin-right: 0;
+}
+.fenyeqi span{
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+#shigu .container-fluidtwo .btn {
+    width: 74px;
+}
+/* 违章统计 */
+#weizhang{
+    display: none;
+}
+
+#weizhang .container-shigu{
+    height: 120px !important;
+}
+#weizhang .title-tb table{
+    background: #fff;
+    text-align: center;
+    font-size: 12px;
+}
+#weizhang .title-tb table th{
+    text-align: center;
+}
+#weizhang .container-shibiao{
+    height: 520px !important;
+}
+#weizhang .inp input{
+    margin-right: 40px;
+}
+#weizhang .inp input{
+    margin-right: 40px;
+}
+#weizhang .inp .rad{
+    margin-right: 0;
+}
+#weizhang .inp span{
+    margin-left: 40px;
+}
+#weizhang .inp span{
+    margin-left: 40px;
+}
+#weizhang .inp input:last-child{
+    margin-right: 0;
+}
+
+#weizhang .container-fluidtwo .btn {
+    width: 74px;
+}
+/* 个人信息 */
+#geren{
+    display: none;
+}
+
+#geren .container-shigu{
+    height: 120px !important;
+}
+#geren .title-tb table{
+    background: #fff;
+    text-align: center;
+    font-size: 12px;
+}
+#geren .title-tb table th{
+    text-align: center;
+}
+#geren .title-tb table{
+    border: 1px solid #ccc;
+}
+#geren .title-tb table thead{
+    background: #F6F3F5;
+}
+#geren .title-tb table thead th{
+    padding: 8px 0;
+}
+#geren .title-tb table tbody td{
+    border: 1px solid #ccc;
+}
+#geren .container-shibiao{
+    height: 372px !important;
+}
+#geren .inp input{
+    margin-right: 40px;
+}
+#geren .inp input:last-child{
+    margin-right: 0;
+}
+
+#geren .container-fluidtwo .btn {
+    width: 74px;
+}
+#geren .title-tb{
+    padding: 30px 60px;
+}
+/*子元素中心对齐*/
+.align_center{
+    text-align: center;
+}
+/*选项卡*/
+#xuka span:hover{
+    cursor: pointer;
+}
+/*自定义图标*/
+.small_icon{
+    width: 1.2em;
+    height: 1.2em;
+    padding: 0.2em;
+    border-radius: 0.75em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+    color: white;
+    background-color: #7C8FF3;
+}

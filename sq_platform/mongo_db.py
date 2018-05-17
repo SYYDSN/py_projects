@@ -307,7 +307,9 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
     :param date_str: 表示时间的字符串."%Y-%m-%d %H:%M:%S  "%Y-%m-%d %H:%M:%S.%f 或者 "%Y-%m-%d
     :return: datetime.datetime对象
     """
-    if isinstance(date_str, (datetime.datetime, datetime.date)):
+    if date_str is None:
+        pass
+    elif isinstance(date_str, (datetime.datetime, datetime.date)):
         return date_str
     elif isinstance(date_str, str):
         date_str.strip()
@@ -1162,7 +1164,7 @@ class BaseDoc:
         """转换成可以json的字典,此方法和同名的独立方法仍在评估中
             to_flat_dict 实例方法.
             to_flat_dict 独立方法
-            doc_to_dict  独立方法
+            doc_to_dict  独立方法  废弃
             三个方法将在最后的评估后进行统一 2018-3-16
             推荐to_flat_dict独立方法
         """
@@ -1232,7 +1234,7 @@ class BaseDoc:
         :return: 精简过的doc
         """
         ignore_columns = [] if ignore_columns is None else ignore_columns
-        result = doc_to_dict(doc_dict, ignore_columns)
+        result = to_flat_dict(doc_dict, ignore_columns)
         return result
 
     @classmethod

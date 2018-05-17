@@ -824,12 +824,14 @@ class Company(mongo_db.BaseDoc):
         return res
 
     @classmethod
-    def all_employee(cls, company_id: (str, ObjectId), filter_dict: dict = None, sort_dict: dict = None) -> list:
+    def all_employee(cls, company_id: (str, ObjectId), filter_dict: dict = None, sort_dict: dict = None,
+                     can_json: bool = False) -> list:
         """
         获取公司的全部employee
         :param company_id:
         :param filter_dict: 附加的过滤条件
         :param sort_dict: 附加的排序条件
+        :param can_json:
         :return: doc的list
         """
         company = cls.find_by_id(company_id)
@@ -856,7 +858,7 @@ class Company(mongo_db.BaseDoc):
                 if filter_dict is not None:
                     f.update(filter_dict)
                 s = {"_id": 1} if sort_dict is None else sort_dict
-                employees = Employee.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
+                employees = Employee.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=can_json)
                 if len(employees) == 0:
                     pass
                 else:

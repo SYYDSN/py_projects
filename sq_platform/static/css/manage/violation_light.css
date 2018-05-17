@@ -79,6 +79,8 @@ body{
 }
 #show_table td{
     padding: 30px 6px 30px 6px;
+    white-space: nowrap;
+    overflow:hidden;
 }
 #show_table th{
     padding: 45px 6px 43px 6px;

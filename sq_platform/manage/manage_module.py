@@ -116,6 +116,7 @@ def online_report_func():
 def block_employee_list_func():
     """用户管理屏蔽列表的页面"""
     user_id = get_platform_session_arg("user_id")
+    company_id = get_platform_session_arg("company_id")
     head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     user = Employee.find_by_id(user_id)
     block_list = Employee.get_block_id_list(user_id, to_str=True)
@@ -127,7 +128,7 @@ def block_employee_list_func():
             company_id = company_dbref.id
             post_dict = Company.all_post(company_id)
             dept_dict = Company.all_dept(company_id, can_json=True)
-        employee_list = Employee.subordinates_instance(user_id, True, True)
+        employee_list = Company.all_employee(company_id=company_id, can_json=True)
         current_user_name = user.get_attr("phone_num") if user.get_attr("real_name", "") == '' \
             else user.get_attr("real_name", "")
         return render_template("manage/block_employee_list.html", block_list=block_list, employee_list=employee_list,
@@ -147,10 +148,9 @@ def block_employee_list_func():
             if company_dbref is None:
                 post_dict, dept_dict = {}, {}
             else:
-                company_id = company_dbref.id
                 post_dict = Company.all_post(company_id)
                 dept_dict = Company.all_dept(company_id, can_json=True)
-            employee_list = Employee.subordinates_instance(user_id)
+            employee_list = Company.all_employee(company_id, can_json=True)
             current_user_name = user.get_attr("phone_num") if user.get_attr("real_name", "") == '' \
                 else user.get_attr("real_name", "")
             data = {
@@ -293,20 +293,26 @@ def track_page_func():
         return render_template("manage/show_track_light.html", head_img_url=head_img_url, real_name=real_name)
 
 
-@manage_blueprint.route("/subordinates_base_info", methods=['post'])
+@manage_blueprint.route("/subordinates_base_info", methods=['get', 'post'])
 @check_platform_session
 def subordinates_base_info_func():
-    """获取下属的基本身份信息.包含自己"""
+    """获取下属的基本身份信息"""
     res = {"message": "success"}
-    user_id = get_platform_session_arg("user_id")
-    base_info_list = Employee.subordinates_instance(user_id)
-    if base_info_list is None:
-        res['message'] = "user_id错误"
+    company_id = get_platform_session_arg("company_id")
+    if company_id is None:
+        return abort(404, "company_id is none")
     else:
-        if len(base_info_list) == 0:
-            me = Employee.find_by_id(user_id).to_flat_dict()
-            res['data'] = [me]
-        res['data'] = base_info_list
+        employees = Company.all_employee(company_id=company_id, can_json=True)
+        if employees is not None:
+            employees = {
+                x['_id']:
+                    {
+                        "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
+                        x['real_name'],
+                        "employee_number": x.get('employee_number', '')
+                    }
+                for x in employees}
+            res['data'] = employees
     return json.dumps(res)
 
 
@@ -321,13 +327,14 @@ def last_positions_func()->dict:
     employees = Company.all_employee(company_id=company_id)
     data = list()
     if len(employees) > 0:
-        data = cache.get("last_position_cache")  # 调试用
+        key = "last_position_cache_{}".format(company_id)
+        data = cache.get(key)  # 调试用
         if data is not None:
             pass
         else:
             data = Track.get_last_position([x['_id'] for x in employees])  # 获取最后的点信息
             data = list(data.values())
-            cache.set("last_position_cache", data, timeout=7200)  # 调试用
+            cache.set(key, data, timeout=120)  # 调试用
     else:
         pass
     res['data'] = data
@@ -440,13 +447,24 @@ def index_func():
         return abort(405)
 
 
-@manage_blueprint.route("/driver_list", methods=["get"])
+@manage_blueprint.route("/driver", methods=["get"])
 @check_platform_session
 def driver_list_func():
+    company_id = get_platform_session_arg("company_id")
+    employees = Company.all_employee(company_id=company_id, can_json=True)
+    emp_dict = {x['_id']: x for x in employees}
     if request.method.lower() == "get":
-        """员工/司机列表页"""
-        page_title = "员工列表"
-        return render_template("manage/driver_list_light.html", page_title=page_title)
+        """司机(列表)页"""
+        page_title = "司机"
+        cur_user_id = get_arg(request, "cur_user_id", None)
+        if cur_user_id is None or cur_user_id not in emp_dict:
+            cur_user = employees[0]
+        else:
+            cur_user = emp_dict[cur_user_id]
+        head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
+
+        return render_template("manage/driver_light.html", page_title=page_title, head_img_url=head_img_url,
+                               cur_user=cur_user, employees=employees)
     else:
         return abort(405)
 
@@ -536,7 +554,7 @@ def get_driver_list_func() -> str:
     :return: 消息字典的json,其中包含下属身份信息的的列表
     """
     company_id = get_platform_session_arg("company_id")
-    employees = Company.all_employee(company_id=company_id)
+    employees = Company.all_employee(company_id=company_id, can_json=True)
     message = dict()
     message['message'] = "success"
     team_info = [{"_id": str(x['_id']), "real_name": x['real_name'],
@@ -725,93 +743,46 @@ def get_archives_from_cache(current_user_id: str, clear: bool = False) -> dict:
 @check_platform_session
 def violation_func():
     """违章页面"""
-    current_user_id = get_platform_session_arg("user_id")
-    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
-    current_real_name = get_platform_session_arg("real_name")
-    """获取基本下属信息,用于身份验证,防止越权查看信息"""
-    key = "base_info_list_{}".format(current_user_id)
-    employees = cache.get(key)  # 从缓存取
-    if employees is None:
-        employees = Employee.subordinates_instance(current_user_id)
-        employees = {
-            x['_id']:
-                         {
-                             "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
-                             x['real_name'],
-                             "employee_number": x.get('employee_number', '')
-                         }
-            for x in employees}
-        if current_user_id not in employees:
-            employees[current_user_id] = current_real_name  # 包含自己
-        cache.set(key, employees, timeout=15 * 60)
 
-    if request.method.lower() == "get":
-        """返回页面"""
-        a_url = "violation?"  # 待拼接url地址,这里是相对地址
-        user_id = get_arg(request, "user_id", None)
-        if user_id is not None and user_id != "":
-            a_url += "user_id={}".format(user_id)
-        city = get_arg(request, "city", None)
-        if city is not None and city != "":
-            if a_url.endswith("?"):
-                a_url += "city={}".format(city)
-            else:
-                a_url += "&city={}".format(city)
-        plate_number = get_arg(request, "plate_number", None)
-        if plate_number is not None and plate_number != "":
-            if a_url.endswith("?"):
-                a_url += "plate_number={}".format(plate_number)
-            else:
-                a_url += "&plate_number={}".format(plate_number)
-        vio_status = get_arg(request, "vio_status", None)
-        ms = "vio_status={}".format(vio_status)
-        try:
-            vio_status = int(vio_status)
-        except ValueError as e:
-            logger.exception(ms)
-            print(e)
-        except TypeError as e:
-            logger.exception(ms)
-            print(e)
-        except Exception as e:
-            logger.exception(ms)
-            print(e)
-        finally:
-            vio_status = None if not isinstance(vio_status, int) else vio_status
-        if vio_status is not None and vio_status != "":
-            if a_url.endswith("?"):
-                a_url += "vio_status={}".format(vio_status)
-            else:
-                a_url += "&vio_status={}".format(vio_status)
-        fine = get_arg(request, "fine", None)
-        if fine is not None and fine != "":
-            if a_url.endswith("?"):
-                a_url += "fine={}".format(fine)
-            else:
-                a_url += "&fine={}".format(fine)
-        end_date_str = get_arg(request, "end_date", None)
-        end_date = get_datetime_from_str(end_date_str)
-        if end_date is None:
-            end_date = datetime.datetime.now()
-        else:
-            if a_url.endswith("?"):
-                a_url += "end_date={}".format(end_date_str)
-            else:
-                a_url += "&end_date={}".format(end_date_str)
-        begin_date_str = get_arg(request, "begin_date", None)
-        begin_date = get_datetime_from_str(begin_date_str)
-        if begin_date is None or (begin_date - end_date).total_seconds() >= 0:
-            begin_date = end_date - datetime.timedelta(days=1365)
-        else:
-            if a_url.endswith("?"):
-                a_url += "begin_date={}".format(begin_date_str)
-            else:
-                a_url += "&begin_date={}".format(begin_date_str)
-        num = get_arg(request, "num", None)
-        if num is not None and num != "":
-            ms = "num={}".format(num)
+    head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
+    """获取基本下属信息,用于身份验证,防止越权查看信息"""
+    company_id = get_platform_session_arg("company_id")
+    if company_id is None:
+        return abort(404, "company_id is none")
+    else:
+        employees = Company.all_employee(company_id=company_id, can_json=True)
+        if employees is not None:
+            employees = {
+                x['_id']:
+                             {
+                                 "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
+                                 x['real_name'],
+                                 "employee_number": x.get('employee_number', '')
+                             }
+                for x in employees}
+
+        if request.method.lower() == "get":
+            """返回页面"""
+            a_url = "violation?"  # 待拼接url地址,这里是相对地址
+            user_id = get_arg(request, "user_id", None)
+            if user_id is not None and user_id != "":
+                a_url += "user_id={}".format(user_id)
+            city = get_arg(request, "city", None)
+            if city is not None and city != "":
+                if a_url.endswith("?"):
+                    a_url += "city={}".format(city)
+                else:
+                    a_url += "&city={}".format(city)
+            plate_number = get_arg(request, "plate_number", None)
+            if plate_number is not None and plate_number != "":
+                if a_url.endswith("?"):
+                    a_url += "plate_number={}".format(plate_number)
+                else:
+                    a_url += "&plate_number={}".format(plate_number)
+            vio_status = get_arg(request, "vio_status", None)  # vio_status is None  查询所有类型的违章记录
+            ms = "vio_status={}".format(vio_status)
             try:
-                num = int(num)
+                vio_status = int(vio_status)
             except ValueError as e:
                 logger.exception(ms)
                 print(e)
@@ -822,363 +793,363 @@ def violation_func():
                 logger.exception(ms)
                 print(e)
             finally:
-                num = 8 if not isinstance(num, int) else num
-
-            if a_url.endswith("?"):
-                a_url += "num={}".format(num)
+                vio_status = None if not isinstance(vio_status, int) else vio_status
+            if vio_status is not None and vio_status != "":
+                if a_url.endswith("?"):
+                    a_url += "vio_status={}".format(vio_status)
+                else:
+                    a_url += "&vio_status={}".format(vio_status)
+            fine = get_arg(request, "fine", None)
+            if fine is not None and fine != "":
+                if a_url.endswith("?"):
+                    a_url += "fine={}".format(fine)
+                else:
+                    a_url += "&fine={}".format(fine)
+            end_date_str = get_arg(request, "end_date", None)
+            end_date = get_datetime_from_str(end_date_str)
+            if end_date is None:
+                end_date = datetime.datetime.now()
             else:
-                a_url += "&num={}".format(num)
-        else:
-            num = 8
-        cur_index = get_arg(request, "cur_index", 1)
-        ms = "cur_index={}".format(cur_index)
-        try:
-            cur_index = int(cur_index)
-        except ValueError as e:
-            logger.exception(ms)
-            print(e)
-        except TypeError as e:
-            logger.exception(ms)
-            print(e)
-        except Exception as e:
-            logger.exception(ms)
-            print(e)
-        finally:
-            cur_index = 1 if not isinstance(cur_index, int) else cur_index
-        if a_url.endswith("?"):
-            a_url += "cur_index={}"
-        else:
-            a_url += "&cur_index={}"
-        vio_list = list()
-        vio_count = 0
-        if user_id is not None and user_id not in employees:
-            """待查看用户不在权限范围内"""
-            pass
-        else:
-            args = {
-                "user_id": user_id,
-                "city": city,
-                "plate_number": plate_number,
-                "vio_status": vio_status,
-                "fine": fine,
-                "end_date": end_date,
-                "begin_date": begin_date,
-                "index": cur_index,
-                "num": num
-            }
-            data = ViolationRecode.page(**args)
-            vio_list = data['data']
-            vio_count = data['count']  # 违章条数
+                if a_url.endswith("?"):
+                    a_url += "end_date={}".format(end_date_str)
+                else:
+                    a_url += "&end_date={}".format(end_date_str)
+            begin_date_str = get_arg(request, "begin_date", None)
+            begin_date = get_datetime_from_str(begin_date_str)
+            if begin_date is None or (begin_date - end_date).total_seconds() >= 0:
+                begin_date = end_date - datetime.timedelta(days=1365)
+            else:
+                if a_url.endswith("?"):
+                    a_url += "begin_date={}".format(begin_date_str)
+                else:
+                    a_url += "&begin_date={}".format(begin_date_str)
+            num = get_arg(request, "num", None)
+            if num is not None and num != "":
+                ms = "num={}".format(num)
+                try:
+                    num = int(num)
+                except ValueError as e:
+                    logger.exception(ms)
+                    print(e)
+                except TypeError as e:
+                    logger.exception(ms)
+                    print(e)
+                except Exception as e:
+                    logger.exception(ms)
+                    print(e)
+                finally:
+                    num = 8 if not isinstance(num, int) else num
 
-        """处理分页"""
-        page_count = math.ceil(vio_count / num)  # 共计多少页?
-        """确认分页范围"""
-        min_index = cur_index - 2
-        min_index = 1 if min_index < 1 else min_index
-        max_index = cur_index + 2
-        max_index = page_count if max_index > page_count else max_index
-        index_list = [{"page_num": x, "page_url": a_url.format(x)} for x in list(range(min_index, max_index + 1))]
-        prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
-        next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
-        cur_page_url = a_url.format(cur_index)
-        """违章状态字典"""
-        vio_dict = {"1": "未处理", "2": "处理中", "3": "已处理", "4": "不支持"}
-        return render_template("manage/violation_light.html", drivers=employees, pages=index_list,
-                               page_count=page_count, vio_list=vio_list, vio_count=vio_count, head_img_url=head_img_url,
-                               prev_page_url=prev_page_url, next_page_url=next_page_url, real_name=current_real_name,
-                               cur_page_url=cur_page_url, vio_status=vio_status, vio_dict=vio_dict)
-        pass
-    elif request.method.lower() == "post":
-        """各种接口"""
-        mes = {"message": "success"}
-        the_type = get_arg(request, "the_type")
-        if the_type == "update_user_id":
-            """修改违章记录所有人"""
-            vio_id = get_arg(request, "vio_id")
-            user_id = get_arg(request, "user_id")
-            filter_dict = {"_id": ObjectId(vio_id)}
-            update_dict = {"$set": {"user_id": ObjectId(user_id)}}
-            ViolationRecode.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
-            return json.dumps(mes)
+                if a_url.endswith("?"):
+                    a_url += "num={}".format(num)
+                else:
+                    a_url += "&num={}".format(num)
+            else:
+                num = 8
+            cur_index = get_arg(request, "cur_index", 1)
+            ms = "cur_index={}".format(cur_index)
+            try:
+                cur_index = int(cur_index)
+            except ValueError as e:
+                logger.exception(ms)
+                print(e)
+            except TypeError as e:
+                logger.exception(ms)
+                print(e)
+            except Exception as e:
+                logger.exception(ms)
+                print(e)
+            finally:
+                cur_index = 1 if not isinstance(cur_index, int) else cur_index
+            if a_url.endswith("?"):
+                a_url += "cur_index={}"
+            else:
+                a_url += "&cur_index={}"
+            vio_list = list()
+            vio_count = 0
+            if user_id is not None and user_id not in employees:
+                """待查看用户不在权限范围内"""
+                pass
+            else:
+                args = {
+                    "user_id": user_id,
+                    "city": city,
+                    "plate_number": plate_number,
+                    "vio_status": vio_status,
+                    "fine": fine,
+                    "end_date": end_date,
+                    "begin_date": begin_date,
+                    "index": cur_index,
+                    "num": num
+                }
+                data = ViolationRecode.page(**args)
+                vio_list = data['data']
+                vio_count = data['count']  # 违章条数
+
+            """处理分页"""
+            page_count = math.ceil(vio_count / num)  # 共计多少页?
+            """确认分页范围"""
+            min_index = cur_index - 2
+            min_index = 1 if min_index < 1 else min_index
+            max_index = cur_index + 2
+            max_index = page_count if max_index > page_count else max_index
+            index_list = [{"page_num": x, "page_url": a_url.format(x)} for x in list(range(min_index, max_index + 1))]
+            prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
+            next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
+            cur_page_url = a_url.format(cur_index)
+            """违章状态字典"""
+            vio_dict = {"1": "未处理", "2": "处理中", "3": "已处理", "4": "不支持"}
+            return render_template("manage/violation_light.html", drivers=employees, pages=index_list,
+                                   page_count=page_count, vio_list=vio_list, vio_count=vio_count,
+                                   head_img_url=head_img_url, prev_page_url=prev_page_url, next_page_url=next_page_url,
+                                   cur_page_url=cur_page_url, vio_status=vio_status, vio_dict=vio_dict)
+            pass
+        elif request.method.lower() == "post":
+            """各种接口"""
+            mes = {"message": "success"}
+            the_type = get_arg(request, "the_type")
+            if the_type == "update_user_id":
+                """修改违章记录所有人"""
+                vio_id = get_arg(request, "vio_id")
+                user_id = get_arg(request, "user_id")
+                filter_dict = {"_id": ObjectId(vio_id)}
+                update_dict = {"$set": {"user_id": ObjectId(user_id)}}
+                ViolationRecode.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
+                return json.dumps(mes)
+            else:
+                return abort(403, "不支持的操作")
         else:
-            return abort(403, "不支持的操作")
-    else:
-        return abort(405, "不支持的操作")
+            return abort(405, "不支持的操作")
 
 
 @manage_blueprint.route("/warning", methods=["get", "post"])
 @check_platform_session
 def warning_func():
     """预警记录页面"""
-    current_user_id = get_platform_session_arg("user_id")
     head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
-    current_real_name = get_platform_session_arg("real_name")
     """获取基本下属信息,用于身份验证,防止越权查看信息"""
-    key = "base_info_list_{}".format(current_user_id)
-    employees = cache.get(key)  # 从缓存取
-    if employees is None:
-        employees = Employee.subordinates_instance(current_user_id)
-        employees = {
-            x['_id']:
-                         {
-                             "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
-                             x['real_name'],
-                             "employee_number": x.get('employee_number', '')
-                         }
-            for x in employees}
-        if current_user_id not in employees:
-            employees[current_user_id] = current_real_name  # 包含自己
-        cache.set(key, employees, timeout=15 * 60)
-
-    if request.method.lower() == "get":
-        """返回页面"""
-        a_url = "warning?"  # 待拼接url地址,这里是相对地址
-        user_id = get_arg(request, "user_id", None)
-        if user_id is not None and user_id != "":
-            a_url += "user_id={}".format(user_id)
-        tip_status = get_arg(request, "tip_status", None)
-        ms = "tip_status={}".format(tip_status)
-        if tip_status is not None:
-            try:
-                tip_status = int(tip_status)
-            except ValueError as e:
-                logger.exception(ms)
-                print(e)
-            except TypeError as e:
-                logger.exception(ms)
-                print(e)
-            except Exception as e:
-                logger.exception(ms)
-                print(e)
-            finally:
-                tip_status = None if not isinstance(tip_status, int) else tip_status
-        else:
-            pass
-        if tip_status is not None and tip_status != "":
-            if a_url.endswith("?"):
-                a_url += "tip_status={}".format(tip_status)
-            else:
-                a_url += "&tip_status={}".format(tip_status)
-        types_str = get_arg(request, "event_type", None)  # 预警类型列表
-        event_type = None
-        if types_str is not None and types_str != "":
-            if a_url.endswith("?"):
-                a_url += "event_type={}".format(types_str)
-            else:
-                a_url += "&event_type={}".format(types_str)
-            event_type = json.loads(types_str)
-        else:
-            pass
-        active_tip_str = get_arg(request, "active_tip", None)  # 主动提醒列表
-        active_tip = None
-        if types_str is not None and types_str != "":
-            if a_url.endswith("?"):
-                a_url += "active_tip={}".format(active_tip_str)
-            else:
-                a_url += "&active_tip={}".format(active_tip_str)
-            active_tip = json.loads(active_tip_str)
-        else:
-            pass
-        end_date_str = get_arg(request, "end_date", None)
-        end_date = get_datetime_from_str(end_date_str)
-        if end_date is None:
-            end_date = datetime.datetime.now()
-        else:
-            if a_url.endswith("?"):
-                a_url += "end_date={}".format(end_date_str)
-            else:
-                a_url += "&end_date={}".format(end_date_str)
-        begin_date_str = get_arg(request, "begin_date", None)
-        begin_date = get_datetime_from_str(begin_date_str)
-        if begin_date is None or (begin_date - end_date).total_seconds() >= 0:
-            begin_date = end_date - datetime.timedelta(days=1365)
-        else:
-            if a_url.endswith("?"):
-                a_url += "begin_date={}".format(begin_date_str)
-            else:
-                a_url += "&begin_date={}".format(begin_date_str)
-        num = get_arg(request, "num", None)
-        if num is not None and num != "":
-            ms = "num={}".format(num)
-            try:
-                num = int(num)
-            except ValueError as e:
-                logger.exception(ms)
-                print(e)
-            except TypeError as e:
-                logger.exception(ms)
-                print(e)
-            except Exception as e:
-                logger.exception(ms)
-                print(e)
-            finally:
-                num = 8 if not isinstance(num, int) else num
-
-            if a_url.endswith("?"):
-                a_url += "num={}".format(num)
-            else:
-                a_url += "&num={}".format(num)
-        else:
-            num = 8
-        cur_index = get_arg(request, "cur_index", 1)
-        ms = "cur_index={}".format(cur_index)
-        try:
-            cur_index = int(cur_index)
-        except ValueError as e:
-            logger.exception(ms)
-            print(e)
-        except TypeError as e:
-            logger.exception(ms)
-            print(e)
-        except Exception as e:
-            logger.exception(ms)
-            print(e)
-        finally:
-            cur_index = 1 if not isinstance(cur_index, int) else cur_index
-        if a_url.endswith("?"):
-            a_url += "cur_index={}"
-        else:
-            a_url += "&cur_index={}"
-        event_list = list()
-        event_count = 0
-        if user_id is not None and user_id not in employees:
-            """待查看用户不在权限范围内"""
-            pass
-        else:
-            args = {
-                "user_id": user_id,
-                "tip_status": tip_status,
-                "event_type": event_type,
-                "end_date": end_date,
-                "begin_date": begin_date,
-                "index": cur_index,
-                "num": num
-            }
-            data = security_module.DrivingEvent.page(**args)
-            event_list = data['data']
-            event_count = data['count']  # 违章条数
-
-        """处理分页"""
-        page_count = math.ceil(event_count / num)  # 共计多少页?
-        """确认分页范围"""
-        min_index = cur_index - 2
-        min_index = 1 if min_index < 1 else min_index
-        max_index = cur_index + 2
-        max_index = page_count if max_index > page_count else max_index
-        index_list = [{"page_num": x, "page_url": a_url.format(x)} for x in list(range(min_index, max_index + 1))]
-        prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
-        next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
-        cur_page_url = a_url.format(cur_index)
-        """违章状态字典"""
-        return render_template("manage/warning_light.html", drivers=employees, pages=index_list, active_tip=active_tip,
-                               page_count=page_count, event_list=event_list, event_count=event_count,
-                               prev_page_url=prev_page_url, next_page_url=next_page_url, real_name=current_real_name,
-                               cur_page_url=cur_page_url, head_img_url=head_img_url)
-
-    elif request.method.lower() == "post":
-        """各种接口"""
-        mes = {"message": "success"}
-        the_type = get_arg(request, "the_type")
-        if the_type == "change_tip_status":
-            """更改提醒状态"""
-            event_ids = get_arg(request, "event_id")
-            event_ids = json.loads(event_ids)
-            event_ids = [ObjectId(x) for x in event_ids]
-            filter_dict = {"_id": {"$in": event_ids}}
-            update_dict = {"$set": {"tip_status": 1}}
-            res = security_module.DrivingEvent.update_many_plus(filter_dict=filter_dict, update_dict=update_dict)
-            return json.dumps(mes)
-        else:
-            return abort(403, "不支持的操作")
+    company_id = get_platform_session_arg("company_id")
+    if company_id is None:
+        return abort(404, "company_id is none")
     else:
-        return abort(405, "不支持的操作")
+        employees = Company.all_employee(company_id=company_id, can_json=True)
+        if employees is not None:
+            employees = {
+                x['_id']:
+                    {
+                        "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
+                        x['real_name'],
+                        "employee_number": x.get('employee_number', '')
+                    }
+                for x in employees}
+
+        if request.method.lower() == "get":
+            """返回页面"""
+            a_url = "warning?"  # 待拼接url地址,这里是相对地址
+            user_id = get_arg(request, "user_id", None)
+            if user_id is not None and user_id != "":
+                a_url += "user_id={}".format(user_id)
+            tip_status = get_arg(request, "tip_status", None)
+            ms = "tip_status={}".format(tip_status)
+            if tip_status is not None:
+                try:
+                    tip_status = int(tip_status)
+                except ValueError as e:
+                    logger.exception(ms)
+                    print(e)
+                except TypeError as e:
+                    logger.exception(ms)
+                    print(e)
+                except Exception as e:
+                    logger.exception(ms)
+                    print(e)
+                finally:
+                    tip_status = None if not isinstance(tip_status, int) else tip_status
+            else:
+                pass
+            if tip_status is not None and tip_status != "":
+                if a_url.endswith("?"):
+                    a_url += "tip_status={}".format(tip_status)
+                else:
+                    a_url += "&tip_status={}".format(tip_status)
+            types_str = get_arg(request, "event_type", None)  # 预警类型列表
+            event_type = None
+            if types_str is not None and types_str != "":
+                if a_url.endswith("?"):
+                    a_url += "event_type={}".format(types_str)
+                else:
+                    a_url += "&event_type={}".format(types_str)
+                event_type = json.loads(types_str)
+            else:
+                pass
+            active_tip_str = get_arg(request, "active_tip", None)  # 主动提醒列表
+            active_tip = None
+            if types_str is not None and types_str != "":
+                if a_url.endswith("?"):
+                    a_url += "active_tip={}".format(active_tip_str)
+                else:
+                    a_url += "&active_tip={}".format(active_tip_str)
+                active_tip = json.loads(active_tip_str)
+            else:
+                pass
+            end_date_str = get_arg(request, "end_date", None)
+            end_date = get_datetime_from_str(end_date_str)
+            if end_date is None:
+                end_date = datetime.datetime.now()
+            else:
+                if a_url.endswith("?"):
+                    a_url += "end_date={}".format(end_date_str)
+                else:
+                    a_url += "&end_date={}".format(end_date_str)
+            begin_date_str = get_arg(request, "begin_date", None)
+            begin_date = get_datetime_from_str(begin_date_str)
+            if begin_date is None or (begin_date - end_date).total_seconds() >= 0:
+                begin_date = end_date - datetime.timedelta(days=1365)
+            else:
+                if a_url.endswith("?"):
+                    a_url += "begin_date={}".format(begin_date_str)
+                else:
+                    a_url += "&begin_date={}".format(begin_date_str)
+            num = get_arg(request, "num", None)
+            if num is not None and num != "":
+                ms = "num={}".format(num)
+                try:
+                    num = int(num)
+                except ValueError as e:
+                    logger.exception(ms)
+                    print(e)
+                except TypeError as e:
+                    logger.exception(ms)
+                    print(e)
+                except Exception as e:
+                    logger.exception(ms)
+                    print(e)
+                finally:
+                    num = 8 if not isinstance(num, int) else num
+
+                if a_url.endswith("?"):
+                    a_url += "num={}".format(num)
+                else:
+                    a_url += "&num={}".format(num)
+            else:
+                num = 8
+            cur_index = get_arg(request, "cur_index", 1)
+            ms = "cur_index={}".format(cur_index)
+            try:
+                cur_index = int(cur_index)
+            except ValueError as e:
+                logger.exception(ms)
+                print(e)
+            except TypeError as e:
+                logger.exception(ms)
+                print(e)
+            except Exception as e:
+                logger.exception(ms)
+                print(e)
+            finally:
+                cur_index = 1 if not isinstance(cur_index, int) else cur_index
+            if a_url.endswith("?"):
+                a_url += "cur_index={}"
+            else:
+                a_url += "&cur_index={}"
+            event_list = list()
+            event_count = 0
+            if user_id is not None and user_id not in employees:
+                """待查看用户不在权限范围内"""
+                pass
+            else:
+                args = {
+                    "user_id": user_id,
+                    "tip_status": tip_status,
+                    "event_type": event_type,
+                    "end_date": end_date,
+                    "begin_date": begin_date,
+                    "index": cur_index,
+                    "num": num
+                }
+                data = security_module.DrivingEvent.page(**args)
+                event_list = data['data']
+                event_count = data['count']  # 违章条数
+
+            """处理分页"""
+            page_count = math.ceil(event_count / num)  # 共计多少页?
+            """确认分页范围"""
+            min_index = cur_index - 2
+            min_index = 1 if min_index < 1 else min_index
+            max_index = cur_index + 2
+            max_index = page_count if max_index > page_count else max_index
+            index_list = [{"page_num": x, "page_url": a_url.format(x)} for x in list(range(min_index, max_index + 1))]
+            prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
+            next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
+            cur_page_url = a_url.format(cur_index)
+            """违章状态字典"""
+            return render_template("manage/warning_light.html", drivers=employees, pages=index_list,
+                                   active_tip=active_tip, page_count=page_count, event_list=event_list,
+                                   event_count=event_count, prev_page_url=prev_page_url, next_page_url=next_page_url,
+                                   cur_page_url=cur_page_url, head_img_url=head_img_url)
+
+        elif request.method.lower() == "post":
+            """各种接口"""
+            mes = {"message": "success"}
+            the_type = get_arg(request, "the_type")
+            if the_type == "change_tip_status":
+                """更改提醒状态"""
+                event_ids = get_arg(request, "event_id")
+                event_ids = json.loads(event_ids)
+                event_ids = [ObjectId(x) for x in event_ids]
+                filter_dict = {"_id": {"$in": event_ids}}
+                update_dict = {"$set": {"tip_status": 1}}
+                res = security_module.DrivingEvent.update_many_plus(filter_dict=filter_dict, update_dict=update_dict)
+                return json.dumps(mes)
+            else:
+                return abort(403, "不支持的操作")
+        else:
+            return abort(405, "不支持的操作")
 
 
 @manage_blueprint.route("/accident", methods=["get", "post"])
 @check_platform_session
 def accident_func():
     """事故(历史)页面"""
-    current_user_id = get_platform_session_arg("user_id")
     head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
-    current_real_name = get_platform_session_arg("real_name")
     """获取基本下属信息,用于身份验证,防止越权查看信息"""
-    key = "base_info_list_{}".format(current_user_id)
-    employees = cache.get(key)  # 从缓存取
-    if employees is None:
-        employees = Employee.subordinates_instance(current_user_id)
-        employees = {
-            x['_id']:
-                         {
-                             "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
-                             x['real_name'],
-                             "employee_number": x.get('employee_number', '')
-                         }
-            for x in employees}
-        if current_user_id not in employees:
-            employees[current_user_id] = current_real_name  # 包含自己
-        cache.set(key, employees, timeout=15 * 60)
+    company_id = get_platform_session_arg("company_id")
+    if company_id is None:
+        return abort(404, "company_id is none")
+    else:
+        employees = Company.all_employee(company_id=company_id, can_json=True)
+        if employees is not None:
+            employees = {
+                x['_id']:
+                    {
+                        "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
+                        x['real_name'],
+                        "employee_number": x.get('employee_number', '')
+                    }
+                for x in employees}
 
-    if request.method.lower() == "get":
-        """返回页面"""
-        a_url = "accident?"  # 待拼接url地址,这里是相对地址
-        driver_name = get_arg(request, "driver_name", None)  # 司机名
-        if driver_name is not None and driver_name != "":
-            a_url += "driver_name={}".format(driver_name)
-        city = get_arg(request, "city", None)  # 城市
-        if city is not None and city != "":
-            if a_url.endswith("?"):
-                a_url += "city={}".format(city)
-            else:
-                a_url += "&city={}".format(city)
-        plate_number = get_arg(request, "plate_number", None)  # 车牌
-        if plate_number is not None and plate_number != "":
-            if a_url.endswith("?"):
-                a_url += "plate_number={}".format(plate_number)
-            else:
-                a_url += "&plate_number={}".format(plate_number)
-        status = get_arg(request, "status", None)  # 处理状态
-        ms = "status={}".format(status)
-        try:
-            status = int(status)
-        except ValueError as e:
-            logger.exception(ms)
-            print(e)
-        except TypeError as e:
-            logger.exception(ms)
-            print(e)
-        except Exception as e:
-            logger.exception(ms)
-            print(e)
-        finally:
-            status = None if not isinstance(status, int) else status
-        if status is not None and status != "":
-            if a_url.endswith("?"):
-                a_url += "status={}".format(status)
-            else:
-                a_url += "&status={}".format(status)
-        end_date_str = get_arg(request, "end_date", None)  # 截至时间
-        end_date = get_datetime_from_str(end_date_str)
-        if end_date is None:
-            end_date = datetime.datetime.now()
-        else:
-            if a_url.endswith("?"):
-                a_url += "end_date={}".format(end_date_str)
-            else:
-                a_url += "&end_date={}".format(end_date_str)
-        begin_date_str = get_arg(request, "begin_date", None)  # 开始时间
-        begin_date = get_datetime_from_str(begin_date_str)
-        if begin_date is None or (begin_date - end_date).total_seconds() >= 0:
-            begin_date = end_date - datetime.timedelta(days=1365)
-        else:
-            if a_url.endswith("?"):
-                a_url += "begin_date={}".format(begin_date_str)
-            else:
-                a_url += "&begin_date={}".format(begin_date_str)
-        num = get_arg(request, "num", None)
-        if num is not None and num != "":
-            ms = "num={}".format(num)
+        if request.method.lower() == "get":
+            """返回页面"""
+            a_url = "accident?"  # 待拼接url地址,这里是相对地址
+            driver_name = get_arg(request, "driver_name", None)  # 司机名
+            if driver_name is not None and driver_name != "":
+                a_url += "driver_name={}".format(driver_name)
+            city = get_arg(request, "city", None)  # 城市
+            if city is not None and city != "":
+                if a_url.endswith("?"):
+                    a_url += "city={}".format(city)
+                else:
+                    a_url += "&city={}".format(city)
+            plate_number = get_arg(request, "plate_number", None)  # 车牌
+            if plate_number is not None and plate_number != "":
+                if a_url.endswith("?"):
+                    a_url += "plate_number={}".format(plate_number)
+                else:
+                    a_url += "&plate_number={}".format(plate_number)
+            status = get_arg(request, "status", None)  # 处理状态
+            ms = "status={}".format(status)
             try:
-                num = int(num)
+                status = int(status)
             except ValueError as e:
                 logger.exception(ms)
                 print(e)
@@ -1189,117 +1160,154 @@ def accident_func():
                 logger.exception(ms)
                 print(e)
             finally:
-                num = 8 if not isinstance(num, int) else num
-
-            if a_url.endswith("?"):
-                a_url += "num={}".format(num)
+                status = None if not isinstance(status, int) else status
+            if status is not None and status != "":
+                if a_url.endswith("?"):
+                    a_url += "status={}".format(status)
+                else:
+                    a_url += "&status={}".format(status)
+            end_date_str = get_arg(request, "end_date", None)  # 截至时间
+            end_date = get_datetime_from_str(end_date_str)
+            if end_date is None:
+                end_date = datetime.datetime.now()
             else:
-                a_url += "&num={}".format(num)
-        else:
-            num = 8
-        cur_index = get_arg(request, "cur_index", 1)
-        ms = "cur_index={}".format(cur_index)
-        try:
-            cur_index = int(cur_index)
-        except ValueError as e:
-            logger.exception(ms)
-            print(e)
-        except TypeError as e:
-            logger.exception(ms)
-            print(e)
-        except Exception as e:
-            logger.exception(ms)
-            print(e)
-        finally:
-            cur_index = 1 if not isinstance(cur_index, int) else cur_index
-        if a_url.endswith("?"):
-            a_url += "cur_index={}"
-        else:
-            a_url += "&cur_index={}"
+                if a_url.endswith("?"):
+                    a_url += "end_date={}".format(end_date_str)
+                else:
+                    a_url += "&end_date={}".format(end_date_str)
+            begin_date_str = get_arg(request, "begin_date", None)  # 开始时间
+            begin_date = get_datetime_from_str(begin_date_str)
+            if begin_date is None or (begin_date - end_date).total_seconds() >= 0:
+                begin_date = end_date - datetime.timedelta(days=1365)
+            else:
+                if a_url.endswith("?"):
+                    a_url += "begin_date={}".format(begin_date_str)
+                else:
+                    a_url += "&begin_date={}".format(begin_date_str)
+            num = get_arg(request, "num", None)
+            if num is not None and num != "":
+                ms = "num={}".format(num)
+                try:
+                    num = int(num)
+                except ValueError as e:
+                    logger.exception(ms)
+                    print(e)
+                except TypeError as e:
+                    logger.exception(ms)
+                    print(e)
+                except Exception as e:
+                    logger.exception(ms)
+                    print(e)
+                finally:
+                    num = 8 if not isinstance(num, int) else num
 
-        args = {
-                "driver_name": driver_name,
-                "city": city,
-                "plate_number": plate_number,
-                "status": status,
-                "end_date": end_date,
-                "begin_date": begin_date,
-                "index": cur_index,
-                "num": num
-            }
-        data = security_module.Accident.page(**args)
-        acc_list = data['data']
-        acc_count = data['count']  # 违章条数
+                if a_url.endswith("?"):
+                    a_url += "num={}".format(num)
+                else:
+                    a_url += "&num={}".format(num)
+            else:
+                num = 8
+            cur_index = get_arg(request, "cur_index", 1)
+            ms = "cur_index={}".format(cur_index)
+            try:
+                cur_index = int(cur_index)
+            except ValueError as e:
+                logger.exception(ms)
+                print(e)
+            except TypeError as e:
+                logger.exception(ms)
+                print(e)
+            except Exception as e:
+                logger.exception(ms)
+                print(e)
+            finally:
+                cur_index = 1 if not isinstance(cur_index, int) else cur_index
+            if a_url.endswith("?"):
+                a_url += "cur_index={}"
+            else:
+                a_url += "&cur_index={}"
 
-        """处理分页"""
-        page_count = math.ceil(acc_count / num)  # 共计多少页?
-        """确认分页范围"""
-        min_index = cur_index - 2
-        min_index = 1 if min_index < 1 else min_index
-        max_index = cur_index + 2
-        max_index = page_count if max_index > page_count else max_index
-        index_list = [{"page_num": x, "page_url": a_url.format(x)} for x in list(range(min_index, max_index + 1))]
-        prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
-        next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
-        cur_page_url = a_url.format(cur_index)
-        """事故处理状态字典"""
-        acc_dict = {"0": "未处理", "1": "已处理"}
-        return render_template("manage/accident_light.html", drivers=employees, pages=index_list,
-                               page_count=page_count, acc_list=acc_list, acc_count=acc_count, head_img_url=head_img_url,
-                               prev_page_url=prev_page_url, next_page_url=next_page_url, real_name=current_real_name,
-                               cur_page_url=cur_page_url, status=status, acc_dict=acc_dict)
-        pass
-    elif request.method.lower() == "post":
-        """各种接口"""
-        return abort(403, "不支持的操作")
-    else:
-        return abort(405, "不支持的操作")
+            args = {
+                    "driver_name": driver_name,
+                    "city": city,
+                    "plate_number": plate_number,
+                    "status": status,
+                    "end_date": end_date,
+                    "begin_date": begin_date,
+                    "index": cur_index,
+                    "num": num
+                }
+            data = security_module.Accident.page(**args)
+            acc_list = data['data']
+            acc_count = data['count']  # 违章条数
+
+            """处理分页"""
+            page_count = math.ceil(acc_count / num)  # 共计多少页?
+            """确认分页范围"""
+            min_index = cur_index - 2
+            min_index = 1 if min_index < 1 else min_index
+            max_index = cur_index + 2
+            max_index = page_count if max_index > page_count else max_index
+            index_list = [{"page_num": x, "page_url": a_url.format(x)} for x in list(range(min_index, max_index + 1))]
+            prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
+            next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
+            cur_page_url = a_url.format(cur_index)
+            """事故处理状态字典"""
+            acc_dict = {"0": "未处理", "1": "已处理"}
+            return render_template("manage/accident_light.html", drivers=employees, pages=index_list,
+                                   page_count=page_count, acc_list=acc_list, acc_count=acc_count,
+                                   head_img_url=head_img_url,
+                                   prev_page_url=prev_page_url, next_page_url=next_page_url,
+                                   cur_page_url=cur_page_url, status=status, acc_dict=acc_dict)
+            pass
+        elif request.method.lower() == "post":
+            """各种接口"""
+            return abort(403, "不支持的操作")
+        else:
+            return abort(405, "不支持的操作")
 
 
 @manage_blueprint.route("/<prefix>_accident", methods=["get", "post"])
 @check_platform_session
 def process_accident_func(prefix):
     """对事故信息的添加,修改,删除"""
-    current_user_id = get_platform_session_arg("user_id")
     head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
-    current_real_name = get_platform_session_arg("real_name")
     """获取基本下属信息,用于身份验证,防止越权查看信息"""
-    key = "base_info_list_{}".format(current_user_id)
-    employees = cache.get(key)  # 从缓存取
-    if employees is None:
-        employees = Employee.subordinates_instance(current_user_id)
-        employees = {
-            x['_id']:
-                {
-                    "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
-                    x['real_name'],
-                    "employee_number": x.get('employee_number', '')
-                }
-            for x in employees}
-        if current_user_id not in employees:
-            employees[current_user_id] = current_real_name  # 包含自己
-        cache.set(key, employees, timeout=15 * 60)
-
-    if prefix == "update":
-        """编辑事故信息的页面或者接口"""
-        if request.method.lower() == "get":
-            """返回编辑/新增事故信息的页面"""
-            acc_id = get_arg(request, "acc_id", None)
-            accident = dict()
-            if acc_id is None:
-                """新增事故信息"""
-                pass
-            else:
-                accident = security_module.Accident.find_by_id(acc_id)
-                if isinstance(accident, security_module.Accident):
-                    accident = accident.to_flat_dict()
-                else:
-                    pass
-            acc_type = ["追尾碰撞", "双车刮蹭", "部件失效", "车辆倾覆"]
-            return render_template("manage/update_accident_light.html", accident=accident, acc_type=acc_type,
-                                   head_img_url=head_img_url, real_name=current_real_name)
+    company_id = get_platform_session_arg("company_id")
+    if company_id is None:
+        return abort(404, "company_id is none")
     else:
-        return abort(404, "页面不存在")
+        employees = Company.all_employee(company_id=company_id, can_json=True)
+        if employees is not None:
+            employees = {
+                x['_id']:
+                    {
+                        "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
+                        x['real_name'],
+                        "employee_number": x.get('employee_number', '')
+                    }
+                for x in employees}
+
+        if prefix == "update":
+            """编辑事故信息的页面或者接口"""
+            if request.method.lower() == "get":
+                """返回编辑/新增事故信息的页面"""
+                acc_id = get_arg(request, "acc_id", None)
+                accident = dict()
+                if acc_id is None:
+                    """新增事故信息"""
+                    pass
+                else:
+                    accident = security_module.Accident.find_by_id(acc_id)
+                    if isinstance(accident, security_module.Accident):
+                        accident = accident.to_flat_dict()
+                    else:
+                        pass
+                acc_type = ["追尾碰撞", "双车刮蹭", "部件失效", "车辆倾覆"]
+                return render_template("manage/update_accident_light.html", accident=accident, acc_type=acc_type,
+                                       head_img_url=head_img_url)
+        else:
+            return abort(404, "页面不存在")
 
 
 @manage_blueprint.route("/<prefix>_structure", methods=["get", "post"])
