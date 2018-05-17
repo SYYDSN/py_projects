@@ -23,7 +23,6 @@ from selenium.webdriver import FirefoxOptions
 from selenium.webdriver import Firefox
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver import Chrome
-from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.select import By
 from pyquery import PyQuery
@@ -229,18 +228,34 @@ type_dict = {"buy": 0, "sell": 1, "balance": 6, "credit": 7}
 #            'Host': 'office.shengfxchina.com:8443',
 #            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
 #                          ' (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 Edge/15.15063'}
-user_name = "xx627265614@tom.com"
-user_password = "XD123456"
-login_url = "http://user.shengfxchina.com/v2.0/common/login.html"
-domain = "user.shengfxchina.com"
-url_dict = {
-    "出金申请": "http://user.shengfxchina.com/v2.0/common/index.html#http://"
-            "user.shengfxchina.com/v2.0/admin/finance_waiting.html",
-    "入金信息": "http://user.shengfxchina.com/v2.0/common/index.html#http://"
-            "user.shengfxchina.com/v2.0/admin/finance_index.html",
-    "开户申请": "http://user.shengfxchina.com/v2.0/common/index.html#http://"
-            "user.shengfxchina.com/v2.0/admin/user_index.html"
-}
+user_name1 = "849607604@qq.com"
+user_password1 = "Kai3349665"
+login_url1 = "http://office.shengfx888.com"
+check_login_url1 = "http://office.shengfx888.com/Public/checkLogin"
+domain1 = "office.shengfx888.com"
+page_url_base1 = "http://office.shengfx888.com/report/history_trade?" \
+                "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=" \
+                "&PROFIT_e=&qtype=&CMD=&closetime=&OPEN_TIME_s=" \
+                "&OPEN_TIME_e=&CLOSE_TIME_s=&CLOSE_TIME_e=&T_LOGIN="
+__page_url_base1 = "http://office.shengfx888.com/report/history_trade?" \
+                "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=" \
+                "&PROFIT_e=&qtype=&CMD={}&closetime=&OPEN_TIME_s=" \
+                "&OPEN_TIME_e=&CLOSE_TIME_s=&CLOSE_TIME_e=&T_LOGIN=&page={}"
+user_name2 = "627853018@qq.com"
+user_password2 = "XIAOxiao@741"
+login_url2 = "https://office.shengfxchina.com:8443/Public/login"
+check_login_url2 = "https://office.shengfxchina.com:8443/Public/checkLogin"
+domain2 = "office.shengfxchina.com:8443"
+page_url_base2 = "https://office.shengfxchina.com:8443/report/history_trade?" \
+                 "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=&qtype=" \
+                 "&CMD=&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=" \
+                 "&CLOSE_TIME_e=&comm_type=&T_LOGIN="
+__page_url_base2 = "https://office.shengfxchina.com:8443/report/history_trade?" \
+                 "username=&datascope=&LOGIN=&TICKET=&PROFIT_s=&PROFIT_e=&qtype=" \
+                 "&CMD={}&closetime=&OPEN_TIME_s=&OPEN_TIME_e=&CLOSE_TIME_s=" \
+                 "&CLOSE_TIME_e=&comm_type=&T_LOGIN=&page={}"
+withdraw_url_base2 = "https://office.shengfxchina.com:8443/deposit/waitin?" \
+                     "layout=yes&weburlredect=1&page={}"  # 2号平台,出金申请
 
 
 def month_str(month_int: int) -> str:
@@ -322,9 +337,135 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
     return browser
 
 
+def upload_and_update_reg(browser, **kwargs) -> bool:
+    """
+    推广页面的注册用户数据传送数据到简道云
+    :param browser:
+    :param kwargs:
+    :return:
+    """
+    ms = "开始向简道云推广资源表单写数据,参数: {}".format(kwargs)
+    logger.info(ms)
+
+    """
+    注意，pyvirtualdisplay需要xvfb支持。安装方法：sudo apt-get install xvfb
+    下载火狐的geckodriver驱动。(当前文件夹下已经有一个了)地址是：
+    https://github.com/mozilla/geckodriver/releases
+    下载后解压是一个geckodriver 文件。拷贝到/usr/local/bin目录下，然后加上可执行的权限
+    sudo chmod +x /usr/local/bin/geckodriver
+    """
+    wait = WebDriverWait(browser, 10)
+
+    url_1 = "https://www.jiandaoyun.com/f/5a658cbc7b87e86216236cb3"
+    browser.get(url=url_1)  # 打开页面
+
+    # 密码输入按钮
+    input_password = wait.until(
+        ec.presence_of_element_located((By.CSS_SELECTOR, ".x-layout-table input[type='password']")))
+    # 提交按钮
+    submit_password = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".x-layout-table .x-btn span")))
+
+    input_password.send_keys("xundie789")  # 输入密码
+    time.sleep(1)
+    submit_password.click()  # 提交密码
+
+    time.sleep(3)  # 等待是为了给页面时间载入
+    # 时间选择器必须手动
+    click_date = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".fui_datetime .icon-widget-datetime")))
+    click_date.click()  # 弹出日期选择器
+    # 修改时间
+    click_today = wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, ".dt .today")))
+    click_today.click()  # 选今天
+
+    user_name = kwargs.get('user_name')
+    js_name = """let d = $(".widget-wrapper>ul>li:eq(1) input"); d.val("{}");""".format(kwargs.get('user_name'))
+    browser.execute_script(js_name)  # 输入姓名
+
+    js_phone = """let d = $(".widget-wrapper>ul>li:eq(2) input"); d.val("{}");""".format(kwargs.get('phone'))
+    browser.execute_script(js_phone)  # 输入电话
+
+    spread_keywords = SpreadChannel.analysis_url(kwargs.get('page_url'))
+    desc1 = ''
+    try:
+        desc1 = spread_keywords[0]
+    except IndexError as e:
+        logger.exception("to_jiandao_cloud error!")
+        recode(e)
+        raise e
+    except Exception as e:
+        logger.exception("to_jiandao_cloud error!")
+        recode(e)
+        raise e
+    finally:
+        js_desc_1 = """let d = $(".widget-wrapper>ul>li:eq(3) input"); d.val("{}");""".format(desc1)
+        browser.execute_script(js_desc_1)  # 备注1
+
+    desc2 = ''
+    try:
+        desc2 = spread_keywords[1]
+    except IndexError as e:
+        logger.exception(e)
+    except Exception as e:
+        logger.exception(e)
+    finally:
+        js_desc_2 = """let d = $(".widget-wrapper>ul>li:eq(4) input"); d.val("{}");""".format(desc2)
+        browser.execute_script(js_desc_2)  # 备注2
+
+    desc3 = ''
+    try:
+        desc3 = spread_keywords[2]
+    except IndexError as e:
+        recode(e)
+        logger.exception(e)
+    except Exception as e:
+        recode(e)
+        logger.exception(e)
+    finally:
+        js_desc_3 = """let d = $(".widget-wrapper>ul>li:eq(5) input"); d.val("{}");""".format(desc3)
+        browser.execute_script(js_desc_3)  # 备注3
+
+    desc6 = kwargs.get('page_url')
+    desc6 = '' if desc6 is None else desc6
+    js_desc_6 = """let d = $(".widget-wrapper>ul>li:eq(6) input"); d.val("{}");""".format(desc6)
+    browser.execute_script(js_desc_6)  # 页面链接
+
+    desc7 = kwargs.get('description')
+    desc7 = '' if desc7 is None else desc7
+    js_desc_7 = """let d = $(".widget-wrapper>ul>li:eq(7) input"); d.val("{}");""".format(desc7)
+    browser.execute_script(js_desc_7)  # 页面内容
+
+    desc8 = kwargs.get('search_keyword')
+    desc8 = '' if desc8 is None else desc8
+    js_desc_8 = """let d = $(".widget-wrapper>ul>li:eq(9) input"); d.val("{}");""".format(desc8)
+    browser.execute_script(js_desc_8)  # 搜索关键字
+
+    """
+    如果查找器没有定位到dom元素或者页面尚未载入,会报如下的错误.
+    selenium.common.exceptions.WebDriverException: Message: unknown error: cannot focus element
+    """
+    """ec.presence_of_all_elements_located方法可以取一组输入框,然后循环操作"""
+    input_list = wait.until(
+        ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".widget-wrapper>ul>li input")))  # 输入组
+    ms = "简道云推广资源表单胡据填充完毕,准备提交"
+    logger.info(ms)
+    recode(ms)
+    submit_info = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".x-btn span")))  # 提交资料按钮
+    submit_info.click()  # 提交信息
+
+    time.sleep(1)
+
+    # browser.refresh()  # 刷新页面
+
+    time.sleep(10)
+    ms = "向简道云推广资源表单写数据成功,参数: {}".format(kwargs)
+    logger.info(ms)
+    recode(ms)
+    return True
+
+
 def get_page_url(domain: str, transaction: str, page_num: int = 1) -> str:
     """
-    获取平台业务网址
+    获取一号/二号平台综合业务网址
     :param domain: 基础网址
     :param transaction: 交易类型， buy/sell/balance/credit
     :param page_num:
@@ -338,61 +479,67 @@ def get_page_url(domain: str, transaction: str, page_num: int = 1) -> str:
     return r
 
 
-def login_platform(browser, url: str):
+def login_platform(browser, domain: str):
     """
-    登录平台
+    登录一号/二号平台
     :param browser:
-    :param url:
+    :param domain:
     :return:requests.Session
     """
+    if domain == domain1:
+        url = login_url1
+        user_name = user_name1
+        user_password = user_password1
+
+    else:
+        url = login_url2
+        user_name = user_name2
+        user_password = user_password2
+
     browser.get(url=url)
     # recode("html= {}".format(browser.page_source))
     # 用户名输入
-    select_email = WebDriverWait(browser, 10).until(ec.presence_of_element_located((By.CLASS_NAME, "tab_emial")))
-    select_email.click()
     input_user_name = WebDriverWait(browser, 10).until(
-        ec.presence_of_element_located((By.CSS_SELECTOR, "#account")))
+        ec.presence_of_element_located((By.CSS_SELECTOR, "form .uname")))
     input_user_name.send_keys(user_name)  # 输入用户名
     # 用户密码输入
     input_user_password = WebDriverWait(browser, 10).until(
-        ec.presence_of_element_located((By.CSS_SELECTOR, "#password")))
+        ec.presence_of_element_located((By.CSS_SELECTOR, "form .pword")))
     input_user_password.send_keys(user_password)  # 输入用户密码
     # 点击登录按钮
     button_login = WebDriverWait(browser, 10).until(
-        ec.presence_of_element_located((By.CSS_SELECTOR, ".login_content .btn_login")))
+        ec.presence_of_element_located((By.ID, "loginbtn")))  # 注意,这里用的不是css选择器而是id选择器
     button_login.click()  # 登录
-    logo = None
-    try:
-        logo = WebDriverWait(browser, 10).until(ec.presence_of_element_located((By.ID, "a_hrefto_domain")))
-    except TimeoutException as e:
-        title = "login_platform 后台登录失败.{}".format(datetime.datetime.now())
-        send_mail(title=title)
-        raise e
-    finally:
-        if isinstance(logo, FirefoxWebElement):
-            del logo
-            return True
+
+    time.sleep(10)
+    return True
 
 
 def need_login_platform(browser) -> bool:
     """
-    平台是否需要登录？
+    一号/二号平台是否需要登录？
     :param browser:
     :return: True需要登录，False，不需要登录
     """
-    if browser.current_url.startswith(login_url):
+    if browser.current_url.startswith("http://office.shengfx888.com/Public/login?") or \
+            browser.current_url.startswith("https://office.shengfxchina.com:8443/Public/login"):
         return True
     else:
         return False
 
 
-def open_platform(browser, url: str) -> bool:
+def open_platform(browser, domain: str) -> bool:
     """
     打开一号/二号平台站点,如果已经登录,返回True,否则尝试重新login,三次失败后,返回False
     :param browser:
-    :param url:
+    :param domain:
     :return: 布尔值 True开打成功，False，打开失败，请检查程序
     """
+    if domain == domain1:
+        url = page_url_base1
+    else:
+        url = page_url_base2
+
     try:
         browser.get(url)
     except Exception as e:
@@ -408,71 +555,38 @@ def open_platform(browser, url: str) -> bool:
             else:
                 pass
             open_count += 1
-            login_platform(browser=browser, url=url)
+            login_platform(browser=browser, domain=domain)
 
         browser.get(url)
         return not need_login_platform(browser)
 
 
-def click_page_num(browser, page_num: int, selector_str: str = None) -> (None, dict):
+def get_page_platform(browser, page_url: str) -> (PyQuery, None):
     """
-    点击页码事件，会对页面的页码部分进行解析，在点击后返回一个字典
+    获取一页一号/二号平台站点的页面html,包含交易和出金申请,返回页面内容的PQuery对象
     :param browser:
-    :param page_num:
-    :param selector_str: ｃｓｓ选择器的文本，默认是
-    :return: 失败返回Ｎｏｎｅ，否则返回一个字典．字典的内容是：
-    {
-     "cur_num": 5,  # 当前页码
-     "last": False,　　＃　是否是最后一页？
-     "page_source": browser.page_source   # 页面内容
-    }
-    """
-    a_list = WebDriverWait(browser, 10).until(ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".pagelist > a")))
-    for a in a_list:
-        print(a)
-
-def get_page_platform(browser, base_url: str, page_num: int = 1) -> (PyQuery, None):
-    """
-    获取一页平台站点的页面html,包含交易和出金申请,返回页面内容的PQuery对象
-    :param browser:
-    :param base_url: 基础网址
-    :param page_num: 页面网址
+    :param page_url: 页面网址
     :return:
     """
-    cur_url = browser.current_url
-    if cur_url != base_url:
-        """说明是第一次打开此类页面,需要加载页面"""
-        o = open_platform(browser=browser, url=base_url)
-        if o:
-            try:
-                browser.get(base_url)
-            except TimeoutException as e:
-                title = "{} 打开页面失败, url:{}".format(datetime.datetime.now(), base_url)
-                content = "错误原因：{}".format(str(e))
-                send_mail(title=title, content=content)
-                ms = "Error {} on {}".format(base_url, str(e))
-                recode(ms)
-                raise e
-            except Exception as e:
-                title = "{} 打开页面失败".format(datetime.datetime.now(), base_url)
-                content = "错误原因：{}".format(str(e))
-                send_mail(title=title, content=content)
-                print(e)
-                ms = "Error {} on {}".format(base_url, str(e))
-                recode(ms)
-                raise e
-        else:
-            title = "{} 打开ｍｔ４站点失败".format(datetime.datetime.now())
-            content = "{} url:{}".format(title, base_url)
-            send_mail(title=title, content=content)
-            logger.exception(content)
-            raise ValueError(content)
-    else:
-        pass
-    """点击页码"""
-    browser.get(base_url)
-    read = click_page_num(browser=browser, page_num=page_num)
-    source = read['page_source']
+    try:
+        browser.get(page_url)
+    except TimeoutException as e:
+        title = "{} 打开页面失败, url:{}".format(datetime.datetime.now(), page_url)
+        content = "错误原因：{}".format(str(e))
+        send_mail(title=title, content=content)
+        print(page_url)
+        ms = "Error {} on {}".format(page_url, str(e))
+        recode(ms)
+        raise e
+    except Exception as e:
+        title = "{} 打开页面失败".format(datetime.datetime.now(), page_url)
+        content = "错误原因：{}".format(str(e))
+        send_mail(title=title, content=content)
+        print(e)
+        ms = "Error {} on {}".format(page_url, str(e))
+        recode(ms)
+        raise e
+    source = browser.page_source
     html = PyQuery(source)
     return html
 
@@ -2025,12 +2139,33 @@ def draw_on_all(browser):
 
 if __name__ == "__main__":
     """全套测试开始,这也是celery的任务"""
-    b = get_browser(headless=0)
-    # for k, v in url_dict.items():
-    #     get_page_platform(browser=b, base_url=v, page_num=1)
-    u = "http://user.shengfxchina.com/v2.0/common/index.html#http://" \
-        "user.shengfxchina.com/v2.0/admin/user_index.html"
-    get_page_platform(browser=b, base_url=u, page_num=1)
-    b.quit()
-    del b
+    b = get_browser(1)
+    while 1:
+        do_jobs(b)
+        time.sleep(300)
+    """全套测试结束"""
+    """测试无效用户的提醒"""
+    # v_s = [
+    #     {"mt4_account": "8300150", "customer_name": "张铭"},
+    #     {"mt4_account": 8300040, "customer_name": "张先胜"}
+    # ]
+    # for x in v_s:
+    #     CustomerManagerRelation.get_relation(**x)
+    """测试发送balance"""
+    # dd = {
+    #     "_id" : ObjectId("5ad86f4fa7a75103612182c3"),
+    #     "send_signal" : 1,
+    #     "nick_name" : "张铭",
+    #     "time" : get_datetime_from_str("2018-04-19T18:24:09.000Z"),
+    #     "system" : "office.shengfxchina.com:8443",
+    #     "real_name" : "张铭",
+    #     "description" : "入金/加金",
+    #     "ticket" : 49734,
+    #     "login" : 8300150,
+    #     "profit" : 1700.0,
+    #     "command" : "balance",
+    #     "comment" : "Deposit maxib#1220",
+    #     "create_date" : get_datetime_from_str("2018-04-19T18:28:31.688Z")
+    # }
+    # send_balance_signal(dd)
     pass

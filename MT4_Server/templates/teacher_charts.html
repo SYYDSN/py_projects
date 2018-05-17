@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teacher Charts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/bootstrap-datetimepicker.min.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='../static/img/favicon.ico') }}">
+    <script src="{{ url_for('static', filename='../static/js/jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='../static/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='../static/js/bootstrap-datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='../static/js/locales/bootstrap-datetimepicker.zh-CN.js') }}"></script>
+    <script src="../static/js/echarts.min.js"></script>
+    <link rel="stylesheet" href="../static/css/teacher_charts.css">
+    <script>
+        url_args = {{ url_args | safe }};  // 全局变量
+    </script>
+    <script src="../static/js/teacher_charts.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row" id="my_nav">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 my_div">
+            <h3 id="main_title">分析师胜率统计</h3>
+            <ul class="nav nav-pills">
+                <li role="presentation" class={{"active" if key == "week" else "" }}><a href="/teacher_charts/week{{ url_path }}">周</a></li>
+                <li role="presentation" class={{"active" if key == "month" else "" }}><a href="/teacher_charts/month{{ url_path }}">月</a></li>
+                <li role="presentation" class={{"active" if key == "teacher" else "" }}><a href="/teacher_charts/teacher{{ url_path }}">老师</a></li>
+                <li role="presentation" class={{"active" if key == "product" else "" }}><a href="/teacher_charts/product{{ url_path }}">产品</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="row main_div">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <!--这里是主要内容-->
+            <div class="row">
+                <div id="my_control" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <!--chart上部的操作区域-->
+                    <div class="form-inline">
+                        <div id="select_date_div" class="form-group">
+                            <label for="begin_date">开始日期:</label>
+                            <input placeholder="点击选择开始日期" class="form-control" id="begin_date" name="begin_name" type="text">
+                            <label for="end_date">截至日期:</label>
+                            <input placeholder="点击选择截至日期" class="form-control" id="end_date" name="end_date" type="text">
+                        </div>
+                        <button type="button" id="submit_select_date" class="btn btn-default btn-info">Go</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div id="chart_zone" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <!--chart上展示区域-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

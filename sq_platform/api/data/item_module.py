@@ -83,7 +83,7 @@ class Log(mongo_db.BaseDoc):
                 req_form = request.form
                 req_json = request.json
                 headers = request.headers
-                info['request_args'] = list(req_args)
+                info['request_args'] = {k: v for k, v in req_args.items()}
                 info['request_form'] = dict(req_form)
                 info['request_json'] = req_json
                 info['request_headers'] = {k: v for k, v in headers.items()}
