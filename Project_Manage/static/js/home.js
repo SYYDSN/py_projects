@@ -536,7 +536,7 @@ $(function(){
                 $("#view_modal .my_item .end_date").val(data['end_date']);
                 // status
                 let status = $(`<div class="form-group"><label>状态</label>
-                                     <select data-key="status" class="my_arg">
+                                     <select data-key="status" class="my_arg my_status">
                                         <option value="normal">正常</option>
                                         <option value="stop">停止</option>
                                         <option value="suspend">暂停</option>
@@ -544,7 +544,7 @@ $(function(){
                                   </div>`);
                 if(the_class === "mission"){
                     status = $(`<div class="form-group"><label>状态</label>
-                                     <select data-key="status" class="my_arg">
+                                     <select data-key="status" class="my_arg my_status">
                                         <option value="ready">准备</option>
                                         <option value="developing">开发中</option>
                                         <option value="complete">完成</option>
@@ -553,7 +553,7 @@ $(function(){
                 }
                 else if(the_class === "task"){
                     status = $(`<div class="form-group"><label>状态</label>
-                                     <select data-key="status" class="my_arg">
+                                     <select data-key="status" class="my_arg my_status">
                                         <option value="normal">正常</option>
                                         <option value="fail">失败</option>
                                         <option value="drop">放弃</option>

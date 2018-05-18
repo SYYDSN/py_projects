@@ -40,7 +40,8 @@ def hello_world():
 def every_event_func(key1, key2):
     """监听所有的消息"""
     mes = {"message": "success"}
-
+    args = RawRequestInfo.get_init_dict(request)
+    mes['data'] = args
     return json.dumps(mes)
 
 

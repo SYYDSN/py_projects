@@ -33,19 +33,30 @@ class RawRequestInfo(mongo_db.BaseDoc):
         super(RawRequestInfo, self).__init__(**kwargs)
 
     @classmethod
+    def get_init_dict(cls, req: request) -> dict:
+        """
+        从request中获取初始化字典.
+        :param req:
+        :return:
+        """
+        args = dict()
+        args['ip'] = get_real_ip(req)
+        args['path'] = req.path
+        args['method'] = req.method.lower()
+        args['args'] = {k: v for k, v in req.args.items()}
+        args['form'] = {k: v for k, v in req.form.items()}
+        args['json'] = request.json
+        args['headers'] = {k: v for k, v in req.headers.items()}
+        return args
+
+    @classmethod
     def instance(cls, req: request) -> object:
         """
         生成一个实例
         :param req: flask.request
         :return: cls()
         """
-        args = dict()
-        args['ip'] = get_real_ip(req)
-        args['path'] = req.path
-        args['args'] = {k: v for k, v in req.args.items()}
-        args['form'] = {k: v for k, v in req.form.items()}
-        args['json'] = request.json
-        args['headers'] = {k: v for k, v in req.headers.items()}
+        args = cls.get_init_dict(req=req)
         instance = cls(**args)
         return instance
 

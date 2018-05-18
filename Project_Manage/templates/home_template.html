@@ -207,7 +207,7 @@
                                                  {% if td == "" %}
                                                  <td class="no_plan"><span></span></td>
                                                  {% else %}
-                                                     <td data-id="{{ td['_id'] }}" class="my_plan" colspan="{{ td['colspan'] }}">
+                                                     <td data-id="{{ td['_id'] }}" class="my_plan {{ td.raw_status }}_status" colspan="{{ td['colspan'] }}">
                                                          <span data-id="{{ td['_id'] }}"  class="hidden_overflow task_td">{{ td['name'] }}</span>
                                                      </td>
                                                  {% endif %}

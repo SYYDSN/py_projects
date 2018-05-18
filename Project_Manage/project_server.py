@@ -454,11 +454,13 @@ def home_func(key1, key2):
                         for day in range(first_day, last_day + 1):
                             if begin_day <= day <= end_day:
                                 if day == end_day:
-                                    status = status_dict[task['status']]
+                                    raw_status = task['status']
+                                    status = status_dict[raw_status]
                                     project_id = str(task['project_id'].id)
                                     project_name = project_map[project_id]
                                     category_name = project_category_map[project_id]['name']
                                     the_begin_date = task['begin_date']
+                                    description = "" if task.get('description') is None else task['description']
                                     if status == "正常":
                                         if the_begin_date <= now:
                                             status = "推进中"
@@ -473,8 +475,10 @@ def home_func(key1, key2):
                                         "end_date": task['end_date'].strftime("%F"),
                                         "type": task['type'],
                                         "status": status,
+                                        "raw_status": raw_status,
                                         "date_range": task['date_range'],
                                         "name": task['name'],
+                                        "description": description,
                                         "colspan": (end_day - begin_day) + 1
                                     }
                                     task_dict[task_id] = temp

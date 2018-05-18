@@ -108,6 +108,39 @@ series : [
 ]
 });
 
+// 全队安全得分
+let myyb = echarts.init(document.getElementById('myyb'));
+	  myyb.setOption({
+	backgroundColor: "#ffffff",
+    color: ["#ccc", "#ccc", "#67E0E3"],
+    series: [{
+        name: '安全指标',
+        type: 'gauge',
+        detail: {
+            formatter: '{value}分',
+            color: '#37a2da',
+            fontSize:18
+        },
+        axisLine: {
+            show: true,
+            lineStyle: {
+                width: 30,
+                shadowBlur: 0,
+                color: [
+                    [0.3, '#fd666d'],
+                    [0.7, '#37a2da'],
+                    [1, '#3BE4E4']
+                ]
+            }
+        },
+        data: [{
+            value: 50 + parseInt((Math.random() * 100) / 2),
+            name: '',
+        }]
+
+    }]
+      });
+
 // 日期插件change事件
 var change_date = function(obj){
   var $obj = $(obj);

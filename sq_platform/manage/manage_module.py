@@ -334,7 +334,7 @@ def last_positions_func()->dict:
         else:
             data = Track.get_last_position([x['_id'] for x in employees])  # 获取最后的点信息
             data = list(data.values())
-            cache.set(key, data, timeout=120)  # 调试用
+            cache.set(key, data, timeout=300)  # 调试用
     else:
         pass
     res['data'] = data
@@ -554,7 +554,14 @@ def get_driver_list_func() -> str:
     :return: 消息字典的json,其中包含下属身份信息的的列表
     """
     company_id = get_platform_session_arg("company_id")
-    employees = Company.all_employee(company_id=company_id, can_json=True)
+    key = "driver_list_{}".format(company_id)
+    employees = cache.get(key)
+    if employees is None:
+        employees = Company.all_employee(company_id=company_id, can_json=True)
+        if isinstance(employees, list):
+            cache.set(key, employees, timeout=1800)
+        else:
+            pass
     message = dict()
     message['message'] = "success"
     team_info = [{"_id": str(x['_id']), "real_name": x['real_name'],

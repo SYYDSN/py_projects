@@ -186,11 +186,22 @@
 .my_plan{
     /*工作计划样式*/
     font-size:1rem;
-    background-color: cornflowerblue;
     line-height: 2em;
-    color:#e6e6e6;
+    color:grey;
     cursor: pointer;
     text-align: center;
+}
+.normal_status{
+    color:#e6e6e6;
+    background-color: cornflowerblue;
+}
+.delay_status{
+    color:#e6e6e6;
+    background-color: indianred;
+}
+.complete_status{
+    color:cornflowerblue;
+    background-color: lightgrey;
 }
 .change_show{
     margin-top:5px;
@@ -240,4 +251,7 @@
 #Prompt .table{
     font-size:1rem;
     width:12em;
+}
+#Prompt td{
+    word-break: break-all;
 }

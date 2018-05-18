@@ -45,7 +45,7 @@ job_key = "job_list"
 cache.delete(job_key)
 
 
-"""爬虫模块"""
+"""爬虫模块,针对新的平台"""
 
 
 class IgnoreInvalidRelationCustomer(mongo_db.BaseDoc):
@@ -322,30 +322,13 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
     return browser
 
 
-def get_page_url(domain: str, transaction: str, page_num: int = 1) -> str:
-    """
-    获取平台业务网址
-    :param domain: 基础网址
-    :param transaction: 交易类型， buy/sell/balance/credit
-    :param page_num:
-    :return:
-    """
-    if domain == domain1:
-        _base = __page_url_base1
-    else:
-        _base = __page_url_base2
-    r = _base.format(type_dict[transaction], page_num)
-    return r
-
-
-def login_platform(browser, url: str):
+def login_platform(browser):
     """
     登录平台
     :param browser:
-    :param url:
     :return:requests.Session
     """
-    browser.get(url=url)
+    browser.get(url=login_url)
     # recode("html= {}".format(browser.page_source))
     # 用户名输入
     select_email = WebDriverWait(browser, 10).until(ec.presence_of_element_located((By.CLASS_NAME, "tab_emial")))
@@ -386,15 +369,16 @@ def need_login_platform(browser) -> bool:
         return False
 
 
-def open_platform(browser, url: str) -> bool:
+def open_platform(browser) -> bool:
     """
-    打开一号/二号平台站点,如果已经登录,返回True,否则尝试重新login,三次失败后,返回False
+    打开平台站点,如果已经登录,返回True,否则尝试重新login,三次失败后,返回False
     :param browser:
-    :param url:
     :return: 布尔值 True开打成功，False，打开失败，请检查程序
     """
+    about_url = "http://user.shengfxchina.com/v2.0/common/index.html#http://user.shengfxchina.com/v2.0/" \
+          "admin/manager_index.html"
     try:
-        browser.get(url)
+        browser.get(about_url)
     except Exception as e:
         print(e)
         recode(e)
@@ -408,10 +392,40 @@ def open_platform(browser, url: str) -> bool:
             else:
                 pass
             open_count += 1
-            login_platform(browser=browser, url=url)
+            login_platform(browser=browser)
 
-        browser.get(url)
+        browser.get(about_url)
         return not need_login_platform(browser)
+
+
+def redirect(browser, page_name: str) -> None:
+    """
+    转到指定的页面
+    :param browser:
+    :param page_name: 出金申请/入金信息/开户申请
+    :return:
+    """
+    """导航第一级的按钮"""
+    """用户"""
+    btn_user = WebDriverWait(browser, 10).until(ec.element_to_be_clickable((By.CSS_SELECTOR,
+                                                                               ".frist-menu dd[data-module='user']")))
+    """财务"""
+    btn_finance = WebDriverWait(browser, 10).until(
+        ec.element_to_be_clickable((By.CSS_SELECTOR, ".frist-menu dd[data-module='finance']")))
+    """
+    导航第二级的按钮,必须要在第一级的导航按钮按下以后才会出现.
+    所有入金记录按钮
+    """
+    btn_finance_in = WebDriverWait(browser, 10).until(
+        ec.element_to_be_clickable((By.CSS_SELECTOR, "a[href='finance_index.html']")))
+    if page_name == '出金申请':
+        pass
+    elif page_name == "出金信息":
+
+    else:
+        """去所有用户的页面,这种情况是为了测试,实际中不会用到"""
+        pass
+
 
 
 def click_page_num(browser, page_num: int, selector_str: str = None) -> (None, dict):
@@ -430,6 +444,7 @@ def click_page_num(browser, page_num: int, selector_str: str = None) -> (None, d
     a_list = WebDriverWait(browser, 10).until(ec.presence_of_all_elements_located((By.CSS_SELECTOR, ".pagelist > a")))
     for a in a_list:
         print(a)
+
 
 def get_page_platform(browser, base_url: str, page_num: int = 1) -> (PyQuery, None):
     """
@@ -2025,12 +2040,7 @@ def draw_on_all(browser):
 
 if __name__ == "__main__":
     """全套测试开始,这也是celery的任务"""
-    b = get_browser(headless=0)
-    # for k, v in url_dict.items():
-    #     get_page_platform(browser=b, base_url=v, page_num=1)
-    u = "http://user.shengfxchina.com/v2.0/common/index.html#http://" \
-        "user.shengfxchina.com/v2.0/admin/user_index.html"
-    get_page_platform(browser=b, base_url=u, page_num=1)
-    b.quit()
-    del b
+    b = get_browser(False, 1)
+    open_platform(b)
+    redirect(b, "")
     pass

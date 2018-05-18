@@ -1201,7 +1201,7 @@ def send_withdraw_signal(reg_info: dict):
     """
     out_put = dict()
     markdown = dict()
-    token_name = "钉钉小助手"
+    token_name = "财务群钉钉小助手"
     out_put['msgtype'] = 'markdown'
     markdown['title'] = "出金申请"
     system_info = reg_info['system']

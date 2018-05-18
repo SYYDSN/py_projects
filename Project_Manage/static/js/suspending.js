@@ -20,6 +20,7 @@ let fill_td = function(data){
 	html += `<tr><td style="width:70px">任务工期:</td><td>${data['date_range']}天</td></tr>`;
 	html += `<tr><td style="width:70px">任务归属:</td><td>${data['category_name']}.${data['project_name']}</td></tr>`;
     html += `<tr><td style="width:70px">任务状态:</td><td>${data['status']}</td></tr>`;
+    html += `<tr><td style="width:70px">任务说明:</td><td>${data['description']}</td></tr>`;
     html += "</table>";
     Prompt.html(html);
 };
