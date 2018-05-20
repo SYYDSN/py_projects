@@ -386,7 +386,6 @@ if __name__ == "__main__":
     #         "time": datetime.datetime.now()
     #     }
     #     customer = Customer.reg(**args)
-    # from browser.crawler_module import do_jobs
     # do_jobs()
     """测试发送注册信号给机器人服务器"""
     # Customer.send_signal(args)

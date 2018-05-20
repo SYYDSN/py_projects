@@ -131,64 +131,6 @@ def listen_func(key):
         if not check:
             return abort(404)
         else:
-            """
-            字段名称	字段ID	字段类型	说明
-            表单名称	formName	string	
-            数据ID	_id	string	数据的唯一ID
-            提交人	creator	json	
-            修改人	updater	json	
-            删除人	deleter	json	
-            提交时间	createTime	string	
-            更新时间	updateTime	string	
-            删除时间	deleteTime	string	
-            日期时间	_widget_1515400344910	string	
-            EC命名	_widget_1516598763647	string	
-            客户姓名	_widget_1515400344920	string	
-            首次接触时间	_widget_1516598763627	string	
-            客户MT账号	_widget_1515400344933	number	
-            所属平台	_widget_1517984569439	string	
-            所属员工	_widget_1520476984707	string	
-            所属经理	_widget_1520476984720	string	
-            所属总监	_widget_1520476984733	string	
-            客户状态	_widget_1516347713330	string	
-            激活金额/美金	_widget_1515400345101	number	
-            备注	_widget_1522391716801	number	
-            example:
-            {
-              "op": "data_create",
-              "data": {
-                "formName": "开户激活",
-                "_id": "5acd21b714c0ae71e9271630",
-                "creator": {
-                  "_id": "5acd21b714c0ae71e9271633",
-                  "name": "张秀兰"
-                },
-                "updater": {
-                  "_id": "5acd21b714c0ae71e9271634",
-                  "name": "唐伟"
-                },
-                "deleter": {
-                  "_id": "5acd21b714c0ae71e9271635",
-                  "name": "任涛"
-                },
-                "createTime": "2018-04-10T14:16:38.10Z",
-                "updateTime": "2018-04-10T01:07:48.739Z",
-                "deleteTime": "2018-04-10T02:53:08.761Z",
-                "_widget_1515400344910": "2018-04-10T06:25:13.146Z",
-                "_widget_1516598763647": "受问须史",
-                "_widget_1515400344920": "这着向几",
-                "_widget_1516598763627": "2018-04-10T14:54:51.174Z",
-                "_widget_1515400344933": -930.3609,
-                "_widget_1517984569439": "响才之转",
-                "_widget_1520476984707": "即第界转",
-                "_widget_1520476984720": "少说民断",
-                "_widget_1520476984733": "将只素精",
-                "_widget_1516347713330": "党权划",
-                "_widget_1515400345101": -289.5047,
-                "_widget_1522391716801": 647.2173
-              }
-            }
-            """
             op = data['op']
             data = data['data']
             record_id = data['_id']
@@ -208,6 +150,7 @@ def listen_func(key):
             if isinstance(delete_date, datetime.datetime):
                 delete_date = delete_date + datetime.timedelta(hours=8)
             mt4_account = str(data.get("_widget_1515400344933"))
+            customer_sn = int(data.get("_widget_1526780188629"))
             customer_name = data.get("_widget_1515400344920")
             platform = data.get("_widget_1517984569439")
             if platform == '盛汇中国':
@@ -227,6 +170,7 @@ def listen_func(key):
                 "update_date": update_date,
                 "delete_date": delete_date,
                 "mt4_account": mt4_account,
+                "customer_sn": customer_sn,
                 "customer_name": customer_name,
                 "platform": platform,
                 "sales_name": sales_name,

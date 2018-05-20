@@ -2,10 +2,6 @@
 import datetime
 from celery import Celery
 from browser.firefox_module import to_jiandao_cloud
-from browser.crawler_module import do_jobs
-from browser.crawler_module import add_job
-from log_module import get_logger
-from log_module import recode
 from mail_module import send_mail
 
 
@@ -78,45 +74,6 @@ def to_jiandao_cloud_and_send_mail(*args, **kwargs):
         content = str(kwargs)
         send_mail("583736361@qq.com", title, content)
     return res
-
-
-@app.task(bind=True)
-def query_transaction(*args, **kwargs):
-    add_job("draw_transaction", dict())  # 抓取交易信息
-    ms = "beat task add draw_transaction success"
-    recode(ms)
-    add_job("query_transaction", dict())  # 提取交易信息并上传
-    ms = "beat task add query_transaction success"
-    recode(ms)
-    # add_job("query_withdraw", dict())    # 提取出金申请并上传。 query_transaction一并上传了.
-    # ms = "beat task add query_withdraw success"
-    recode(ms)
-    return "celery query_transaction ok"
-
-
-@app.task(bind=True)
-def query_withdraw(self, *args, **kwargs):
-    """每5分钟检查一下出金申请,出入金记录和赠金"""
-    add_job("draw_withdraw", dict())  # 查询出金申请并发消息给钉钉机器人。
-    ms = "beat task add draw_withdraw success"
-    recode(ms)
-    return "celery query_withdraw ok"
-
-
-@app.task(bind=True)
-def do_works(self, *args, **kwargs):
-    """每分钟检查一下工作"""
-    err = None
-    try:
-        err = do_jobs()
-    except Exception as e:
-        err = e
-    finally:
-        if err is None:
-            return "works success!"
-        else:
-            recode(err)
-            return err
 
 
 if __name__ == "__main__":
