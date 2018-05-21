@@ -13,6 +13,7 @@ import mongo_db
 from module import send_moudle
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver import FirefoxProfile
 from selenium.webdriver import FirefoxOptions
 from selenium.webdriver import Firefox
@@ -588,10 +589,24 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
     你也可以自行搜索chromedriver的下载地址,解压是个可执行文件,放到chrome的目录即可.
     一般ubuntu下面,chrome的目录是/opt/google/chrome/
     据说使用root权限运行的话,chrome的headless浏览器会报异常.而firefox的headless浏览器不会!
+    附录:
+    安装火狐浏览器标准版的方法:
+    1. sudo add-apt-repository ppa:mozillateam/firefox-next  出现提示后回车继续
+       如果你提示 add-apt-repository: command not found ,那就是缺少命令,请用如下方式安装:
+       sudo apt-get install software-properties-common python-software-properties  
+    2. sudo apt update
+    3. sudo apt install firefox
     """
     if browser_class == 1:
         profile = FirefoxProfile()
         profile.set_preference("intl.accept_languages", "zh-cn")
+        """设置代理"""
+        # profile.set_preference("signon.autologin.proxy", False)
+        # profile.set_preference("network.proxy.type", 1)
+        # profile.set_preference("network.proxy.http", "121.236.77.190")
+        # profile.set_preference("network.proxy.http_port", 8118)
+        # profile.set_preference("network.proxy.share_proxy_settings", True)
+
         options = FirefoxOptions()
         options.add_argument("--headless")
         if headless:
@@ -637,6 +652,8 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
                 recode(e)
                 logger.exception(e)
                 raise e
+    u = "https://www.baidu.com/baidu?wd=ip&tn=ubuntuu_cb&ie=utf-8"
+    browser.get(u)
     return browser
 
 
@@ -727,6 +744,8 @@ def redirect(browser, page_name: str) -> None:
     """
     """先切换到默认文档，保证接下来的操作从正确的文档开始"""
     browser.switch_to_default_content()
+    # browser.switch_to.parent_frame()  # 两种方法都切换回主文档
+    # browser.switch_to_default_content() # 两种方法都可以切换回主文档
     """导航第一级的按钮"""
     """用户"""
     btn_user = WebDriverWait(browser, 10).until(ec.element_to_be_clickable((By.CSS_SELECTOR,
@@ -742,12 +761,23 @@ def redirect(browser, page_name: str) -> None:
         """
         btn_finance.click()
         browser.switch_to.frame(browser.find_element_by_id("show_content"))  # 切换进内层frame
-        btn_finance_in = WebDriverWait(browser, 10).until(
-            ec.element_to_be_clickable((By.CSS_SELECTOR, ".btn-d[href='finance_index.html']")))
-        btn_finance_in.click()
-        """获取入金状态选择按钮"""
-        select_status = Select(browser.find_element_by_id("state1"))
-        select_status.select_by_value("DEPOSITED")  # 选择＂已到帐＂
+        flag = True
+        """防止元素被遮住"""
+        while flag:
+            try:
+                """获取所入金记录二级导航按钮"""
+                btn_finance_in = WebDriverWait(browser, 10).until(
+                    ec.element_to_be_clickable((By.CSS_SELECTOR, ".btn-d[href='finance_index.html']")))
+                btn_finance_in.click()  # 点击所入金记录二级导航按钮
+                """获取入金状态选择按钮"""
+                select_status = Select(browser.find_element_by_id("state1"))
+                select_status.select_by_value("DEPOSITED")  # 选择＂已到帐＂
+                flag = False
+            except ElementClickInterceptedException as e:
+                print(e)
+                time.sleep(0.1)
+            finally:
+                pass
     elif page_name == "出金申请":
         """按下财务按钮"""
         btn_finance.click()
@@ -756,25 +786,43 @@ def redirect(browser, page_name: str) -> None:
         注意，二级页面是在ｉｆｒａｍｅ里面
         """
         browser.switch_to.frame(browser.find_element_by_id("show_content"))  # 切换进内层frame
-        btn_finance_out = WebDriverWait(browser, 10).until(
-            ec.element_to_be_clickable((By.CSS_SELECTOR, "a[href='finance_check_record.html']")))
-        btn_finance_out.click()
-        # browser.switch_to.parent_frame()  # 两种方法都切换回主文档
-        # browser.switch_to_default_content() # 两种方法都可以切换回主文档
-        """获取入金状态选择按钮"""
-        select_status = Select(browser.find_element_by_id("state1"))
-        select_status.select_by_value("WAITING")  # 选择＂待合规审核＂
+        flag = True
+        """防止元素被遮住"""
+        while flag:
+            try:
+                """获取所有出金记录二级导航按钮"""
+                btn_finance_out = WebDriverWait(browser, 10).until(
+                    ec.element_to_be_clickable((By.CSS_SELECTOR, "a[href='finance_check_record.html']")))
+                btn_finance_out.click()  # 按下所有出金记录二级导航按钮
+                """获取入金状态选择按钮"""
+                select_status = Select(browser.find_element_by_id("state1"))
+                select_status.select_by_value("WAITING")  # 选择＂待合规审核＂
+                flag = False
+            except ElementClickInterceptedException as e:
+                print(e)
+                time.sleep(0.1)
+            finally:
+                pass
     elif page_name == "开户申请":
         btn_user.click()
         browser.switch_to.frame(browser.find_element_by_id("show_content"))  # 切换进内层frame
-        btn_user_all = WebDriverWait(browser, 10).until(
-            ec.presence_of_element_located((By.CSS_SELECTOR, ".load_user_header a[href='user_index.html']")))
-        while not btn_user_all.is_enabled():
-            time.sleep(0.1)
-        btn_user_all.click()
-        """获取用户状态选择按钮"""
-        select_status = Select(browser.find_element_by_id("state1"))
-        select_status.select_by_value("auditing")  # 选择＂待审核＂
+        flag = True
+        """防止元素被遮住"""
+        while flag:
+            try:
+                """获取所有用户二级导航按钮"""
+                btn_user_all = WebDriverWait(browser, 10).until(
+                    ec.presence_of_element_located((By.CSS_SELECTOR, ".load_user_header a[href='user_index.html']")))
+                btn_user_all.click()  # 所有用户二级导航按钮
+                """获取用户状态选择按钮"""
+                select_status = Select(browser.find_element_by_id("state1"))
+                select_status.select_by_value("auditing")  # 选择＂待审核＂
+                flag = False
+            except ElementClickInterceptedException as e:
+                print(e)
+                time.sleep(0.1)
+            finally:
+                pass
     else:
         """去所有用户的页面,这种情况是为了测试,实际中不会用到"""
         pass
@@ -839,7 +887,7 @@ def create_account_formater(browser) -> dict:
             a = tds[0].split("]")
             user_id = int(re.search(r'\d+', a[0]).group())
             temp['user_id'] = user_id
-            print(tds)
+            # print(tds)
             temp['user_name'] = a[1]
             temp['sn'] = user_id
             temp['status'] = tds[1]
@@ -917,7 +965,7 @@ def cash_in_formater(browser) -> dict:
             tds = [PyQuery(td).text().strip() for td in tds]
             temp = dict()
             temp['sn'] = tds[0].strip("#")
-            print(tds)
+            # print(tds)
             temp['status'] = tds[1]
             a = tds[2].split("]")
             temp['user_id'] = int(re.search(r'\d+', a[0]).group())
@@ -996,7 +1044,7 @@ def finance_out_formater(browser) -> dict:
             tds = [PyQuery(td).text().strip() for td in tds]
             temp = dict()
             temp['sn'] = tds[0].strip("#")
-            print(tds)
+            # print(tds)
             temp['status'] = tds[1]
             a = tds[2].split("]")
             temp['user_id'] = int(re.search(r'\d+', a[0]).group())
@@ -1069,6 +1117,9 @@ def parse_content(browser, type_name) -> None:
             sn = x.get_attr("sn")
             if sn not in sent_list and sn > last_sn:
                 x.send()  # 发送信号
+                ms = "sent!!! {}信号已发送.sn:{}, time:{}".format(type_name, x.get_attr("sn", ""), now)
+                logger.info(ms)
+                print(ms)
                 last_sn = sn
             x.set_attr("sent_time", now)
             try:
@@ -1109,5 +1160,5 @@ if __name__ == "__main__":
     """全套测试开始"""
     while 1:
         do_jobs()
-        time.sleep(300)
+        time.sleep(500)
     pass
