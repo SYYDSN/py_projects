@@ -38,7 +38,7 @@
             {% for emp in data.employees %}
                 <tr>
                     <td><img src="/{{ emp.head_img_url }}" alt="头像"></td>
-                    <td>{{ emp.real_name }}</td>
+                    <td>{{ emp.official_name if emp.get("real_name") is none else emp.real_name }}</td>
                     <td>{{ emp.phone_num }}</td>
                     <td>{{ emp.os_version }}</td>
                     <td>{{ emp.app_version }}</td>

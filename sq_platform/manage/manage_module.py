@@ -21,9 +21,7 @@ from role.role_module import Role
 from role.role_module import Func
 from manage.company_module import Employee
 
-
 """管理页面模块/后台管理/登录"""
-
 
 manage_blueprint = Blueprint("manage_blueprint", __name__, url_prefix="/manage", template_folder="templates/manage")
 logger = get_logger()
@@ -47,7 +45,7 @@ def hello():
 def app_version_table_func():
     """查看版本汇总信息"""
     if request.method.lower() == "get":
-        return render_template("manage/app_version_table.html",)
+        return render_template("manage/app_version_table.html", )
     elif request.method.lower() == "post":
         app_versions = User.app_version_list()
         app_versions.sort(key=lambda obj: datetime.datetime.strptime(
@@ -168,7 +166,7 @@ def block_employee_list_func():
                     message = Employee.add_block_id(user_id, block_id)
                 get_archives_from_cache(current_user_id=user_id, clear=True)  # 清缓存
                 key = "all_last_position_{}".format(user_id)
-                cache.delete(key=key)   # 清除最后的位置信息的缓存
+                cache.delete(key=key)  # 清除最后的位置信息的缓存
             else:
                 message['message'] = "参数 {} 不合法".format(block_id)
         else:
@@ -307,8 +305,8 @@ def subordinates_base_info_func():
             employees = {
                 x['_id']:
                     {
-                        "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
-                        x['real_name'],
+                        "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
+                      'real_name') is None else x['real_name'],
                         "employee_number": x.get('employee_number', '')
                     }
                 for x in employees}
@@ -318,7 +316,7 @@ def subordinates_base_info_func():
 
 @manage_blueprint.route("/last_positions", methods=['post'])
 @check_platform_session
-def last_positions_func()->dict:
+def last_positions_func() -> dict:
     """
     根据用户id，获取他所能查看的员工的最后的位置信息，注意这里的用户指的是公司管理员
     """
@@ -438,7 +436,7 @@ def index_func():
     """展示自定义的点的信息，用于实时显示一批司机的信息。后台的首页"""
     if request.method.lower() == "get":
         """返回页面"""
-        head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png") # 用户头像
+        head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")  # 用户头像
         real_name = get_platform_session_arg("real_name")
         company_id = get_platform_session_arg("company_id")
         return render_template("manage/index_light.html", head_img_url=head_img_url,
@@ -564,8 +562,9 @@ def get_driver_list_func() -> str:
             pass
     message = dict()
     message['message'] = "success"
-    team_info = [{"_id": str(x['_id']), "real_name": x['real_name'],
-                  "head_img_url": x['head_img_url']} for x in employees]
+    team_info = [{"_id": str(x['_id']),
+                  "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
+                      'real_name') is None else x['real_name'], "head_img_url": x['head_img_url']} for x in employees]
     message['data'] = team_info
     return json.dumps(message)
 
@@ -628,14 +627,14 @@ def report_page_func():
         scr_synt = sum([v['scr_synt'] for k, v in member_archives.items()]) / len(member_archives)
         message = {"message": "success"}
         data = {
-            "member_count": member_count,     # 成员统计
-            "total_time": total_time,         # 时长统计
-            "total_mileage": total_mileage,   # 里程统计
-            "speed_avg": speed_avg,           # 平均速度
-            "cnt_rapi_acce": cnt_rapi_acce,   # 急加速统计
-            "cnt_shar_turn": cnt_shar_turn,   # 急转统计
-            "cnt_sudd_brak": cnt_sudd_brak,   # 急刹统计
-            "scr_synt": scr_synt              # 平均综合/安全指数
+            "member_count": member_count,  # 成员统计
+            "total_time": total_time,  # 时长统计
+            "total_mileage": total_mileage,  # 里程统计
+            "speed_avg": speed_avg,  # 平均速度
+            "cnt_rapi_acce": cnt_rapi_acce,  # 急加速统计
+            "cnt_shar_turn": cnt_shar_turn,  # 急转统计
+            "cnt_sudd_brak": cnt_sudd_brak,  # 急刹统计
+            "scr_synt": scr_synt  # 平均综合/安全指数
         }
         message['data'] = data
         return json.dumps(message)
@@ -658,7 +657,7 @@ def get_archives_from_cache(current_user_id: str, clear: bool = False) -> dict:
     else:
         member_archives = cache.get(key)
         if member_archives is not None and len(member_archives) > 0:
-        # if -1 > 0:
+            # if -1 > 0:
             pass
         else:
             """没有取到缓存的话，就生成一个虚拟数据"""
@@ -761,11 +760,11 @@ def violation_func():
         if employees is not None:
             employees = {
                 x['_id']:
-                             {
-                                 "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
-                                 x['real_name'],
-                                 "employee_number": x.get('employee_number', '')
-                             }
+                    {
+                        "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
+                      'real_name') is None else x['real_name'],
+                        "employee_number": x.get('employee_number', '')
+                    }
                 for x in employees}
 
         if request.method.lower() == "get":
@@ -944,8 +943,8 @@ def warning_func():
             employees = {
                 x['_id']:
                     {
-                        "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
-                        x['real_name'],
+                        "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
+                      'real_name') is None else x['real_name'],
                         "employee_number": x.get('employee_number', '')
                     }
                 for x in employees}
@@ -1129,8 +1128,8 @@ def accident_func():
             employees = {
                 x['_id']:
                     {
-                        "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
-                        x['real_name'],
+                        "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
+                      'real_name') is None else x['real_name'],
                         "employee_number": x.get('employee_number', '')
                     }
                 for x in employees}
@@ -1235,15 +1234,15 @@ def accident_func():
                 a_url += "&cur_index={}"
 
             args = {
-                    "driver_name": driver_name,
-                    "city": city,
-                    "plate_number": plate_number,
-                    "status": status,
-                    "end_date": end_date,
-                    "begin_date": begin_date,
-                    "index": cur_index,
-                    "num": num
-                }
+                "driver_name": driver_name,
+                "city": city,
+                "plate_number": plate_number,
+                "status": status,
+                "end_date": end_date,
+                "begin_date": begin_date,
+                "index": cur_index,
+                "num": num
+            }
             data = security_module.Accident.page(**args)
             acc_list = data['data']
             acc_count = data['count']  # 违章条数
@@ -1289,8 +1288,8 @@ def process_accident_func(prefix):
             employees = {
                 x['_id']:
                     {
-                        "real_name": x['user_name'] if x['real_name'] == "" or x['real_name'] is None else
-                        x['real_name'],
+                        "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
+                      'real_name') is None else x['real_name'],
                         "employee_number": x.get('employee_number', '')
                     }
                 for x in employees}

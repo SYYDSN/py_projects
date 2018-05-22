@@ -242,6 +242,7 @@ class User(mongo_db.BaseDoc):
     type_dict['last_update'] = datetime.datetime  # 用户最后一次上传gps数据的时间.
 
     def __init__(self, **kwargs):
+        now = datetime.datetime.now()
         if "phone_num" not in kwargs:
             raise ValueError("phone_num参数必须!")
         if "user_name" not in kwargs:
@@ -257,7 +258,9 @@ class User(mongo_db.BaseDoc):
         if "head_img_url" not in kwargs:
             kwargs['head_img_url'] = "static/image/head_img/default_01.png"
         if "create_date" not in kwargs:
-            kwargs['create_date'] = datetime.datetime.now()
+            kwargs['create_date'] = now
+        if "last_update" not in kwargs:
+            kwargs['last_update'] = now
         super(User, self).__init__(**kwargs)
 
     def get_archives(self) -> dict:
@@ -404,6 +407,43 @@ class User(mongo_db.BaseDoc):
             raise ValueError(ms)
             return False
 
+    def get_last_update(self) -> datetime.datetime:
+        """
+        这是一个补救的函数,用于在旧的用户没有self.last_update属性的时候补齐这个属性.
+        :return:
+        """
+        last_update = self.get_attr("last_update")
+        if last_update is None:
+            """从gps查询"""
+            f = {"user_id": self.get_dbref()}
+            s = {"time": -1}
+            r = GPS.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+            if r is None:
+                """没有gps数据,就取create_date"""
+                create_date = self.get_attr("create_date")
+                if isinstance(create_date, datetime.datetime):
+                    last_update = create_date
+                else:
+                    last_update = datetime.datetime.now()
+            else:
+                last_update = r['time']
+            self.set_attr("last_update", last_update)
+            self.save_plus()
+        else:
+            pass
+        return last_update
+
+    @classmethod
+    def last_update_cls(cls, user_id: (str, ObjectId)) -> datetime.datetime:
+        """
+        这是一个补救的函数,用于在旧的用户没有self.last_update属性的时候补齐这个属性.
+        本质上是self.last_update函数的类方法实现.
+        :param user_id: 用户id
+        :return:
+        """
+        user = cls.find_by_id(user_id)
+        last_upate = user.get_last_update()
+        return last_upate
 
     @classmethod
     def get_usable_license(cls, user_id: (str, ObjectId, DBRef, MyDBRef), to_dict: bool = True,

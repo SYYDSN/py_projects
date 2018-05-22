@@ -660,7 +660,7 @@
                                     {% for e in employees %}
                                         <li>
                                         <a href="/manage/driver?cur_user_id={{ e._id }}">
-                                            {{ e.real_name }}
+                                            {{ e.official_name if e.get("real_name") is none else e.real_name }}
                                         </a>
                                         </li>
                                     {% endfor %}

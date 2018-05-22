@@ -146,7 +146,7 @@ class Company(mongo_db.BaseDoc):
             x['query_violation'] = vio
             vio_count += vio
             """检查在线情况?"""
-            last_update = x['last_update']
+            last_update = User.last_update_cls(x['_id'])
             online = -1 if (now - last_update).total_seconds() > 1500 else 1
             x['online'] = online
             """最后登录时间"""
@@ -249,6 +249,109 @@ class Company(mongo_db.BaseDoc):
                 """查询职务信息"""
                 post = employee.get_post()
                 return post
+
+    def hire_one_employee(self, user_id: (str, ObjectId, DBRef), dept_id: (str, ObjectId, DBRef), post_id:
+    (str, ObjectId, DBRef)) -> bool:
+        """
+        雇佣一名员工,这是一个实例方法
+        :param user_id: 用户id
+        :param dept_id: 岗位id
+        :param post_id: 职务id
+        :return: 
+        """
+        """转换user_id为DBRef类型"""
+        if isinstance(user_id, DBRef):
+            employee_dbref = user_id
+        elif isinstance(user_id, (str, ObjectId)):
+            if isinstance(user_id, str):
+                l = len(user_id)
+                if l != 24:
+                    ms = "user_id的长度错误,length:{}".format(l)
+                    raise ValueError(ms)
+                else:
+                    user_id = ObjectId(user_id)
+            else:
+                pass
+            employee_dbref = DBRef(database=mongo_db.db_name, collection=Employee.get_table_name(), id=user_id)
+        else:
+            ms = "错误的user_id类型:{}".format(type(user_id))
+            raise ValueError(ms)
+
+        """转换dept_id为DBRef类型"""
+        if isinstance(dept_id, DBRef):
+            dept_dbref = dept_id
+        elif isinstance(dept_id, (str, ObjectId)):
+            if isinstance(dept_id, str):
+                l = len(dept_id)
+                if l != 24:
+                    ms = "dept_id的长度错误,length:{}".format(l)
+                    raise ValueError(ms)
+                else:
+                    dept_id = ObjectId(dept_id)
+            else:
+                pass
+            dept_dbref = DBRef(database=mongo_db.db_name, collection=Dept.get_table_name(), id=dept_id)
+        else:
+            ms = "错误的dept_id类型:{}".format(type(dept_id))
+            raise ValueError(ms)
+
+        """转换post_id为DBRef类型"""
+        if isinstance(post_id, DBRef):
+            post_dbref = post_id
+        elif isinstance(post_id, (str, ObjectId)):
+            if isinstance(post_id, str):
+                l = len(post_id)
+                if l != 24:
+                    ms = "post_id的长度错误,length:{}".format(l)
+                    raise ValueError(ms)
+                else:
+                    post_id = ObjectId(post_id)
+            else:
+                pass
+            post_dbref = DBRef(database=mongo_db.db_name, collection=Post.get_table_name(), id=post_id)
+        else:
+            ms = "错误的post_id类型:{}".format(type(post_id))
+            raise ValueError(ms)
+
+        company_dbref = self.get_dbref()
+
+        lock_rebuild_relation.acquire()  # 锁定
+        """清除旧的关系库"""
+        now = datetime.datetime.now()
+        f = {
+            "$or": [
+                {"end_date": {"$gt": now}},
+                {"end_date": {"exists": False}}
+            ],
+            "employee_id": employee_dbref
+        }
+        u = {"$set": {"end_date": now}}
+        EmployeeCompanyRelation.update_many_plus(filter_dict=f, update_dict=u)
+        EmployeeDeptRelation.update_many_plus(filter_dict=f, update_dict=u)
+        EmployeePostRelation.update_many_plus(filter_dict=f, update_dict=u)
+        # 添加员工/公司关系
+        company_relation_dbref = EmployeeCompanyRelation.add_relation(emp_dbref=employee_dbref,
+                                                                      dbref_name="company_id",
+                                                                      dbref_val=company_dbref)
+        # 添加员工/部门关系
+        dept_relation_dbref = EmployeeDeptRelation.add_relation(emp_dbref=employee_dbref, dbref_name="dept_id",
+                                                                dbref_val=dept_dbref)
+        # 添加员工/职务关系
+        post_relation_dbref = EmployeePostRelation.add_relation(emp_dbref=employee_dbref, dbref_name="post_id",
+                                                                dbref_val=post_dbref)
+        f = {"_id": employee_dbref.id}
+        u = {"$set": {
+            "company_relation_id": company_relation_dbref,
+            "dept_relation_id": dept_relation_dbref,
+            "post_relation_id": post_relation_dbref
+        }}
+        res = Employee.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+        lock_rebuild_relation.release()  # 释放
+        if res is None:
+            print("修改用户信息失败,f:{},u:{}".format(f, u))
+            return False
+        else:
+            return True
 
     @classmethod
     def add_employee(cls, company_id: (str, ObjectId), args_list: (list, dict)) -> None:
@@ -782,8 +885,7 @@ class Company(mongo_db.BaseDoc):
         :param company_id:
         :param post_dict: 职务的初始化字典,比如
         driver_dict = {
-        "_id": ObjectId(None),
-        "company_id": company_dbref,
+        "company_id": company_dbref,  # 无需添加亦可
         "post_name": "司机",
         "description": "车辆驾驶员,默认岗位,不可删除",
         "level": 1,
@@ -2222,5 +2324,18 @@ if __name__ == "__main__":
     #              only_view=True,
     #              desc="只有查看本公司在线人数权限")
     """获取公司职员在线情况"""
-    sf.online_report()
+    # sf.online_report()
+    """给添加一个职务"""
+    # p_dict = {
+    #     "post_name": "管理人员",
+    #     "description": "非司机,无排班",
+    #     "level": 2,
+    #     "default": False
+    # }
+    # Company.add_post(company_id=sf_id, post_dict=p_dict)
+    """添加一个管理人员,无管理权限,只是作为旁观者而已"""
+    p_id_m = ObjectId("5b03e2004660d34b81a17188")  # 管理人员的post_id
+    u_id_z = ObjectId("5af547e4e39a7b5371943a4a")  # 顺丰华新张小龙id
+    d_id_h = ObjectId("5abcac4b4660d3599207fe18")  # 顺丰华新本部门id
+    print(sf.hire_one_employee(user_id=u_id_z, dept_id=d_id_h, post_id=p_id_m))
     pass
