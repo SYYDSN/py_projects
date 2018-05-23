@@ -235,7 +235,10 @@ def query_position(*arg, **kwargs):
 
 
 class ViolationRecode(mongo_db.BaseDoc):
-    """违章记录"""
+    """
+    违章记录
+    以车牌号和违章时间,违章地址.作为唯一标识
+    """
     _table_name = "violation_info"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
@@ -243,8 +246,9 @@ class ViolationRecode(mongo_db.BaseDoc):
     type_dict['plate_number'] = str  # 违章时的车牌号
     type_dict["code"] = str  # 违章编码,唯一，非违章条例码
     type_dict["time"] = datetime.datetime  # 违章时间
-    type_dict["update_time"] = datetime.datetime  # 记录变更时间
-    type_dict["create_time"] = datetime.datetime  # 记录创建时间
+    type_dict["update_time"] = datetime.datetime  # 记录最后一次从互联网查询的时间
+    """记录创建时间 在强调性能的情况下,此字段无法保证不被更新,废弃 2018-5-23"""
+    # type_dict["create_time"] = datetime.datetime
     type_dict["fine"] = float  # 罚款金额
     type_dict["address"] = str  # 违章地址
     type_dict["reason"] = str  # 违章处理原因
@@ -257,10 +261,13 @@ class ViolationRecode(mongo_db.BaseDoc):
     type_dict["process_status"] = int  # 违章处理状态：1：未处理，2：处理中，3：已处理，4：不支持
     type_dict["payment_status"] = int  # 违章缴费状态 不返回表示无法获取该信息，1-未缴费 2-已缴
     type_dict['position_id'] = ObjectId  # 违章地址的经纬度信息的id，指向Position类
+    type_dict['forgery'] = bool          # 是否是伪造的数据?如果添加的违章是虚拟的,需要加上这个字段并置为True,默认是False
 
     def __init__(self, **kwargs):
-        if "create_time" not in kwargs:
-            kwargs['create_time'] = datetime.datetime.now()
+        if "update_time" not in kwargs:
+            kwargs['update_time'] = datetime.datetime.now()
+        if "forgery" not in kwargs:
+            kwargs['forgery'] = False
         super(ViolationRecode, self).__init__(**kwargs)
 
     def check_position(self):
@@ -310,6 +317,9 @@ class ViolationRecode(mongo_db.BaseDoc):
         3. 不存在就insert
         :return: DBRef对象。
         """
+        ms = "此方法已被废弃,无需再在保存前检查重复,请直接调用self.save_plus方法," \
+             "self.save_plus方法会自行决定是插入还是修改 2018-5-23"
+        warnings.warn(ms)
         """先构建判断唯一的查询条件"""
         query_dict = {"code": self.get_attr("code"), "address": self.get_attr("address"),
                       "time": self.get_attr("time"), "plate_number": self.get_attr("plate_number")}
@@ -350,13 +360,35 @@ class ViolationRecode(mongo_db.BaseDoc):
                 dbref = query_obj.get_dbref()
         return dbref
 
+    def save_instance(self) -> dict:
+        """
+        重载父类的方法,用于在从互联网查询到违章记录后:
+        1. 检查是否有重复记录?
+        2. 检查是否需要更新? 更新哪些字段?
+        :return: doc
+        """
+        f = {
+            "user_id": self.get_attr("user_id"),
+            "plate_number": self.get_attr("plate_number"),
+            "time": self.get_attr("time")
+        }
+        _id = self.get_id()
+        ignore = ['_id']
+        doc = self.get_dict(ignore=ignore)
+        if "update_time" not in doc:
+            doc['update_time'] = datetime.datetime.now()
+        # doc['forgery'] = True  # 调试时开启,给虚拟数据一个标记
+        u = {"$set": doc}
+        res = ViolationRecode.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+        return res
+
     @classmethod
     def page(cls, user_id: str = None, city: str = None, plate_number: str = None, vio_status: str = None,
              fine: float = None, begin_date: datetime.datetime = None, end_date: datetime.datetime = None,
              index: int = 1, num: int = 20, can_json: bool = True, reverse: bool = True) -> dict:
         """
         分页查询违章记录
-        :param user_id: 用户id,为空表示所有司机
+        :param user_id: 用户id或者id的list,id可以是str或者ObjectId类型,为空表示所有司机
         :param city:   城市
         :param plate_number:   车牌
         :param vio_status:  违章状态? 已/未处理
@@ -371,7 +403,14 @@ class ViolationRecode(mongo_db.BaseDoc):
         """
         filter_dict = dict()
         if user_id is not None:
-            filter_dict['user_id'] = mongo_db.get_obj_id(user_id)
+            if isinstance(user_id, list) and len(user_id) > 0:
+                if isinstance(user_id[0], ObjectId):
+                    """ViolationRecode.user_id的类型是ObjectId不是DBRef"""
+                    filter_dict['user_id'] = {"$in": user_id}
+                else:
+                    filter_dict['user_id'] = {"$in": [ObjectId(x) for x in user_id]}
+            else:
+                filter_dict['user_id'] = mongo_db.get_obj_id(user_id)
         if city is not None:
             filter_dict['city'] = regex.Regex('.*{}.*'.format(city))  # 正则表达式,匹配city中包含city字符串的
         if plate_number is not None:
@@ -400,7 +439,10 @@ class ViolationRecode(mongo_db.BaseDoc):
     @classmethod
     def instance(cls, **kwargs):
         """
-        创建一个违章记录的实例,应该用此方法创建实例
+        创建一个违章记录的实例,
+        由于本方法会自动转换字段名称.然后再生成实例对象.所以
+        推荐使用此方法创建实例,
+        此方法目前适应聚合数据的直联查询接口  2018-5-23
         :param kwargs:
                     "code": "1232-D1",                  //违章编码,唯一，非违章条例码
                     "time": "2016-06-06 12:32:38",         //违章时间
@@ -521,8 +563,12 @@ class ViolationQueryResult(mongo_db.BaseDoc):
                     vio['user_id'] = user_id
                     vio.pop("_id", None)  # 这个_id可能是空字符,要去掉,让系统自行添加_id
                     obj = ViolationRecode.instance(**vio)
-                    dbref = obj.exists()
-                    vio_list.append(dbref)
+                    r = obj.save_instance()
+                    if isinstance(r, dict):
+                        """保存违章记录的实例成功"""
+                        dbref = DBRef(database=mongo_db.db_name, collection=ViolationRecode.get_table_name(),
+                                      id=r['_id'])
+                        vio_list.append(dbref)
                 kwargs['violations'] = vio_list
             return cls.insert_one(**kwargs)
 
@@ -1308,6 +1354,22 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             message = pack_message(message, 3011, user_id=user_id, object_id=object_id)
         return message
 
+    @classmethod
+    def repair_user_id(cls) -> None:
+        """
+        这是一个调试函数,用于把user_id的属性从旧的ObjectId转换为DBRef类型.
+        :return:
+        """
+        f = {"user_id": {"$exists": True, "$type": 7}}
+        res = cls.find_plus(filter_dict=f, to_dict=True)
+        database = mongo_db.db_name
+        collection = cls.get_table_name()
+        for x in res:
+            f = {"_id": x['_id']}
+            ref = DBRef(database=database, collection=collection, id=x['user_id'])
+            u = {"$set": {"user_id": ref, "repair": 1}}
+            cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+
 
 def add_plate_number():
     """把所有的违章记录都加上车牌号,这是一个调试专用函数"""
@@ -1344,7 +1406,32 @@ if __name__ == "__main__":
     """测试直接调用查询接口的方法"""
     # print(VioQueryGenerator.query(g_id))
     # print(VioQueryGenerator.query(object_id=None, arg_dict=q))
-    r = ViolationQueryResult.find_by_id("5ae2b8c2e39a7b4cf7d7cc27")
-    print(r)
+    # r = ViolationQueryResult.find_by_id("5ae2b8c2e39a7b4cf7d7cc27")
+    # print(r)
+    """测试保存/更新违章记录"""
+    # args = {
+    #     "can_select" : 0,
+    #     "code" : "49-809554",
+    #     "fine" : 210.0,
+    #     "position_id" : ObjectId("5acad1fe4660d325c813e583"),
+    #     "organ_name" : "上海市公安局徐汇分局交通警察支队四大队",
+    #     "user_id" : ObjectId("598d6ac2de713e32dfc74796"),
+    #     "city" : "上海市",
+    #     "province" : "上海市",
+    #     "violation_city" : "上海市",
+    #     "plate_number" : "赣EG2A81",
+    #     "reason" : "机动车违反规定停放、临时停车，驾驶人不在现场或者虽在现场但驾驶人拒绝立即驶离，妨碍其它车辆、行人通行的",
+    #     "point" : 0,
+    #     "violation_num" : "1039A",
+    #     "payment_status" : "1",
+    #     "address" : "柳州路出宜山路北约60米",
+    #     "update_time" : mongo_db.get_datetime_from_str("2018-05-14T16:59:15.689Z"),
+    #     "time" : mongo_db.get_datetime_from_str("2018-05-02T07:45:00.000Z"),
+    #     "process_status" : "1"
+    # }
+    # vio = ViolationRecode(**args)
+    # vio.save_instance()
+    """转换违章查询器的user_id属性为DBRef"""
+    VioQueryGenerator.repair_user_id()
     pass
 

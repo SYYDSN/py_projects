@@ -9,6 +9,7 @@ if __project_dir not in sys.path:
 import mongo_db
 from api.data.item_module import User, Track
 from api.data.base_item_extends import UseHandlerRecord
+from api.user.violation_module import VioQueryGenerator
 import hashlib
 import datetime
 from threading import Lock
@@ -1145,6 +1146,49 @@ class Company(mongo_db.BaseDoc):
         else:
             raise ValueError("错误的用户id:{}".format(str(user_id)))
         return prefix
+
+    @classmethod
+    def employee_and_generator_cls(cls, company_id: (ObjectId, str)) -> dict:
+        """
+        查询一个公司的员工和违章查询器的对应关系的字典.
+        :param company_id: 公司id
+        :return: dict  example:  {user_id: [generator1_id, generator2_id,...]}
+        """
+        res = dict()
+        es = cls.all_employee(company_id=company_id)
+        if len(es) == 0:
+            pass
+        else:
+            for em in es:
+                e_id = em['_id']
+                gs = VioQueryGenerator.generator_list(e_id)
+                gs = [g['_id'] for g in gs]
+                res[e_id] = gs
+        return res
+
+    @classmethod
+    def all_vio_cls(cls, company_id: (ObjectId, str)) -> list:
+        """
+        查询一个公司的全部的违章记录,这是个临时性方法, 2018-5-23
+        :param company_id:
+        :return:
+        """
+        res = list()
+        a_d = cls.employee_and_generator_cls(company_id=company_id)
+        g_ids = list()
+        [g_ids.extend(v) for k, v in a_d.items() if len(v) > 0]
+        for g_id in g_ids:
+            t = VioQueryGenerator.query(object_id=g_id)
+            if "data" in t:
+                data = t['data']
+                vs = data['violations']
+                if len(vs) > 0:
+                    res.extend(vs)
+                else:
+                    pass
+            else:
+                pass
+        return res
 
 
 class CompanyAdmin(mongo_db.BaseDoc):
@@ -2334,8 +2378,11 @@ if __name__ == "__main__":
     # }
     # Company.add_post(company_id=sf_id, post_dict=p_dict)
     """添加一个管理人员,无管理权限,只是作为旁观者而已"""
-    p_id_m = ObjectId("5b03e2004660d34b81a17188")  # 管理人员的post_id
-    u_id_z = ObjectId("5af547e4e39a7b5371943a4a")  # 顺丰华新张小龙id
-    d_id_h = ObjectId("5abcac4b4660d3599207fe18")  # 顺丰华新本部门id
-    print(sf.hire_one_employee(user_id=u_id_z, dept_id=d_id_h, post_id=p_id_m))
+    # p_id_m = ObjectId("5b03e2004660d34b81a17188")  # 管理人员的post_id
+    # u_id_z = ObjectId("5af547e4e39a7b5371943a4a")  # 顺丰华新张小龙id
+    # d_id_h = ObjectId("5abcac4b4660d3599207fe18")  # 顺丰华新本部门id
+    # print(sf.hire_one_employee(user_id=u_id_z, dept_id=d_id_h, post_id=p_id_m))
+    """查询一个公司的全部的违章记录"""
+    dd = Company.all_vio_cls(sf_id)
+    print(dd)
     pass

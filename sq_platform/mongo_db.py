@@ -1036,12 +1036,16 @@ class BaseDoc:
                         warnings.warn("{}的值{}的类型与设定不符，原始的设定为{}，实际类型为{}".format(k, v, self.type_dict[k], type(v)),
                                       RuntimeWarning)
 
-    def get_dict(self) -> dict:
+    def get_dict(self, ignore: list = None) -> dict:
         """
         获取self.__dict__
+        :param ignore: 忽略的字段名
         :return:
         """
-        return self.__dict__
+        if ignore is None or len(ignore) == 0:
+            return self.__dict__
+        else:
+            return {k: v for k, v in self.__dict__.items() if k not in ignore}
 
     def insert(self, obj=None):
         """插入数据库,单个对象,返回ObjectId的实例"""
@@ -1088,7 +1092,37 @@ class BaseDoc:
         if res is None:
             return res
         else:
-            """如果是upsert的对象,res.upserted_id就是对象的_id,否则,res.upserted_id对象为空"""
+            """
+            insert的情况
+            UpdateResult = {
+                ....
+                acknowledged: True,
+                matched_count: 0,
+                modified_count: 0,
+                raw_result: {
+                              'n': 1, 'updatedExisting': False, 
+                              'nModified': 0, 'ok': 1, 
+                              'upserted': ObjectId('5b051532c55c281e882494e0')
+                            }
+                upserted_id: ObjectId("5b051532c55c281e882494e0")
+            }
+            update的情况
+            UpdateResult = {
+                ....
+                acknowledged: True,
+                matched_count: 1,
+                modified_count: 1,
+                raw_result: {
+                              'nModified': 1, 
+                              'updatedExisting': True, 
+                              'ok': 1, 'n': 1
+                            }
+                upserted_id: None
+            }
+            如果是插入新的对象,res.upserted_id就是新对象的_id,
+            如果是修改旧的对象,res.upserted_id对象为空,这时返回的结果中不包含被修改的对象的id(另行查找),
+            本例是以_id查找,在修改旧对象的情况下,不用另行查找也能获得被修改对象的id.
+            """
             return _id if res.upserted_id is None else res.upserted_id
 
     def save(self, obj=None)->ObjectId:

@@ -756,23 +756,29 @@ def violation_func():
     if company_id is None:
         return abort(404, "company_id is none")
     else:
-        employees = Company.all_employee(company_id=company_id, can_json=True)
-        if employees is not None:
-            employees = {
-                x['_id']:
-                    {
-                        "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
-                      'real_name') is None else x['real_name'],
-                        "employee_number": x.get('employee_number', '')
+        es = Company.all_employee(company_id=company_id, can_json=False)
+        employees = dict()
+        eids = list()
+        if len(es) > 0:
+            for e in es:
+                e_id = e['_id']
+                o = {
+                        "real_name": ("" if e.get("official_name") is None else e['official_name']) if e.get(
+                      'real_name') is None else e['real_name'],
+                        "employee_number": e.get('employee_number', '')
                     }
-                for x in employees}
+                eids.append(e_id)
+                employees[str(e_id)] = o
+        else:
+            pass
 
         if request.method.lower() == "get":
             """返回页面"""
             a_url = "violation?"  # 待拼接url地址,这里是相对地址
-            user_id = get_arg(request, "user_id", None)
-            if user_id is not None and user_id != "":
+            user_id = get_arg(request, "user_id", None)  # 筛选条件 user_id
+            if isinstance(user_id, str) and len(user_id) == 24:
                 a_url += "user_id={}".format(user_id)
+                user_id = ObjectId(user_id)
             city = get_arg(request, "city", None)
             if city is not None and city != "":
                 if a_url.endswith("?"):
@@ -873,10 +879,13 @@ def violation_func():
                 a_url += "&cur_index={}"
             vio_list = list()
             vio_count = 0
-            if user_id is not None and user_id not in employees:
+            if (user_id is not None and user_id not in eids) or len(eids) == 0:
                 """待查看用户不在权限范围内"""
-                pass
+                vio_list = list()
+                vio_count = 0  # 违章条数
             else:
+                user_id = eids if user_id is None else user_id
+                user_id = None # 调试时打开,以尽可能多的获取违章记录
                 args = {
                     "user_id": user_id,
                     "city": city,

@@ -93,8 +93,7 @@ def test_query_violation():
     auth_token = "a98d8bb4840c42e3993ccc6d6c79d431"  # app段登录标识 me
     # auth_token = "47a55e628931458fb70773badbe063ba"  # app段登录标识 me
     headers = {"auth_token": auth_token}
-    # args = {"_id": "5af55414e39a7b7691355f41"}   #
-    args = {"_id": "5af938984660d345c070c1c7"}   #
+    args = {"_id": "5af95af2e39a7b5b754c4efe"}   # 查询器id
     url = "http://safego.org:5000/api/query_violation"
     url = "http://127.0.0.1:5000/api/query_violation"
     res = requests.post(url, data=args, headers=headers)
@@ -285,7 +284,7 @@ if __name__ == "__main__":
     #     "user_id": "59cda886ad01be237680e28e"
     # }
     """测试检查新版本"""
-    test_check_version()
+    # test_check_version()
     """测试获取用户信息"""
     # test_get_user_info()
     """测试获取每日报告"""
@@ -293,7 +292,7 @@ if __name__ == "__main__":
     """测试获取违章查询器列表"""
     # test_get_vio_query_shortcuts()
     """测试违章查询"""
-    # test_query_violation()
+    test_query_violation()
     """测试获取用户行车证信息"""
     # test_get_car_license()
     """测试用户上传行车证图片"""
