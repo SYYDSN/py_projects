@@ -13,8 +13,8 @@ def insert_error_code(**kwargs):
     return inserted_id
 
 
-args = {"code": 7002,
-        "description": "接口返回了出错信息"}
+args = {"code": 3018,
+        "description": "约定的图片名未在本次请求或图片名与约定不一致"}
 
 
 print(insert_error_code(**args))

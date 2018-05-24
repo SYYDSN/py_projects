@@ -137,17 +137,33 @@ class Log(mongo_db.BaseDoc):
         """
         func_name = self.get_attr("func_name")
         user_id = self.get_attr("user_id")
-        if func_name is None or user_id is None or (isinstance(user_id, str) and len(user_id) != 24):
-            ms = "异常的Log实例: {}".format(str(self.__dict__))
-            logger.exception(ms)
-            print(ms)
-            pass
+        """检查执行的函数是否有异常?"""
+        error_reason = ""
+        error_flag = False
+        if func_name is None:
+            error_flag = True
+            error_reason = "没有func_name"
+        elif user_id is None:
+            error_flag = True
+            error_reason = "没有user_id"
+        elif isinstance(user_id, str) and len(user_id) != 24:
+            error_flag = True
+            error_reason = "user_id长度不足, user_id:{}".format(user_id)
         else:
             """
             统计事件
             query_violation: 统计违章查询
             """
             UseHandlerRecord.record(user_id=user_id, func_name=func_name)
+        """检查是否有必要记录异常"""
+        if error_flag:
+            # 不需要登录的函数名
+            loginless_func = ['api_send_sms', 'app_user_login']
+            if func_name is not None and func_name not in loginless_func:
+                ms = "异常的请求记录,错误原因:{}. Log实例: {}".format(error_reason, str(self.__dict__))
+                logger.exception(ms)
+                title = "保驾犬平台监控到{}函数的异常操作信息".format(func_name)
+                mail_module.send_mail(title=title, content=ms)
         super(Log, self).save_plus(ignore=ignore, upsert=upsert)
 
 
@@ -259,8 +275,8 @@ class User(mongo_db.BaseDoc):
             kwargs['head_img_url'] = "static/image/head_img/default_01.png"
         if "create_date" not in kwargs:
             kwargs['create_date'] = now
-        if "last_update" not in kwargs:
-            kwargs['last_update'] = now
+        # if "last_update" not in kwargs:
+        #     kwargs['last_update'] = now
         super(User, self).__init__(**kwargs)
 
     def get_archives(self) -> dict:
@@ -437,7 +453,7 @@ class User(mongo_db.BaseDoc):
     def last_update_cls(cls, user_id: (str, ObjectId)) -> datetime.datetime:
         """
         这是一个补救的函数,用于在旧的用户没有self.last_update属性的时候补齐这个属性.
-        本质上是self.last_update函数的类方法实现.
+        本质上是self.get_last_update函数的类方法实现.
         :param user_id: 用户id
         :return:
         """
@@ -2490,7 +2506,14 @@ if __name__ == "__main__":
     """获取指定用户,指定时间距今途经的城市列表"""
     # the_date = mongo_db.get_datetime_from_str("2017-01-01 0:0:0")
     # ThroughCity.get_cities(ObjectId("59895177de713e304a67d30c"))
-    """查询制定用户的有效行车证列表"""
+    """查询指定用户的有效行车证列表"""
     # print(User.get_usable_license(u_id))
     # print(CarLicense.get_usable_license(u_id))
+    """查询指定用户的短信发送"""
+    ff = {"func_name": "api_send_sms"}
+    rr = Log.find_plus(filter_dict=ff, to_dict=True)
+    for x in rr:
+        phone = x['request_json']['username']
+        if phone in ['13817754724', '13918677317']:
+            print(x)
     pass

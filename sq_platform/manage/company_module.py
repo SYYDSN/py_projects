@@ -175,8 +175,7 @@ class Company(mongo_db.BaseDoc):
             if online in filter_online_list:
                 """过滤条件"""
                 res.append(mongo_db.to_flat_dict(x))
-        if sort_dict is None:
-            """默认最后登录时间倒序"""
+
         resp = dict()
         resp["all"] = all_count
         resp['today_reg'] = today_reg_count

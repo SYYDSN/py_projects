@@ -248,108 +248,115 @@ def update_image(user_id, key):
         ms = "{} 上传文件，key={},files={}, user_id={}".format(sys._getframe().f_code.co_name, key, upload_files, user_id)
         logger.info(ms)
         try:
-            file = upload_files[key]
-            raw_file_name = file.filename.lower()
-            suffix = raw_file_name.split(".")[-1]
-            if suffix in ALLOWED_EXTENSIONS:
-                """允许的文件类型"""
-                file_name = "{}.{}".format(uuid4().hex, suffix)
-                img_dir_path = get_img_dir_path(key)
-                full_path = os.path.join(img_dir_path, file_name)
-                file.save(full_path)
-                update_dict = None
-                result = None
-                if key == "avatar":
-                    """用户上传头像"""
-                    part_url = "static/image/{}/{}".format(key, file_name)
-                    img_url = request.host_url + part_url
-                    message['data'] = img_url
-                    user = User.find_by_id(user_id)
-                    filter_dict = {"_id": user_id}
-                    update_dict = {"$set": {"head_img_url": part_url}}
-                    print("------------")
-                    print(filter_dict)
-                    print(update_dict)
-                    print("---------")
-                    result = user.find_one_and_update(filter_dict=filter_dict, update=update_dict)
-                    print(result)
-                elif key == "permit_image":
-                    """如果是行车证照片的话，需要创建/修改一个对应的行车证信息"""
-                    part_url = "static/image/{}/{}".format(key, file_name)
-                    img_url = request.host_url + part_url
-                    message['data'] = img_url
-                    result = "Ok"  # 仅仅为了下面的if不报错而已
-                    _id = get_arg(request, "_id")  # 获取请求的行车证信息的id
-                    _id = _id.strip() if isinstance(_id, str) else _id
-                    """创建一个行车证信息"""
-                    if _id is None or _id == "":
-                        """这是上传图片添加行车证的情况"""
-                        permit_image_url = request.host_url + part_url
-                        car_license_kwargs = {"permit_image_url": part_url,
-                                              "user_id": user_id}
-                        print("new permit_image args: {}".format(_id))
-                        r = CarLicense.instance(**car_license_kwargs)  # 插入一个行车证信息
-                        if r is not None:
-                            _id = r.get_id()
-                            res = dict()
-                            res['_id'] = str(_id)
-                            res['permit_image_url'] = permit_image_url
-                            message['data'] = res
-                        else:
-                            ms = "CarLicense.instance函数没有正确的返回,参数:{}".format(car_license_kwargs)
-                            logger.exception(ms)
-                            print(ms)
-                            message = pack_message(message, 5000, **car_license_kwargs)
-                    else:
-                        """这是修改一个行车证图片的情况"""
-                        print("修改行车证图片,_id={}".format(_id))
-                        if not isinstance(_id, ObjectId):
-                            _id = ObjectId(_id)
-                        filter_dict = {"_id": _id}
-                        permit_image_url = request.host_url + part_url
-                        update = {"$set": {"permit_image_url": part_url}}
-                        r = CarLicense.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update, upsert=False)
-                        if r is not None:
-                            res = dict()
-                            res['_id'] = str(_id)
-                            res['permit_image_url'] = permit_image_url
-                            message['data'] = res
-                        else:
-                            ms = "CarLicense.find_one_and_update_plus函数没有正确的返回,参数:{} {}".format(filter_dict, update)
-                            logger.exception(ms)
-                            print(ms)
-                            message = pack_message(message, 3004, _id=_id, error_cause=ms, permit_image_url=permit_image_url)
-                elif key == "license_image":
-                    """上传驾驶证照片信息,驾驶证的照片地址是User的直接属性"""
-                    part_url = "static/image/{}/{}".format(key, file_name)
-                    img_url = request.host_url + part_url
-                    message['data'] = img_url
-                    result = "Ok"  # 仅仅为了下面的if不报错而已
-                    user = User.find_by_id(user_id)
-                    if isinstance(user, User):
-                        res = user.update_driving_license(image_url=part_url)
-                        if res['message'] == "success":
-                            image_url = img_url  # 返回驾驶证图片的绝对地址
-                            _id = str(user_id)
-                            data = {"_id": _id, "image_url": image_url}
-                            message['data'] = data
-                        else:
-                            ms = "update_image func Error: key={},img_url={}".format(key, img_url)
-                            logger.exception(ms)
-                    else:
-                        message = pack_message(message, 3004, user_id=str(user_id))
-                else:
-                    """不是用户上传头像,行车证和驾驶证照片"""
-                    part_url = "static/image/{}/{}".format(key, file_name)
-                    img_url = request.host_url + part_url
-                    message['data'] = img_url
-                    result = "Ok"  # 仅仅为了下面的if不报错而已
-                    print(result)
-
-                if result is None:
-                    message = pack_message(message, 6001, user_id=user_id, update_dict=update_dict)
+            if key not in upload_files:
+                """请求中没有包含图片"""
+                message = pack_message(message, 3018, key=key)
+                ms = "上传图片的请求中没有包含图片,path:{}".format(request.path)
+                logger.exception(ms)
+                print(ms)
             else:
-                message = pack_message(message, 3001, file_name=raw_file_name, allow_file_suffix=ALLOWED_EXTENSIONS)
+                file = upload_files[key]
+                raw_file_name = file.filename.lower()
+                suffix = raw_file_name.split(".")[-1]
+                if suffix in ALLOWED_EXTENSIONS:
+                    """允许的文件类型"""
+                    file_name = "{}.{}".format(uuid4().hex, suffix)
+                    img_dir_path = get_img_dir_path(key)
+                    full_path = os.path.join(img_dir_path, file_name)
+                    file.save(full_path)
+                    update_dict = None
+                    result = None
+                    if key == "avatar":
+                        """用户上传头像"""
+                        part_url = "static/image/{}/{}".format(key, file_name)
+                        img_url = request.host_url + part_url
+                        message['data'] = img_url
+                        user = User.find_by_id(user_id)
+                        filter_dict = {"_id": user_id}
+                        update_dict = {"$set": {"head_img_url": part_url}}
+                        print("------------")
+                        print(filter_dict)
+                        print(update_dict)
+                        print("---------")
+                        result = user.find_one_and_update(filter_dict=filter_dict, update=update_dict)
+                        print(result)
+                    elif key == "permit_image":
+                        """如果是行车证照片的话，需要创建/修改一个对应的行车证信息"""
+                        part_url = "static/image/{}/{}".format(key, file_name)
+                        img_url = request.host_url + part_url
+                        message['data'] = img_url
+                        result = "Ok"  # 仅仅为了下面的if不报错而已
+                        _id = get_arg(request, "_id")  # 获取请求的行车证信息的id
+                        _id = _id.strip() if isinstance(_id, str) else _id
+                        """创建一个行车证信息"""
+                        if _id is None or _id == "":
+                            """这是上传图片添加行车证的情况"""
+                            permit_image_url = request.host_url + part_url
+                            car_license_kwargs = {"permit_image_url": part_url,
+                                                  "user_id": user_id}
+                            print("new permit_image args: {}".format(_id))
+                            r = CarLicense.instance(**car_license_kwargs)  # 插入一个行车证信息
+                            if r is not None:
+                                _id = r.get_id()
+                                res = dict()
+                                res['_id'] = str(_id)
+                                res['permit_image_url'] = permit_image_url
+                                message['data'] = res
+                            else:
+                                ms = "CarLicense.instance函数没有正确的返回,参数:{}".format(car_license_kwargs)
+                                logger.exception(ms)
+                                print(ms)
+                                message = pack_message(message, 5000, **car_license_kwargs)
+                        else:
+                            """这是修改一个行车证图片的情况"""
+                            print("修改行车证图片,_id={}".format(_id))
+                            if not isinstance(_id, ObjectId):
+                                _id = ObjectId(_id)
+                            filter_dict = {"_id": _id}
+                            permit_image_url = request.host_url + part_url
+                            update = {"$set": {"permit_image_url": part_url}}
+                            r = CarLicense.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update, upsert=False)
+                            if r is not None:
+                                res = dict()
+                                res['_id'] = str(_id)
+                                res['permit_image_url'] = permit_image_url
+                                message['data'] = res
+                            else:
+                                ms = "CarLicense.find_one_and_update_plus函数没有正确的返回,参数:{} {}".format(filter_dict, update)
+                                logger.exception(ms)
+                                print(ms)
+                                message = pack_message(message, 3004, _id=_id, error_cause=ms, permit_image_url=permit_image_url)
+                    elif key == "license_image":
+                        """上传驾驶证照片信息,驾驶证的照片地址是User的直接属性"""
+                        part_url = "static/image/{}/{}".format(key, file_name)
+                        img_url = request.host_url + part_url
+                        message['data'] = img_url
+                        result = "Ok"  # 仅仅为了下面的if不报错而已
+                        user = User.find_by_id(user_id)
+                        if isinstance(user, User):
+                            res = user.update_driving_license(image_url=part_url)
+                            if res['message'] == "success":
+                                image_url = img_url  # 返回驾驶证图片的绝对地址
+                                _id = str(user_id)
+                                data = {"_id": _id, "image_url": image_url}
+                                message['data'] = data
+                            else:
+                                ms = "update_image func Error: key={},img_url={}".format(key, img_url)
+                                logger.exception(ms)
+                        else:
+                            message = pack_message(message, 3004, user_id=str(user_id))
+                    else:
+                        """不是用户上传头像,行车证和驾驶证照片"""
+                        part_url = "static/image/{}/{}".format(key, file_name)
+                        img_url = request.host_url + part_url
+                        message['data'] = img_url
+                        result = "Ok"  # 仅仅为了下面的if不报错而已
+                        print(result)
+
+                    if result is None:
+                        message = pack_message(message, 6001, user_id=user_id, update_dict=update_dict)
+                else:
+                    message = pack_message(message, 3001, file_name=raw_file_name, allow_file_suffix=ALLOWED_EXTENSIONS)
         except KeyError as e:
             print(e)
             logger.exception("Error! case: {}".format(e))

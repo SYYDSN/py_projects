@@ -107,17 +107,26 @@ body{
     max-width: 15em;
 }
 /*状态相关*/
-#show_table  status_0,status_1{
+. status_0, .status_1, .status_2, .status_3, .status_4{
     word-wrap: normal;
     word-break: keep-all;
+}
+#show_table  .status_1{
+    background-color: #ff7772 !important;
+}
+#show_table  .status_2{
+    background-color: #fb9c70 !important;
+}
+#show_table  .status_3{
+    background-color: #87aafb !important;
+}
+#show_table  .status_4{
+    background-color: #666 !important;
 }
 #show_table .my_status{
     padding: 0.5em 0.8em;
     border-radius: 0.3em;
     color:white;
-}
-#show_table  .status_0{
-    background-color: #ff7772;
 }
 #show_table  .status_1{
     background-color: #ddd;

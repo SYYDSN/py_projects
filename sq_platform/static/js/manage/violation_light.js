@@ -39,60 +39,61 @@ $(function(){
     $(window).resize(function(){resize();});
     resize();
 
-    // 修改按钮事件
-    $("#show_table .my_btn_group .edit").each(function(){
-        let item = $(this);
-        item.click(function(){
-            let $this = $(this);
-            let vio_id = $this.attr("data-id");
-            let tr = $(`#${vio_id}`);
-            let span = tr.find(".span");
-            let select = tr.find(".select");
-            let span_show = span.hasClass("show");
-            console.log(span_show);
-            if(span_show){
-                // 处于正常状态
-                $this.text("放弃");
-            }
-            else{
-                $this.text("修改");
-            }
-            span.toggleClass("show").toggleClass("hide");
-            select.toggleClass("show").toggleClass("hide");
-        });
-    });
-
-    // 保存按钮事件
-    $("#show_table .my_btn_group .save").each(function(){
-        let item = $(this);
-        item.click(function(){
-            let $this = $(this);
-            let vio_id = $this.attr("data-id");
-            let tr = $(`#${vio_id}`);
-            let span = tr.find(".span");
-            let select = tr.find(".select");
-            let span_show = span.hasClass("show");
-            if(!span_show){
-                let user_id = select.val();
-                if(user_id !== ""){
-                    // 修改违章的所有人
-                    let args = {
-                      "vio_id": vio_id,
-                      "user_id": user_id,
-                      "the_type": "update_user_id"
-                    };
-                    $.post("violation", args, function(resp){
-                        span.text(select.find("option:selected").text());
-                    });
-                span.toggleClass("show").toggleClass("hide");
-                select.toggleClass("show").toggleClass("hide");
-                }else{}
-            }
-            else{
-                // 非编辑状态,pass
-            }
-        });
-    });
+    // 事件注销,只保留直接修改关联司机的功能
+    // // 修改按钮事件
+    // $("#show_table .my_btn_group .edit").each(function(){
+    //     let item = $(this);
+    //     item.click(function(){
+    //         let $this = $(this);
+    //         let vio_id = $this.attr("data-id");
+    //         let tr = $(`#${vio_id}`);
+    //         let span = tr.find(".span");
+    //         let select = tr.find(".select");
+    //         let span_show = span.hasClass("show");
+    //         console.log(span_show);
+    //         if(span_show){
+    //             // 处于正常状态
+    //             $this.text("放弃");
+    //         }
+    //         else{
+    //             $this.text("修改");
+    //         }
+    //         span.toggleClass("show").toggleClass("hide");
+    //         select.toggleClass("show").toggleClass("hide");
+    //     });
+    // });
+    //
+    // // 保存按钮事件
+    // $("#show_table .my_btn_group .save").each(function(){
+    //     let item = $(this);
+    //     item.click(function(){
+    //         let $this = $(this);
+    //         let vio_id = $this.attr("data-id");
+    //         let tr = $(`#${vio_id}`);
+    //         let span = tr.find(".span");
+    //         let select = tr.find(".select");
+    //         let span_show = span.hasClass("show");
+    //         if(!span_show){
+    //             let user_id = select.val();
+    //             if(user_id !== ""){
+    //                 // 修改违章的所有人
+    //                 let args = {
+    //                   "vio_id": vio_id,
+    //                   "user_id": user_id,
+    //                   "the_type": "update_user_id"
+    //                 };
+    //                 $.post("violation", args, function(resp){
+    //                     span.text(select.find("option:selected").text());
+    //                 });
+    //             span.toggleClass("show").toggleClass("hide");
+    //             select.toggleClass("show").toggleClass("hide");
+    //             }else{}
+    //         }
+    //         else{
+    //             // 非编辑状态,pass
+    //         }
+    //     });
+    // });
 
     // 确定跳转按钮事件
     $("#redirect_btn").click(function(){
@@ -156,6 +157,52 @@ $(function(){
         $("#begin_date,#end_date,#select_city,#select_car,#select_driver").val("");
     });
 
+    // let prev_relevant_user = null;   // 在修改违章关联的事件发生前,保存之前的违章相关司机,以便修改失败的时候回溯.
+    // 改变违章记录归属司机的selected事件.
+    $(".change_user_id").each(function(){
+        let select = $(this);
+        // select.mousedown(function(){
+        //     // 把改变之前的违章关联司机的id写入全局变量
+        //     prev_relevant_user = select.parents("tr:first").attr("data-uid");
+        // });
+        select.change(function(){
+            let tr = select.parents("tr:first");
+            let vio_id = tr.attr("id");
+            let prev_user_id = tr.attr("data-uid");
+            let new_user_id = select.val();
+            let new_driver = driver_dict[new_user_id];
+            let emp_num = new_driver === undefined? "": new_driver['employee_number'];
+            // 发送修改违章关联司机的请求
+            let u = "/manage/violation";
+            let args = {
+                "the_type": "update_user_id",
+                "vio_id": vio_id,
+                "user_id": new_user_id
+            };
+            if(vio_id.length === 24 && new_user_id.length === 24){
+                $.post(u, args, function(resp){
+                    let json = JSON.parse(resp);
+                    if(json['message'] === "success"){
+                        let id_str = "#" + vio_id;
+                        $(`${id_str} .employee_number`).text(emp_num);
+                        $(`${id_str}`).attr("data-uid", new_user_id);
+                    }
+                    else{
+                        alert(json['message']);
+                        select.val(prev_user_id);
+                        return false;
+                    }
+                });
+            }else{
+                console.log(`错误的id长度,vio_id:${vio_id}, new_user_id:${new_user_id}`);
+                select.val(prev_user_id);
+                return false;
+            }
+
+
+        });
+    });
+
 
     function init_input(arg_url) {
         // 从url分析参数,进行初始化工作
@@ -185,7 +232,18 @@ $(function(){
                     else if (k === "plate_number") {
                         $("#select_car").val(v);
                     }
-
+                    else if (k === "vio_status") {
+                         $("#check_processed, #check_unprocessed").removeProp("checked");
+                        if(v === "3"){
+                            $("#check_processed").prop("checked", true);
+                        }
+                        else if (v === "1"){
+                            $("#check_unprocessed").prop("checked", true);
+                        }
+                        else{
+                             $("#check_processed, #check_unprocessed").prop("checked", true);
+                        }
+                    }
                 } else {}
             }
         }

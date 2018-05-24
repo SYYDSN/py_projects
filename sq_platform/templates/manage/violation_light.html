@@ -62,7 +62,7 @@
                 <!--列表显示区域-->
                 <table class="" id="show_table">
                     <tr class="title">
-                        <th>违章编号</th>
+                        <!--<th>违章编号</th>-->
                         <th>车牌</th>
                         <th>违章地点</th>
                         <th>违章时间</th>
@@ -73,38 +73,42 @@
                         <th>扣分</th>
                         <th>罚金</th>
                         <th>处理状态</th>
-                        <th></th>
                     </tr>
                     {% for vio in vio_list %}
-                        <tr id="{{ vio._id }}">
-                            <td>{{ vio.code }}</td>
+                        <tr id="{{ vio._id }}" data-uid="{{ vio.user_id }}">
+                            <!--<td>{{ vio.code }}</td>-->
                             <td>{{ vio.plate_number }}</td>
                             <td title="vio.address">{{ vio.address }}</td>
                             <td>{{ vio.time.split(" ")[0] }}</td>
                             <td title="{{ vio.reason }}" class="blue fix_width">{{ vio.reason }}</td>
                             <td>{{ vio.city }}</td>
                             <td class="driver_name">
+                                <!--
                                 <span class="span show" data-id="{{ vio.user_id }}">
                                     {{ '' if drivers.get(vio.user_id) is none else drivers[vio.user_id].real_name }}
                                 </span>
-                                <select class="select hide">
+                                -->
+                                <select class="select change_user_id">
+                                    <option value=""></option>
                                     {% for k, v in drivers.items() %}
-                                        <option value="{{ k }}">{{ v.real_name }}</option>
+                                        <option value="{{ k }}" {{ "selected" if k == vio.user_id else "" }}>{{ v.real_name }}</option>
                                     {% endfor %}
                                 </select>
                             </td>
-                            <td>{{ '' if drivers.get(vio.user_id) is none else drivers.get(vio.user_id)['employee_number'] }}</td>
+                            <td><span class="employee_number">{{ drivers.get(vio.user_id).employee_number }}</span></td>
                             <td>{{ vio.point }}</td>
                             <td class="blue">{{ vio.fine }}</td>
                             <td>
-                                <span class="my_status {{ 'status_1' if vio.process_status == "3" else 'status_0' }}">{{ "未知" if vio.process_status is none else vio_dict[vio.process_status | string ] }}</span>
+                                <span class="my_status {{ 'status_' + vio.process_status | string }}">{{ "未知" if vio.process_status is none else vio_dict[vio.process_status | string ] }}</span>
                             </td>
+                            <!--
                             <td class="blue">
                                 <div class="my_btn_group">
                                     <span class="edit" data-id="{{ vio._id }}">修改</span>
                                     <span class="save" data-id="{{ vio._id }}">保存</span>
                                 </div>
                             </td>
+                            -->
                         </tr>
                     {% endfor %}
                 </table>
@@ -130,12 +134,16 @@
     </div>
 {% endblock %}
 {% block extend_js %}
+    <script>
+    /*传递变量*/
+    driver_dict = {{ drivers | safe }};  // 以司机id为key,司机信息的dict为val的字典.
+    </script>
     <!--日期选择器样式-->
     <link rel="stylesheet" href="../static/css/bootstrap-datetimepicker.min.css">
     <!--日期选择器-->
-    <script src="../../static/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="../static/js/bootstrap-datetimepicker.min.js"></script>
     <!--日期选择器本地化语言-->
-    <script src="../../static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="../static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
 
     <script src="../static/js/manage/violation_light.js"></script>
 {% endblock %}

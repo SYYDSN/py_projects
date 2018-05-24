@@ -242,7 +242,7 @@ class ViolationRecode(mongo_db.BaseDoc):
     _table_name = "violation_info"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
-    type_dict['user_id'] = ObjectId  # 关联用户的id
+    type_dict['user_id'] = ObjectId  # 关联用户的id,
     type_dict['plate_number'] = str  # 违章时的车牌号
     type_dict["code"] = str  # 违章编码,唯一，非违章条例码
     type_dict["time"] = datetime.datetime  # 违章时间
@@ -311,6 +311,7 @@ class ViolationRecode(mongo_db.BaseDoc):
 
     def exists(self):
         """
+        废弃方法 2018-5-23
         检查一条违章记录是否已存在？
         1. 存在且完全相同就不做更新。
         2. 存在不同就update
@@ -415,9 +416,15 @@ class ViolationRecode(mongo_db.BaseDoc):
             filter_dict['city'] = regex.Regex('.*{}.*'.format(city))  # 正则表达式,匹配city中包含city字符串的
         if plate_number is not None:
             filter_dict['plate_number'] = regex.Regex('.*{}.*'.format(plate_number))  # 正则表达式
-        if vio_status is not None:
-            s_d = {"未处理": 1, "处理中": 2, "已处理": 3}
-            filter_dict['process_status'] = s_d.get(vio_status, 4)  # 4是不支持的状态
+        if isinstance(vio_status, int) and 0 < vio_status < 5:
+            """
+            违章状态分四种,分别是1-4的数组.
+            1. 未处理
+            2. 处理中
+            3. 已处理
+            4. 不支持
+            """
+            filter_dict['process_status'] = vio_status  # int类型
         if fine is not None:
             filter_dict['fine'] = float(fine)
         filter_dict['time'] = {"$lte": end_date, "$gte": begin_date}
@@ -1392,6 +1399,7 @@ def add_plate_number():
 
 
 if __name__ == "__main__":
+    import random
     u_id = ObjectId("59895177de713e304a67d30c")  # 上海市
     # g_id = ObjectId("5acac5214660d32418a93f3c")  # 信阳市
     g_id = ObjectId("5ac49aa74660d356cce9df9f")  # 违章查询器id
@@ -1409,29 +1417,41 @@ if __name__ == "__main__":
     # r = ViolationQueryResult.find_by_id("5ae2b8c2e39a7b4cf7d7cc27")
     # print(r)
     """测试保存/更新违章记录"""
-    # args = {
-    #     "can_select" : 0,
-    #     "code" : "49-809554",
-    #     "fine" : 210.0,
-    #     "position_id" : ObjectId("5acad1fe4660d325c813e583"),
-    #     "organ_name" : "上海市公安局徐汇分局交通警察支队四大队",
-    #     "user_id" : ObjectId("598d6ac2de713e32dfc74796"),
-    #     "city" : "上海市",
-    #     "province" : "上海市",
-    #     "violation_city" : "上海市",
-    #     "plate_number" : "赣EG2A81",
-    #     "reason" : "机动车违反规定停放、临时停车，驾驶人不在现场或者虽在现场但驾驶人拒绝立即驶离，妨碍其它车辆、行人通行的",
-    #     "point" : 0,
-    #     "violation_num" : "1039A",
-    #     "payment_status" : "1",
-    #     "address" : "柳州路出宜山路北约60米",
-    #     "update_time" : mongo_db.get_datetime_from_str("2018-05-14T16:59:15.689Z"),
-    #     "time" : mongo_db.get_datetime_from_str("2018-05-02T07:45:00.000Z"),
-    #     "process_status" : "1"
-    # }
-    # vio = ViolationRecode(**args)
-    # vio.save_instance()
+    # def random_args(num):
+    #     res = {
+    #         "can_select": 0,
+    #         "code": "49-809554",
+    #         "fine": 210.0,
+    #         "position_id": ObjectId("5af547e4e39a7b5371943a4a"),
+    #         "organ_name": "上海市公安局徐汇分局交通警察支队四大队",
+    #         "user_id": ObjectId("5af547e4e39a7b5371943a4a"),
+    #         "city": "上海市",
+    #         "province": "上海市",
+    #         "violation_city": "上海市",
+    #         "plate_number": "沪A12345",
+    #         "reason": "机动车违反规定停放(测试违章)",
+    #         "point": 0,
+    #         "violation_num": "1039A",
+    #         "payment_status": "1",
+    #         "address": "柳州路出宜山路北约{}米".format(random.randint(10, 20) * num),
+    #         "update_time": mongo_db.get_datetime_from_str("2018-05-14T16:59:15.689Z"),
+    #         "time": mongo_db.get_datetime_from_str("2018-05-{}T07:{}:00.000Z".format(10 + num,
+    #                                                                                  random.randint(1, 59))),
+    #         "process_status": 1,
+    #         "forgery": True
+    #     }
+    #     return res
+    # for i in range(3):
+    #     vio = ViolationRecode(**random_args(i))
+    #     vio.save_instance()
     """转换违章查询器的user_id属性为DBRef"""
-    VioQueryGenerator.repair_user_id()
+    # VioQueryGenerator.repair_user_id()
+    """转换所有的违章记录的处理状态为int类型"""
+    # ff = {"process_status": {"$type": 2}}
+    # rr = ViolationRecode.find_plus(filter_dict=ff, to_dict=True)
+    # for r in rr:
+    #     f = {"_id": r['_id']}
+    #     u = {"$set": {"process_status": int(r['process_status'])}}
+    #     ViolationRecode.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
     pass
 

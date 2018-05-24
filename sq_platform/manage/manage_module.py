@@ -873,6 +873,7 @@ def violation_func():
                 print(e)
             finally:
                 cur_index = 1 if not isinstance(cur_index, int) else cur_index
+                cur_index = 1 if cur_index < 1 else cur_index
             if a_url.endswith("?"):
                 a_url += "cur_index={}"
             else:
@@ -885,7 +886,7 @@ def violation_func():
                 vio_count = 0  # 违章条数
             else:
                 user_id = eids if user_id is None else user_id
-                user_id = None # 调试时打开,以尽可能多的获取违章记录
+                # user_id = None  # 调试时打开,以尽可能多的获取违章记录
                 args = {
                     "user_id": user_id,
                     "city": city,
@@ -928,7 +929,8 @@ def violation_func():
                 vio_id = get_arg(request, "vio_id")
                 user_id = get_arg(request, "user_id")
                 filter_dict = {"_id": ObjectId(vio_id)}
-                update_dict = {"$set": {"user_id": ObjectId(user_id)}}
+                user_id = None if user_id == "" else ObjectId(user_id)
+                update_dict = {"$set": {"user_id": user_id}}
                 ViolationRecode.find_one_and_update_plus(filter_dict=filter_dict, update_dict=update_dict)
                 return json.dumps(mes)
             else:
