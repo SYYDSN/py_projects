@@ -489,6 +489,11 @@ update_custom_markers = function(debug){
 };
 
 
+// 收到最后的坐标信息的事件.
+io_client.on("last_position", function(resp){
+    console.log(resp);
+});
+
 // 右侧边滑动栏收放事件.
 $("#right_side_bar_handler").click(function(e){
     var class_str = $("#right_side_bar").attr("class");

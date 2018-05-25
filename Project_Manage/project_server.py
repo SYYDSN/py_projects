@@ -10,6 +10,8 @@ from flask import request
 from werkzeug.contrib.cache import RedisCache
 from flask_session import Session
 from log_module import get_logger
+from module.online_module import get_online_report
+from module.online_module import get_online_report2
 import json
 from json import JSONDecodeError
 from module.user_module import *
@@ -127,11 +129,21 @@ def login_out_func():
     return json.dumps({"message": "success"})
 
 
-@app.route("/online_report")
+@app.route("/online_report", methods=['post', 'get'])
 @check_platform_session
 def online_report_func():
     """在线人数报告页面"""
-    return render_template("online_report.html")
+    if request.method.lower() == "get":
+        data = get_online_report()
+        return render_template("online_report.html", data=data)
+    else:
+        user_id = get_arg(request, "user_id", None)
+        if user_id is None:
+            """查询月活跃数据"""
+            data = get_online_report2()
+            return json.dumps(data)
+        else:
+            return abort(404)
 
 
 @app.route("/manage_<key1>/<key2>", methods=['post', 'get'])

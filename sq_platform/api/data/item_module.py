@@ -2510,10 +2510,17 @@ if __name__ == "__main__":
     # print(User.get_usable_license(u_id))
     # print(CarLicense.get_usable_license(u_id))
     """查询指定用户的短信发送"""
-    ff = {"func_name": "api_send_sms"}
-    rr = Log.find_plus(filter_dict=ff, to_dict=True)
-    for x in rr:
-        phone = x['request_json']['username']
-        if phone in ['13817754724', '13918677317']:
-            print(x)
+    # ff = {"func_name": "api_send_sms"}
+    # rr = Log.find_plus(filter_dict=ff, to_dict=True)
+    # for x in rr:
+    #     phone = x['request_json']['username']
+    #     if phone in ['13817754724', '13918677317']:
+    #         print(x)
+    begin = mongo_db.get_datetime_from_str("2018-5-3 00:00:00")
+    end = mongo_db.get_datetime_from_str("2018-5-3 23:59:59")
+    f = {"time": {"$lte": end, "$gte": begin}}
+    r = GPS.find_plus(filter_dict=f, to_dict=True)
+    r = [str(x['user_id'].id) for x in r]
+    r = set(r)
+    print(r)
     pass

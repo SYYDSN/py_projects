@@ -315,49 +315,8 @@ def files_to_mongodb_bak(args_dict: dict) -> None:
             obj_list = [x for x in obj_list if not (x.get("time") == "0" or x.get('ts') == "0")]
             if len(obj_list) > 0:
                 inserted_obj_list = GPS.insert_many(obj_list)  # 插入成功的GPS实例的doc的数组
-                """开始生产track数据,并返回最后的位置点"""
-                last_position = Track.batch_create_item_from_gps(inserted_obj_list)
-                if last_position is not None:
-                    """发送给tornado服务器，通告最后的位置点"""
-                    flask_server_port = cache.get("flask_server_port")
-                    if flask_server_port is None:
-                        tornado_server_port = 5001
-                    else:
-                        try:
-                            flask_server_port = int(flask_server_port)
-                        except ValueError as e:
-                            flask_server_port = 5000
-                            print(e)
-                        except TypeError as e:
-                            flask_server_port = 5000
-                            print(e)
-                        finally:
-                            tornado_server_port = flask_server_port + 1
-                    url = "http://127.0.0.1:{}/listen_request".format(tornado_server_port)
-                    data = {"mes_type": "last_position",
-                            "data_dict": {"position": last_position}}
-                    try:
-                        # r = requests.post(url=url, data=data, timeout=1)  # tornado端未完善，暂时注销
-                        r = None
-                        if r is not None and r.status_code == 200:
-                            logger.info("last_position send success!", exc_info=True, stack_info=True)
-                    except requests.exceptions.Timeout as e:
-                        logger.exception("Connection timeout: ", exc_info=True, stack_info=True)
-                        raise e
-                    except requests.exceptions.ConnectionError as e:
-                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
-                        raise e
-                    except requests.exceptions.HTTPError as e:
-                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
-                        raise e
-                    except requests.exceptions.RequestException as e:
-                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
-                        raise e
-                    except Exception as e:
-                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
-                        raise e
-                    finally:
-                        pass
+                """生产track数据"""
+                Track.batch_create_item_from_gps(inserted_obj_list)
             else:
                 print("empty file: {}".format(file_path))
         else:
@@ -399,49 +358,8 @@ def files_to_mongodb(args_dict: dict) -> None:
             obj_list = [x for x in obj_list if not (x.get("time") == "0" or x.get('ts') == "0")]
             if len(obj_list) > 0:
                 inserted_obj_list = GPS.insert_many(obj_list)  # 插入成功的GPS实例的doc的数组
-                """开始生产track数据,并返回最后的位置点"""
+                """生产track数据,并返回最后的位置点"""
                 last_position = Track.batch_create_item_from_gps(inserted_obj_list)
-                if last_position is not None:
-                    """发送给tornado服务器，通告最后的位置点"""
-                    flask_server_port = cache.get("flask_server_port")
-                    if flask_server_port is None:
-                        tornado_server_port = 5001
-                    else:
-                        try:
-                            flask_server_port = int(flask_server_port)
-                        except ValueError as e:
-                            flask_server_port = 5000
-                            print(e)
-                        except TypeError as e:
-                            flask_server_port = 5000
-                            print(e)
-                        finally:
-                            tornado_server_port = flask_server_port + 1
-                    url = "http://127.0.0.1:{}/listen_request".format(tornado_server_port)
-                    data = {"mes_type": "last_position",
-                            "data_dict": {"position": last_position}}
-                    try:
-                        # r = requests.post(url=url, data=data, timeout=1)  # tornado端未完善，暂时注销
-                        r = None
-                        if r is not None and r.status_code == 200:
-                            logger.info("last_position send success!", exc_info=True, stack_info=True)
-                    except requests.exceptions.Timeout as e:
-                        logger.exception("Connection timeout: ", exc_info=True, stack_info=True)
-                        raise e
-                    except requests.exceptions.ConnectionError as e:
-                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
-                        raise e
-                    except requests.exceptions.HTTPError as e:
-                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
-                        raise e
-                    except requests.exceptions.RequestException as e:
-                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
-                        raise e
-                    except Exception as e:
-                        logger.exception("Connection Error: ", exc_info=True, stack_info=True)
-                        raise e
-                    finally:
-                        pass
             else:
                 print("empty file: {}".format(file_path))
         else:

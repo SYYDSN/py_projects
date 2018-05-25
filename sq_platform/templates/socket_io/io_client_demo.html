@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script src="../static/js/jquery-3.2.1.min.js"></script>
+<script src="../static/js/socket.io.js"></script>
+<script>
+    let io_client = io.connect(`${location.protocol}//${document.domain}:5006`);
+    io_client.on("connect", function(){
+        // 连接时发送一个hello.
+        io_client.emit("last_position", {"data": "I an coming!"});
+    });
+
+    io_client.on("last_position", function(resp){
+        console.log(resp);
+    });
+</script>
+</html>

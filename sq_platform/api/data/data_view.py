@@ -1,11 +1,12 @@
 # -*- coding:utf-8 -*-
 import json
 import os
-
+from celery_module import send_last_pio_celery
 from bson.objectid import ObjectId
 from flask import Blueprint, abort
 from bson.dbref import DBRef
 import error_module
+from mongo_db import to_flat_dict
 from api.data import item_module
 from api.data.file_module import unzip_all_user_file
 from api.data.item_module import User
@@ -40,6 +41,7 @@ def query_error_code():
 
 @api_data_blueprint.route("/gps_push", methods=['post'])
 @login_required_app
+@log_request_args
 def gps_push(user_id):
     """接收设备发来的gps信息"""
     args = get_args(request)
@@ -59,6 +61,8 @@ def gps_push(user_id):
         info_dict = args.copy()
         info_dict['result'] = 'before begin'
         info_dict['result'] = 'unknown error'
+        """发送给socketio服务器"""
+        send_last_pio_celery.delay(to_flat_dict(args))
         try:
             result = item_module.GPS.insert_queue(args)
             if result:
@@ -86,6 +90,7 @@ def gps_push(user_id):
 
 @api_data_blueprint.route("/gps_push_async", methods=['get', 'post'])
 @login_required_app
+@log_request_args
 def gps_push_async(user_id):
     """接收设备发来的gps信息 异步队列模式"""
     message = {"message": "success"}
@@ -118,6 +123,7 @@ def gps_push_async(user_id):
 
 @api_data_blueprint.route("/sensor_push", methods=['get', 'post'])
 @login_required_app
+@log_request_args
 def sensor_push(user_id):
     """接收设备的传感器发来的信息"""
     args = get_args(request)
@@ -152,6 +158,7 @@ def sensor_push(user_id):
 
 @api_data_blueprint.route("/sensor_push_async", methods=['get', 'post'])
 @login_required_app
+@log_request_args
 def sensor_push_async(user_id):
     """接收设备的传感器发来的信息 异步队列模式"""
     message = {"message": "success"}
@@ -185,6 +192,7 @@ def sensor_push_async(user_id):
 
 @api_data_blueprint.route("/<key>_device_info", methods=['get', 'post'])
 @login_required_app
+@log_request_args
 def process_device_info(user_id, key):
     """处理手机（及其附带的传感器的）信息的增删改查"""
     message = pack_message(error_code=3012, key=key)
@@ -232,6 +240,7 @@ def process_device_info(user_id, key):
 
 @api_data_blueprint.route("/add_driving_data", methods=['post', 'get'])
 @login_required_app
+@log_request_args
 def process_driving_data(user_id):
     """以文件方式保存传感器和gps数据"""
     message = {"message": "success"}

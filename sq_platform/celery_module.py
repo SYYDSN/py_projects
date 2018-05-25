@@ -11,6 +11,7 @@ from mongo_db import get_conn, get_obj_id, cache, replica_hosts
 import telnetlib
 from mail_module import send_mail
 from manage.analysis_module import backup
+from ws_server import send_last_position
 
 
 logger = get_logger("celery")
@@ -282,6 +283,12 @@ def backup_reg_today(*args, **kwargs):
     # send_mail(to_email='zixuan.gao@soooqooo.com', title=title, content=content)
     send_mail(title=title, content=content)
     return "backup_reg_today success"
+
+
+@app.task
+def send_last_pio_celery(position):
+    """发送用户最后的位置信息到socketio服务器"""
+    send_last_position(position)
 
 
 if __name__ == "__main__":

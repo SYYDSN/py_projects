@@ -296,7 +296,7 @@ if __name__ == "__main__":
     """测试获取用户行车证信息"""
     # test_get_car_license()
     """测试用户上传行车证图片"""
-    test_upload_user_permit_image()
+    # test_upload_user_permit_image()
     """测试用户删除行车证"""
     # test_delete_user_vehicle_info()
     """测试用户编辑行车证图片"""
@@ -315,4 +315,6 @@ if __name__ == "__main__":
     # test_get_report_detail()
     """测试获取安全报告历史"""
     # test_get_safety_report_history()
+    """测试gps上传"""
+    test_gps_push()
     pass
