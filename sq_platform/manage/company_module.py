@@ -178,8 +178,11 @@ class Company(mongo_db.BaseDoc):
 
         resp = dict()
         resp["all"] = all_count
+        """今日注册"""
         resp['today_reg'] = today_reg_count
-        resp['mean'] = round((hours / all_count), 1)
+        """平均在线时长"""
+        resp['mean'] = 0 if all_count == 0 else round((hours / all_count), 1)
+        """违章统计"""
         resp['vio_count'] = vio_count
         resp['employees'] = res
         return resp
@@ -926,6 +929,54 @@ class Company(mongo_db.BaseDoc):
         return res
 
     @classmethod
+    def add_dept(cls, company_id: (str, ObjectId), dept_dict: dict) -> dict:
+        """
+        添加一个部门  如果存在同名部门,那就返回它而不添加.
+        :param company_id:
+        :param dept_dict: 部门的初始化字典,比如
+        dept_dict = {
+        "company_id": company_dbref,  # 无需添加亦可
+        "dept_name": "xx部门",
+        "root_dept"; False,  # 是不是总部?
+        "higher_dept": DBRef,  # 上级部门id
+        "description": "技术部门",
+        "create_date": datetime
+        }
+        :return: doc
+        """
+        res = None
+        company = cls.find_by_id(company_id)
+        if not isinstance(company, cls) or 'dept_name' not in dept_dict:
+            ms = "错误的公司id或错误的初始化参数,company_id:{}, post_dict:{}".format(company_id, dept_dict)
+            logger.exception(ms)
+            raise ValueError(ms)
+        else:
+            company_dbref = company.get_dbref()
+            """先查找公司是否已有相同的部门名称?"""
+            f = {"company_id": company_dbref, 'dept_name': dept_dict['dept_name']}
+            r = Dept.find_one_plus(filter_dict=f, instance=False)
+            if r is None:
+                """还没有相同的职务"""
+                if "_id" in dept_dict:
+                    pass
+                else:
+                    dept_dict['_id'] = ObjectId(None)
+                if "company_id" in dept_dict:
+                    pass
+                else:
+                    dept_dict['company_id'] = company_dbref
+                r = Dept.insert_one(**dept_dict)
+                if r is None:
+                    ms = "插入失败 post_dict:{}".format(dept_dict)
+                    logger.exception(ms)
+                    raise ValueError(ms)
+                else:
+                    res = dept_dict
+            else:
+                res = r
+        return res
+
+    @classmethod
     def all_employee(cls, company_id: (str, ObjectId), filter_dict: dict = None, sort_dict: dict = None,
                      can_json: bool = False) -> list:
         """
@@ -1196,6 +1247,7 @@ class CompanyAdmin(mongo_db.BaseDoc):
     新振兴的管理员 xzx_root  密码 xzx@1588
     顺丰的管理员   sf_root   密码 Sf@123567
     顺丰的查看员   sf_view   密码 123456
+    苏秦的管理员   sq_root   密码 Sq@123457
     """
     _table_name = "company_admin_info"
     type_dict = dict()
@@ -2362,26 +2414,41 @@ class Employee(User):
 if __name__ == "__main__":
     """添加公司管理员"""
     sf_id = ObjectId("59a671a0de713e3db34de8bf")
+    sq_id = ObjectId("59e456854660d32fa2f13642")  # 苏秦.公司id
     sf = Company.find_by_id(sf_id)
+    sq = Company.find_by_id(sq_id)  # 苏秦
+    sq_p = ObjectId("5b0bbb334660d344c0f44bcd") # 苏秦,司机职务.
+    sq_d = ObjectId("5b0bbe344660d3466c0352ad") # 苏秦, 昌吉东路部门
+    sq_e = ObjectId("59895177de713e304a67d30c")  # me的user_id
+    # sq.add_admin(admin_name="sq_root", admin_password="Sq@123457",
+    #              desc="苏秦网络管理员")
     # sf.add_admin(admin_name="sf_view", admin_password="123456",
     #              only_view=True,
     #              desc="只有查看本公司在线人数权限")
     """获取公司职员在线情况"""
     # sf.online_report()
+    """添加一个部门"""
+    # d_dict = {
+    #     "dept_name": "昌吉东路部门",
+    #     "root_dept": True,
+    #     "description": "昌吉东路的研发本部"
+    # }
+    # Company.add_dept(company_id=sq_id, dept_dict=d_dict)
     """给添加一个职务"""
     # p_dict = {
-    #     "post_name": "管理人员",
-    #     "description": "非司机,无排班",
-    #     "level": 2,
-    #     "default": False
+    #     "post_name": "司机",
+    #     "description": "一般员工,默认,不可删除",
+    #     "level": 1,
+    #     "default": True
     # }
-    # Company.add_post(company_id=sf_id, post_dict=p_dict)
+    # Company.add_post(company_id=sq_id, post_dict=p_dict)
     """添加一个管理人员,无管理权限,只是作为旁观者而已"""
+    sq.hire_one_employee(user_id=sq_e, dept_id=sq_d, post_id=sq_p)
     # p_id_m = ObjectId("5b03e2004660d34b81a17188")  # 管理人员的post_id
     # u_id_z = ObjectId("5af547e4e39a7b5371943a4a")  # 顺丰华新张小龙id
     # d_id_h = ObjectId("5abcac4b4660d3599207fe18")  # 顺丰华新本部门id
     # print(sf.hire_one_employee(user_id=u_id_z, dept_id=d_id_h, post_id=p_id_m))
     """查询一个公司的全部的违章记录"""
-    dd = Company.all_vio_cls(sf_id)
-    print(dd)
+    # dd = Company.all_vio_cls(sf_id)
+    # print(dd)
     pass

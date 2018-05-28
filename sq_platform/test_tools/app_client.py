@@ -195,7 +195,7 @@ def test_add_driving_data():
     print(res.json())
 
 
-def test_gps_push():
+def test_gps_push(ts=None, delta=None):
     """测试是是上传gps数据"""
     auth_token = "a98d8bb4840c42e3993ccc6d6c79d431"  # app段登录标识 me
     headers = {"auth_token": auth_token}
@@ -203,17 +203,18 @@ def test_gps_push():
     "ct" : "上海市",
     "dt" : "嘉定区",
     "speed" : 0.0,
-    "longitude" : 121.172826,
+    "longitude" : 121.172826 if not delta else delta['longitude'] + 121.172826,
     "be" : 0.0,
     "fl" : "false",
     "app_version" : "1.2.4.0122 Debug",
     "pv" : "上海市",
     "ac" : 15.0,
-    "ts" : "2018-01-23 13:25:08.000",
-    "latitude" : 31.296939,
+    "ts" : "2018-05-28 13:25:08.000" if ts is None else ts,
+    "latitude" : 31.296939 if not delta else delta['latitude'] + 31.296939,
     "ad" : "310114",
     "altitude" : 0.0,
     "amap" : "amap",
+    "forgery": True,  # 伪造的数据
     "pr" : "lbs"
 }
     res = requests.post("http://127.0.0.1:5000/api/gps_push", headers=headers, data=args)
@@ -316,5 +317,13 @@ if __name__ == "__main__":
     """测试获取安全报告历史"""
     # test_get_safety_report_history()
     """测试gps上传"""
-    test_gps_push()
+    import time, random
+    for x in range(5):
+        d = {
+            "longitude": random.randint(0, 10) / 1000,
+            "latitude": random.randint(0, 10) / 1000
+        }
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        test_gps_push(now, d)
+        time.sleep(6)
     pass

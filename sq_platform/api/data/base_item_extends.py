@@ -138,7 +138,7 @@ class UseHandlerRecord(mongo_db.BaseDoc):
         doc['update_date'] = datetime.datetime.now()
         u = {"$set": doc}
         r = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
-        print(r)
+        return r
 
     @classmethod
     def get_count(cls, user_id: ObjectId, func_name: str) -> int:

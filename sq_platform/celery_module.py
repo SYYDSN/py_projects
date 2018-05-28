@@ -9,9 +9,10 @@ from api.data.file_module import when_upload_success
 from api.data.file_module import unzip_all_user_file
 from mongo_db import get_conn, get_obj_id, cache, replica_hosts
 import telnetlib
+from kombu import Exchange, Queue
 from mail_module import send_mail
 from manage.analysis_module import backup
-from ws_server import send_last_position
+import requests
 
 
 logger = get_logger("celery")
@@ -25,18 +26,19 @@ save_sensor: 存传感器数据的而队列，现在不会被使用
 unzip_file： 解压app用户上传的文件，是一个重负载的队列
 """
 
+#
+# CELERY_QUEUES = {
+#     "test": {"queue": "test", "exchange_type": "direct", "routing_key": "test"},
+#     "batch_generator_report":{"queue":"batch_generator_report_exchange", "exchange_type":"direct", "routing_key": "batch_generator_report"},
+#     "real_time_gps": ""
+#     # Queue(name="fanout_queue_01", exchange=Exchange(name='fanout_queue_01_exchange', type="fanout")),  # 广播类型
+# }
 
-CELERY_QUEUES = {
-    "test": {"queue": "test", "exchange_type": "direct", "routing_key": "test"},
-    "batch_generator_report":{"queue":"batch_generator_report_exchange", "exchange_type":"direct", "routing_key": "batch_generator_report"}
-    # Queue(name="fanout_queue_01", exchange=Exchange(name='fanout_queue_01_exchange', type="fanout")),  # 广播类型
-}
-
-"""指定路由暂时无法成功"""
-CELERY_ROUTES = {
-    "generator_yesterday_security_report": "batch_generator_report",
-    "celery_module.test": "test"
-}
+# """指定路由暂时无法成功"""
+# CELERY_ROUTES = {
+#     "generator_yesterday_security_report": "batch_generator_report",
+#     "celery_module.test": "test"
+# }
 
 broker_url = "redis://127.0.0.1:6379/15"
 backend_url = "redis://127.0.0.1:6379/14"
@@ -46,19 +48,48 @@ CELERY_TIMEZONE = 'Asia/Shanghai'
 CELERY_TASK_SERIALIZER = "json"
 CELERYD_CONCURRENCY = 2  # 并发worker数
 CELERYD_PREFETCH_MULTIPLIER = 4  # celery worker 每次去rabbitmq取任务的数量，我这里预取了4个慢慢执行,因为任务有长有短没有预取太多
-CELERYD_MAX_TASKS_PER_CHILD = 10  # 每个worker执行了多少任务就会死掉，越小释放内存越快
+CELERYD_MAX_TASKS_PER_CHILD = 40  # 每个worker执行了多少任务就会死掉，越小释放内存越快
 CELERYD_FORCE_EXECV = True          # 有些情况下可以防止死锁
-CELERY_DEFAULT_QUEUE = "default"  # 默认的队列，如果一个消息不符合其他的队列就会放在默认队列里面
+
+
+default_exchange = Exchange('default', type='direct')  # 默认交换机
+gps_push_exchange = Exchange("gps_push", type='direct')  # gps_push专用交换机
+gps_save_exchange = Exchange("gps_save", type='direct')  # gps_save和unzip专用交换机
+"""创建3个队列,一个默认的,一个gps_push专用队列, 一个gps_save和unzip专用"""
+CELERY_QUEUES = (
+    Queue('default', exchange=default_exchange, routing_key='default'),
+    Queue('gps_push', exchange=gps_push_exchange, routing_key='gps_push'),
+    Queue('gps_save', exchange=gps_save_exchange, routing_key='gps_save')
+)
+CELERY_DEFAULT_QUEUE = 'default'  # 默认的队列，如果一个消息不符合其他的队列就会放在默认队列里面
+CELERY_DEFAULT_EXCHANGE = 'default'
+CELERY_DEFAULT_ROUTING_KEY = 'default'
+CELERY_ROUTES = (
+    {'celery_module.send_last_pio_celery': {'queue': 'gps_push', 'routing_key': 'gps_push'}},
+    {'celery_module.save_gps': {'queue': 'gps_save', 'routing_key': 'gps_save'}},
+    {'celery_module.unzip_file': {'queue': 'gps_save', 'routing_key': 'gps_save'}}
+)
+CELERY_IMPORTS = ('celery_module', )
+
 
 app = Celery('my_task', broker=broker_url, backend=backend_url)
+app.conf.update(CELERY_TIMEZONE=CELERY_TIMEZONE,
+                CELERY_QUEUES=CELERY_QUEUES,
+                CELERY_ROUTES=CELERY_ROUTES,
+                CELERY_IMPORTS=CELERY_IMPORTS,
+                CELERY_TASK_SERIALIZER=CELERY_TASK_SERIALIZER,
+                CELERYD_CONCURRENCY=CELERYD_CONCURRENCY,
+                CELERYD_PREFETCH_MULTIPLIER=CELERYD_PREFETCH_MULTIPLIER,
+                CELERYD_MAX_TASKS_PER_CHILD=CELERYD_MAX_TASKS_PER_CHILD,
+                CELERY_DEFAULT_ROUTING_KEY=CELERY_DEFAULT_ROUTING_KEY,
+                CELERY_DEFAULT_EXCHANGE=CELERY_DEFAULT_EXCHANGE,
+                CELERY_DEFAULT_QUEUE=CELERY_DEFAULT_QUEUE
+                )
 
-app.conf.update(CELERY_TIMEZONE=CELERY_TIMEZONE, CELERY_ROUTES=CELERY_ROUTES,
-                   CELERY_TASK_SERIALIZER=CELERY_TASK_SERIALIZER,
-                   CELERYD_CONCURRENCY=CELERYD_CONCURRENCY,
-                   CELERYD_PREFETCH_MULTIPLIER=CELERYD_PREFETCH_MULTIPLIER,
-                   CELERYD_MAX_TASKS_PER_CHILD=CELERYD_MAX_TASKS_PER_CHILD,
-                   CELERY_DEFAULT_QUEUE=CELERY_DEFAULT_QUEUE)
-
+"""
+启动队列建议分别用不同的worker启动队列.
+python3 -m celery -A celery_module worker -Q default --loglevel=info  # 启动默认队列
+"""
 """broker是中间人，backend用来储存结果,从celery.result.AsyncResult对象返回响应结果，两者的设置可以一致"""
 
 
@@ -189,9 +220,8 @@ def batch_insert_gps(*args, **kwargs):
     用于处理app端的实时gps数据.定时批量插入
     """
     res = item_module.GPS.async_insert_many()
-    log_type = "celery_module.batch_insert_gps"
-    info = {"return": res}
-    print(res)
+    info = {"queue_length": res}
+    print(info)
 
 
 @app.task
@@ -285,10 +315,46 @@ def backup_reg_today(*args, **kwargs):
     return "backup_reg_today success"
 
 
+prev_resp_status = 200  # 记录send_last_pio_celery函数上一次发送请求的返回状态
+
+
 @app.task
 def send_last_pio_celery(position):
-    """发送用户最后的位置信息到socketio服务器"""
-    send_last_position(position)
+    """
+    发送用户最后的位置信息到socketio服务器,调用本函数的目前只有api.data.data_view.gps_push函数.
+    此函数是同步模式的接收app发送的gps信息.确保调用本函数的地方尽可能的少以保证逻辑的简单性.
+    对于压缩包的gps信息,由于是历史信息,所以没必要发送.而且压缩包一旦可以发送的时候,gps实时数据也必然
+    恢复了,肯定比压缩包的gps信息更新,所以对压缩包的gps信息处理时,没必要调用本函数.
+    : param position:  一个可以被json序列化的dict
+    : return:  None
+    """
+    mes = {"the_type": "last_position", "data": json.dumps(position)}
+    status = 200
+    error = None
+    try:
+        r = requests.post("http://127.0.0.1:5006/listen", data=mes)
+        status = r.status_code
+    except Exception as e:
+        status = -1
+        error = e
+    finally:
+        global prev_resp_status
+        if status != prev_resp_status:
+            """可以发送邮件"""
+            if status == 200:
+                ms = "保驾犬平台send_last_pio_celery函数发送位置信息恢复正常."
+            else:
+                ms = "保驾犬平台send_last_pio_celery函数发送位置信息失败,"
+            now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            if error is None:
+                content = "{}.{},服务器返回状态码:{}".format(now, ms, status)
+            else:
+                content = "{}.{},服务器返回状态码:{},错误原因:{}".format(now, ms, status, error.__str__())
+            prev_resp_status = status
+            send_mail(title=ms, content=content)
+        else:
+            pass
+        return status
 
 
 if __name__ == "__main__":

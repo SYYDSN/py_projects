@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 import json
 import os
-from celery_module import send_last_pio_celery
 from bson.objectid import ObjectId
 from flask import Blueprint, abort
 from bson.dbref import DBRef
@@ -43,7 +42,7 @@ def query_error_code():
 @login_required_app
 @log_request_args
 def gps_push(user_id):
-    """接收设备发来的gps信息"""
+    """接收设备发来的实时gps信息"""
     args = get_args(request)
     log_type = "data_view.gps_push"
     info_dict = args.copy()
@@ -62,8 +61,9 @@ def gps_push(user_id):
         info_dict['result'] = 'before begin'
         info_dict['result'] = 'unknown error'
         """发送给socketio服务器"""
-        send_last_pio_celery.delay(to_flat_dict(args))
+        celery_module.send_last_pio_celery.delay(to_flat_dict(args))
         try:
+            args['real_time'] = 1
             result = item_module.GPS.insert_queue(args)
             if result:
                 info_dict['result'] = 'success'
@@ -76,7 +76,7 @@ def gps_push(user_id):
             message['message'] = "{}的值 {} 重复".format(error_col, error_val)
             info_dict['result'] = message['message']
         except Exception as e:
-            logger.exception("Error: ", exc_info=True, stack_info=True)
+            logger.exception("Error: {}".format(e), exc_info=True, stack_info=True)
             print(e)
             message = error_module.pack_message(message, 5000, **args)
             info_dict['result'] = str(e)

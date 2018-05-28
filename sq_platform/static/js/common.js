@@ -333,3 +333,9 @@ function get_url_arg(arg_url){
     }
     return args;
 }
+
+function get_io_client(){
+    // 获取一个socketio的页面客户端.
+    let io_client = io.connect(`${location.protocol}//${document.domain}:5006`);
+    return io_client;
+}

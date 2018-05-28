@@ -250,6 +250,7 @@ AMapUI.loadUI(['overlay/AwesomeMarker'], function (AwesomeMarker) {
         let phone_num = arg_dict['phone_num'] === undefined ? "1580080080": arg_dict['phone_num'];
         // 真实姓名
         let real_name = typeof(arg_dict['real_name']) === "undefined" ? phone_num: arg_dict['real_name'];
+        real_name = real_name === ""?phone_num: real_name;
         // 当前位置
         let position = arg_dict['position'] === undefined ? [121.304239, 31.239981]: arg_dict['position'];
         // 车辆型号
@@ -488,10 +489,27 @@ update_custom_markers = function(debug){
     });
 };
 
+let move_marker = function(loc_data){
+    // 移动单个自定义标记点的位置.
+    let user_id = loc_data['user_id'];
+    let last_update = loc_data['ts'].split(".")[0];
+    update_last_date(user_id, last_update);  // 更新最后更新时间
+    let longitude = loc_data['longitude'];  // 经度
+    let latitude = loc_data['latitude'];  // 纬度
+
+    let info = `接收到实时坐标信息,user_id:${user_id},纬度:${latitude},经度:${longitude},${last_update}`;
+    console.log(info);
+    let marker = global_markers[user_id];
+    if(marker !== undefined){
+        marker.moveTo([longitude, latitude], 5000);  //移动,第二个从参数是速度,单位公里/小时
+    }
+};
 
 // 收到最后的坐标信息的事件.
-io_client.on("last_position", function(resp){
-    console.log(resp);
+let client = get_io_client();
+client.on("last_position", function(resp){
+    let data = resp;
+    move_marker(data);
 });
 
 // 右侧边滑动栏收放事件.

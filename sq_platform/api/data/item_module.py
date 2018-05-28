@@ -2016,6 +2016,12 @@ class GPS(mongo_db.BaseDoc):
     type_dict['altitude'] = float  # 海拔
     type_dict['longitude'] = float  # 经度
     type_dict['latitude'] = float  # 纬度
+    """
+    是否是实时数据? 目前的规定是:
+    api.data.data_view.gps_push函数接收的是实时数据.
+    压缩文件中的不是实时数据
+    """
+    type_dict['real_time'] = bool
     type_dict['loc'] = GeoJSON  # 经度和维度的数组组成的地理位置信息
 
     def __init__(self, **kwargs):
@@ -2140,11 +2146,12 @@ class GPS(mongo_db.BaseDoc):
         global insert_queue_lock
         lock = insert_queue_lock
         lock.acquire()
-        val = cache.get(key)
-        if val is None:
-            val = list()
-        val.append(obj)
-        cache.set(key=key, value=val, timeout=300)  # 最长5分钟
+        gps_list = cache.get(key)
+        if not isinstance(gps_list, list):
+            gps_list = list()
+        gps_list.append(obj)
+        print("实时gps插入结果:{}".format(gps_list))
+        cache.set(key=key, value=gps_list, timeout=300)  # 最长5分钟
         lock.release()
         # cls.async_insert_many()  # 测试用,正式要注销
         return True
@@ -2173,23 +2180,23 @@ class GPS(mongo_db.BaseDoc):
         cache.delete(key)
 
     @classmethod
-    def async_insert_many(cls) -> str:
+    def async_insert_many(cls) -> int:
         """
         以异步/celery队列的方式.批量插入gps数据.
-        :return:
+        :return: 队列长度
         """
-        res = "async_insert_many function: "
         gps_list = cls.get_queue()
         l = len(gps_list)
         mes = "队列长度:{}".format(l)
         print(mes)
+        # mail_module.send_mail(title=mes, content='')
         if l == 0:
             pass
         else:
             reserted_list = cls.insert_many(gps_list)
             Track.batch_create_item_from_gps(reserted_list)
             cls.clear_queue()
-        return res
+        return l
 
     @classmethod
     def get_prev_gps(cls, user_id: (str, ObjectId)) -> dict:

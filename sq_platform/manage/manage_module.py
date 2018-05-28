@@ -82,6 +82,7 @@ def online_report_view_func():
     if company_id is None:
         return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
     else:
+        """在线状态过滤器,0表示全部, 1/在线,-1/离线"""
         filter_online = get_arg(request, "filter_online", 0)
         if isinstance(filter_online, str) and filter_online.isdigit():
             filter_online = int(filter_online)
@@ -101,6 +102,7 @@ def online_report_func():
         return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
     else:
         head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
+        """在线状态过滤器,0表示全部, 1/在线,-1/离线"""
         filter_online = get_arg(request, "filter_online", 0)
         if isinstance(filter_online, str) and filter_online.isdigit():
             filter_online = int(filter_online)
@@ -325,14 +327,19 @@ def last_positions_func() -> dict:
     employees = Company.all_employee(company_id=company_id)
     data = list()
     if len(employees) > 0:
-        key = "last_position_cache_{}".format(company_id)
-        data = cache.get(key)  # 调试用
-        if data is not None:
-            pass
+        debug = False  # 调试开关,生产环境保持False,调试请置True
+        if debug:
+            key = "last_position_cache_{}".format(company_id)
+            data = cache.get(key)  # 调试用设置
+            if data is not None:
+                pass
+            else:
+                data = Track.get_last_position([x['_id'] for x in employees])  # 获取最后的点信息
+                data = list(data.values())
+                cache.set(key, data, timeout=300)  # 调试用设置
         else:
             data = Track.get_last_position([x['_id'] for x in employees])  # 获取最后的点信息
             data = list(data.values())
-            cache.set(key, data, timeout=300)  # 调试用
     else:
         pass
     res['data'] = data
