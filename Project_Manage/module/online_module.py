@@ -9,6 +9,7 @@ from mongo_db import to_flat_dict
 from mongo_db import get_datetime_from_str
 from bson.code import Code
 import datetime
+from uuid import uuid4
 from log_module import get_logger
 
 
@@ -111,35 +112,68 @@ def get_online_report():
     return res
 
 
-def get_online_report2():
-    """获取在线报告, 按天切分"""
+def get_online_report_by_map_reduce():
+    """
+    获取在线报告, 统计当月按天切分每日上线人数.使用的是mapReduce方法.
+    由于reduce函数的返回值会被循环调用(返回值会被当作输入值再次调用).使用mapReduce方法有以下几个要注意的:
+    1. reduce 归约函数必须是幂等的.
+    2. reduce 的返回格式必须和map函数的第二个参数保持一致.
+    3. finalize函数也必须是幂等的.
+    """
     ses = get_conn("gps_info")
     now = datetime.datetime.now()
     year = now.year
     month = now.month
-    begin = get_datetime_from_str("{}-{}-1 0:0:0".format(year, month))
+    begin = get_datetime_from_str("{}-{}-25 0:0:0".format(year, month))
     # begin = now - datetime.timedelta(days=30)
     query = {"time": {"$gte": begin}}
     s = {"time": -1}
-    out = "online_report_result2"  # 保存数据的表,每次map_reduce都会提前清空这个表
+    out = "online_report_result_{}".format(12)  # 保存数据的表,每次map_reduce都会提前清空这个表
     map_func = Code("""
         function(){
-            emit(this.time.getDate(), 1);
+            // 注意mongodb的时区问题,在mongodb内部,时区默认是UTC,需要手动处理.
+            var the_time = this.time;
+            the_time.setHours(the_time.getHours() - 8);
+            var key = the_time.getDate(); // 获取天
+            // reduce的返回值必须和emit的第二个参数格式保持一致
+            emit(key, {"user_id":[this.user_id.$id.toString()]}); 
         }
         """)
     reduce_func = Code("""
         function(key, values){
-            return Array.sum(values);
+            var all_id = {};  
+            values.forEach(function(value){
+                var user_ids = value['user_id'];
+                var id_list = all_id['user_id'];
+                id_list = id_list == undefined?[]:id_list;
+                for(var user_id of user_ids){
+                    if( id_list.indexOf(user_id) == -1){
+                        id_list.push(user_id);
+                        all_id['user_id'] = id_list;
+                        }
+                    }
+            });
+            return all_id;  // 返回值会被当作values再次输入本函数运行
         }
         """)
+    finalize_func = Code("""
+        function(key, values){
+            if(values.count == undefined){
+                values.count = values['user_id'].length;
+            }            
+            return values;
+        }
+    """)
 
-    result_conn = ses.map_reduce(map=map_func, reduce=reduce_func,  query=query, sort=s, out=out, full_response=False)
+    result_conn = ses.map_reduce(map=map_func, reduce=reduce_func,  query=query, sort=s, out=out,
+                                 finalize=finalize_func, full_response=False)
     res = result_conn.find(filter=dict())
-    res = [x for x in res]
-
+    res = [{"day": x['_id'], "count": x['value']['count']} for x in res]
+    db = get_db()
+    db.drop_collection(name_or_collection=out)
     return res
 
 
 if __name__ == "__main__":
-    get_online_report2()
+    get_online_report_by_map_reduce()
     pass
