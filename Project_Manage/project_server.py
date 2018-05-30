@@ -11,7 +11,7 @@ from werkzeug.contrib.cache import RedisCache
 from flask_session import Session
 from log_module import get_logger
 from module.online_module import get_online_report
-from module.online_module import get_online_report2
+from module.online_module import MonthActive
 import json
 from json import JSONDecodeError
 from module.user_module import *
@@ -140,9 +140,15 @@ def online_report_func():
         user_id = get_arg(request, "user_id", None)
         if user_id is None:
             """查询月活跃数据"""
-            data = get_online_report2()
+            year = get_arg(request, "year", None)
+            month = get_arg(request, "month", None)
+            now = datetime.datetime.now()
+            year = now.year if year is None else int(year)
+            month = now.month if month is None else int(month)
+            data = MonthActive.find_chart_info(year=year, month=month)
             return json.dumps(data)
         else:
+            """查询个人的上线情况,目前没实现"""
             return abort(404)
 
 
@@ -390,8 +396,8 @@ def home_func(key1, key2):
             m_list = list()
         m_list.append(m)
         allow_edit_modules[p_id] = m_list
-    year = int(get_arg(request, "y")) if get_arg(request, "y", "").isdecimal() else now.year
-    month = int(get_arg(request, "m")) if get_arg(request, "m", "").isdecimal() else now.month
+    year = int(get_arg(request, "year")) if get_arg(request, "year", "").isdecimal() else now.year
+    month = int(get_arg(request, "month")) if get_arg(request, "month", "").isdecimal() else now.month
     current_month_str = "{}年{}月".format(year, month)
     first_day, last_day = 1, calendar.monthrange(year, month)[-1]
     days = list()
@@ -539,14 +545,25 @@ def home_func(key1, key2):
                         x['children'] = item
                 c_list = [{"_id": x['_id'], "name": x['name'], "children": list() if c_p_dict.get(x['_id']) is None
                 else c_p_dict[x['_id']]} for x in categories]
-                tree_dict = {"name": "苏秦网络", "children": c_list}
+                tree_dict = {"name": "苏秦网络", "children": c_list}  # 产品架构树
+                """ 求下个月第一天"""
+                next_month_first = get_datetime_from_str("{}-{}-{}".format(year, month, last_day)) + \
+                                   datetime.timedelta(days=1)
+                """ 求上个月最后一天"""
+                prev_month_last = get_datetime_from_str("{}-{}-1".format(year, month)) - datetime.timedelta(days=1)
+                next_year = next_month_first.year
+                next_month = next_month_first.month
+                prev_year = prev_month_last.year
+                prev_month = prev_month_last.month
                 return render_template("home_template.html", trs=rows, allow_edit=allow_edit, categories=categories,
                                        allow_view=allow_view, cur_method=cur_method, days=days, weeks=weeks,
                                        current_month=current_month_str, allow_edit_projects=allow_edit_projects,
                                        allow_edit_modules=allow_edit_modules, nav_projects=all_projects,
                                        nav_modules=modules, nav_missions=missions, tasks=tasks, tree_dict=tree_dict,
                                        module_mission_dict=module_mission_dict, allow_edit_pids=allow_edit_pids,
-                                       allow_edit_mids=allow_edit_mids, user_name=user_name, task_dict=task_dict)
+                                       allow_edit_mids=allow_edit_mids, user_name=user_name, task_dict=task_dict,
+                                       next_year=next_year, next_month=next_month, prev_year=prev_year,
+                                       prev_month=prev_month)
             elif key1 in ['web', 'app', 'platform']:
                 part = get_arg(request, "part", "chart")  # url参数，用于确认处于哪一个子导航下？
                 return redirect("/home_all/view")

@@ -2016,6 +2016,8 @@ class GPS(mongo_db.BaseDoc):
     type_dict['altitude'] = float  # 海拔
     type_dict['longitude'] = float  # 经度
     type_dict['latitude'] = float  # 纬度
+    type_dict['pr'] = str  # 数据来源,lbs/gps  gps精度更高
+    type_dict['be'] = float # 方位角 目前单位和测量标准未知
     """
     是否是实时数据? 目前的规定是:
     api.data.data_view.gps_push函数接收的是实时数据.
@@ -2523,11 +2525,13 @@ if __name__ == "__main__":
     #     phone = x['request_json']['username']
     #     if phone in ['13817754724', '13918677317']:
     #         print(x)
-    begin = mongo_db.get_datetime_from_str("2018-5-3 00:00:00")
-    end = mongo_db.get_datetime_from_str("2018-5-3 23:59:59")
-    f = {"time": {"$lte": end, "$gte": begin}}
+    begin = mongo_db.get_datetime_from_str("2017-2-1 00:00:00")
+    end = mongo_db.get_datetime_from_str("2018-3-1 23:59:59")
+    f = {"time": {"$lte": end, "$gte": begin}, "be":{"$type": 2}}
     r = GPS.find_plus(filter_dict=f, to_dict=True)
-    r = [str(x['user_id'].id) for x in r]
-    r = set(r)
-    print(r)
+    for x in r:
+        be = float(x['be'])
+        f = {"_id": x['_id']}
+        r = GPS.find_one_and_update_plus(filter_dict=f, update_dict={"$set": {"be": be}}, upsert=False)
+        print(r)
     pass

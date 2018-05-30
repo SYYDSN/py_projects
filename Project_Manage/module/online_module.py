@@ -7,8 +7,11 @@ if __project_path not in sys.path:
 import pymongo
 from mongo_db import to_flat_dict
 from mongo_db import get_datetime_from_str
+from mongo_db import BaseDoc
+from mongo_db import ObjectId
 from bson.code import Code
 import datetime
+import calendar
 from uuid import uuid4
 from log_module import get_logger
 
@@ -112,31 +115,38 @@ def get_online_report():
     return res
 
 
-def get_online_report_by_map_reduce():
+def get_online_report_by_map_reduce(year: int = None, month: int = None) -> dict:
     """
     获取在线报告, 统计当月按天切分每日上线人数.使用的是mapReduce方法.
     由于reduce函数的返回值会被循环调用(返回值会被当作输入值再次调用).使用mapReduce方法有以下几个要注意的:
     1. reduce 归约函数必须是幂等的.
     2. reduce 的返回格式必须和map函数的第二个参数保持一致.
     3. finalize函数也必须是幂等的.
+    : param year: 年份,默认是今年
+    : param month: 月份,默认是当前月
+    : return: dict
     """
     ses = get_conn("gps_info")
     now = datetime.datetime.now()
-    year = now.year
-    month = now.month
-    begin = get_datetime_from_str("{}-{}-25 0:0:0".format(year, month))
+    year = now.year if year is None else year
+    month = now.month if month is None else month
+    begin = get_datetime_from_str("{}-{}-01 0:0:0".format(year, month))
+    last_day = calendar.monthrange(year=year, month=month)[-1]  # 计算这个月(month)有多少天?
+    end = get_datetime_from_str("{}-{}-{} 23:59:59.999".format(year, month, last_day))
     # begin = now - datetime.timedelta(days=30)
-    query = {"time": {"$gte": begin}}
+    query = {"time": {"$gte": begin, "$lte": end}}
     s = {"time": -1}
-    out = "online_report_result_{}".format(12)  # 保存数据的表,每次map_reduce都会提前清空这个表
+    out = "online_report_result_{}".format(uuid4().hex)  # 暂时保存数据的表,每次map_reduce都会提前清空这个表
     map_func = Code("""
         function(){
             // 注意mongodb的时区问题,在mongodb内部,时区默认是UTC,需要手动处理.
-            var the_time = this.time;
-            the_time.setHours(the_time.getHours() - 8);
-            var key = the_time.getDate(); // 获取天
-            // reduce的返回值必须和emit的第二个参数格式保持一致
-            emit(key, {"user_id":[this.user_id.$id.toString()]}); 
+            if(this.user_id != undefined){
+                var the_time = this.time;
+                the_time.setHours(the_time.getHours() - 8);
+                var key = the_time.getDate(); // 获取天
+                // reduce的返回值必须和emit的第二个参数格式保持一致
+                emit(key, {"user_id":[this.user_id.$id.toString()]}); 
+            }            
         }
         """)
     reduce_func = Code("""
@@ -168,10 +178,67 @@ def get_online_report_by_map_reduce():
     result_conn = ses.map_reduce(map=map_func, reduce=reduce_func,  query=query, sort=s, out=out,
                                  finalize=finalize_func, full_response=False)
     res = result_conn.find(filter=dict())
-    res = [{"day": x['_id'], "count": x['value']['count']} for x in res]
+    data = list()
+    ids = set()
+    for x in res:
+        temp = {"day": x['_id'], "count": x['value']['count']}
+        data.append(temp)
+        ids.update(x['value']['user_id'])
     db = get_db()
-    db.drop_collection(name_or_collection=out)
-    return res
+    db.drop_collection(name_or_collection=out)  # 删除临时的表
+    return {"data": data, "user_count": len(ids)}
+
+
+class MonthActive(BaseDoc):
+    """月活跃用户统计"""
+    _table_name = "month_active_info"
+    type_dict = dict()
+    type_dict["_id"] = ObjectId
+    type_dict['year'] = int
+    type_dict['month'] = int
+    type_dict['user_count'] = int
+    type_dict['data'] = list
+    type_dict['update_time'] = datetime.datetime
+
+    def __init__(self, **kwargs):
+        if "update_time" not in kwargs:
+            kwargs['update_time'] = datetime.datetime.now()
+        super(MonthActive, self).__init__(**kwargs)
+
+    @classmethod
+    def find_chart_info(cls, year: int, month: int) -> dict:
+        """
+        查询月活记录数据
+        :param year:
+        :param month:
+        :return:
+        """
+        f = {"year": year, "month": month}
+        one = cls.find_one_plus(filter_dict=f, instance=False)
+        flag = False  # 是否需要生成数据的标志位
+        if one is None:
+            flag = True
+        else:
+            now = datetime.datetime.now()
+            update_time = one['update_time']
+            if update_time.year == now.year and update_time.month == now.month and (now - update_time).total_seconds() > 3600:
+                """是本月的数据,并且更新时间已经是一月之前了,那就重新生成一个"""
+                flag = True
+            else:
+                pass
+        if flag:
+            """生成一个"""
+            d = get_online_report_by_map_reduce(year=year, month=month)
+            d['year'] = year
+            d['month'] = month
+            if "update_time" not in d:
+                d['update_time'] = datetime.datetime.now()
+            r = cls.find_one_and_update_plus(filter_dict=f, update_dict={"$set": d}, upsert=True)
+            print(r)
+            res = d
+        else:
+            res = one
+        return to_flat_dict(res)
 
 
 if __name__ == "__main__":

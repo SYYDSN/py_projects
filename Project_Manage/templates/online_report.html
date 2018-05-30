@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="icon" href="{{ url_for('static', filename='../static/images/favicon.ico') }}">
     <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link href="../static/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/online_report.css">
     {#    <link rel="stylesheet" href="./font/iconfont.css">#}
     <title>用户信息列表</title>
@@ -14,11 +15,13 @@
 <div class="box">
     <!-- 标题头 -->
     <div class="top">
-        <span class="iconfont icon-font icon-arrow-top-copy"></span>
-        <p>用户列表</p>
+        <a href="/home_all/view">
+            <span class="iconfont icon-font icon-arrow-top-copy"></span>
+        </a>
+        <p>本月活跃用户列表</p>
         <div class="top_info">
-            <span>月活用户量:{{ data | length }}</span>
-            <button type="button" id="btn_01" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal1">
+            <span>月活跃用户数:{{ data | length }}人</span>
+            <button onclick="month_active_chart($(this))" type="button" id="btn_01" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal1">
               分布图
             </button>
         </div>
@@ -97,9 +100,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">月活用户分布图</h4>
+        <h4 class="modal-title" id="myModalLabel">
+            <div id="my_modal_nav">
+
+            </div>
+        </h4>
       </div>
-      <div class="modal-body">
+      <div id="month_active_chart" class="modal-body">
 
       </div>
       <div class="modal-footer">
@@ -109,6 +116,12 @@
     </div>
   </div>
 </div>
+
+<!--加载蒙板-->
+<div class="my_outer">
+    <i class="fa fa-spinner fa-pulse"></i>
+</div>
+<!--加载蒙板-->
 </body>
 <script src="/static/js/jquery-3.2.1.min.js"></script>
 <script src="../static/js/bootstrap.min.js"></script>

@@ -172,7 +172,7 @@
                         <li><a href="/home_{{ category['path'] }}/view">{{ category['name'] }}</a></li>
                     {% endfor %}
                     -->
-                <li><a target="_blank" href="/online_report">在线情况</a></li>
+                <li><a  href="/online_report">在线情况</a></li>
                 </ul>
                 <div class="user_info">
                     <span id="user_name">{{ user_name }}</span>
@@ -183,7 +183,16 @@
                 <span>甘特图</span>
                 <span>架构图</span>
             </div>
-                <p class="time-title" id="bar_title"><span class="glyphicon  glyphileft  glyphicon-chevron-left"></span>{{ current_month }}<span class="glyphicon glyphiright glyphicon-chevron-right"></span></p>
+                <p class="time-title" id="bar_title">
+                    <a title="{{ prev_year }}年{{ prev_month }}月"  href="/home_all/view?year={{ prev_year }}&month={{ prev_month }}">
+                        <span class="glyphicon  glyphileft  glyphicon-chevron-left"></span>
+                    </a>
+                    {{ current_month }}
+
+                    <a title="{{ next_year }}年{{ next_month }}月" href="/home_all/view?year={{ next_year }}&month={{ next_month }}">
+                        <span class="glyphicon glyphiright glyphicon-chevron-right"></span>
+                    </a>
+                </p>
                 <div class="gundong" id="my_bar">
                     <div class="coll">
                         <div class="tab">
