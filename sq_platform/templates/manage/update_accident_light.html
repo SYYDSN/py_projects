@@ -1,6 +1,8 @@
 {% extends "manage/base_template_light.html" %}
 {% block extend_css %}
-<link rel="stylesheet" href="../static/css/manage/update_accident_light.css">
+    <!--富文本编辑器-->
+    <link rel="stylesheet" href="/static/css/wangEditor.min.css">
+    <link rel="stylesheet" href="/static/css/manage/update_accident_light.css">
 {% endblock %}
 {% block main %}
     <div id="main_zone" class="main_zone col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -88,7 +90,7 @@
                 <div class="my_item">
                     <div class="sub_item">
                         <span class="my_label">事件描述</span>
-                        <input type="text" id="accident_description">
+                        <div  id="accident_description"></div>
                     </div>
                 </div>
 
@@ -104,7 +106,7 @@
                 <div class="my_item">
                     <div class="sub_item">
                         <span class="my_label">备注</span>
-                        <input type="text" id="accident_comment">
+                        <div contenteditable="true" id="accident_comment"></div>
                     </div>
                 </div>
 
@@ -115,12 +117,14 @@
     </div>
 {% endblock %}
 {% block extend_js %}
+    <!--富文本编辑器js-->
+    <script src="/static/js/wangEditor.min.js"></script>
     <!--日期选择器样式-->
-    <link rel="stylesheet" href="../static/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
     <!--日期选择器-->
-    <script src="../../static/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
     <!--日期选择器本地化语言-->
-    <script src="../../static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="/static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
 
-    <script src="../static/js/manage/update_accident_light.js"></script>
+    <script src="/static/js/manage/update_accident_light.js"></script>
 {% endblock %}

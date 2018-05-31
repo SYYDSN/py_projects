@@ -334,6 +334,90 @@ function get_url_arg(arg_url){
     return args;
 }
 
+function upload_progress(event){
+    /*
+    上传进度处理函数,这里只是一个示范函数,实际中要重写此函数.
+    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
+    :return: nothing
+    */
+    if (event.lengthComputable) {
+        var complete_percent = Math.round(event.loaded * 100 / event.total);
+        console.log(`完成度:${complete_percent}`);
+    }else{}
+}
+
+function upload_complete(event){
+    /*
+    上传文件success时的事件,根据实际需要可以覆盖.
+    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
+    :return: nothing
+    */
+    let json = {"message": "未知的错误"};
+    let status = event.target.status;
+    if(status !== 200){
+        json = {"message": `服务器没有作出正确的回应,返回码:${status}`};
+    }
+    else{
+        let str = event.responseText;
+        if(str === undefined){
+            json['message'] = "上传成功,但服务器没有回应任何消息";
+        }
+        else{
+            json = JSON.parse(event.responseText);
+        }
+    }
+    console.log(json);
+    if(json['message'] === "success"){
+        alert("上传成功!");
+    }
+    else{
+        alert(json['message']);
+    }
+}
+
+function upload_error(event){
+    /*
+    上传文件失败时的事件,根据实际需要可以覆盖.
+    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
+    :return: nothing
+    */
+    let json = {"message": "error"};
+    console.log(json);
+}
+
+function upload_abort(event){
+    /*
+    上传文件被中止时的事件,根据实际需要可以覆盖.
+    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
+    :return: nothing
+    */
+    let json = {"message": "abort"};;
+    console.log(json);
+}
+
+function upload(file_name, $obj, action_url){
+    /*
+    上传文件.
+    :params file_name:   文件名.
+    :params $obj:        input的jquery对象.
+    :params action_url:  上传的服务器url
+    :return:             dict类型. 一个字典对象,一般是{"message": "success"}
+    */
+    let data = new FormData();
+    data.append(file_name, $obj[0].files[0]);
+    /*
+    有关XMLHttpRequest对象的详细信息,请参考.
+    https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest
+    */
+    let req = new XMLHttpRequest();
+    req.upload.addEventListener("progress", upload_progress, false);
+    req.addEventListener("load", upload_complete, false);
+    req.addEventListener("error", upload_error, false);
+    req.addEventListener("abort", upload_abort, false);
+    req.open("post", action_url);
+    req.send(data);
+}
+
 function get_io_client(){
     // 获取一个socketio的页面客户端.
     let io_client = io.connect(`${location.protocol}//${document.domain}:5006`);

@@ -78,9 +78,8 @@ def app_version_table_func():
 def online_report_view_func():
     """观察员的在线报告页面"""
     company_id = get_platform_session_arg("company_id", None)
-    prefix = get_platform_session_arg("prefix", "sf")
     if company_id is None:
-        return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+        return redirect(url_for("manage_blueprint.login_func"))
     else:
         """在线状态过滤器,0表示全部, 1/在线,-1/离线"""
         filter_online = get_arg(request, "filter_online", 0)
@@ -97,9 +96,8 @@ def online_report_view_func():
 def online_report_func():
     """管理员的在线报告页面"""
     company_id = get_platform_session_arg("company_id", None)
-    prefix = get_platform_session_arg("prefix", "sf")
     if company_id is None:
-        return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+        return redirect(url_for("manage_blueprint.login_func"))
     else:
         head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
         """在线状态过滤器,0表示全部, 1/在线,-1/离线"""
@@ -193,8 +191,8 @@ def process_error_code(key):
     return "ok"
 
 
-@manage_blueprint.route("/<prefix>/login", methods=['post', 'get'])
-def login_func(prefix):
+@manage_blueprint.route("/login", methods=['post', 'get'])
+def login_func():
     """
     登录页,
     针对新振兴项目,现在决定需求如下:
@@ -202,48 +200,41 @@ def login_func(prefix):
     2. 权限为基于方法的权限,不再推进基于角色的权限.(基于角色的权限管理暂停)
     3. 不考虑跨域用户
     """
-    company = Company.find_by_prefix(prefix)
-    if company is None:
-        html = "<html><head><style>h1{font-size:400px;text-align:center;}</style></head>" \
-               "<body><h1>404</h1></body></html>"
-        return html
-    else:
-        if request.method.lower() == "get":
-            return render_template("manage/login.html")
-        elif request.method.lower() == "post":
-            """验证用户身份"""
-            message = {"message": "success"}
-            """取登录参数"""
-            user_name = get_arg(request, "user_name", None)
-            user_password = get_arg(request, "user_password", None)
-            if user_name is None or user_name == '' or user_password == '' or user_password is None:
-                message['message'] = '用户名或密码不能为空'
-            else:
-                user_password = user_password.lower()
-                """登录参数合法,开始验证"""
-                args = {"user_name": user_name}
-                admin = CompanyAdmin.find_one_plus(filter_dict=args, instance=False)
-                if admin is None:
-                    message['message'] = "用户名不存在或手机未注册"
-                else:
-                    if user_password != admin['user_password']:
-                        message['message'] = "密码错误"
-                    elif admin.get("user_status") != 1:
-                        message['message'] = "账户未启用"
-                    else:
-                        """登录成功,写入会话"""
-                        args['user_id'] = str(admin['_id'])  # 写入用户id的str格式.
-                        args['user_password'] = user_password
-                        args['company_id'] = str(company['_id'])
-                        args['prefix'] = prefix
-                        only_view = admin.get("only_view", "True")
-                        args['only_view'] = only_view
-                        message['only_view'] = only_view
-                        save_platform_session(**args)
-
-            return json.dumps(message)
+    if request.method.lower() == "get":
+        return render_template("manage/login.html")
+    elif request.method.lower() == "post":
+        """验证用户身份"""
+        message = {"message": "success"}
+        """取登录参数"""
+        user_name = get_arg(request, "user_name", None)
+        user_password = get_arg(request, "user_password", None)
+        if user_name is None or user_name == '' or user_password == '' or user_password is None:
+            message['message'] = '用户名或密码不能为空'
         else:
-            return abort(400, "unknown request")
+            user_password = user_password.lower()
+            """登录参数合法,开始验证"""
+            args = {"user_name": user_name}
+            admin = CompanyAdmin.find_one_plus(filter_dict=args, instance=False)
+            if admin is None:
+                message['message'] = "用户名不存在或手机未注册"
+            else:
+                if user_password != admin['user_password']:
+                    message['message'] = "密码错误"
+                elif admin.get("user_status") != 1:
+                    message['message'] = "账户未启用"
+                else:
+                    """登录成功,写入会话"""
+                    args['user_id'] = str(admin['_id'])  # 写入用户id的str格式.
+                    args['user_password'] = user_password
+                    args['company_id'] = str(admin['company_id'].id)
+                    only_view = admin.get("only_view", "True")
+                    args['only_view'] = only_view
+                    message['only_view'] = only_view
+                    save_platform_session(**args)
+
+        return json.dumps(message)
+    else:
+        return abort(400, "unknown request")
 
 
 @manage_blueprint.route("/register", methods=['post', 'get'])
@@ -276,9 +267,8 @@ def logout_func():
             clear_platform_cors_session(sid)
             return json.dumps({"message": "success"})
         else:
-            prefix = get_platform_session_arg("prefix", 'sf')
             clear_platform_session()
-            return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+            return redirect(url_for("manage_blueprint.login_func"))
     else:
         return abort(400, "unknown request")
 
@@ -502,7 +492,6 @@ def driver_detail_func():
         message = {"message": "success"}
         user_id = get_arg(request, "user_id", None)  # 待查询的用户的id
         date_str = get_arg(request, "date", None)  # 查询的日期 2013-12-12
-        prefix = get_platform_session_arg("prefix", None)  # 当前用户所在公司前缀
         raw_user_id = user_id
         if user_id is None:
             message['message'] = "用户id不能为空"
@@ -1334,10 +1323,38 @@ def process_accident_func(prefix):
             return abort(404, "页面不存在")
 
 
+@manage_blueprint.route("/test_page/<uid>")
+@check_platform_session
+def test_page_func(uid):
+    """
+    用于测试web功能的页面.
+    :param uid: token,用于简单的身份验证
+    :return:
+    """
+    today_uid = "1025de51f1654c0bbc91fae8d88f7939"
+    if uid != today_uid:
+        return abort(404)
+    else:
+        return render_template("test_page.html")
+
+
+@manage_blueprint.route("/upload_file", methods=['post'])
+@check_platform_session
+@log_request_args
+def upload_file_func():
+    """
+    接收页面上传的文件,以GridFS的形式保存在数据库中.最常见的情况是为富文本编辑器服务
+    :return:
+    """
+    files = {k: v for k, v in request.files.items()}
+
+    
+
+
 @manage_blueprint.route("/<prefix>_structure", methods=["get", "post"])
 @check_platform_session
-def process__structure_func(prefix):
-    """组织架构管理页面"""
+def process__structure_func():
+    """组织架构管理页面,暂停"""
     current_user_id = get_platform_session_arg("user_id")
     head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     current_real_name = get_platform_session_arg("real_name")

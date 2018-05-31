@@ -212,18 +212,16 @@ def check_platform_session(f):
                     return f(*args, **kwargs)
         else:
             """本域用户"""
-            prefix = 'sf'
             user_name = session.get("user_name")  # 检测session中的user_name
             user_password = session.get("user_password")  # user_password
             user_id = session.get("user_id")  # 检测session中的user_id
-            prefix = prefix if session.get("prefix") is None else session.get("prefix")
             if not (user_password and user_name and user_id):
-                return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+                return redirect(url_for("manage_blueprint.login_func"))
             else:
                 checked_user_obj = CompanyAdmin.find_one(user_name=user_name, user_password=user_password)
                 if checked_user_obj is None:
                     """用户名和密码不正确"""
-                    return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+                    return redirect(url_for("manage_blueprint.login_func"))
                 else:
                     if str(checked_user_obj.get_id()) == user_id:
                         """检查时不是只读管理员,如果是,进行path检查,只允许访问规定的path"""
@@ -235,11 +233,11 @@ def check_platform_session(f):
                                 return f(*args, **kwargs)
                             else:
                                 """不在许可路径列表内"""
-                                return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+                                return redirect(url_for("manage_blueprint.login_func"))
                         else:
                             return f(*args, **kwargs)
                     else:
-                        return redirect(url_for("manage_blueprint.login_func", prefix=prefix))
+                        return redirect(url_for("manage_blueprint.login_func"))
     return decorated_function
 
 

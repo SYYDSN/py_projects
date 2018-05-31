@@ -26,28 +26,10 @@ app.register_blueprint(manage_blueprint)
 SESSION_TYPE = "redis"
 app.config.from_object(__name__)
 Session(app)
-csrf = CSRFProtect(app)                                       # 开启全局CSRF保护
-csrf.exempt(api_user_blueprint)                               # 此蓝图不做csrf保护
-csrf.exempt(api_data_blueprint)                               # 此蓝图不做csrf保护
-csrf.exempt(m_module.track_info)                              # 此视图不做csrf保护
-csrf.exempt(m_module.login_func)                              # 此视图不做csrf保护
-csrf.exempt(m_module.register_func)                           # 此视图不做csrf保护
-csrf.exempt(m_module.track_info)                              # 此视图不做csrf保护
-csrf.exempt(m_module.index_func)                              # 此视图不做csrf保护
-csrf.exempt(m_module.get_driver_list_func)                    # 此视图不做csrf保护
-csrf.exempt(m_module.get_employee_archives_func)              # 此视图不做csrf保护
-csrf.exempt(m_module.driver_detail_func)                      # 此视图不做csrf保护
-csrf.exempt(m_module.report_page_func)                        # 此视图不做csrf保护
-csrf.exempt(m_module.app_version_table_func)                  # 此视图不做csrf保护
-csrf.exempt(m_module.block_employee_list_func)                # 此视图不做csrf保护
-csrf.exempt(m_module.user_info_func)                          # 此视图不做csrf保护
-csrf.exempt(m_module.last_positions_func)                     # 此视图不做csrf保护
-csrf.exempt(m_module.subordinates_base_info_func)             # 此视图不做csrf保护
-csrf.exempt(m_module.violation_func)                          # 此视图不做csrf保护
-csrf.exempt(m_module.warning_func)                            # 此视图不做csrf保护
-csrf.exempt(m_module.accident_func)                           # 此视图不做csrf保护
-csrf.exempt(m_module.process_accident_func)                   # 此视图不做csrf保护
-csrf.exempt(m_module.batch_insert_user)                       # 此视图不做csrf保护
+# csrf = CSRFProtect(app)                                       # 开启全局CSRF保护
+# csrf.exempt(api_user_blueprint)                               # 此蓝图不做csrf保护
+
+
 port = 5000
 
 
@@ -57,13 +39,11 @@ def index_func():
 
 
 @app.route("/hello", methods=['get', 'post'])
-@csrf.exempt
 def hello_world_2():
     return "ok"
 
 
 @app.route("/token", methods=['post', 'get'])
-@csrf.exempt
 def test_token():
     token = request.headers.get("auth-token")
     result = {"token": token}

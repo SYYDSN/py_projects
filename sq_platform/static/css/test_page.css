@@ -1,0 +1,19 @@
+html{
+    font-size:14px;
+}
+h1,h2,h3,h4,h5,h6{
+    text-align: center;
+}
+.show_img{
+    min-width: 200px;
+    min-height: 140px;
+}
+#up_file{
+    display: none;
+}
+#file_path{
+    background-color: #e6e6e6;
+}
+#file_path:hover{
+    cursor:pointer !important;
+}

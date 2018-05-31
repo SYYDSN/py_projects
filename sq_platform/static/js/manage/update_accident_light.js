@@ -1,4 +1,9 @@
 $(function(){
+    // 初始化富文本编辑器
+    const E = window.wangEditor;
+    let desc_obj = new E("#accident_description");
+    desc_obj.create();
+
     // 初始化日期选择器
     $("#accident_time").datetimepicker({
         language: "zh-CN",

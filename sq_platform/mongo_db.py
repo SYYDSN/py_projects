@@ -21,6 +21,7 @@ from pymongo.client_session import ClientSession
 from werkzeug.contrib.cache import RedisCache
 from log_module import get_logger
 from pymongo import ReturnDocument
+import gridfs
 from pymongo.errors import *
 import warnings
 from pymongo.errors import DuplicateKeyError
@@ -811,6 +812,103 @@ class MyCache:
             raise e
         finally:
             return
+
+
+class BaseFile:
+    """GridFS操作基础类"""
+    _table_name = "base_file"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['file_name'] = str
+    type_dict['uploadDate'] = datetime.datetime
+    type_dict['length'] = int
+    type_dict['chunkSize'] = int
+    type_dict['md5'] = str
+    type_dict['data'] = bytes
+
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            type_dict = self.type_dict
+            if k in type_dict:
+                if isinstance(v, type_dict[k]):
+                    self.__dict__[k] = v
+                else:
+                    the_type = self.type_dict[k]
+                    if the_type.__name__ == 'datetime':
+                        self.__dict__[k] = get_datetime_from_str(v)
+                    else:
+                        self.__dict__[k] = the_type(v)
+            else:
+                self.__dict__[k] = v
+
+    def table_name(self):
+        return self._table_name
+
+    @classmethod
+    def get_table_name(cls):
+        return cls._table_name
+
+    @classmethod
+    def fs_cls(cls) -> gridfs.GridFS:
+        """
+        返回一个
+        :return:
+        """
+        return gridfs.GridFS(database=get_db(), collection=cls.get_table_name())
+
+    @classmethod
+    def save_cls(cls, file_obj, **kwargs) -> ObjectId:
+        """
+        保存文件.
+        :param file_obj: 一个有read方法的对象,比如一个就绪状态的BufferedReader对象.
+        :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
+        :return: 失败返回None,成功返回_id
+        """
+        fs = cls.fs_cls()
+        r = fs.put(data=file_obj, **kwargs)
+        file_obj.close()
+        return r
+
+    @classmethod
+    def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False) -> (dict, None):
+        """
+        查找一个文件.
+        :param filter_dict: 查找条件
+        :param sort_dict: 排序条件
+        :param instance: 是否返回实例?
+        :return:
+        """
+        fs = cls.fs_cls()
+        if isinstance(sort_dict, dict) and len(sort_dict) > 0:
+            s = [(k, v) for k, v in sort_dict.items()]
+            one = fs.find_one(filter=filter_dict, sort=s)
+        else:
+            one = fs.find_one(filter=filter_dict)
+        if one is None:
+            pass
+        else:
+            r = one._file
+            r['data'] = one.read()
+            one.close()
+            return cls(**r) if instance else r
+
+    def data(self) -> bytes:
+        """返回数据"""
+        return self.__dict__['data']
+
+    @classmethod
+    def get_one_data(cls, filter_dict: dict, sort_dict: dict = None) -> bytes:
+        """
+        根据条件,查询一个文件,
+        :param filter_dict: 查找条件
+        :param sort_dict: 排序条件
+        :return:
+        """
+        r = cls.find_one_cls(filter_dict=filter_dict, sort_dict=sort_dict)
+        if r is None:
+            pass
+        else:
+            return r['data']
 
 
 class BaseDoc:
@@ -2102,5 +2200,9 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 
 if __name__ == "__main__":
+    f = "/home/walle/intel.txt"
+    c = open(f, 'rb')
+    e = BaseFile.find_one_cls(filter_dict={"file_name":"hello"}, instance=True)
+    print(e)
     pass
 

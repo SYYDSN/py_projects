@@ -72,3 +72,18 @@ body{
 .check_div .check_name{
     margin-right:3em;
 }
+/*富文本编辑器*/
+#accident_description{
+    min-width:600px;
+    max-width: 1000px;
+    min-height: 300px;
+    max-height: 600px;
+}
+#accident_comment{
+    min-width:600px;
+    max-width: 1000px;
+    min-height: 200px;
+    max-height: 300px;
+    overflow-y: scroll;
+    border: 1px solid grey;
+}
