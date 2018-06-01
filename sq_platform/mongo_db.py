@@ -195,28 +195,43 @@ class DB:
         return cls.instance
 
 
-def get_db():
+def get_db(database: str = None):
     """
     获取一个针对db_name对应的数据库的的连接，一般用于ORM方面。比如构建一个类。
+    :param database: 数据库名
     :return: 一个Database对象。
     """
     mongodb_conn = DB()
-    conn = mongodb_conn[db_name]
+    if database is None:
+        conn = mongodb_conn[db_name]
+    else:
+        conn = mongodb_conn[database]
     return conn
 
 
-def get_conn(table_name):
+def get_conn(table_name: str, database: str = None):
     """
     获取一个针对table_name对应的表的的连接，一般用户对数据库进行增删查改等操作。
     :param table_name: collection的名称，对应sql的表名。必须。
+    :param database: 数据库名
     :return: 一个Collection对象，用于操作数据库。
     """
     if table_name is None or table_name == '':
         raise TypeError("表名不能为空")
     else:
-        mongodb_conn = get_db()
+        mongodb_conn = get_db(database)
         conn = mongodb_conn[table_name]
         return conn
+
+
+def get_fs(table_name: str, database: str = None) -> gridfs.GridFS:
+    """
+    获取一个GridFS对象
+    :param table_name: collection名
+    :param database: 数据库名
+    :return:
+    """
+    return gridfs.GridFS(database=get_db(database), collection=table_name)
 
 
 def other_can_json(obj):
@@ -820,6 +835,8 @@ class BaseFile:
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['file_name'] = str
+    type_dict['file_type'] = str  # 文件类型
+    type_dict['description'] = str
     type_dict['uploadDate'] = datetime.datetime
     type_dict['length'] = int
     type_dict['chunkSize'] = int
@@ -827,6 +844,14 @@ class BaseFile:
     type_dict['data'] = bytes
 
     def __init__(self, **kwargs):
+        if "file_name" not in kwargs:
+            ms = "file_name arg is require!"
+            raise ValueError(ms)
+        if "file_type" not in kwargs:
+            ms = "file_type参数缺失.未知的文件类型"
+            raise ValueError(ms)
+        if "description" not in kwargs:
+            kwargs['description'] = ""
         for k, v in kwargs.items():
             type_dict = self.type_dict
             if k in type_dict:
@@ -849,36 +874,40 @@ class BaseFile:
         return cls._table_name
 
     @classmethod
-    def fs_cls(cls) -> gridfs.GridFS:
+    def fs_cls(cls, collection: str = None) -> gridfs.GridFS:
         """
-        返回一个
+        返回一个GridFS对象.
+        :param collection: 表名,
         :return:
         """
-        return gridfs.GridFS(database=get_db(), collection=cls.get_table_name())
+        collection = cls.get_table_name() if collection is None else collection
+        return get_fs(collection)
 
     @classmethod
-    def save_cls(cls, file_obj, **kwargs) -> ObjectId:
+    def save_cls(cls, file_obj, collection: str = None,  **kwargs) -> (str, ObjectId, None):
         """
         保存文件.
         :param file_obj: 一个有read方法的对象,比如一个就绪状态的BufferedReader对象.
+        :param collection: 表名,
         :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
-        :return: 失败返回None,成功返回_id
+        :return: 失败返回None,成功返回_id/str
         """
-        fs = cls.fs_cls()
+        fs = cls.fs_cls(collection)
         r = fs.put(data=file_obj, **kwargs)
         file_obj.close()
         return r
 
     @classmethod
-    def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False) -> (dict, None):
+    def find_one_cls(cls, filter_dict: dict, collection: str = None, sort_dict: dict = None, instance: bool = False) -> (dict, None):
         """
         查找一个文件.
         :param filter_dict: 查找条件
+        :param filter_dict:
         :param sort_dict: 排序条件
         :param instance: 是否返回实例?
-        :return:
+        :return: object/doc
         """
-        fs = cls.fs_cls()
+        fs = cls.fs_cls(collection)
         if isinstance(sort_dict, dict) and len(sort_dict) > 0:
             s = [(k, v) for k, v in sort_dict.items()]
             one = fs.find_one(filter=filter_dict, sort=s)
@@ -909,6 +938,50 @@ class BaseFile:
             pass
         else:
             return r['data']
+
+    @classmethod
+    def format_url(cls, file_id: (str, ObjectId), file_name: str, collection: str = None) -> str:
+        """
+        格式化file对象的url, 这个函数仅仅被cls.transform调用.
+        对于不同的class,你可能需要重载此方法以自定义file的url
+        :param file_id:
+        :param file_name:
+        :param collection:
+        :return:
+        """
+        file_id = file_id if isinstance(file_id, str) else str(file_id)
+        collection = collection if collection else cls.get_table_name()
+        return 'manage/fs/{}/{}/{}'.format(collection, file_id, file_name)
+
+    @classmethod
+    def transform(cls, doc: dict, include_data: bool = False) -> dict:
+        """
+        转换字典成为:
+        1. files部分的BDRef转为url
+        2. 除data外,都转为适合json的类型.
+        :param doc:
+        :param include_data: 是否包含data?
+        :return:
+        """
+        temp = dict()
+        f_id = doc['_id']
+        temp['_id'] = f_id
+        f_name = doc.get('file_name', '')
+        temp['file_name'] = f_name
+        f_type = doc.get('file_type', '')
+        temp['file_type'] = f_type
+        f_desc = doc.get('description', '')
+        temp['desc'] = f_desc
+        f_md5 = doc.get('md5', '')
+        temp['md5'] = f_md5
+        f_time = doc.get('uploadDate').strftime("%Y-%m-%d %H:%M:%S")
+        temp['time'] = f_time
+        if include_data:
+            f_data = doc.get('data')
+            temp['data'] = f_data
+        f_url = cls.format_url(file_id=f_id, file_name=f_name)
+        temp['url'] = f_url
+        return temp
 
 
 class BaseDoc:

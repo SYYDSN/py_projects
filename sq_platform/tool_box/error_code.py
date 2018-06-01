@@ -2,7 +2,7 @@
 from mongo_db import get_conn
 from mongo_db import ObjectId
 from mongo_db import DBRef
-from api.user.violation_module import ViolationQueryResult
+from api.data.violation_module import ViolationQueryResult
 from api.data.item_module import CarLicense
 
 

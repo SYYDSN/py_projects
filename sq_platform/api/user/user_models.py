@@ -456,7 +456,7 @@ def rebuild_car_license()->None:
     """重建行车证信息，去掉重复的键值，为创建plate_number和user_id的联合唯一主键提供前提条件
         db.car_license_info.ensureIndex({"user_id":1,"plate_number":1}, {"unique":1})
     """
-    from api.user.violation_module import VioQueryGenerator
+    from api.data.violation_module import VioQueryGenerator
     vios = VioQueryGenerator.find()
     for vio in vios:
         car_license = CarLicense.find_by_id(vio.get_attr("car_license").id)

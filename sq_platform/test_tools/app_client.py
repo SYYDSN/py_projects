@@ -21,7 +21,7 @@ def test_check_version():
 
 def test_get_security_rank_list():
     """测试用户安全指数排名接口"""
-    auth_token = "f40bc71e130c48f4bcebff1169dfe22a" # app段登录标识 me
+    auth_token = "f40bc71e130c48f4bcebff1169dfe22a"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     res = requests.post("http://127.0.0.1:5000/api/get_security_rank_list", headers=headers)
     print(res.json())

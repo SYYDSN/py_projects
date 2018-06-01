@@ -11,7 +11,7 @@ import sys
 from error_module import pack_message, RepeatError
 from mongo_db import BaseDoc
 from log_module import get_logger
-from api.user import violation_module
+from api.data import violation_module
 from uuid import uuid4
 from api.user.app_module import check_version as check_client_version
 from api.data.item_module import *

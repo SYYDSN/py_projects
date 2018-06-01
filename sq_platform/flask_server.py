@@ -10,6 +10,7 @@ import manage.manage_module as m_module
 from flask_wtf.csrf import CSRFProtect
 from flask_debugtoolbar import DebugToolbarExtension
 import json
+import datetime
 import os
 from mongo_db import cache
 
@@ -19,6 +20,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = keystr  # 配置会话密钥
 app.config['SESSION_TYPE'] = "redis"  # session类型为redis
 app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持久化的会话的生存时间
 # app.config['SERVER_NAME'] = "127.0.0.1:8001"  此域名下的所有子域名的session都会接受
 app.register_blueprint(api_user_blueprint)
 app.register_blueprint(api_data_blueprint)
@@ -79,5 +81,6 @@ if __name__ == '__main__':
     cache.set("flask_server_port", port)
     # app.debug = True  # 这一行必须在toolbar = DebugToolbarExtension(app)前面,否则不生效
     toolbar = DebugToolbarExtension(app)  # 开启html调试toolbar
-    # app.run(host="0.0.0.0", port=port, threaded=True)  # 开启DebugToolbar的调试模式. 对应app.debug = True
+    # 开启DebugToolbar的调试模式.对应app.debug = True
+    # app.run(host="0.0.0.0", port=port, threaded=True)
     app.run(host="0.0.0.0", port=port, debug=True, threaded=True)  # 一般调试模式

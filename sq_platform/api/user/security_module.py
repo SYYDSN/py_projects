@@ -43,7 +43,7 @@ print(path_dict)
 
 
 
-"""安全（评估）模块"""
+"""安全（评估）模块,此模块准备重写或者废止, 2018-6-1"""
 
 logger = get_logger()
 Binary = mongo_db.Binary
@@ -390,6 +390,7 @@ class DrivingEvent(mongo_db.BaseDoc):
 
 class Accident(mongo_db.BaseDoc):
     """事故类
+    此类已转移到api.data.accident_module.Accident .2018-6-1
     """
     _table_name = "accident_info"
     type_dict = dict()

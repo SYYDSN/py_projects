@@ -222,6 +222,7 @@ def batch_insert_gps(*args, **kwargs):
     res = item_module.GPS.async_insert_many()
     info = {"queue_length": res}
     print(info)
+    return info
 
 
 @app.task

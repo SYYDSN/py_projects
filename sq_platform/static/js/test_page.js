@@ -13,7 +13,7 @@ $(function(){
     // 上传文件按钮点击事件.
     $("#upload_btn").click(function(){
         let url = `http://${location.host}/manage/upload_file`;
-        upload("case_file", $("#up_file"), url);
+        upload("accident_data", $("#up_file"), url);
     });
     
 // end!

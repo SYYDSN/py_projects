@@ -9,7 +9,7 @@ if __project_dir not in sys.path:
 import mongo_db
 from api.data.item_module import User, Track
 from api.data.base_item_extends import UseHandlerRecord
-from api.user.violation_module import VioQueryGenerator
+from api.data.violation_module import VioQueryGenerator
 import hashlib
 import datetime
 from threading import Lock

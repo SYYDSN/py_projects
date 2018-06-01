@@ -89,7 +89,6 @@ class Log(mongo_db.BaseDoc):
                 info['request_headers'] = {k: v for k, v in headers.items()}
             except RuntimeError as e:
                 print(e)
-
             func_args = args
             func_kwargs = kwargs
             info['func_name'] = func_name
@@ -1508,7 +1507,7 @@ class CarLicense(mongo_db.BaseDoc):
         db.car_license_info.ensureIndex({"user_id":1,"plate_number":1}, {"unique":1})
         这个函数很少使用
         """
-        from api.user.violation_module import VioQueryGenerator
+        from api.data.violation_module import VioQueryGenerator
         vios = VioQueryGenerator.find()
         for vio in vios:
             car_license = CarLicense.find_by_id(vio.get_attr("car_license").id)
@@ -2167,25 +2166,17 @@ class GPS(mongo_db.BaseDoc):
         cache = mongo_db.cache
         key = "gps_realtime_queue"
         val = cache.get(key)
+        cache.delete(key)
         if val is None:
             val = list()
         return val
-
-    @staticmethod
-    def clear_queue() -> None:
-        """
-        清除队列
-        :return:
-        """
-        cache = mongo_db.cache
-        key = "gps_realtime_queue"
-        cache.delete(key)
 
     @classmethod
     def async_insert_many(cls) -> int:
         """
         以异步/celery队列的方式.批量插入gps数据.
         :return: 队列长度
+        2018-06-01 12:34:41
         """
         gps_list = cls.get_queue()
         l = len(gps_list)
@@ -2197,7 +2188,6 @@ class GPS(mongo_db.BaseDoc):
         else:
             reserted_list = cls.insert_many(gps_list)
             Track.batch_create_item_from_gps(reserted_list)
-            cls.clear_queue()
         return l
 
     @classmethod

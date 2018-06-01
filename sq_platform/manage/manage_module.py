@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, request, render_template, Blueprint, abort, make_response
+from flask import send_file
 from flask_wtf.form import FlaskForm
 import os
 from api.data.item_module import GPS
@@ -9,6 +10,7 @@ import random
 import math
 import json
 import json.decoder
+from io import BytesIO
 from manage.company_module import *
 from api.data.item_module import User
 from api.data.item_module import Track
@@ -16,7 +18,7 @@ from log_module import get_logger
 from api.user import security_module
 from werkzeug.contrib.cache import RedisCache
 from mongo_db import get_datetime_from_str
-from api.user.violation_module import ViolationRecode
+from api.data.violation_module import ViolationRecode
 from role.role_module import Role
 from role.role_module import Func
 from manage.company_module import Employee
@@ -693,7 +695,7 @@ def get_archives_from_cache(current_user_id: str, clear: bool = False) -> dict:
                 #     archive['health'] = _source['health']  # 健康记录, 字典的数组
                 """
                 不良驾驶事件字典的格式
-                {                                              
+                {
                   "speeding_drive": {                           # 不良驾驶行为类别：    type:string
                   "datetime" : "2017-12-07T20:00:00",           # 不良驾驶行为发生时间: type:date
                   "longitude" : 121.0,                          # 不良驾驶发生经度：    type: float
@@ -1340,15 +1342,51 @@ def test_page_func(uid):
 
 @manage_blueprint.route("/upload_file", methods=['post'])
 @check_platform_session
-@log_request_args
 def upload_file_func():
     """
     接收页面上传的文件,以GridFS的形式保存在数据库中.最常见的情况是为富文本编辑器服务
     :return:
     """
+    mes = {"message": "success"}
     files = {k: v for k, v in request.files.items()}
+    if len(files) == 0:
+        mes['message'] = "没有发现上传的文件"
+    else:
+        for table_name, file in files.items():
+            args = dict()
+            file_name = file.filename
+            args['file_name'] = file_name
+            args['file_type'] = file.content_type
+            _id = mongo_db.BaseFile.save_cls(file_obj=file, collection=table_name, **args)
+            if isinstance(_id, ObjectId):
+                _id = str(_id)
+                mes['_id'] = _id
+                mes['url'] = mongo_db.BaseFile.format_url(_id, file_name, collection=table_name)
+            else:
+                mes['message'] = "保存文件失败"
+    return json.dumps(mes)
 
-    
+
+@manage_blueprint.route("/fs/<collection>/<o_id>/<file_name>", methods=['get'])
+@check_platform_session
+def rebuild_file_func(collection, o_id, file_name):
+    """
+    显示GridFS里的文件.
+    :param collection: 表名
+    :param o_id:
+    :param file_name:
+    :return:
+    """
+    f = {"_id": ObjectId(o_id), "file_name": file_name}
+    file = mongo_db.BaseFile.find_one_cls(filter_dict=f, collection=collection, instance=False)
+    if file is None:
+        return abort(404)
+    else:
+        # resp = make_response()
+        # return resp
+        from PIL import Image
+        im = Image.open(BytesIO(file['data']))
+        return send_file(BytesIO(file['data']), attachment_filename="2323.jpg", mimetype="image/png")
 
 
 @manage_blueprint.route("/<prefix>_structure", methods=["get", "post"])
@@ -1375,7 +1413,7 @@ def batch_insert_user():
             company_id = "5aab48ed4660d32b752a7ee9"  # 新振兴的id,<br>
             e1 = {<br>
             &nbsp;&nbsp;&nbsp;&nbsp;"phone_num": "15618318888", <br>
-            &nbsp;&nbsp;&nbsp;&nbsp;"real_name": "张三",                  <br>  
+            &nbsp;&nbsp;&nbsp;&nbsp;"real_name": "张三",                  <br>
             &nbsp;&nbsp;&nbsp;&nbsp;"dept_id": "5ab21b2a4660d3745e53adfa",  # 新振兴的默认部门id<br>
             &nbsp;&nbsp;&nbsp;&nbsp;"post_id": "5ab21fc74660d376c982ee27"   # 新振兴的默认职务id<br>
             }<br>

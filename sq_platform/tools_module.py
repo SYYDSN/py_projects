@@ -73,9 +73,6 @@ def save_platform_session(**kwargs) -> bool:
     user_name = kwargs.get('user_name')
     user_password = kwargs.get('user_password')
     if not (user_id and user_name and user_password):
-        """去掉session中的内容"""
-        keys = list(session.keys())
-        [session.pop(x) for x in keys]
         return False
     else:
         """验证信息写入session"""
@@ -87,55 +84,6 @@ def save_platform_session(**kwargs) -> bool:
 
 def log_request_args(func):
     return Log.record_function_args(func)
-    # @functools.wraps(func)
-    # def my_wrapper(*args, **kwargs):
-    #     """记录函数传入的参数"""
-    #     func_name = func.__name__
-    #     info = dict()
-    #     try:
-    #         req_args = request.args
-    #         req_form = request.form
-    #         req_json = request.json
-    #         info['request_args'] = req_args
-    #         info['request_form'] = req_form
-    #         info['request_json'] = req_json
-    #     except RuntimeError as e:
-    #         print(e)
-    #
-    #     func_args = str(args)
-    #     func_kwargs = str(kwargs)
-    #     info['func_name'] = func_name
-    #     info['process_status'] = "before"
-    #     info['func_args'] = func_args
-    #     if "user_id" in func_kwargs:
-    #         info['user_id'] = func_kwargs['user_id']
-    #     info['func_kwargs'] = func_kwargs
-    #     info['event_date'] = datetime.datetime.now()
-    #     obj = Log(**info)
-    #     obj.save_plus()
-    #     """执行函数"""
-    #     res = "{}"
-    #     try:
-    #         res = func(*args, **kwargs)
-    #     except Exception as e:
-    #         """记录函数出错信息"""
-    #         info.pop("_id", None)
-    #         info['process_status'] = "error"
-    #         info['error_cause'] = str(e)
-    #         info['event_date'] = datetime.datetime.now()
-    #         obj = Log(**info)
-    #         obj.save_plus()
-    #     """记录函数的返回"""
-    #     info['process_status'] = "after"
-    #     info.pop("error_cause", None)
-    #     info.pop("_id", None)
-    #     res = res if isinstance(res, str) else str(res)
-    #     info['resp'] = res
-    #     info['event_date'] = datetime.datetime.now()
-    #     obj = Log(**info)
-    #     obj.save_plus()
-    #     return res
-    # return my_wrapper
 
 
 def save_platform_cors_session(**kwargs) -> (str, None):
@@ -173,7 +121,7 @@ def clear_platform_session():
     """
     """去掉session中的内容"""
     keys = list(session.keys())
-    [session.pop(x) for x in keys]
+    [session.pop(x, None) for x in keys]
     return False
 
 

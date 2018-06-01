@@ -11,7 +11,6 @@ def upload_file():
     url_local = "http://127.0.0.1:5000/api/add_driving_data"
     url_remote = "http://safego.org:5000/api/add_driving_data"
     # url = "http://127.0.0.1:9000/cc"
-    s = requests.Session()
     files = {"driving_data": open("/home/walle/work/projects/2017_10_11_18_47_01.zip", 'rb')}
     # r = requests.post(url, files=files, headers=headers)
     # r = s.post(url, files=files,  headers=headers)

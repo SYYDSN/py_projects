@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 import sys
 import os
-
 """直接运行此脚本，避免import失败的方法"""
 __dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 if __dir_path not in sys.path:
@@ -101,7 +100,7 @@ class UseHandlerRecord(mongo_db.BaseDoc):
         super(UseHandlerRecord, self).__init__(**kwargs)
 
     @classmethod
-    def record(cls, user_id: ObjectId, func_name: str) -> None:
+    def record(cls, user_id: (str, ObjectId), func_name: str) -> None:
         """
         对用户的操作行为进行计数
         :param user_id: 用户id
@@ -141,7 +140,7 @@ class UseHandlerRecord(mongo_db.BaseDoc):
         return r
 
     @classmethod
-    def get_count(cls, user_id: ObjectId, func_name: str) -> int:
+    def get_count(cls, user_id: (str, ObjectId), func_name: str) -> int:
         """
         获取用户对某一操作的统计信息
         :param user_id:
