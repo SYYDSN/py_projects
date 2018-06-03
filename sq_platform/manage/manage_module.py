@@ -21,6 +21,8 @@ from mongo_db import get_datetime_from_str
 from api.data.violation_module import ViolationRecode
 from role.role_module import Role
 from role.role_module import Func
+from api.data.accident_module import AccidentData
+from api.data.accident_module import Accident
 from manage.company_module import Employee
 
 """管理页面模块/后台管理/登录"""
@@ -1342,9 +1344,9 @@ def test_page_func(uid):
 
 @manage_blueprint.route("/upload_file", methods=['post'])
 @check_platform_session
-def upload_file_func():
+def upload_accident_file_func():
     """
-    接收页面上传的文件,以GridFS的形式保存在数据库中.最常见的情况是为富文本编辑器服务
+    接收页面上传的事故相关文件,以GridFS的形式保存在数据库中.最常见的情况是为富文本编辑器服务
     :return:
     """
     mes = {"message": "success"}
@@ -1357,11 +1359,12 @@ def upload_file_func():
             file_name = file.filename
             args['file_name'] = file_name
             args['file_type'] = file.content_type
-            _id = mongo_db.BaseFile.save_cls(file_obj=file, collection=table_name, **args)
+            # _id = mongo_db.BaseFile.save_cls(file_obj=file, collection=table_name, **args)
+            _id = AccidentData.save_cls(file_obj=file, **args)
             if isinstance(_id, ObjectId):
                 _id = str(_id)
                 mes['_id'] = _id
-                mes['url'] = mongo_db.BaseFile.format_url(_id, file_name, collection=table_name)
+                mes['url'] = mongo_db.BaseFile.format_url(_id, file_name)
             else:
                 mes['message'] = "保存文件失败"
     return json.dumps(mes)
@@ -1382,11 +1385,14 @@ def rebuild_file_func(collection, o_id, file_name):
     if file is None:
         return abort(404)
     else:
-        # resp = make_response()
-        # return resp
-        from PIL import Image
-        im = Image.open(BytesIO(file['data']))
-        return send_file(BytesIO(file['data']), attachment_filename="2323.jpg", mimetype="image/png")
+        file_name = file['file_name']
+        file_type = file['file_type']
+        file_data = file['data']
+        resp = make_response(send_file(BytesIO(file_data), attachment_filename=file_name, as_attachment=True,
+                                       mimetype=file_type))
+        """把文件名的中文从utf-8转成latin-1"""
+        resp.headers["Content-Disposition"] = "attachment; filename={}".format(file_name.encode().decode('latin-1'))
+        return resp
 
 
 @manage_blueprint.route("/<prefix>_structure", methods=["get", "post"])

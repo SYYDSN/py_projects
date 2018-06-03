@@ -245,15 +245,10 @@ def login_required_app(f):
                     message = pack_message({"message": "success"}, 3008, token=token)
                     return json.dumps(message)
                 else:
-                    cache.set(key, user_id, timeout=7200)  # 缓存2小时
-            """比对是否一致?"""
-            if user_id is not None:
-                kwargs['user_id'] = user_id  # 把user_id作为地一个参数传递给视图函数
+                    kwargs['user_id'] = user_id  # 把user_id作为地一个参数传递给视图函数
+                    cache.set(key, user_id, timeout=1200)  # 缓存20分钟
             else:
-                # token验证失败
-                logger.exception("app token验证失败: {}".format(ms))
-                message = pack_message({"message": "success"}, 3008, token=token)
-                return json.dumps(message)
+                kwargs['user_id'] = user_id  # 把user_id作为地一个参数传递给视图函数
         return f(*args, **kwargs)
 
     return decorated_function

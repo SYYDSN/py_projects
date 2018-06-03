@@ -85,13 +85,12 @@ class DBCommandListener(monitoring.CommandListener):
         pass
 
     def failed(self, event):
-        # command_name = event.command_name
-        # command_dict = event.command
-        # database_name = event.database_name
-        # ms = "Error: {} 数据库的 {} 命令执行失败,参数:{}".format(database_name, command_name, command_dict)
-        # print(ms)
-        # logger.exception(ms)
-        pass
+        command_name = event.command_name
+        command_dict = event.command
+        database_name = event.database_name
+        ms = "Error: {} 数据库的 {} 命令执行失败,参数:{}".format(database_name, command_name, command_dict)
+        print(ms)
+        logger.exception(ms)
 
 
 class DBServerListener(monitoring.ServerListener):
@@ -875,37 +874,40 @@ class BaseFile:
         return cls._table_name
 
     @classmethod
-    def fs_cls(cls) -> gridfs.GridFS:
+    def fs_cls(cls, collection: str = None) -> gridfs.GridFS:
         """
         返回一个GridFS对象.
+        :param collection: 表名,
         :return:
         """
-        collection = cls.get_table_name()
+        collection = cls.get_table_name() if collection is None else collection
         return get_fs(collection)
 
     @classmethod
-    def save_cls(cls, file_obj, **kwargs) -> (str, ObjectId, None):
+    def save_cls(cls, file_obj, collection: str = None,  **kwargs) -> (str, ObjectId, None):
         """
         保存文件.
         :param file_obj: 一个有read方法的对象,比如一个就绪状态的BufferedReader对象.
+        :param collection: 表名,
         :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
         :return: 失败返回None,成功返回_id/str
         """
-        fs = cls.fs_cls()
+        fs = cls.fs_cls(collection)
         r = fs.put(data=file_obj, **kwargs)
         file_obj.close()
         return r
 
     @classmethod
-    def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False) -> (dict, None):
+    def find_one_cls(cls, filter_dict: dict, collection: str = None, sort_dict: dict = None, instance: bool = False) -> (dict, None):
         """
         查找一个文件.
         :param filter_dict: 查找条件
+        :param filter_dict:
         :param sort_dict: 排序条件
         :param instance: 是否返回实例?
         :return: object/doc
         """
-        fs = cls.fs_cls()
+        fs = cls.fs_cls(collection)
         if isinstance(sort_dict, dict) and len(sort_dict) > 0:
             s = [(k, v) for k, v in sort_dict.items()]
             one = fs.find_one(filter=filter_dict, sort=s)
@@ -938,16 +940,17 @@ class BaseFile:
             return r['data']
 
     @classmethod
-    def format_url(cls, file_id: (str, ObjectId), file_name: str) -> str:
+    def format_url(cls, file_id: (str, ObjectId), file_name: str, collection: str = None) -> str:
         """
         格式化file对象的url, 这个函数仅仅被cls.transform调用.
         对于不同的class,你可能需要重载此方法以自定义file的url
         :param file_id:
         :param file_name:
+        :param collection:
         :return:
         """
         file_id = file_id if isinstance(file_id, str) else str(file_id)
-        collection = cls.get_table_name()
+        collection = collection if collection else cls.get_table_name()
         return 'manage/fs/{}/{}/{}'.format(collection, file_id, file_name)
 
     @classmethod
@@ -2270,9 +2273,8 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 
 if __name__ == "__main__":
-    f = "/home/walle/java_error_in_PYCHARM_.log"
+    f = "/home/walle/intel.txt"
     c = open(f, 'rb')
-    e = BaseFile.save_cls(c, **{"file_name":"hello", "file_type":"text"})
     e = BaseFile.find_one_cls(filter_dict={"file_name":"hello"}, instance=True)
     print(e)
     pass

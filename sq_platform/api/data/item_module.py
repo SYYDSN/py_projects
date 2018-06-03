@@ -157,7 +157,7 @@ class Log(mongo_db.BaseDoc):
         """检查是否有必要记录异常"""
         if error_flag:
             # 不需要登录的函数名
-            loginless_func = ['api_send_sms', 'app_user_login']
+            loginless_func = ['api_send_sms', 'app_user_login', 'app_user_reg']
             if func_name is not None and func_name not in loginless_func:
                 ms = "异常的请求记录,错误原因:{}. Log实例: {}".format(error_reason, str(self.__dict__))
                 logger.exception(ms)

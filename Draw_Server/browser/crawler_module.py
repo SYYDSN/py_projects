@@ -450,7 +450,7 @@ class FinanceOutApply(mongo_db.BaseDoc):
         customer_name = self.get_attr("user_name")
         customer_id = self.get_attr("user_id")
         relation = CustomerManagerRelation.get_relation_by_sn(customer_id, customer_name)
-        mt4_account = relation['mt4_account']
+        mt4_account = relation.get('mt4_account')
         manager_name = relation['manager_name']
         sales_name = relation['sales_name']
         director_name = relation['director_name']
@@ -652,8 +652,6 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
                 recode(e)
                 logger.exception(e)
                 raise e
-    u = "https://www.baidu.com/baidu?wd=ip&tn=ubuntuu_cb&ie=utf-8"
-    browser.get(u)
     return browser
 
 
@@ -665,20 +663,30 @@ def login_platform(browser):
     """
     browser.get(url=login_url)
     # recode("html= {}".format(browser.page_source))
-    # 用户名输入
-    select_email = WebDriverWait(browser, 10).until(ec.presence_of_element_located((By.CLASS_NAME, "tab_emial")))
-    select_email.click()
-    input_user_name = WebDriverWait(browser, 10).until(
-        ec.presence_of_element_located((By.CSS_SELECTOR, "#account")))
-    input_user_name.send_keys(user_name)  # 输入用户名
-    # 用户密码输入
-    input_user_password = WebDriverWait(browser, 10).until(
-        ec.presence_of_element_located((By.CSS_SELECTOR, "#password")))
-    input_user_password.send_keys(user_password)  # 输入用户密码
-    # 点击登录按钮
-    button_login = WebDriverWait(browser, 10).until(
-        ec.presence_of_element_located((By.CSS_SELECTOR, ".login_content .btn_login")))
-    button_login.click()  # 登录
+    flag = True
+    """防止元素被遮住"""
+    while flag:
+        try:
+            # 用户名输入
+            select_email = WebDriverWait(browser, 10).until(ec.presence_of_element_located((By.CLASS_NAME, "tab_emial")))
+            select_email.click()
+            input_user_name = WebDriverWait(browser, 10).until(
+                ec.presence_of_element_located((By.CSS_SELECTOR, "#account")))
+            input_user_name.send_keys(user_name)  # 输入用户名
+            # 用户密码输入
+            input_user_password = WebDriverWait(browser, 10).until(
+                ec.presence_of_element_located((By.CSS_SELECTOR, "#password")))
+            input_user_password.send_keys(user_password)  # 输入用户密码
+            # 点击登录按钮
+            button_login = WebDriverWait(browser, 10).until(
+                ec.presence_of_element_located((By.CSS_SELECTOR, ".login_content .btn_login")))
+            button_login.click()  # 登录
+            flag = False
+        except ElementClickInterceptedException as e:
+            print(e)
+            time.sleep(0.1)
+        finally:
+            pass
     logo = None
     try:
         logo = WebDriverWait(browser, 10).until(ec.presence_of_element_located((By.ID, "a_hrefto_domain")))
@@ -1143,7 +1151,7 @@ def do_jobs():
     begin = datetime.datetime.now()
     ms = "批量作业开始: {}".format(begin)
     logger.info(ms)
-    b = get_browser(True, 1)
+    b = get_browser(False, 1)
     open_platform(b)
     for type_name in formater_dict.keys():
         redirect(b, type_name)
