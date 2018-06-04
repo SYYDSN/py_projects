@@ -35,6 +35,7 @@ body{
     display: flex;
     flex-direction:row;
     justify-content: flex-start;
+    max-width:1000px;
     /*align-items: baseline;*/
 }
 .second_row .my_col{
@@ -86,4 +87,8 @@ body{
     max-height: 300px;
     overflow-y: scroll;
     border: 1px solid grey;
+}
+#submit_accident{
+    margin-top:1em;
+    margin-left: 0;
 }

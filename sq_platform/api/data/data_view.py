@@ -40,7 +40,7 @@ def query_error_code():
 
 @api_data_blueprint.route("/gps_push", methods=['post'])
 @login_required_app
-@log_request_args
+# @log_request_args
 def gps_push(user_id):
     """接收设备发来的实时gps信息"""
     args = get_args(request)
@@ -90,7 +90,7 @@ def gps_push(user_id):
 
 @api_data_blueprint.route("/gps_push_async", methods=['get', 'post'])
 @login_required_app
-@log_request_args
+# @log_request_args
 def gps_push_async(user_id):
     """接收设备发来的gps信息 异步队列模式"""
     message = {"message": "success"}
@@ -123,7 +123,7 @@ def gps_push_async(user_id):
 
 @api_data_blueprint.route("/sensor_push", methods=['get', 'post'])
 @login_required_app
-@log_request_args
+# @log_request_args
 def sensor_push(user_id):
     """接收设备的传感器发来的信息"""
     args = get_args(request)
@@ -158,7 +158,7 @@ def sensor_push(user_id):
 
 @api_data_blueprint.route("/sensor_push_async", methods=['get', 'post'])
 @login_required_app
-@log_request_args
+# @log_request_args
 def sensor_push_async(user_id):
     """接收设备的传感器发来的信息 异步队列模式"""
     message = {"message": "success"}
@@ -192,7 +192,7 @@ def sensor_push_async(user_id):
 
 @api_data_blueprint.route("/<key>_device_info", methods=['get', 'post'])
 @login_required_app
-@log_request_args
+# @log_request_args
 def process_device_info(user_id, key):
     """处理手机（及其附带的传感器的）信息的增删改查"""
     message = pack_message(error_code=3012, key=key)

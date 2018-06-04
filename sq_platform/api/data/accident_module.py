@@ -32,9 +32,10 @@ class Accident(mongo_db.BaseDoc):
     _table_name = "accident_info"
     type_dict = dict()
     type_dict["_id"] = ObjectId  # id 唯一
+    type_dict["writer"] = DBRef  # dbref 记录者id,
     type_dict['code'] = str  # 事故编号
     type_dict['title'] = str  # 事故标题,非必须
-    type_dict['description'] = str  # 事故描述,非必须
+    type_dict['content'] = str  # 事故正文,必须,指向
     type_dict['comment'] = str  # 事故备注,非必须
     type_dict['type'] = str  # 事故类型 追尾碰撞, 双车刮蹭, 部件失效, 车辆倾覆
     type_dict['level'] = str  # 事故结果类别, 轻微事故, 一般事故, 重大事故, 特大事故
@@ -45,7 +46,7 @@ class Accident(mongo_db.BaseDoc):
     type_dict['address'] = str  # 事发地址
     type_dict['city'] = str  # 事发城市
     type_dict['files'] = list  # 相关视频,文件资料.内部都是DBRef
-    type_dict['status'] = int   # 事故状态,0未处理.1 已处理
+    type_dict['status'] = int   # 事故状态, 1已处理0未处理
     type_dict['create_date'] = datetime.datetime
     type_dict['last_update'] = datetime.datetime
 

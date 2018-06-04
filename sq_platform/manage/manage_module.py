@@ -1323,6 +1323,41 @@ def process_accident_func(prefix):
                 acc_type = ["追尾碰撞", "双车刮蹭", "部件失效", "车辆倾覆"]
                 return render_template("manage/update_accident_light.html", accident=accident, acc_type=acc_type,
                                        head_img_url=head_img_url)
+            elif request.method.lower() == "post":
+                """提交事故"""
+                mes = {"message": "success"}
+                user_id = get_platform_session_arg("user_id")
+                if isinstance(user_id, str) and len(user_id) == 24:
+                    writer = DBRef(database=mongo_db.db_name, collection="user_info", id=ObjectId(user_id))
+                    args = get_args(request)
+                    a_status = args.get('status', 0)
+                    try:
+                        a_status = int(a_status)
+                    except Exception as e:
+                        print(e)
+                        a_status = 0
+                    finally:
+                        args['status'] = a_status
+                    args['writer'] = writer
+                    accident = Accident(**args)
+                    _id = None
+                    error = None
+                    try:
+                        _id = accident.save_plus()
+                    except Exception as e:
+                        logger.exception(e)
+                        error = e
+                        print(e)
+                    finally:
+                        if isinstance(_id, ObjectId):
+                            pass
+                        else:
+                            mes['message'] = "插入失败,错误原因:{}".format(str(error))
+                else:
+                    mes['message'] = "身份验证失败"
+                return json.dumps(mes)
+            else:
+                return abort(404)
         else:
             return abort(404, "页面不存在")
 
@@ -1351,20 +1386,28 @@ def upload_accident_file_func():
     """
     mes = {"message": "success"}
     files = {k: v for k, v in request.files.items()}
+    user_id = get_platform_session_arg("user_id", None)
     if len(files) == 0:
         mes['message'] = "没有发现上传的文件"
+    elif not (isinstance(user_id, str) and len(user_id) == 24):
+        mes['message'] = "身份验证失败"
     else:
-        for table_name, file in files.items():
+        owner = DBRef(database=mongo_db.db_name, collection="user_info", id=ObjectId(user_id))
+        """存在一次上传多个文件的可能性,但现在不予考虑"""
+        for collection, file in files.items():
+            data = dict()
             args = dict()
             file_name = file.filename
             args['file_name'] = file_name
             args['file_type'] = file.content_type
-            # _id = mongo_db.BaseFile.save_cls(file_obj=file, collection=table_name, **args)
-            _id = AccidentData.save_cls(file_obj=file, **args)
+            args['owner'] = owner
+            _id = mongo_db.BaseFile.save_cls(file_obj=file, collection=collection, **args)
+            # _id = AccidentData.save_cls(file_obj=file, **args)
             if isinstance(_id, ObjectId):
                 _id = str(_id)
-                mes['_id'] = _id
-                mes['url'] = mongo_db.BaseFile.format_url(_id, file_name)
+                data['_id'] = _id
+                data['url'] = mongo_db.BaseFile.format_url(file_id=_id, file_name=file_name, collection=collection)
+                mes['data'] = data
             else:
                 mes['message'] = "保存文件失败"
     return json.dumps(mes)
@@ -1380,8 +1423,11 @@ def rebuild_file_func(collection, o_id, file_name):
     :param file_name:
     :return:
     """
-    f = {"_id": ObjectId(o_id), "file_name": file_name}
+    user_id = get_platform_session_arg("user_id", None)
+    owner = DBRef(database=mongo_db.db_name, collection="user_info", id=ObjectId(user_id))
+    f = {"_id": ObjectId(o_id), "file_name": file_name, "owner": owner}
     file = mongo_db.BaseFile.find_one_cls(filter_dict=f, collection=collection, instance=False)
+    """分析查询结果"""
     if file is None:
         return abort(404)
     else:
@@ -1390,7 +1436,7 @@ def rebuild_file_func(collection, o_id, file_name):
         file_data = file['data']
         resp = make_response(send_file(BytesIO(file_data), attachment_filename=file_name, as_attachment=True,
                                        mimetype=file_type))
-        """把文件名的中文从utf-8转成latin-1"""
+        """把文件名的中文从utf-8转成latin-1,这是防止中文的文件名造成的混乱"""
         resp.headers["Content-Disposition"] = "attachment; filename={}".format(file_name.encode().decode('latin-1'))
         return resp
 

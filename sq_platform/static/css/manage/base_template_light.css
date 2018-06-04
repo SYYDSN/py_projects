@@ -21,6 +21,10 @@ body {
     /*100%高度*/
     height:100%;
 }
+.my_text_align{
+    text-align: center;
+    justify-content: center !important;
+}
 .clear {
     clear: both;
 }
@@ -91,29 +95,30 @@ li {
 }
 
 /*提示信息*/
-.cue_info{
-  position: absolute;
-  left: 50%;
-  top:50%;
-  -webkit-transform: translateX(-50%) translateY(-50%);
-  -moz-transform: translateX(-50%) translateY(-50%);
-  -ms-transform: translateX(-50%) translateY(-50%);
-  -o-transform: translateX(-50%) translateY(-50%);
-  transform: translateX(-50%) translateY(-50%);
-  width: auto;
-  height: auto;
-  background-color: rgba(0,0,0,.5);
-  opacity:0;
-  text-align: center;
-  /*line-height:100px;*/
-  border-radius: 8px;
-  color: #f9f9f9;
-  -webkit-transition: opacity .5s linear;
-  -moz-transition: opacity .5s linear;
-  -ms-transition: opacity .5s linear;
-  -o-transition: opacity .5s linear;
-  transition: opacity .5s linear;
-  z-index: 1000;
+.cue_info {
+    position: absolute;
+    display: none;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -o-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    width: auto;
+    height: auto;
+    background-color: rgba(0, 0, 0, .5);
+    opacity: 0;
+    text-align: center;
+    /*line-height:100px;*/
+    border-radius: 8px;
+    color: #f9f9f9;
+    -webkit-transition: opacity .5s linear;
+    -moz-transition: opacity .5s linear;
+    -ms-transition: opacity .5s linear;
+    -o-transition: opacity .5s linear;
+    transition: opacity .5s linear;
+    z-index: 1000;
 }
 .cue_info > p{
   padding:3rem 1.5rem 3rem 1.5rem;

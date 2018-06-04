@@ -369,6 +369,8 @@ function upload_complete(event){
     console.log(json);
     if(json['message'] === "success"){
         alert("上传成功!");
+        // 以下为定制脚本
+        $("#return_url").attr("src", json['data']['url']);
     }
     else{
         alert(json['message']);
