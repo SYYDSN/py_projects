@@ -448,7 +448,7 @@ def index_func():
 
 @manage_blueprint.route("/driver", methods=["get"])
 @check_platform_session
-def driver_list_func():
+def driver_func():
     company_id = get_platform_session_arg("company_id")
     employees = Company.all_employee(company_id=company_id, can_json=True)
     emp_dict = {x['_id']: x for x in employees}
@@ -543,7 +543,7 @@ def driver_detail_func():
         return abort(405)
 
 
-@manage_blueprint.route("/get_driver_list", methods=['post', 'get'])
+@manage_blueprint.route("/driver_list", methods=['post', 'get'])
 @check_platform_session
 def get_driver_list_func() -> str:
     """
@@ -555,18 +555,26 @@ def get_driver_list_func() -> str:
     key = "driver_list_{}".format(company_id)
     employees = cache.get(key)
     if employees is None:
-        employees = Company.all_employee(company_id=company_id, can_json=True)
+        employees = Company.all_employee(company_id=company_id, can_json=True, include_truck=True)
         if isinstance(employees, list):
             cache.set(key, employees, timeout=1800)
         else:
             pass
-    message = dict()
-    message['message'] = "success"
-    team_info = [{"_id": str(x['_id']),
-                  "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
-                      'real_name') is None else x['real_name'], "head_img_url": x['head_img_url']} for x in employees]
-    message['data'] = team_info
-    return json.dumps(message)
+    # team_info = [{"_id": str(x['_id']),
+    #               "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
+    #                   'real_name') is None else x['real_name'], "head_img_url": x['head_img_url']} for x in employees]
+    if request.method.lower() == "post":
+        """返回Ajax请求的结果"""
+        message = dict()
+        message['message'] = "success"
+        message['data'] = employees
+        return json.dumps(message)
+    elif request.method.lower() == "get":
+        """返回列表页"""
+        head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
+        return render_template("manage/driver_list_light.html", drivers=employees, head_img_url=head_img_url)
+    else:
+        return abort(405)
 
 
 @manage_blueprint.route("/get_employee_archives", methods=['post', 'get'])
@@ -1131,6 +1139,7 @@ def accident_func():
     head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     """获取基本下属信息,用于身份验证,防止越权查看信息"""
     company_id = get_platform_session_arg("company_id")
+    user_id = get_platform_session_arg("user_id")
     if company_id is None:
         return abort(404, "company_id is none")
     else:
@@ -1146,7 +1155,8 @@ def accident_func():
                 for x in employees}
 
         if request.method.lower() == "get":
-            """返回页面"""
+            """返回页面事故列表页"""
+            """开始取地址栏参数"""
             a_url = "accident?"  # 待拼接url地址,这里是相对地址
             driver_name = get_arg(request, "driver_name", None)  # 司机名
             if driver_name is not None and driver_name != "":
@@ -1157,36 +1167,29 @@ def accident_func():
                     a_url += "city={}".format(city)
                 else:
                     a_url += "&city={}".format(city)
+
             plate_number = get_arg(request, "plate_number", None)  # 车牌
             if plate_number is not None and plate_number != "":
                 if a_url.endswith("?"):
                     a_url += "plate_number={}".format(plate_number)
                 else:
                     a_url += "&plate_number={}".format(plate_number)
-            status = get_arg(request, "status", None)  # 处理状态
-            ms = "status={}".format(status)
-            try:
-                status = int(status)
-            except ValueError as e:
-                logger.exception(ms)
-                print(e)
-            except TypeError as e:
-                logger.exception(ms)
-                print(e)
-            except Exception as e:
-                logger.exception(ms)
-                print(e)
-            finally:
-                status = None if not isinstance(status, int) else status
-            if status is not None and status != "":
+
+            status_str = get_arg(request, "status", None)  # 处理状态
+            if isinstance(status_str, str) and status_str.isdigit():
+                status = int(status_str)
+            else:
+                status = -1
+            if status in [0, 1]:
+                ms = "status={}".format(status)
                 if a_url.endswith("?"):
-                    a_url += "status={}".format(status)
+                    a_url += "{}".format(ms)
                 else:
-                    a_url += "&status={}".format(status)
+                    a_url += "&{}".format(ms)
             end_date_str = get_arg(request, "end_date", None)  # 截至时间
             end_date = get_datetime_from_str(end_date_str)
             if end_date is None:
-                end_date = datetime.datetime.now()
+                pass
             else:
                 if a_url.endswith("?"):
                     a_url += "end_date={}".format(end_date_str)
@@ -1194,58 +1197,46 @@ def accident_func():
                     a_url += "&end_date={}".format(end_date_str)
             begin_date_str = get_arg(request, "begin_date", None)  # 开始时间
             begin_date = get_datetime_from_str(begin_date_str)
-            if begin_date is None or (begin_date - end_date).total_seconds() >= 0:
-                begin_date = end_date - datetime.timedelta(days=1365)
+            begin_date = None if begin_date is None or (begin_date - end_date).total_seconds() >= 0 else begin_date
+            if begin_date is None:
+                pass
             else:
                 if a_url.endswith("?"):
                     a_url += "begin_date={}".format(begin_date_str)
                 else:
                     a_url += "&begin_date={}".format(begin_date_str)
-            num = get_arg(request, "num", None)
-            if num is not None and num != "":
-                ms = "num={}".format(num)
-                try:
-                    num = int(num)
-                except ValueError as e:
-                    logger.exception(ms)
-                    print(e)
-                except TypeError as e:
-                    logger.exception(ms)
-                    print(e)
-                except Exception as e:
-                    logger.exception(ms)
-                    print(e)
-                finally:
-                    num = 8 if not isinstance(num, int) else num
 
-                if a_url.endswith("?"):
-                    a_url += "num={}".format(num)
-                else:
-                    a_url += "&num={}".format(num)
+            num_str = get_arg(request, "num", None)   # 每页多少条记录?
+            if isinstance(num_str, str) and num_str.isdigit():
+                num = int(num_str)
             else:
                 num = 8
-            cur_index = get_arg(request, "cur_index", 1)
-            ms = "cur_index={}".format(cur_index)
-            try:
-                cur_index = int(cur_index)
-            except ValueError as e:
-                logger.exception(ms)
-                print(e)
-            except TypeError as e:
-                logger.exception(ms)
-                print(e)
-            except Exception as e:
-                logger.exception(ms)
-                print(e)
-            finally:
-                cur_index = 1 if not isinstance(cur_index, int) else cur_index
-            if a_url.endswith("?"):
-                a_url += "cur_index={}"
+            if num_str is None:
+                pass
             else:
-                a_url += "&cur_index={}"
+                ms = "num={}".format(num)
+                if a_url.endswith("?"):
+                    a_url += "{}".format(ms)
+                else:
+                    a_url += "&{}".format(ms)
+
+            cur_index_str = get_arg(request, "cur_index", None)  # 当前是第几页?
+            if isinstance(cur_index_str, str) and cur_index_str.isdigit():
+                cur_index = int(cur_index_str)
+            else:
+                cur_index = 1
+            if cur_index_str is None:
+                pass
+            else:
+                ms = "cur_index={}".format(cur_index)
+                if a_url.endswith("?"):
+                    a_url += "{}".format(ms)
+                else:
+                    a_url += "&{}".format(ms)
 
             args = {
                 "driver_name": driver_name,
+                "writer": user_id,
                 "city": city,
                 "plate_number": plate_number,
                 "status": status,
@@ -1254,29 +1245,36 @@ def accident_func():
                 "index": cur_index,
                 "num": num
             }
-            data = security_module.Accident.page(**args)
-            acc_list = data['data']
-            acc_count = data['count']  # 违章条数
-
-            """处理分页"""
-            page_count = math.ceil(acc_count / num)  # 共计多少页?
-            """确认分页范围"""
-            min_index = cur_index - 2
-            min_index = 1 if min_index < 1 else min_index
-            max_index = cur_index + 2
-            max_index = page_count if max_index > page_count else max_index
-            index_list = [{"page_num": x, "page_url": a_url.format(x)} for x in list(range(min_index, max_index + 1))]
-            prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
-            next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
-            cur_page_url = a_url.format(cur_index)
-            """事故处理状态字典"""
-            acc_dict = {"0": "未处理", "1": "已处理"}
-            return render_template("manage/accident_light.html", drivers=employees, pages=index_list,
-                                   page_count=page_count, acc_list=acc_list, acc_count=acc_count,
-                                   head_img_url=head_img_url,
-                                   prev_page_url=prev_page_url, next_page_url=next_page_url,
-                                   cur_page_url=cur_page_url, status=status, acc_dict=acc_dict)
-            pass
+            error = None
+            try:
+                data = Accident.page(**args)
+                acc_list = data['data']
+                acc_count = data['count']  # 事故条数
+            except Exception as e:
+                print(e)
+                error = str(e)
+            finally:
+                if error is None:
+                    """处理分页"""
+                    page_count = math.ceil(acc_count / num)  # 共计多少页?
+                    """确认分页范围"""
+                    min_index = cur_index - 2
+                    min_index = 1 if min_index < 1 else min_index
+                    max_index = cur_index + 2
+                    max_index = page_count if max_index > page_count else max_index
+                    index_list = [{"page_num": x, "page_url": a_url.format(x)} for x in list(range(min_index, max_index + 1))]
+                    prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
+                    next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
+                    cur_page_url = a_url.format(cur_index)
+                    """事故处理状态字典"""
+                    acc_dict = {"0": "未处理", "1": "已处理"}
+                    return render_template("manage/accident_light.html", drivers=employees, pages=index_list,
+                                           page_count=page_count, acc_list=acc_list, acc_count=acc_count,
+                                           head_img_url=head_img_url,
+                                           prev_page_url=prev_page_url, next_page_url=next_page_url,
+                                           cur_page_url=cur_page_url, status=status, acc_dict=acc_dict)
+                else:
+                    abort(401, error)
         elif request.method.lower() == "post":
             """各种接口"""
             return abort(403, "不支持的操作")
@@ -1309,7 +1307,7 @@ def process_accident_func(prefix):
             """编辑事故信息的页面或者接口"""
             if request.method.lower() == "get":
                 """返回编辑/新增事故信息的页面"""
-                acc_id = get_arg(request, "acc_id", None)
+                acc_id = get_arg(request, "a_id", None)
                 accident = dict()
                 if acc_id is None:
                     """新增事故信息"""
@@ -1321,7 +1319,7 @@ def process_accident_func(prefix):
                     else:
                         pass
                 acc_type = ["追尾碰撞", "双车刮蹭", "部件失效", "车辆倾覆"]
-                return render_template("manage/update_accident_light.html", accident=accident, acc_type=acc_type,
+                return render_template("manage/update_accident_light.html", acc=accident, acc_type=acc_type,
                                        head_img_url=head_img_url)
             elif request.method.lower() == "post":
                 """提交事故"""
@@ -1339,6 +1337,7 @@ def process_accident_func(prefix):
                     finally:
                         args['status'] = a_status
                     args['writer'] = writer
+                    args['last_update'] = datetime.datetime.now()
                     accident = Accident(**args)
                     _id = None
                     error = None

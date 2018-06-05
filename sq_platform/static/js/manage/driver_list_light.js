@@ -1,22 +1,22 @@
-$(function(){
+$(function() {
     // 主区域最小高度
-    console.log($(window).height(),$("#main_zone").css("top"));
+    console.log($(window).height(), $("#main_zone").css("top"));
     $("#main_zone").css("min-height", $(window).height() - $("#main_zone").offset().top);
 
 
     // 填充中间的司机列表区域
-    let fill_list = function(drivers_list){
+    let fill_list = function (drivers_list) {
         let l = drivers_list.length;
         $("#driver_count").text(l);
-        if(l > 0){
+        if (l > 0) {
             let ul = $(".driver-list-content");
             ul.empty();
-            for(let i=0;i<l;i++){
+            for (let i = 0; i < l; i++) {
                 let driver = drivers_list[i];
-                let driving_hours_sum = driver['driving_hours_sum']?driver['driving_hours_sum']:"--";                    // 总驾驶时长,单位小时
-                let real_name = driver['real_name']?driver['real_name']:driver['user_name'];                             // 真实姓名
-                let head_img_url = driver['head_img_url']?driver['head_img_url']:"static/image/head_img/default_01.png"; // 头像地址
-                let drive_age = driver['drive_age']?driver['drive_age']:"--";                                            // 驾龄
+                let driving_hours_sum = driver['driving_hours_sum'] ? driver['driving_hours_sum'] : "--";                    // 总驾驶时长,单位小时
+                let real_name = driver['real_name'] ? driver['real_name'] : driver['user_name'];                             // 真实姓名
+                let head_img_url = driver['head_img_url'] ? driver['head_img_url'] : "static/image/head_img/default_01.png"; // 头像地址
+                let drive_age = driver['drive_age'] ? driver['drive_age'] : "--";                                            // 驾龄
                 head_img_url = `../${head_img_url}`;
                 // head_img_url = "../static/image/head_img/2015111093556890.jpg";
                 let str_html = `<div class="item_div_outer col-lg-3 col-md-4 col-sm-6 col-xs-12" id="${driver._id}">
@@ -54,22 +54,26 @@ $(function(){
                                 </div>`;
                 ul.append(str_html);
             }
-        }else{}
+        } else {
+        }
     };
 
-    // 启动页面时加载司机档案
-    $.post(`${server}/manage/get_employee_archives`, function(json){
-        let resp = JSON.parse(json);
-        if(resp['message']!=="success"){
-            alert(resp['message']);
-        }
-        else{
-            let data = resp['data'];
-            console.log(data);
-            fill_list(data);  // 填充中间的区域
-        }
-    });
+    // 启动页面时加载司机档案,目前使用jinja2方法,本方法暂不使用.
+    function init_list() {
 
+
+        $.post(`${server}/manage/get_employee_archives`, function (json) {
+            let resp = JSON.parse(json);
+            if (resp['message'] !== "success") {
+                alert(resp['message']);
+            }
+            else {
+                let data = resp['data'];
+                console.log(data);
+                fill_list(data);  // 填充中间的区域
+            }
+        });
+    }
     // 隐藏给定姓/姓名之外的司机
     let hide_other_drivers = function(the_name){
         let drivers = $(".item_div_outer");

@@ -83,6 +83,7 @@ $(function(){
         let url = "accident?";
         url += $.param(args);
         console.log("url = " + url);
+        url = url.endsWith("?")?url.slice(0, -1): url;
         location.href = url;
     });
 

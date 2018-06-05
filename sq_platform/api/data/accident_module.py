@@ -6,6 +6,7 @@ __dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__
 if __dir_path not in sys.path:
     sys.path.append(__dir_path)
 import mongo_db
+from api.data.item_module import User
 import datetime
 import re
 
@@ -100,13 +101,15 @@ class Accident(mongo_db.BaseDoc):
         return raw
 
     @classmethod
-    def page(cls, driver_name: str = None, status: int = None, plate_number: str = None, city: str = None,
-             begin_date: datetime.datetime = None, end_date: datetime.datetime = None,
-             index: int = 1, num: int = 20, can_json: bool = True, reverse: bool = True) -> dict:
+    def page(cls, driver_name: str = None, writer: (str, ObjectId, DBRef) = None, status: int = None,
+             plate_number: str = None, city: str = None, begin_date: datetime.datetime = None,
+             end_date: datetime.datetime = None, index: int = 1, num: int = 20, can_json: bool = True,
+             reverse: bool = True) -> dict:
         """
         分页查询行车记录
         :param driver_name: 司机真实姓名,为空表示所有司机
-        :param status: int 处理状态 0未处理,1已处理
+        :param writer: 录入者id,默认指向user_info的_id
+        :param status: int 处理状态 0未处理,1已处理, -1和None表示不做筛选
         :param plate_number: 车牌
         :param city: 城市
         :param begin_date:   开始时间
@@ -118,15 +121,35 @@ class Accident(mongo_db.BaseDoc):
         :return: 事件记录的列表和统计组成的dict
         """
         filter_dict = dict()
-        if driver_name is not None:
+        if isinstance(driver_name, str) and len(driver_name) > 1:
+            """司机名存在"""
             filter_dict['driver_name'] = driver_name
-        if status is not None:
+        if writer is not None:
+            if isinstance(writer, DBRef):
+                filter_dict['writer'] = writer
+            elif isinstance(writer, ObjectId):
+                writer = DBRef(database=mongo_db.db_name, collection=User.get_table_name(), id=writer)
+                filter_dict['writer'] = writer
+            elif isinstance(writer, str) and len(writer) == 24:
+                writer = DBRef(database=mongo_db.db_name, collection=User.get_table_name(), id=ObjectId(writer))
+                filter_dict['writer'] = writer
+            else:
+                ms = "身份验证失败"
+                raise ValueError(ms)
+        if status is not None and status != -1:
             filter_dict['status'] = status
         if plate_number is not None:
             filter_dict['plate_number'] = plate_number
         if city is not None:
             filter_dict['city'] = city
-        filter_dict['time'] = {"$lte": end_date, "$gte": begin_date}
+        if isinstance(begin_date, datetime.datetime) and isinstance(end_date, datetime.datetime):
+            filter_dict['time'] = {"$lte": end_date, "$gte": begin_date}
+        elif isinstance(begin_date, datetime.datetime):
+            filter_dict['time'] = {"$gte": begin_date}
+        elif isinstance(end_date, datetime.datetime):
+            filter_dict['time'] = {"$lte": end_date}
+        else:
+            pass
         skip = (index - 1) * num
         sort_dict = {"time": -1 if reverse else 1}
         count = cls.count(filter_dict=filter_dict)

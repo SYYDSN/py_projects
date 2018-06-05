@@ -51,10 +51,24 @@ $(function(){
             "comment": a_comment,
             "content": content
         };
+        let a_id = get_url_arg("a_id");
+        if(a_id){
+            args['_id'] = a_id;
+        }
         let url = "/manage/update_accident";
         $.post(url, args, function(resp){
             let json = JSON.parse(resp);
-            console.log(json);
+            if(a_id && json['message'] === "success"){
+                alert("编辑成功");
+                location.href = "/manage/accident";
+            }
+            else if(json['message'] === "success"){
+                alert("提交成功");
+            }
+            else{
+                alert(json['message']);
+                return false;
+            }
         });
     });
 
@@ -99,96 +113,6 @@ $(function(){
 
     $(window).resize(function(){resize();});
     resize();
-
-    // 修改按钮事件
-
-
-    // 确定跳转按钮事件
-    $("#redirect_btn").click(function(){
-        let args = {};
-        let begin_date_str = get_picker_date($("#begin_date"));
-        let end_date_str = get_picker_date($("#end_date"));
-        console.log(begin_date_str, end_date_str);
-        if(begin_date_str !== null && end_date_str !== null){
-            let begin_date = new Date(begin_date_str);
-            let end_date = new Date(end_date_str);
-            if(end_date < begin_date){
-                // 检查时间的合法性
-                pop_tip_div("结束时间不能早于开始时间");
-                return false;
-            }
-            else{
-                // pass
-            }
-        }else{}
-        if(begin_date_str !== null){
-            args["begin_date"] = begin_date_str + " 00:00:00";
-        }
-        if(end_date_str !== null){
-            args["end_date"] = end_date_str + " 23:59:59";
-        }
-        let city = $.trim($("#select_city").val());
-        if(city !== ""){
-            args['city'] = city;
-        }else{}
-        let driver_name = $.trim($("#select_driver").val());
-        if(driver_name !== ""){
-            args['driver_name'] = driver_name;
-        }else{}
-        let plate_number = $.trim($("#select_car").val());
-        if(plate_number !== ""){
-            args['plate_number'] = plate_number;
-        }else{}
-
-        let url = "accident?";
-        url += $.param(args);
-        console.log("url = " + url);
-        location.href = url;
-    });
-
-    // 清空筛选条件
-    $("#clear_condition").click(function(){
-        $("#begin_date,#end_date,#select_city,#select_car,#select_driver").val("");
-    });
-
-
-    function init_input(arg_url) {
-        // 从url分析参数,进行初始化工作
-        let url = typeof(arg_url) === "undefined" ? location.href : arg_url;
-        if (url.indexOf("?") !== -1) {
-            let arg_str = url.split("?")[1];
-            arg_str = decodeURIComponent(arg_str);
-            console.log(arg_str);
-            let a_list = arg_str.split("&");
-            for (var item of a_list) {
-                if (item.indexOf("=") !== -1) {
-                    let temp = item.split("=");
-                    let k = temp[0];
-                    let v = temp[1];
-                    if (k === "begin_date") {
-                        $("#begin_date").val(v.split(" ")[0]);
-                    }
-                    else if (k === "end_date") {
-                        $("#end_date").val(v.split(" ")[0]);
-                    }
-                    else if (k === "driver_name") {
-                        $("#select_driver").val(v);
-                    }
-                    else if (k === "city") {
-                        $("#select_city").val(v);
-                    }
-                    else if (k === "plate_number") {
-                        $("#select_car").val(v);
-                    }
-
-                } else {}
-            }
-        }
-        else {
-            // pass
-        }
-    }
-    init_input();  // 根据url参数初始化input状态
 
 // end!
 });

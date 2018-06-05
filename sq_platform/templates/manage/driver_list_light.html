@@ -1,6 +1,8 @@
 {% extends "manage/base_template_light.html" %}
 {% block extend_css %}
     <link rel="stylesheet" href="../static/css/manage/driver_list_light.css">
+    <link rel="stylesheet/less" href="/static/less/manage/driver_list.less">
+    <script src="/static/js/less.min.js"></script>
 {% endblock %}
 {% block main %}
 
@@ -15,17 +17,36 @@
                         <span class="all">全部</span>
                     </div>
                     <div class="header-right col-xs-12 col-sm-6 col-lg-6 col-md-6">
-                        <input  id="inp" type="text" placeholder="精确搜索">
-                        <input  id="btn" type="submit" value="立即搜索">
+                        <input id="inp" type="text" placeholder="精确搜索">
+                        <input id="btn" type="submit" value="立即搜索">
                     </div>
                 </div>
                 <div class="row driver-list-content">
-
-                    <div class="content">未找到对应的用户</div>
+                    {% for driver in drivers %}
+                        <div class="fonts">
+                            <p class="p_pad">
+                                <span class="pull-left">{{ driver.real_name }}</span>
+                                <span class="pull-right pull_tlt">驾龄: {{ driver.driving_exerience }}</span>
+                            </p>
+                            <p>
+                                <img class="" src="/static/image/icon/icon_cheliang.svg" alt="">
+                                <span>车辆类型:{{ driver.car_type }}</span>
+                            </p>
+                            <p>
+                                <img src="/static/image/icon/icon_naozhong.svg" alt="">
+                                <span>驾驶总时长:4000</span>
+                            </p>
+                            <p>
+                                <span class="pull-left">事故:0</span>
+                                <span>违章:0</span>
+                            </p>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
+
 
 
 {% endblock %}

@@ -225,9 +225,8 @@ class User(mongo_db.BaseDoc):
     type_dict['online_time'] = float  # 在线时长的统计.单位分钟
     type_dict['description'] = str  # 备注
     """
-    此属性废止,不再使用,2018-05-13
-    需要获取用户的行车证列表,请查询使用时查询CarLicense表      
-    type_dict['license_relation_id'] = list
+    需要获取用户的行车证列表,请查询CarLicense表      
+    或者调用cls.get_usable_license方法
     """
     """
     驾驶证信息部分,驾驶证和用户有一一对应的关系.所以需要直接存储在对象中.
@@ -241,7 +240,7 @@ class User(mongo_db.BaseDoc):
     type_dict['valid_from'] = datetime.datetime  # 驾照有效期的开始时间
     type_dict['valid_duration'] = str  # 驾照有效持续期,比如1年有效期
     """
-    有关行车证信息部分,由于行车证和用户没有意义对应关系.
+    有关行车证信息部分,由于行车证和用户没有一一对应关系.
     由于业务逻辑上个人可能创建和自己不相干的车牌的查询器，所以这个cars失去了业务逻辑上的意义。
     在车牌信息用，有一个user_id参数。用于确认车牌信息的使用者。
     车牌号码和使用者id构成了联合唯一主键。  
@@ -280,6 +279,7 @@ class User(mongo_db.BaseDoc):
 
     def get_archives(self) -> dict:
         """
+        此函数目前在获取车辆信息时存在业务逻辑问题(car_licenses属性已废止),需要重写.2018-6-5
         获取个人档案,可以看作是超详细版的个人资料,主要是辅助显示个人详细信息
         :return:
         """
@@ -1396,7 +1396,7 @@ class CarLicense(mongo_db.BaseDoc):
     app在上传行车证图片的时候会先创建一个临时行车证记录,这和时候的和plate_number为空.而且这种记录可能有多个.
     所以用户id 和plate_number的联合主键因该删除
     """
-    type_dict["user_id"] = DBRef  # 注意,驾驶员,必须属性
+    type_dict["user_id"] = DBRef  # 注意,驾驶员(或本条记录创建者的_id),必须属性
     type_dict["permit_image_url"] = str  # 车辆照片url
     type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
     type_dict["car_type"] = str  # 车辆类型  比如 重型箱式货车
@@ -1503,6 +1503,7 @@ class CarLicense(mongo_db.BaseDoc):
     @staticmethod
     def rebuild_car_license() -> None:
         """
+        废止, 业务逻辑已变更 2018-6-5
         重建行车证信息，去掉重复的键值，为创建plate_number和user_id的联合唯一主键提供前提条件
         db.car_license_info.ensureIndex({"user_id":1,"plate_number":1}, {"unique":1})
         这个函数很少使用

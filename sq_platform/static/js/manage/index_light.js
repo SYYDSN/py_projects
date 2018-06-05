@@ -382,7 +382,11 @@ let top_20 = function(name_dict){
 
 // 初始化右边栏
 let init_right_bar = function() {
-    $.post("/manage/get_driver_list", function (resp) {
+    /*
+    * 和common.js的fill_right_bar方法不同,本方法是电子地图首页专用的.
+    * fill_right_bar填充的右边栏更简单
+    * */
+    $.post("/manage/driver_list", function (resp) {
         let data = JSON.parse(resp)['data'];
         console.log(data);
         $("#driver_list").empty();  // 清除旧的右侧导航

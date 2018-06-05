@@ -20,13 +20,13 @@
                 <div class="my_item">
                     <div class="sub_item">
                         <span class="my_label">事故名称</span>
-                        <input type="text" id="accident_title">
+                        <input type="text" id="accident_title" value="{{ acc.title }}">
                     </div>
                     <div class="sub_item">
                         <span class="my_label">事故类型</span>
                         <select id="accident_type">
                             {% for x in acc_type %}
-                                <option value="{{ x }}">{{ x }}</option>
+                                <option value="{{ x }}" {{ 'checked' if acc.type == x else '' }}>{{ x }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -38,15 +38,15 @@
                 <div class="my_item">
                     <div class="sub_item">
                         <span class="my_label">事故编号</span>
-                        <input type="text" id="accident_code">
+                        <input type="text" id="accident_code" value="{{ acc.code }}">
                     </div>
                     <div class="sub_item">
                         <span class="my_label">涉事司机</span>
-                        <input type="text" id="accident_driver">
+                        <input type="text" id="accident_driver" value="{{ acc.driver_name }}">
                     </div>
                     <div class="sub_item">
                         <span class="my_label">涉事车辆</span>
-                        <input type="text" id="accident_truck" placeholder="输入车牌">
+                        <input type="text" id="accident_truck" placeholder="输入车牌" value="{{ acc.plate_number }}">
                     </div>
                 </div>
                 <div class="hr_outer">
@@ -56,16 +56,16 @@
 
                 <div class="my_item">
                     <div class="sub_item">
-                        <span class="my_label">事故地点</span>
-                        <input type="text" id="accident_address">
+                        <span class="my_label">事发地址</span>
+                        <input type="text" id="accident_address" value="{{ acc.address }}">
                     </div>
                     <div class="sub_item">
-                        <span class="my_label">事故时间</span>
-                        <input type="text" readonly id="accident_time">
+                        <span class="my_label">事发时间</span>
+                        <input type="text" readonly id="accident_time" value="{{ acc.time }}">
                     </div>
                     <div class="sub_item">
-                        <span class="my_label">事故城市</span>
-                        <input type="text" id="accident_city">
+                        <span class="my_label">事发城市</span>
+                        <input type="text" id="accident_city" value="{{ acc.city }}">
                     </div>
                 </div>
                 <div class="hr_outer">
@@ -75,11 +75,11 @@
                 <div class="my_item">
                     <div class="sub_item">
                         <span class="my_label">损失金额</span>
-                        <input type="text" id="accident_loss">
+                        <input type="text" id="accident_loss" value="{{ acc.loss }}">
                     </div>
                     <div class="sub_item">
                         <span class="my_label">事故后果(严重程度)</span>
-                        <input type="text" id="accident_level">
+                        <input type="text" id="accident_level" value="{{ acc.level }}">
                     </div>
                 </div>
                 <div class="hr_outer">
@@ -90,11 +90,11 @@
                     <div class="sub_item">
                         <span>处理状态</span>
                         <div class="check_div">
-                            <input class="accident_status" type="checkbox" {{'checked' if vio_status is none or vio_statis == 1 else ''}}  id="check_processed">
+                            <input class="accident_status" type="checkbox" {{'checked' if acc.statis == 1 else ''}}  id="check_processed">
                             <span class="check_name">
                             已处理
                         </span>
-                            <input class="accident_status" type="checkbox" {{'checked' if vio_status is none or vio_statis == 3 else ''}}  id="check_unprocessed">
+                            <input class="accident_status" type="checkbox" {{'checked' if acc.statis is none or acc.statis == 0 else ''}}  id="check_unprocessed">
                             <span class="check_name">
                             未处理
                         </span>
@@ -108,7 +108,7 @@
                 <div class="my_item">
                     <div class="sub_item">
                         <span class="my_label">事件描述</span>
-                        <div  id="accident_content"></div>
+                        <div  id="accident_content">{{ acc.content | safe }}</div>
                     </div>
                 </div>
 
@@ -124,7 +124,7 @@
                 <div class="my_item">
                     <div class="sub_item">
                         <span class="my_label">备注</span>
-                        <div contenteditable="true" id="accident_comment"></div>
+                        <div contenteditable="true" id="accident_comment">{{ acc.comment }}</div>
                     </div>
                 </div>
 

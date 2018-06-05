@@ -211,14 +211,18 @@ function init_map() {
         zoom: 11
     });
     // 地图缩放事件
-    AMap.event.addListener(map,'zoomend',function(){
+    AMap.event.addListener(map,'zoomed',function(){
         console.log("当前缩放级别:"+map.getZoom());
     });
 }
 
 // 填充右侧边栏司机列表部分
 fill_right_bar = function (func_name) {
-    $.post(`/manage/get_driver_list`, function (json) {
+    /*
+    * 和index_light.js的init_right_bar方法不同,后者是电子地图首页专用的.比较复杂
+    * 本方法填充的右边栏更简单
+    * */
+    $.post(`/manage/driver_list`, function (json) {
         let resp = JSON.parse(json);
         if (resp['message'] !== "success") {
             alert(resp['message']);

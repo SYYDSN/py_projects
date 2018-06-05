@@ -7,7 +7,9 @@ __project_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))  # 
 if __project_dir not in sys.path:
     sys.path.append(__project_dir)
 import mongo_db
-from api.data.item_module import User, Track
+from api.data.item_module import User
+from api.data.item_module import CarLicense
+from api.data.item_module import Track
 from api.data.base_item_extends import UseHandlerRecord
 from api.data.violation_module import VioQueryGenerator
 import hashlib
@@ -978,13 +980,14 @@ class Company(mongo_db.BaseDoc):
 
     @classmethod
     def all_employee(cls, company_id: (str, ObjectId), filter_dict: dict = None, sort_dict: dict = None,
-                     can_json: bool = False) -> list:
+                     can_json: bool = False, include_truck: bool = False) -> list:
         """
         获取公司的全部employee
         :param company_id:
         :param filter_dict: 附加的过滤条件
         :param sort_dict: 附加的排序条件
         :param can_json:
+        :param include_truck: 是否包含车辆信息
         :return: doc的list
         """
         company = cls.find_by_id(company_id)
@@ -1011,11 +1014,67 @@ class Company(mongo_db.BaseDoc):
                 if filter_dict is not None:
                     f.update(filter_dict)
                 s = {"_id": 1} if sort_dict is None else sort_dict
-                employees = Employee.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=can_json)
+                employees = Employee.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
                 if len(employees) == 0:
                     pass
                 else:
+                    if include_truck:
+                        ids = [DBRef(database=mongo_db.db_name, collection=User.get_table_name(), id=x['_id']) for x in
+                               employees]
+                        f = {"user_id": {"$in": ids}}
+                        trucks = CarLicense.find_plus(filter_dict=f, to_dict=True, can_json=False)
+                        truck_dict = {x['user_id'].id: {
+                            "permit_image_url": x['permit_image_url'],
+                            "plate_number": x['plate_number'],
+                            "car_type": x['car_type'],
+                            "car_model": x['car_model'],
+                            "vin_id": x['vin_id'],
+                            "engine_id": x['engine_id']
+                        } for x in trucks}
+                        for employee in employees:
+                            truck = truck_dict.get(employee['_id'])
+                            first_issued_date = employee.get("first_issued_date")
+                            if isinstance(truck, dict):
+                                employee.update(truck)
+                            if isinstance(first_issued_date, datetime.datetime):
+                                """计算驾龄"""
+                                y1 = datetime.datetime.now().year
+                                y2 = first_issued_date.year
+                                driving_experience = y1 - y2 + 1
+                                employee['driving_experience'] = driving_experience
+                    else:
+                        pass
+                    employees = [mongo_db.to_flat_dict(x) for x in employees] if can_json else employees
                     res = employees
+        return res
+
+    @classmethod
+    def get_employee(cls, company_id: (str, ObjectId), user_id: (str, ObjectId, list), sort_dict: dict = None,
+                     can_json: bool = False, include_truck: bool = False) -> (None, dict, list):
+        """
+        根据条件查询员工信息.这本质上是cls.all_employee方法的特例.
+        :param company_id:
+        :param user_id: 用户id,可以是一个,也可以是一个数组.
+        :param sort_dict: 附加的排序条件
+        :param can_json:
+        :param include_truck: 是否包含车辆信息
+        :return: doc的list
+        """
+        new_ids = list()
+        if isinstance(user_id, list):
+            ids = user_id
+        else:
+            ids = [user_id]
+        for _id in ids:
+            if isinstance(_id, str) and len(_id) == 24:
+                new_ids.append(ObjectId(_id))
+            elif isinstance(_id, ObjectId):
+                new_ids.append(_id)
+            else:
+                pass
+        filter_dict = {"_id": {"$in": new_ids}}
+        res = cls.all_employee(company_id=company_id, filter_dict=filter_dict, sort_dict=sort_dict, can_json=can_json,
+                               include_truck=include_truck)
         return res
 
     @classmethod
@@ -1131,6 +1190,7 @@ class Company(mongo_db.BaseDoc):
     @classmethod
     def get_prefix_by_user_id(cls, user_id: (str, ObjectId)) ->str:
         """
+        此方法暂停使用,因为此函数当前的业务逻辑已经过时 2018-6-5
         根据用户id获取用户所在公司的前缀,这用于向AI模块查询报告和排名
 
         用户和公司之间的约束关系如下:
@@ -1160,6 +1220,8 @@ class Company(mongo_db.BaseDoc):
         :param user_id: 用户id
         :return: Company.prefix, 散户是xxx作为prefix
         """
+        ms = "此方法暂停使用,因为此函数当前的业务逻辑已经过时. 2018-6-5"
+        warnings.warn(ms)
         user = User.find_by_id(user_id)
         prefix = "xxx"
         if isinstance(user, User):
@@ -2069,71 +2131,18 @@ class Employee(User):
 
     def get_archives(self) -> dict:
         """
-        获取个人档案,可以看作是超详细版的个人资料,主要是辅助显示个人详细信息,
-        此方法覆盖了父类的方法.用于增强效果(增加组织架构信息的获取)
+        声明废止 2018-6-5
+        获取员工个人档案,可以看作是超详细版的个人资料,包含车辆信息
+        此方法覆盖了父类的方法.
         :return:
         """
-        extend_dict = dict()
-        """要从父类方法的结果集中,去掉这些字段"""
-        pop_columns = ["dept_path", "company_id", "post_id"]
-        # 取出部门信息,Dept类要大改,目前是临时方案
-        dept_path = self.get_attr("dept_path")
-        if dept_path is None:
-            pass
-        else:
-            my_dept = dept_path.pop(-1)  # 弹出任职的部门
-            my_dept = Dept.find_by_id(my_dept.id)
-            if isinstance(my_dept, Dept):
-                """查询就职部门相关信息"""
-                extend_dict['dept_name'] = my_dept.get_attr("dept_name")  # 部门名称
-                leader = Employee.find_by_id(my_dept.get_attr("leader_id").id)
-                if isinstance(leader, Employee):
-                    """取本部门领导名字"""
-                    extend_dict['leader_name'] = leader.get_attr("user_name") if leader.get_attr("real_name") is None \
-                        else leader.get_attr("real_name")
-            if len(dept_path) < 1:
-                """没有部门所属"""
-                pass
-            else:
-                # 弹出上级部门
-                prev_dept = dept_path.pop(-1)
-                prev_dept = Dept.find_by_id(prev_dept.id)
-                if isinstance(prev_dept, Dept):
-                    extend_dict['prev_dept'] = prev_dept.get_attr("dept_name")
-
-        # 取公司名
-        company_id = self.get_attr("company_id")
-        if company_id is None:
-            pass
-        else:
-            company = Company.find_by_id(company_id.id)
-            if isinstance(company, Company):
-                extend_dict['company_name'] = company.get_attr("short_name")
-            """临时方案,苏秦的全部转sf的."""
-            if company_id.id == ObjectId("59e456854660d32fa2f13642"):
-                """如果是苏秦网络的,进行转换"""
-                extend_dict['company_name'] = "顺丰速运"
-                extend_dict['prev_dept'] = '华新分拨中心'
-            else:
-                pass
-        # 取职务信息
-        post_id = self.get_attr("post_id")
-        if post_id is None:
-            pass
-        else:
-            post = Post.find_by_id(post_id.id)
-            if isinstance(post, Post):
-                extend_dict['post_name'] = post.get_attr("post_name")
-        raw_dict = super(Employee, self).get_archives()
-        raw_dict = {k: v for k, v in raw_dict.items() if k not in pop_columns}
-        if isinstance(raw_dict, dict):
-            extend_dict.update(raw_dict)
-        return extend_dict
+        ms = "此方法被废止,请使用Company.get_employee方法替代. 2018-6-5"
+        warnings.warn(ms)
 
     @classmethod
     def get_archives_cls(cls, e_id: (str, ObjectId)) -> (None, dict, list):
         """
-        未完成  2018-4-18
+        声明废止 2018-6-5
         可以看作是Employee.get_archives的类方法.自2018-4-17起,要求获取更详细的个人资料.包括
         1. 用户信息.(含驾照信息)
         2. 相关行车证信息
@@ -2143,15 +2152,8 @@ class Employee(User):
         :param e_id: 员工id或者员工id的list.
         :return: 如果是e_id参数是员工id,这里返回的是None/dict,否则返回list对象
         """
-        emp = cls.find_by_id(e_id)
-        if isinstance(emp, cls):
-            e_dbref = emp.get_dbref()
-            """查询公司信息"""
-            emp.get_company()
-        else:
-            ms = "{}不是有效的用户id".format(e_id)
-            logger.exception(ms)
-            raise ValueError(ms)
+        ms = "此方法被废止,请使用Company.get_employee方法替代. 2018-6-5"
+        warnings.warn(ms)
 
     @classmethod
     def get_block_id_list(cls, my_id: (str, ObjectId), to_str: bool = False) -> list:

@@ -70,29 +70,27 @@
                         <th>损失金额</th>
                         <th>驾驶员</th>
                         <th>事故车辆</th>
-                        <th>事故对象分类</th>
-                        <th>事故后果状态</th>
+                        <th>事故严重性</th>
                         <th>处理状态</th>
-                        <th></th>
+                        <th>操作</th>
                     </tr>
                     {% for acc in acc_list %}
                         <tr id="{{ acc._id }}">
                             <td>{{ acc.code }}</td>
                             <td>{{ acc.type }}</td>
-                            <td>{{ acc.time.split(" ")[0] }}</td>
+                            <td>{{ acc.time.split(" ")[0] if acc.time is string else '' }}</td>
                             <td class="fix_width blue">{{ acc.address }}</td>
                             <td>{{ acc.city }}</td>
                             <td>{{ acc.loss }}</td>
                             <td>{{ acc.driver_name }}</td>
                             <td>{{ acc.plate_number }}</td>
-                            <td>{{ acc.class }}</td>
-                            <td>{{ acc.result }}</td>
+                            <td>{{ acc.level }}</td>
                             <td>
                                 <span class="my_status {{ 'status_0' if acc.status == 0 else 'status_1' }}">
                                     {{ '未处理' if acc.status == 0 else '已处理' }}
                                 </span>
                             </td>
-                            <td><span class="edit blue">修改</span></td>
+                            <td><a class="edit blue" href="/manage/update_accident?a_id={{ acc._id }}">修改</a></td>
                         </tr>
                     {% endfor %}
                 </table>
