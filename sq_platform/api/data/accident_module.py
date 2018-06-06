@@ -42,7 +42,8 @@ class Accident(mongo_db.BaseDoc):
     type_dict['level'] = str  # 事故结果类别, 轻微事故, 一般事故, 重大事故, 特大事故
     type_dict['loss'] = float  # 事故造成的损失.浮点.
     type_dict['plate_number'] = str  # 肇事车牌
-    type_dict['driver_name'] = str  # 肇事司机真实姓名
+    # type_dict['driver_name'] = str  # 肇事司机真实姓名  废止
+    type_dict['driver_id'] = ObjectId  # 肇事司机为了和违章记录保持一致,这里也使用了ObjectId而不是DBRef
     type_dict['time'] = datetime.datetime  # 事发时间
     type_dict['address'] = str  # 事发地址
     type_dict['city'] = str  # 事发城市
@@ -101,13 +102,13 @@ class Accident(mongo_db.BaseDoc):
         return raw
 
     @classmethod
-    def page(cls, driver_name: str = None, writer: (str, ObjectId, DBRef) = None, status: int = None,
+    def page(cls, driver_id: ObjectId = None, writer: (str, ObjectId, DBRef) = None, status: int = None,
              plate_number: str = None, city: str = None, begin_date: datetime.datetime = None,
              end_date: datetime.datetime = None, index: int = 1, num: int = 20, can_json: bool = True,
              reverse: bool = True) -> dict:
         """
         分页查询行车记录
-        :param driver_name: 司机真实姓名,为空表示所有司机
+        :param driver_id: 司机id,为空表示所有司机,注意这里为了和违章记录保持一致,是ObjectId对象而不是常见的DBRef
         :param writer: 录入者id,默认指向user_info的_id
         :param status: int 处理状态 0未处理,1已处理, -1和None表示不做筛选
         :param plate_number: 车牌
@@ -121,9 +122,8 @@ class Accident(mongo_db.BaseDoc):
         :return: 事件记录的列表和统计组成的dict
         """
         filter_dict = dict()
-        if isinstance(driver_name, str) and len(driver_name) > 1:
-            """司机名存在"""
-            filter_dict['driver_name'] = driver_name
+        if driver_id is not None:
+            filter_dict['driver_id'] = driver_id
         if writer is not None:
             if isinstance(writer, DBRef):
                 filter_dict['writer'] = writer

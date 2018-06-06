@@ -42,7 +42,13 @@
                     </div>
                     <div class="sub_item">
                         <span class="my_label">涉事司机</span>
-                        <input type="text" id="accident_driver" value="{{ acc.driver_name }}">
+                        <select id="accident_driver">
+                            {% for id, name in e_dict.items() %}
+                                <option value="{{ id }}" {{ 'checked' if acc.driver_id == id else '' }}>
+                                    {{ name }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="sub_item">
                         <span class="my_label">涉事车辆</span>

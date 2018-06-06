@@ -71,9 +71,9 @@ $(function(){
         if(city !== ""){
             args['city'] = city;
         }else{}
-        let driver_name = $.trim($("#select_driver").val());
-        if(driver_name !== ""){
-            args['driver_name'] = driver_name;
+        let driver_id = $.trim($("#select_driver").val());
+        if(driver_id !== ""){
+            args['driver_id'] = driver_id;
         }else{}
         let plate_number = $.trim($("#select_car").val());
         if(plate_number !== ""){
@@ -130,6 +130,60 @@ $(function(){
         }
     }
     init_input();  // 根据url参数初始化input状态
+
+    // 显示事故详情按钮的点击之前的事件.
+    $(".show_accident_btn").each(function(){
+        let $this = $(this);
+        $this.mousedown(function(){
+            let id = $this.attr("data-id");
+            let acc = acc_dict[id];
+            let driver = e_dict[acc['driver_id']];
+            console.log(acc);
+            console.log(driver);
+            $("#show_accident").attr("data-id", id);
+            let doms = $("#show_accident .attr");
+            for(let dom of doms){
+                let key = $(dom).attr("id");
+                console.log(key);
+                let val = acc[key];
+                console.log(val);
+                if(key === "head_img_url"){
+                    val = driver['head_img_url'];
+                    $(dom).attr("src", `/${val}`);
+                }
+                else if(key === "status"){
+                    val = val === 1?"已处理": "未处理";
+                    $(dom).html(val);
+                }
+                else{
+                    $(dom).html(val);
+                }
+
+            }
+        });
+    });
+
+    // 删除事故的按钮
+    $("#delete_btn").click(function(){
+        let id = $("#show_accident").attr("data-id");
+        if(id.length === 24){
+            let c = confirm("事故记录删除后不能恢复,你确认吗?");
+            if(c){
+                let args = {"_id": id, 'delete': "1"};
+                $.post("/manage/update_accident", args, function(resp){
+                    let json = JSON.parse(resp);
+                    if(json['message'] !== "success"){
+                        alert(json['message']);
+                    }
+                    else{
+                        alert("删除成功");
+                        location.reload();
+                    }
+                });
+            }
+        }
+
+    });
 
 // end!
 });

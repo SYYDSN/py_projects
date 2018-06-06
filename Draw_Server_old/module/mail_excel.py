@@ -176,9 +176,9 @@ class EveryDayExcel(mongo_db.BaseDoc):
         title = excel.get_attr("excel_name")
         if isinstance(email_address, list):
             for email in email_address:
-                send_mail(to_email=email, title=title, content='', file_path=file_path)
+                send_mail(to_email=email, title=title, content='', files=[{"path": file_path}])
         else:
-            send_mail(to_email=email_address, title=title, content='', file_path=file_path)
+            send_mail(to_email=email_address, title=title, content='', files=[{"path": file_path}])
 
 
 class EveryWeekExcel(mongo_db.BaseDoc):
@@ -333,9 +333,9 @@ class EveryWeekExcel(mongo_db.BaseDoc):
             title = excel.get_attr("excel_name")
             if isinstance(email_address, list):
                 for email in email_address:
-                    send_mail(to_email=email, title=title, content='', file_path=file_path)
+                    send_mail(to_email=email, title=title, content='', files=[{"path": file_path}])
             else:
-                send_mail(to_email=email_address, title=title, content='', file_path=file_path)
+                send_mail(to_email=email_address, title=title, content='', files=[{"path": file_path}])
         else:
             print("今天不是星期一")
 
@@ -493,9 +493,9 @@ class EveryMonthExcel(mongo_db.BaseDoc):
         title = excel.get_attr("excel_name")
         if isinstance(email_address, list):
             for email in email_address:
-                send_mail(to_email=email, title=title, content='', file_path=file_path)
+                send_mail(to_email=email, title=title, content='', files=[{"path": file_path}])
         else:
-            send_mail(to_email=email_address, title=title, content='', file_path=file_path)
+            send_mail(to_email=email_address, title=title, content='', files=[{"path": file_path}])
 
 
 if __name__ == "__main__":

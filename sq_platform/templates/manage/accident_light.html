@@ -29,8 +29,8 @@
                         <span>司机</span>
                         <select id="select_driver">
                             <option value=""></option>
-                            {% for user_id, item in drivers.items() %}
-                                <option value="{{ item['real_name'] }}">{{ item['real_name'] }}</option>
+                            {% for user_id, item in e_dict.items() %}
+                                <option value="{{ user_id }}">{{ item.real_name }}</option>
                             {%  endfor %}
                         </select>
                     </div>
@@ -82,7 +82,7 @@
                             <td class="fix_width blue">{{ acc.address }}</td>
                             <td>{{ acc.city }}</td>
                             <td>{{ acc.loss }}</td>
-                            <td>{{ acc.driver_name }}</td>
+                            <td>{{ e_dict[acc.driver_id].real_name }}</td>
                             <td>{{ acc.plate_number }}</td>
                             <td>{{ acc.level }}</td>
                             <td>
@@ -90,7 +90,10 @@
                                     {{ '未处理' if acc.status == 0 else '已处理' }}
                                 </span>
                             </td>
-                            <td><a class="edit blue" href="/manage/update_accident?a_id={{ acc._id }}">修改</a></td>
+                            <td>
+                                <a class="edit blue" href="/manage/update_accident?a_id={{ acc._id }}">修改</a>
+                                <a class="edit blue show_accident_btn" data-toggle="modal" data-target="#show_accident" data-id="{{ acc._id }}">查看</a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -112,10 +115,80 @@
 
         </div>
         <!--中间区域结束-->
+        <!--查看事故模态框-->
+        <div class="modal fade bs-example-modal-lg" id="show_accident" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="myLargeModalLabel">事故详情页</h4>
+                    </div>
+                    <div class="model-body">
+                        <table>
+                            <tr>
+                                <td>事故名称</td>
+                                <td id="title" class="attr">机动车辆引起的机械伤害事故</td>
+                                <td>事故类型</td>
+                                <td class="attr" id="type">追尾碰撞</td>
+                                <td rowspan="3"><img id="head_img_url" class="si_tou attr" src="/static/image/si_tou.jpg" alt=""></td>
+                            </tr>
+                            <tr>
+                                <td>事故编号</td>
+                                <td id="code" class="attr">08311</td>
+                                <td>事故车辆</td>
+                                <td id="plate_number" class="attr">沪A0017</td>
+                            </tr>
+                            <tr>
+                                <td>事故时间</td>
+                                <td id="time" class="attr">2018-03-11</td>
+                                <td>驾驶员</td>
+                                <td id="real_name" class="attr">刘成刚</td>
+                            </tr>
+                            <tr>
+                                <td>事故地点</td>
+                                <td id="address" class="attr">则铺路魔域路交叉口东99米</td>
+                                <td>事故严重性</td>
+                                <td colspan="2"  id="level" class="attr">轻微事故</td>
+                            </tr>
+                            <tr>
+                                <td>损失金额</td>
+                                <td  id="loss" class="attr">2000元</td>
+                                <td>处理结果</td>
+                                <td colspan="2"  id="status" class="attr">已处理</td>
+                            </tr>
+                            <tr>
+                                <td>事故描述</td>
+                                <td class="accident_td attr" colspan="4"  id="content">
+                                    <textarea class="accident_text" name="" id="" cols="30" rows="10"></textarea>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>备注</td>
+                                <td class="accident_td attr" colspan="4"  id="comment">
+                                    <textarea class="accident_text" name="" id="" cols="30" rows="10"></textarea>
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+                     <div class="modal-footer my_text_align">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" id="delete_btn" class="btn btn-danger">删除</button>
+                      </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 {% endblock %}
 {% block extend_js %}
+    <script>
+    /*传值区域*/
+    acc_dict = {{ acc_dict | safe }};  // 事故字典
+    e_dict = {{ e_dict | safe }};   // 司机字典
+    </script>
     <!--日期选择器样式-->
     <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
     <!--日期选择器-->

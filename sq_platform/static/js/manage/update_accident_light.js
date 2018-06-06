@@ -40,7 +40,7 @@ $(function(){
             "title": a_name,
             "type": a_type,
             "code": a_code,
-            "driver_name": a_driver,
+            "driver_id": a_driver,
             "plate_number": a_truck,
             "address": a_address,
             "time": a_time,

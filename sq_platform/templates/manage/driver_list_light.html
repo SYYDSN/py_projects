@@ -1,6 +1,6 @@
 {% extends "manage/base_template_light.html" %}
 {% block extend_css %}
-    <link rel="stylesheet" href="../static/css/manage/driver_list_light.css">
+    <link rel="stylesheet" href="/static/css/manage/driver_list_light.css">
     <link rel="stylesheet/less" href="/static/less/manage/driver_list.less">
     <script src="/static/js/less.min.js"></script>
 {% endblock %}
@@ -23,10 +23,10 @@
                 </div>
                 <div class="row driver-list-content">
                     {% for driver in drivers %}
-                        <div class="fonts">
+                        <div class="employee">
                             <p class="p_pad">
                                 <span class="pull-left">{{ driver.real_name }}</span>
-                                <span class="pull-right pull_tlt">驾龄: {{ driver.driving_exerience }}</span>
+                                <span class="pull-right pull_tlt">驾龄: {{ driver.driving_experience }}</span>
                             </p>
                             <p>
                                 <img class="" src="/static/image/icon/icon_cheliang.svg" alt="">

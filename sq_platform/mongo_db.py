@@ -212,7 +212,7 @@ def get_db(database: str = None):
 
 def get_conn(table_name: str, database: str = None):
     """
-    获取一个针对table_name对应的表的的连接，一般用户对数据库进行增删查改等操作。
+    获取一个针对table_name对应的表的的连接，一般用户直接对数据库进行增删查改等操作。
     :param table_name: collection的名称，对应sql的表名。必须。
     :param database: 数据库名
     :return: 一个Collection对象，用于操作数据库。

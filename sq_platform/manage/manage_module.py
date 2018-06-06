@@ -555,7 +555,7 @@ def get_driver_list_func() -> str:
     key = "driver_list_{}".format(company_id)
     employees = cache.get(key)
     if employees is None:
-        employees = Company.all_employee(company_id=company_id, can_json=True, include_truck=True)
+        employees = Company.all_employee(company_id=company_id, can_json=True, include_truck=True, count_vio=True)
         if isinstance(employees, list):
             cache.set(key, employees, timeout=1800)
         else:
@@ -1144,23 +1144,19 @@ def accident_func():
         return abort(404, "company_id is none")
     else:
         employees = Company.all_employee(company_id=company_id, can_json=True)
-        if employees is not None:
-            employees = {
-                x['_id']:
-                    {
-                        "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
-                      'real_name') is None else x['real_name'],
-                        "employee_number": x.get('employee_number', '')
-                    }
-                for x in employees}
-
+        e_dict = {x['_id']: {
+            "real_name": x['real_name'] if x.get("real_name") else
+            (x['official_name'] if x.get("official_name") else x['phone_num']),
+            "head_img_url": x.get("head_img_url", "/static/image/head_img/default_01.png")
+        } for x in employees}
         if request.method.lower() == "get":
             """返回页面事故列表页"""
             """开始取地址栏参数"""
             a_url = "accident?"  # 待拼接url地址,这里是相对地址
-            driver_name = get_arg(request, "driver_name", None)  # 司机名
-            if driver_name is not None and driver_name != "":
-                a_url += "driver_name={}".format(driver_name)
+            driver_id = get_arg(request, "driver_id", None)  # 司机名
+            if driver_id is not None and driver_id != "" and len(driver_id) == 24:
+                a_url += "driver_id={}".format(driver_id)
+                driver_id = ObjectId(driver_id)
             city = get_arg(request, "city", None)  # 城市
             if city is not None and city != "":
                 if a_url.endswith("?"):
@@ -1235,7 +1231,7 @@ def accident_func():
                     a_url += "&{}".format(ms)
 
             args = {
-                "driver_name": driver_name,
+                "driver_id": driver_id,
                 "writer": user_id,
                 "city": city,
                 "plate_number": plate_number,
@@ -1249,6 +1245,7 @@ def accident_func():
             try:
                 data = Accident.page(**args)
                 acc_list = data['data']
+                acc_dict = {x['_id']: x for x in acc_list}
                 acc_count = data['count']  # 事故条数
             except Exception as e:
                 print(e)
@@ -1266,20 +1263,18 @@ def accident_func():
                     prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
                     next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
                     cur_page_url = a_url.format(cur_index)
-                    """事故处理状态字典"""
-                    acc_dict = {"0": "未处理", "1": "已处理"}
                     return render_template("manage/accident_light.html", drivers=employees, pages=index_list,
                                            page_count=page_count, acc_list=acc_list, acc_count=acc_count,
-                                           head_img_url=head_img_url,
+                                           head_img_url=head_img_url, e_dict=e_dict, acc_dict=acc_dict,
                                            prev_page_url=prev_page_url, next_page_url=next_page_url,
-                                           cur_page_url=cur_page_url, status=status, acc_dict=acc_dict)
+                                           cur_page_url=cur_page_url, status=status)
                 else:
                     abort(401, error)
         elif request.method.lower() == "post":
             """各种接口"""
             return abort(403, "不支持的操作")
         else:
-            return abort(405, "不支持的操作")
+            return abort(405, "不支持的方法")
 
 
 @manage_blueprint.route("/<prefix>_accident", methods=["get", "post"])
@@ -1293,16 +1288,8 @@ def process_accident_func(prefix):
         return abort(404, "company_id is none")
     else:
         employees = Company.all_employee(company_id=company_id, can_json=True)
-        if employees is not None:
-            employees = {
-                x['_id']:
-                    {
-                        "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
-                      'real_name') is None else x['real_name'],
-                        "employee_number": x.get('employee_number', '')
-                    }
-                for x in employees}
-
+        e_dict = {x['_id']: x['real_name'] if x.get("real_name") else (
+            x['official_name'] if x.get("official_name") else x['phone_num']) for x in employees}
         if prefix == "update":
             """编辑事故信息的页面或者接口"""
             if request.method.lower() == "get":
@@ -1320,7 +1307,7 @@ def process_accident_func(prefix):
                         pass
                 acc_type = ["追尾碰撞", "双车刮蹭", "部件失效", "车辆倾覆"]
                 return render_template("manage/update_accident_light.html", acc=accident, acc_type=acc_type,
-                                       head_img_url=head_img_url)
+                                       head_img_url=head_img_url, e_dict=e_dict)
             elif request.method.lower() == "post":
                 """提交事故"""
                 mes = {"message": "success"}
@@ -1328,30 +1315,57 @@ def process_accident_func(prefix):
                 if isinstance(user_id, str) and len(user_id) == 24:
                     writer = DBRef(database=mongo_db.db_name, collection="user_info", id=ObjectId(user_id))
                     args = get_args(request)
-                    a_status = args.get('status', 0)
-                    try:
-                        a_status = int(a_status)
-                    except Exception as e:
-                        print(e)
-                        a_status = 0
-                    finally:
-                        args['status'] = a_status
-                    args['writer'] = writer
-                    args['last_update'] = datetime.datetime.now()
-                    accident = Accident(**args)
-                    _id = None
-                    error = None
-                    try:
-                        _id = accident.save_plus()
-                    except Exception as e:
-                        logger.exception(e)
-                        error = e
-                        print(e)
-                    finally:
-                        if isinstance(_id, ObjectId):
+                    """
+                    delete 用来确认是否是删除对象. 有就是删除,无就是insert和update
+                    insert和update用_id的有无来判断.无是insert,有就是update
+                    """
+                    delete = args.pop("delete", "0")
+                    _id = args.get('_id')
+                    if delete == "1" and isinstance(_id, str) and len(_id) == 24:
+                        """删除事故"""
+                        f = {"writer": writer, "_id": ObjectId(_id)}
+                        r = Accident.find_one_and_delete(filter_dict=f)
+                        if r:
                             pass
                         else:
-                            mes['message'] = "插入失败,错误原因:{}".format(str(error))
+                            mes['message'] = "删除失败"
+                    else:
+                        """insert和update"""
+                        a_status = args.get('status', 0)
+                        try:
+                            a_status = int(a_status)
+                        except Exception as e:
+                            print(e)
+                            a_status = 0
+                        finally:
+                            args['status'] = a_status
+                        args['writer'] = writer
+                        driver_id = None
+                        try:
+                            driver_id = ObjectId(args['driver_id'])
+                        except Exception as e:
+                            print(e)
+                            mes['message'] = str(e)
+                        finally:
+                            if isinstance(driver_id, ObjectId):
+                                args['driver_id'] = driver_id
+                                args['last_update'] = datetime.datetime.now()
+                                accident = Accident(**args)
+                                _id = None
+                                error = None
+                                try:
+                                    _id = accident.save_plus()
+                                except Exception as e:
+                                    logger.exception(e)
+                                    error = e
+                                    print(e)
+                                finally:
+                                    if isinstance(_id, ObjectId):
+                                        pass
+                                    else:
+                                        mes['message'] = "插入失败,错误原因:{}".format(str(error))
+                            else:
+                                pass
                 else:
                     mes['message'] = "身份验证失败"
                 return json.dumps(mes)

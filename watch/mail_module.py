@@ -23,13 +23,13 @@ cache = RedisCache()
 logger = get_logger(os.path.split(__file__)[-1].split(".", 1)[0])
 
 
-def send_mail(to_email: str = "583736361@qq.com", title: str='hello', content: str = '', file_path: str = None,
-              file_name: str = None) -> bool:
+def send_mail(to_email: str = "583736361@qq.com", title: str='hello', content: str = '', files: list = None) -> bool:
     """
     发送邮件,
     :param to_email: 目的邮件地址
     :param title:  主题
     :param content: 正文
+    :param files: 附件的list[{"path":file_path,"name":file_name},...]
     :return: 是否发送成功
     """
     msg = MIMEMultipart()
@@ -38,14 +38,16 @@ def send_mail(to_email: str = "583736361@qq.com", title: str='hello', content: s
     msg["From"] = my_email
     msg["To"] = to_email
     """添加附件"""
-    if isinstance(file_path, str) and os.path.isfile(file_path):
-        with open(file_path, 'rb') as f:
-            att1 = MIMEApplication(f.read())  # 附件的容器
-            att1.set_charset("utf-8")  # 保证中文文件名不乱码
-        if file_name is None or file_name == "":
-            file_name = os.path.split(file_path)[-1]
-        att1.add_header('Content-Disposition', 'attachment', filename=file_name)
-        msg.attach(att1)
+    if isinstance(files, list):
+        for file in files:
+            file_path = file['path']
+            file_name = file['name'] if file.get('name') is not None else os.path.split(file_path)[-1]
+            if isinstance(file_path, str) and os.path.isfile(file_path):
+                with open(file_path, 'rb') as f:
+                    att = MIMEApplication(f.read())  # 附件的容器
+                    att.set_charset("utf-8")  # 保证中文文件名不乱码
+                att.add_header('Content-Disposition', 'attachment', filename=file_name)
+                msg.attach(att)
     else:
         pass
     """添加附件结束,添加邮件正文"""
@@ -116,5 +118,4 @@ def send_warning_email(title: str, content: str, interval: int = 900, to_mail: s
 
 
 if __name__ == '__main__':
-    send_mail(to_email="583736361@qq.com", file_path="log_module.py", title="title", content="你好")
     pass

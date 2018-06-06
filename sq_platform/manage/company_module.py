@@ -12,6 +12,8 @@ from api.data.item_module import CarLicense
 from api.data.item_module import Track
 from api.data.base_item_extends import UseHandlerRecord
 from api.data.violation_module import VioQueryGenerator
+from api.data.violation_module import ViolationRecode
+from api.data.accident_module import Accident
 import hashlib
 import datetime
 from threading import Lock
@@ -980,7 +982,7 @@ class Company(mongo_db.BaseDoc):
 
     @classmethod
     def all_employee(cls, company_id: (str, ObjectId), filter_dict: dict = None, sort_dict: dict = None,
-                     can_json: bool = False, include_truck: bool = False) -> list:
+                     can_json: bool = False, include_truck: bool = False, count_vio: bool = False) -> list:
         """
         获取公司的全部employee
         :param company_id:
@@ -988,6 +990,7 @@ class Company(mongo_db.BaseDoc):
         :param sort_dict: 附加的排序条件
         :param can_json:
         :param include_truck: 是否包含车辆信息
+        :param count_vio: 是否统计违章?
         :return: doc的list
         """
         company = cls.find_by_id(company_id)
@@ -1018,10 +1021,14 @@ class Company(mongo_db.BaseDoc):
                 if len(employees) == 0:
                     pass
                 else:
+                    if count_vio:
+                        """包含违章信息"""
+                        vio_dict = cls.count_vio(id_list=ids)
                     if include_truck:
-                        ids = [DBRef(database=mongo_db.db_name, collection=User.get_table_name(), id=x['_id']) for x in
+                        """是否包含车辆信息?"""
+                        dbrefs = [DBRef(database=mongo_db.db_name, collection=User.get_table_name(), id=x['_id']) for x in
                                employees]
-                        f = {"user_id": {"$in": ids}}
+                        f = {"user_id": {"$in": dbrefs}}
                         trucks = CarLicense.find_plus(filter_dict=f, to_dict=True, can_json=False)
                         truck_dict = {x['user_id'].id: {
                             "permit_image_url": x['permit_image_url'],
@@ -1031,8 +1038,10 @@ class Company(mongo_db.BaseDoc):
                             "vin_id": x['vin_id'],
                             "engine_id": x['engine_id']
                         } for x in trucks}
-                        for employee in employees:
-                            truck = truck_dict.get(employee['_id'])
+                    for employee in employees:
+                        _id = employee['_id']
+                        if include_truck:
+                            truck = truck_dict.get(_id)
                             first_issued_date = employee.get("first_issued_date")
                             if isinstance(truck, dict):
                                 employee.update(truck)
@@ -1042,8 +1051,12 @@ class Company(mongo_db.BaseDoc):
                                 y2 = first_issued_date.year
                                 driving_experience = y1 - y2 + 1
                                 employee['driving_experience'] = driving_experience
+                        if count_vio:
+                            if _id in vio_dict:
+                                employee['vio_count'] = vio_dict[_id]
                     else:
                         pass
+                    """json序列化准备"""
                     employees = [mongo_db.to_flat_dict(x) for x in employees] if can_json else employees
                     res = employees
         return res
@@ -1300,6 +1313,45 @@ class Company(mongo_db.BaseDoc):
                     pass
             else:
                 pass
+        return res
+
+    @classmethod
+    def count_vio(cls, id_list: list, filter_dict: dict = None) -> dict:
+        """
+        统计员工的违章次数.
+        :param id_list: 员工的ObjectId组成的数组.
+        :param filter_dict: 自定义过滤器
+        :return:
+        """
+        f = filter_dict if filter_dict else dict()
+        f['user_id'] = {"$in": id_list}
+        ses = mongo_db.get_conn(table_name=ViolationRecode.get_table_name())
+        pipeline = [
+            {"$match": f},
+            {"$group": {"_id": "$user_id", "count":{"$sum": 1}}}
+        ]
+        res = ses.aggregate(pipeline=pipeline)
+        res = {x["_id"]: x['count'] for x in res}
+        return res
+
+    @classmethod
+    def count_acc(cls, id_list: list, filter_dict: dict = None) -> dict:
+        """
+        统计员工的事故次数.
+        :param id_list: 员工的ObjectId组成的数组.
+        :param filter_dict: 自定义过滤器
+        :return:
+        """
+        f = filter_dict if filter_dict else dict()
+        id_list
+        f['user_id'] = {"$in": id_list}
+        ses = mongo_db.get_conn(table_name=Accident.get_table_name())
+        pipeline = [
+            {"$match": f},
+            {"$group": {"_id": "$user_id", "count": {"$sum": 1}}}
+        ]
+        res = ses.aggregate(pipeline=pipeline)
+        res = {x["_id"]: x['count'] for x in res}
         return res
 
 
@@ -2445,7 +2497,7 @@ if __name__ == "__main__":
     # }
     # Company.add_post(company_id=sq_id, post_dict=p_dict)
     """添加一个管理人员,无管理权限,只是作为旁观者而已"""
-    sq.hire_one_employee(user_id=sq_e, dept_id=sq_d, post_id=sq_p)
+    # sq.hire_one_employee(user_id=sq_e, dept_id=sq_d, post_id=sq_p)
     # p_id_m = ObjectId("5b03e2004660d34b81a17188")  # 管理人员的post_id
     # u_id_z = ObjectId("5af547e4e39a7b5371943a4a")  # 顺丰华新张小龙id
     # d_id_h = ObjectId("5abcac4b4660d3599207fe18")  # 顺丰华新本部门id
@@ -2453,4 +2505,6 @@ if __name__ == "__main__":
     """查询一个公司的全部的违章记录"""
     # dd = Company.all_vio_cls(sf_id)
     # print(dd)
+    """统计一个公司每个人的的违章记录"""
+    print(Company.all_employee(company_id=sf_id, count_vio=True))
     pass
