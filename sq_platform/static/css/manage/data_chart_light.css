@@ -118,10 +118,6 @@ p{
 .personal-data .touxiang{
 	width: 90px;
 }
-.personal-data .p1{
-	text-indent: 10px;
-	margin-top: 30px;
-}
 .personal-data .p2{
 	color: #0BF9D2;
 	text-align: center;
@@ -164,7 +160,7 @@ p{
 	background: #0BF9D2;
 }
 .sijib .p1{
-    margin: 0;
+    margin-left: 15px;
     border-bottom: 1px solid #EBEFF5;
     padding: 12px 6px;
 }
@@ -249,4 +245,17 @@ p{
  .overhie{
      height:208px;
     overflow-y: auto;
+ }
+ .select_interval:hover{
+     cursor: pointer;
+ }
+ .select_interval_action{
+	 background-color: #7CA4FA;
+	 border: 1px solid #7CA4FA;
+     border-radius: 4px;
+	 color: #fff;
+	 padding: 0.1em 0.6em !important;
+ }
+.select_interval_last{
+     margin-right:2em;
  }

@@ -1,4 +1,118 @@
-@employee_width: calc(100% / 6);
-.employee {
-      width: @employee_width;
+
+.driver-list-content {
+  height:auto;
+}
+.driver-list-content .content_inner{
+  display: flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  align-items: flex-start;
+  height:auto;
+}
+@media screen and (max-width: 2700px) {
+  @employee_width: calc(100% / 9);
+  .employee {
+    width: @employee_width;
+  }
+}
+@media screen and (max-width: 2400px) {
+  @employee_width: calc(100% / 8);
+  .employee {
+    width: @employee_width;
+  }
+}
+@media screen and (max-width: 2100px) {
+  @employee_width: calc(100% / 7);
+  .employee {
+    width: @employee_width;
+  }
+}
+@media screen and (max-width: 1800px) {
+  @employee_width: calc(100% / 6);
+  .employee {
+    width: @employee_width;
+  }
+}
+
+@media screen and (max-width: 1500px) {
+  @employee_width: calc(100% / 5);
+  .employee {
+    width: @employee_width;
+  }
+}
+@media screen and (max-width: 1200px) {
+  @employee_width: calc(100% / 4);
+  .employee {
+    width: @employee_width;
+  }
+}
+@media screen and (max-width: 900px) {
+  @employee_width: calc(100% / 3);
+  .employee {
+    width: @employee_width;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  @employee_width: calc(100% / 2);
+  .employee {
+    width: @employee_width;
+  }
+}
+.employee .inner{
+  height: 10em;
+  margin: 0.2em;
+  //margin-right: 2px;
+  font-size:12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.2em 0;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.inner .left{
+  width:5em;
+  padding-left:0.5em;
+}
+.inner .right{
+  width:calc(100% - 5em);
+  margin-left:1em;
+  margin-top:1em;
+  padding-right:1em;
+}
+.inner .head_img{
+  width:4.5em;
+  height:4.5em;
+  margin-top:40%;
+}
+.color_red{
+  color: #ac1f20;
+}
+.mini_icon_09{
+  width:0.9em;
+  height:0.9em;
+  align-self: center;
+  margin-right:0.5em;
+}
+.my_row .pull-right{
+  margin-left:2.5em;
+}
+.mini_icon_10{
+  width:1em;
+  height:1em;
+  align-self: center;
+  margin-right:0.5em;
+}
+.inner .right .my_row{
+  display: flex;
+  justify-content: flex-start;
+  margin: 0.5em 0;
+}
+.inner span{
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow: hidden;
 }

@@ -1,6 +1,6 @@
 {% extends "manage/base_template_light.html" %}
 {% block extend_css %}
-    <link rel="stylesheet" href="../static/css/manage/data_chart_light.css">
+    <link rel="stylesheet" href="/static/css/manage/data_chart_light.css">
 
 {% endblock %}
 {% block main %}
@@ -11,10 +11,12 @@
                     <div class="container-fluid pull-left  personal-data">
                         <div class="row">
                             <p class="p1">
-                                <span>周报表</span><span>月报表</span> 
-                                <span>  开始时间：<input type="text" id="date_picker" class=""></span>
-                                <span>  结束时间：<input type="text" id="date_picker_end" class=""></span>
-                                <img class="dayin" src="/static/image/icon/ic_guanbishigu.svg" alt="">
+                                <span class="select_interval" data-val="day">日报表</span>
+                                <span class="select_interval select_interval_action" data-val="month">月报表</span>
+                                <span class="select_interval select_interval_last" data-val="year">年报表</span>
+                                <span>  开始时间：<input readonly type="text" id="date_picker" class=""></span>
+                                <span>  结束时间：<input readonly type="text" id="date_picker_end" class=""></span>
+                                <span id="redirect_btn" class="btn btn-primary btn-sm">查询</span>
                             </p>
                             <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_liebiao.svg" alt=""><p class="sijib-p">全队人数</p><p class="sijib-p sijib-p2">18人</p></div>
                             <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_naozhong.svg" alt=""><p class="sijib-p">全队车辆</p><p class="sijib-p sijib-p2">18辆</p></div>

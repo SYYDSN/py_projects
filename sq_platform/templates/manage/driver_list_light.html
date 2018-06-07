@@ -22,26 +22,40 @@
                     </div>
                 </div>
                 <div class="row driver-list-content">
+                <div class="content_inner">
                     {% for driver in drivers %}
-                        <div class="employee">
-                            <p class="p_pad">
-                                <span class="pull-left">{{ driver.real_name }}</span>
-                                <span class="pull-right pull_tlt">驾龄: {{ driver.driving_experience }}</span>
-                            </p>
-                            <p>
-                                <img class="" src="/static/image/icon/icon_cheliang.svg" alt="">
-                                <span>车辆类型:{{ driver.car_type }}</span>
-                            </p>
-                            <p>
-                                <img src="/static/image/icon/icon_naozhong.svg" alt="">
-                                <span>驾驶总时长:4000</span>
-                            </p>
-                            <p>
-                                <span class="pull-left">事故:0</span>
-                                <span>违章:0</span>
-                            </p>
+                        <div data-id="{{ driver._id }}" class="employee">
+                            <div class="inner">
+
+                                <div class="left">
+                                     <img class="img img-circle head_img" src="/{{ driver.head_img_url }}" alt="{{ driver.real_name }}">
+                                </div>
+
+                                <div class="right">
+                                    <div class="my_row">
+                                        <span class="pull-left color_red">{{ driver.real_name if driver.real_name else driver.official_name }}</span>
+                                        <span class="pull-right">驾龄: {{ driver.driving_experience }}</span>
+                                    </div>
+                                    <div class="my_row">
+                                        <img class="mini_icon_10" src="/static/image/icon/icon_cheliang.svg" alt="">
+                                        <span title="{{ driver.car_type }}">车辆类型:{{ driver.car_type if driver.car_type else "" }}</span>
+                                    </div>
+                                    <div class="my_row">
+                                        <img class="mini_icon_09" src="/static/image/icon/icon_naozhong.svg" alt="">
+                                        <span title="{{ ((driver.online_time  / 60) | int) | string + "小时" if driver.online_time else "" }}">驾驶时长:{{ ((driver.online_time  / 60) | int) | string + "小时" if driver.online_time else "" }}</span>
+                                    </div>
+                                    <div class="my_row">
+                                        <span class="pull-left">事故:0</span>
+                                        <span class="pull-left">违章:{{ driver.vio_count if driver.vio_count else 0 }}</span>
+                                    </div>
+                                    <div class="my_row"></div>
+                                </div>
+
+                            </div>
                         </div>
                     {% endfor %}
+                </div>
+
                 </div>
             </div>
         </div>

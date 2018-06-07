@@ -453,7 +453,7 @@ def driver_func():
     employees = Company.all_employee(company_id=company_id, can_json=True)
     emp_dict = {x['_id']: x for x in employees}
     if request.method.lower() == "get":
-        """司机(列表)页"""
+        """司机详情页页"""
         page_title = "司机"
         cur_user_id = get_arg(request, "cur_user_id", None)
         if cur_user_id is None or cur_user_id not in emp_dict:
@@ -474,6 +474,11 @@ def data_chart_func():
     if request.method.lower() == "get":
         """数据报表"""
         page_title = "数据报表"
+        step = get_arg(request, 'step', "month")  # 取时间粒度
+        begin = get_arg(request, 'begin', None)  # 取开始时间
+        end = get_arg(request, 'end', None)  # 取结束时间
+        begin = get_datetime_from_str(begin) if begin is not None else begin
+        end = get_datetime_from_str(end) if end is not None else end
         head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")  # 用户头像
         return render_template("manage/data_chart_light.html", page_title=page_title, head_img_url=head_img_url)
     else:
@@ -483,6 +488,7 @@ def data_chart_func():
 @manage_blueprint.route("/driver_detail", methods=["get", "post"])
 @check_platform_session
 def driver_detail_func():
+    """司机详情页.20180606废止,以driver_func替代"""
     current_id = get_platform_session_arg("user_id")
     head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
     real_name = get_platform_session_arg("real_name")
