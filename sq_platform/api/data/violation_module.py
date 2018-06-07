@@ -234,6 +234,39 @@ def query_position(*arg, **kwargs):
     return str(position_id)
 
 
+class Penalty(mongo_db.BaseDoc):
+    """
+    对交通违规的处罚
+    """
+    _table_name = "penalty_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['code'] = str   # 违章代码 唯一
+    type_dict['reason'] = str  # 原因
+    type_dict['point'] = int  # 扣分
+    type_dict['fine'] = float  # 罚金
+    type_dict['extra'] = str   # 并罚
+
+    @classmethod
+    def import_data(cls) -> None:
+        """
+        从文件导入信息，初始化数据用。
+        :return:
+        """
+        f_p = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resource", "最新车辆交通违章代码查询表.data")
+        f = open(f_p, "r", encoding="utf-8")
+        for line in f:
+            l = line.split("\t")
+            l = [x.rstrip() for x in l if x.rstrip() != ""]
+            if len(l) == 4:
+                l.append("")
+            args = dict(zip(['code', 'reason', 'point', 'fine', "extra"], l))
+            f = {"code": args.pop("code")}
+            u = {"$set": args}
+            r = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+            if r is None:
+                print(l)
+
 class ViolationRecode(mongo_db.BaseDoc):
     """
     违章记录
@@ -1453,5 +1486,7 @@ if __name__ == "__main__":
     #     f = {"_id": r['_id']}
     #     u = {"$set": {"process_status": int(r['process_status'])}}
     #     ViolationRecode.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+    """导入处罚信息"""
+    Penalty.import_data()
     pass
 

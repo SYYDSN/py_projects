@@ -1384,16 +1384,16 @@ class Company(mongo_db.BaseDoc):
         ids = [x['_id'] for x in ids]  # 事故和违章的user_id都是ObjectId对象而不是常见的DBRef
         f = {"user_id": {"$in": ids}}
         if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime) and end >= begin:
-            f = {"time": {"$lte": end, "$gte": begin}}
+            f["time"] = {"$lte": end, "$gte": begin}
         elif isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime) and end < begin:
             """结束时间早于开始时间的无需查询"""
             return res
         elif isinstance(begin, datetime.datetime) and not isinstance(end, datetime.datetime):
-            f = {"time": {"$gte": begin}}
+            f["time"] = {"$gte": begin}
         elif not isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
-            f = {"time": {"$lte": end, "$gte": mongo_db.get_datetime_from_str("2017-8-1 0:0:0")}}
+            f["time"] = {"$lte": end, "$gte": mongo_db.get_datetime_from_str("2017-8-1 0:0:0")}
         elif begin is None and end is None:
-            f = {"time": {"$lte": datetime.datetime.now(), "$gte": mongo_db.get_datetime_from_str("2017-8-1 0:0:0")}}
+            f["time"] = {"$lte": datetime.datetime.now(), "$gte": mongo_db.get_datetime_from_str("2017-8-1 0:0:0")}
         else:
             """直接返回,不浪费计算资源"""
             return res
@@ -1506,104 +1506,84 @@ class Company(mongo_db.BaseDoc):
         print(res)
 
     @classmethod
-    def chart_data(cls, company_id: (ObjectId, str), begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
+    def chart_data(cls, company_id: (ObjectId, str), filter_dict: dict = None, end: datetime.datetime = None, step: str = None) -> dict:
         """
-        此函数只能反映固定时间区间的类别的统计结果,只适合当前的设计的柱状图, 下一版本的线图本函数无法满足
+        此函数只能反映固定时间区间的类别的统计结果,包括同比和环比。只适合当前的设计的柱状图, 下一版本的线图本函数无法满足
         届时将废止本函数 2018-6-7
-        获取数据模块显示的数据,这些数据一般是一个周期统计的结果.本例使用的是mapReduce方法.
-        由于reduce函数的返回值会被循环调用(返回值会被当作输入值再次调用).使用mapReduce方法有以下几个要注意的:
-        1. reduce 归约函数必须是幂等的.
-        2. reduce 的返回格式必须和map函数的第二个参数保持一致.
-        3. finalize函数也必须是幂等的.
+        获取数据模块显示的数据,这些数据一般是一个周期统计的结果.本例使用的是aggregate方法.
         :param company_id:
-        :param begin:
+        :param filter_dict:
         :param end:
-        :param step: 切分粒度 , day/month/year 默认是month
+        :param step: 切分粒度 , day/month/year 默认是month,主要用于同比和环比
         :return:
         """
         res = dict()
         ids = cls.all_employee(company_id=company_id)
         ids = [x['_id'] for x in ids]  # 事故和违章的user_id都是ObjectId对象而不是常见的DBRef
         f = {"user_id": {"$in": ids}}
-        if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime) and end >= begin:
-            f = {"time": {"$lte": end, "$gte": begin}}
-        elif isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime) and end < begin:
-            """结束时间早于开始时间的无需查询"""
-            return res
-        elif isinstance(begin, datetime.datetime) and not isinstance(end, datetime.datetime):
-            f = {"time": {"$gte": begin}}
-        elif not isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
-            f = {"time": {"$lte": end, "$gte": mongo_db.get_datetime_from_str("2017-8-1 0:0:0")}}
-        elif begin is None and end is None:
-            f = {"time": {"$lte": datetime.datetime.now(), "$gte": mongo_db.get_datetime_from_str("2017-8-1 0:0:0")}}
+        if isinstance(filter_dict, dict):
+            f.update(filter_dict)
+
+        if isinstance(end, datetime.datetime):
+            pass
         else:
-            """直接返回,不浪费计算资源"""
-            return res
-        s = {"sort": -1}
-        out = "company_chart_date_{}".format(random.randint(1000, 9999))  # 暂时保存数据的表,每次map_reduce都会提前清空这个表
+            end = datetime.datetime.now()
+        year = end.year
+        month = end.month
+        day = end.day
+        if step == "day":
+            b1 = mongo_db.get_datetime_from_str("{}-{}-{} 0:0:0".format(year, month, day))
+            e1 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(year, month, day))  # 当前
+            b2 = b1 - datetime.timedelta(days=1)
+            e2 = e1 - datetime.timedelta(days=1)  # 环比
+            t_year, t_month = mongo_db.prev_month(b1)
+            b3 = mongo_db.get_datetime_from_str("{}-{}-{} 0:0:0".format(t_year, t_month, day))
+            e3 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(t_year, t_month, day))  # 同比
+        elif step == "month":
+            max_day = mongo_db.last_day_of_month(end)
+            b1 = mongo_db.get_datetime_from_str("{}-{}-1 0:0:0".format(year, month))
+            e1 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(year, month, max_day))  # 当前
+            prev_y, prev_m = mongo_db.prev_month(end)
+            b2 = mongo_db.get_datetime_from_str("{}-{}-1 0:0:0".format(prev_y, prev_m))
+            max_day = mongo_db.last_day_of_month(b2)
+            e2 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(prev_y, prev_m, max_day))  # 环比
+            b3 = mongo_db.get_datetime_from_str("{}-{}-1 0:0:0".format(year - 1, month))
+            max_day = mongo_db.last_day_of_month(b3)
+            e3 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(year - 1, month, max_day))  # 同比
+        else:
+            b1 = mongo_db.get_datetime_from_str("{}-1-1 0:0:0".format(year))
+            e1 = b1 + datetime.timedelta(seconds=31535999)  # 当前
+            b2 = mongo_db.get_datetime_from_str("{}-1-1 0:0:0".format(year - 1))
+            e2 = b2 + datetime.timedelta(seconds=31535999)  # 环比
+            b3 = mongo_db.get_datetime_from_str("{}-1-1 0:0:0".format(year - 10))
+            e3 = b3 + datetime.timedelta(seconds=31535999)  # 同比
+        s = {"time": -1}
         """先统计违章的信息"""
         ses = mongo_db.get_conn(table_name="violation_info")
-
-        map_func = Code("""
-         function(){
-            // 注意mongodb的时区问题,在mongodb内部,时区默认是UTC,需要手动处理.
-            if(this.user_id != undefined){
-            var key = this.violation_num;
-            // reduce的返回值必须和emit的第二个参数格式保持一致
-            emit(key, {"vio":[
-            {"_id": this._id.toString(),
-            "reason": this.reason,
-            "point": isNaN(parseInt(this.point))?0:parseInt(this.point)
+        """当前"""
+        f['time'] = {"$lte": e1, "$gte": b1}
+        pipeline = [
+            {"$match": f},
+            {"$group": {
+                "_id": "$violation_num",
+                "reason_list": {"$push": "$reason"},
+                "count": {"$sum": 1},
+                "reason": {"$last": "$reason"}
+                }
             }
-            ]}); 
-        }            
-        }
-        """)
-        reduce_func = Code("""
-                    function(key, values){
-                        var vio_dict = {};  
-                        values.forEach(function(value)
-                        {
-                           var vios = vio_dict['vio'];
-                           vios = vios==undefined?[]:vios;
-                           var keys = new Set();
-                           for(var o of vios){
-                              keys.add(o['_id']);
-                           }
-                           for(var x of value['vio']){
-                             if(!keys.has(x['_id'])){
-                               vios.push(x);
-                             }
-                             else{}
-                           }
-                           vio_dict['vio'] = vios;
-                        });
-                        return vio_dict;
-                    }
-                    """)
-        finalize_func = Code("""
-                    function(key, values){
-                        if(values.digest == undefined){
-                            var digest = {};
-                            var vio_list = values['vio'];
-                            for(var vio of vio_list){
-                                var reason = vio['reason'];
-                                var v = digest[reason];
-                                v = v == undefined?[]:v;
-                                v.push(vio['point']);
-                                digest[reason] = v;
-                            }
-                            values.digest=digest;
-                        }            
-                        return values;
-                    }
-                """)
-        result_conn = ses.map_reduce(map=map_func, reduce=reduce_func, query=f, sort=s, out=out)
-        # result_conn = ses.map_reduce(map=map_func, reduce=reduce_func, finalize=finalize_func, query=f, sort=s, out=out)
-        res = result_conn.find(filter=dict())
-        res = [x for x in res]
-        db = mongo_db.get_db()
-        db.drop_collection(name_or_collection=out)  # 删除临时的表
+        ]
+        res = ses.aggregate(pipeline=pipeline)
+        r1 = [x for x in res]  # 当前结果
+        f['time'] = {"$lte": e2, "$gte": b2}
+        pipeline.pop(0)
+        pipeline.insert(0, {"$match": f})
+        res = ses.aggregate(pipeline=pipeline)
+        r2 = [x for x in res]  # 环比结果
+        f['time'] = {"$lte": e3, "$gte": b3}
+        pipeline.pop(0)
+        pipeline.insert(0, {"$match": f})
+        res = ses.aggregate(pipeline=pipeline)
+        r3 = [x for x in res]  # 同比结果
         """https://www.icauto.com.cn/weizhang/daima/ 交通违章代码查询"""
         print(res)
 
@@ -2761,5 +2741,6 @@ if __name__ == "__main__":
     """统计一个公司每个人的的违章记录"""
     # print(Company.all_employee(company_id=sf_id, count_vio=True))
     """获取一个公司的图表数据"""
-    Company.chart_data(company_id=sf_id)
+    Company.chart_data2(company_id=sf_id)
+    Company.chart_data(company_id=sf_id, step="month")
     pass

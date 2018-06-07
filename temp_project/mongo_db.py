@@ -280,6 +280,21 @@ def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     return {other_can_json(k): other_can_json(v) for k, v in a_dict.items() if k not in ignore_columns}
 
 
+def prev_month(the_date: datetime.datetime = None) -> tuple:
+    """
+    给定一个时间,返回上个月的年和月的信息
+    :param the_date:
+    :return:
+    """
+    if not isinstance(the_date, datetime.datetime):
+        ms = "the_date类型错误,使用当前日期替代,错误原因:期待一个datetime.datetime对象,获得了一个{}对象".format(type(the_date))
+        warnings.warn(ms)
+        the_date = datetime.datetime.now()
+    the_date = the_date - datetime.timedelta(days=1)
+    res = (the_date.year, the_date.month)
+    return res
+
+
 def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
     """获取日期和时间，以字符串类型返回，格式为：2016-12-19 14:33:03
     number是指在当前日期上延后多少天，默认是0,可以是负值

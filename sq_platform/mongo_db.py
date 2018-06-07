@@ -5,6 +5,7 @@ import pymongo
 from pymongo import monitoring
 import warnings
 import datetime
+import calendar
 import hashlib
 from uuid import uuid4
 from bson.objectid import ObjectId
@@ -279,6 +280,34 @@ def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     :return:
     """
     return {other_can_json(k): other_can_json(v) for k, v in a_dict.items() if k not in ignore_columns}
+
+
+def last_day_of_month(the_date: datetime.datetime) -> int:
+    """
+    求这个月的最后一天
+    :param the_date:
+    :return:
+    """
+    y = the_date.year
+    m = the_date.month
+    return calendar.monthrange(y, m)[-1]
+
+
+def prev_month(the_date: datetime.datetime = None) -> tuple:
+    """
+    给定一个时间,返回上个月的年和月的信息
+    :param the_date:
+    :return:
+    """
+    if not isinstance(the_date, datetime.datetime):
+        ms = "the_date类型错误,使用当前日期替代,错误原因:期待一个datetime.datetime对象,获得了一个{}对象".format(type(the_date))
+        warnings.warn(ms)
+        the_date = datetime.datetime.now()
+    y = the_date.year
+    m = the_date.month
+    the_date = datetime.datetime.strptime("{}-{}-1".format(y, m), "%Y-%m-%d") - datetime.timedelta(days=1)
+    res = (the_date.year, the_date.month)
+    return res
 
 
 def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
