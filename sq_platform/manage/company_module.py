@@ -14,6 +14,7 @@ from api.data.item_module import Track
 from api.data.base_item_extends import UseHandlerRecord
 from api.data.violation_module import VioQueryGenerator
 from api.data.violation_module import ViolationRecode
+from api.data.violation_module import Penalty
 from api.data.accident_module import Accident
 import hashlib
 import datetime
@@ -1072,6 +1073,25 @@ class Company(mongo_db.BaseDoc):
         return res
 
     @classmethod
+    def get_employee_in_cache(cls, company_id: (str, ObjectId)) -> list:
+        """
+        从缓存中获取公司的全部employee,这个一般是给页面端做缓存用的.
+        :param company_id:
+        :return: doc的list
+        """
+        cache = mongo_db.cache
+        key = "driver_list_{}".format(company_id)
+        employees = cache.get(key)
+        if employees is None:
+            employees = Company.all_employee(company_id=company_id, can_json=True, include_truck=True, count_vio=True,
+                                             count_acc=True)
+            if isinstance(employees, list):
+                cache.set(key, employees, timeout=1800)
+            else:
+                pass
+        return employees
+
+    @classmethod
     def get_employee(cls, company_id: (str, ObjectId), user_id: (str, ObjectId, list), sort_dict: dict = None,
                      can_json: bool = False, include_truck: bool = False) -> (None, dict, list):
         """
@@ -1534,30 +1554,38 @@ class Company(mongo_db.BaseDoc):
         if step == "day":
             b1 = mongo_db.get_datetime_from_str("{}-{}-{} 0:0:0".format(year, month, day))
             e1 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(year, month, day))  # 当前
+            name1 = b1.strftime("%F")
             b2 = b1 - datetime.timedelta(days=1)
             e2 = e1 - datetime.timedelta(days=1)  # 环比
+            name2 = b2.strftime("%F")
             t_year, t_month = mongo_db.prev_month(b1)
             b3 = mongo_db.get_datetime_from_str("{}-{}-{} 0:0:0".format(t_year, t_month, day))
             e3 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(t_year, t_month, day))  # 同比
+            name3 = b3.strftime("%F")
         elif step == "month":
             max_day = mongo_db.last_day_of_month(end)
             b1 = mongo_db.get_datetime_from_str("{}-{}-1 0:0:0".format(year, month))
             e1 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(year, month, max_day))  # 当前
+            name1 = "{}-{}".format(year, month)
             prev_y, prev_m = mongo_db.prev_month(end)
             b2 = mongo_db.get_datetime_from_str("{}-{}-1 0:0:0".format(prev_y, prev_m))
             max_day = mongo_db.last_day_of_month(b2)
             e2 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(prev_y, prev_m, max_day))  # 环比
+            name2 = "{}-{}".format(prev_y, prev_m)
             b3 = mongo_db.get_datetime_from_str("{}-{}-1 0:0:0".format(year - 1, month))
             max_day = mongo_db.last_day_of_month(b3)
             e3 = mongo_db.get_datetime_from_str("{}-{}-{} 23:59:59".format(year - 1, month, max_day))  # 同比
+            name3 = "{}-{}".format(year - 1, month)
         else:
             b1 = mongo_db.get_datetime_from_str("{}-1-1 0:0:0".format(year))
             e1 = b1 + datetime.timedelta(seconds=31535999)  # 当前
+            name1 = "{}".format(year)
             b2 = mongo_db.get_datetime_from_str("{}-1-1 0:0:0".format(year - 1))
             e2 = b2 + datetime.timedelta(seconds=31535999)  # 环比
+            name2 = "{}".format(year - 1)
             b3 = mongo_db.get_datetime_from_str("{}-1-1 0:0:0".format(year - 10))
             e3 = b3 + datetime.timedelta(seconds=31535999)  # 同比
-        s = {"time": -1}
+            name3 = "{}".format(year - 10)
         """先统计违章的信息"""
         ses = mongo_db.get_conn(table_name="violation_info")
         """当前"""
@@ -1585,7 +1613,118 @@ class Company(mongo_db.BaseDoc):
         res = ses.aggregate(pipeline=pipeline)
         r3 = [x for x in res]  # 同比结果
         """https://www.icauto.com.cn/weizhang/daima/ 交通违章代码查询"""
-        print(res)
+        p_dict = Penalty.all_point()
+        vio_dict = dict()
+        for v in r1:
+            temp = dict()
+            code = v.pop("_id")  # 违章代码
+            temp['date'] = name1  # 日期,也就是 当前/环比/同比
+            temp['count'] = v.pop("count", 0)  # 违章统计
+            temp['code'] = code
+            temp['reason'] = v.pop("reason")   # 违章原因
+            temp['point'] = p_dict.get(code, 0)  # 扣分
+            vio_dict[code] = {"当前": temp}
+        for v in r2:
+            temp = dict()
+            code = v.pop("_id")  # 违章代码
+            temp['date'] = name2  # 日期,也就是 当前/环比/同比
+            temp['count'] = v.pop("count", 0)  # 违章统计
+            temp['code'] = code
+            temp['reason'] = v.pop("reason")   # 违章原因
+            temp['point'] = p_dict.get(code, 0)  # 扣分
+            vio_dict[code] = {"环比": temp}
+        for v in r3:
+            temp = dict()
+            code = v.pop("_id")  # 违章代码
+            temp['date'] = name3  # 日期,也就是 当前/环比/同比
+            temp['count'] = v.pop("count", 0)  # 违章统计
+            temp['code'] = code
+            temp['reason'] = v.pop("reason")   # 违章原因
+            temp['point'] = p_dict.get(code, 0)  # 扣分
+            vio_dict[code] = {"同比": temp}
+        # print(vio_dict)
+        """查询事故"""
+        f['driver_id'] = f.pop("user_id")
+        ses = mongo_db.get_conn(table_name="accident_info")
+        """当前"""
+        f['time'] = {"$lte": e1, "$gte": b1}
+        pipeline = [
+            {"$match": f},
+            {"$group":
+                {
+                    "_id": "$type",
+                    "count": {"$sum": 1}
+                }
+            }
+        ]
+        res = ses.aggregate(pipeline=pipeline)
+        r1 = [x for x in res]  # 当前结果
+        f['time'] = {"$lte": e2, "$gte": b2}
+        pipeline.pop(0)
+        pipeline.insert(0, {"$match": f})
+        res = ses.aggregate(pipeline=pipeline)
+        r2 = [x for x in res]  # 环比结果
+        f['time'] = {"$lte": e3, "$gte": b3}
+        pipeline.pop(0)
+        pipeline.insert(0, {"$match": f})
+        res = ses.aggregate(pipeline=pipeline)
+        r3 = [x for x in res]  # 同比结果
+        acc_dict = dict()
+        for v in r1:
+            temp = dict()
+            the_type = v.pop("_id")  # 事故类型
+            temp['date'] = name1  # 日期,也就是 当前/环比/同比
+            temp['count'] = v.pop("count", 0)
+            temp['type'] = the_type
+            acc_dict[the_type] = {"当前": temp}
+        for v in r2:
+            temp = dict()
+            the_type = v.pop("_id")  # 事故类型
+            temp['date'] = name2  # 日期,也就是 当前/环比/同比
+            temp['count'] = v.pop("count", 0)
+            temp['type'] = the_type
+            acc_dict[the_type] = {"环比": temp}
+        for v in r3:
+            temp = dict()
+            the_type = v.pop("_id")  # 事故类型
+            temp['date'] = name3  # 日期,也就是 当前/环比/同比
+            temp['count'] = v.pop("count", 0)
+            temp['type'] = the_type
+            acc_dict[the_type] = {"同比": temp}
+        # print(acc_dict)
+        """整理成适合多柱状图表示的数组格式"""
+        reason_dict = Penalty.all_reason()
+        v_data = list()  # 违章的数据
+        v_x = ['product', '当前', '环比', '同比']
+        v_data.append(v_x)
+        for k, v in vio_dict.items():
+            """多柱状图是数组的数组的格式,每一鏃数据也是数组,不足补齐,顺序是当前/环比/同比"""
+            temp = list()
+            reason = reason_dict[k]
+            reason = reason.split("，")[0]
+            reason = reason.split("、")[0]
+            temp.append(reason)
+            temp.append(v.get('当前', {"count": 0})['count'])
+            temp.append(v.get('环比', {"count": 0})['count'])
+            temp.append(v.get('同比', {"count": 0})['count'])
+            v_data.append(temp)
+
+        a_data = list()  # 事故的数据
+        a_x = ['product', '当前', '环比', '同比']
+        a_data.append(a_x)
+        for k, v in acc_dict.items():
+            """多柱状图是数组的数组的格式,每一鏃数据也是数组,不足补齐,顺序是当前/环比/同比"""
+            temp = list()
+            temp.append(k)
+            temp.append(v.get('当前', {"count": 0})['count'])
+            temp.append(v.get('环比', {"count": 0})['count'])
+            temp.append(v.get('同比', {"count": 0})['count'])
+            a_data.append(temp)
+        res = {
+            "vio": v_data,
+            "acc": a_data
+        }
+        return res
 
 
 class CompanyAdmin(mongo_db.BaseDoc):
@@ -2741,6 +2880,6 @@ if __name__ == "__main__":
     """统计一个公司每个人的的违章记录"""
     # print(Company.all_employee(company_id=sf_id, count_vio=True))
     """获取一个公司的图表数据"""
-    Company.chart_data2(company_id=sf_id)
+    # Company.chart_data2(company_id=sf_id)
     Company.chart_data(company_id=sf_id, step="month")
     pass

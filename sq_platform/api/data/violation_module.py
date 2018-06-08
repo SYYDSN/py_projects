@@ -24,6 +24,7 @@ from amap_module import get_position_by_address
 from extends.car_city import CarCity
 from extends.vio_module import TrafficViolationHandler
 import warnings
+import Levenshtein
 
 
 """违章查询模块"""
@@ -233,39 +234,6 @@ def query_position(*arg, **kwargs):
     ses.find_one_and_update(filter=filter_dict, update=update)
     return str(position_id)
 
-
-class Penalty(mongo_db.BaseDoc):
-    """
-    对交通违规的处罚
-    """
-    _table_name = "penalty_info"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    type_dict['code'] = str   # 违章代码 唯一
-    type_dict['reason'] = str  # 原因
-    type_dict['point'] = int  # 扣分
-    type_dict['fine'] = float  # 罚金
-    type_dict['extra'] = str   # 并罚
-
-    @classmethod
-    def import_data(cls) -> None:
-        """
-        从文件导入信息，初始化数据用。
-        :return:
-        """
-        f_p = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resource", "最新车辆交通违章代码查询表.data")
-        f = open(f_p, "r", encoding="utf-8")
-        for line in f:
-            l = line.split("\t")
-            l = [x.rstrip() for x in l if x.rstrip() != ""]
-            if len(l) == 4:
-                l.append("")
-            args = dict(zip(['code', 'reason', 'point', 'fine', "extra"], l))
-            f = {"code": args.pop("code")}
-            u = {"$set": args}
-            r = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
-            if r is None:
-                print(l)
 
 class ViolationRecode(mongo_db.BaseDoc):
     """
@@ -515,6 +483,137 @@ class ViolationRecode(mongo_db.BaseDoc):
             return result
         else:
             return cls.instance(**result)
+
+    @classmethod
+    def repair_violation_num(cls) -> None:
+        """
+        修复违章记录中,没有违章代码的部分
+        :return:
+        """
+        f = {
+            "$or": [
+                {"violation_num": {"$exists": False}},
+                {"violation_num": ""}
+            ]
+        }
+        vios = cls. find_plus(filter_dict=f, to_dict=True)
+        for vio in vios:
+            result = Penalty.match_code(vio)
+            if result:
+                f = {"_id": result['_id']}
+                u = {"$set": {"violation_num": result['violation_num']}}
+                r = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                if r is None:
+                    print(result)
+
+
+class Penalty(mongo_db.BaseDoc):
+    """
+    对交通违规的处罚
+    """
+    _table_name = "penalty_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['code'] = str   # 违章代码 唯一
+    type_dict['reason'] = str  # 原因
+    type_dict['point'] = int  # 扣分
+    type_dict['fine'] = float  # 罚金
+    type_dict['extra'] = str   # 并罚
+
+    @classmethod
+    def import_data(cls) -> None:
+        """
+        从文件导入信息，初始化数据用。
+        :return:
+        """
+        f_p = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resource", "最新车辆交通违章代码查询表.data")
+        f = open(f_p, "r", encoding="utf-8")
+        for line in f:
+            l = line.split("\t")
+            l = [x.rstrip() for x in l if x.rstrip() != ""]
+            if len(l) == 4:
+                l.append("")
+            args = dict(zip(['code', 'reason', 'point', 'fine', "extra"], l))
+            f = {"code": args.pop("code")}
+            u = {"$set": args}
+            r = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+            if r is None:
+                print(l)
+
+    @classmethod
+    def all_reason(cls) -> dict:
+        """
+        获取所有的违章代码和违章原因的字典.注意,有缓存2个小时
+        :return:
+        """
+        key = "penalty_reason_cache"
+        d = cache.get(key=key)
+        if d is None:
+            res = cls.find_plus(filter_dict={}, projection=['code', "reason"], to_dict=True)
+            res = {x['code']: x['reason'] for x in res}
+            cache.set(key, res, timeout=7200)
+            d = res
+        return d
+
+    @classmethod
+    def all_point(cls) -> dict:
+        """
+        获取所有的违章代码和扣分的字典.注意,有缓存2个小时
+        :return:
+        """
+        key = "penalty_point_cache"
+        d = cache.get(key=key)
+        if d is None:
+            res = cls.find_plus(filter_dict={}, projection=['code', "point"], to_dict=True)
+            res = {x['code']: x['point'] for x in res}
+            cache.set(key, res, timeout=7200)
+            d = res
+        return d
+
+    @classmethod
+    def match_code(cls, vio: (dict, ViolationRecode) = None, cover: bool = False) -> (None, dict, ViolationRecode):
+        """
+        给违章记录配置违章代码:
+        1. 如果有违章代码就不匹配,除非强制重新匹配.
+        2. 使用字符串近视度匹配,低于70%就认为匹配失败.
+        :param vio: 违章记录, doc/dict/ViolationRecode的实例
+        :param cover: 对于已有违章代码的对象,是否重新匹配?
+        :return: 失败返回None
+        """
+        if isinstance(vio, dict):
+            reason = vio.get("reason")
+        elif isinstance(vio, ViolationRecode):
+            reason = vio.get_attr("reason")
+        else:
+            ms = "错误的参数类型vio:{}".format(type(vio))
+            raise TypeError(ms)
+        d = cls.all_reason()
+        result = {"code": "", "str": "", "per": 0}
+        for code, word in d.items():
+            per = Levenshtein.jaro_winkler(reason, word)
+            if per > result['per']:
+                result['str'] = word
+                result['code'] = code
+                result['per'] = per
+        if result['per'] < 0.5:
+            """匹配失败"""
+            pass
+        else:
+            if isinstance(vio, dict):
+                old = vio.get("violation_num")
+                if old is None or old == "" or cover:
+                    vio['violation_num'] = result['code']
+                    return vio
+                else:
+                    pass
+            else:
+                if isinstance(vio, ViolationRecode):
+                    old = vio.get_attr("violation_num")
+                    if old is None or old == "" or cover:
+                        vio.set_attr("violation_num", result['code'])
+                        return vio
+                    else:
+                        pass
 
 
 class ViolationQueryResult(mongo_db.BaseDoc):
@@ -1487,6 +1586,11 @@ if __name__ == "__main__":
     #     u = {"$set": {"process_status": int(r['process_status'])}}
     #     ViolationRecode.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
     """导入处罚信息"""
-    Penalty.import_data()
+    # Penalty.import_data()
+    """匹配违章代码"""
+    # vio = {"reason": "驾驶中型以上载客载货汽车、校车、危险物品运输车辆以外的其他机动车行驶超过规定时速20%以上未达到50%的"}
+    # Penalty.match_code(vio)
+    """修复违章记录中,没有违章代码的部分"""
+    ViolationRecode.repair_violation_num()
     pass
 

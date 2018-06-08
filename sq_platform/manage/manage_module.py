@@ -19,6 +19,7 @@ from api.user import security_module
 from werkzeug.contrib.cache import RedisCache
 from mongo_db import get_datetime_from_str
 from api.data.violation_module import ViolationRecode
+from api.data.violation_module import Penalty
 from role.role_module import Role
 from role.role_module import Func
 from api.data.accident_module import AccidentData
@@ -471,16 +472,41 @@ def driver_func():
 @manage_blueprint.route("/data_chart", methods=["get"])
 @check_platform_session
 def data_chart_func():
+    company_id = get_platform_session_arg("company_id")
+    company_id = ObjectId(company_id)
+    emps = Company.get_employee_in_cache(company_id=company_id)
+    """计算人数,车辆数,时长"""
+    count_person = 0  # 统计人数
+    count_truck = 0   # 统计车辆
+    count_time = 0  # 驾驶时长,目前的单位是分钟
+    for emp in emps:
+        count_person += 1
+        if emp.get("plate_number"):
+            count_truck += 1
+        online_time = emp.get("online_time")
+        if online_time:
+            count_time += online_time if isinstance(online_time, float) else float(online_time)
+    hour = int(count_time / 60)  # 小时
+    minute = int(count_time % 60)  # 分
     if request.method.lower() == "get":
         """数据报表"""
         page_title = "数据报表"
         step = get_arg(request, 'step', "month")  # 取时间粒度
-        begin = get_arg(request, 'begin', None)  # 取开始时间
-        end = get_arg(request, 'end', None)  # 取结束时间
-        begin = get_datetime_from_str(begin) if begin is not None else begin
-        end = get_datetime_from_str(end) if end is not None else end
+        end = get_arg(request, 'date', None)  # 取时间
+        if end is not None:
+            if step == "month":
+                end = mongo_db.get_datetime_from_str("{}-1".format(end))
+            elif step == "year":
+                end = mongo_db.get_datetime_from_str("{}-1-1".format(end))
+            else:
+                end = mongo_db.get_datetime_from_str(end)
+
+        chart_data = Company.chart_data(company_id=company_id, end=end, step=step)
         head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")  # 用户头像
-        return render_template("manage/data_chart_light.html", page_title=page_title, head_img_url=head_img_url)
+        reason_dict = Penalty.all_reason()
+        return render_template("manage/data_chart_light.html", page_title=page_title, head_img_url=head_img_url,
+                               chart_data=chart_data, reason_dict=reason_dict, minute=minute, hour=hour,
+                               count_person=count_person, count_truck=count_truck)
     else:
         return abort(405)
 
@@ -558,17 +584,7 @@ def get_driver_list_func() -> str:
     :return: 消息字典的json,其中包含下属身份信息的的列表
     """
     company_id = get_platform_session_arg("company_id")
-    key = "driver_list_{}".format(company_id)
-    employees = cache.get(key)
-    if employees is None:
-        employees = Company.all_employee(company_id=company_id, can_json=True, include_truck=True, count_vio=True)
-        if isinstance(employees, list):
-            cache.set(key, employees, timeout=1800)
-        else:
-            pass
-    # team_info = [{"_id": str(x['_id']),
-    #               "real_name": ("" if x.get("official_name") is None else x['official_name']) if x.get(
-    #                   'real_name') is None else x['real_name'], "head_img_url": x['head_img_url']} for x in employees]
+    employees = Company.get_employee_in_cache(company_id=company_id)
     if request.method.lower() == "post":
         """返回Ajax请求的结果"""
         message = dict()

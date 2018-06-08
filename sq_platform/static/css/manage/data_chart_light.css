@@ -197,11 +197,11 @@ p{
     background: none;
 }
 .data-img{
-    background: #fff;
-    width: 49.8% !important;
+    /*background: #fff;*/
+    /*width: 49.8% !important;*/
 }
 .data-imgs{
-    width: 30% !important;
+    /*width: 30% !important;*/
 }
 .data-imgtwo{
     width: 69.4% !important;
@@ -246,6 +246,10 @@ p{
      height:208px;
     overflow-y: auto;
  }
+ .select_interval{
+     margin-left:0.5em;
+     margin-right:0.5em;
+ }
  .select_interval:hover{
      cursor: pointer;
  }
@@ -259,3 +263,160 @@ p{
 .select_interval_last{
      margin-right:2em;
  }
+.line_1 > div{
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+}
+.line_1 label{
+    margin-right:0.2em;
+}
+.space_line > div{
+    height:5px;
+}
+.space_line_min > div{
+    height:2px;
+}
+.white_backgrounp > div{
+    background-color: #fff;
+}
+/*日期选择器*/
+#select_date{
+    margin-left: 1em;
+    margin-right: 1em;
+    border-radius: 0.5em;
+    border: 1px solid lightgrey;
+    padding-left:1em;
+    height:1.8em;
+}
+/*查询按钮*/
+#redirect_btn{
+    padding: 2px 10px;
+}
+.flex_start_center{
+    display:flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+.left_div{
+    display: flex;
+    align-items: center;
+}
+.right_div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:center;
+}
+/*引入的样式*/
+.sijib .p1{
+    margin: 0;
+    border-bottom: 1px solid #EBEFF5;
+    padding: 12px 6px;
+}
+.sijib .p1 span{
+    display: inline-block;
+}
+.sijib .sijib-p{
+    text-align: center;
+}
+.sijib .sijib-p2{
+    font-size: 22px;
+}
+.sijib-top{
+    top: 30px;
+    position: relative;
+    border-right: 1px solid #ccc;
+}
+.sijib-top:last-child{
+    border: none;
+}
+.sijib-top img{
+    position: absolute;
+    left: 24%;
+}
+.sijib .personal-data{
+    height: 160px;
+}
+.dayin{
+    float:right;
+    width: 25px;
+}
+.sijib  .personal-datas{
+    height: 260px;
+    background: none;
+}
+.data-img{
+    /*background: #fff;*/
+    /*width: 49.8%;*/
+}
+.data-imgs{
+    /*width: 30%;*/
+}
+.data-imgtwo{
+    width: 69.4%;
+    /* padding-bottom: 24px;  */
+}
+.data-imgtwo table{
+    width: 100%;
+}
+.data-imgtwo table td{
+    padding: 24px 0;
+    border: 1px solid #ccc;
+    width:12.5%;
+}
+.data-imgtwo table th{
+    padding: 24px 0;
+    text-align: center;
+    /* border: 1px solid #ccc; */
+    background: #F6F6F6;
+    width:12.5%;
+}
+.title{
+    padding: 10px 0;
+}
+ .personal-dibu {
+     padding: 1px;
+     width: 100%;
+     background: #fff;
+ }
+ .sijib .personal-datatop{
+     height: 338px;
+ }
+ .personal-data{
+     width: 100%;
+ }
+ .diburow{
+     margin-left:0;
+     width: 100%;
+ }
+ /* table 超出部分出现滚动条 */
+ .overhie{
+     height:208px;
+    overflow-y: auto;
+ }
+ /* 生理状况图表 */
+.summary{
+display: flex;
+justify-content: space-between;
+}
+.summary div{
+position: relative;
+width: 33.3333%;
+}
+.summary p{
+position: absolute;
+width: 100%;
+text-align: center;
+bottom: 0;
+}
+/*选择时间 样式*/
+#date_picker{
+border: 1px solid #ccc;
+border-radius: 8px;
+outline: none;
+}
+#date_picker_end{
+border: 1px solid #ccc;
+border-radius: 8px;
+outline: none;
+}

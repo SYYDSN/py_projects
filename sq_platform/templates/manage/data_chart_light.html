@@ -8,119 +8,136 @@
 
         <div class="sijib">
             <div class="content-right pull-right">
-                    <div class="container-fluid pull-left  personal-data">
-                        <div class="row">
-                            <p class="p1">
-                                <span class="select_interval" data-val="day">日报表</span>
-                                <span class="select_interval select_interval_action" data-val="month">月报表</span>
-                                <span class="select_interval select_interval_last" data-val="year">年报表</span>
-                                <span>  开始时间：<input readonly type="text" id="date_picker" class=""></span>
-                                <span>  结束时间：<input readonly type="text" id="date_picker_end" class=""></span>
-                                <span id="redirect_btn" class="btn btn-primary btn-sm">查询</span>
-                            </p>
-                            <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_liebiao.svg" alt=""><p class="sijib-p">全队人数</p><p class="sijib-p sijib-p2">18人</p></div>
-                            <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_naozhong.svg" alt=""><p class="sijib-p">全队车辆</p><p class="sijib-p sijib-p2">18辆</p></div>
-                            <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_naozhong.svg" alt=""><p class="sijib-p">行使时长</p><p class="sijib-p sijib-p2">450小时45分钟</p></div>
-                            <div class="col-xs-3 sijib-top"><img src="/static/image/icon/icon_naozhong.svg" alt=""><p class="sijib-p">行使公里</p><p class="sijib-p sijib-p2">8200公里</p></div>
+
+                <div style="" class="row white_backgrounp line_1">
+                    <div  class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="select_interval" data-val="day">日报表</span>
+                        <span class="select_interval select_interval_action" data-val="month">月报表</span>
+                        <span class="select_interval select_interval_last" data-val="year">年报表</span>
+                        <!--
+                        <span>  开始时间：<input readonly type="text" id="date_picker" class=""></span>
+                        <span>  结束时间：<input readonly type="text" id="date_picker_end" class=""></span>
+                        -->
+                        <label>选择日期</label><input id="select_date" type="text" readonly>
+                        <span id="redirect_btn" class="btn btn-primary btn-sm">查 询</span>
+                    </div>
+                </div>
+                <div class="row space_line_min">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <!--空白行-->
+                    </div>
+                </div>
+                <div class="row white_backgrounp">
+
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 flex_start_center">
+                        <div class="left_div">
+                            <img src="/static/image/icon/icon_liebiao.svg" alt="">
+                        </div>
+                        <div class="right_div">
+                            <p class="sijib-p">全队人数</p>
+                            <p class="sijib-p sijib-p2">{{ count_person }}人</p>
                         </div>
                     </div>
-                    <!-- 第二个板块 -->
-                    <div class="container-fluid pull-left  personal-data personal-datas   container-fluidtwo">
-                        <div class="row">
-                            <div class="col-xs-6 data-img">
-                                <div id="data_img" style="width: 100%;height: 260px;"></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 flex_start_center">
+                        <div class="left_div">
+                            <img src="/static/image/icon/icon_cheliang.svg" alt="">
+                        </div>
+                        <div class="right_div">
+                            <p class="sijib-p">全队车辆</p>
+                            <p class="sijib-p sijib-p2">{{ count_truck }}辆</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 flex_start_center">
+                        <div class="left_div">
+                            <img src="/static/image/icon/icon_naozhong.svg" alt="">
+                        </div>
+                        <div class="right_div">
+                            <p class="sijib-p">行驶时长</p>
+                            <p class="sijib-p sijib-p2">{{ hour }}小时{{ hour }}分钟</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 flex_start_center">
+                        <div class="left_div">
+                            <img src="/static/image/icon/icon_licheng.svg" alt="">
+                        </div>
+                        <div class="right_div">
+                            <p class="sijib-p">行驶公里</p>
+                            <p class="sijib-p sijib-p2">8200公里</p>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row space_line">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <!--空白行-->
+                    </div>
+                </div>
+                <!-- 第二个板块 -->
+
+                <div class="row white_backgrounp">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" id="data_img" style="height: 260px;"></div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" id="data_imgtwo" style="height: 260px;"></div>
+                </div>
+                <div class="row space_line">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    </div>
+                </div>
+                <!-- 第三个板块 -->
+                {#                    <div class="container-fluid pull-left  personal-data personal-datas personal-datatop container-fluidtwo">#}
+                <div class="row white_backgrounp">
+                    <div class="col-lg-4 col-dm-4 col-sm-4 col-xs-4">
+                        <p>安全评估</p>
+                        <div id="pie" style="width: 100%;height: 320px;"></div>
+                    </div>
+                    <div class="col-lg-8 col-dm-8 col-sm-8 col-xs-8">
+                        <p class="title">生理状况汇总</p>
+                        <div class="summary">
+                            <div>
+                                <div id="summary_img" style="width: 100%;height: 300px;"></div>
+                                <p>健康</p>
                             </div>
-                            <div class="col-xs-6 data-img pull-right">
-                                <div id="data_imgtwo" style="width: 100%;height: 260px;"></div>
+                            <div>
+                                <div id="summary_img_two" style="width: 100%;height: 300px;"></div>
+                                <p>情绪</p>
+                            </div>
+                            <div>
+                                <div id="summary_img_three" style="width: 100%;height: 300px;"></div>
+                                <p>睡眠</p>
                             </div>
                         </div>
                     </div>
-                    <!-- 第三个板块 -->
-                    <div class="container-fluid pull-left  personal-data personal-datas personal-datatop container-fluidtwo">
-                        <div class="row">
-                            <div class="col-xs-4 data-img data-imgs">
-                                <p>安全评估</p>
-                                <div id="myyb" style="width: 100%;height: 320px;"></div>
-                            </div>
-                            <div class="col-xs-8 data-img data-imgtwo pull-right">
-                                <p class="title">生理状况汇总</p>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>类别</th>
-                                            <th>王兆阳</th>
-                                            <th>栾新军</th>
-                                            <th>蒋克雷</th>
-                                            <th>胡磊磊</th>
-                                            <th>张太荣</th>
-                                            <th>董庆中</th>
-                                            <th>刘成刚</th>
-                                        </tr>
-                                    </thead>
-                                    
-                                </table>
-                                <div class="overhie">
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                <td>健康</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                            </tr>
-                                            <tr>
-                                                <td>情绪</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                            </tr>
-                                            <tr>
-                                                <td>睡眠</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                                <td>优</td>
-                                            </tr>
-                                            
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                    <div class="row space_line">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         </div>
                     </div>
                     <!-- 底部不良驾驶行为 -->
                     <div class="container-fluid pull-left   personal-dibu  container-fluidtwo">
-                       <div class="row diburow">
-                           <div class="col-xs-12">
-                               <div id="myxw"  style="width: 100%;height: 300px;"></div>
-                           </div>
-                       </div>
+                        <div class="row diburow">
+                            <div class="col-xs-12">
+                                <div id="myxw" style="width: 100%;height: 300px;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-        </div>
+            </div>
 
+        </div>
     </div>
 {% endblock %}
 {% block extend_js %}
-<!--百度图表-->
+    <script>
+        // 传值
+        chart_data = {{ chart_data | safe }};  // 绘图的数据.目前是事故和违章2个柱状图的
+        reason_dict = {{ reason_dict | safe }};  // 违章的代码和原因的字典
+    </script>
+    <!--百度图表-->
     <script src="/static/js/echarts.common.min.js"></script>
-<script src="/static/js/echarts.min.js"></script>
-<!--日期选择器样式-->
-<link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
-<!--日期选择器-->
-<script src="/static/js/bootstrap-datetimepicker.min.js"></script>
-<!--日期选择器本地化语言-->
-<script src="/static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
-<script src="/static/js/manage/data_chart_light.js"></script>
+    <script src="/static/js/echarts.min.js"></script>
+    <!--日期选择器样式-->
+    <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
+    <!--日期选择器-->
+    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+    <!--日期选择器本地化语言-->
+    <script src="/static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="/static/js/manage/data_chart_light.js"></script>
 {% endblock %}

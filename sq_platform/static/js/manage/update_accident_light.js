@@ -64,6 +64,7 @@ $(function(){
             }
             else if(json['message'] === "success"){
                 alert("提交成功");
+                location.href = "/manage/accident";
             }
             else{
                 alert(json['message']);
