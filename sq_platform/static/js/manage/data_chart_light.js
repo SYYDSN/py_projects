@@ -133,25 +133,30 @@ $(function(){
         let min_v = 2;
         let start_v = 2;
         let format = "yyyy-mm-dd";
+        let begin = `2018-01-01`;
         if(step === "day"){
             min_v = 2;
             start_v = 2;
             format = "yyyy-mm-dd";
+            begin = `2017-01-01`;
         }
         else if(step === "month"){
             min_v = 3;
             start_v = 3;
             format = "yyyy-mm";
+            begin = `2017-01`;
         }
         else if(step === "year"){
             min_v = 4;
             start_v = 4;
             format = "yyyy";
+            begin = `2017`;
         }
         else{}
         $('#select_date').datetimepicker('remove');
         $("#select_date").datetimepicker({
             language: "zh-CN",
+            startDate: begin,
             weekStart:1,  // 星期一作为一周的开始
             startView: start_v,  // 开始视图
             minView: min_v,  // 最小视图
@@ -182,7 +187,9 @@ $(function(){
             $(".select_interval[data-val='year']").click();
         }
         else{}
-        $('#select_date').val(str);
+        if(date){
+            $('#select_date').val(date);
+        }
 
     })();
 

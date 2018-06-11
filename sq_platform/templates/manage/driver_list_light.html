@@ -24,7 +24,7 @@
                 <div class="row driver-list-content">
                 <div class="content_inner">
                     {% for driver in drivers %}
-                        <div data-id="{{ driver._id }}" class="employee">
+                        <div data-id="{{ driver._id }}" onclick="to_driver_detail($(this))" class="employee">
                             <div class="inner">
 
                                 <div class="left">
@@ -33,7 +33,7 @@
 
                                 <div class="right">
                                     <div class="my_row">
-                                        <span class="pull-left color_red">{{ driver.real_name if driver.real_name else driver.official_name }}</span>
+                                        <span class="pull-left color_red driver_name">{{ driver.real_name if driver.real_name else driver.official_name }}</span>
                                         <span class="pull-right">驾龄: {{ driver.driving_experience }}</span>
                                     </div>
                                     <div class="my_row">

@@ -144,7 +144,7 @@ p{
 	background: #fff;
 	color: #999999;
 	width: 6%;
-	height: 100%;
+	height: auto;
 	position: absolute;
 	right: 0;
 }
@@ -416,6 +416,7 @@ p{
 #geren .title-tb{
     padding: 30px 60px;
 }
+
 /*子元素中心对齐*/
 .align_center{
     text-align: center;
@@ -435,4 +436,31 @@ p{
     overflow: hidden;
     color: white;
     background-color: #7C8FF3;
+}
+ .select_interval{
+     margin-left:0.5em;
+     margin-right:0.5em;
+ }
+ .select_interval:hover{
+     cursor: pointer;
+ }
+ .select_interval_action{
+	 background-color: #7CA4FA;
+	 border: 1px solid #7CA4FA;
+     border-radius: 4px;
+	 color: #fff;
+	 padding: 0.1em 0.6em !important;
+ }
+.select_interval_last{
+     margin-right:2em;
+ }
+/*日期选择器*/
+#select_date{
+    width:12em;
+    margin-left: 1em;
+    margin-right: 1em;
+    border-radius: 0.5em;
+    border: 1px solid lightgrey;
+    padding-left:1em;
+    height:1.8em;
 }

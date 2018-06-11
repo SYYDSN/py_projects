@@ -76,7 +76,7 @@ $(function() {
     }
     // 隐藏给定姓/姓名之外的司机
     let hide_other_drivers = function(the_name){
-        let drivers = $(".item_div_outer");
+        let drivers = $(".employee");
         if(typeof(the_name) === "undefined" || $.trim(the_name) === ""){
             drivers.show();
         }else{
@@ -126,8 +126,8 @@ $(function() {
     // 跳转到司机详情页面
     to_driver_detail = function($obj){
         // $obj就是$(this);
-        let user_id = $.trim($obj.parents(".item_div_outer:first").attr("id"));
-        let redirect_url = `${server}/manage/driver_detail?user_id=${user_id}`;
+        let user_id = $obj.attr("data-id");
+        let redirect_url = `${server}/manage/driver?user_id=${user_id}`;
         location.href = redirect_url;
     };
 

@@ -1,7 +1,6 @@
 {% extends "manage/base_template_light.html" %}
 {% block extend_css %}
     <link rel="stylesheet" href="/static/css/manage/data_chart_light.css">
-
 {% endblock %}
 {% block main %}
     <div id="app">
@@ -14,10 +13,6 @@
                         <span class="select_interval" data-val="day">日报表</span>
                         <span class="select_interval select_interval_action" data-val="month">月报表</span>
                         <span class="select_interval select_interval_last" data-val="year">年报表</span>
-                        <!--
-                        <span>  开始时间：<input readonly type="text" id="date_picker" class=""></span>
-                        <span>  结束时间：<input readonly type="text" id="date_picker_end" class=""></span>
-                        -->
                         <label>选择日期</label><input id="select_date" type="text" readonly>
                         <span id="redirect_btn" class="btn btn-primary btn-sm">查 询</span>
                     </div>

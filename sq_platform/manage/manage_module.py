@@ -451,20 +451,22 @@ def index_func():
 @check_platform_session
 def driver_func():
     company_id = get_platform_session_arg("company_id")
-    employees = Company.all_employee(company_id=company_id, can_json=True)
+    employees = Company.get_employee_in_cache(company_id=company_id)
     emp_dict = {x['_id']: x for x in employees}
     if request.method.lower() == "get":
         """司机详情页页"""
         page_title = "司机"
-        cur_user_id = get_arg(request, "cur_user_id", None)
+        cur_user_id = get_arg(request, "user_id", None)
+        page = get_arg(request, "page", None)
         if cur_user_id is None or cur_user_id not in emp_dict:
-            cur_user = employees[0]
+            """用户不存在或者用户不在查看范围内"""
+            return redirect(url_for("manage_blueprint.login_func"))
         else:
-            cur_user = emp_dict[cur_user_id]
-        head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
-
-        return render_template("manage/driver_light.html", page_title=page_title, head_img_url=head_img_url,
-                               cur_user=cur_user, employees=employees)
+            head_img_url = get_platform_session_arg("head_img_url", "static/image/head_img/default_02.png")
+            cur_user = emp_dict[cur_user_id]  # 被查看用户基本资料
+            max_day = mongo_db.last_day_of_month(datetime.datetime.now())
+            return render_template("manage/driver_light.html", page_title=page_title, head_img_url=head_img_url,
+                               cur_user=cur_user, employees=employees, max_day=max_day)
     else:
         return abort(405)
 
