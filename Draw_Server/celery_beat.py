@@ -22,7 +22,7 @@ app.conf.CELERYBEAT_SCHEDULE = {
     #     'task': 'celery_module.do_works',
     #     'schedule': datetime.timedelta(seconds=300)  # 每5分钟检查一次
     # },
-    'add_check_transaction': {  # 增加每周一凌晨5点把交易信息发送excel到指定的邮箱
+    'add_check_transaction': {  # 增加每周一凌晨5点把交易信息发送excel到指定的邮箱,任务取消 2018-6-12
         'task': 'celery_module.send_every_week_excel',
         'schedule': crontab(minute="40", hour="21"),  # 爬虫服务器时区问题。由于时区问题实际是临晨6:10点执行
         'args': (2, 3)
