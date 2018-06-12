@@ -26,7 +26,7 @@
     list-style: none;
     li{
       text-align: center;
-      margin: 0.5em 0.2em;
+      margin: 0.8em 0.2em;
     }
   }
 }
@@ -47,6 +47,7 @@
     padding-left:2em;
     display:flex;
     flex-direction:row;
+    padding-bottom:1em;
     .my_left{
       width:12em;
       display: flex;
@@ -390,15 +391,183 @@
   }
 }
 /*事故统计页面*/
+.acc_count{
+  background-color: #EAEDF4 !important;
+  .filter_row {
+    background-color: #fff;
+    margin-top: 1.2em; /*灰色间隔*/
+    padding: 1em;
+    .my_title{
+      margin-bottom:0.6em;
+    }
+    .filter_zone{
+      margin-bottom:0.6em;
+      .input{
+        width:4em;
+        margin-right:1em;
+        border: 1px solid #adadad;
+        border-radius: 4px;
+        height:95%;
+      }
+      .sep{
+        margin-left:2em;
+        margin-right:0.2em;
+      }
+      .pull_right{
+        float:right;
+        .my_btn_default{
+          border:1px solid #a7a7a7;
+          background-color: #ededed;
+          padding:0.1em 0.2em;
+          border-radius: 4px;
+        }
+        .my_btn_default:hover{
+          border:1px solid #a7a7a7;
+          background-color: #fefefe;
+          cursor: pointer;
+        }
+        .my_btn_primary{
+          margin-left:1em;
+          background-color: #3071a9;
+          border:1px solid #285e8e;
+          color: #e6e6e6;
+          padding:0.1em 1.3em;
+          border-radius: 4px;
+        }
+        .my_btn_primary:hover{
+          background-color: #3a92d6;
+          border:1px solid #357dbc;
+          color:#fff;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .table_row{
+    background-color: #fff;
+    margin-top: 1.2em; /*灰色间隔*/
+    table{
+      width:100%;
+      th, td{
+        text-align: center;
+        white-space: nowrap;
+        word-break: break-all;
+        overflow: hidden;
+        padding: 1.5em 0;
+      }
+      .vio_status{
+        background-color: #3071a9;
+          border:1px solid #285e8e;
+          color: #fff;
+          padding:0.4em 1em;
+          border-radius: 4px;
+      }
+    }
+  }
+  .bottom_row{
+    background-color: #fff;
+    >div{
+      padding: 1em 2em;
+      .pull_right{
+        .filter_row .filter_zone .pull_right;  /*混合*/
+        margin-right: 1em;
+        span{
+          border: 1px solid #d3d3d3;
+          padding: 0.2em 0.4em;
+          border-radius:0.2em;
+        }
+      }
+    }
+  }
+}
 /*违章统计页面*/
 .vio_count{
   background-color: #EAEDF4 !important;
   .filter_row {
     background-color: #fff;
     margin-top: 1.2em; /*灰色间隔*/
+    padding: 1em;
+    .my_title{
+      margin-bottom:0.6em;
+    }
+    .filter_zone{
+      margin-bottom:0.6em;
+      .input{
+        width:4em;
+        margin-right:1em;
+        border: 1px solid #adadad;
+        border-radius: 4px;
+        height:95%;
+      }
+      .sep{
+        margin-left:2em;
+        margin-right:0.2em;
+      }
+      .pull_right{
+        float:right;
+        .my_btn_default{
+          border:1px solid #a7a7a7;
+          background-color: #ededed;
+          padding:0.1em 0.2em;
+          border-radius: 4px;
+        }
+        .my_btn_default:hover{
+          border:1px solid #a7a7a7;
+          background-color: #fefefe;
+          cursor: pointer;
+        }
+        .my_btn_primary{
+          margin-left:1em;
+          background-color: #3071a9;
+          border:1px solid #285e8e;
+          color: #e6e6e6;
+          padding:0.1em 1.3em;
+          border-radius: 4px;
+        }
+        .my_btn_primary:hover{
+          background-color: #3a92d6;
+          border:1px solid #357dbc;
+          color:#fff;
+          cursor: pointer;
+        }
+      }
+    }
   }
   .table_row{
-
+    background-color: #fff;
+    margin-top: 1.2em; /*灰色间隔*/
+    table{
+      width:100%;
+      th, td{
+        text-align: center;
+        white-space: nowrap;
+        word-break: break-all;
+        overflow: hidden;
+        padding: 1.5em 0;
+      }
+      .vio_status{
+        background-color: #3071a9;
+          border:1px solid #285e8e;
+          color: #fff;
+          padding:0.4em 1em;
+          border-radius: 4px;
+      }
+    }
+  }
+  .bottom_row{
+    background-color: #fff;
+    >div{
+      padding: 1em 2em;
+      .pull_right{
+        .filter_row .filter_zone .pull_right;  /*混合*/
+        margin-right: 1em;
+        span{
+          border: 1px solid #d3d3d3;
+          padding: 0.2em 0.4em;
+          border-radius:0.2em;
+        }
+      }
+    }
   }
 }
 /*个人信息子页面*/

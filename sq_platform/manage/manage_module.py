@@ -456,7 +456,7 @@ def driver_func():
     if request.method.lower() == "get":
         """司机详情页页"""
         page_title = "司机"
-        cur_user_id = get_arg(request, "user_id", None)
+        cur_user_id = get_arg(request, "cur_user_id", None)
         page = get_arg(request, "page", None)
         if cur_user_id is None or cur_user_id not in emp_dict:
             """用户不存在或者用户不在查看范围内"""

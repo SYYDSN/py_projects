@@ -2321,6 +2321,30 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
     return res
 
 
+class TransactionItem:
+    """
+    事务操作中的一个步骤
+    """
+    def __init__(self, **kwargs):
+        handlers = ['insert', 'create', 'update', 'edit', 'delete', 'remove']
+        handler = kwargs.pop('handler')
+        if handler is not None and handler in handlers:
+            if handler in ['insert', 'create']:
+                self.handler = 'insert'
+            elif handler in ['update', 'edit']:
+                self.handler = 'update'
+            else:
+                self.handler = 'delete'
+        else:
+            ms = "错误的操作类型:{}".format(handler)
+
+class BaseTransaction:
+    """事务"""
+    _table_name = "base_transaction_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+
+
 if __name__ == "__main__":
     f = "/home/walle/java_error_in_PYCHARM_.log"
     c = open(f, 'rb')

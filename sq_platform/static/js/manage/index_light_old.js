@@ -104,53 +104,59 @@ $("#right_bar_handler .icon-quanbu").click(function(){
 
 // 函数字典，用于最小化全局污染。
 func_dict = {};
-// function get_marker(arg_dict) {
-//     /*
-//     * 获取一个AMap.Marker的实例。
-//     * arg_dict为字典格式的参数。
-//     * marker.setMap(map);
-//     * */
-//     let res = new AMap.Marker({
-//         position: arg_dict === undefined ? [121.504239, 31.239981] : arg_dict['position'],  // 经纬度
-//         image: "/static/image/img_lan.png",
-//         title: arg_dict === undefined ? "name" : arg_dict['position'], // 名字
-//         imageOffset: new AMap.Pixel(0, 0)
-//     });
-//     return res;
-// }
-// func_dict['get_marker'] = get_marker;  // 加入函数集
+function get_marker(arg_dict) {
+    /*
+    * 获取一个AMap.Marker的实例。
+    * arg_dict为字典格式的参数。
+    * marker.setMap(map);
+    * */
+    let res = new AMap.Marker({
+        position: arg_dict === undefined ? [121.504239, 31.239981] : arg_dict['position'],  // 经纬度
+        title: arg_dict === undefined ? "name" : arg_dict['position'], // 名字
+    });
+    return res;
+}
+func_dict['get_marker'] = get_marker;  // 加入函数集
 
 // 为每个自定义标记点增加鼠标事件
 let custom_maker_hover = function(custom_marker_obj){
     // 参数是高德的自定义marker对象.
-    AMap.event.addDomListener(custom_marker_obj, "mouseover", function(e) {
+    AMap.event.addListener(custom_marker_obj, "mouseover", function(e) {
         // 鼠标进入自定义标记点时
         let user_id = this.G.extData;
         console.log("user_id is " + user_id);
-        alert();
-        // let label = $(`#marker_table_${user_id}`);
-        // label.css("display", "block");
-        // label.parents(".amap-marker-label:first").animate({"width": 220}, 200);
-        // let tips_html = '<li><span>暂无相关警示信息</span></li>';
-        // $(".alarm_tips").html(tips_html);
+        let label = $(`#marker_table_${user_id}`);
+        label.css("display", "block");
+        label.parents(".amap-marker-label:first").find("img").css("display", "block");
+        label.parents(".amap-marker-label:first").animate({"width": 220}, 200);
+        let tips_html = '<li><span>暂无相关警示信息</span></li>';
+        $(".alarm_tips").html(tips_html);
+        let cur_img_src = label.parents(".amap-marker-label:first").find("img").attr("src");
+        if (cur_img_src === "./image/head_img/lan.png") {
+            $('.inner_left img').attr("src", "../static/image/icon/anquan.png");
+            $(".inner_left img").attr("class", "anquan_img");
+        } else {
+            $('.inner_left img').attr("src", "../static/image/icon/alarm_big_circle.png");
+            $(".inner_left img").attr("class", "alarm_img");
+        }
     });
 
-        // AMap.event.addListener(custom_marker_obj, "mouseout", function(e){
-        //     // 鼠标移动出自定义标记点时
-        // let user_id = this.G.extData;
-        // // console.log("user_id is "+user_id);
-        // let label = $(`#marker_table_${user_id}`);
-        // setTimeout(function(){
-        //     label.css("display","none");
-        //     label.parents(".amap-marker-label:first").find("img").css("display","none");
-        // }, 200);
-        // label.parents(".amap-marker-label:first").animate({"width":0},200);
-        // let tips_html = '<li><span>沪宁高速路口有交通事故发生</span></li>' + '<li><span>心率偏高危险</span></li>' + '<li><span>前方有事故请绕道行驶，注意安全。</span></li>' + '<li><span>司机已长时间驾驶，注意休息。</span></li>';
-        // $(".alarm_tips").html(tips_html);
-        // $('.inner_left img').attr("src", "../static/image/icon/alarm_big_circle.png");
-        // $(".inner_left img").attr("class", "alarm_img");
+        AMap.event.addListener(custom_marker_obj, "mouseout", function(e){
+            // 鼠标移动出自定义标记点时
+        let user_id = this.G.extData;
+        // console.log("user_id is "+user_id);
+        let label = $(`#marker_table_${user_id}`);
+        setTimeout(function(){
+            label.css("display","none");
+            label.parents(".amap-marker-label:first").find("img").css("display","none");
+        }, 200);
+        label.parents(".amap-marker-label:first").animate({"width":0},200);
+        let tips_html = '<li><span>沪宁高速路口有交通事故发生</span></li>' + '<li><span>心率偏高危险</span></li>' + '<li><span>前方有事故请绕道行驶，注意安全。</span></li>' + '<li><span>司机已长时间驾驶，注意休息。</span></li>';
+        $(".alarm_tips").html(tips_html);
+        $('.inner_left img').attr("src", "../static/image/icon/alarm_big_circle.png");
+        $(".inner_left img").attr("class", "alarm_img");
 
-    // });
+    });
 };
 func_dict['custom_maker_hover'] = custom_maker_hover;  // 加入函数集
 
@@ -184,28 +190,30 @@ AMapUI.loadUI(['overlay/AwesomeMarker'], function (AwesomeMarker) {
         let security_score = typeof(arg_dict['security_score']) === "undefined"? 80 : arg_dict['security_score'] ;
         let time = typeof(arg_dict['time']) === "undefined"? '' : arg_dict['time'] ;
 
-        let icon_img = "/static/image/img_lan.png";
+        let icon_img = [
+            "/static/image/head_img/lan.png",
+            "/static/image/head_img/hong.png",
+        ];
         let cur_user_id = arg_dict['user_id'];
-        let head_url = arg_dict['head_img_url']?`/${arg_dict['head_img_url']}`: "/static/image/head_img/default.png";
-        // let html = `<div><img class="circle_outer" src="${icon_img}"><img class="circle_inner" src="${head_url}"></div>`;
-        let html = `<div><img class="circle_outer" src="${icon_img}"></div>`;
         let custom_marker = new AMap.Marker({
             map: map,
             position: arg_dict === undefined ? [121.504239, 31.239981] : arg_dict['loc'],
             extData: cur_user_id,
-            content: html
-            // icon: new AMap.Icon({
-            //     size: new AMap.Size(46, 64),  // 图标大小
-            //     image: `<div><img href="${icon_img}"></div>`           // 外面蓝色的环
-            // })
+            icon: new AMap.Icon({
+                size: new AMap.Size(46, 64),  // 图标大小
+                image: icon_img[0]            // 都是蓝色的图标
+            })
         });
 
+
+        let imgs = ["/static/image/head_img/zMsb-fximeyv2774914.jpg","/static/image/head_img/2015111093556890.jpg","/static/image/head_img/2014092116375761ad6.jpg","/static/image/head_img/16080904183524.jpg","/static/image/head_img/16072910584233.jpg"];
+        let num = parseInt(Math.random() * imgs.length);
         let content=[];
         content.push(`<ul id='marker_table_${cur_user_id}'><li><span>姓名</span>
                       <span>${real_name}</span></li><li><span>部门</span>
                       <span>华新分拨公司</span></li><li><span>电话</span>
                       <span>${arg_dict.phone_num}</span></li></ul>
-                      `);
+                      <img src="${imgs[num]}">`);
         // 图片图标，由于这个图片方向性太强，实用需要同时选择图标，比较复杂，稍后再处理。
         // track_content = "<img class='img' src='/static/image/icon/normal_truck.png'/>";
         // obj.setContent(track_content);   // 设置定义点样式。

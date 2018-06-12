@@ -127,7 +127,7 @@ $(function() {
     to_driver_detail = function($obj){
         // $obj就是$(this);
         let user_id = $obj.attr("data-id");
-        let redirect_url = `${server}/manage/driver?user_id=${user_id}`;
+        let redirect_url = `${server}/manage/driver?cur_user_id=${user_id}`;
         location.href = redirect_url;
     };
 

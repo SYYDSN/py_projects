@@ -801,3 +801,19 @@ hr{
   transition: opacity .5s linear;
   z-index: 0;
 }
+/*自定义标记点样式*/
+.circle_inner{
+    position: absolute;
+    width:45px;
+    height:45px;
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 99;
+    left:2px;
+    top:3px;
+}
+.circle_outer{
+    position: absolute;
+    width:49px;
+    height:59px;
+}
