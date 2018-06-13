@@ -805,15 +805,38 @@ hr{
 .circle_inner{
     position: absolute;
     width:45px;
-    height:45px;
+    height:44px;
     border-radius: 50%;
     overflow: hidden;
     z-index: 99;
     left:2px;
-    top:3px;
+    top:2px;
 }
 .circle_outer{
     position: absolute;
+    top:0;
+    left:0;
     width:49px;
-    height:59px;
+    height:55px;
+    z-index: 98;
+}
+.float_right{
+    position: absolute;
+    display: none;
+    top:0;
+    left:0px;
+    background-color: #fff;
+    font-size: 12px;
+    width: 177px;
+    height: 48px;
+    z-index: 97;
+    border-radius: 45px;
+    padding:1px 1px;
+}
+.float_right > table{
+    position: absolute;
+    border:none;
+    width: 120px;
+    top:0;
+    right:0;
 }

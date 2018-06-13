@@ -1,0 +1,11 @@
+// this is a example
+digraph {
+	A [label="步骤1" fontname="SimSun Microsoft YaHei" id=No1 text="我是说明"]
+	B [label="步骤2" color=red shape=star]
+	C [label="步骤3"]
+	D [label="步骤4"]
+	A -> B
+	A -> C
+	C -> D [label="判断" constraint=true]
+	D -> A [label="递归" constraint=true]
+}

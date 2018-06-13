@@ -2,6 +2,7 @@
 import logging
 import datetime
 import os
+import hashlib
 import logging.handlers
 
 """日志模块"""

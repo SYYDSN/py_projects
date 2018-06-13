@@ -123,36 +123,61 @@ func_dict = {};
 // 为每个自定义标记点增加鼠标事件
 let custom_maker_hover = function(custom_marker_obj){
     // 参数是高德的自定义marker对象.
-    AMap.event.addDomListener(custom_marker_obj, "mouseover", function(e) {
+    AMap.event.addListener(custom_marker_obj, "mouseover", function(e) {
         // 鼠标进入自定义标记点时
         let user_id = this.G.extData;
         console.log("user_id is " + user_id);
-        alert();
-        // let label = $(`#marker_table_${user_id}`);
-        // label.css("display", "block");
-        // label.parents(".amap-marker-label:first").animate({"width": 220}, 200);
-        // let tips_html = '<li><span>暂无相关警示信息</span></li>';
-        // $(".alarm_tips").html(tips_html);
+        let label = $(`#marker_table_${user_id}`);
+        label.css("display", "block");
+        label.parents(".amap-marker-label:first").find("img").css("display", "block");
+        label.parents(".amap-marker-label:first").animate({"width": 220}, 200);
+        let tips_html = '<li><span>暂无相关警示信息</span></li>';
+        $(".alarm_tips").html(tips_html);
+        let cur_img_src = label.parents(".amap-marker-label:first").find("img").attr("src");
+        if (cur_img_src === "./image/head_img/lan.png") {
+            $('.inner_left img').attr("src", "../static/image/icon/anquan.png");
+            $(".inner_left img").attr("class", "anquan_img");
+        } else {
+            $('.inner_left img').attr("src", "../static/image/icon/alarm_big_circle.png");
+            $(".inner_left img").attr("class", "alarm_img");
+        }
     });
 
-        // AMap.event.addListener(custom_marker_obj, "mouseout", function(e){
-        //     // 鼠标移动出自定义标记点时
-        // let user_id = this.G.extData;
-        // // console.log("user_id is "+user_id);
-        // let label = $(`#marker_table_${user_id}`);
-        // setTimeout(function(){
-        //     label.css("display","none");
-        //     label.parents(".amap-marker-label:first").find("img").css("display","none");
-        // }, 200);
-        // label.parents(".amap-marker-label:first").animate({"width":0},200);
-        // let tips_html = '<li><span>沪宁高速路口有交通事故发生</span></li>' + '<li><span>心率偏高危险</span></li>' + '<li><span>前方有事故请绕道行驶，注意安全。</span></li>' + '<li><span>司机已长时间驾驶，注意休息。</span></li>';
-        // $(".alarm_tips").html(tips_html);
-        // $('.inner_left img').attr("src", "../static/image/icon/alarm_big_circle.png");
-        // $(".inner_left img").attr("class", "alarm_img");
+        AMap.event.addListener(custom_marker_obj, "mouseout", function(e){
+            // 鼠标移动出自定义标记点时
+        let user_id = this.G.extData;
+        // console.log("user_id is "+user_id);
+        let label = $(`#marker_table_${user_id}`);
+        setTimeout(function(){
+            label.css("display","none");
+            label.parents(".amap-marker-label:first").find("img").css("display","none");
+        }, 200);
+        label.parents(".amap-marker-label:first").animate({"width":0},200);
+        let tips_html = '<li><span>沪宁高速路口有交通事故发生</span></li>' + '<li><span>心率偏高危险</span></li>' + '<li><span>前方有事故请绕道行驶，注意安全。</span></li>' + '<li><span>司机已长时间驾驶，注意休息。</span></li>';
+        $(".alarm_tips").html(tips_html);
+        $('.inner_left img').attr("src", "../static/image/icon/alarm_big_circle.png");
+        $(".inner_left img").attr("class", "alarm_img");
 
-    // });
+    });
 };
+
 func_dict['custom_maker_hover'] = custom_maker_hover;  // 加入函数集
+
+marker_mouseover = function(arg){
+    // 这个arg是用户id
+    let str = "#marker_table_" + arg;
+    console.log(str);
+    let ul = $(str);
+    ul.show();
+};
+
+marker_mouseout = function(arg){
+    // 这个arg是用户id
+    let str = "#marker_table_" + arg;
+    console.log(str);
+    let ul = $(str);
+    ul.hide();
+};
 
 // 初始化ui库
 initAMapUI();
@@ -184,38 +209,55 @@ AMapUI.loadUI(['overlay/AwesomeMarker'], function (AwesomeMarker) {
         let security_score = typeof(arg_dict['security_score']) === "undefined"? 80 : arg_dict['security_score'] ;
         let time = typeof(arg_dict['time']) === "undefined"? '' : arg_dict['time'] ;
 
-        let icon_img = "/static/image/img_lan.png";
+        let icon_img = [
+            "/static/image/head_img/lan.png",
+            "/static/image/head_img/hong.png",
+        ];
         let cur_user_id = arg_dict['user_id'];
         let head_url = arg_dict['head_img_url']?`/${arg_dict['head_img_url']}`: "/static/image/head_img/default.png";
-        // let html = `<div><img class="circle_outer" src="${icon_img}"><img class="circle_inner" src="${head_url}"></div>`;
-        let html = `<div><img class="circle_outer" src="${icon_img}"></div>`;
+        let html = `
+                    <div onmouseover="marker_mouseover('${user_id}')" onmouseout="marker_mouseout('${user_id}')">
+                        <img class="circle_outer" src="/static/image/img_lan.png">
+                        <img class="circle_inner" src="${head_url}">
+                    </div>
+                    <div class="float_right" id='marker_table_${user_id}'>
+                        <table>
+                            <tr><td>姓名</td><td>${real_name}</td></tr>
+                            <tr><td>部门</td><td>华新分拨中心</td></tr>
+                            <tr><td>电话</td><td>${arg_dict['phone_num']}</td></tr>
+                        </table>
+                    </div>`;
+        // let html = `<div><img class="circle_outer" src="${icon_img[0]}"></div>`;
         let custom_marker = new AMap.Marker({
             map: map,
             position: arg_dict === undefined ? [121.504239, 31.239981] : arg_dict['loc'],
             extData: cur_user_id,
-            content: html
+            content:html
             // icon: new AMap.Icon({
             //     size: new AMap.Size(46, 64),  // 图标大小
-            //     image: `<div><img href="${icon_img}"></div>`           // 外面蓝色的环
+            //     image: icon_img[0]            // 都是蓝色的图标
             // })
         });
 
-        let content=[];
-        content.push(`<ul id='marker_table_${cur_user_id}'><li><span>姓名</span>
-                      <span>${real_name}</span></li><li><span>部门</span>
-                      <span>华新分拨公司</span></li><li><span>电话</span>
-                      <span>${arg_dict.phone_num}</span></li></ul>
-                      `);
-        // 图片图标，由于这个图片方向性太强，实用需要同时选择图标，比较复杂，稍后再处理。
-        // track_content = "<img class='img' src='/static/image/icon/normal_truck.png'/>";
-        // obj.setContent(track_content);   // 设置定义点样式。
-        // 设置label，也就是自定义点的信息框体
-        custom_marker.setLabel({
-            offset: new AMap.Pixel(-1, -2),  // 调整偏移量
-            isCustom: true,
-            content: content
-        });
-        custom_maker_hover(custom_marker);
+
+        // let imgs = ["/static/image/head_img/zMsb-fximeyv2774914.jpg","/static/image/head_img/2015111093556890.jpg","/static/image/head_img/2014092116375761ad6.jpg","/static/image/head_img/16080904183524.jpg","/static/image/head_img/16072910584233.jpg"];
+        // let num = parseInt(Math.random() * imgs.length);
+        // let content=[];
+        // content.push(`<ul id='marker_table_${cur_user_id}'><li><span>姓名</span>
+        //               <span>${real_name}</span></li><li><span>部门</span>
+        //               <span>华新分拨公司</span></li><li><span>电话</span>
+        //               <span>${arg_dict.phone_num}</span></li></ul>
+        //               <img src="${imgs[num]}">`);
+        // // 图片图标，由于这个图片方向性太强，实用需要同时选择图标，比较复杂，稍后再处理。
+        // // track_content = "<img class='img' src='/static/image/icon/normal_truck.png'/>";
+        // // obj.setContent(track_content);   // 设置定义点样式。
+        // // 设置label，也就是自定义点的信息框体
+        // custom_marker.setLabel({
+        //     offset: new AMap.Pixel(-1, -2),  // 调整偏移量
+        //     isCustom: true,
+        //     content: content
+        // });
+        // custom_maker_hover(custom_marker);
         custom_marker.setMap(map);
         return custom_marker;
     };

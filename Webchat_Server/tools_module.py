@@ -406,6 +406,31 @@ def expand_list(set_list: (list, tuple)) -> list:
     return res
 
 
+def validate_token(timestamp: str, nonce: str, signature: str) -> bool:
+    """
+    验证微信服务器的的配置
+    :param timestamp:时间戳
+    :param nonce: 随机数
+    :param signature:微信加密签名
+    :return: bool
+    """
+    res = False
+    token = "0cceb6c6157747dcab9791569418799a"
+    if isinstance(timestamp, str) and isinstance(nonce, str) and isinstance(signature, str):
+        l = [token, timestamp, nonce]
+        l.sort()
+        s = "".join(l)
+        sha = hashlib.sha1(s.encode(encoding="utf-8"))
+        sha = sha.hexdigest()
+        if sha == signature:
+            res = True
+        else:
+            pass
+    else:
+        pass
+    return res
+
+
 if __name__ == "__main__":
         pass
 

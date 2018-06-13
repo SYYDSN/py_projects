@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import abort
 from flask import request
 from flask import session
 from flask_session import Session
@@ -30,8 +31,21 @@ def hello_world():
 @app.route("/message", methods=['post', 'get'])
 def message_func():
     """接收微信发来的消息"""
-    mes = {"message": "success"}
-    return json.dumps(mes)
+    if request.method.lower() == "get":
+        """验证微信服务器的配置"""
+        signature = get_arg(request, "signature")
+        t_stamp = get_arg(request, "timestamp")
+        nonce = get_arg(request, "nonce")
+        echostr = get_arg(request, "echostr")
+        if validate_token(timestamp=t_stamp, nonce=nonce, signature=signature):
+            return echostr
+        else:
+            return abort(403)
+    elif request.method.lower() == "post":
+        mes = {"message": "success"}
+        return json.dumps(mes)
+    else:
+        return abort(405)
 
 
 @app.before_request

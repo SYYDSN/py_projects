@@ -293,7 +293,7 @@ if __name__ == "__main__":
     """测试获取违章查询器列表"""
     # test_get_vio_query_shortcuts()
     """测试违章查询"""
-    # test_query_violation()
+    test_query_violation()
     """测试获取用户行车证信息"""
     # test_get_car_license()
     """测试用户上传行车证图片"""
@@ -317,13 +317,13 @@ if __name__ == "__main__":
     """测试获取安全报告历史"""
     # test_get_safety_report_history()
     """测试gps上传"""
-    import time, random
-    for x in range(5):
-        d = {
-            "longitude": random.randint(0, 10) / 1000,
-            "latitude": random.randint(0, 10) / 1000
-        }
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        test_gps_push(now, d)
-        time.sleep(6)
+    # import time, random
+    # for x in range(5):
+    #     d = {
+    #         "longitude": random.randint(0, 10) / 1000,
+    #         "latitude": random.randint(0, 10) / 1000
+    #     }
+    #     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #     test_gps_push(now, d)
+    #     time.sleep(6)
     pass
