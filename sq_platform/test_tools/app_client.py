@@ -94,8 +94,9 @@ def test_query_violation():
     # auth_token = "47a55e628931458fb70773badbe063ba"  # app段登录标识 me
     headers = {"auth_token": auth_token}
     args = {"_id": "5af95af2e39a7b5b754c4efe"}   # 查询器id
+    args = {"_id": ""}   # 查询器id
     url = "http://safego.org:5000/api/query_violation"
-    url = "http://127.0.0.1:5000/api/query_violation"
+    # url = "http://127.0.0.1:5000/api/query_violation"
     res = requests.post(url, data=args, headers=headers)
     print(res.json())
 

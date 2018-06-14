@@ -252,7 +252,7 @@ def query_relation(mt4_account: str = None, customer_name: str = None) -> dict:
             res = val
         else:
             """缓存里没有,就从数据库查询"""
-            f = {"mt4_account": mt4_account}
+            f = {"mt4_account": str(mt4_account)}
             val = query_relation_from_db(f)
             if len(val) == 0:
                 val = {

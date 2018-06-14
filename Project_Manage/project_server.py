@@ -15,6 +15,7 @@ from module.online_module import MonthActive
 import json
 from json import JSONDecodeError
 from module.user_module import *
+from module.graph_module import *
 from module.project_module import *
 from mongo_db import get_datetime_from_str
 from tools_module import *
@@ -108,6 +109,7 @@ def login_func():
             save_dict = mes['data']
             save_dict['user_name'] = user_name
             save_dict['user_password'] = user_password
+            save_dict['user_id'] = mes['data']['_id']
             save_dict['allow_view'] = mes['data']['allow_view']
             save_dict['allow_edit'] = mes['data']['allow_edit']
             save_platform_session(**save_dict)
@@ -150,6 +152,51 @@ def online_report_func():
         else:
             """查询个人的上线情况,目前没实现"""
             return abort(404)
+
+
+@app.route("/flow_chart", methods=['post', 'get'])
+@check_platform_session
+def flow_chart_func():
+    """流程图页面"""
+    user_id = get_platform_session_arg("user_id")
+    if request.method.lower() == "get":
+        digraph_list = MyDigraph.find_plus(filter_dict=dict(), to_dict=True)
+        _id = get_arg(request, "did", "")
+        digraph = dict()
+        img = ''
+        if len(_id) == 24:
+            _id = ObjectId(_id)
+            digraph = digraph_list['_id']
+            img = digraph['image']
+        return render_template("flow_chart.html", digraph=digraph)
+    elif request.method.lower() == "post":
+        mes = {"message": "success"}
+        init = json.loads(get_arg(request, "init", "{}"))
+        the_class = get_arg(request, "class", None)
+        the_type = get_arg(request, "type", None)
+        if the_type not in ['save', 'delete']:
+            mes['message'] = "不支持的操作:{}".format(the_type)
+        else:
+            if the_class == "digraph":
+                """对图的操作"""
+                init['owner'] = user_id
+                if the_type == "save":
+                    """添加/编辑图"""
+                    digraph = MyDigraph(**init)
+                    r = digraph.save_plus(upsert=True)
+                    if isinstance(r, ObjectId):
+                        mes['_id'] = str(r)
+                    else:
+                        mes['message'] = "保存失败"
+            elif the_class == "edge":
+                """对弧的操作"""
+            elif the_class == "node":
+                """对节点的操作"""
+            else:
+                mes['message'] = '错误的对象类型:{}'.format(the_class)
+        return json.dumps(mes)
+    else:
+        return abort(405)
 
 
 @app.route("/manage_<key1>/<key2>", methods=['post', 'get'])

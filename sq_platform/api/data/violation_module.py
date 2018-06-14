@@ -721,7 +721,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
     type_dict["_id"] = ObjectId  # id 唯一
     type_dict['user_id'] = DBRef  # 关联用户的id
     type_dict['car_license'] = DBRef  # 关联的行车证（上的有关信息）
-    type_dict['city'] = str  # 查询的城市  聚合数据不需要这个字段
+    type_dict['city'] = str  # 查询的城市  聚合数据接口不需要这个字段
     type_dict['create_date'] = datetime.datetime  # 查询器的创建时间
     type_dict['prev_date'] = datetime.datetime  # 查询器的上一次使用时间(从网络)
     type_dict['prev_date_local'] = datetime.datetime  # 查询器的上一次使用时间(从本地数据库)
@@ -957,7 +957,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         return res
 
     @classmethod
-    def generator_list(cls, user_id):
+    def generator_list(cls, user_id: (str, ObjectId)):
         """
         查询用户名下所有的查询器,现阶段,利用用户车牌信息和去过的城市(ThroughCity类的实例)
         来自动组合生成违章查询器.
@@ -1302,130 +1302,155 @@ class VioQueryGenerator(mongo_db.BaseDoc):
         :return: 可json化的字典/如果
         """
         message = {"message": "success"}
-        object_id = mongo_db.get_obj_id(object_id)
-        generator = cls.find_by_id(object_id)
-        if generator is None:
-            message['message'] = "错误的查询器id"
+        user_id = mongo_db.get_obj_id(user_id)
+        user_dbref = DBRef(database=mongo_db.db_name, collection=User.get_table_name(), id=user_id)
+        f = {"user_id": user_dbref}
+        if isinstance(object_id, ObjectId):
+            f['_id'] = object_id
+        elif isinstance(object_id, str) and len(object_id) == 24:
+            object_id = mongo_db.get_obj_id(object_id)
+            f['_id'] = object_id
         else:
-            user_id = mongo_db.get_obj_id(user_id)
-            user_dbref = generator.get_attr("user_id")
-
-            check_user_id = False if user_dbref is None else user_id == user_dbref.id
-            # check_user_id = 1
-            if check_user_id:
-                """检查此查询器是否和用户身份吻合"""
-                now = datetime.datetime.now()
-                try:
-                    prev_date = generator.get_attr("prev_date")  # 取上一次从互联网查询的时间,和现在的时间比较
-                    """
-                    如果prev_date是None,那就是没用过的的新查询器.直接就从互联网查了.
-                    interval_time = interval_seconds + 1 是为了创造大于interval_seconds的条件
-                    """
-                    if prev_date is None:
-                        interval_time = interval_seconds + 1
-                    else:
-                        interval_time = (now - prev_date).total_seconds()
-                    """检查查询的时间间隔"""
-                    # interval_time = 9999999999  # 调试时打开
-                    flag = False
-                    last_query_result_id = generator.get_attr("last_query_result_id")
-                    if last_query_result_id is None:
-                        result_obj = None
-                    else:
-                        """上一次查询记录"""
-                        result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
-                    """开始判断是否可以从互联网查询?"""
-                    if last_query_result_id is None:
-                        flag = True
-                    elif result_obj is None:
-                        """上一次查询记录被删除或者丢失了，那就从互联网查询一下"""
-                        flag = True
-                    elif interval_time > interval_seconds:
-                        """间隔大一天就从互联网读"""
-                        flag = True
-                        # if result_obj is None:
-                        #
-                        #     message = cls.query(object_id)
-                        # else:
-                        #     res = result_obj.read()
-                        #     message['data'] = res
-                        #     generator.update_count_offline()
-                    else:
-                        """检查是否出发查询次数限制?现在的限制是一个查询器一天只能从网络查一次"""
-                        today_online_query_count = generator.get_attr("today_online_query_count", 0)
-                        flag = True if today_online_query_count < 1 else False
-                    # flag = True  # 调试时打开
-                    if flag:
-                        """可以从互联网查询"""
-                        message = cls.query(object_id)
-                    else:
-                        """触发查询次数限制后从本地取"""
-                        last_query_result_id = generator.last_query_result_id
-                        result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
-                        res = result_obj.read()
-                        message['data'] = res
-                        generator.update_count_offline()
-                except AttributeError as e:
-                    print(e)
-                    ms = "Error! case:{}, args:{}".format(e, str({"object_id": object_id}))
-                    logger.exception(ms, exc_info=True, stack_info=True)
-                    message = pack_message(message, 3008, object_id=object_id)
-                except Exception as e:
-                    print(e)
-                    ms = "Error! reason:{},args:{}".format(e, str({"object_id": object_id}))
-                    logger.exception(ms, exc_info=True, stack_info=True)
-                    message = pack_message(message, 5000, object_id=object_id)
-                finally:
-                    """
-                    返回的message.error_code的值:
-                    1. 如果是int,类型的.而且大于1000的,那就是包装过的.
-                    2. 如果是int类型的,小于1000的,那就是服务器返回的错误码
-                    3. 过是str类型的,那就是违章查询接口返回的错误码
-                    """
-                    error_code = message.get("error_code")
-                    if error_code is None or error_code == 0:
-                        """正常的返回.没有错误信息"""
+            pass
+        generator = cls.find_one_plus(filter_dict=f, instance=True)
+        if generator is None:
+            l = cls.generator_list(user_id=user_id)
+            if len(l) == 0:
+                pass
+            else:
+                generator = cls(**l[0])
+        else:
+            pass
+        if generator is None:
+            data = {
+                "amount": 0,
+                "total_fine": 0,
+                "total_points": 0,
+                "untreated": 0,
+                "plate_number": "",
+                "violations": []
+            }
+            message['data'] = data
+        else:
+            object_id = object_id if object_id else generator.get_id()
+            """有对应的查询器"""
+            now = datetime.datetime.now()
+            try:
+                prev_date = generator.get_attr("prev_date")  # 取上一次从互联网查询的时间,和现在的时间比较
+                """
+                如果prev_date是None,那就是没用过的的新查询器.直接就从互联网查了.
+                interval_time = interval_seconds + 1 是为了创造大于interval_seconds的条件
+                """
+                if prev_date is None:
+                    interval_time = interval_seconds + 1
+                else:
+                    interval_time = (now - prev_date).total_seconds()
+                """检查查询的时间间隔"""
+                # interval_time = 9999999999  # 调试时打开
+                flag = False
+                last_query_result_id = generator.get_attr("last_query_result_id")
+                if last_query_result_id is None:
+                    result_obj = None
+                else:
+                    """上一次查询记录"""
+                    result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
+                """开始判断是否可以从互联网查询?"""
+                if last_query_result_id is None:
+                    flag = True
+                elif result_obj is None:
+                    """上一次查询记录被删除或者丢失了，那就从互联网查询一下"""
+                    flag = True
+                elif interval_time > interval_seconds:
+                    """间隔大一天就从互联网读"""
+                    flag = True
+                    # if result_obj is None:
+                    #
+                    #     message = cls.query(object_id)
+                    # else:
+                    #     res = result_obj.read()
+                    #     message['data'] = res
+                    #     generator.update_count_offline()
+                else:
+                    """检查是否出发查询次数限制?现在的限制是一个查询器一天只能从网络查一次"""
+                    today_online_query_count = generator.get_attr("today_online_query_count", 0)
+                    flag = True if today_online_query_count < 1 else False
+                # flag = True  # 调试时打开
+                if flag:
+                    """可以从互联网查询"""
+                    message = cls.query(object_id)
+                else:
+                    """触发查询次数限制后从本地取"""
+                    last_query_result_id = generator.last_query_result_id
+                    result_obj = ViolationQueryResult.find_by_id(last_query_result_id)
+                    res = result_obj.read()
+                    message['data'] = res
+                    generator.update_count_offline()
+            except AttributeError as e:
+                print(e)
+                ms = "Error! case:{}, args:{}".format(e, str({"object_id": object_id}))
+                logger.exception(ms, exc_info=True, stack_info=True)
+                message = pack_message(message, 3008, object_id=object_id)
+            except Exception as e:
+                print(e)
+                ms = "Error! reason:{},args:{}".format(e, str({"object_id": object_id}))
+                logger.exception(ms, exc_info=True, stack_info=True)
+                message = pack_message(message, 5000, object_id=object_id)
+            finally:
+                """
+                返回的message.error_code的值:
+                1. 如果是int,类型的.而且大于1000的,那就是包装过的.
+                2. 如果是int类型的,小于1000的,那就是服务器返回的错误码
+                3. 过是str类型的,那就是违章查询接口返回的错误码
+                """
+                error_code = message.get("error_code")
+                if error_code is None or error_code == 0:
+                    """正常的返回.没有错误信息,"""
+                    if "plate_number" in message['data']:
                         pass
                     else:
-                        ms = "查询违章接口发生错误error_code类型出错,error_code:{}".format(error_code)
-                        print(ms)
-                        city = generator.get_attr("city")
-                        logger.exception(msg=ms, stack_info=True, exc_info=True)
-                        error_code = int(error_code)
-                        if isinstance(error_code, int) and error_code >= 1000:
-                            """包装过的message"""
-                            pass
-                        elif isinstance(error_code, int) and error_code < 1000:
-                            """
-                            违章查询接口返回了错误的状态码
-                            """
-                            desc = "服务器返回了错误的状态码:{}".format(error_code)
-                            ms = "{}, 查询器id:{}".format(desc, object_id)
-                            logger.exception(ms)
-                            message = pack_message(message, 7001, desc=desc, city=city)
+                        data = message['data']
+                        q = generator.get_query_args()
+                        plate_number = q['plate_number'] if 'plate_number' in q else ""
+                        data['plate_number'] = plate_number
+                        message['data'] = data
+                else:
+                    ms = "查询违章接口发生错误error_code类型出错,error_code:{}".format(error_code)
+                    print(ms)
+                    city = generator.get_attr("city")
+                    logger.exception(msg=ms, stack_info=True, exc_info=True)
+                    error_code = int(error_code)
+                    if isinstance(error_code, int) and error_code >= 1000:
+                        """包装过的message"""
+                        pass
+                    elif isinstance(error_code, int) and error_code < 1000:
+                        """
+                        违章查询接口返回了错误的状态码
+                        """
+                        desc = "服务器返回了错误的状态码:{}".format(error_code)
+                        ms = "{}, 查询器id:{}".format(desc, object_id)
+                        logger.exception(ms)
+                        message = pack_message(message, 7001, desc=desc, city=city)
+                    else:
+                        error_map = {
+                            "1000": "系统异常",
+                            "1001": "请求参数错误",
+                            "1003": "违章查询请求参数错误",
+                            "1012": "API接口调用过于频繁",
+                            "1013": "查询失败	交管接口网络异常",
+                            "1014": "查询中，请稍后再试",
+                            "1015": "官方接口维护中",
+                            "1016": "该接口不支持异地车牌查询",
+                            "1020": "车辆信息错误",
+                            "1021": "发动机号错误",
+                            "1022": "车架号错误",
+                            "1030": "车牌格式错误",
+                            "1031": "该城市暂未开通",
+                            "1032": "车架号或发动机号位数错误"}
+                        if error_code in error_map:
+                            desc = error_map[error_code]
                         else:
-                            error_map = {
-                                "1000": "系统异常",
-                                "1001": "请求参数错误",
-                                "1003": "违章查询请求参数错误",
-                                "1012": "API接口调用过于频繁",
-                                "1013": "查询失败	交管接口网络异常",
-                                "1014": "查询中，请稍后再试",
-                                "1015": "官方接口维护中",
-                                "1016": "该接口不支持异地车牌查询",
-                                "1020": "车辆信息错误",
-                                "1021": "发动机号错误",
-                                "1022": "车架号错误",
-                                "1030": "车牌格式错误",
-                                "1031": "该城市暂未开通",
-                                "1032": "车架号或发动机号位数错误"}
-                            if error_code in error_map:
-                                desc = error_map[error_code]
-                            else:
-                                desc = "服务器返回了未识别的错误提示--error_code:{}".format(error_code)
-                            message = pack_message(message, 7002, desc=desc, city=city)
-            else:
-                message = pack_message(message, 3011, user_id=str(user_id), generator_id=str(object_id))
+                            desc = "服务器返回了未识别的错误提示--error_code:{}".format(error_code)
+                        message = pack_message(message, 7002, desc=desc, city=city)
         return message
 
     @classmethod

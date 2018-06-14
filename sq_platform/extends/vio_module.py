@@ -691,6 +691,7 @@ class TrafficViolationHandler:
                         temp = {k: v for k, v in temp.items()}
                         violations.append(temp)
                     data['amount'] = amount
+                    data['plate_number'] = plate_number
                     data['untreated'] = untreated
                     data['total_fine'] = total_fine
                     data['total_points'] = total_points

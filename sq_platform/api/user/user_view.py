@@ -439,29 +439,27 @@ def get_vio_query_shortcuts(user_id):
 
 @api_user_blueprint.route("/query_violation", methods=['post', 'get'])
 @login_required_app
-@log_request_args
 def query_violation(user_id):
     """查询违章记录"""
     message = {"message": "success"}
-    args = get_args(request)
     """记录违章查询参数"""
-    if args is None:
-        message = pack_message(message, 3000, args=args)
+    generator_id = get_arg(request, "_id", "")  # 查询器id
+    if isinstance(generator_id, str) and len(generator_id) == 24:
+        generator_id = ObjectId(generator_id)
     else:
-        generator_id = args["_id"]  # 查询器id
-        try:
-            message = violation_module.VioQueryGenerator.get_prev_query_result(user_id, generator_id)
-        except Exception as e:
-            message = pack_message(None, 5000, **{"user_id": user_id, "generator_id": generator_id})
-            ms = "Server Error: args:user_id={},generator_id={}".format(user_id, generator_id)
-            logger.exception(ms, exc_info=True, stack_info=True)
-            print(e)
-        finally:
-            pass
-    ms = "违章查询的结果是:{}".format(message)
-    logger.info(ms)
-    print(ms)
-    return json.dumps(message)
+        generator_id = None
+    try:
+        message = violation_module.VioQueryGenerator.get_prev_query_result(user_id, generator_id)
+    except Exception as e:
+        message = pack_message(None, 5000, **{"user_id": user_id, "generator_id": generator_id})
+        ms = "Server Error: args:user_id={},generator_id={}".format(user_id, generator_id)
+        logger.exception(ms, exc_info=True, stack_info=True)
+        print(e)
+    finally:
+        ms = "违章查询的结果是:{}".format(message)
+        logger.info(ms)
+        print(ms)
+        return json.dumps(message)
 
 
 @api_user_blueprint.route("/<key>_license_info", methods=['post'])
