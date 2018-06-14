@@ -18,6 +18,7 @@ from module.user_module import *
 from module.graph_module import *
 from module.project_module import *
 from mongo_db import get_datetime_from_str
+import pyquery
 from tools_module import *
 import calendar
 import os
@@ -162,19 +163,38 @@ def flow_chart_func():
     if request.method.lower() == "get":
         digraph_list = MyDigraph.find_plus(filter_dict=dict(), to_dict=True)
         _id = get_arg(request, "did", "")
-        digraph = dict()
-        img = ''
+        node_dict = dict()
+        edge_dict = dict()
         if len(_id) == 24:
-            _id = ObjectId(_id)
-            digraph = digraph_list['_id']
-            img = digraph['image']
-        return render_template("flow_chart.html", digraph=digraph)
+            for x in digraph_list:
+                if str(x['_id']) == _id:
+                    digraph = x
+                    digraph['_id'] = _id
+                    digraph.pop("image")
+                    digraph['time'] = digraph['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    digraph['owner'] = str(digraph['owner'].id)
+                    new_editors = list()
+                    for y in digraph['editors']:
+                        new_editors.append(str(y.id))
+                    digraph['editors'] = new_editors
+                    nodes = digraph['nodes']
+                    edges = digraph['edges']
+                    for node in nodes:
+                        n = node
+                        node['_id'] = node['name']
+                        node['name'] = node['desc']
+                        node_dict[node['_id']] = node
+                    for edge in edges:
+                        edge_dict[edge['_id']] = edge
+                    break
+        return render_template("flow_chart.html", digraph_list=digraph_list, _id=_id, edge_dict=edge_dict,
+                               node_dict=node_dict)
     elif request.method.lower() == "post":
         mes = {"message": "success"}
         init = json.loads(get_arg(request, "init", "{}"))
         the_class = get_arg(request, "class", None)
         the_type = get_arg(request, "type", None)
-        if the_type not in ['save', 'delete']:
+        if the_type not in ['save', 'delete', 'view']:
             mes['message'] = "不支持的操作:{}".format(the_type)
         else:
             if the_class == "digraph":
@@ -188,10 +208,43 @@ def flow_chart_func():
                         mes['_id'] = str(r)
                     else:
                         mes['message'] = "保存失败"
+                elif the_type == "view":
+                    mes = dict()
+                    f = {"_id": ObjectId(get_arg(request, "did", None))}
+                    digraph = MyDigraph.find_one_plus(filter_dict=f, instance=False)
+                    pq = pyquery.PyQuery(digraph['image'])
+                    pq.find("svg")
+                    svg = pq.outer_html()
+                    mes['svg'] = svg
             elif the_class == "edge":
                 """对弧的操作"""
             elif the_class == "node":
                 """对节点的操作"""
+                if the_type == "save":
+                    """添加/编辑图"""
+                    did = init.pop("did")
+                    digraph = MyDigraph.find_by_id(o_id=did)
+                    nodes = digraph.get_attr('nodes')
+                    if "name" not in init:
+                        """新节点"""
+                        nodes.append(Node(**init))
+                    else:
+                        for node in nodes:
+                            if node['name'] == init['name']:
+                                node['shape'] = init['shape']
+                                node['label'] = init['label']
+                                node['desc'] = init['desc']
+                                break
+                    digraph.set_attr("nodes", nodes)
+                    html = digraph.draw()
+                    pq = pyquery.PyQuery(html)
+                    pq.find("svg")
+                    svg = pq.outer_html()
+                    r = digraph.save_plus(upsert=True)
+                    if isinstance(r, ObjectId):
+                        mes['svg'] = svg
+                    else:
+                        mes['message'] = "保存失败"
             else:
                 mes['message'] = '错误的对象类型:{}'.format(the_class)
         return json.dumps(mes)

@@ -6,6 +6,7 @@ if __project_path not in sys.path:
     sys.path.append(__project_path)
 from graphviz import Digraph
 import datetime
+from uuid import uuid4
 from module.user_module import User
 import mongo_db
 
@@ -27,14 +28,14 @@ DBRef = mongo_db.DBRef
 
 class Node(dict):
     def __init__(self, **kwargs):
+        """Node对象不需要id，name就可以做唯一性判定"""
         super(Node, self).__init__()
         if 'desc' not in kwargs:
             kwargs['desc'] = ''
         if "shape" not in kwargs:
             kwargs['shape'] = "ellipse"
         if "name" not in kwargs:
-            ms = "name参数必须"
-            raise ValueError(ms)
+            kwargs['name'] = uuid4().hex
         if "label" not in kwargs:
             ms = "label参数必须"
             raise ValueError(ms)
@@ -45,6 +46,8 @@ class Node(dict):
 class Edge(dict):
     def __init__(self, **kwargs):
         super(Edge, self).__init__()
+        if "_id" not in kwargs:
+            kwargs['_id'] = uuid4().hex
         if 'desc' not in kwargs:
             kwargs['desc'] = ''
         if "tail_name" not in kwargs:
@@ -191,6 +194,34 @@ class MyDigraph(mongo_db.BaseDoc):
             kwargs['time'] = datetime.datetime.now()
 
         super(MyDigraph, self).__init__(**kwargs)
+
+    def draw(self) -> bytes:
+        """
+        绘制并以bytes方式返回svg格式的图片。
+        :return:
+        """
+        # dot = Digraph(comment="this is a example", format="svg", encoding="utf-8")
+        # dot.node("A", "步骤1", text="我是说明", id="No1", fontname="SimSun Microsoft YaHei")
+        # dot.node("B", "步骤2", shape="star", color="red")
+        # dot.node("C", "步骤3")
+        # dot.node("D", "步骤4")
+        # dot.edges(["AB", "AC"])
+        # dot.edge("C", "D", "判断", constraint='true')
+        # dot.edge("D", "A", "递归", constraint='true')
+        # print(dot.source)
+        # svg = dot.pipe(format="svg")
+        # print(svg)
+        dot = Digraph(comment=self.get_attr("name"), format="svg", encoding="utf-8")
+        for node in self.get_attr("nodes"):
+            dot.node(name=node['name'], label=node['label'], shape=node['shape'],
+                     id=node['name'], fontname="SimSun Microsoft YaHei")
+        for edge in self.get_attr("edges"):
+            dot.edge(tail_name=edge['tail_name'], label=node['label'], head_name=node['head_name'],
+                     id=node['_id'], fontname="SimSun Microsoft YaHei")
+        svg = dot.pipe(format="svg")
+        self.set_attr("image", svg)
+        return svg
+
 
 
 if __name__ == "__main__":

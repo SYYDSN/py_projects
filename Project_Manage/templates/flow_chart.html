@@ -19,7 +19,17 @@
 </div>
 
 <div class="main">
-    <div class="left"></div>
+    <div class="left">
+        <ul class="nav nav-pills nav-stacked">
+            {% for digraph in digraph_list %}
+                <li data-id="{{ digraph._id }}" role="presentation" class="{{ 'active' if digraph._id == _id else '' }}">
+                    <a href="/flow_chart?did={{ digraph._id }}">
+                        {{ digraph.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
     <div class="middle"></div>
     <div class="right">
         <div class="my_line">
@@ -215,5 +225,9 @@
 </div>
 
 </body>
+<script>
+    edge_dict = {{ edge_dict | safe }};
+    node_dict = {{ node_dict | safe }};
+</script>
 <script src="/static/js/flow_chart.js"></script>
 </html>
