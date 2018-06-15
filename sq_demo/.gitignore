@@ -1,6 +1,0 @@
-webui/*
-*.pyc
-*.log
-static/data_file/*
-static/thumbs/*
-*.apk

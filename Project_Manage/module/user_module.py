@@ -18,7 +18,6 @@ from log_module import get_logger
 
 cache = mongo_db.cache
 logger = get_logger()
-ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
 secret = "6296d5ab38124c368eb9f97e4b58107d"  # 密钥，为jwt服务。
 

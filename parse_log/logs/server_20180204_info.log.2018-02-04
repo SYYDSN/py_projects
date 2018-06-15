@@ -1,6 +1,0 @@
-2018-02-04 03:35:56,362 base.py[line:83] INFO GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:200 request:0.032s]
-2018-02-04 03:35:56,363 security_module.py[line:1032] INFO elasticsearch query success! at 2018-02-04 03:35:56, user_id:59895177de713e304a67d30c,date:None共计查询到0条记录
-2018-02-04 03:37:18,092 base.py[line:83] INFO GET http://api.safego.org:9200/sf/daily_report/_search?size=1000 [status:200 request:0.056s]
-2018-02-04 03:37:18,092 security_module.py[line:1032] INFO elasticsearch query success! at 2018-02-04 03:37:18, user_id:59895177de713e304a67d30c,date:2018-02-04共计查询到0条记录
-2018-02-04 03:37:44,533 base.py[line:83] INFO GET http://api.safego.org:9200/sf/daily_report/_search?size=100 [status:200 request:0.030s]
-2018-02-04 03:37:44,534 security_module.py[line:1032] INFO elasticsearch query success! at 2018-02-04 03:37:44, user_id:59895177de713e304a67d30c,date:None共计查询到0条记录

@@ -12,7 +12,9 @@
 </head>
 <body>
 <div class="top">
-    <i class="top_icon fa fa-chevron-left fa-2x"></i>
+    <a href="/home_all/view">
+        <i class="top_icon fa fa-chevron-left fa-2x"></i>
+    </a>
     <div class="top_title">
         产品流程图
     </div>
@@ -32,6 +34,7 @@
     </div>
     <div class="middle"></div>
     <div class="right">
+        <!--
         <div class="my_line">
             <ul class="nav nav-tabs right_nav1">
                   <li role="presentation" class="active"><a>新 建</a></li>
@@ -39,11 +42,13 @@
                   <li role="presentation"><a>删 除</a></li>
                 </ul>
         </div>
+        -->
         <div class="my_panel">
             <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="zone_title">
-                                    选择类型
+                        <span>选择类型</span>
+                         <i id="delete_icon" class="fa fa-trash fa-x"></i>
                     </div>
                     <ul class="nav nav-pills small_ul">
                       <li id="select_node" role="presentation" class="active"><a>节点</a></li>
@@ -74,7 +79,7 @@
                                     选择节点形状
                                 </div>
                                 <div class="half">
-                                    <input data-id="ellipse" checked type="radio" name="node_shape">
+                                    <input data-id="ellipse" type="radio" name="node_shape">
                                     <span class="shape_desc">椭圆形节点</span>
                                 </div>
                                 <div class="half">
@@ -128,7 +133,7 @@
                                 </div>
                                 <div class="select_line">
                                     <span>选择起点</span>
-                                    <select>
+                                    <select id="tail_name">
                                         <option value="ssd">节点名称</option>
                                         <option value="ssd">节点名称</option>
                                         <option value="ssd">节点名称</option>
@@ -137,7 +142,7 @@
                                 </div>
                                 <div class="select_line">
                                     <span>选择终点</span>
-                                    <select>
+                                    <select id="head_name">
                                         <option value="ssd">节点名称</option>
                                         <option value="ssd">节点名称</option>
                                         <option value="ssd">节点名称</option>
@@ -223,11 +228,14 @@
         </div>
     </div>
 </div>
-
+<div id="mini_menu">
+    <span class="mini_menu_item">新 建</span>
+    <span class="mini_menu_item">编 辑</span>
+    <span class="mini_menu_item">删 除</span>
+</div>
 </body>
 <script>
-    edge_dict = {{ edge_dict | safe }};
-    node_dict = {{ node_dict | safe }};
+
 </script>
 <script src="/static/js/flow_chart.js"></script>
 </html>

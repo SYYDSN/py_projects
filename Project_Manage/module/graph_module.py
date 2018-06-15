@@ -216,8 +216,8 @@ class MyDigraph(mongo_db.BaseDoc):
             dot.node(name=node['name'], label=node['label'], shape=node['shape'],
                      id=node['name'], fontname="SimSun Microsoft YaHei")
         for edge in self.get_attr("edges"):
-            dot.edge(tail_name=edge['tail_name'], label=node['label'], head_name=node['head_name'],
-                     id=node['_id'], fontname="SimSun Microsoft YaHei")
+            dot.edge(tail_name=edge['tail_name'], label=edge['label'], head_name=edge['head_name'],
+                     id=edge['_id'], fontname="SimSun Microsoft YaHei")
         svg = dot.pipe(format="svg")
         self.set_attr("image", svg)
         return svg
