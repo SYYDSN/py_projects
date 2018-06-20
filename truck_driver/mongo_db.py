@@ -32,7 +32,7 @@ cache = RedisCache()
 logger = get_logger()
 user = "d_root"              # 数据库用户名
 password = "Driver@0619"       # 数据库密码
-db_name = "driver_db"        # 库名称
+db_name = "driver_site"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 
 """mongodb配置信息"""
