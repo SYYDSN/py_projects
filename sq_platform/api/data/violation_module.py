@@ -248,8 +248,7 @@ class ViolationRecode(mongo_db.BaseDoc):
     type_dict["code"] = str  # 违章编码,唯一，非违章条例码
     type_dict["time"] = datetime.datetime  # 违章时间
     type_dict["update_time"] = datetime.datetime  # 记录最后一次从互联网查询的时间
-    """记录创建时间 在强调性能的情况下,此字段无法保证不被更新,废弃 2018-5-23"""
-    # type_dict["create_time"] = datetime.datetime
+    # type_dict["create_time"] = datetime.datetime  # 字段废弃,以update_time替代.2018-6-21
     type_dict["fine"] = float  # 罚款金额
     type_dict["address"] = str  # 违章地址
     type_dict["reason"] = str  # 违章处理原因
@@ -374,7 +373,6 @@ class ViolationRecode(mongo_db.BaseDoc):
             "plate_number": self.get_attr("plate_number"),
             "time": self.get_attr("time")
         }
-        _id = self.get_id()
         ignore = ['_id']
         doc = self.get_dict(ignore=ignore)
         if "update_time" not in doc:
@@ -417,6 +415,10 @@ class ViolationRecode(mongo_db.BaseDoc):
             filter_dict['city'] = regex.Regex('.*{}.*'.format(city))  # 正则表达式,匹配city中包含city字符串的
         if plate_number is not None:
             filter_dict['plate_number'] = regex.Regex('.*{}.*'.format(plate_number))  # 正则表达式
+        if isinstance(vio_status, str) and vio_status.isdigit():
+            vio_status = int(vio_status)
+        else:
+            pass
         if isinstance(vio_status, int) and 0 < vio_status < 5:
             """
             违章状态分四种,分别是1-4的数组.
@@ -685,6 +687,7 @@ class ViolationQueryResult(mongo_db.BaseDoc):
         else:
             """查询成功，检查是否有数据"""
             data = data_dict['data']
+            new_ids = list()  # 记录本次查询获取到的违章记录,用于确认哪些历史违章记录已被处理?
             if data['amount'] == 0:
                 """没有查询到结果"""
                 pass
@@ -704,12 +707,19 @@ class ViolationQueryResult(mongo_db.BaseDoc):
                     obj = ViolationRecode.instance(**vio)
                     r = obj.save_instance()
                     if isinstance(r, dict):
+                        save_id = r['_id']
+                        """记录成功保存的违章记录的id,用于排除并更新那些已处理的违章记录"""
+                        new_ids.append(save_id)
                         """保存违章记录的实例成功"""
                         dbref = DBRef(database=mongo_db.db_name, collection=ViolationRecode.get_table_name(),
-                                      id=r['_id'])
+                                      id=save_id)
                         vio_list.append(dbref)
                 kwargs['violations'] = vio_list
-            return cls.insert_one(**kwargs)
+            """更新已被处理的违章记录的信息"""
+            f = {"_id": {"$nin": new_ids}, "user_id": user_id}
+            u = {"$set": {"process_status": 3}}
+            ViolationRecode.update_many_plus(filter_dict=f, update_dict=u)
+            return cls.insert_one(**kwargs)  # 返回结果
 
 
 class VioQueryGenerator(mongo_db.BaseDoc):

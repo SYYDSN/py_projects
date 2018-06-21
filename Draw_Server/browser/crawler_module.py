@@ -613,7 +613,7 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
             try:
                 browser = Firefox(firefox_profile=profile, firefox_options=options)
             except Exception as e:
-                title = "{} Firefox headless浏览器打开失败".format(datetime.datetime.now())
+                title = "爬虫服务器 {} Firefox headless浏览器打开失败".format(datetime.datetime.now())
                 content = "错误原因是：{}".format(e)
                 send_mail(title=title, content=content)
                 recode(e)
@@ -623,7 +623,7 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
             try:
                 browser = Firefox(firefox_profile=profile)
             except Exception as e:
-                title = "{} Firefox headless浏览器打开失败".format(datetime.datetime.now())
+                title = "爬虫服务器 {} Firefox headless浏览器打开失败".format(datetime.datetime.now())
                 content = "错误原因是：{}".format(e)
                 send_mail(title=title, content=content)
                 recode(e)
@@ -636,7 +636,7 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
             try:
                 browser = Chrome(executable_path=chrome_driver, chrome_options=options)
             except Exception as e:
-                title = "{} Chrome headless浏览器打开失败".format(datetime.datetime.now())
+                title = "爬虫服务器 {} Chrome headless浏览器打开失败".format(datetime.datetime.now())
                 content = "错误原因是：{}".format(e)
                 send_mail(title=title, content=content)
                 recode(e)
@@ -646,7 +646,7 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
             try:
                 browser = Chrome(executable_path=chrome_driver)
             except Exception as e:
-                title = "{} Chrome headless浏览器打开失败".format(datetime.datetime.now())
+                title = "爬虫服务器 {} Chrome headless浏览器打开失败".format(datetime.datetime.now())
                 content = "错误原因是：{}".format(e)
                 send_mail(title=title, content=content)
                 recode(e)

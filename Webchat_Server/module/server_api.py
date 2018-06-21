@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-__project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+__project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
 import mongo_db
@@ -105,8 +105,28 @@ class AccessToken(mongo_db.BaseDoc):
         return res
 
 
+def get_templates() -> list:
+    """
+    获取全部的模板信息
+    :return:
+    """
+    u = "https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token={}".\
+        format(AccessToken.get_token())
+    r = requests.get(u)
+    status = r.status_code
+    if status != 200:
+        ms = "获取模板信息时,服务器返回了错误的状态码:{}, time:{}".format(status, datetime.datetime.now())
+        send_mail(title=ms)
+        raise ValueError(ms)
+    else:
+        data = r.json()
+        data
+
+
+def send_template_message():
+    pass
+
+
 if __name__ == "__main__":
-    for i in range(4):
-        t = AccessToken.get_token()
-        print(t)
+    get_templates()
     pass

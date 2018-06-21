@@ -437,6 +437,140 @@ def get_vio_query_shortcuts(user_id):
         return json.dumps(message)
 
 
+@api_user_blueprint.route("/get_violation_report", methods=['post', 'get'])
+@login_required_app
+def get_violation_report(user_id):
+    """
+    获取用户的当年的违章行报告
+    :param user_id:
+    :return:
+    """
+    mes = {"message": "success"}
+    year = get_arg(request, "year", None)
+    year = datetime.datetime.now().year if year is None else year
+    begin = mongo_db.get_datetime_from_str("{}-01-01 0:0:0".format(year))
+    end = mongo_db.get_datetime_from_str("{}-01-01 0:0:0".format(year + 1))
+    end = end - datetime.timedelta(seconds=0.000001)
+    f = {"time": {"$lte": end, "$gte": begin}, "user_id": user_id}
+    s = {"time": -1}
+    r = violation_module.ViolationRecode.find_plus(filter_dict=f, sort_dict=s, can_json=True)
+    data = dict()
+    total_fine = 0.0  # 总罚款
+    total_point = 0  # 总扣分
+    total_untread = 0  # 未处理违章条数
+    total_processed = 0  # 已处理违章条数
+    if len(r) > 0:
+        """统计数据"""
+        real_last = None
+        for x in r:
+            point = x['point']  # 扣分
+            if isinstance(point, int):
+                pass
+            elif isinstance(point, str) and point.isdigit():
+                point = int(point)
+            else:
+                point = 0
+            total_point += point
+            fine = x['fine']  # 罚款
+            if isinstance(fine, float):
+                pass
+            elif isinstance(fine, int):
+                fine = float(fine)
+            elif isinstance(fine, str) and fine.isdigit():
+                fine = float(fine)
+            else:
+                fine = 0.0
+            total_fine += fine
+            if x['process_status'] == 1:
+                total_untread += 1
+            else:
+                total_processed += 1
+    else:
+        pass
+    data['total_fine'] = total_fine
+    data['total_point'] = total_point
+    data['total_untread'] = total_untread
+    data['total_processed'] = total_processed
+    data['violations'] = r
+    mes['data'] = data
+    return json.dumps(mes)
+
+
+@api_user_blueprint.route("/query_all_violations", methods=['post', 'get'])
+@login_required_app
+def query_all_violations(user_id):
+    """获取账户下所有已处理/未处理违章信息"""
+    the_type = get_arg(request, "type", None)
+    mes = {"message": "success"}
+    if isinstance(the_type, (int, str)):
+        if isinstance(the_type, str) and the_type.isdigit():
+            the_type = int(the_type)
+        else:
+            pass
+        if the_type in [0, 1]:
+            the_type = 3 if the_type == 0 else 1
+            """先从互联网查一下,更新数据,注意,这个逻辑不是那么合理,将来要优化的"""
+            violation_module.VioQueryGenerator.get_prev_query_result(user_id, None)
+            """查询历史数据"""
+            f = {"user_id": user_id, "process_status": the_type}
+            s = {"update_time": -1}
+            r = violation_module.ViolationRecode.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
+            data = {"token": str(user_id)}
+            last_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            total_fine = 0.0  # 总罚款
+            amount = 0  # 未处理违章总扣分
+            untreated = 0  # 未处理违章条数
+            violations = list()
+            if len(r) > 0:
+                """统计数据"""
+                real_last = None
+                for x in r:
+                    violations.append(mongo_db.to_flat_dict(x))
+                    update_time = x.get('update_time')
+                    if real_last is None and isinstance(update_time, datetime.datetime):
+                        real_last = update_time.strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        pass
+                    if x['process_status'] == 1:
+                        untreated += 1
+                        point = x['point']   # 扣分
+                        if isinstance(point, int):
+                            pass
+                        elif isinstance(point, str) and point.isdigit():
+                            point = int(point)
+                        else:
+                            point = 0
+                        amount += point
+                        fine = x['fine']  # 罚款
+                        if isinstance(fine, float):
+                            pass
+                        elif isinstance(fine, int):
+                            fine = float(fine)
+                        elif isinstance(fine, str) and fine.isdigit():
+                            fine = float(fine)
+                        else:
+                            fine = 0.0
+                        total_fine += fine
+                    else:
+                        pass
+                if real_last is not None:
+                    last_date = real_last
+            else:
+                pass
+            data['create_date'] = last_date
+            data['plate_number'] = ""
+            data['amount'] = amount
+            data['untreated'] = untreated
+            data['total_fine'] = total_fine
+            data['violations'] = violations
+            mes['data'] = data
+        else:
+            mes = pack_message(message_dict=mes, error_code=3001, type=the_type)
+    else:
+        mes = pack_message(message_dict=mes, error_code=3000, type=the_type)
+    return json.dumps(mes)
+
+
 @api_user_blueprint.route("/query_violation", methods=['post', 'get'])
 @login_required_app
 def query_violation(user_id):
