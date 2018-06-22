@@ -1283,10 +1283,16 @@ class BaseDoc:
         :param upsert:
         :return: ObjectId
         """
-        ignore = ["_id"] if ignore is None else ignore
+        if isinstance(ignore, list):
+            if "_id" in ignore:
+                pass
+            else:
+                ignore.append("_id")
+        else:
+            ignore = ["_id"]
         ses = get_conn(self.table_name())
         doc = self.__dict__
-        _id = doc.pop("_id", None)
+        _id = doc.get("_id", None)
         doc = {k: v for k, v in doc.items() if k not in ignore}
         f = {"_id": _id}
         res = None

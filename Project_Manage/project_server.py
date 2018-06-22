@@ -158,253 +158,262 @@ def online_report_func():
 @app.route("/flow_chart", methods=['post', 'get'])
 @check_platform_session
 def flow_chart_func():
-    """流程图页面"""
+    """
+    流程图页面
+    存在权限混乱的问题,暂时没解决.
+    1. 用户只能操作自己创建的图,别人创建的图只能浏览不能修改和删除
+    2. 现阶段,还不能对已创建的图的信息进行修改.
+    """
     user_id = get_platform_session_arg("user_id")
-    if request.method.lower() == "get":
-        digraph_list = MyDigraph.find_plus(filter_dict=dict(), to_dict=True)
-        _id = get_arg(request, "did", "")
-        if len(_id) == 24:
-            for x in digraph_list:
-                if str(x['_id']) == _id:
-                    digraph = x
-                    digraph['_id'] = _id
-                    digraph.pop("image")
-                    digraph['time'] = digraph['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    digraph['owner'] = str(digraph['owner'].id)
-                    new_editors = list()
-                    for y in digraph['editors']:
-                        new_editors.append(str(y.id))
-                    digraph['editors'] = new_editors
-                    break
-        return render_template("flow_chart.html", digraph_list=digraph_list, _id=_id)
-    elif request.method.lower() == "post":
-        mes = {"message": "success"}
-        init = json.loads(get_arg(request, "init", "{}"))
-        the_class = get_arg(request, "class", None)
-        the_type = get_arg(request, "type", None)
-        if the_type not in ['save', 'delete', 'view']:
-            mes['message'] = "不支持的操作:{}".format(the_type)
-        else:
-            if the_class == "digraph":
-                """对图的操作"""
-                init['owner'] = user_id
-                if the_type == "save":
-                    """添加/编辑图"""
-                    digraph = MyDigraph(**init)
-                    r = digraph.save_plus(upsert=True)
-                    if isinstance(r, ObjectId):
-                        mes['_id'] = str(r)
+    if user_id is None:
+        return redirect(url_for("login_func"))
+    else:
+        user = User.find_by_id(o_id=user_id)
+        if request.method.lower() == "get":
+            digraph_list = MyDigraph.find_plus(filter_dict=dict(), to_dict=True)
+            _id = get_arg(request, "did", "")
+            if len(_id) == 24:
+                for x in digraph_list:
+                    if str(x['_id']) == _id:
+                        digraph = x
+                        digraph['_id'] = _id
+                        digraph.pop("image")
+                        digraph['time'] = digraph['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        digraph['owner'] = str(digraph['owner'].id)
+                        new_editors = list()
+                        for y in digraph['editors']:
+                            new_editors.append(str(y.id))
+                        digraph['editors'] = new_editors
+                        break
+            return render_template("flow_chart.html", digraph_list=digraph_list, _id=_id)
+        elif request.method.lower() == "post":
+            mes = {"message": "success"}
+            init = json.loads(get_arg(request, "init", "{}"))
+            the_class = get_arg(request, "class", None)
+            the_type = get_arg(request, "type", None)
+            if the_type not in ['save', 'delete', 'view']:
+                mes['message'] = "不支持的操作:{}".format(the_type)
+            else:
+                if the_class == "digraph":
+                    """对图的操作"""
+                    init['owner'] = user_id
+                    if the_type == "save":
+                        """添加/编辑图"""
+                        digraph = MyDigraph(**init)
+                        r = digraph.save_plus(upsert=True)
+                        if isinstance(r, ObjectId):
+                            mes['_id'] = str(r)
+                        else:
+                            mes['message'] = "保存失败"
+                    elif the_type == "view":
+                        mes = dict()
+                        f = {"_id": ObjectId(get_arg(request, "did", None))}
+                        digraph = MyDigraph.find_one_plus(filter_dict=f, instance=True)
+                        html = digraph.get_attr('image')
+                        if html == b"":
+                            svg = ""
+                        else:
+                            pq = pyquery.PyQuery(html)
+                            pq.find("svg")
+                            svg = pq.outer_html()
+                        data = dict()
+                        data['svg'] = svg
+                        node_dict = dict()
+                        edge_dict = dict()
+                        nodes = digraph.get_attr('nodes')
+                        edges = digraph.get_attr('edges')
+                        for node in nodes:
+                            node['_id'] = node['name']
+                            node['name'] = node['desc']
+                            node_dict[node['_id']] = node
+                        for edge in edges:
+                            edge_dict[edge['_id']] = edge
+                        data['title'] = digraph.get_attr("name")
+                        data['node_dict'] = node_dict
+                        data['edge_dict'] = edge_dict
+                        mes['data'] = data
+                    elif the_type == 'delete':
+                        """删除图"""
+                        did = init.pop("did")
+                        f = {"_id": ObjectId(did)}
+                        r = MyDigraph.find_one_and_delete(filter_dict=f)
+                        if isinstance(r, dict):
+                            f = dict()
+                            one = MyDigraph.find_one_plus(filter_dict=f, instance=False, can_json=True)
+                            if one is None:
+                                pass
+                            else:
+                                mes['_id'] = one['_id']
+                        else:
+                            mes['message'] = "删除失败"
                     else:
-                        mes['message'] = "保存失败"
-                elif the_type == "view":
-                    mes = dict()
-                    f = {"_id": ObjectId(get_arg(request, "did", None))}
-                    digraph = MyDigraph.find_one_plus(filter_dict=f, instance=True)
-                    html = digraph.get_attr('image')
-                    if html == b"":
-                        svg = ""
-                    else:
+                        mes['message'] = '不支持的操作'
+                elif the_class == "edge":
+                    """对弧的操作"""
+                    if the_type == "save":
+                        """添加/编辑弧"""
+                        did = init.pop("did")
+                        digraph = MyDigraph.find_by_id(o_id=did)
+                        edges = digraph.get_attr('edges')
+                        _id = init.get("_id")
+                        if _id:
+                            for edge in edges:
+                                if edge['_id'] == init['_id']:
+                                    edge['tail_name'] = init['tail_name']
+                                    edge['head_name'] = init['head_name']
+                                    edge['label'] = init['label']
+                                    edge['desc'] = init['desc']
+                                    break
+                        else:
+                            edges.append(Edge(**init))
+                        digraph.set_attr("edges", edges)
+                        html = digraph.draw()
                         pq = pyquery.PyQuery(html)
                         pq.find("svg")
                         svg = pq.outer_html()
-                    data = dict()
-                    data['svg'] = svg
-                    node_dict = dict()
-                    edge_dict = dict()
-                    nodes = digraph.get_attr('nodes')
-                    edges = digraph.get_attr('edges')
-                    for node in nodes:
-                        node['_id'] = node['name']
-                        node['name'] = node['desc']
-                        node_dict[node['_id']] = node
-                    for edge in edges:
-                        edge_dict[edge['_id']] = edge
-                    data['title'] = digraph.get_attr("name")
-                    data['node_dict'] = node_dict
-                    data['edge_dict'] = edge_dict
-                    mes['data'] = data
-                elif the_type == 'delete':
-                    """删除图"""
-                    did = init.pop("did")
-                    f = {"_id": ObjectId(did)}
-                    r = MyDigraph.find_one_and_delete(filter_dict=f)
-                    if isinstance(r, dict):
-                        f = dict()
-                        one = MyDigraph.find_one_plus(filter_dict=f, instance=False, can_json=True)
-                        if one is None:
-                            pass
+                        r = digraph.save_plus(upsert=True)
+                        if isinstance(r, ObjectId):
+                            data = dict()
+                            data['svg'] = svg
+                            data['title'] = digraph.get_attr("name")
+                            node_dict = dict()
+                            edge_dict = dict()
+                            nodes = digraph.get_attr('nodes')
+                            edges = digraph.get_attr('edges')
+                            for node in nodes:
+                                node['_id'] = node['name']
+                                node['name'] = node['desc']
+                                node_dict[node['_id']] = node
+                            for edge in edges:
+                                edge_dict[edge['_id']] = edge
+                            data['title'] = digraph.get_attr("name")
+                            data['node_dict'] = node_dict
+                            data['edge_dict'] = edge_dict
+                            mes['data'] = data
                         else:
-                            mes['_id'] = one['_id']
-                    else:
-                        mes['message'] = "删除失败"
-                else:
-                    mes['message'] = '不支持的操作'
-            elif the_class == "edge":
-                """对弧的操作"""
-                if the_type == "save":
-                    """添加/编辑弧"""
-                    did = init.pop("did")
-                    digraph = MyDigraph.find_by_id(o_id=did)
-                    edges = digraph.get_attr('edges')
-                    _id = init.get("_id")
-                    if _id:
-                        for edge in edges:
+                            mes['message'] = "保存失败"
+                    elif the_type == 'delete':
+                        """删除弧"""
+                        did = init.pop("did")
+                        digraph = MyDigraph.find_by_id(o_id=did)
+                        edges = digraph.get_attr('edges')
+                        for i, edge in enumerate(edges):
                             if edge['_id'] == init['_id']:
-                                edge['tail_name'] = init['tail_name']
-                                edge['head_name'] = init['head_name']
-                                edge['label'] = init['label']
-                                edge['desc'] = init['desc']
+                                edges.pop(i)
                                 break
+                        digraph.set_attr("edges", edges)
+                        html = digraph.draw()
+                        pq = pyquery.PyQuery(html)
+                        pq.find("svg")
+                        svg = pq.outer_html()
+                        r = digraph.save_plus(upsert=True)
+                        if isinstance(r, ObjectId):
+                            data = dict()
+                            data['svg'] = svg
+                            data['title'] = digraph.get_attr("name")
+                            node_dict = dict()
+                            edge_dict = dict()
+                            nodes = digraph.get_attr('nodes')
+                            edges = digraph.get_attr('edges')
+                            for node in nodes:
+                                node['_id'] = node['name']
+                                node['name'] = node['desc']
+                                node_dict[node['_id']] = node
+                            for edge in edges:
+                                edge_dict[edge['_id']] = edge
+                            data['title'] = digraph.get_attr("name")
+                            data['node_dict'] = node_dict
+                            data['edge_dict'] = edge_dict
+                            mes['data'] = data
+                        else:
+                            mes['message'] = "删除失败"
                     else:
-                        edges.append(Edge(**init))
-                    digraph.set_attr("edges", edges)
-                    html = digraph.draw()
-                    pq = pyquery.PyQuery(html)
-                    pq.find("svg")
-                    svg = pq.outer_html()
-                    r = digraph.save_plus(upsert=True)
-                    if isinstance(r, ObjectId):
-                        data = dict()
-                        data['svg'] = svg
-                        data['title'] = digraph.get_attr("name")
-                        node_dict = dict()
-                        edge_dict = dict()
+                        mes['message'] = '不支持的操作'
+                elif the_class == "node":
+                    """对节点的操作"""
+                    if the_type == "save":
+                        """添加/编辑节点"""
+                        did = init.pop("did")
+                        digraph = MyDigraph.find_by_id(o_id=did)
                         nodes = digraph.get_attr('nodes')
-                        edges = digraph.get_attr('edges')
-                        for node in nodes:
-                            node['_id'] = node['name']
-                            node['name'] = node['desc']
-                            node_dict[node['_id']] = node
-                        for edge in edges:
-                            edge_dict[edge['_id']] = edge
-                        data['title'] = digraph.get_attr("name")
-                        data['node_dict'] = node_dict
-                        data['edge_dict'] = edge_dict
-                        mes['data'] = data
-                    else:
-                        mes['message'] = "保存失败"
-                elif the_type == 'delete':
-                    """删除弧"""
-                    did = init.pop("did")
-                    digraph = MyDigraph.find_by_id(o_id=did)
-                    edges = digraph.get_attr('edges')
-                    for i, edge in enumerate(edges):
-                        if edge['_id'] == init['_id']:
-                            edges.pop(i)
-                            break
-                    digraph.set_attr("edges", edges)
-                    html = digraph.draw()
-                    pq = pyquery.PyQuery(html)
-                    pq.find("svg")
-                    svg = pq.outer_html()
-                    r = digraph.save_plus(upsert=True)
-                    if isinstance(r, ObjectId):
-                        data = dict()
-                        data['svg'] = svg
-                        data['title'] = digraph.get_attr("name")
-                        node_dict = dict()
-                        edge_dict = dict()
+                        if "name" not in init:
+                            """新节点"""
+                            nodes.append(Node(**init))
+                        else:
+                            for node in nodes:
+                                if node['name'] == init['name']:
+                                    node['shape'] = init['shape']
+                                    node['label'] = init['label']
+                                    node['desc'] = init['desc']
+                                    break
+                        digraph.set_attr("nodes", nodes)
+                        html = digraph.draw()
+                        pq = pyquery.PyQuery(html)
+                        pq.find("svg")
+                        svg = pq.outer_html()
+                        r = digraph.save_plus(upsert=True)
+                        if isinstance(r, ObjectId):
+                            data = dict()
+                            data['svg'] = svg
+                            data['title'] = digraph.get_attr("name")
+                            node_dict = dict()
+                            edge_dict = dict()
+                            nodes = digraph.get_attr('nodes')
+                            edges = digraph.get_attr('edges')
+                            for node in nodes:
+                                node['_id'] = node['name']
+                                node['name'] = node['desc']
+                                node_dict[node['_id']] = node
+                            for edge in edges:
+                                edge_dict[edge['_id']] = edge
+                            data['title'] = digraph.get_attr("name")
+                            data['node_dict'] = node_dict
+                            data['edge_dict'] = edge_dict
+                            mes['data'] = data
+                        else:
+                            mes['message'] = "保存失败"
+                    elif the_type == 'delete':
+                        """删除节点"""
+                        did = init.pop("did")
+                        digraph = MyDigraph.find_by_id(o_id=did)
                         nodes = digraph.get_attr('nodes')
-                        edges = digraph.get_attr('edges')
-                        for node in nodes:
-                            node['_id'] = node['name']
-                            node['name'] = node['desc']
-                            node_dict[node['_id']] = node
-                        for edge in edges:
-                            edge_dict[edge['_id']] = edge
-                        data['title'] = digraph.get_attr("name")
-                        data['node_dict'] = node_dict
-                        data['edge_dict'] = edge_dict
-                        mes['data'] = data
-                    else:
-                        mes['message'] = "删除失败"
-                else:
-                    mes['message'] = '不支持的操作'
-            elif the_class == "node":
-                """对节点的操作"""
-                if the_type == "save":
-                    """添加/编辑节点"""
-                    did = init.pop("did")
-                    digraph = MyDigraph.find_by_id(o_id=did)
-                    nodes = digraph.get_attr('nodes')
-                    if "name" not in init:
-                        """新节点"""
-                        nodes.append(Node(**init))
-                    else:
-                        for node in nodes:
+                        for i, node in enumerate(nodes):
                             if node['name'] == init['name']:
-                                node['shape'] = init['shape']
-                                node['label'] = init['label']
-                                node['desc'] = init['desc']
+                                nodes.pop(i)
                                 break
-                    digraph.set_attr("nodes", nodes)
-                    html = digraph.draw()
-                    pq = pyquery.PyQuery(html)
-                    pq.find("svg")
-                    svg = pq.outer_html()
-                    r = digraph.save_plus(upsert=True)
-                    if isinstance(r, ObjectId):
-                        data = dict()
-                        data['svg'] = svg
-                        data['title'] = digraph.get_attr("name")
-                        node_dict = dict()
-                        edge_dict = dict()
-                        nodes = digraph.get_attr('nodes')
-                        edges = digraph.get_attr('edges')
-                        for node in nodes:
-                            node['_id'] = node['name']
-                            node['name'] = node['desc']
-                            node_dict[node['_id']] = node
-                        for edge in edges:
-                            edge_dict[edge['_id']] = edge
-                        data['title'] = digraph.get_attr("name")
-                        data['node_dict'] = node_dict
-                        data['edge_dict'] = edge_dict
-                        mes['data'] = data
+                        digraph.set_attr("nodes", nodes)
+                        html = digraph.draw()
+                        pq = pyquery.PyQuery(html)
+                        pq.find("svg")
+                        svg = pq.outer_html()
+                        r = digraph.save_plus(upsert=True)
+                        if isinstance(r, ObjectId):
+                            data = dict()
+                            data['svg'] = svg
+                            data['title'] = digraph.get_attr("name")
+                            node_dict = dict()
+                            edge_dict = dict()
+                            nodes = digraph.get_attr('nodes')
+                            edges = digraph.get_attr('edges')
+                            for node in nodes:
+                                node['_id'] = node['name']
+                                node['name'] = node['desc']
+                                node_dict[node['_id']] = node
+                            for edge in edges:
+                                edge_dict[edge['_id']] = edge
+                            data['title'] = digraph.get_attr("name")
+                            data['node_dict'] = node_dict
+                            data['edge_dict'] = edge_dict
+                            mes['data'] = data
+                        else:
+                            mes['message'] = "删除失败"
                     else:
-                        mes['message'] = "保存失败"
-                elif the_type == 'delete':
-                    """删除节点"""
-                    did = init.pop("did")
-                    digraph = MyDigraph.find_by_id(o_id=did)
-                    nodes = digraph.get_attr('nodes')
-                    for i, node in enumerate(nodes):
-                        if node['name'] == init['name']:
-                            nodes.pop(i)
-                            break
-                    digraph.set_attr("nodes", nodes)
-                    html = digraph.draw()
-                    pq = pyquery.PyQuery(html)
-                    pq.find("svg")
-                    svg = pq.outer_html()
-                    r = digraph.save_plus(upsert=True)
-                    if isinstance(r, ObjectId):
-                        data = dict()
-                        data['svg'] = svg
-                        data['title'] = digraph.get_attr("name")
-                        node_dict = dict()
-                        edge_dict = dict()
-                        nodes = digraph.get_attr('nodes')
-                        edges = digraph.get_attr('edges')
-                        for node in nodes:
-                            node['_id'] = node['name']
-                            node['name'] = node['desc']
-                            node_dict[node['_id']] = node
-                        for edge in edges:
-                            edge_dict[edge['_id']] = edge
-                        data['title'] = digraph.get_attr("name")
-                        data['node_dict'] = node_dict
-                        data['edge_dict'] = edge_dict
-                        mes['data'] = data
-                    else:
-                        mes['message'] = "删除失败"
+                        mes['message'] = '不支持的操作'
                 else:
-                    mes['message'] = '不支持的操作'
-            else:
-                mes['message'] = '错误的对象类型:{}'.format(the_class)
-        return json.dumps(mes)
-    else:
-        return abort(405)
+                    mes['message'] = '错误的对象类型:{}'.format(the_class)
+            return json.dumps(mes)
+        else:
+            return abort(405)
 
 
 @app.route("/manage_<key1>/<key2>", methods=['post', 'get'])

@@ -27,7 +27,7 @@ class Region(mongo_db.BaseDoc):
     type_dict['name'] = str  # 名称
     type_dict['code'] = int  # 六位数字
     type_dict['region_path'] = str  # 六位数字,左右都有逗号
-    type_dict['parent_id'] = int  # 上级行政区域_id
+    type_dict['parent_id'] = int  # 上级行政区域_id 如果是顶层的,这个值是0
 
     @classmethod
     def build_region_1(cls):
@@ -112,37 +112,16 @@ class Region(mongo_db.BaseDoc):
                 ms = "服务器返回了错误的响应码:{}".format(status)
                 raise ValueError(ms)
 
-    @staticmethod
-    def fill_dict(d: dict, l: list) -> None:
-        """填充字典"""
-        for x in l:
-            name = x['name']
-            _id = x['_id']
-            paths = x['path']
-            if paths[-1] != "":
-                print(x)
-            else:
-
-                for path in paths:
-                    key = ""
-
-                    if path == "":
-
-
-
     @classmethod
-    def get_dict(cls) -> dict:
+    def get_data(cls) -> list:
         """
-        返回一个全国行政辖区的多级字典
+        返回第一级行政辖区
         :return:
         """
-        res = dict()
-        items = cls.find_plus(filter_dict=dict(), to_dict=True)
-        no1 = [{"_id": x['_id'], "name": x['name'], "path": x['region_path'].split(",")} for x in items]
-        tree = dict()
-        cls.fill_dict(tree, no1)
-
-
+        f = {"parent_id": 0}
+        p = ["_id", "name"]
+        r = cls.find_plus(filter_dict=f, projection=p, to_dict=True, can_json=True)
+        return r
 
 
 class Route(mongo_db.BaseDoc):
@@ -155,7 +134,7 @@ class Route(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
     type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
-    type_dict['region_list'] = list  # Region._id组成的list
+    type_dict['cities'] = list  # 城市名称(str)组成的list
     type_dict['create_date'] = datetime.datetime  # 创建时间
 
     def __init__(self, **kwargs):
@@ -177,6 +156,7 @@ class Honor(mongo_db.BaseDoc):
     type_dict['time'] = datetime.datetime  # 获奖时间
     type_dict['info'] = str    # 荣誉信息
     type_dict['image'] = bytes  # 荣誉图片
+    type_dict['create_date'] = datetime.datetime  # 创建时间
 
 
 class Vehicle(mongo_db.BaseDoc):
@@ -188,7 +168,7 @@ class Vehicle(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
-    type_dict["license_image"] = bytes  # 车辆照片
+    type_dict["image"] = bytes  # 车辆照片
     type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
     """
     相关标准参考GB1589
@@ -208,7 +188,6 @@ class Vehicle(mongo_db.BaseDoc):
     type_dict['vehicle_length'] = float  # 车辆载重量,单位米.
     type_dict["owner_name"] = str  # 车主姓名/不一定是驾驶员
     type_dict["address"] = str  # 地址
-    type_dict["use_character"] = str  # 使用性质
     type_dict["vehicle_model"] = str  # 车辆型号  比如 一汽解放J6
     type_dict["vin_id"] = str  # 车辆识别码/车架号的后六位 如果大于6，查询违章的时候就用后6位查询
     type_dict["engine_id"] = str  # 发动机号
@@ -267,11 +246,12 @@ class WorkHistory(mongo_db.BaseDoc):
     type_dict['vehicle_length'] = float  # 车辆载重量,单位米.
     type_dict['description'] = str  # 工作描述.带换行符和空格的字符串格式.
     type_dict['achievement'] = str  # 工作业绩.带换行符和空格的字符串格式.
+    type_dict["create_date"] = datetime.datetime  # 创建日期
 
 
-class Driver(mongo_db.BaseDoc):
-    """司机"""
-    _table_name = "driver_info"
+class DriverResume(mongo_db.BaseDoc):
+    """司机简历"""
+    _table_name = "driver_resume"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['user_name'] = str  # 用户名,唯一判定,默认和手机相同
@@ -303,17 +283,17 @@ class Driver(mongo_db.BaseDoc):
     type_dict['dl_valid_duration'] = int  # 驾驶证信息 驾照有效持续期,单位年
     """道路运输从业资格证部分,Road transport qualification certificate 简称rtqc"""
     type_dict['rtqc_image'] = bytes  # 道路运输从业资格证信息,照片
-    type_dict['rtqc_license_class'] = str  # 道路运输从业资格证信息.驾驶证类型,准驾车型
+    type_dict['rtqc_license_class'] = str  # 道路运输从业资格证信息.货物运输驾驶员/危险货物运输驾驶员
     type_dict['rtqc_first_date'] = datetime.datetime  # 道路运输从业资格证信息 首次领证日期,用于推定从业年限
     type_dict['rtqc_valid_begin'] = datetime.datetime  # 道路运输从业资格证信息 资格证的有效期的开始时间
     type_dict['rtqc_valid_end'] = datetime.datetime  # 道路运输从业资格证信息 资格证的有效期的结束时间
     """某些司机自己有车辆"""
-    type_dict['vehicle'] = list()  # 车辆信息, Vehicle.的DBRef对象
+    type_dict['vehicle'] = list  # 车辆信息, Vehicle.的DBRef对象
     """求职意愿"""
     type_dict['want_job'] = bool  # 是否有求职意向?有求职意向的才会推荐工作,可以认为这是个开关.
     type_dict['remote'] = bool  # 是否原因在外地工作?
     """留下,暂时不用,只有愿意不愿意取外地工作这个选项"""
-    type_dict['expected_regions'] = list()    # 期望工作地区,list是区域代码的list,
+    type_dict['expected_regions'] = list    # 期望工作地区,list是区域代码的list,
     """
      期望待遇,2个int元素组成的数组.第一个元素表示待遇下限,第二个元素表示待遇上限.
      如果只有一个元素,则代表下限.
@@ -321,14 +301,14 @@ class Driver(mongo_db.BaseDoc):
      超过2个的元素会被抛弃.
      元素必须是int类型
     """
-    type_dict['expected_salary'] = list()    # 期望待遇
+    type_dict['expected_salary'] = list   # 期望待遇
     """熟悉线路"""
-    type_dict['routes'] = list()  # 熟悉线路,Route的DBRef的list
+    type_dict['routes'] = list  # 熟悉线路,Route的DBRef的list
     """工作履历部分,是WorkHistory.的DBRef的list对象"""
-    type_dict['我'] = list()
+    type_dict['work_history'] = list
     type_dict['self_evaluation'] = str  # 自我评价
     """获奖/荣誉证书 Honor._id的list对象"""
-    type_dict['honor'] = list()
+    type_dict['honor'] = list
     type_dict['create_date'] = datetime.datetime  # 简历的创建时间
 
     def __init__(self, **kwargs):
@@ -349,14 +329,17 @@ class Driver(mongo_db.BaseDoc):
         else:
             pass
         age = kwargs.pop('age', "")
-        if age.isdigit():
+        if isinstance(age, int):
+            pass
+        elif isinstance(age, str) and age.isdigit():
             age = int(age)
-            if 16 <= age <= 60:
-                kwargs['age'] = age
-            else:
-                pass
         else:
             pass
+        if isinstance(age, int) and 16 <= age <= 60:
+            kwargs['age'] = age
+        else:
+            pass
+
         birth_date = kwargs.pop("birth_date", None)
         if isinstance(birth_date, datetime.datetime):
             kwargs['birth_date'] = birth_date
@@ -401,7 +384,7 @@ class Driver(mongo_db.BaseDoc):
                 pass
         else:
             pass
-        super(Driver, self).__init__(**kwargs)
+        super(DriverResume, self).__init__(**kwargs)
 
 
 if __name__ == "__main__":

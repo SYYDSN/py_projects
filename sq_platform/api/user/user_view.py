@@ -453,17 +453,55 @@ def get_violation_report(user_id):
     end = end - datetime.timedelta(seconds=0.000001)
     f = {"time": {"$lte": end, "$gte": begin}, "user_id": user_id}
     s = {"time": -1}
-    r = violation_module.ViolationRecode.find_plus(filter_dict=f, sort_dict=s, can_json=True)
+    r = violation_module.ViolationRecode.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
+    now = datetime.datetime.now()
     data = dict()
     total_fine = 0.0  # 总罚款
     total_point = 0  # 总扣分
     total_untread = 0  # 未处理违章条数
     total_processed = 0  # 已处理违章条数
+    count_by_month = [0] * 12  # 每个月的违章数
+    points_by_month = [0] * 12  # 每个月的罚分
+    fine_by_month = [0] * 12  # 每个月的罚款
+    cnt_serious = 0  # 一年中严重违章的次数
+    cnt_slight = 0  # 一年中轻微违章的次数
+    cnt_parking = 0  # 一年中违章停车的次数
+    cnt_speed = 0  # 一年中超速的次数
+    cnt_overload = 0  # 一年中超载的次数
+    cnt_out = 0  # 一年中压线的次数
+    cnt_signal = 0  # 一年中闯红灯的次数
+    cnt_smoke = 0  # 一年中其他违章的次数
+    violations = list()
     if len(r) > 0:
         """统计数据"""
-        real_last = None
         for x in r:
+            violations.append(mongo_db.to_flat_dict(x))
+            month = x['time'].month if isinstance(x.get("time"), datetime.datetime) else now.month
+            """违章分类计数"""
+            reason = x['reason']
+            if reason.find("内停车") != -1 or reason.find("上停车") != -1:
+                """违章停车"""
+                cnt_parking += 1
+            elif reason.find("超速") != -1 or reason.find("超过规定时速") != -1:
+                """超速"""
+                cnt_speed += 1
+            elif reason.find("超过核定人数") != -1 or reason.find("质量") != -1:
+                """超载"""
+                cnt_overload += 1
+            elif reason.find("停止线") != -1:
+                """压线"""
+                cnt_out += 1
+            elif reason.find("信号灯") != -1:
+                """闯红灯"""
+                cnt_signal += 1
+            else:
+                cnt_smoke += 1
+            """统计扣分"""
             point = x['point']  # 扣分
+            if point > 3:
+                cnt_serious += 1
+            else:
+                cnt_slight += 1
             if isinstance(point, int):
                 pass
             elif isinstance(point, str) and point.isdigit():
@@ -471,6 +509,8 @@ def get_violation_report(user_id):
             else:
                 point = 0
             total_point += point
+            points_by_month[month - 1] = points_by_month[month - 1] + point
+            """统计罚款"""
             fine = x['fine']  # 罚款
             if isinstance(fine, float):
                 pass
@@ -481,6 +521,9 @@ def get_violation_report(user_id):
             else:
                 fine = 0.0
             total_fine += fine
+            fine_by_month[month - 1] = fine_by_month[month - 1] + fine
+            """统计违章次数"""
+            count_by_month[month - 1] = count_by_month[month - 1] + 1
             if x['process_status'] == 1:
                 total_untread += 1
             else:
@@ -491,7 +534,18 @@ def get_violation_report(user_id):
     data['total_point'] = total_point
     data['total_untread'] = total_untread
     data['total_processed'] = total_processed
-    data['violations'] = r
+    data['count_by_month'] = count_by_month
+    data['points_by_month'] = points_by_month
+    data['fine_by_month'] = fine_by_month
+    data['cnt_serious'] = cnt_serious
+    data['cnt_slight'] = cnt_slight
+    data['cnt_parking'] = cnt_parking
+    data['cnt_speed'] = cnt_speed
+    data['cnt_overload'] = cnt_overload
+    data['cnt_out'] = cnt_out
+    data['cnt_signal'] = cnt_signal
+    data['cnt_smoke'] = cnt_smoke
+    data['violations'] = violations
     mes['data'] = data
     return json.dumps(mes)
 
@@ -502,6 +556,11 @@ def query_all_violations(user_id):
     """获取账户下所有已处理/未处理违章信息"""
     the_type = get_arg(request, "type", None)
     mes = {"message": "success"}
+    year = get_arg(request, "year", None)
+    year = datetime.datetime.now().year if year is None else year
+    begin = mongo_db.get_datetime_from_str("{}-01-01 0:0:0".format(year))
+    end = mongo_db.get_datetime_from_str("{}-01-01 0:0:0".format(year + 1))
+    end = end - datetime.timedelta(seconds=0.000001)
     if isinstance(the_type, (int, str)):
         if isinstance(the_type, str) and the_type.isdigit():
             the_type = int(the_type)
@@ -512,7 +571,7 @@ def query_all_violations(user_id):
             """先从互联网查一下,更新数据,注意,这个逻辑不是那么合理,将来要优化的"""
             violation_module.VioQueryGenerator.get_prev_query_result(user_id, None)
             """查询历史数据"""
-            f = {"user_id": user_id, "process_status": the_type}
+            f = {"user_id": user_id, "process_status": the_type, "time": {"$lte": end, "$gte": begin}}
             s = {"update_time": -1}
             r = violation_module.ViolationRecode.find_plus(filter_dict=f, sort_dict=s, to_dict=True, can_json=False)
             data = {"token": str(user_id)}
