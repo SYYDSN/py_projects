@@ -7,7 +7,6 @@ if __project_path not in sys.path:
 import mongo_db
 import datetime
 from log_module import get_logger
-from item_module import Signal
 import re
 import pandas as pd
 

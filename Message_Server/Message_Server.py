@@ -1,20 +1,12 @@
 #  -*- coding: utf-8 -*-
 from flask import Flask
 from flask import abort
-from flask import make_response
 from flask import render_template
-from flask import render_template_string
-from flask import send_file
-from flask import request
-from werkzeug.contrib.cache import RedisCache
 from flask_session import Session
-from log_module import get_logger
-import sms_module
-import json
 from user_module import User
 from module.data.pickle_data import query_chart_data
 from tools_module import *
-from item_module import *
+from module.item_module import *
 import os
 
 

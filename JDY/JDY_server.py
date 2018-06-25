@@ -3,30 +3,19 @@ from flask import Flask
 from flask import abort
 from flask import make_response
 from flask import render_template
-from flask import render_template_string
-from flask import send_file
-from flask import request
 from mongo_db import get_datetime_from_str
-from mongo_db import ObjectId
 from flask_session import Session
-from log_module import get_logger
 import sms_module
 from mongo_db import get_obj_id
 from flask_tokenauth import TokenAuth, TokenManager
-import json
-from werkzeug.contrib.cache import RedisCache
-from flask_debugtoolbar import DebugToolbarExtension
 from tools_module import *
-import item_module
 from module.spread_module import AllowOrigin
 from uuid import uuid4
-from module import user_module
-from item_module import *
+from module import user_module, item_module
+from module.item_module import *
 import os
 from mail_module import send_mail
 from browser.crawler_module import CustomerManagerRelation
-from pdb import set_trace
-
 
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
 app = Flask(__name__)

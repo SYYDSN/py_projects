@@ -5,7 +5,7 @@ __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import datetime
-from item_module import Signal
+from module.item_module import Signal
 from mongo_db import get_datetime_from_str
 from mongo_db import get_conn
 import openpyxl
