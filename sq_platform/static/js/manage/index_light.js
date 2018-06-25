@@ -452,6 +452,7 @@ let init_right_bar = function() {
     });
 };
 
+let global_markers = {};  // 全局自定义标记点容器.用于后继对全局自定义标记点的操作.
 
 // 从数据库请求最后的位置
 last_positions = function(){
@@ -462,7 +463,6 @@ last_positions = function(){
         let l = data_list.length;
         if(l > 0){
             map.clearMap();  // 清除覆盖物
-            global_markers = {};  // 全局自定义标记点容器.用于后继对全局自定义标记点的操作.
             // 添加自定义标记
             for(let i=0;i<l;i++){
                 let data = data_list[i];

@@ -147,6 +147,9 @@ $(function(){
         }
         let url = "violation?";
         url += $.param(args);
+        if(url.endsWith("?")){
+            url = url.slice(0, -1);
+        }
         console.log("url = " + url);
         location.href = url;
     });

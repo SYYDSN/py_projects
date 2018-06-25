@@ -95,7 +95,7 @@ def test_query_violation():
     headers = {"auth_token": auth_token}
     args = {"_id": "5af95af2e39a7b5b754c4efe"}   # 查询器id
     args = {"_id": ""}   # 查询器id
-    url = "http://safego.org:5000/api/query_violation"
+    # url = "http://safego.org:5000/api/query_violation"
     url = "http://127.0.0.1:5000/api/query_violation"
     res = requests.post(url, data=args, headers=headers)
     print(res.json())
@@ -321,11 +321,11 @@ if __name__ == "__main__":
     """测试获取违章查询器列表"""
     # test_get_vio_query_shortcuts()
     """测试违章查询"""
-    # test_query_violation()
+    test_query_violation()
     """测试查询用户全部违章"""
     # test_query_all_violations()
     """测试查询用户违章报告"""
-    test_get_violation_report()
+    # test_get_violation_report()
     """测试获取用户行车证信息"""
     # test_get_car_license()
     """测试用户上传行车证图片"""

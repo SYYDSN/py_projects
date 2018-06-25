@@ -1694,7 +1694,7 @@ class BaseDoc:
         instance = None
         try:
             instance = cls(**kwargs)
-        except TypeError:
+        except TypeError as e:
             logger.exception("Error! args: {}".format(str(kwargs)))
         finally:
             if instance is None:
@@ -2213,6 +2213,74 @@ class BaseDoc:
                 return None
             else:
                 return [x for x in res]
+
+    @classmethod
+    def query_by_page(cls, query_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
+                      page_index: int = 1, to_dict: bool = True, can_json: bool = False) -> list:
+        """
+        分页查询
+        :param query_dict:  查询条件字典
+        :param sort_dict:  排序条件字典
+        :param projection:  投影数组,决定输出哪些字段?
+        :param page_size: 每页大小(多少条记录?)
+        :param page_index: 页码(第几页?)
+        :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
+        :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
+        :return: 查询结果的数组
+        """
+        if isinstance(page_size, int):
+            pass
+        elif isinstance(page_size, float):
+            page_size = int(page_size)
+        elif isinstance(page_size, str) and page_size.isdigit():
+            page_size = int(page_size)
+        else:
+            page_size = 10
+        page_size = 1 if page_size < 1 else page_size
+
+        if isinstance(page_index, int):
+            pass
+        elif isinstance(page_index, float):
+            page_index = int(page_index)
+        elif isinstance(page_index, str) and page_index.isdigit():
+            page_index = int(page_index)
+        else:
+            page_size = 1
+        page_index = 1 if page_index < 1 else page_index
+
+        skip = (page_index - 1) * page_size
+        if can_json:
+            to_dict = True
+        if sort_dict is not None:
+            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        else:
+            sort_list = None
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        args = {
+            "filter": query_dict,
+            "sort": sort_list,   # 可能是None,但是没问题.
+            "projection": projection,
+            "skip": skip,
+            "limit": page_size
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        res = list()
+        r = ses.find(**args)
+        if r is None:
+            pass
+        else:
+            if r.count() > 0:
+                if to_dict:
+                    if can_json:
+                        res = [to_flat_dict(x) for x in r]
+                    else:
+                        res = [x for x in r]
+                else:
+                    res = [cls(**x) for x in r]
+            else:
+                pass
+        return res
 
 
 """

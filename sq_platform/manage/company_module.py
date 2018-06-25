@@ -1700,14 +1700,19 @@ class Company(mongo_db.BaseDoc):
         for k, v in vio_dict.items():
             """多柱状图是数组的数组的格式,每一鏃数据也是数组,不足补齐,顺序是当前/环比/同比"""
             temp = list()
-            reason = reason_dict[k]
-            reason = reason.split("，")[0]
-            reason = reason.split("、")[0]
-            temp.append(reason)
-            temp.append(v.get('当前', {"count": 0})['count'])
-            temp.append(v.get('环比', {"count": 0})['count'])
-            temp.append(v.get('同比', {"count": 0})['count'])
-            v_data.append(temp)
+            if k not in reason_dict:
+                ms = "异常的违章记录:K:{}, v:{}".format(k, v)
+                print(ms)
+                logger.exception(msg=ms)
+            else:
+                reason = reason_dict[k]
+                reason = reason.split("，")[0]
+                reason = reason.split("、")[0]
+                temp.append(reason)
+                temp.append(v.get('当前', {"count": 0})['count'])
+                temp.append(v.get('环比', {"count": 0})['count'])
+                temp.append(v.get('同比', {"count": 0})['count'])
+                v_data.append(temp)
 
         a_data = list()  # 事故的数据
         a_x = ['product', '当前', '环比', '同比']
@@ -2873,7 +2878,8 @@ if __name__ == "__main__":
     # p_id_m = ObjectId("5b03e2004660d34b81a17188")  # 管理人员的post_id
     # u_id_z = ObjectId("5af547e4e39a7b5371943a4a")  # 顺丰华新张小龙id
     # d_id_h = ObjectId("5abcac4b4660d3599207fe18")  # 顺丰华新本部门id
-    # print(sf.hire_one_employee(user_id=u_id_z, dept_id=d_id_h, post_id=p_id_m))
+    # d_id_h = ObjectId("5b30634fe39a7b413f7e1452")  # 重庆测试庄沪
+    # print(sf.hire_one_employee(user_id=d_id_h, dept_id=d_id_h, post_id=p_id_m))
     """查询一个公司的全部的违章记录"""
     # dd = Company.all_vio_cls(sf_id)
     # print(dd)

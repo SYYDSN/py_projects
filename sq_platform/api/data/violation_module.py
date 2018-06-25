@@ -1415,14 +1415,19 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 error_code = message.get("error_code")
                 if error_code is None or error_code == 0:
                     """正常的返回.没有错误信息,"""
-                    if "plate_number" in message['data']:
-                        pass
+                    vio_data = message.get('data')
+                    if isinstance(vio_data, dict):
+                        if "plate_number" in message['data']:
+                            pass
+                        else:
+                            data = message['data']
+                            q = generator.get_query_args()
+                            plate_number = q['plate_number'] if 'plate_number' in q else ""
+                            data['plate_number'] = plate_number
+                            message['data'] = data
                     else:
-                        data = message['data']
-                        q = generator.get_query_args()
-                        plate_number = q['plate_number'] if 'plate_number' in q else ""
-                        data['plate_number'] = plate_number
-                        message['data'] = data
+                        ms = "异常的违章查询结果:{}".format(message)
+                        logger.exception(msg=ms)
                 else:
                     ms = "查询违章接口发生错误error_code类型出错,error_code:{}".format(error_code)
                     print(ms)

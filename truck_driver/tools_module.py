@@ -10,22 +10,17 @@ from wtforms.validators import DataRequired
 from bson.objectid import ObjectId
 from flask_wtf.file import FileRequired, FileAllowed
 import datetime
-from error_module import pack_message
 import json
 import re
 import numpy as np
-from manage.company_module import CompanyAdmin
 import random
 import hashlib
 from uuid import uuid4
 import base64
 import urllib.request
 import os
-from manage.company_module import Company
+import jwt
 from uuid import uuid4
-from api.data.item_module import AppLoginToken
-from api.data.item_module import User
-from api.data.item_module import Log
 from werkzeug.contrib.cache import RedisCache
 from log_module import get_logger
 from log_module import recode
@@ -44,26 +39,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-class MyForm(FlaskForm):
-    """只做cstf检测"""
-    pass
-
-
-class HandlerLoginForm(FlaskForm):
-    """操作员登录用"""
-    handler_name = StringField('handler_name', validators=[DataRequired()])
-    handler_password = PasswordField('handler_password', validators=[DataRequired()])
-
-
-class VisitorLoginForm(FlaskForm):
-    """来宾登录用"""
-    v_email = StringField('v_email', validators=[DataRequired()])
-
-
-def create_rand(low_limit):
-    """随机生成一个百分比,参数low_limit是最低的下限，返回的是字符串格式的百分比"""
-
-
 def save_platform_session(**kwargs) -> bool:
     """保存平台操作者会话信息
     :kwargs 必须包含 user_id user_name user_password三个参数
@@ -80,10 +55,6 @@ def save_platform_session(**kwargs) -> bool:
             if v is not None:
                 session[k] = v
         return True
-
-
-def log_request_args(func):
-    return Log.record_function_args(func)
 
 
 def save_platform_cors_session(**kwargs) -> (str, None):

@@ -222,7 +222,6 @@ def produce_resume() -> None:
     obj.save_plus()
 
 
-
 if __name__ == "__main__":
     # ref = DBRef(database=mongo_db.db_name, collection="user_info", id=ObjectId())
     # produce_honor(ref)

@@ -825,24 +825,27 @@ def violation_func():
                     a_url += "&plate_number={}".format(plate_number)
             vio_status = get_arg(request, "vio_status", None)  # vio_status is None  查询所有类型的违章记录
             ms = "vio_status={}".format(vio_status)
-            try:
-                vio_status = int(vio_status)
-            except ValueError as e:
-                logger.exception(ms)
-                print(e)
-            except TypeError as e:
-                logger.exception(ms)
-                print(e)
-            except Exception as e:
-                logger.exception(ms)
-                print(e)
-            finally:
-                vio_status = None if not isinstance(vio_status, int) else vio_status
-            if vio_status is not None and vio_status != "":
-                if a_url.endswith("?"):
-                    a_url += "vio_status={}".format(vio_status)
-                else:
-                    a_url += "&vio_status={}".format(vio_status)
+            if vio_status is None:
+                pass
+            else:
+                try:
+                    vio_status = int(vio_status)
+                except ValueError as e:
+                    logger.exception(ms)
+                    print(e)
+                except TypeError as e:
+                    logger.exception(ms)
+                    print(e)
+                except Exception as e:
+                    logger.exception(ms)
+                    print(e)
+                finally:
+                    vio_status = None if not isinstance(vio_status, int) else vio_status
+                    if vio_status is not None and vio_status != "":
+                        if a_url.endswith("?"):
+                            a_url += "vio_status={}".format(vio_status)
+                        else:
+                            a_url += "&vio_status={}".format(vio_status)
             fine = get_arg(request, "fine", None)
             if fine is not None and fine != "":
                 if a_url.endswith("?"):
@@ -945,6 +948,7 @@ def violation_func():
             prev_page_url = a_url.format((min_index if cur_index - 1 < min_index else cur_index - 1))
             next_page_url = a_url.format((max_index if cur_index + 1 > max_index else cur_index + 1))
             cur_page_url = a_url.format(cur_index)
+
             """违章状态字典"""
             vio_dict = {"1": "未处理", "2": "处理中", "3": "已处理", "4": "不支持"}
             return render_template("manage/violation_light.html", drivers=employees, pages=index_list,
