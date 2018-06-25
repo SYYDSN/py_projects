@@ -1,6 +1,6 @@
 # API列表
 
-*[hello]()#login_func2")
+*[hello](#login_func2")
 
 # API接口说明
 
