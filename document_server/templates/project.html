@@ -1,0 +1,32 @@
+{% extends "template.html" %}
+
+{% block private_css %}
+    <link rel="stylesheet" href="../static/css/index.css">
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid narrow_container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 page-header">
+            <h1>{{ page_title }} 文档列表 <small>共计{{ children | length }}个文档</small></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p class="my_project bg-success">
+                <a class="project_title" href="/project?p_path={{project_path }}">{{ page_title }}</a>
+            <ul class="project_detail">
+                {% for x in children  %}
+                    <li>
+                        <a href="/md?m_path={{ x.path }}" target="_blank">{{ x.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block private_js %}
+{% endblock %}

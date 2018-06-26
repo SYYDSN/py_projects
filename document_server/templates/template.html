@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{{ url_for('static', filename='../static/image/favicon.ico') }}">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="../static/css/common.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/default.css">
+    {% block private_css %}
+    {% endblock %}
+    <script src="../static/js/jquery-3.2.1.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/showdown.min.js"></script>
+    <script src="../static/js/common.js"></script>
+</head>
+<body>
+{% block body %}
+    <!--body内容-->
+    <div class="container-fluid">
+    {% block container %}
+        <!--container内容-->
+    {% endblock %}
+    </div>
+{% endblock %}
+</body>
+{% block private_js %}
+{% endblock %}
+</html>

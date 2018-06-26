@@ -13,7 +13,7 @@ import datetime
 import os
 
 
-port = 7000
+port = 7001
 key_str = os.urandom(24)  # 生成密钥，为session服务。
 app = Flask(__name__)
 app.config['SECRET_KEY'] = key_str  # 配置会话密钥

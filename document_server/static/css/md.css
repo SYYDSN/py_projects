@@ -1,0 +1,15 @@
+body{
+    padding:0 calc((100% - 1000px) / 2);
+}
+.narrow_container{
+    max-width: 1000px !important;
+}
+.project_title{
+    font-size: 1.4rem;
+}
+.my_title{
+    color: #0c99f6;
+}
+.my_outer{
+    background-color: #f9f9f9;
+}

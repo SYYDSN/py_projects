@@ -1,0 +1,32 @@
+{% extends "template.html" %}
+
+{% block private_css %}
+    <link rel="stylesheet" href="../static/css/index.css">
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid narrow_container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 page-header">
+            <h1>文档列表 <small>共计{{ ds | length }}个项目的文档</small></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            {% for k, v in ds.items() %}
+                <p class="my_project {{ "bg-success" if loop.index / 2 == 0 else "bg-info" }}">
+                <a class="project_title" href="/project?p_path={{ v.path }}">{{ k }}</a>
+                <ul class="project_detail">
+                    {% for x in v['children']  %}
+                        <li><a href="/md?m_path={{ x.path }}" target="_blank">{{ x.name }}</a></li>
+                    {% endfor %}
+                </ul>
+                </p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block private_js %}
+{% endblock %}

@@ -20,7 +20,7 @@ web_blueprint = Blueprint("web_blueprint", __name__, url_prefix="/web", template
 
 def login_func(series: str, **kwargs) -> str:
     """
-    登录函数
+    登录函数. 加密接口.所有参数封装在payload中.
     :param series: 用于区分不同的登录用户 company/operator/driver/admin  企业/运营/司机用户/管理员  默认是company(公司)
     :param kwargs: 备用参数
     :return:
@@ -39,7 +39,7 @@ def login_func(series: str, **kwargs) -> str:
         else:
             """看看是什么类型登录?"""
             if series == 'company':
-                return Company.login(user_name=user_name, user_password=user_password)
+                mes = Company.login(user_name=user_name, user_password=user_password)
             else:
                 mes['message'] = "功能未实现"
     return json.dumps(mes)

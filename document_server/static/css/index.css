@@ -1,0 +1,9 @@
+body{
+    padding:0 calc((100% - 1000px) / 2);
+}
+.narrow_container{
+    max-width: 1000px !important;
+}
+.project_title{
+    font-size: 1.4rem;
+}

@@ -20,8 +20,8 @@ identity_blueprint = Blueprint("identity_blueprint", __name__, url_prefix="/iden
 
 def get_signature_func() -> str:
     """
-    获取服务器端的数字签名和当前算法,nodejs服务器用此两项信息来进行和保驾犬后台的加密通讯
-    当前情况下.使用郑宏振的手机号码做sid   sid = "18336048620"
+    获取服务器端的数字签名和当前算法,node.js服务器用此两项信息来进行和保驾犬后台的加密通讯
+    当前情况下.使用郑宏振的手机号码做sid来换取signature  sid = "18336048620"
     :return:
     """
     mes = {"message": "success"}
