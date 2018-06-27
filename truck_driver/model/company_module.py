@@ -107,6 +107,7 @@ class Company(mongo_db.BaseDoc):
         if one:
             pw = one.get('user_password', "")
             if isinstance(user_password, str) and user_password.lower() == pw.lower():
+                one.pop("user_password", "")
                 mes['data'] = one
             else:
                 mes['message'] = "密码错误"

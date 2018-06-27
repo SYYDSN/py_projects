@@ -1046,8 +1046,13 @@ class Company(mongo_db.BaseDoc):
                             "vin_id": x['vin_id'],
                             "engine_id": x['engine_id']
                         } for x in trucks}
+                    now = datetime.datetime.now()
                     for employee in employees:
                         _id = employee['_id']
+                        if "birth_date" in employee:
+                            birth_date = employee['birth_date']
+                            if isinstance(birth_date, datetime.datetime):
+                                employee['age'] = now.year - birth_date.year
                         if include_truck:
                             truck = truck_dict.get(_id)
                             first_issued_date = employee.get("first_issued_date")
@@ -1055,7 +1060,7 @@ class Company(mongo_db.BaseDoc):
                                 employee.update(truck)
                             if isinstance(first_issued_date, datetime.datetime):
                                 """计算驾龄"""
-                                y1 = datetime.datetime.now().year
+                                y1 = now.year
                                 y2 = first_issued_date.year
                                 driving_experience = y1 - y2 + 1
                                 employee['driving_experience'] = driving_experience

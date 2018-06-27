@@ -1,26 +1,30 @@
 # API列表
 
+> 本项目内网地址: 192.168.0.99  端口号: 7001
+
 * [一般性约定](#1) 
 * [加密方式](#2) 
 * [请求](#3)
 
-**接口**
+## 接口
 
 * [换取服务器签名和算法](#4)
 * [企业用户登录](#5)
+* [分页查询司机简历](#6)
 
-# 约定
+## 约定
 
-## <span id="1">一般性约定</span>
+### <span id="1">一般性约定</span>
 
+#### 除换取signature(签名)的接口外,其他接口发送数据都需要JWT进行加密
 
-#### 除换取signature(签名)的接口外,其他接口发送数据都需要JWT进行加密.
-#### 返回的数据分为加密和不加密两种.一般来说:
+#### 返回的数据分为加密和不加密两种.一般来说
+
 >1. 以加密数据为主.
 >2. 如果返回的数据很大,可能不使用加密.
 >3. 是否加密以具体接口协商为准.
 >4. 请求无需加密的接口,返回的数据也不会加密.反之依然.
->5. 加密的接口,返回的数据放在payload字段中,不加密的数据会放置data字段中.
+>5. 加密的接口,返回的数据统一放置data字段中.
 
 ## <span id="2">加密方式</span>
 
@@ -41,13 +45,15 @@
 请求分加密请求和不加密请求两种.
 
 ### 非加密请求
-*非加密请求会将多个参数同时发送到服务器端*
+
+**非加密请求会将多个参数同时发送到服务器端*
+
 举例说明
 
 ```javascript
 /*一个不需要加密的请求的例子*/
 let api = "/check_something";   // 接口地址
-let server = "http://server:port";  // 服务器地址金额端口
+let server = "http://192.168.0.99:7001";  // 服务器地址和端口
 let url = server + api;             // 拼接请求的url
 let user_name = "x_user";  
 let user_password = "123455"; 
@@ -72,9 +78,13 @@ $.post(url, args, function(resp){
     }
 });
 ```
+
 ### 加密请求
-*加密请求会将所有参数封装为请求载荷后发送到服务器端*
+
+**加密请求会将所有参数封装为请求载荷后发送到服务器端*
+
 举例说明
+
 ```javascript
 /*一个需要加密的请求的例子*/
 let jwt = require('jsonwebtoken');
@@ -97,7 +107,7 @@ $.post(url, {"payload": payload}, function(resp){
     let message = result['message'];
     if( message == 'success'){
         // 请求成功.
-        let data = result['payload'];  // 取出数据载荷,注意这里是密文
+        let data = result['data'];  // 取出数据载荷,注意这里是密文
         // 具体解密方式请参考对应的类库文档
     }
     else{
@@ -108,8 +118,7 @@ $.post(url, {"payload": payload}, function(resp){
 });
 ```
 
-
-# API接口说明
+## API接口说明
 
 ### <span id="4">换取服务器签名和算法</span>
 
@@ -121,7 +130,7 @@ $.post(url, {"payload": payload}, function(resp){
 
 **参数**：
 
-```
+``` javscript
 sid      换取signature的id   字符串类型 目前是固定值 18336048620
 ```
 
@@ -133,7 +142,7 @@ sid      换取signature的id   字符串类型 目前是固定值 18336048620
 // 成功
 {
     "message": "success",
-    "data": data 
+    "data": data
  }
  // 失败
 {
@@ -143,8 +152,8 @@ sid      换取signature的id   字符串类型 目前是固定值 18336048620
 
 **返回说明**：
 
- * message: 返回状态消息，字符串类型，只有在等于字符串“success”的时候才表示返回结果正确，否则，这里出现的将是返回错误的原因。
- * data: 数据字典。
+* message: 返回状态消息，字符串类型，只有在等于字符串“success”的时候才表示返回结果正确，否则，这里出现的将是返回错误的原因。
+* data: 数据字典。
  
 **data**: 
 
@@ -157,7 +166,7 @@ sid      换取signature的id   字符串类型 目前是固定值 18336048620
 
 ### <span id="5">企业用户登录</span>
 
->企业用户的登录接口. 
+>企业用户的登录接口.
 
 **url**:  /web/login_company
 
@@ -171,20 +180,51 @@ sid      换取signature的id   字符串类型 目前是固定值 18336048620
 ```
 
 **返回类型**： json
- 
+
 **返回结构**：
 
 ```.javascript
-{
-    "message": "success",
-    "payload": payload 
- 
- }
+    {
+        "message": "success",
+        "data": data
+    }
 ```
 
 **返回说明**：
 
- * message: 返回状态消息，字符串类型，只有在等于字符串“success”的时候才表示返回结果正确，否则，这里出现的将是返回错误的原因。
- * payload: 密文数据。
- 
-**payload**: 本例不返回密文数据,message的结果可判断企业登录的身份验证是否正确.
+* message: 返回状态消息，字符串类型，只有在等于字符串“success”的时候才表示返回结果正确，否则，这里出现的将是返回错误的原因。
+* data: 密文数据。
+
+**data**: 本例不返回密文数据,message的结果可判断企业登录的身份验证是否正确.
+
+### <span id="6">分页查询司机简历</span>
+
+>按照页码和过滤条件,分页从服务器查询司机简历.
+
+**url**:  /web/driver_page
+
+**加密**: 是
+
+**参数**：
+
+```javascript
+ // 本接口查询参数为复合型.需具体商议
+```
+
+**返回类型**： json
+
+**返回结构**：
+
+```.javascript
+    {
+        "message": "success",
+        "data": data
+    }
+```
+
+**返回说明**：
+
+* message: 返回状态消息，字符串类型，只有在等于字符串“success”的时候才表示返回结果正确，否则，这里出现的将是返回错误的原因。
+* data: 密文数据。
+
+**data**: 司机简历字典组成的数组对象.

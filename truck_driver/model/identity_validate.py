@@ -9,11 +9,13 @@ import datetime
 from werkzeug.contrib.cache import SimpleCache
 from uuid import uuid4
 import mongo_db
+from log_module import get_logger
 
 
 """身份验证模块,主要是和jwt相关的部分"""
 
 
+logger = get_logger()
 ObjectId = mongo_db.ObjectId
 s_cache = SimpleCache()  # 内存型缓存,关闭系统就消失.
 
@@ -91,7 +93,7 @@ class GlobalSignature(mongo_db.BaseDoc):
             s_cache.set(key, signature, timeout=7200)
         else:
             now = datetime.datetime.now()
-            delta_seconds = now - signature['time'] - signature['expire']
+            delta_seconds = (now - signature['time']).total_seconds() - signature['expire']
             if delta_seconds <= 300:
                 signature = cls.__get_signature(return_type="dict")
                 s_cache.set(key, signature, timeout=7200)
@@ -100,10 +102,11 @@ class GlobalSignature(mongo_db.BaseDoc):
         return signature
 
     @classmethod
-    def encode(cls, payload: dict, algorithm: str = "HS256") -> (bytes, None):
+    def encode(cls, payload: dict, secret: str = None, algorithm: str = "HS256") -> (bytes, None):
         """
         加密.注意返回的类型是bytes.
         :param payload:  需要加密的对象,必须是字典类型,字段都是可json序列化的数字或者字符串
+        :param secret:  签名
         :param algorithm:  加密算法
         :return:  bytes
         """
@@ -112,23 +115,30 @@ class GlobalSignature(mongo_db.BaseDoc):
                 "HS256", "HS384", "HS512", "ES256", "ES384", "ES512", "RS256",
                 "RS384", "RS512", "PS256", "PS384", "PS512"
             ]
-            secret = cls.get_signature().get("signature")
+            secret = secret if secret is not None else cls.get_signature().get("signature")
             if algorithm not in algorithm_list:
                 ms = "不支持的算法:{}".format(algorithm)
                 raise ValueError(ms)
             else:
                 payload = mongo_db.to_flat_dict(payload)
-                res = jwt.encode(payload=payload, key=secret, algorithm=algorithm)
-                return res
+                res = None
+                try:
+                    res = jwt.encode(payload=payload, key=secret, algorithm=algorithm)
+                except Exception as e:
+                    print(e)
+                    logger.exception(e)
+                finally:
+                    return res
         else:
             ms = "待加密对象必须是dict类型"
             raise TypeError(ms)
 
     @classmethod
-    def decode(cls, jwt_str: (str, bytes), algorithm: str = "HS256") -> (dict, None):
+    def decode(cls, jwt_str: (str, bytes), secret: str = None, algorithm: str = "HS256") -> (dict, None):
         """
         解密,返回的是字典
         :param jwt_str: 密文
+        :param secret:  签名
         :param algorithm: 算法.
         :return: 解密后的dict
         """
@@ -137,13 +147,19 @@ class GlobalSignature(mongo_db.BaseDoc):
                 "HS256", "HS384", "HS512", "ES256", "ES384", "ES512", "RS256",
                 "RS384", "RS512", "PS256", "PS384", "PS512"
             ]
-            secret = cls.get_signature().get("signature")
+            secret = secret if secret is not None else cls.get_signature().get("signature")
             if algorithm not in algorithm_list:
                 ms = "不支持的算法:{}".format(algorithm)
                 raise ValueError(ms)
             else:
-                res = jwt.decode(jwt=jwt_str, key=secret, algorithm=algorithm)
-                return res
+                res = None
+                try:
+                    res = jwt.decode(jwt=jwt_str, key=secret, algorithm=algorithm)
+                except Exception as e:
+                    print(e)
+                    logger.exception(e)
+                finally:
+                    return res
         else:
             ms = "密文必须是字符串或字节类型"
             raise TypeError(ms)

@@ -4,7 +4,13 @@ import matplotlib.patches as mpatches
 import math
 import random
 import sympy
+import datetime
 import matplotlib
+from bson.objectid import ObjectId
+from bson.dbref import DBRef
+from api.data.item_module import GPS
+from api.data.item_module import User
+from mongo_db import get_datetime_from_str
 
 
 matplotlib.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 设定全局字体，前提是安装了微软雅黑字体
@@ -109,18 +115,87 @@ def draw_multiple_ploy_line(data_dict) -> None:
     plt.show()
 
 
+def draw_line(data: list) -> None:
+    """
+    绘制折线图
+    :param data:
+    :return:
+    """
+    x = list()
+    y = list()
+    for a in data:
+        x.append(a['coordinates'][0])
+        y.append(a['coordinates'][1])
+    plt.plot(x, y)
+    plt.show()
+    print()
+
+
+def query_gps(user_id: (str, ObjectId), begin: datetime.datetime, end: datetime.datetime) -> list:
+    """
+    查询指定用户,指定时间区间的数据
+    :param user_id:
+    :param begin:
+    :param end:
+    :return:
+    """
+    u = User.find_by_id(user_id)
+    f = {"user_id": u.get_dbref(), "time": {"$gte": begin, "$lte": end}}
+    s = {"time": -1}
+    r = GPS.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
+    return r
+
+
+def calculate_slope(data_list: list) -> list:
+    """
+    计算一组数的连续的斜率变化
+    :param data_list:
+    :return:
+    """
+    res = list()
+    prev = None
+    data_list = [x['coordinates'] for x in data_list]
+    for x in data_list:
+        if prev is None:
+            pass
+        else:
+            r = 999999 if (prev[1] - x[1]) == 0 else (prev[0] - x[0]) / (prev[1] - x[1])
+            if r != 999999:
+                res.append(r)
+        prev = x
+    return res
+
+
+def draw_hist(data) -> None:
+    """
+    绘制直方图
+    :return:
+    """
+    plt.hist(data)
+    plt.show()
+    print()
+
+
 if __name__ == "__main__":
-    x_1 = [x for x in range(1, 51)]
-    y_1 = [1 / i for i in x_1]
-    y_2 = [1 / math.pow(i, 2) for i in x_1]
-    x = sympy.symbols('x1')
-    # 打印ｙ１函数的导数
-    for i in x_1:
-        print(sympy.limit((i + x), x, 0))
-    print(sympy.limit(1 / x, x, 0))  # 第一个参数是函数,第二个参数是x变量,第三个参数表示x的逼近方向
-    data = [
-        {"data_x": x_1, "data_y": y_1, "label": "1/x"},
-        {"data_x": x_1, "data_y": y_2, "label": "1/x^2"}
-    ]
-    datas ={"data": data}
-    draw_multiple_ploy_line(datas)
+    # x_1 = [x for x in range(1, 51)]
+    # y_1 = [1 / i for i in x_1]
+    # y_2 = [1 / math.pow(i, 2) for i in x_1]
+    # x = sympy.symbols('x1')
+    # # 打印ｙ１函数的导数
+    # for i in x_1:
+    #     print(sympy.limit((i + x), x, 0))
+    # print(sympy.limit(1 / x, x, 0))  # 第一个参数是函数,第二个参数是x变量,第三个参数表示x的逼近方向
+    # data = [
+    #     {"data_x": x_1, "data_y": y_1, "label": "1/x"},
+    #     {"data_x": x_1, "data_y": y_2, "label": "1/x^2"}
+    # ]
+    # datas ={"data": data}
+    # draw_multiple_ploy_line(datas)
+    """查询gps数据并绘制坐标线图"""
+    u_id = ObjectId("5b30634fe39a7b413f7e1452")
+    b = get_datetime_from_str("2018-6-26 0:0:0")
+    e = get_datetime_from_str("2018-6-26 23:0:0")
+    gps_data = query_gps(u_id, b, e)
+    print(set([x['pr'] for x in gps_data]))
+    # draw_hist(calculate_slope(gps_data))
+    pass
