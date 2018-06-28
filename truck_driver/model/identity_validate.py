@@ -63,15 +63,15 @@ class GlobalSignature(mongo_db.BaseDoc):
         :param return_type: 返回的类型.可以选3个值object/dict/can_json,分表代表返回 实例/字典/可json序列化的字典
         :return: 取决于return_type参数.
         """
-        """现阶段,不存在signature过期时间"""
-        now = datetime.datetime.now()
-        last = now - datetime.timedelta(seconds=6900)  # 6900是2个小时减去5分钟.
-        f = {'time': {"$gte": last}}
+        """目前没有过期时间"""
+        f = dict()
         s = {"time": -1}
         one = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
         """表为空或者没有有效的signature,重新生成一个signature"""
         if one is None:
             one = cls.__add_signature()
+        else:
+            pass
         if return_type == "object":
             one = cls(**one)
         elif return_type == "can_json":

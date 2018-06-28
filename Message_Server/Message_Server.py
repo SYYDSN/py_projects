@@ -123,7 +123,7 @@ def teacher_charts_func(key):
 
 @app.route("/teacher_login", methods=['post', 'get'])
 def teacher_login_func():
-    """登录页"""
+    """管理登录页，登录后可查看老师喊单的有关统计图表"""
     if request.method.lower() == "get":
         login_title = "Login"
         return render_template("teacher_login.html", login_title=login_title)
@@ -141,6 +141,9 @@ def teacher_login_func():
         return json.dumps(mes)
     else:
         return abort(405)
+
+
+@app.route("/")
 
 
 @app.before_request
