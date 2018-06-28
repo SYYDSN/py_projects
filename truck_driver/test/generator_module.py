@@ -152,9 +152,9 @@ def produce_history(user_id: DBRef) -> object:
         "vehicle_type": "平板式货车",
         "vehicle_load": 14,
         "vehicle_length": 9.6,
-        "description": "负责xxx到xx之间的物流工作,遵守工作纪律，恪守职业道德，具备良好的职业修养。为领导开车的专职司机要谦虚谨慎，"
-                       "严守公司机密，维护公司利益。",
-        "achievement": "工作努力,热情为公司领导服务，一切以领导满意为宗旨。",
+        "description": "负责xxx到xx之间的物流工作,遵守工作纪律恪守职业道德具备良好的职业修养为领导开车的专职司机要谦虚谨慎"
+                       "严守公司机密维护公司利益",
+        "achievement": "工作努力,热情为公司领导服务一切以领导满意为宗旨",
         "create_date": datetime.datetime.now()
     }
     obj = WorkHistory(**init)
@@ -167,11 +167,15 @@ def produce_resume() -> None:
     随机生成司机简历并保存
     :return:
     """
+    p = "赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜戚谢邹喻柏水窦章云苏潘葛奚范彭郎鲁韦昌马苗凤花方俞任袁柳酆鲍" \
+        "史唐费廉岑薛雷贺倪汤滕殷罗毕郝邬安常乐于时傅皮卞齐康伍余元卜顾孟平黄和穆萧尹姚邵湛汪祁毛禹狄米贝明臧计伏成戴谈宋茅庞熊纪舒屈" \
+        "项祝董梁杜阮蓝闵席季麻强贾路娄危江童颜郭梅盛林刁钟徐邱骆高夏蔡田樊胡凌霍虞万支柯"
+    p = [x for x in p]
     p1 = "/home/walle/图片/驾照.jpeg"
     f1 = open(file=p1, mode="rb")
     dl_image = f1.read()
     f1.close()
-    phone = "1{}".format(random.randint(300000000, 9999999999))
+    phone = "1{}".format(random.randint(3000000000, 9999999999))
     now = datetime.datetime.now()
     y = random.randint(1960, 1995)
     m = str(random.randint(1, 12)).zfill(2)
@@ -184,6 +188,7 @@ def produce_resume() -> None:
     init = {
         "_id": u_id,
         "user_name": phone,
+        "real_name": random.choice(p) + "某某",
         "gender": "男",
         "birth_place": "上海",
         "living_place": "上海",
@@ -213,7 +218,8 @@ def produce_resume() -> None:
         "expected_salary": [base, base * 1.5],
         "routes": [produce_route(ref).get_dbref()],
         "work_history": [produce_history(ref).get_dbref(), produce_history(ref).get_dbref()],
-        "self_evaluation": "自我评价是多学科研究的对象，它已经被哲学、心理学、社会心理学、社会学、"
+        "last_company": "xx物流集团公司",
+        "self_evaluation": "自我评价是多学科研究的对象它已经被哲学、心理学、社会心理学、社会学、"
                            "教育学、文化学、人学、价值科学等都许多学科所关注",
         "honor": [produce_honor(ref).get_dbref()],
         "create_date": datetime.datetime.now()
@@ -227,5 +233,10 @@ if __name__ == "__main__":
     # produce_honor(ref)
     # xx = ObjectId("5b2cad1a4660d33bbe4d3481")
     # show_honor_image(xx)
-    produce_resume()
+    """生成300个司机简历"""
+    # for i in range(300):
+    #     produce_resume()
+    f = dict()
+    u = {"$set": {"last_company": "xx物流集团公司"}}
+    DriverResume.update_many_plus(filter_dict=f, update_dict=u)
     pass

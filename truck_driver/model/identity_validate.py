@@ -63,7 +63,7 @@ class GlobalSignature(mongo_db.BaseDoc):
         :param return_type: 返回的类型.可以选3个值object/dict/can_json,分表代表返回 实例/字典/可json序列化的字典
         :return: 取决于return_type参数.
         """
-        """在老的signature过期前5分钟就应该生成一个新的signature,在这5分钟内,新旧signature豆可以使用."""
+        """现阶段,不存在signature过期时间"""
         now = datetime.datetime.now()
         last = now - datetime.timedelta(seconds=6900)  # 6900是2个小时减去5分钟.
         f = {'time': {"$gte": last}}
@@ -92,13 +92,7 @@ class GlobalSignature(mongo_db.BaseDoc):
             signature = cls.__get_signature(return_type="dict")
             s_cache.set(key, signature, timeout=7200)
         else:
-            now = datetime.datetime.now()
-            delta_seconds = (now - signature['time']).total_seconds() - signature['expire']
-            if delta_seconds <= 300:
-                signature = cls.__get_signature(return_type="dict")
-                s_cache.set(key, signature, timeout=7200)
-            else:
-                pass
+            pass
         return signature
 
     @classmethod
@@ -134,12 +128,14 @@ class GlobalSignature(mongo_db.BaseDoc):
             raise TypeError(ms)
 
     @classmethod
-    def decode(cls, jwt_str: (str, bytes), secret: str = None, algorithm: str = "HS256") -> (dict, None):
+    def decode(cls, jwt_str: (str, bytes), secret: str = None, algorithm: str = "HS256",
+               to_str: bool = True) -> (dict, None):
         """
         解密,返回的是字典
         :param jwt_str: 密文
         :param secret:  签名
         :param algorithm: 算法.
+        :param to_str: 是否将结果转成str格式?默认是bytes格式.
         :return: 解密后的dict
         """
         if isinstance(jwt_str, (str, bytes)):
@@ -159,6 +155,8 @@ class GlobalSignature(mongo_db.BaseDoc):
                     print(e)
                     logger.exception(e)
                 finally:
+                    if isinstance(res, bytes) and to_str:
+                        res = res.decode(encoding="utf-8")
                     return res
         else:
             ms = "密文必须是字符串或字节类型"
@@ -166,9 +164,12 @@ class GlobalSignature(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    # s = GlobalSignature.encode({"name": "hello", "time": datetime.datetime.now()})
-    s = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiaGVsbG8iLCJ0aW1lIjoiMjAxOC0wNi0yNSAxNzo1MzoyMyJ9.D7-3yV2' \
-        '5rKCSCuHTNAmvKsJEXCuLZqVR62PxD3Ejj1M'
-    s = GlobalSignature.decode(s)
+    """编码"""
+    s = GlobalSignature.encode({"filter": {}})
     print(s)
+    """解码"""
+    # s = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiaGVsbG8iLCJ0aW1lIjoiMjAxOC0wNi0yNSAxNzo1MzoyMyJ9.D7-3yV2' \
+    #     '5rKCSCuHTNAmvKsJEXCuLZqVR62PxD3Ejj1M'
+    # s = GlobalSignature.decode(s)
+    # print(s)
     pass

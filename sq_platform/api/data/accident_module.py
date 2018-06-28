@@ -8,6 +8,7 @@ if __dir_path not in sys.path:
 import mongo_db
 from api.data.item_module import User
 import datetime
+from log_module import get_logger
 import re
 
 
@@ -18,6 +19,7 @@ ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
 get_datetime_from_str = mongo_db.get_datetime_from_str
 cache = mongo_db.cache
+logger = get_logger()
 
 
 class AccidentData(mongo_db.BaseFile):
@@ -72,6 +74,15 @@ class Accident(mongo_db.BaseDoc):
             kwargs['create_date'] = now
         if "last_update" not in kwargs:
             kwargs['last_update'] = now
+        loss = kwargs.pop("loss", "0")
+        try:
+            loss = float(loss)
+        except Exception as e:
+            print(e)
+            loss = 0.0
+            logger.exception(e)
+        finally:
+            kwargs['loss'] = loss
         super(Accident, self).__init__(**kwargs)
 
     @classmethod
@@ -151,7 +162,7 @@ class Accident(mongo_db.BaseDoc):
         else:
             pass
         skip = (index - 1) * num
-        sort_dict = {"time": -1 if reverse else 1}
+        sort_dict = {"time": -1 if reverse else 1 }
         count = cls.count(filter_dict=filter_dict)
         res = cls.find_plus(filter_dict=filter_dict, sort_dict=sort_dict, skip=skip, limit=num, to_dict=True)
         if can_json:

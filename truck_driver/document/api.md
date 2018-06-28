@@ -40,6 +40,38 @@
 6. 从返回结果的payload字段中取回返回的密文.
 7. 使用约定的signature(签名)和algorithm(算法)进行解密.
 
+一个解密的例子
+
+```javascript
+var http = require("http");
+var url = require("url");
+var jwt = require('jsonwebtoken');
+var cert = "f45799819d864f4b8c26ccbbb4d68255";
+
+
+function start() {
+    function onRequest(request, response) {
+        var token = url.parse(request.url).pathname;
+        token = token.slice(1); // 去掉路径的/
+        /*
+        jwt.verify(token, cert, { algorithms: ['HS256'] }, function(error, payload) {
+            console.log(error);
+            console.log(payload);
+        });
+        */
+        var res = jwt.decode(token, { "cert": cert, algorithms: ['HS256'] });
+        console.log(res);
+        response.writeHead(200, { "Content-Type": "text/javascript;charset=utf-8" });
+        response.write(JSON.stringify(res));
+        response.end();
+    }
+    http.createServer(onRequest).listen(3000);
+    console.log("Server has started.");
+}
+start();
+
+```
+
 ## <span id="3">请求</span>
 
 请求分加密请求和不加密请求两种.

@@ -112,7 +112,7 @@ $(function(){
                     else if (k === "end_date") {
                         $("#end_date").val(v.split(" ")[0]);
                     }
-                    else if (k === "driver_name") {
+                    else if (k === "driver_id") {
                         $("#select_driver").val(v);
                     }
                     else if (k === "city") {

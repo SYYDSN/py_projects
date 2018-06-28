@@ -1062,7 +1062,7 @@ class Company(mongo_db.BaseDoc):
                                 """计算驾龄"""
                                 y1 = now.year
                                 y2 = first_issued_date.year
-                                driving_experience = y1 - y2 + 1
+                                driving_experience = y1 - y2
                                 employee['driving_experience'] = driving_experience
                         if count_vio:
                             if _id in vio_dict:

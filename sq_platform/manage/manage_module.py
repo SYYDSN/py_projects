@@ -1032,10 +1032,10 @@ def warning_func():
                     a_url += "event_type={}".format(types_str)
                 else:
                     a_url += "&event_type={}".format(types_str)
-                event_type = json.loads(types_str)
+                event_type = [types_str]
             else:
                 pass
-            active_tip_str = get_arg(request, "active_tip", None)  # 主动提醒列表
+            active_tip_str = get_arg(request, "active_tip", "[]")  # 主动提醒列表
             active_tip = None
             if types_str is not None and types_str != "":
                 if a_url.endswith("?"):
@@ -1213,7 +1213,7 @@ def accident_func():
             end_date_str = get_arg(request, "end_date", None)  # 截至时间
             end_date = get_datetime_from_str(end_date_str)
             if end_date is None:
-                pass
+                end_date = datetime.datetime.now()
             else:
                 if a_url.endswith("?"):
                     a_url += "end_date={}".format(end_date_str)

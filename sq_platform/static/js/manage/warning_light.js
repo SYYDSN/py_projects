@@ -98,9 +98,9 @@ $(function(){
         if(end_date_str !== null){
             args["end_date"] = end_date_str + " 23:59:59";
         }
-        let city = $.trim($("#select_city").val());
-        if(city !== ""){
-            args['city'] = city;
+        let event_type = $.trim($("#event_type").val());
+        if(event_type !== ""){
+            args['event_type'] = event_type;
         }else{}
         let driver = $.trim($("#select_driver").val());
         if(driver !== ""){
@@ -122,7 +122,7 @@ $(function(){
 
     // 清空筛选条件
     $("#clear_condition").click(function(){
-        $("#begin_date,#end_date,#select_city,#select_car,#select_driver").val("");
+        $("#begin_date,#end_date,#event_type,#select_car,#select_driver").val("");
     });
 
 
@@ -148,8 +148,8 @@ $(function(){
                     else if (k === "user_id") {
                         $("#select_driver").val(v);
                     }
-                    else if (k === "city") {
-                        $("#select_city").val(v);
+                    else if (k === "event_type") {
+                        $("#event_type").val(v);
                     }
                     else if (k === "plate_number") {
                         $("#select_car").val(v);

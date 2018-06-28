@@ -2215,11 +2215,11 @@ class BaseDoc:
                 return [x for x in res]
 
     @classmethod
-    def query_by_page(cls, query_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
+    def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
                       page_index: int = 1, to_dict: bool = True, can_json: bool = False) -> list:
         """
         分页查询
-        :param query_dict:  查询条件字典
+        :param filter_dict:  查询条件字典
         :param sort_dict:  排序条件字典
         :param projection:  投影数组,决定输出哪些字段?
         :param page_size: 每页大小(多少条记录?)
@@ -2258,7 +2258,7 @@ class BaseDoc:
         table_name = cls._table_name
         ses = get_conn(table_name=table_name)
         args = {
-            "filter": query_dict,
+            "filter": filter_dict,
             "sort": sort_list,   # 可能是None,但是没问题.
             "projection": projection,
             "skip": skip,

@@ -255,6 +255,7 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['user_name'] = str  # 用户名,唯一判定,默认和手机相同
+    type_dict['real_name'] = str  # 真实姓名 ,可以从驾驶证取
     type_dict['gender'] = str   # 以驾驶证信息为准. 男/女
     type_dict['birth_place'] = str   # 籍贯/出生地
     type_dict['living_place'] = str   # 居住地,
@@ -306,15 +307,19 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['routes'] = list  # 熟悉线路,Route的DBRef的list
     """工作履历部分,是WorkHistory.的DBRef的list对象"""
     type_dict['work_history'] = list
+    type_dict['last_company'] = str  # 最后工作的公司,仅仅为列表页而添加
     type_dict['self_evaluation'] = str  # 自我评价
     """获奖/荣誉证书 Honor._id的list对象"""
     type_dict['honor'] = list
+    type_dict['update_date'] = datetime.datetime  # 简历的刷新时间
     type_dict['create_date'] = datetime.datetime  # 简历的创建时间
 
     def __init__(self, **kwargs):
         now = datetime.datetime.now()
         if "create_date" not in kwargs:
             kwargs['create_date'] = now
+        if "update_date" not in kwargs:
+            kwargs['update_date'] = now
         if "gender" not in kwargs:
             kwargs['gender'] = "男"
         phone = kwargs.get("phone")
@@ -367,7 +372,7 @@ class DriverResume(mongo_db.BaseDoc):
             dl_first_date = mongo_db.get_datetime_from_str(dl_first_date)
             if isinstance(dl_first_date, datetime.datetime):
                 kwargs['dl_first_date'] = dl_first_date
-                driving_experience = now.year - dl_first_date.year + 1
+                driving_experience = now.year - dl_first_date.year
                 kwargs['driving_experience'] = driving_experience
             else:
                 pass
@@ -378,13 +383,16 @@ class DriverResume(mongo_db.BaseDoc):
             rtqc_first_date = mongo_db.get_datetime_from_str(rtqc_first_date)
             if isinstance(rtqc_first_date, datetime.datetime):
                 kwargs['rtqc_first_date'] = rtqc_first_date
-                industry_experience = now.year - rtqc_first_date.year + 1
+                industry_experience = now.year - rtqc_first_date.year
                 kwargs['industry_experience'] = industry_experience
             else:
                 pass
         else:
             pass
         super(DriverResume, self).__init__(**kwargs)
+
+    @classmethod
+    def add_work_history(cls, history_args):
 
 
 if __name__ == "__main__":
