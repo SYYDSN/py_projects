@@ -48,7 +48,7 @@ def login_func(series: str, **kwargs) -> str:
                 user_password = payload['user_password']
                 """看看是什么类型登录?"""
                 if series == 'company':
-                    mes = Company.login(user_name=user_name, user_password=user_password)
+                    mes = Company.login(user_name=user_name, user_password=user_password, can_json=True)
                 else:
                     mes['message'] = "功能未实现"
             else:

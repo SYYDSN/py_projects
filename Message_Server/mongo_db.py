@@ -5,6 +5,7 @@ import pymongo
 from pymongo import monitoring
 import warnings
 import datetime
+import calendar
 import hashlib
 from uuid import uuid4
 from bson.objectid import ObjectId
@@ -17,10 +18,11 @@ import numpy as np
 import re
 import math
 from pymongo import errors
-from werkzeug.contrib.cache import RedisCache
 from pymongo.client_session import ClientSession
+from werkzeug.contrib.cache import RedisCache
 from log_module import get_logger
 from pymongo import ReturnDocument
+import gridfs
 from pymongo.errors import *
 import warnings
 from pymongo.errors import DuplicateKeyError
@@ -183,28 +185,43 @@ class DB:
         return cls.instance
 
 
-def get_db():
+def get_db(database: str = None):
     """
     获取一个针对db_name对应的数据库的的连接，一般用于ORM方面。比如构建一个类。
+    :param database: 数据库名
     :return: 一个Database对象。
     """
     mongodb_conn = DB()
-    conn = mongodb_conn[db_name]
+    if database is None:
+        conn = mongodb_conn[db_name]
+    else:
+        conn = mongodb_conn[database]
     return conn
 
 
-def get_conn(table_name):
+def get_conn(table_name: str, database: str = None):
     """
-    获取一个针对table_name对应的表的的连接，一般用户对数据库进行增删查改等操作。
+    获取一个针对table_name对应的表的的连接，一般用户直接对数据库进行增删查改等操作。
     :param table_name: collection的名称，对应sql的表名。必须。
+    :param database: 数据库名
     :return: 一个Collection对象，用于操作数据库。
     """
     if table_name is None or table_name == '':
         raise TypeError("表名不能为空")
     else:
-        mongodb_conn = get_db()
+        mongodb_conn = get_db(database)
         conn = mongodb_conn[table_name]
         return conn
+
+
+def get_fs(table_name: str, database: str = None) -> gridfs.GridFS:
+    """
+    获取一个GridFS对象
+    :param table_name: collection名
+    :param database: 数据库名
+    :return:
+    """
+    return gridfs.GridFS(database=get_db(database), collection=table_name)
 
 
 def other_can_json(obj):
@@ -219,7 +236,10 @@ def other_can_json(obj):
     elif isinstance(obj, (DBRef, MyDBRef)):
         return str(obj.id)
     elif isinstance(obj, datetime.datetime):
-        return obj.strftime("%Y-%m-%d %H:%M:%S")
+        if obj.hour == 0 and obj.minute == 0 and obj.second == 0 and obj.microsecond == 0:
+            return obj.strftime("%F")
+        else:
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
     elif isinstance(obj, datetime.date):
         return obj.strftime("%F")
     elif isinstance(obj, list):
@@ -248,6 +268,34 @@ def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     :return:
     """
     return {other_can_json(k): other_can_json(v) for k, v in a_dict.items() if k not in ignore_columns}
+
+
+def last_day_of_month(the_date: datetime.datetime) -> int:
+    """
+    求这个月的最后一天
+    :param the_date:
+    :return:
+    """
+    y = the_date.year
+    m = the_date.month
+    return calendar.monthrange(y, m)[-1]
+
+
+def prev_month(the_date: datetime.datetime = None) -> tuple:
+    """
+    给定一个时间,返回上个月的年和月的信息
+    :param the_date:
+    :return:
+    """
+    if not isinstance(the_date, datetime.datetime):
+        ms = "the_date类型错误,使用当前日期替代,错误原因:期待一个datetime.datetime对象,获得了一个{}对象".format(type(the_date))
+        warnings.warn(ms)
+        the_date = datetime.datetime.now()
+    y = the_date.year
+    m = the_date.month
+    the_date = datetime.datetime.strptime("{}-{}-1".format(y, m), "%Y-%m-%d") - datetime.timedelta(days=1)
+    res = (the_date.year, the_date.month)
+    return res
 
 
 def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
@@ -293,7 +341,9 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
     :param date_str: 表示时间的字符串."%Y-%m-%d %H:%M:%S  "%Y-%m-%d %H:%M:%S.%f 或者 "%Y-%m-%d
     :return: datetime.datetime对象
     """
-    if isinstance(date_str, (datetime.datetime, datetime.date)):
+    if date_str is None:
+        pass
+    elif isinstance(date_str, (datetime.datetime, datetime.date)):
         return date_str
     elif isinstance(date_str, str):
         date_str.strip()
@@ -301,28 +351,31 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
         if search:
             date_str = search.group()
             pattern_0 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d$')  # 时间匹配2017-01-01
-            pattern_1 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
-            pattern_2 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
-            pattern_3 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$') # 时间匹配2017-01-01 12:00:00 000
-            pattern_4 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
-            pattern_5 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01T12:00:00.000
-            pattern_6 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
-            pattern_7 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
+            pattern_1 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00
+            pattern_2 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
+            pattern_3 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
+            pattern_4 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$') # 时间匹配2017-01-01 12:00:00 000
+            pattern_5 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
+            pattern_6 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01T12:00:00.000
+            pattern_7 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
+            pattern_8 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
 
-            if pattern_7.match(date_str):
+            if pattern_8.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S %f")
-            elif pattern_6.match(date_str):
+            elif pattern_7.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-            elif pattern_5.match(date_str):
+            elif pattern_6.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
-            elif pattern_4.match(date_str):
+            elif pattern_5.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
-            elif pattern_3.match(date_str):
+            elif pattern_4.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S %f")
-            elif pattern_2.match(date_str):
+            elif pattern_3.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
-            elif pattern_1.match(date_str):
+            elif pattern_2.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+            elif pattern_1.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M")
             elif pattern_0.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d")
             else:
@@ -815,6 +868,180 @@ class MyCache:
             return
 
 
+class BaseFile:
+    """GridFS操作基础类"""
+    _table_name = "base_file"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['owner'] = DBRef   # 拥有者id,一般是指向user_info的_id
+    type_dict['file_name'] = str
+    type_dict['file_type'] = str  # 文件类型
+    type_dict['description'] = str
+    type_dict['uploadDate'] = datetime.datetime
+    type_dict['length'] = int
+    type_dict['chunkSize'] = int
+    type_dict['md5'] = str
+    type_dict['data'] = bytes
+
+    def __init__(self, **kwargs):
+        _id = kwargs.pop("_id", None)
+        if _id is None:
+            pass
+        elif isinstance(_id, ObjectId):
+            kwargs['_id'] = _id
+        elif isinstance(_id, str) and len(_id) == 24:
+            kwargs['_id'] = ObjectId(_id)
+        else:
+            ms = "_id参数不合法:{}".format(_id)
+            raise ValueError(ms)
+        owner = kwargs.get("owner", None)
+        if not isinstance(owner, DBRef):
+            ms = "owner只能是DBRef类型,期待DBRef,得到:{}".format(type(owner))
+            raise ValueError(ms)
+        else:
+            pass
+        if "file_name" not in kwargs:
+            ms = "file_name arg is require!"
+            raise ValueError(ms)
+        if "file_type" not in kwargs:
+            ms = "file_type参数缺失.未知的文件类型"
+            raise ValueError(ms)
+        if "description" not in kwargs:
+            kwargs['description'] = ""
+        for k, v in kwargs.items():
+            type_dict = self.type_dict
+            if k in type_dict:
+                if isinstance(v, type_dict[k]):
+                    self.__dict__[k] = v
+                else:
+                    the_type = self.type_dict[k]
+                    if the_type.__name__ == 'datetime':
+                        self.__dict__[k] = get_datetime_from_str(v)
+                    else:
+                        self.__dict__[k] = the_type(v)
+            else:
+                self.__dict__[k] = v
+
+    def table_name(self):
+        return self._table_name
+
+    @classmethod
+    def get_table_name(cls):
+        return cls._table_name
+
+    @classmethod
+    def fs_cls(cls, collection: str = None) -> gridfs.GridFS:
+        """
+        返回一个GridFS对象.
+        :param collection:
+        :return:
+        """
+        collection = collection if collection else cls.get_table_name()
+        return get_fs(collection)
+
+    @classmethod
+    def save_cls(cls, file_obj, collection: str = None, **kwargs) -> (str, ObjectId, None):
+        """
+        保存文件.
+        :param file_obj: 一个有read方法的对象,比如一个就绪状态的BufferedReader对象.
+        :param collection:
+        :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
+        :return: 失败返回None,成功返回_id/str
+        """
+        fs = cls.fs_cls(collection)
+        r = fs.put(data=file_obj, **kwargs)
+        file_obj.close()
+        return r
+
+    @classmethod
+    def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False, collection: str = None) -> (dict, None):
+        """
+        查找一个文件.
+        :param filter_dict: 查找条件
+        :param sort_dict: 排序条件
+        :param instance: 是否返回实例?
+        :param collection:
+        :return: object/doc
+        """
+        fs = cls.fs_cls(collection)
+        if isinstance(sort_dict, dict) and len(sort_dict) > 0:
+            s = [(k, v) for k, v in sort_dict.items()]
+            one = fs.find_one(filter=filter_dict, sort=s)
+        else:
+            one = fs.find_one(filter=filter_dict)
+        if one is None:
+            pass
+        else:
+            r = one._file
+            r['data'] = one.read()
+            one.close()
+            return cls(**r) if instance else r
+
+    def data(self) -> bytes:
+        """返回数据"""
+        return self.__dict__['data']
+
+    @classmethod
+    def get_one_data(cls, filter_dict: dict, sort_dict: dict = None, collection: str = None) -> bytes:
+        """
+        根据条件,查询一个文件,
+        :param filter_dict: 查找条件
+        :param sort_dict: 排序条件
+        :param collection: 排序条件
+        :return:
+        """
+        r = cls.find_one_cls(filter_dict=filter_dict, sort_dict=sort_dict, collection=collection)
+        if r is None:
+            pass
+        else:
+            return r['data']
+
+    @classmethod
+    def format_url(cls, file_id: (str, ObjectId), file_name: str, collection: str = None) -> str:
+        """
+        格式化file对象的url, 这个函数仅仅被cls.transform调用.
+        对于不同的class,你可能需要重载此方法以自定义file的url
+        :param file_id:
+        :param file_name:
+        :param collection:
+        :return:
+        """
+        file_id = file_id if isinstance(file_id, str) else str(file_id)
+        collection = collection if collection else cls.get_table_name()
+        return '/manage/fs/{}/{}/{}'.format(collection, file_id, file_name)
+
+    @classmethod
+    def transform(cls, doc: dict, include_data: bool = False, collection: str = None) -> dict:
+        """
+        转换字典成为:
+        1. files部分的BDRef转为url
+        2. 除data外,都转为适合json的类型.
+        :param doc:
+        :param include_data: 是否包含data?
+        :param collection:
+        :return:
+        """
+        temp = dict()
+        f_id = doc['_id']
+        temp['_id'] = f_id
+        f_name = doc.get('file_name', '')
+        temp['file_name'] = f_name
+        f_type = doc.get('file_type', '')
+        temp['file_type'] = f_type
+        f_desc = doc.get('description', '')
+        temp['desc'] = f_desc
+        f_md5 = doc.get('md5', '')
+        temp['md5'] = f_md5
+        f_time = doc.get('uploadDate').strftime("%Y-%m-%d %H:%M:%S")
+        temp['time'] = f_time
+        if include_data:
+            f_data = doc.get('data')
+            temp['data'] = f_data
+        f_url = cls.format_url(file_id=f_id, file_name=f_name, collection=collection)
+        temp['url'] = f_url
+        return temp
+
+
 class BaseDoc:
     """所有存储到mongo的类都应该继承此类"""
     type_dict = dict()
@@ -1038,12 +1265,16 @@ class BaseDoc:
                         warnings.warn("{}的值{}的类型与设定不符，原始的设定为{}，实际类型为{}".format(k, v, self.type_dict[k], type(v)),
                                       RuntimeWarning)
 
-    def get_dict(self) -> dict:
+    def get_dict(self, ignore: list = None) -> dict:
         """
         获取self.__dict__
+        :param ignore: 忽略的字段名
         :return:
         """
-        return self.__dict__
+        if ignore is None or len(ignore) == 0:
+            return self.__dict__
+        else:
+            return {k: v for k, v in self.__dict__.items() if k not in ignore}
 
     def insert(self, obj=None):
         """插入数据库,单个对象,返回ObjectId的实例"""
@@ -1085,11 +1316,48 @@ class BaseDoc:
         _id = doc.get("_id", None)
         doc = {k: v for k, v in doc.items() if k not in ignore}
         f = {"_id": _id}
-        res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
+        res = None
+        try:
+            res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
+        except Exception as e:
+            ms = "error_cause:{},filter:{}, replacement:{}".format(e, f, doc)
+            print(ms)
+            logger.exception(ms)
+            raise e
         if res is None:
             return res
         else:
-            """如果是upsert的对象,res.upserted_id就是对象的_id,否则,res.upserted_id对象为空"""
+            """
+            insert的情况
+            UpdateResult = {
+                ....
+                acknowledged: True,
+                matched_count: 0,
+                modified_count: 0,
+                raw_result: {
+                              'n': 1, 'updatedExisting': False, 
+                              'nModified': 0, 'ok': 1, 
+                              'upserted': ObjectId('5b051532c55c281e882494e0')
+                            }
+                upserted_id: ObjectId("5b051532c55c281e882494e0")
+            }
+            update的情况
+            UpdateResult = {
+                ....
+                acknowledged: True,
+                matched_count: 1,
+                modified_count: 1,
+                raw_result: {
+                              'nModified': 1, 
+                              'updatedExisting': True, 
+                              'ok': 1, 'n': 1
+                            }
+                upserted_id: None
+            }
+            如果是插入新的对象,res.upserted_id就是新对象的_id,
+            如果是修改旧的对象,res.upserted_id对象为空,这时返回的结果中不包含被修改的对象的id(另行查找),
+            本例是以_id查找,在修改旧对象的情况下,不用另行查找也能获得被修改对象的id.
+            """
             return _id if res.upserted_id is None else res.upserted_id
 
     def save(self, obj=None)->ObjectId:
@@ -1165,7 +1433,7 @@ class BaseDoc:
         """转换成可以json的字典,此方法和同名的独立方法仍在评估中
             to_flat_dict 实例方法.
             to_flat_dict 独立方法
-            doc_to_dict  独立方法
+            doc_to_dict  独立方法  废弃
             三个方法将在最后的评估后进行统一 2018-3-16
             推荐to_flat_dict独立方法
         """
@@ -1235,7 +1503,7 @@ class BaseDoc:
         :return: 精简过的doc
         """
         ignore_columns = [] if ignore_columns is None else ignore_columns
-        result = doc_to_dict(doc_dict, ignore_columns)
+        result = to_flat_dict(doc_dict, ignore_columns)
         return result
 
     @classmethod

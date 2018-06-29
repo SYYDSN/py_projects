@@ -392,8 +392,15 @@ class DriverResume(mongo_db.BaseDoc):
         super(DriverResume, self).__init__(**kwargs)
 
     @classmethod
-    def add_work_history(cls, history_args):
-
+    def add_work_history(cls, history_args: dict) -> ObjectId:
+        """
+        增加工作经历,在增加工作经历的同时,根据工作经历的时间,判断是不是最后一段工作经历?
+        1. 如果是最后的工作经历(截至时间最晚),更新.
+        2. 如果不是最后的工作经历,忽视.
+        3. 如果最后的工作经历出现重复(1个以上截止时间是now的).更新(简单说,和1一样,比较截至时间)
+        :param history_args:  WorkHistory的init字典
+        :return: ObjectId, WorkHistory._id
+        """
 
 if __name__ == "__main__":
     Region.get_dict()

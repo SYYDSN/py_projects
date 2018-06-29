@@ -8,7 +8,7 @@ import mongo_db
 import requests
 import datetime
 import warnings
-import re
+import hashlib
 
 
 ObjectId = mongo_db.ObjectId
@@ -24,7 +24,7 @@ class Company(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['full_name'] = str
-    type_dict['sort_name'] = str
+    type_dict['short_name'] = str
     type_dict['desc'] = str              # 公司简介
     type_dict['user_name'] = str         # 公司账户的登录名,全局唯一
     type_dict['user_password'] = str
@@ -39,8 +39,8 @@ class Company(mongo_db.BaseDoc):
             warnings.warn(message=ms)
         if "full_name" not in kwargs:
             kwargs['full_name'] = ''
-        if "sort_name" not in kwargs:
-            kwargs['sort_name'] = ''
+        if "short_name" not in kwargs:
+            kwargs['short_name'] = ''
         if "desc" not in kwargs:
             kwargs['desc'] = ''
         if "create_date" not in kwargs:
@@ -93,11 +93,12 @@ class Company(mongo_db.BaseDoc):
         return instance
 
     @classmethod
-    def login(cls, user_name: str, user_password: str) -> dict:
+    def login(cls, user_name: str, user_password: str, can_json: bool = False) -> dict:
         """
         公司用户的登录
         :param user_name:
         :param user_password:
+        :param can_json:
         :return:
         """
         mes = {"message": "success"}
@@ -108,6 +109,7 @@ class Company(mongo_db.BaseDoc):
             pw = one.get('user_password', "")
             if isinstance(user_password, str) and user_password.lower() == pw.lower():
                 one.pop("user_password", "")
+                one = mongo_db.to_flat_dict(one)if can_json else one
                 mes['data'] = one
             else:
                 mes['message'] = "密码错误"
@@ -115,6 +117,33 @@ class Company(mongo_db.BaseDoc):
             mes['message'] = "用户名不存在"
         return mes
 
+    @classmethod
+    def add_user_raw(cls, init: dict = None, md5: bool = False, save: bool = True, instance: bool = False) -> (object, ObjectId):
+        """
+        添加用户,此方法原始的添加用户的方法.
+        :param init: 初始化实力的参数字典.
+        :param md5: 是否对密码属性进行md5转换(默认不转,即密码已经是md5转换过了.如果是node/前端传来的初始化字典,密码是应该
+        已经进行过md5转换的,所以这里应该设置为False,如果是直接在内部或命令行调用此方法,此参数一定要被设置为True)
+        :param save: 是否创建实例后立即保存?
+        :param instance: 返回实例还是ObjectId?默认返回ObjectId
+        :return:
+        """
+        pw = init.pop("user_password", None)
+        if pw is None:
+            pw = "123456"
+        else:
+            pw = pw if isinstance(pw, str) else str(pw)
+        if md5:
+            pw = hashlib.md5(pw.encode(encoding="utf-8")).hexdigest()
+        else:
+            pass
+        init['user_password'] = pw
+        return cls.create(save=save, **init) if instance else cls.create(save=save, **init).get_id()
+
 
 if __name__ == "__main__":
+    """增加一个用户"""
+    a = {"user_name": "jack", "user_password": "123456", "short_name": "测试公司"}
+    o = Company.add_user_raw(a, md5=True)
+    print(o)
     pass

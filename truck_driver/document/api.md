@@ -46,7 +46,7 @@
 var http = require("http");
 var url = require("url");
 var jwt = require('jsonwebtoken');
-var cert = "f45799819d864f4b8c26ccbbb4d68255";
+var cert = "f45799819d864f4b8c26ccbbb4d68255";   // 请用实际的值替换
 
 
 function start() {
@@ -207,8 +207,8 @@ sid      换取signature的id   字符串类型 目前是固定值 18336048620
 **参数**：
 
 ```javascript
- user_name      用户名   字符串类型
- user_password   密码    字符串类型
+ user_name      用户名   字符串类型  当前可用的用户名: jack
+ user_password   密码    字符串类型  当前可用的密码: 123456
 ```
 
 **返回类型**： json

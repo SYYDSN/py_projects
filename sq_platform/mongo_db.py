@@ -2332,7 +2332,7 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 class TransactionItem:
     """
-    事务操作中的一个步骤
+    事务操作中的一个步骤. 未完成
     """
     def __init__(self, **kwargs):
         handlers = ['insert', 'create', 'update', 'edit', 'delete', 'remove']
@@ -2347,8 +2347,9 @@ class TransactionItem:
         else:
             ms = "错误的操作类型:{}".format(handler)
 
+
 class BaseTransaction:
-    """事务"""
+    """事务. 未完成"""
     _table_name = "base_transaction_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId

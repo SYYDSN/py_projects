@@ -3,19 +3,30 @@ from flask import Flask
 from flask import abort
 from flask import make_response
 from flask import render_template
+from flask import render_template_string
+from flask import send_file
+from flask import request
 from mongo_db import get_datetime_from_str
+from mongo_db import ObjectId
 from flask_session import Session
+from log_module import get_logger
 import sms_module
 from mongo_db import get_obj_id
 from flask_tokenauth import TokenAuth, TokenManager
+import json
+from werkzeug.contrib.cache import RedisCache
+from flask_debugtoolbar import DebugToolbarExtension
 from tools_module import *
+import item_module
 from module.spread_module import AllowOrigin
 from uuid import uuid4
-from module import user_module, item_module
-from module.item_module import *
+from module import user_module
+from item_module import *
 import os
 from mail_module import send_mail
 from browser.crawler_module import CustomerManagerRelation
+from pdb import set_trace
+
 
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
 app = Flask(__name__)
@@ -110,191 +121,194 @@ def listen_func(key):
     print(event_id)
     print(signature)
     print(data)
-    raw = RawSignal(**data)
-    raw.save_plus()  # 保存原始数据
-    if key == "customermanagerrelation":
-        """更新客户和管理者之间的关系"""
-        secret_str = 'n63tPGK9e7TvrAqPXnUTwiGG'  # 不同的消息定义的secret不同，用来验证消息的合法性
-        check = validate_signature(request, secret_str, signature)
-        print("signal_test check is {}".format(check))
-        if not check:
-            return abort(404)
-        else:
-            op = data['op']
-            data = data['data']
-            record_id = data['_id']
-            create_date_str = data.get('createTime')
-            print("create_date_str is {}".format(create_date_str))
-            create_date = get_datetime_from_str(create_date_str)
-            if isinstance(create_date, datetime.datetime):
-                create_date = create_date + datetime.timedelta(hours=8)
-            update_date_str = data.get('updateTime')
-            print("update_date_str is {}".format(update_date_str))
-            update_date = get_datetime_from_str(update_date_str)
-            if isinstance(update_date, datetime.datetime):
-                update_date = update_date + datetime.timedelta(hours=8)
-            delete_date_str = data.get('deleteTime')
-            print("delete_date_str is {}".format(delete_date_str))
-            delete_date = get_datetime_from_str(delete_date_str)
-            if isinstance(delete_date, datetime.datetime):
-                delete_date = delete_date + datetime.timedelta(hours=8)
-            mt4_account = str(data.get("_widget_1515400344933"))
-            customer_sn = int(data.get("_widget_1526780188629"))
-            customer_name = data.get("_widget_1515400344920")
-            platform = data.get("_widget_1517984569439")
-            if platform == '盛汇中国':
-                platform = 'shengfxchina'
-            elif platform == 'fx888':
-                platform = 'shengfx888'
-            elif platform == 'fx china':
-                platform = 'shengfxchina'
-            else:
-                pass
-            sales_name = data.get("_widget_1520476984707")
-            manager_name = data.get("_widget_1520476984720")
-            director_name = data.get("_widget_1520476984733")
-            args = {
-                "record_id": record_id,
-                "create_date": create_date,
-                "update_date": update_date,
-                "delete_date": delete_date,
-                "mt4_account": mt4_account,
-                "customer_sn": customer_sn,
-                "customer_name": customer_name,
-                "platform": platform,
-                "sales_name": sales_name,
-                "manager_name": manager_name,
-                "director_name": director_name
-            }
-            args = {k: v for k, v in args.items() if v is not None}
-            print("op is {}".format(op))
-            print(args)
-            if op == 'data_create':
-                f = {"mt4_account": args.pop("mt4_account")}
-                """如果是创建用户？那就先检查是否重复？"""
-                r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
-                if r is not None:
-                    """有重复客户，发送警告消息，仍然添加"""
-                    title = "重复的添加客户！mt4账户：{}".format(mt4_account)
-                    mes['message'] = title
-                    content = '{}'.format(args)
-                    send_mail(title=title, content=content)
-                else:
-                    pass
-                args = {"$set": args}
-                r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=True)
-                print(r)
-            elif op == 'data_update':
-                """修改用户关系，有记录就修改，没记录就插入"""
-                f = {"mt4_account": args.pop("mt4_account")}
-                r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
-                if r is None:
-                    """没有对应客户，发送警告消息，修改变添加"""
-                    title = "修改客户时没有发现对应客户！mt4账户：{}".format(mt4_account)
-                    mes['message'] = title
-                    content = ''
-                    send_mail(title=title, content=content)
-                else:
-                    pass
-                args = {"$set": args}
-                r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=True)
-                print(r)
-            elif op == "data_remove":
-                """删除用户关系"""
-                f = {"record_id": record_id}
-                r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
-                if r is None:
-                    title = "无法删除，因为没有对应的客户！_id：{}".format(record_id)
-                    mes['message'] = title
-                    content = '{}'.format(args)
-                    send_mail(title=title, content=content)
-                else:
-                    """有客户，可以删除"""
-                    args = {"$set": {"delete_date": delete_date}}
-                    r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=False)
-                    print(r)
-            else:
-                pass
-    elif key == "distribution_scheme":
-        """资源分配方案"""
-        secret_str = 'lYLaLKgFX9Mi6ij19tpZELlt'  # 不同的消息定义的secret不同，用来验证消息的合法性
-        check = validate_signature(request, secret_str, signature)
-        print("signal_test check is {}".format(check))
-        if not check:
-            return abort(404)
-        else:
-            """
-            {
-                "_id" : ObjectId("5af626224513533cc34ea6e3"),
-                "data" : {
-                    "updateTime" : "2018-05-11T23:24:18.813Z",
-                    "_widget_1525903100391" : [ 
-                        "1", 
-                        "3", 
-                        "4", 
-                        "6"
-                    ],
-                    "_id" : "5af62604c281e01263b74981",
-                    "formName" : "今日分配方案",
-                    "entryId" : "5af36ea9a618d61e69243ad7",
-                    "deleteTime" : null,
-                    "appId" : "5a658ca3b2596932dab31f0c",
-                    "updater" : {
-                        "name" : "徐立杰",
-                        "_id" : "5a684c9b42f8c1bffc68f4b4"
-                    },
-                    "deleter" : null,
-                    "submitPrompt" : {
-                        "content" : ""
-                    },
-                    "createTime" : "2018-05-11T23:23:48.445Z",
-                    "label" : "",
-                    "creator" : {
-                        "name" : "徐立杰",
-                        "_id" : "5a684c9b42f8c1bffc68f4b4"
-                    }
-                },
-                "op" : "data_update"
-            }
-            """
-            op = data["op"]
-            data = data['data']
-            args = dict()
-            _id = data['_id']
-            _id = _id if isinstance(_id, ObjectId) else ObjectId(_id)
-            args['groups'] = data['_widget_1525903100391']
-            if op == "data_update":
-                op = "update"
-            elif op == "data_create":
-                op = "insert"
-            else:
-                op = "other"
-            if op == "insert":
-                """添加分配方案"""
-                create_date = mongo_db.get_datetime_from_str(data['createTime'])
-                create_date = transform_time_zone(create_date)
-                args["_id"] = _id
-                args['create_date'] = create_date
-                scheme = DistributionScheme(**args)
-                r = scheme.save_plus()
-                ms = "插入结果:{}".format((str(r)))
-                logger.info(ms)
-            if op == "update":
-                """修改分配方案"""
-                create_date = mongo_db.get_datetime_from_str(data['updateTime'])
-                create_date = transform_time_zone(create_date)
-                f = {"_id": _id}
-                args['create_date'] = create_date
-                u = {"$set": args}
-                r = DistributionScheme.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
-                ms = "插入结果:{}".format((str(r)))
-                logger.info(ms)
-            else:
-                pass
-
+    if data is None:
+        return abort(403)
     else:
-        mes['message'] = '错误的path'
-    return json.dumps(mes)
+        raw = RawSignal(**data)
+        raw.save_plus()  # 保存原始数据
+        if key == "customermanagerrelation":
+            """更新客户和管理者之间的关系"""
+            secret_str = 'n63tPGK9e7TvrAqPXnUTwiGG'  # 不同的消息定义的secret不同，用来验证消息的合法性
+            check = validate_signature(request, secret_str, signature)
+            print("signal_test check is {}".format(check))
+            if not check:
+                return abort(404)
+            else:
+                op = data['op']
+                data = data['data']
+                record_id = data['_id']
+                create_date_str = data.get('createTime')
+                print("create_date_str is {}".format(create_date_str))
+                create_date = get_datetime_from_str(create_date_str)
+                if isinstance(create_date, datetime.datetime):
+                    create_date = create_date + datetime.timedelta(hours=8)
+                update_date_str = data.get('updateTime')
+                print("update_date_str is {}".format(update_date_str))
+                update_date = get_datetime_from_str(update_date_str)
+                if isinstance(update_date, datetime.datetime):
+                    update_date = update_date + datetime.timedelta(hours=8)
+                delete_date_str = data.get('deleteTime')
+                print("delete_date_str is {}".format(delete_date_str))
+                delete_date = get_datetime_from_str(delete_date_str)
+                if isinstance(delete_date, datetime.datetime):
+                    delete_date = delete_date + datetime.timedelta(hours=8)
+                mt4_account = str(data.get("_widget_1515400344933"))
+                customer_sn = int(data.get("_widget_1526780188629"))
+                customer_name = data.get("_widget_1515400344920")
+                platform = data.get("_widget_1517984569439")
+                if platform == '盛汇中国':
+                    platform = 'shengfxchina'
+                elif platform == 'fx888':
+                    platform = 'shengfx888'
+                elif platform == 'fx china':
+                    platform = 'shengfxchina'
+                else:
+                    pass
+                sales_name = data.get("_widget_1520476984707")
+                manager_name = data.get("_widget_1520476984720")
+                director_name = data.get("_widget_1520476984733")
+                args = {
+                    "record_id": record_id,
+                    "create_date": create_date,
+                    "update_date": update_date,
+                    "delete_date": delete_date,
+                    "mt4_account": mt4_account,
+                    "customer_sn": customer_sn,
+                    "customer_name": customer_name,
+                    "platform": platform,
+                    "sales_name": sales_name,
+                    "manager_name": manager_name,
+                    "director_name": director_name
+                }
+                args = {k: v for k, v in args.items() if v is not None}
+                print("op is {}".format(op))
+                print(args)
+                if op == 'data_create':
+                    f = {"mt4_account": args.pop("mt4_account")}
+                    """如果是创建用户？那就先检查是否重复？"""
+                    r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
+                    if r is not None:
+                        """有重复客户，发送警告消息，仍然添加"""
+                        title = "重复的添加客户！mt4账户：{}".format(mt4_account)
+                        mes['message'] = title
+                        content = '{}'.format(args)
+                        send_mail(title=title, content=content)
+                    else:
+                        pass
+                    args = {"$set": args}
+                    r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=True)
+                    print(r)
+                elif op == 'data_update':
+                    """修改用户关系，有记录就修改，没记录就插入"""
+                    f = {"mt4_account": args.pop("mt4_account")}
+                    r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
+                    if r is None:
+                        """没有对应客户，发送警告消息，修改变添加"""
+                        title = "修改客户时没有发现对应客户！mt4账户：{}".format(mt4_account)
+                        mes['message'] = title
+                        content = ''
+                        send_mail(title=title, content=content)
+                    else:
+                        pass
+                    args = {"$set": args}
+                    r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=True)
+                    print(r)
+                elif op == "data_remove":
+                    """删除用户关系"""
+                    f = {"record_id": record_id}
+                    r = CustomerManagerRelation.find_one_plus(filter_dict=f, instance=False)
+                    if r is None:
+                        title = "无法删除，因为没有对应的客户！_id：{}".format(record_id)
+                        mes['message'] = title
+                        content = '{}'.format(args)
+                        send_mail(title=title, content=content)
+                    else:
+                        """有客户，可以删除"""
+                        args = {"$set": {"delete_date": delete_date}}
+                        r = CustomerManagerRelation.find_one_and_update_plus(filter_dict=f, update_dict=args, upsert=False)
+                        print(r)
+                else:
+                    pass
+        elif key == "distribution_scheme":
+            """资源分配方案"""
+            secret_str = 'lYLaLKgFX9Mi6ij19tpZELlt'  # 不同的消息定义的secret不同，用来验证消息的合法性
+            check = validate_signature(request, secret_str, signature)
+            print("signal_test check is {}".format(check))
+            if not check:
+                return abort(404)
+            else:
+                """
+                {
+                    "_id" : ObjectId("5af626224513533cc34ea6e3"),
+                    "data" : {
+                        "updateTime" : "2018-05-11T23:24:18.813Z",
+                        "_widget_1525903100391" : [ 
+                            "1", 
+                            "3", 
+                            "4", 
+                            "6"
+                        ],
+                        "_id" : "5af62604c281e01263b74981",
+                        "formName" : "今日分配方案",
+                        "entryId" : "5af36ea9a618d61e69243ad7",
+                        "deleteTime" : null,
+                        "appId" : "5a658ca3b2596932dab31f0c",
+                        "updater" : {
+                            "name" : "徐立杰",
+                            "_id" : "5a684c9b42f8c1bffc68f4b4"
+                        },
+                        "deleter" : null,
+                        "submitPrompt" : {
+                            "content" : ""
+                        },
+                        "createTime" : "2018-05-11T23:23:48.445Z",
+                        "label" : "",
+                        "creator" : {
+                            "name" : "徐立杰",
+                            "_id" : "5a684c9b42f8c1bffc68f4b4"
+                        }
+                    },
+                    "op" : "data_update"
+                }
+                """
+                op = data["op"]
+                data = data['data']
+                args = dict()
+                _id = data['_id']
+                _id = _id if isinstance(_id, ObjectId) else ObjectId(_id)
+                args['groups'] = data['_widget_1525903100391']
+                if op == "data_update":
+                    op = "update"
+                elif op == "data_create":
+                    op = "insert"
+                else:
+                    op = "other"
+                if op == "insert":
+                    """添加分配方案"""
+                    create_date = mongo_db.get_datetime_from_str(data['createTime'])
+                    create_date = transform_time_zone(create_date)
+                    args["_id"] = _id
+                    args['create_date'] = create_date
+                    scheme = DistributionScheme(**args)
+                    r = scheme.save_plus()
+                    ms = "插入结果:{}".format((str(r)))
+                    logger.info(ms)
+                if op == "update":
+                    """修改分配方案"""
+                    create_date = mongo_db.get_datetime_from_str(data['updateTime'])
+                    create_date = transform_time_zone(create_date)
+                    f = {"_id": _id}
+                    args['create_date'] = create_date
+                    u = {"$set": args}
+                    r = DistributionScheme.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+                    ms = "插入结果:{}".format((str(r)))
+                    logger.info(ms)
+                else:
+                    pass
+
+        else:
+            mes['message'] = '错误的path'
+        return json.dumps(mes)
 
 
 @app.route("/")

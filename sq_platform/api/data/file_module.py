@@ -144,7 +144,7 @@ def parse_content(content: str, user_id: str = None, app_version: str = None) ->
     pattern = r'\{.+?\}'  # 注意+号后面的？ 那是防止进入w贪婪模式的符号
     str_list = re.findall(pattern, content, re.M)
     extend_dict = {"user_id": user_id} if app_version is None else {"user_id": user_id, "app_version": app_version}
-    dict_list = [join_item(json.loads(x), extend_dict) for x in str_list]
+    dict_list = [join_item(json.loads(x.replace(",}", "}") if x.endswith(",}") else x), extend_dict) for x in str_list]
     return dict_list
 
 
@@ -539,5 +539,5 @@ def unzip_all_user_file() -> None:
 
 if __name__ == "__main__":
     # files_to_mongodb_bak({})
-    process_all_zipfile(user_id=ObjectId("59895177de713e304a67d30c"))
+    process_all_zipfile(user_id=ObjectId("5af547e4e39a7b5371943a4a"))
     pass

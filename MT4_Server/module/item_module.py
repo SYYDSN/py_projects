@@ -50,11 +50,11 @@ class RawRequestInfo(mongo_db.BaseDoc):
         return args
 
     @classmethod
-    def instance(cls, req: request) -> object:
+    def instance(cls, req: request):
         """
         生成一个实例
         :param req: flask.request
-        :return: cls()
+        :return: 实例
         """
         args = cls.get_init_dict(req=req)
         instance = cls(**args)

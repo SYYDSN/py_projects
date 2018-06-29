@@ -110,6 +110,7 @@ class GlobalSignature(mongo_db.BaseDoc):
                 "RS384", "RS512", "PS256", "PS384", "PS512"
             ]
             secret = secret if secret is not None else cls.get_signature().get("signature")
+            print({"signature": secret})
             if algorithm not in algorithm_list:
                 ms = "不支持的算法:{}".format(algorithm)
                 raise ValueError(ms)
@@ -144,6 +145,7 @@ class GlobalSignature(mongo_db.BaseDoc):
                 "RS384", "RS512", "PS256", "PS384", "PS512"
             ]
             secret = secret if secret is not None else cls.get_signature().get("signature")
+            print({"signature": secret})
             if algorithm not in algorithm_list:
                 ms = "不支持的算法:{}".format(algorithm)
                 raise ValueError(ms)
@@ -165,11 +167,12 @@ class GlobalSignature(mongo_db.BaseDoc):
 
 if __name__ == "__main__":
     """编码"""
-    s = GlobalSignature.encode({"filter": {}})
+    s = GlobalSignature.encode({"user_name": "jack", "user_password": "e10adc3949ba59abbe56e057f20f883e"})
     print(s)
     """解码"""
-    # s = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiaGVsbG8iLCJ0aW1lIjoiMjAxOC0wNi0yNSAxNzo1MzoyMyJ9.D7-3yV2' \
-    #     '5rKCSCuHTNAmvKsJEXCuLZqVR62PxD3Ejj1M'
-    # s = GlobalSignature.decode(s)
-    # print(s)
+    s = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJqYWNrIiwidXNlcl9wYXNzd29yZCI6ImUxMGFkYzM5NDliYTU5' \
+        'YWJiZTU2ZTA1N2YyMGY4ODNlIiwiaWF0IjoxNTMwMjUyNTE3fQ.fEoU--7TdnPvYotxIZoQWGQuHxX_S-KTh601fRbXhVc'
+    print(s)
+    s = GlobalSignature.decode(s)
+    print(s)
     pass
