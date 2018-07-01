@@ -15,7 +15,7 @@ from flask import request
 identity_blueprint = Blueprint("identity_blueprint", __name__, url_prefix="/identity", template_folder="templates/web")
 
 
-"""用于进行身份验证,数字签名和签权的视图函数"""
+"""用于进行身份验证,数字签名和签权的视图函数，主要是为分离式前端站点调用"""
 
 
 def get_signature_func() -> str:

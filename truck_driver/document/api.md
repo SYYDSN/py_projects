@@ -200,7 +200,7 @@ sid      换取signature的id   字符串类型 目前是固定值 18336048620
 
 >企业用户的登录接口.
 
-**url**:  /web/login_company
+**url**:  /api/login_company
 
 **加密**: 是
 
@@ -233,7 +233,7 @@ sid      换取signature的id   字符串类型 目前是固定值 18336048620
 
 >按照页码和过滤条件,分页从服务器查询司机简历.
 
-**url**:  /web/driver_page
+**url**:  /api/driver_page
 
 **加密**: 是
 

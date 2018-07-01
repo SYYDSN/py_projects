@@ -16,10 +16,10 @@ from mongo_db import DBRef
 
 
 """注册蓝图"""
-web_blueprint = Blueprint("web_blueprint", __name__, url_prefix="/web", template_folder="templates/web")
+api_blueprint = Blueprint("api_blueprint", __name__, url_prefix="/api", template_folder="templates/web")
 
 
-"""用于站点部分的视图函数"""
+"""用于接口部分的视图函数，主要被分离式前端站点调用"""
 
 
 def login_func(series: str, **kwargs) -> str:
@@ -142,5 +142,5 @@ def driver_page_func() -> str:
 """集中注册函数"""
 
 
-web_blueprint.add_url_rule(rule="/login_<series>", view_func=login_func, methods=['get', 'post'])  # 注册
-web_blueprint.add_url_rule(rule="/driver_page", view_func=driver_page_func, methods=['get', 'post'])  # 分页查询司机信息
+api_blueprint.add_url_rule(rule="/login_<series>", view_func=login_func, methods=['get', 'post'])  # 注册
+api_blueprint.add_url_rule(rule="/driver_page", view_func=driver_page_func, methods=['get', 'post'])  # 分页查询司机信息

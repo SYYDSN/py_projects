@@ -6,7 +6,8 @@ from flask import send_from_directory
 from flask import session
 from flask_session import Session
 from flask import redirect
-from views.driver_view import web_blueprint
+from views.api_view import api_blueprint
+from views.web_view import web_blueprint
 from views.identity_view import identity_blueprint
 import json
 import datetime
@@ -23,6 +24,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持
 SESSION_TYPE = "redis"
 app.config.from_object(__name__)
 app.register_blueprint(web_blueprint)
+app.register_blueprint(api_blueprint)
 app.register_blueprint(identity_blueprint)
 Session(app)
 
