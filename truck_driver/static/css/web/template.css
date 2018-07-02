@@ -1,0 +1,63 @@
+html {
+  font-size: 14px;
+  width: 100%;
+  height: 100%;
+}
+body {
+  width: 100%;
+  height: 100%;
+}
+body .page_top {
+/*页头*/
+  width: 100%;
+  background-color: #f4f4f4;
+  height: 70px;
+  padding: 10px 0;
+}
+body .page_top .top_div {
+  margin-left: calc(50% - 500px);
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+}
+body .page_top .top_div .top_right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 1rem;
+}
+body .page_top .top_div .top_right > span {
+  width: 6em;
+}
+body .page_top .top_div .top_right > span > a {
+  color: #bababa;
+  padding-bottom: 2px;
+  text-decoration: none;
+}
+body .page_top .top_div .top_right > span > a:hover {
+  color: #000;
+  border-bottom: 2px solid #3388fe;
+}
+body .page_top .top_div .top_right > span .active {
+  color: #000;
+  border-bottom: 2px solid #3388fe;
+}
+body .page_middle {
+/*中间区域*/
+  max-width: 1000px;
+  margin-left: calc(50% - 500px);
+  min-height: calc(100% - 70px - 65px) /*子页面需要覆盖此属性*/;
+}
+body .page_bottom {
+/*页脚*/
+  width: 100%;
+  height: 65px;
+  background-color: #5c5f63;
+  font-size: 0.8rem;
+  color: #bababa;
+  text-align: center;
+  padding-top: 0.6em;
+}
+body .page_bottom > div span {
+  color: #f4f4f4;
+}

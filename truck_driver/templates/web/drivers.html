@@ -1,0 +1,479 @@
+{%  extends "web/template.html" %}
+
+{% block extend_css %}
+<link rel="stylesheet" href="/static/css/web/drivers.css">
+{% endblock %}
+
+{% block content %}
+    <div class="nav_div">
+    首页 <i class="fa fa-angle-right fa-1g"></i> 司机列表
+    </div>
+
+    <div class="search_div">
+        <div class="line_div row_01">
+            <label for="keywords">
+                <span>关</span>
+                <span>键</span>
+                <span>词</span>
+            </label>
+            <input type="text" id="keywords" placeholder="请输入关键词搜索">
+        </div>
+        <div class="line_div row_02">
+            <label for="i_exp">
+                <span>从</span>
+                <span>业</span>
+                <span>年</span>
+                <span>限</span>
+            </label>
+            <div class="dropdown">
+              <button id="i_exp"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择从业年限
+                    <i class="fa fa-list"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-year="请选择从业年限" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-year="1" href="javascript:;">1年以上</a></li>
+                <li><a data-year="2" href="javascript:;">2年以上</a></li>
+                <li><a data-year="3" href="javascript:;">3年以上</a></li>
+                <li><a data-year="5" href="javascript:;">5年以上</a></li>
+                <li><a data-year="10" href="javascript:;">10年以上</a></li>
+              </ul>
+            </div>
+
+            <label class="left_margin" for="i_exp">
+                <span>驾</span>
+                <span>照</span>
+                <span>要</span>
+                <span>求</span>
+            </label>
+            <div class="dropdown">
+              <button id="dl_class"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择驾照类型
+                    <i class="fa fa-list"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-class="请选择驾照类型" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-class="A1" href="javascript:;">A1驾照</a></li>
+                <li><a data-class="A2" href="javascript:;">A2驾照</a></li>
+                <li><a data-class="A3" href="javascript:;">A3驾照</a></li>
+                <li><a data-class="B1" href="javascript:;">B1驾照</a></li>
+                <li><a data-class="B2" href="javascript:;">B2驾照</a></li>
+                <li><a data-class="C1" href="javascript:;">C1驾照</a></li>
+                <li><a data-class="C2" href="javascript:;">C2驾照</a></li>
+                <li><a data-class="C3" href="javascript:;">C3驾照</a></li>
+                <li><a data-class="C4" href="javascript:;">C4驾照</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-class="N" href="javascript:;">N驾照</a></li>
+                <li><a data-class="P" href="javascript:;">P驾照</a></li>
+              </ul>
+            </div>
+        </div>
+        <div class="line_div row_03">
+            <label for="i_exp">
+                <span>期</span>
+                <span>望</span>
+                <span>待</span>
+                <span>遇</span>
+            </label>
+            <div class="dropdown">
+              <button id="salary"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择期望待遇(月)
+                    <i class="fa fa-list"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-salary="请选择期望待遇(月)" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-salary="0,3000" href="#">3000元以下</a></li>
+                <li><a data-salary="3000,5000" href="javascript:;">3000元到5000元</a></li>
+                <li><a data-salary="5000,8000" href="javascript:;">5000元到8000元</a></li>
+                <li><a data-salary="8000,10000" href="javascript:;">8000元到10000元</a></li>
+                <li><a data-salary="10000,15000" href="javascript:;">10000元到15000元</a></li>
+                <li><a data-salary="15000,20000" href="javascript:;">15000元到20000元</a></li>
+                <li><a data-salary="15000,20000" href="javascript:;">15000元到20000元</a></li>
+                <li><a data-salary="20000,30000" href="javascript:;">30000元到30000元</a></li>
+                <li><a data-salary="30000,9999999" href="javascript:;">30000元以上</a></li>
+              </ul>
+            </div>
+            <label class="left_margin" for="education">
+                <span>学</span>
+                <span>历</span>
+                <span>要</span>
+                <span>求</span>
+            </label>
+            <div class="dropdown small_select">
+              <button id="education"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择学历
+                    <i class="fa fa-angle-down"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-education="请选择学历" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-education="1" href="javascript:;">初中及以下</a></li>
+                <li><a data-education="2" href="javascript:;">高中及以下</a></li>
+                <li><a data-education="3" href="javascript:;">专科学历</a></li>
+                <li><a data-education="4" href="javascript:;">本科及以上</a></li>
+              </ul>
+            </div>
+            <label class="left_margin_small_label" for="education">
+                <span>工</span>
+                <span>作</span>
+                <span>经</span>
+                <span>验</span>
+            </label>
+            <div class="dropdown small_select">
+              <button id="work_exp"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择工作经验
+                    <i class="fa fa-angle-down"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-work="请选择工作经验" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-work="1" href="javascript:;">1年以上</a></li>
+                <li><a data-work="2" href="javascript:;">2年以上</a></li>
+                <li><a data-work="5" href="javascript:;">5年以上</a></li>
+                <li><a data-work="10" href="javascript:;">10年以上</a></li>
+              </ul>
+            </div>
+        </div>
+
+        <div class="line_div my_center">
+            <div class="btn_area">
+                <button type="button" id="submit_search" class="btn btn-primary">&nbsp;搜索&nbsp;</button>
+                <button type="button" id="reset_condition" class="btn btn-default">清空搜索条件</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="small_middle">
+        <div class="count_text">
+            已为您搜索<span class="driver_count">{{ total }}</span>位司机
+        </div>
+        <div class="dropdown">
+            <button id="driver_status"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                当前状态
+                <i class="fa fa-angle-down"></i>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-status="当前状态" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-status="0" href="javascript:;">离职</a></li>
+                <li><a data-status="1" href="javascript:;">在职</a></li>
+                <li><a data-status="-1" href="javascript:;">个体经营</a></li>
+            </ul>
+        </div>
+        <div class="dropdown">
+            <button id="update_date"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                发布时间
+                <i class="fa fa-angle-down"></i>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-update="当前状态" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-update="today" href="javascript:;">今天</a></li>
+                <li><a data-update="three_day" href="javascript:;">三天内</a></li>
+                <li><a data-update="week" href="javascript:;">一周内</a></li>
+                <li><a data-update="month" href="javascript:;">一月内</a></li>
+                <li><a data-update="three_month" href="javascript:;">三月内</a></li>
+                <li><a data-update="half_year" href="javascript:;">半年内</a></li>
+            </ul>
+        </div>
+        <div class="dropdown">
+            <button id="driving_exp"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                驾龄
+                <i class="fa fa-angle-down"></i>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-exp="驾龄" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-exp="1" href="javascript:;">1年以上</a></li>
+                <li><a data-exp="2" href="javascript:;">2年以上</a></li>
+                <li><a data-exp="5" href="javascript:;">5年以上</a></li>
+                <li><a data-exp="10" href="javascript:;">10年以上</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="driver_list">
+        <div class="left">
+            <!--
+            <div class="loading_animation">
+                <i class="fa fa-spinner fa-pulse"></i>
+                <span class="mes">正在加载数据 </span>
+                <span id="ellipsis">.</span>
+            </div>
+            -->
+
+            {% for resume in resumesa %}
+                <div class="line_div" data-id="{{ resume._id }}">
+                    <div class="item base_info">
+                        <div class="cell">
+                            <span class="driver_name">{{ resume.real_name[0] }}{{ "先生" if resume.gender == "男" else "小姐" }}</span>
+                            <span class="want_job">{{ "hello" if not resume['want_job'] | safe else "希望跳槽" }}</span>
+                        </div>
+                        <div class="cell">
+                            <span class="sex">男</span>
+                            <span class="age">35岁</span>
+                            <span class="status">在职</span>
+                            <span class="living">现居上海</span>
+                        </div>
+                        <div  class="cell">
+                            <span class="expected_salary">期望薪资20k</span>
+                        </div>
+                    </div>
+                    <div class="item truck_info">
+                        <div class="cell">
+                            <span class="rtqc_class">重型货车司机</span>
+                        </div>
+                        <div class="cell">
+                            驾照<span class="dl_class">C</span>
+                        </div>
+                    </div>
+                    <div class="item exp_info">
+                        <div class="cell">
+                            驾龄 <span class="i_exp">9年</span>
+                        </div>
+                        <div class="cell">
+                            从业年限 <span class="d_exp">5年</span>
+                        </div>
+                    </div>
+                    <div class="item last">
+                        <div class="cell company_name">
+                            能力天空长途运输公司
+                        </div>
+                        <div class="cell last_cell">
+                            <button class="btn btn-default favorite">收藏此人</button>
+                            <button class="btn btn-default more_info">更多信息</button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!--测试数据-->
+            <!--
+            <div class="line_div">
+                <div class="item base_info">
+                    <div class="cell">
+                        <span class="driver_name">王先生</span>
+                        <span class="want_job">希望跳槽</span>
+                    </div>
+                    <div class="cell">
+                        <span class="sex">男</span>
+                        <span class="age">35岁</span>
+                        <span class="status">在职</span>
+                        <span class="living">现居上海</span>
+                    </div>
+                    <div  class="cell">
+                        <span class="expected_salary">期望薪资20k</span>
+                    </div>
+                </div>
+                <div class="item truck_info">
+                    <div class="cell">
+                        <span class="rtqc_class">重型货车司机</span>
+                    </div>
+                    <div class="cell">
+                        驾照<span class="dl_class">C</span>
+                    </div>
+                </div>
+                <div class="item exp_info">
+                    <div class="cell">
+                        驾龄 <span class="i_exp">9年</span>
+                    </div>
+                    <div class="cell">
+                        从业年限 <span class="d_exp">5年</span>
+                    </div>
+                </div>
+                <div class="item last">
+                    <div class="cell company_name">
+                        能力天空长途运输公司
+                    </div>
+                    <div class="cell last_cell">
+                        <button class="btn btn-default favorite">收藏此人</button>
+                        <button class="btn btn-default more_info">更多信息</button>
+                    </div>
+                </div>
+            </div>
+            <div class="line_div">
+                <div class="item base_info">
+                    <div class="cell">
+                        <span class="driver_name">王先生</span>
+                        <span class="want_job">希望跳槽</span>
+                    </div>
+                    <div class="cell">
+                        <span class="sex">男</span>
+                        <span class="age">35岁</span>
+                        <span class="status">在职</span>
+                        <span class="living">现居上海</span>
+                    </div>
+                    <div  class="cell">
+                        <span class="expected_salary">期望薪资20k</span>
+                    </div>
+                </div>
+                <div class="item truck_info">
+                    <div class="cell">
+                        <span class="rtqc_class">重型货车司机</span>
+                    </div>
+                    <div class="cell">
+                        驾照<span class="dl_class">C</span>
+                    </div>
+                </div>
+                <div class="item exp_info">
+                    <div class="cell">
+                        驾龄 <span class="i_exp">9年</span>
+                    </div>
+                    <div class="cell">
+                        从业年限 <span class="d_exp">5年</span>
+                    </div>
+                </div>
+                <div class="item last">
+                    <div class="cell company_name">
+                        能力天空长途运输公司
+                    </div>
+                    <div class="cell last_cell">
+                        <button class="btn btn-default favorite">收藏此人</button>
+                        <button class="btn btn-default more_info">更多信息</button>
+                    </div>
+                </div>
+            </div>
+            <div class="line_div">
+                <div class="item base_info">
+                    <div class="cell">
+                        <span class="driver_name">王先生</span>
+                        <span class="want_job">希望跳槽</span>
+                    </div>
+                    <div class="cell">
+                        <span class="sex">男</span>
+                        <span class="age">35岁</span>
+                        <span class="status">在职</span>
+                        <span class="living">现居上海</span>
+                    </div>
+                    <div  class="cell">
+                        <span class="expected_salary">期望薪资20k</span>
+                    </div>
+                </div>
+                <div class="item truck_info">
+                    <div class="cell">
+                        <span class="rtqc_class">重型货车司机</span>
+                    </div>
+                    <div class="cell">
+                        驾照<span class="dl_class">C</span>
+                    </div>
+                </div>
+                <div class="item exp_info">
+                    <div class="cell">
+                        驾龄 <span class="i_exp">9年</span>
+                    </div>
+                    <div class="cell">
+                        从业年限 <span class="d_exp">5年</span>
+                    </div>
+                </div>
+                <div class="item last">
+                    <div class="cell company_name">
+                        能力天空长途运输公司
+                    </div>
+                    <div class="cell last_cell">
+                        <button class="btn btn-default favorite">收藏此人</button>
+                        <button class="btn btn-default more_info">更多信息</button>
+                    </div>
+                </div>
+            </div>
+            <div class="line_div">
+                <div class="item base_info">
+                    <div class="cell">
+                        <span class="driver_name">王先生</span>
+                        <span class="want_job">希望跳槽</span>
+                    </div>
+                    <div class="cell">
+                        <span class="sex">男</span>
+                        <span class="age">35岁</span>
+                        <span class="status">在职</span>
+                        <span class="living">现居上海</span>
+                    </div>
+                    <div  class="cell">
+                        <span class="expected_salary">期望薪资20k</span>
+                    </div>
+                </div>
+                <div class="item truck_info">
+                    <div class="cell">
+                        <span class="rtqc_class">重型货车司机</span>
+                    </div>
+                    <div class="cell">
+                        驾照<span class="dl_class">C</span>
+                    </div>
+                </div>
+                <div class="item exp_info">
+                    <div class="cell">
+                        驾龄 <span class="i_exp">9年</span>
+                    </div>
+                    <div class="cell">
+                        从业年限 <span class="d_exp">5年</span>
+                    </div>
+                </div>
+                <div class="item last">
+                    <div class="cell company_name">
+                        能力天空长途运输公司
+                    </div>
+                    <div class="cell last_cell">
+                        <button class="btn btn-default favorite">收藏此人</button>
+                        <button class="btn btn-default more_info">更多信息</button>
+                    </div>
+                </div>
+            </div>
+            <div class="line_div">
+                <div class="item base_info">
+                    <div class="cell">
+                        <span class="driver_name">王先生</span>
+                        <span class="want_job">希望跳槽</span>
+                    </div>
+                    <div class="cell">
+                        <span class="sex">男</span>
+                        <span class="age">35岁</span>
+                        <span class="status">在职</span>
+                        <span class="living">现居上海</span>
+                    </div>
+                    <div  class="cell">
+                        <span class="expected_salary">期望薪资20k</span>
+                    </div>
+                </div>
+                <div class="item truck_info">
+                    <div class="cell">
+                        <span class="rtqc_class">重型货车司机</span>
+                    </div>
+                    <div class="cell">
+                        驾照<span class="dl_class">C</span>
+                    </div>
+                </div>
+                <div class="item exp_info">
+                    <div class="cell">
+                        驾龄 <span class="i_exp">9年</span>
+                    </div>
+                    <div class="cell">
+                        从业年限 <span class="d_exp">5年</span>
+                    </div>
+                </div>
+                <div class="item last">
+                    <div class="cell company_name">
+                        能力天空长途运输公司
+                    </div>
+                    <div class="cell last_cell">
+                        <button class="btn btn-default favorite">收藏此人</button>
+                        <button class="btn btn-default more_info">更多信息</button>
+                    </div>
+                </div>
+            </div>
+            -->
+
+        </div>
+        <div class="right">
+            <img src="/static/image/web/bg_tu.png">
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block extend_js %}
+    <script src="/static/js/web/drivers.js"></script>
+{% endblock %}

@@ -1,0 +1,182 @@
+font_color = #BABABA
+border_color = #dcdcdc
+default_blue = #3388FE
+light_grey = #f4f4f4
+deep_grey = #5C5F63
+
+
+.page_middle
+  height auto !important
+  .nav_div
+    font-size:1rem
+    color font_color
+    padding 1em 0
+
+  .search_div
+    font-size:1rem
+    background-color light_grey
+    padding 1.5em
+
+    .line_div
+      padding 10px 0
+      display flex
+      flex-direction row
+
+      .dropdown
+        width 40%
+
+        > button
+          width 100%
+          padding: 10px
+          color font_color !important
+          text-align left !important
+          > i
+            float:right
+            color font_color !important
+            margin-top 2px
+
+        > ul
+          width 100%
+          padding: 10px
+          color font_color !important
+          text-align left !important
+          > li > a
+            color font_color !important
+
+      label
+        font-weight 400
+        color font_color
+        display flex
+        flex-direction row
+        flex-wrap nowrap
+        justify-content space-around
+        align-items center
+        vertical-align center
+
+      .left_margin
+        margin-left 1.5em
+
+      input
+        border 1px solid border_color
+        border-radius 6px
+        padding 0.8em 0.6em
+
+    .row_01
+      label
+        width 10%
+      input
+        width 90%
+    .row_02
+      label
+        width 10%
+    .row_03
+      label
+        width 10%
+      .small_select
+        width 15%
+    .my_center
+      margin-top 1em 0
+      display: flex
+      justify-content center
+      #submit_search
+        font-size: 1.2rem
+      #reset_condition
+        font-size 1rem
+        border none
+        background none
+
+
+
+  .small_middle
+    color font_color
+    width 100%
+    display flex
+    flex-direction row
+    align-items baseline
+    padding 20px 0
+    .dropdown
+      margin-left 2em
+      font-size 0.9rem
+      .show_area
+        padding 2px 12px
+        > i
+          padding-left 4em
+        color font_color !important
+      li > a
+        color font_color !important
+
+  .driver_list
+    width 100%
+    height auto
+    display flex
+    flex-direction row
+    .left
+      width calc(100% - 245px)
+      border 1px solid #dedede
+      display flex
+      flex-direction column
+      .loading_animation
+        margin-top 6em
+        margin-left calc(50% - 70px)
+        color font_color
+        width 140px
+        height 18px
+
+      .line_div
+        display flex
+        flex-direction row
+        justify-content flex-start
+        padding 1em 0.1em
+        align-items center
+        border-bottom 1px solid #dedede
+        .item
+          width 20%
+          color #7d7d7d
+          .cell
+            padding 0.3em 0
+
+        .base_info
+          .driver_name
+            font-size 1.2rem
+            color #333993
+            font-weight 700
+            border-bottom 1px solid #333993
+            margin-bottom 1px
+          .want_job
+            color #fe9f28
+            margin-left 1em
+          .sex,.age,.status,.living
+            font-size 1rem
+            padding 0 0.8em
+            border-right 1px solid font_color
+          .sex
+            padding-left 0
+          .living
+            border-right: none
+          .expected_salary
+            color #fe9f28
+        .last
+          border-left 1px solid #dedede
+          padding-left 2em
+          width 30%
+          .company_name
+            white-space nowrap
+            word-break break-all
+            overflow hidden
+            text-overflow ellipsis
+          .last_cell
+            padding-top 0.8em
+            padding-bottom 1em
+            .btn
+              padding 6px 16px !important
+            .favorite
+              color #fe9f28
+              border-color #fe9f28
+            .more_info
+              margin-left 3px
+              color #47a9fe
+              border-color #47a9fe
+    .right
+      float right
+      width 240px
+      padding-left 4px

@@ -48,19 +48,40 @@ body #main {
   align-items: center;
 }
 body #main #login_div {
-  margin-top: -2em;
+  margin-top: -1em;
   background-color: #fff;
   width: 480px;
   height: 400px;
   z-index: 100;
   text-align: center;
+  font-size: 16px;
+  border-radius: 6px;
 }
 body #main #login_div > div {
   border: none;
+  padding: 1.2em 3em;
+}
+body #main #login_div > div > input {
+  font-size: 14px;
+  width: 100%;
+  background-color: #f1f1f1;
+  padding: 10px 20px;
+  color: #c7c7c7;
+  border: 1px solid #c7c7c7;
+  border-radius: 6px;
+}
+body #main #login_div > div > input:focus {
+  border-radius: 6px;
 }
 body #main #login_div .title {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 400;
+}
+body #main #login_div #submit_login {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #fff;
+  background-color: #23a1fe;
 }
 body #bottom_div {
   width: 100%;

@@ -1,0 +1,203 @@
+.page_middle {
+  height: auto !important;
+}
+.page_middle .nav_div {
+  font-size: 1rem;
+  color: #bababa;
+  padding: 1em 0;
+}
+.page_middle .search_div {
+  font-size: 1rem;
+  background-color: #f4f4f4;
+  padding: 1.5em;
+}
+.page_middle .search_div .line_div {
+  padding: 10px 0;
+  display: flex;
+  flex-direction: row;
+}
+.page_middle .search_div .line_div .dropdown {
+  width: 40%;
+}
+.page_middle .search_div .line_div .dropdown > button {
+  width: 100%;
+  padding: 10px;
+  color: #bababa !important;
+  text-align: left !important;
+}
+.page_middle .search_div .line_div .dropdown > button > i {
+  float: right;
+  color: #bababa !important;
+  margin-top: 2px;
+}
+.page_middle .search_div .line_div .dropdown > ul {
+  width: 100%;
+  padding: 10px;
+  color: #bababa !important;
+  text-align: left !important;
+}
+.page_middle .search_div .line_div .dropdown > ul > li > a {
+  color: #bababa !important;
+}
+.page_middle .search_div .line_div label {
+  font-weight: 400;
+  color: #bababa;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+  align-items: center;
+  vertical-align: center;
+}
+.page_middle .search_div .line_div .left_margin {
+  margin-left: 1.5em;
+}
+.page_middle .search_div .line_div input {
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  padding: 0.8em 0.6em;
+}
+.page_middle .search_div .row_01 label {
+  width: 10%;
+}
+.page_middle .search_div .row_01 input {
+  width: 90%;
+}
+.page_middle .search_div .row_02 label {
+  width: 10%;
+}
+.page_middle .search_div .row_03 label {
+  width: 10%;
+}
+.page_middle .search_div .row_03 .small_select {
+  width: 15%;
+}
+.page_middle .search_div .my_center {
+  margin-top: 1em 0;
+  display: flex;
+  justify-content: center;
+}
+.page_middle .search_div .my_center #submit_search {
+  font-size: 1.2rem;
+}
+.page_middle .search_div .my_center #reset_condition {
+  font-size: 1rem;
+  border: none;
+  background: none;
+}
+.page_middle .small_middle {
+  color: #bababa;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  padding: 20px 0;
+}
+.page_middle .small_middle .dropdown {
+  margin-left: 2em;
+  font-size: 0.9rem;
+}
+.page_middle .small_middle .dropdown .show_area {
+  padding: 2px 12px;
+  color: #bababa !important;
+}
+.page_middle .small_middle .dropdown .show_area > i {
+  padding-left: 4em;
+}
+.page_middle .small_middle .dropdown li > a {
+  color: #bababa !important;
+}
+.page_middle .driver_list {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+}
+.page_middle .driver_list .left {
+  width: calc(100% - 245px);
+  border: 1px solid #dedede;
+  display: flex;
+  flex-direction: column;
+}
+.page_middle .driver_list .left .loading_animation {
+  margin-top: 6em;
+  margin-left: calc(50% - 70px);
+  color: #bababa;
+  width: 140px;
+  height: 18px;
+}
+.page_middle .driver_list .left .line_div {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 1em 0.1em;
+  align-items: center;
+  border-bottom: 1px solid #dedede;
+}
+.page_middle .driver_list .left .line_div .item {
+  width: 20%;
+  color: #7d7d7d;
+}
+.page_middle .driver_list .left .line_div .item .cell {
+  padding: 0.3em 0;
+}
+.page_middle .driver_list .left .line_div .base_info .driver_name {
+  font-size: 1.2rem;
+  color: #333993;
+  font-weight: 700;
+  border-bottom: 1px solid #333993;
+  margin-bottom: 1px;
+}
+.page_middle .driver_list .left .line_div .base_info .want_job {
+  color: #fe9f28;
+  margin-left: 1em;
+}
+.page_middle .driver_list .left .line_div .base_info .sex,
+.page_middle .driver_list .left .line_div .base_info .age,
+.page_middle .driver_list .left .line_div .base_info .status,
+.page_middle .driver_list .left .line_div .base_info .living {
+  font-size: 1rem;
+  padding: 0 0.8em;
+  border-right: 1px solid #bababa;
+}
+.page_middle .driver_list .left .line_div .base_info .sex {
+  padding-left: 0;
+}
+.page_middle .driver_list .left .line_div .base_info .living {
+  border-right: none;
+}
+.page_middle .driver_list .left .line_div .base_info .expected_salary {
+  color: #fe9f28;
+}
+.page_middle .driver_list .left .line_div .last {
+  border-left: 1px solid #dedede;
+  padding-left: 2em;
+  width: 30%;
+}
+.page_middle .driver_list .left .line_div .last .company_name {
+  white-space: nowrap;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.page_middle .driver_list .left .line_div .last .last_cell {
+  padding-top: 0.8em;
+  padding-bottom: 1em;
+}
+.page_middle .driver_list .left .line_div .last .last_cell .btn {
+  padding: 6px 16px !important;
+}
+.page_middle .driver_list .left .line_div .last .last_cell .favorite {
+  color: #fe9f28;
+  border-color: #fe9f28;
+}
+.page_middle .driver_list .left .line_div .last .last_cell .more_info {
+  margin-left: 3px;
+  color: #47a9fe;
+  border-color: #47a9fe;
+}
+.page_middle .driver_list .right {
+  float: right;
+  width: 240px;
+  padding-left: 4px;
+}

@@ -267,6 +267,7 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['age'] = int  # 年龄 以身份证号码为准
     type_dict['driving_experience'] = int  # 驾龄 单位 年 用驾驶证信息中的首次领证日期计算
     type_dict['industry_experience'] = int  # 从业年限 单位 年 用道路运输从业资格证信息中的首次领证日期计算
+    type_dict['work_experience'] = int  # 工作年限 单位 年 工作履历记录中最早的开始计算,需要更新工作经历时同步
     """
     学历分以下几种:
     1. 初等教育(小学及以下)
@@ -278,7 +279,7 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['status'] = int  # 任职/经营 状态. -1 个体经营/0 离职/ 1 在职
     """驾驶证信息 Driving License,简称dl"""
     type_dict['dl_image'] = bytes  # 驾驶证信息,驾驶证照片,这里直接存储的是图片,注意大小不可太大.
-    type_dict['dl_license_class'] = str  # 驾驶证信息.驾驶证类型,准驾车型
+    type_dict['dl_license_class'] = str  # 驾驶证信息.驾驶证类型,准驾车型 英文字母一律大写
     type_dict['dl_first_date'] = datetime.datetime  # 驾驶证信息 首次领证日期
     type_dict['dl_valid_begin'] = datetime.datetime  # 驾驶证信息 驾照有效期的开始时间
     type_dict['dl_valid_duration'] = int  # 驾驶证信息 驾照有效持续期,单位年
@@ -296,7 +297,7 @@ class DriverResume(mongo_db.BaseDoc):
     """留下,暂时不用,只有愿意不愿意取外地工作这个选项"""
     type_dict['expected_regions'] = list    # 期望工作地区,list是区域代码的list,
     """
-     期望待遇,2个int元素组成的数组.第一个元素表示待遇下限,第二个元素表示待遇上限.
+     期望待遇,2个int元素组成的数组.第一个元素表示待遇下限,第二个元素表示待遇上限.  
      如果只有一个元素,则代表下限.
      如果没有元素,代表待遇面议.
      超过2个的元素会被抛弃.
@@ -307,7 +308,7 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['routes'] = list  # 熟悉线路,Route的DBRef的list
     """工作履历部分,是WorkHistory.的DBRef的list对象"""
     type_dict['work_history'] = list
-    type_dict['last_company'] = str  # 最后工作的公司,仅仅为列表页而添加
+    type_dict['last_company'] = str  # 最后工作的公司,仅仅为列表页而添加,需要更新工作经历时同步
     type_dict['self_evaluation'] = str  # 自我评价
     """获奖/荣誉证书 Honor._id的list对象"""
     type_dict['honor'] = list
@@ -315,6 +316,9 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['create_date'] = datetime.datetime  # 简历的创建时间
 
     def __init__(self, **kwargs):
+        dl_license_class = kwargs.pop("dl_license_class", None)
+        if isinstance(dl_license_class, str):
+            kwargs['dl_license_class'] = dl_license_class.upper()
         now = datetime.datetime.now()
         if "create_date" not in kwargs:
             kwargs['create_date'] = now

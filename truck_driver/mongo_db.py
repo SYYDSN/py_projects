@@ -2216,7 +2216,7 @@ class BaseDoc:
 
     @classmethod
     def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
-                      page_index: int = 1, to_dict: bool = True, can_json: bool = False) -> list:
+                      page_index: int = 1, to_dict: bool = True, can_json: bool = False) -> dict:
         """
         分页查询
         :param filter_dict:  查询条件字典
@@ -2226,7 +2226,7 @@ class BaseDoc:
         :param page_index: 页码(第几页?)
         :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
         :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
-        :return: 查询结果的数组
+        :return: 查询结果 {"count": 100, "data": [{...},{...}, ....]}
         """
         if isinstance(page_size, int):
             pass
@@ -2265,6 +2265,7 @@ class BaseDoc:
             "limit": page_size
         }
         args = {k: v for k, v in args.items() if v is not None}
+        count = ses.count(filter=filter_dict)
         res = list()
         r = ses.find(**args)
         if r is None:
@@ -2280,7 +2281,7 @@ class BaseDoc:
                     res = [cls(**x) for x in r]
             else:
                 pass
-        return res
+        return {"total": count, "data": res}
 
 
 """
