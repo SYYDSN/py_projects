@@ -206,7 +206,7 @@
             </div>
             -->
 
-            {% for resume in resumesa %}
+            {% for resume in resumes %}
                 <div class="line_div" data-id="{{ resume._id }}">
                     <div class="item base_info">
                         <div class="cell">
@@ -467,8 +467,19 @@
 
         </div>
         <div class="right">
+            <!--右边的图片，可能会被调整到主区域之外的地方-->
             <img src="/static/image/web/bg_tu.png">
         </div>
+    </div>
+
+    <!--翻页区域-->
+    <div class="page_area">
+        <a href="#" class="prev">上一页</a>
+        <a href="#" class="num">1</a>
+        <a href="#" class="num">2</a>
+        <a href="#" class="num active">3</a>
+        <a href="#" class="num">4</a>
+        <a href="#" class="next">下一页</a>
     </div>
 
 

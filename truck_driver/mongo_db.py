@@ -2216,13 +2216,14 @@ class BaseDoc:
 
     @classmethod
     def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
-                      page_index: int = 1, to_dict: bool = True, can_json: bool = False) -> dict:
+                      ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False) -> dict:
         """
         分页查询
         :param filter_dict:  查询条件字典
         :param sort_dict:  排序条件字典
         :param projection:  投影数组,决定输出哪些字段?
         :param page_size: 每页大小(多少条记录?)
+        :param ruler: 翻页器最多显示几个页码？
         :param page_index: 页码(第几页?)
         :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
         :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
@@ -2265,7 +2266,11 @@ class BaseDoc:
             "limit": page_size
         }
         args = {k: v for k, v in args.items() if v is not None}
-        count = ses.count(filter=filter_dict)
+        """开始计算分页数据"""
+        record_count = ses.count(filter=filter_dict)
+        page_count = math.ceil(record_count / page_size)  # 共计多少页?
+        middle_num = math.ceil(page_count / 2)
+        """开始查询页面"""
         res = list()
         r = ses.find(**args)
         if r is None:
@@ -2281,7 +2286,7 @@ class BaseDoc:
                     res = [cls(**x) for x in r]
             else:
                 pass
-        return {"total": count, "data": res}
+        return {"total": record_count, "data": res}
 
 
 """

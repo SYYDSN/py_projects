@@ -201,3 +201,22 @@
   width: 240px;
   padding-left: 4px;
 }
+.page_middle .page_area {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  padding: 1.2em 0;
+}
+.page_middle .page_area > a {
+  color: #bababa;
+  font-size: 1rem;
+  border: 1px solid #dcdcdc;
+  padding: 0 5px;
+  margin: 0 6px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+.page_middle .page_area .active {
+  color: #47a9fe;
+}
