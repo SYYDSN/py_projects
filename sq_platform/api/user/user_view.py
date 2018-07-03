@@ -637,8 +637,6 @@ def query_violation(user_id):
     message = {"message": "success"}
     """记录违章查询参数"""
     generator_id = get_arg(request, "_id", "")  # 查询器id
-    user_id = ObjectId("598d6ac2de713e32dfc74796")
-    generator_id = "5b398ce8e39a7b655f9959a5"
     if isinstance(generator_id, str) and len(generator_id) == 24:
         generator_id = ObjectId(generator_id)
     else:

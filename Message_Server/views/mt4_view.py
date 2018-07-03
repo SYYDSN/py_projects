@@ -8,6 +8,8 @@ from flask.blueprints import Blueprint
 from flask import request
 import json
 from bson.objectid import ObjectId
+from tools_module import *
+from module.identity_validate import GlobalSignature
 from module.item_module import RawRequestInfo
 
 
@@ -27,6 +29,31 @@ def index_func() -> str:
     :return:
     """
     return "hello world!, 1 am mt4 server."
+
+
+def secret_func(key) -> str:
+    """
+    获取服务器端的数字签名和当前算法,node.js服务器用此两项信息来进行和保驾犬后台的加密通讯
+    当前情况下.使用sid来换取signature  sid = "bbb5fd48094942be80dbf0467be3d6f6"
+    :return:
+    """
+    mes = {"message": "success"}
+    if key == "get":
+        """获取签名和算法"""
+        sid = get_arg(request, "sid", "")
+        if sid == "bbb5fd48094942be80dbf0467be3d6f6":
+            """可以请求signature"""
+            data = dict()
+            r = GlobalSignature.get_signature()
+            data['signature'] = r['signature']
+            data['algorithm'] = r['algorithm']
+            data['expire'] = r['expire']
+            mes['data'] = data
+        else:
+            mes['message'] = "未实现请求"
+    else:
+        mes = "未实现"
+    return json.dumps(mes)
 
 
 def mes_func(key) -> str:
@@ -61,4 +88,5 @@ def mes_func(key) -> str:
 
 
 mt4_blueprint.add_url_rule(rule="/", view_func=index_func, methods=['get', 'post'])  # hello world
+mt4_blueprint.add_url_rule(rule="/secret/<key>", view_func=index_func, methods=['get', 'post'])  # 获取签名和算法
 mt4_blueprint.add_url_rule(rule="/message/<key>", view_func=mes_func, methods=['get', 'post'])  # 接收平台消息
