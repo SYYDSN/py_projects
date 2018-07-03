@@ -2216,7 +2216,8 @@ class BaseDoc:
 
     @classmethod
     def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
-                      ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False) -> dict:
+                      ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False,
+                      func: object = None, target: str = "dict") -> dict:
         """
         分页查询
         :param filter_dict:  查询条件字典
@@ -2224,10 +2225,20 @@ class BaseDoc:
         :param projection:  投影数组,决定输出哪些字段?
         :param page_size: 每页大小(多少条记录?)
         :param ruler: 翻页器最多显示几个页码？
-        :param page_index: 页码(第几页?)
+        :param page_index: 页码(当前页码)
         :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
         :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
-        :return: 查询结果 {"count": 100, "data": [{...},{...}, ....]}
+        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
+        :param target: 和func参数配合使用,指明func是对实例本身操作还是对doc进行操作(instance/dict)
+        :return: 字典对象.
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
         """
         if isinstance(page_size, int):
             pass
@@ -2269,7 +2280,10 @@ class BaseDoc:
         """开始计算分页数据"""
         record_count = ses.count(filter=filter_dict)
         page_count = math.ceil(record_count / page_size)  # 共计多少页?
-        middle_num = math.ceil(page_count / 2)
+        delta = math.ceil(ruler / 2)
+        range_left = 1 if (page_index - delta) <= 1 else page_index - delta
+        range_right = page_count if (range_left + ruler) >= page_count else page_index + delta
+        pages = [x for x in range(range_left, int(range_right) + 1)]
         """开始查询页面"""
         res = list()
         r = ses.find(**args)
@@ -2278,15 +2292,31 @@ class BaseDoc:
         else:
             if r.count() > 0:
                 if to_dict:
-                    if can_json:
-                        res = [to_flat_dict(x) for x in r]
+                    if func and target == "dict":
+                        if can_json:
+                            res = [to_flat_dict(func(x)) for x in r]
+                        else:
+                            res = [func(x) for x in r]
                     else:
-                        res = [x for x in r]
+                        if can_json:
+                            res = [to_flat_dict(x) for x in r]
+                        else:
+                            res = [x for x in r]
                 else:
-                    res = [cls(**x) for x in r]
+                    if func and target == "instance":
+                        res = [func(cls(**x)) for x in r]
+                    else:
+                        res = [cls(**x) for x in r]
             else:
                 pass
-        return {"total": record_count, "data": res}
+        resp = {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        return resp
 
 
 """

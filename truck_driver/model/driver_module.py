@@ -265,9 +265,11 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['birth_date'] = datetime.datetime  # 出生日期,以身份证号码为准
     type_dict['id_num'] = str  # 身份证号码
     type_dict['age'] = int  # 年龄 以身份证号码为准
+    """以下3个字段因为是动态的,需要在每次查询doc的时候进行计算,以保证准确性"""
     type_dict['driving_experience'] = int  # 驾龄 单位 年 用驾驶证信息中的首次领证日期计算
     type_dict['industry_experience'] = int  # 从业年限 单位 年 用道路运输从业资格证信息中的首次领证日期计算
-    type_dict['work_experience'] = int  # 工作年限 单位 年 工作履历记录中最早的开始计算,需要更新工作经历时同步
+    type_dict['work_experience'] = int  # 工作年限 单位 年 依赖first_work_date属性
+
     """
     学历分以下几种:
     1. 初等教育(小学及以下)
@@ -309,6 +311,7 @@ class DriverResume(mongo_db.BaseDoc):
     """工作履历部分,是WorkHistory.的DBRef的list对象"""
     type_dict['work_history'] = list
     type_dict['last_company'] = str  # 最后工作的公司,仅仅为列表页而添加,需要更新工作经历时同步
+    type_dict['first_work_date'] = datetime.datetime  # 最早的工作时间,由最早的工作经历确定.可以用来计算工龄.需要更新工作经历时同步
     type_dict['self_evaluation'] = str  # 自我评价
     """获奖/荣誉证书 Honor._id的list对象"""
     type_dict['honor'] = list
@@ -394,6 +397,106 @@ class DriverResume(mongo_db.BaseDoc):
         else:
             pass
         super(DriverResume, self).__init__(**kwargs)
+
+    @classmethod
+    def extend_info(cls, raw: dict) -> dict:
+        """
+        重新计算扩展的信息,此函数需要在查询的时候被调用以计算
+        1. 工龄
+        2. 驾龄
+        3. 从业年限
+        ,最常见的情况是在分页查询时.重新计算经验
+        type_dict['driving_experience'] = int  # 驾龄 单位 年 用驾驶证信息中的首次领证日期计算
+        type_dict['industry_experience'] = int  # 从业年限 单位 年 用道路运输从业资格证信息中的首次领证日期计算
+        type_dict['work_experience'] = int  # 工作年限 单位 年 工作履历记录中最早的开始计算,需要更新工作经历时同步
+        :param raw: 实例的doc类型,确保时间类型的原有格式
+        :return:
+        """
+        now = datetime.datetime.now()
+        dl_first_date = raw.pop("dl_first_date", None)  # 驾照首次申领日期
+        if isinstance(dl_first_date, str) or isinstance(dl_first_date, datetime.datetime):
+            dl_first_date = dl_first_date if isinstance(dl_first_date,
+                                                        datetime.datetime) else mongo_db.get_datetime_from_str(
+                dl_first_date)
+            if isinstance(dl_first_date, datetime.datetime):
+                driving_experience = now.year - dl_first_date.year
+                raw['driving_experience'] = driving_experience
+            else:
+                pass
+        else:
+            pass
+        rtqc_first_date = raw.pop("rtqc_first_date", None)  # 运输许可证首次申领日期
+        if isinstance(rtqc_first_date, str) or isinstance(rtqc_first_date, datetime.datetime):
+            rtqc_first_date = rtqc_first_date if isinstance(rtqc_first_date, datetime.datetime) else \
+                mongo_db.get_datetime_from_str(rtqc_first_date)
+            if isinstance(rtqc_first_date, datetime.datetime):
+                industry_experience = now.year - rtqc_first_date.year
+                raw['industry_experience'] = industry_experience
+            else:
+                pass
+        else:
+            pass
+        first_work_date = raw.pop("first_work_date", None)  # 首次工作时间
+        if first_work_date is None:
+            """查工作履历"""
+            f = {"driver_id": DBRef(database=mongo_db.db_name, collection=DriverResume.get_table_name(),
+                                       id=raw['_id'])}
+            s = {"begin": 1}
+            projection = ['begin']
+            r = WorkHistory.find_one_plus(filter_dict=f, sort_dict=s, projection=projection, instance=False)
+            if r is None:
+                pass
+            else:
+                begin = r['begin']
+                f = {"_id": "raw['_id']"}
+                u = {"$set": {"first_work_date": begin}}
+                cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)  # 更新首次工作日期
+                first_work_date = begin
+        else:
+            pass
+        if isinstance(first_work_date, str) or isinstance(first_work_date, datetime.datetime):
+            first_work_date = first_work_date if isinstance(first_work_date, datetime.datetime) else \
+                mongo_db.get_datetime_from_str(first_work_date)
+            if isinstance(first_work_date, datetime.datetime):
+                work_experience = now.year - first_work_date.year
+                raw['work_experience'] = work_experience
+            else:
+                pass
+        else:
+            pass
+        return raw
+
+    @classmethod
+    def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
+                      ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False,
+                      func: object = None, target: str = "dict"):
+        """
+        分页查询,覆盖了父类的对象
+        :param filter_dict:  查询条件字典
+        :param sort_dict:  排序条件字典
+        :param projection:  投影数组,决定输出哪些字段?
+        :param page_size: 每页大小(多少条记录?)
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
+        :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
+        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
+        :param target: 和func参数配合使用,指明func是对实例本身操作还是对doc进行操作(instance/dict)
+        :return: 字典对象.
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        """
+        func = cls.extend_info
+        target = "dict"
+        return super().query_by_page(filter_dict=filter_dict, sort_dict=sort_dict, projection=projection,
+                                     page_size=page_size, ruler=ruler, page_index=page_index, to_dict=to_dict,
+                                     can_json=can_json, func=func, target=target)
 
     @classmethod
     def add_work_history(cls, history_args: dict) -> ObjectId:

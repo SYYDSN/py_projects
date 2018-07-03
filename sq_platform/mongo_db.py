@@ -1186,7 +1186,8 @@ class BaseDoc:
                                 self.__dict__[k] = temp
                             except Exception as e:
                                 print(e)
-                                raise TypeError("{} 不是一个DBRef的实例".format(v))
+                                ms = "{} 不是一个DBRef的实例".format(v)
+                                raise TypeError(ms)
                         elif type_name.__name__ == "ObjectId" and v is None:
                             pass
                         elif type_name.__name__ == "GeoJSON" and isinstance(v, dict):
@@ -1864,16 +1865,22 @@ class BaseDoc:
         return result
 
     @classmethod
-    def find_by_id(cls, o_id: (str, ObjectId), to_dict: bool = False, can_json: bool = False):
+    def find_by_id(cls, o_id: (str, ObjectId), to_dict: bool = False, can_json: bool = False, debug: bool = False):
         """查找并返回一个对象，这个对象是o_id对应的类的实例
         :param o_id: _id可以是字符串或者ObjectId
         :param to_dict: 是否转换结果为字典?
         :param can_json: 是否转换结果为可json化的字典?注意如果can_json为真,to_dict参数自动为真
+        :param debug: debug模式,开启后会记录所有的参数和返回结果.
         return cls.instance
         """
+        raw_args = {"_id": o_id}
         o_id = get_obj_id(o_id)
         ses = get_conn(cls._table_name)
-        result = ses.find_one({"_id": o_id})
+        result = ses.find_one({"_id": o_id})  # 返回的是文档
+        if debug:
+            record = {"doc": result}
+            record.update(raw_args)
+            logger.exception(msg=str(record))
         if result is None:
             return result
         else:

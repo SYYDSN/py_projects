@@ -200,9 +200,10 @@ def test_update_user_driving_license():
 def test_get_car_license():
     """测试获取用户行车证信息"""
     auth_token = "a98d8bb4840c42e3993ccc6d6c79d431"  # app段登录标识 me
-    auth_token = "12b9b21c959140f3af79ce56bf30a7e1"  # app段登录标识 有问题的测试手机
     headers = {"auth_token": auth_token}
+    args = {"_id": "5af95af2e39a7b5b754c4efe"}  # 查询器id
     res = requests.post("http://127.0.0.1:5000/api/get_vehicle_info", headers=headers)
+    # res = requests.post("http://safego.org:5000/api/get_vehicle_info", headers=headers)
     print(res.json())
 
 
@@ -321,13 +322,13 @@ if __name__ == "__main__":
     """测试获取违章查询器列表"""
     # test_get_vio_query_shortcuts()
     """测试违章查询"""
-    test_query_violation()
+    # test_query_violation()
     """测试查询用户全部违章"""
     # test_query_all_violations()
     """测试查询用户违章报告"""
     # test_get_violation_report()
     """测试获取用户行车证信息"""
-    # test_get_car_license()
+    test_get_car_license()
     """测试用户上传行车证图片"""
     # test_upload_user_permit_image()
     """测试用户删除行车证"""

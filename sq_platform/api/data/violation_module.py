@@ -1414,16 +1414,18 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 """
                 error_code = message.get("error_code")
                 if error_code is None or error_code == 0:
-                    """正常的返回.没有错误信息,"""
+                    """正常的返回.没有错误"""
                     vio_data = message.get('data')
                     if isinstance(vio_data, dict):
-                        if "plate_number" in message['data']:
-                            pass
-                        else:
+                        """填充行车证相关信息"""
+                        car_id = generator.get_attr("car_license").id
+                        car = CarLicense.find_by_id(o_id=car_id, debug=True)
+                        if isinstance(car, CarLicense):
+                            car = car.get_dict()
                             data = message['data']
-                            q = generator.get_query_args()
-                            plate_number = q['plate_number'] if 'plate_number' in q else ""
-                            data['plate_number'] = plate_number
+                            data['plate_number'] = car['plate_number'] if 'plate_number' in car else ""
+                            data['car_model'] = car['car_model'] if 'car_model' in car else ""
+                            data['car_id'] = str(car['_id'])
                             message['data'] = data
                     else:
                         ms = "异常的违章查询结果:{}".format(message)

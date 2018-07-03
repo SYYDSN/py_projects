@@ -62,7 +62,7 @@ class RawRequestInfo(mongo_db.BaseDoc):
         args['method'] = req.method.lower()
         args['args'] = {k: v for k, v in req.args.items()}
         args['form'] = {k: v for k, v in req.form.items()}
-        args['json'] = request.json
+        args['json'] = req.json
         args['headers'] = {k: v for k, v in req.headers.items()}
         return args
 

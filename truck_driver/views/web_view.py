@@ -55,8 +55,8 @@ def driver_page_func():
     :return:
     """
     url_path = request.path  # 当前web路径
-    q = dict()
-    keywords = request.args.get("kw", "")  # 搜索关键词
+    q = dict()  # 查询条件
+    keywords = request.args.get("keywords", "")  # 搜索关键词
     keywords = keywords.strip()
     if keywords == "":
         pass
@@ -65,16 +65,81 @@ def driver_page_func():
         if len(keywords) == 0:
             pass
         else:
-            r = list()
-            r.extend([{"phone": {"$regex": Regex("\S*{}\S*".format(x))}} for x in keywords])
-            q['$or'] = r
+            """填充搜索条件,匹配其他表的字段先忽视,因为那需要一个检索服务器,比如elasticsearch"""
+            or_list = list()
+            """匹配简历的字段"""
+            fields = ["living_place", "address", "email"]  # 模糊匹配字段
+            for word in keywords:
+                for field in fields:
+                    t = {field: {"$regex": Regex("\S*{}\S*".format(word))}}
+                    or_list.append(t)
+            q['$or'] = or_list
+    now = datetime.datetime.now()
+    """从业年限"""
+    i_exp = request.args.get("i_exp", "")
+    if i_exp == "":
+        pass
+    else:
+        try:
+            i_exp = int(i_exp)
+        except Exception as e:
+            print(e)
+    if isinstance(i_exp, int) and i_exp > 0:
+        i_exp = now + datetime.timedelta(days=365 * i_exp)
+        q['rtqc_first_date'] = {"$lte": i_exp}
+    """工作经验"""
+    work_exp = request.args.get("work_exp", "")
+    if work_exp == "":
+        pass
+    else:
+        try:
+            work_exp = int(work_exp)
+        except Exception as e:
+            print(e)
+    if isinstance(work_exp, int) and work_exp > 0:
+        work_exp = now + datetime.timedelta(days=365 * i_exp)
+        q['first_work_date'] = {"$lte": work_exp}
+    """驾龄"""
+    driving_exp = request.args.get("driving_exp", "")
+    if driving_exp == "":
+        pass
+    else:
+        try:
+            driving_exp = int(driving_exp)
+        except Exception as e:
+            print(e)
+    if isinstance(driving_exp, int) and driving_exp > 0:
+        driving_exp = now + datetime.timedelta(days=365 * i_exp)
+        q['dl_first_date'] = {"$lte": driving_exp}
+    """发布时间"""
+    update_date = request.args.get("update_date", "")
+    times = ['today', 'three_day', 'week', 'month', 'three_month', 'half_year']
+    if update_date in times:
+        if update_date == "today":
+            delta = datetime.timedelta(days=1)
+        elif update_date == "three_day":
+            delta = datetime.timedelta(days=3)
+        elif update_date == "week":
+            delta = datetime.timedelta(days=7)
+        elif update_date == "month":
+            """不精确,暂时这样"""
+            delta = datetime.timedelta(days=30)
+        elif update_date == "three_month":
+            delta = datetime.timedelta(days=90)
+        else:
+            delta = datetime.timedelta(days=181)
+        q['update_date'] = {"$gte": now - delta}
+    """当前状态"""
+
     index = request.args.get("index", "1")  # 第几页
     try:
-        index = int(index)
+        page_index = int(index)
     except Exception as e:
-        index = 1
-    resumes = DriverResume.query_by_page(filter_dict=q)
-    return render_template("web/drivers.html", url_path=url_path, total=resumes['total'], resumes=resumes['data'])
+        print(e)
+        page_index = 1
+    r = DriverResume.query_by_page(filter_dict=q)
+    return render_template("web/drivers.html", url_path=url_path, resumes=r['data'], total_record=r['total_record'],
+                           total_page=r['total_page'], pages=r['pages'], page_index=page_index)
 
 
 
