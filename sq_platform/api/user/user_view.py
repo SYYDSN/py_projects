@@ -652,6 +652,8 @@ def query_violation(user_id):
         ms = "违章查询的结果是:{}".format(message)
         logger.info(ms)
         print(ms)
+        if "args" in message:
+            message['args'] = {k: str(v) for k, v in message['args'].items()}
         return json.dumps(message)
 
 

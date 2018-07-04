@@ -66,6 +66,19 @@ deep_grey = #5C5F63
         width 10%
       input
         width 90%
+        /*input的placeholder的颜色*/
+      ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+        color:    font_color;
+      }
+      :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color:    font_color;
+      }
+      ::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color:    font_color;
+      }
+      :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color:    font_color;
+      }
     .row_02
       label
         width 10%
@@ -158,6 +171,7 @@ deep_grey = #5C5F63
         .last
           border-left 1px solid #dedede
           padding-left 2em
+          white-space nowrap
           width 30%
           .company_name
             white-space nowrap
@@ -172,6 +186,9 @@ deep_grey = #5C5F63
             .favorite
               color #fe9f28
               border-color #fe9f28
+            .un_favorite
+              color border_color
+              border-color border_color
             .more_info
               margin-left 3px
               color #47a9fe
@@ -197,3 +214,7 @@ deep_grey = #5C5F63
       text-decoration none
     .active
       color #47a9fe
+    > span
+      color font_color
+      font-size 1rem
+      margin-left 1em

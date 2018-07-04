@@ -2223,7 +2223,7 @@ class BaseDoc:
         :param filter_dict:  查询条件字典
         :param sort_dict:  排序条件字典
         :param projection:  投影数组,决定输出哪些字段?
-        :param page_size: 每页大小(多少条记录?)
+        :param page_size:
         :param ruler: 翻页器最多显示几个页码？
         :param page_index: 页码(当前页码)
         :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)

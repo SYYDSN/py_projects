@@ -6,11 +6,14 @@ if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 from flask.blueprints import Blueprint
 from flask import request
+from flask import abort
+from flask import render_template
 import json
 from bson.objectid import ObjectId
 from tools_module import *
 from module.identity_validate import GlobalSignature
 from module.item_module import RawRequestInfo
+from module.document_tools import markdown_to_html
 
 
 """接受mt4后台推送过来的信息2018-6-29"""
@@ -29,6 +32,19 @@ def index_func() -> str:
     :return:
     """
     return "hello world!, 1 am mt4 server."
+
+
+def md_view():
+    """md文档视图"""
+    if request.method.lower() == "get":
+        sid = get_arg(request, "sid", "")
+        if sid == "bbb5fd48094942be80dbf0467be3d6f6":
+            content = markdown_to_html()
+            return render_template("md.html", content=content)
+        else:
+            return abort(404)
+    else:
+        return abort(405)
 
 
 def secret_func(key) -> str:
@@ -88,5 +104,6 @@ def mes_func(key) -> str:
 
 
 mt4_blueprint.add_url_rule(rule="/", view_func=index_func, methods=['get', 'post'])  # hello world
+mt4_blueprint.add_url_rule(rule="/api", view_func=md_view, methods=['get'])  # api
 mt4_blueprint.add_url_rule(rule="/secret/<key>", view_func=index_func, methods=['get', 'post'])  # 获取签名和算法
 mt4_blueprint.add_url_rule(rule="/message/<key>", view_func=mes_func, methods=['get', 'post'])  # 接收平台消息

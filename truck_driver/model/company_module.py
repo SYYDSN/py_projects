@@ -5,7 +5,7 @@ __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import mongo_db
-import requests
+from model.driver_module import DriverResume
 import datetime
 import warnings
 import hashlib
@@ -118,9 +118,9 @@ class Company(mongo_db.BaseDoc):
         return mes
 
     @classmethod
-    def add_user_raw(cls, init: dict = None, md5: bool = False, save: bool = True, instance: bool = False) -> (object, ObjectId):
+    def add_company_raw(cls, init: dict = None, md5: bool = False, save: bool = True, instance: bool = False) -> (object, ObjectId):
         """
-        添加用户,此方法原始的添加用户的方法.
+        此方法原始的添加公司账户的方法.一般只在用做开发级别的调用.也可作为其他函数的底层函数.
         :param init: 初始化实力的参数字典.
         :param md5: 是否对密码属性进行md5转换(默认不转,即密码已经是md5转换过了.如果是node/前端传来的初始化字典,密码是应该
         已经进行过md5转换的,所以这里应该设置为False,如果是直接在内部或命令行调用此方法,此参数一定要被设置为True)
@@ -140,10 +140,110 @@ class Company(mongo_db.BaseDoc):
         init['user_password'] = pw
         return cls.create(save=save, **init) if instance else cls.create(save=save, **init).get_id()
 
+    def resume_favorite(self, page_size: int = 10, ruler: int = 5, page_index: int = 1, to_dict: bool = True,
+                        can_json: bool = False) -> dict:
+        """
+        以分页方式查看收藏的简历
+        :param page_size: 每页大小(多少条记录?)
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
+        :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
+        :return:
+        """
+        f = {"company_id": self.get_dbref()}
+        s = {"time": -1}
+        args = dict()
+        args['filter_dict'] = f
+        args['sort_dict'] = s
+        args['page_size'] = page_size
+        args['ruler'] = ruler
+        args['page_index'] = page_index
+        args['to_dict'] = to_dict
+        args['can_json'] = can_json
+        res = ResumeFavorite.query_by_page(**args)
+        return res
+
+    @classmethod
+    def get_resume_favorite(cls, company_id: (str, ObjectId), page_size: int = 10, ruler: int = 5, page_index: int = 1,
+                            to_dict: bool = True, can_json: bool = False) -> dict:
+        """
+        以分页方式查看收藏的简历, self/resume_favorite的类方法
+        :param company_id:  公司id
+        :param page_size: 每页大小(多少条记录?)
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
+        :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
+        :return:
+        """
+        company = cls.find_by_id(company_id)
+        if not isinstance(company, cls):
+            ms = "错误的公司id:{}".format(company_id)
+            raise ValueError(ms)
+        else:
+            return company.resume_favorite(page_size=page_size, ruler=ruler, page_index=page_index, to_dict=to_dict,
+                                           can_json=can_json)
+
+    @classmethod
+    def in_favorite(cls, company_id: (str, ObjectId), drivers: list, to_str: bool = True) -> dict:
+        """
+        检查一组给定的简历是否已被收藏?
+        :param company_id: 公司id
+        :param drivers:  司机建立的_id的ObjectId/DBRef组成的list
+        :param to_str:  是否转ObjectId/DBRef
+        :return: {driver1_id: "yes", driver2_id: "no",....}
+        """
+        company = cls.find_by_id(company_id)
+        if not isinstance(company, cls):
+            ms = "错误的公司id:{}".format(company_id)
+            raise ValueError(ms)
+        else:
+            company_dbref = company.get_dbref()
+            resume_ids = list()
+            for x in drivers:
+                if isinstance(x, str) and len(x) == 24:
+                    x = ObjectId(x)
+                else:
+                    pass
+                if isinstance(x, ObjectId):
+                    x = DBRef(database=mongo_db.db_name, collection=DriverResume.get_table_name(), id=x)
+                else:
+                    pass
+                if isinstance(x, DBRef):
+                    resume_ids.append(x)
+                else:
+                    pass
+            f = {"company_id": company_dbref, "resume_id": {"$in": resume_ids}}
+            r = ResumeFavorite.find_plus(filter_dict=f, to_dict=True)
+            r = [x['resume_id'] for x in r]
+            if to_str:
+                res = {str(x.id): ("yes" if x in r else "no") for x in resume_ids}
+            else:
+                res = {x.id: ("yes" if x in r else "no") for x in resume_ids}
+            return res
+
+
+class ResumeFavorite(mongo_db.BaseDoc):
+    """公司的简历收藏夹,用于收藏自己中意的司机"""
+    _table_name = "resume_favorite"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId  # _id
+    type_dict['company_id'] = DBRef
+    type_dict['resume_id'] = DBRef
+    type_dict['time'] = datetime.datetime  # 收藏时间.
+
+    def __init__(self, **kwargs):
+        if "company_id" not in kwargs:
+            ms = "company_id必须"
+            raise ValueError(ms)
+        if "resume_id" not in kwargs:
+            ms = "resume_id必须"
+            raise ValueError(ms)
+        if "time" not in kwargs:
+            kwargs['time'] = datetime.datetime.now()
+        super(ResumeFavorite, self).__init__(**kwargs)
+
 
 if __name__ == "__main__":
-    """增加一个用户"""
-    a = {"user_name": "jack", "user_password": "123456", "short_name": "测试公司"}
-    o = Company.add_user_raw(a, md5=True)
-    print(o)
     pass

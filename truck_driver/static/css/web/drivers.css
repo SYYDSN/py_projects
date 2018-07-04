@@ -62,6 +62,23 @@
 }
 .page_middle .search_div .row_01 input {
   width: 90%;
+/*input的placeholder的颜色*/
+}
+.page_middle .search_div .row_01 ::-webkit-input-placeholder {
+/* WebKit, Blink, Edge */
+  color: #bababa;
+}
+.page_middle .search_div .row_01 :-moz-placeholder {
+/* Mozilla Firefox 4 to 18 */
+  color: #bababa;
+}
+.page_middle .search_div .row_01 ::-moz-placeholder {
+/* Mozilla Firefox 19+ */
+  color: #bababa;
+}
+.page_middle .search_div .row_01 :-ms-input-placeholder {
+/* Internet Explorer 10-11 */
+  color: #bababa;
 }
 .page_middle .search_div .row_02 label {
   width: 10%;
@@ -172,6 +189,7 @@
 .page_middle .driver_list .left .line_div .last {
   border-left: 1px solid #dedede;
   padding-left: 2em;
+  white-space: nowrap;
   width: 30%;
 }
 .page_middle .driver_list .left .line_div .last .company_name {
@@ -190,6 +208,10 @@
 .page_middle .driver_list .left .line_div .last .last_cell .favorite {
   color: #fe9f28;
   border-color: #fe9f28;
+}
+.page_middle .driver_list .left .line_div .last .last_cell .un_favorite {
+  color: #dcdcdc;
+  border-color: #dcdcdc;
 }
 .page_middle .driver_list .left .line_div .last .last_cell .more_info {
   margin-left: 3px;
@@ -219,4 +241,9 @@
 }
 .page_middle .page_area .active {
   color: #47a9fe;
+}
+.page_middle .page_area > span {
+  color: #bababa;
+  font-size: 1rem;
+  margin-left: 1em;
 }

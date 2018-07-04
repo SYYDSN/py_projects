@@ -46,7 +46,7 @@ body .page_middle {
 /*中间区域*/
   max-width: 1000px;
   margin-left: calc(50% - 500px);
-  min-height: calc(100% - 70px - 65px) /*子页面需要覆盖此属性*/;
+  min-height: calc(100% - 70px - 65px) /*保证最小页面高度*/;
 }
 body .page_bottom {
 /*页脚*/

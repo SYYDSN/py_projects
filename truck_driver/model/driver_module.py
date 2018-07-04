@@ -249,6 +249,27 @@ class WorkHistory(mongo_db.BaseDoc):
     type_dict["create_date"] = datetime.datetime  # 创建日期
 
 
+class HeadImage(mongo_db.BaseFile):
+    """
+    用户头像
+    """
+    _table_name = "head_image"
+
+
+class DrivingLicenseImage(mongo_db.BaseFile):
+    """
+    驾驶证(驾照)图片
+    """
+    _table_name = "driving_license_image"
+
+
+class RTQCImage(mongo_db.BaseFile):
+    """
+    公路运输从业资格证图片
+    """
+    _table_name = "rtqc_image"
+
+
 class DriverResume(mongo_db.BaseDoc):
     """司机简历"""
     _table_name = "driver_resume"
@@ -256,6 +277,7 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['user_name'] = str  # 用户名,唯一判定,默认和手机相同
     type_dict['real_name'] = str  # 真实姓名 ,可以从驾驶证取
+    type_dict['head_image'] = DBRef  # 头像
     type_dict['gender'] = str   # 以驾驶证信息为准. 男/女
     type_dict['birth_place'] = str   # 籍贯/出生地
     type_dict['living_place'] = str   # 居住地,
@@ -280,13 +302,13 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['education'] = int  # 学历,学历代码见注释
     type_dict['status'] = int  # 任职/经营 状态. -1 个体经营/0 离职/ 1 在职
     """驾驶证信息 Driving License,简称dl"""
-    type_dict['dl_image'] = bytes  # 驾驶证信息,驾驶证照片,这里直接存储的是图片,注意大小不可太大.
+    type_dict['dl_image'] = DBRef  # 驾驶证图片,.
     type_dict['dl_license_class'] = str  # 驾驶证信息.驾驶证类型,准驾车型 英文字母一律大写
     type_dict['dl_first_date'] = datetime.datetime  # 驾驶证信息 首次领证日期
     type_dict['dl_valid_begin'] = datetime.datetime  # 驾驶证信息 驾照有效期的开始时间
     type_dict['dl_valid_duration'] = int  # 驾驶证信息 驾照有效持续期,单位年
     """道路运输从业资格证部分,Road transport qualification certificate 简称rtqc"""
-    type_dict['rtqc_image'] = bytes  # 道路运输从业资格证信息,照片
+    type_dict['rtqc_image'] = DBRef  # 道路运输从业资格证信息,照片
     type_dict['rtqc_license_class'] = str  # 道路运输从业资格证信息.货物运输驾驶员/危险货物运输驾驶员
     type_dict['rtqc_first_date'] = datetime.datetime  # 道路运输从业资格证信息 首次领证日期,用于推定从业年限
     type_dict['rtqc_valid_begin'] = datetime.datetime  # 道路运输从业资格证信息 资格证的有效期的开始时间
@@ -377,23 +399,23 @@ class DriverResume(mongo_db.BaseDoc):
         dl_first_date = kwargs.pop("dl_first_date", None)  # 驾照首次申领日期
         if isinstance(dl_first_date, str):
             dl_first_date = mongo_db.get_datetime_from_str(dl_first_date)
-            if isinstance(dl_first_date, datetime.datetime):
-                kwargs['dl_first_date'] = dl_first_date
-                driving_experience = now.year - dl_first_date.year
-                kwargs['driving_experience'] = driving_experience
-            else:
-                pass
+        else:
+            pass
+        if isinstance(dl_first_date, datetime.datetime):
+            kwargs['dl_first_date'] = dl_first_date
+            driving_experience = now.year - dl_first_date.year
+            kwargs['driving_experience'] = driving_experience
         else:
             pass
         rtqc_first_date = kwargs.pop("rtqc_first_date", None)  # 运输许可证首次申领日期
         if isinstance(rtqc_first_date, str):
             rtqc_first_date = mongo_db.get_datetime_from_str(rtqc_first_date)
-            if isinstance(rtqc_first_date, datetime.datetime):
-                kwargs['rtqc_first_date'] = rtqc_first_date
-                industry_experience = now.year - rtqc_first_date.year
-                kwargs['industry_experience'] = industry_experience
-            else:
-                pass
+        else:
+            pass
+        if isinstance(rtqc_first_date, datetime.datetime):
+            kwargs['rtqc_first_date'] = rtqc_first_date
+            industry_experience = now.year - rtqc_first_date.year
+            kwargs['industry_experience'] = industry_experience
         else:
             pass
         super(DriverResume, self).__init__(**kwargs)
@@ -412,6 +434,7 @@ class DriverResume(mongo_db.BaseDoc):
         :param raw: 实例的doc类型,确保时间类型的原有格式
         :return:
         """
+        """计算驾龄"""
         now = datetime.datetime.now()
         dl_first_date = raw.pop("dl_first_date", None)  # 驾照首次申领日期
         if isinstance(dl_first_date, str) or isinstance(dl_first_date, datetime.datetime):
@@ -425,6 +448,7 @@ class DriverResume(mongo_db.BaseDoc):
                 pass
         else:
             pass
+        """计算从业年限"""
         rtqc_first_date = raw.pop("rtqc_first_date", None)  # 运输许可证首次申领日期
         if isinstance(rtqc_first_date, str) or isinstance(rtqc_first_date, datetime.datetime):
             rtqc_first_date = rtqc_first_date if isinstance(rtqc_first_date, datetime.datetime) else \
@@ -436,6 +460,7 @@ class DriverResume(mongo_db.BaseDoc):
                 pass
         else:
             pass
+        """计算工龄"""
         first_work_date = raw.pop("first_work_date", None)  # 首次工作时间
         if first_work_date is None:
             """查工作履历"""
@@ -448,7 +473,7 @@ class DriverResume(mongo_db.BaseDoc):
                 pass
             else:
                 begin = r['begin']
-                f = {"_id": "raw['_id']"}
+                f = {"_id": raw['_id']}
                 u = {"$set": {"first_work_date": begin}}
                 cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)  # 更新首次工作日期
                 first_work_date = begin
@@ -464,6 +489,24 @@ class DriverResume(mongo_db.BaseDoc):
                 pass
         else:
             pass
+        """计算年龄"""
+        birth = raw['birth_date']
+        if isinstance(birth, datetime.datetime):
+            age = now.year - birth.year
+            raw['age'] = age
+        """转期望待遇的数组为字符串,以方便前端展示"""
+        expected_salary = raw.get("expected_salary")
+        if isinstance(expected_salary, list):
+            expected_salary = expected_salary[0:2]
+            if len(expected_salary) == 1:
+                expected_salary = "{}k".format(round(expected_salary[0] / 1000, 1))
+            else:
+                expected_salary = "{}k至{}k".format(round(expected_salary[0] / 1000, 1),
+                                                   round(expected_salary[1] / 1000, 1))
+        else:
+            expected_salary = "面议"
+        raw['expected_salary'] = expected_salary
+
         return raw
 
     @classmethod
@@ -480,7 +523,7 @@ class DriverResume(mongo_db.BaseDoc):
         :param page_index: 页码(当前页码)
         :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
         :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
-        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
+        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入.
         :param target: 和func参数配合使用,指明func是对实例本身操作还是对doc进行操作(instance/dict)
         :return: 字典对象.
         查询结果示范:
@@ -501,16 +544,32 @@ class DriverResume(mongo_db.BaseDoc):
     @classmethod
     def add_work_history(cls, history_args: dict) -> ObjectId:
         """
-        增加工作经历,在增加工作经历的同时,根据工作经历的时间,判断是不是最后一段工作经历?
-        1. 如果是最后的工作经历(截至时间最晚),更新.
+        增加工作经历,在增加工作经历的同时,根据工作经历的时间,进行如下判断:
+
+        判断是不是最后一段工作经历?,
+        1. 如果是最后的工作经历(截至时间最晚),更新last_company字段.
         2. 如果不是最后的工作经历,忽视.
         3. 如果最后的工作经历出现重复(1个以上截止时间是now的).更新(简单说,和1一样,比较截至时间)
+
+        判断是不是最早一段工作经历?
+        1. 如果是最早的工作经历(截至时间最晚),更新.first_work_date字段
+
         :param history_args:  WorkHistory的init字典
         :return: ObjectId, WorkHistory._id
         """
 
+
 if __name__ == "__main__":
-    Region.get_dict()
+    """随机标记首次工作时间"""
+    import random
+    r = DriverResume.find_plus(filter_dict=dict(), projection=["_id"], to_dict=True)
+    for x in r:
+        _id = x['_id']
+        u = {"$set": {
+            "first_work_date": mongo_db.get_datetime_from_str("201{}-01-01".format(random.randint(0, 8)))
+                }
+            }
+        DriverResume.find_one_and_update_plus(filter_dict={"_id": _id}, update_dict=u, upsert=False)
     pass
 
 

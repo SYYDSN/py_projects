@@ -98,28 +98,6 @@ compare_hour_and_minute_str = function (a, b) {
         };
     }
 
-// 获取url参数
-get_url_arg = function (name) {
-let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-let r = window.location.search.substr(1).match(reg);
-return (r !== null)?decodeURI(r[2]):null;
-};
-
-// 定义高德地图样式
-let current_amap_style = "normal";
-
-// 设置高德地图的样式
-function set_amap_style(style_str){
-    let style_list = [
-        'whitesmoke', 'normal', 'macaron', 'graffiti', 'darkblue', 'blue',
-        'fresh', 'dark', 'light', 'grey'
-    ];
-    if(style_list.indexOf(style_str) !== -1){
-        amap_style = style_str;
-        map.setMapStyle(`amap://styles/${amap_style}`);
-    }
-}
-
 // 检查某个日期是不是今天?
 function is_today(date){
     let now1 = new Date();
@@ -180,8 +158,8 @@ function get_picker_date($obj){
 
 }
 
-function get_url_arg(arg_url){
-    // 从url分析参数,
+function get_url_arg_dict(arg_url){
+    // 从url分析参数,返回参数字典.
     let args = {};
     let url = typeof(arg_url) === "undefined"? location.href: arg_url;
     if(url.indexOf("?") !== -1){
@@ -203,4 +181,21 @@ function get_url_arg(arg_url){
         // pass
     }
     return args;
+}
+
+function build_url(base_path, arg_dict){
+    // 根据基础url和参数字典拼接url,
+    base_path += "?";
+    for(let name in arg_dict){
+        let val = arg_dict[name];
+        console.log(name, val);
+        base_path += `${name}=${val}&`;
+    }
+    if(base_path.endsWith("?")){
+        base_path = base_path.slice(0, -1);
+    }
+    if(base_path.endsWith("&")){
+        base_path = base_path.slice(0, -1);
+    }
+    return base_path;
 }

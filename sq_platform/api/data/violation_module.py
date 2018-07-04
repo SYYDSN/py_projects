@@ -1300,7 +1300,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             logger.info(ms)
             message['message'] = result['message']
             message['error_code'] = 0 if result.get('error_code') is None else result.get('error_code')
-            message['args'] = str({"generator_id": object_id})
+            message['args'] = {"generator_id": object_id}
         return message
 
     @classmethod
@@ -1343,6 +1343,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
             message['data'] = data
         else:
             object_id = object_id if object_id else generator.get_id()
+            car_id = generator.get_attr("car_license").id
             """有对应的查询器"""
             now = datetime.datetime.now()
             try:
@@ -1399,12 +1400,12 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                 print(e)
                 ms = "Error! case:{}, args:{}".format(e, str({"object_id": object_id}))
                 logger.exception(ms, exc_info=True, stack_info=True)
-                message = pack_message(message, 3008, object_id=object_id)
+                message = pack_message(message, 3008, object_id=object_id, car_id=car_id)
             except Exception as e:
                 print(e)
                 ms = "Error! reason:{},args:{}".format(e, str({"object_id": object_id}))
                 logger.exception(ms, exc_info=True, stack_info=True)
-                message = pack_message(message, 5000, object_id=object_id)
+                message = pack_message(message, 5000, object_id=object_id, car_id=car_id)
             finally:
                 """
                 返回的message.error_code的值:
@@ -1418,7 +1419,6 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                     vio_data = message.get('data')
                     if isinstance(vio_data, dict):
                         """填充行车证相关信息"""
-                        car_id = generator.get_attr("car_license").id
                         car = CarLicense.find_by_id(o_id=car_id, debug=True)
                         if isinstance(car, CarLicense):
                             car = car.get_dict()
@@ -1428,7 +1428,8 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                             data['car_id'] = str(car['_id'])
                             message['data'] = data
                     else:
-                        ms = "异常的违章查询结果:{}".format(message)
+                        message['args']['car_id'] = car_id
+                        ms = "异常的违章查询结果:{}".format(str(message))
                         logger.exception(msg=ms)
                 else:
                     ms = "查询违章接口发生错误error_code类型出错,error_code:{}".format(error_code)
@@ -1446,7 +1447,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                         desc = "服务器返回了错误的状态码:{}".format(error_code)
                         ms = "{}, 查询器id:{}".format(desc, object_id)
                         logger.exception(ms)
-                        message = pack_message(message, 7001, desc=desc, city=city)
+                        message = pack_message(message, 7001, desc=desc, city=city, car_id=car_id)
                     else:
                         error_map = {
                             "1000": "系统异常",
@@ -1467,7 +1468,7 @@ class VioQueryGenerator(mongo_db.BaseDoc):
                             desc = error_map[error_code]
                         else:
                             desc = "服务器返回了未识别的错误提示--error_code:{}".format(error_code)
-                        message = pack_message(message, 7002, desc=desc, city=city)
+                        message = pack_message(message, 7002, desc=desc, city=city, car_id=car_id)
         return message
 
     @classmethod

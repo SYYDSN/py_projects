@@ -1,0 +1,20 @@
+{%  extends "web/template.html" %}
+{% block extend_css %}
+<link rel="stylesheet" href="/static/css/web/resume.css">
+{% endblock %}
+
+{% block content %}
+
+    <div class="block_01">
+        <div class="block_left">
+            <img src="data:image/jpeg;base64,{{ head_image | safe }}">
+        </div>
+        <div class="block_right"></div>
+    </div>
+    <div class="block_02"></div>
+
+{% endblock %}
+
+{% block extend_js %}
+    <script src="/static/js/web/resume.js"></script>
+{% endblock %}

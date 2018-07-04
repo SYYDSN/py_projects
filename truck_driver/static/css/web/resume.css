@@ -1,0 +1,14 @@
+.page_middle {
+  height: auto !important;
+}
+.page_middle .nav_div {
+  font-size: 1rem;
+  color: #bababa;
+  padding: 1em 0;
+}
+.page_middle .nav_div .block_01 .block_left {
+  width: 75%;
+}
+.page_middle .nav_div .block_01 .block_right {
+  width: 25%;
+}

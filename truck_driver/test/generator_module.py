@@ -234,9 +234,9 @@ if __name__ == "__main__":
     # xx = ObjectId("5b2cad1a4660d33bbe4d3481")
     # show_honor_image(xx)
     """生成300个司机简历"""
-    # for i in range(300):
-    #     produce_resume()
-    f = dict()
-    u = {"$set": {"last_company": "xx物流集团公司"}}
-    DriverResume.update_many_plus(filter_dict=f, update_dict=u)
+    for i in range(300):
+        produce_resume()
+    # f = dict()
+    # u = {"$set": {"last_company": "xx物流集团公司"}}
+    # DriverResume.update_many_plus(filter_dict=f, update_dict=u)
     pass
