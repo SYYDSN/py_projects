@@ -7,7 +7,9 @@ if __project_path not in sys.path:
 import markdown
 
 
-"""对目录和文件的操作"""
+"""
+对目录和文件的操作
+"""
 
 
 def get_md() -> str:
@@ -29,7 +31,7 @@ def get_md() -> str:
 
 def markdown_to_html() -> str:
     """
-    转换markdown到html
+    转换markdown到html,python-markdown必须  pip3/pip install markdown
     :param raw:
     :return:
     """

@@ -11,6 +11,7 @@ from flask import render_template
 import json
 from bson.objectid import ObjectId
 from tools_module import *
+from module.event_module import PlatformEvent
 from module.identity_validate import GlobalSignature
 from module.item_module import RawRequestInfo
 from module.document_tools import markdown_to_html
@@ -47,26 +48,24 @@ def md_view():
         return abort(405)
 
 
-def secret_func(key) -> str:
+def secret_func() -> str:
     """
     获取服务器端的数字签名和当前算法,node.js服务器用此两项信息来进行和保驾犬后台的加密通讯
     当前情况下.使用sid来换取signature  sid = "bbb5fd48094942be80dbf0467be3d6f6"
     :return:
     """
     mes = {"message": "success"}
-    if key == "get":
-        """获取签名和算法"""
-        sid = get_arg(request, "sid", "")
-        if sid == "bbb5fd48094942be80dbf0467be3d6f6":
-            """可以请求signature"""
-            data = dict()
-            r = GlobalSignature.get_signature()
-            data['signature'] = r['signature']
-            data['algorithm'] = r['algorithm']
-            data['expire'] = r['expire']
-            mes['data'] = data
-        else:
-            mes['message'] = "未实现请求"
+    """获取签名和算法"""
+    now = datetime.datetime.now()
+    sid = get_arg(request, "sid", "")
+    if sid == "bbb5fd48094942be80dbf0467be3d6f6":
+        """可以请求signature"""
+        data = dict()
+        r = GlobalSignature.get_signature()
+        data['signature'] = r['signature']
+        data['algorithm'] = r['algorithm']
+        data['expire'] = int(r['expire'] - (now - r['time']).total_seconds())
+        mes['data'] = data
     else:
         mes = "未实现"
     return json.dumps(mes)
@@ -83,8 +82,48 @@ def mes_func(key) -> str:
     mes = {"message": "success"}
     if key == "push":
         """推送数据"""
-        oid = RawRequestInfo.record(req=request)
-        mes['mid'] = str(oid)
+        debug = get_arg(request, "debug", False)  # 调试模式
+        if debug:
+            oid = RawRequestInfo.record(req=request)
+            mes['mid'] = str(oid)
+        else:
+            payload = get_arg(request, "payload", "")
+            if isinstance(payload, str) and len(payload) > 0:
+                try:
+                    payload = GlobalSignature.decode(payload)
+                except Exception as e:
+                    mes['message'] = str(e)
+                    logger.exception(e)
+                    print(e)
+                finally:
+                    if isinstance(payload, dict):
+                        """成功"""
+                        init = dict()
+                        for k, v in payload.items():
+                            if k in ['deposit_money', 'withdrawal_money']:
+                                k = 'money'
+                            elif k in ['operate_time', 'update_time']:
+                                k = 'time'
+                            elif k in ['deposit_order', 'withdrawal_order']:
+                                k = "order"
+                            else:
+                                k = k.lower()
+                            init[k] = v
+                        obj = PlatformEvent(**init)
+                        r = obj.save_plus()
+                        if isinstance(r, ObjectId):
+                            mes['id'] = str(r)
+                        else:
+                            mes['message'] = "保存对象失败"
+                            ms = "保存对象失败,args:{}".format(init)
+                            logger.exception(ms)
+                    else:
+                        if mes['message'] == "success":
+                            mes['message'] = "解码失败"
+                        else:
+                            pass
+            else:
+                mes['message'] = "payload is null"
     elif key == "get":
         mid = request.args.get("mid", "")
         if mid == "":
@@ -104,6 +143,6 @@ def mes_func(key) -> str:
 
 
 mt4_blueprint.add_url_rule(rule="/", view_func=index_func, methods=['get', 'post'])  # hello world
-mt4_blueprint.add_url_rule(rule="/api", view_func=md_view, methods=['get'])  # api
-mt4_blueprint.add_url_rule(rule="/secret/<key>", view_func=index_func, methods=['get', 'post'])  # 获取签名和算法
+mt4_blueprint.add_url_rule(rule="/api_document", view_func=md_view, methods=['get'])  # api
+mt4_blueprint.add_url_rule(rule="/secret", view_func=secret_func, methods=['get', 'post'])  # 获取签名和算法
 mt4_blueprint.add_url_rule(rule="/message/<key>", view_func=mes_func, methods=['get', 'post'])  # 接收平台消息

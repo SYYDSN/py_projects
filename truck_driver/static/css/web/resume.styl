@@ -7,13 +7,42 @@ deep_grey = #5C5F63
 
 .page_middle
   height auto !important
-  .nav_div
-    font-size:1rem
-    color font_color
-    padding 1em 0
+  color font_color
 
-    .block_01
-      .block_left
-        width 75%
-      .block_right
-        width 25%
+  .block_01
+    .block_left
+      width 75%
+      font-size 1rem
+      display flex
+      flex-direction row
+      justify-content flex-start
+      .cell
+        width 33%
+      .image
+        height 16em
+        padding-top 2.5em
+        display flex
+        flex-direction row
+        justify-content center
+        align-items center
+        > img
+          height 100%
+          width auto
+      .base_info
+        margin-top 2em
+        .line
+          font-size 1rem
+          padding 0.5em 1em
+          .driver_name,.age,.education,.married
+            padding 0 0.3em
+            border-right 1px solid font_color
+          .married
+            border-right none
+          .favorite
+            color: white
+            font-size 0.9rem
+            background-color default_blue
+            padding 2px 20px !important
+
+    .block_right
+      width 25%

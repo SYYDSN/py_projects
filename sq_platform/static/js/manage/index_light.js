@@ -283,7 +283,7 @@ AMapUI.loadUI(['overlay/AwesomeMarker'], function (AwesomeMarker) {
         // 用户手机
         let phone_num = arg_dict['phone_num'] === undefined ? "1580080080": arg_dict['phone_num'];
         // 真实姓名
-        let real_name = typeof(arg_dict['real_name']) === "undefined" ? phone_num: arg_dict['real_name'];
+        let real_name = arg_dict['real_name']? arg_dict['real_name']: (arg_dict['official_name']? arg_dict['official_name']: arg_dict['phone_num']);
         real_name = real_name === ""?phone_num: real_name;
         // 当前位置
         let position = arg_dict['position'] === undefined ? [121.304239, 31.239981]: arg_dict['position'];
@@ -430,6 +430,7 @@ let init_right_bar = function() {
         for (let p of data) {
             add_right_side_bar_item_func(p);  // 添加右侧边栏
             let real_name = p['real_name'];
+            real_name = real_name? real_name: (p['official_name']? p['official_name']: p['phone_num']);
             if(isNaN(real_name) && real_name !== ""){
                 // 如果用户没有真名,那就不做此项操作
                 if(real_name !== undefined && real_name.length > 0){

@@ -7,6 +7,7 @@ import warnings
 import datetime
 import calendar
 import hashlib
+from flask import request
 from uuid import uuid4
 from bson.objectid import ObjectId
 from bson.code import Code
@@ -351,28 +352,31 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
         if search:
             date_str = search.group()
             pattern_0 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d$')  # 时间匹配2017-01-01
-            pattern_1 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
-            pattern_2 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
-            pattern_3 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$') # 时间匹配2017-01-01 12:00:00 000
-            pattern_4 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
-            pattern_5 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01T12:00:00.000
-            pattern_6 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
-            pattern_7 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
+            pattern_1 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00
+            pattern_2 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
+            pattern_3 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
+            pattern_4 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$') # 时间匹配2017-01-01 12:00:00 000
+            pattern_5 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
+            pattern_6 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01T12:00:00.000
+            pattern_7 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
+            pattern_8 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
 
-            if pattern_7.match(date_str):
+            if pattern_8.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S %f")
-            elif pattern_6.match(date_str):
+            elif pattern_7.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-            elif pattern_5.match(date_str):
+            elif pattern_6.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
-            elif pattern_4.match(date_str):
+            elif pattern_5.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
-            elif pattern_3.match(date_str):
+            elif pattern_4.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S %f")
-            elif pattern_2.match(date_str):
+            elif pattern_3.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
-            elif pattern_1.match(date_str):
+            elif pattern_2.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+            elif pattern_1.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M")
             elif pattern_0.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d")
             else:
@@ -848,7 +852,11 @@ class MyCache:
 
 
 class BaseFile:
-    """GridFS操作基础类"""
+    """
+    保存文件到mongodb数据库的GridFS操作基础类,
+    这一类函数都不推荐使用init创建实例.而是使用
+    cls.save_cls以及其眼神的方法cls.save_flask_file来保存文件.
+    """
     _table_name = "base_file"
     type_dict = dict()
     type_dict['_id'] = ObjectId
@@ -904,6 +912,11 @@ class BaseFile:
     def table_name(self):
         return self._table_name
 
+    def get_dbref(self):
+        """获取一个实例的DBRef对象"""
+        obj = DBRef(self._table_name, self._id, db_name)
+        return obj
+
     @classmethod
     def get_table_name(cls):
         return cls._table_name
@@ -921,7 +934,7 @@ class BaseFile:
     @classmethod
     def save_cls(cls, file_obj, collection: str = None, **kwargs) -> (str, ObjectId, None):
         """
-        保存文件.
+        保存文件.类中最底层的保存文件的方法.
         :param file_obj: 一个有read方法的对象,比如一个就绪状态的BufferedReader对象.
         :param collection:
         :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
@@ -933,9 +946,53 @@ class BaseFile:
         return r
 
     @classmethod
-    def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False, collection: str = None) -> (dict, None):
+    def save_flask_file(cls, req: request, collection: str = None, arg_name: str = None, **kwargs) -> (str, ObjectId, None):
         """
-        查找一个文件.
+        保存文件. cls.save_cls的包装方法,专门针对flask.request进行了封装.
+        :param req: 一个有flask.request对象.
+        :param collection:
+        :param arg_name: 保存在flask.request.files里面的文件的参数名,如果不指明这个参数名,将只会取出其中的第一个对象进行保存.
+        :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
+        :return: 失败返回None,成功返回_id/str
+        """
+        res = None
+        if arg_name is None:
+            for key_name, file_storage in req.files.items():
+                if file_storage is not None:
+                    file_name = file_storage.filename
+                    file_suffix = file_name.split(".")[-1]
+                    content_type = file_storage.content_type
+                    mime_type = file_storage.mimetype
+                    kwargs['file_name'] = file_name
+                    kwargs['file_suffix'] = file_suffix
+                    kwargs['content_type'] = content_type
+                    kwargs['mime_type'] = mime_type
+                    res = cls.save_cls(file_obj=file_storage, collection=collection, arg_name=key_name, **kwargs)
+                    if res is None:
+                        pass
+                    else:
+                        break
+        else:
+            file_storage = req.files.items.get(arg_name, None)
+            if file_storage is None:
+                pass
+            else:
+                file_name = file_storage.filename
+                file_suffix = file_name.split(".")[-1]
+                content_type = file_storage.content_type
+                mime_type = file_storage.mimetype
+                kwargs['file_name'] = file_name
+                kwargs['file_suffix'] = file_suffix
+                kwargs['content_type'] = content_type
+                kwargs['mime_type'] = mime_type
+                res = cls.save_cls(file_obj=file_storage, collection=collection, arg_name=arg_name, **kwargs)
+        return res
+
+    @classmethod
+    def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False, collection: str = None)\
+            -> (dict, None):
+        """
+        查找一个文件.cls.get_one_data的底层方法,
         :param filter_dict: 查找条件
         :param sort_dict: 排序条件
         :param instance: 是否返回实例?
@@ -963,7 +1020,8 @@ class BaseFile:
     @classmethod
     def get_one_data(cls, filter_dict: dict, sort_dict: dict = None, collection: str = None) -> bytes:
         """
-        根据条件,查询一个文件,
+        根据条件,查询一个文件,cls.find_one_cls的包装函数,和cls.find_one_cls不同,前者返回的是文档或者实例.本
+        函数只返回文件的内容(bytes).
         :param filter_dict: 查找条件
         :param sort_dict: 排序条件
         :param collection: 排序条件
@@ -1695,7 +1753,7 @@ class BaseDoc:
         try:
             instance = cls(**kwargs)
         except TypeError as e:
-            logger.exception("Error! args: {}".format(str(kwargs)))
+            logger.exception("Error! args:rease:{},kwargs: {}".format(e, str(kwargs)))
         finally:
             if instance is None:
                 return instance
@@ -1849,16 +1907,22 @@ class BaseDoc:
         return result
 
     @classmethod
-    def find_by_id(cls, o_id: (str, ObjectId), to_dict: bool = False, can_json: bool = False):
+    def find_by_id(cls, o_id: (str, ObjectId), to_dict: bool = False, can_json: bool = False, debug: bool = False):
         """查找并返回一个对象，这个对象是o_id对应的类的实例
         :param o_id: _id可以是字符串或者ObjectId
         :param to_dict: 是否转换结果为字典?
         :param can_json: 是否转换结果为可json化的字典?注意如果can_json为真,to_dict参数自动为真
+        :param debug: debug模式,开启后会记录所有的参数和返回结果.
         return cls.instance
         """
+        raw_args = {"_id": o_id}
         o_id = get_obj_id(o_id)
         ses = get_conn(cls._table_name)
-        result = ses.find_one({"_id": o_id})
+        result = ses.find_one({"_id": o_id})  # 返回的是文档
+        if debug:
+            record = {"doc": result}
+            record.update(raw_args)
+            logger.exception(msg=str(record))
         if result is None:
             return result
         else:
@@ -2421,7 +2485,7 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 class TransactionItem:
     """
-    事务操作中的一个步骤
+    事务操作中的一个步骤. 未完成
     """
     def __init__(self, **kwargs):
         handlers = ['insert', 'create', 'update', 'edit', 'delete', 'remove']
@@ -2436,8 +2500,9 @@ class TransactionItem:
         else:
             ms = "错误的操作类型:{}".format(handler)
 
+
 class BaseTransaction:
-    """事务"""
+    """事务. 未完成"""
     _table_name = "base_transaction_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId

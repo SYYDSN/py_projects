@@ -1796,9 +1796,11 @@ class Track(mongo_db.BaseDoc):
         :return: track文档组成的dict。注意，doc做不做序列化的转换以can_json参数决定。
         """
         """先计算结束时间"""
-        if end is None:
-            """如果结束时间为空，那就以当前时间作为结束时间"""
+        if begin is None and end is None:
+            """如果开始时间和结束时间都为空，那就以当前时间作为结束时间"""
             end = mongo_db.get_datetime(0, False)
+        elif isinstance(begin, datetime.datetime) and end is None:
+            end = begin + datetime.timedelta(hours=24)
         elif isinstance(end, datetime.datetime):
             pass
         else:

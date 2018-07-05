@@ -7,6 +7,7 @@ import warnings
 import datetime
 import calendar
 import hashlib
+from flask import request
 from uuid import uuid4
 from bson.objectid import ObjectId
 from bson.code import Code
@@ -863,7 +864,11 @@ class MyCache:
 
 
 class BaseFile:
-    """GridFS操作基础类"""
+    """
+    保存文件到mongodb数据库的GridFS操作基础类,
+    这一类函数都不推荐使用init创建实例.而是使用
+    cls.save_cls以及其眼神的方法cls.save_flask_file来保存文件.
+    """
     _table_name = "base_file"
     type_dict = dict()
     type_dict['_id'] = ObjectId
@@ -919,6 +924,11 @@ class BaseFile:
     def table_name(self):
         return self._table_name
 
+    def get_dbref(self):
+        """获取一个实例的DBRef对象"""
+        obj = DBRef(self._table_name, self._id, db_name)
+        return obj
+
     @classmethod
     def get_table_name(cls):
         return cls._table_name
@@ -936,7 +946,7 @@ class BaseFile:
     @classmethod
     def save_cls(cls, file_obj, collection: str = None, **kwargs) -> (str, ObjectId, None):
         """
-        保存文件.
+        保存文件.类中最底层的保存文件的方法.
         :param file_obj: 一个有read方法的对象,比如一个就绪状态的BufferedReader对象.
         :param collection:
         :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
@@ -948,9 +958,53 @@ class BaseFile:
         return r
 
     @classmethod
-    def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False, collection: str = None) -> (dict, None):
+    def save_flask_file(cls, req: request, collection: str = None, arg_name: str = None, **kwargs) -> (str, ObjectId, None):
         """
-        查找一个文件.
+        保存文件. cls.save_cls的包装方法,专门针对flask.request进行了封装.
+        :param req: 一个有flask.request对象.
+        :param collection:
+        :param arg_name: 保存在flask.request.files里面的文件的参数名,如果不指明这个参数名,将只会取出其中的第一个对象进行保存.
+        :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
+        :return: 失败返回None,成功返回_id/str
+        """
+        res = None
+        if arg_name is None:
+            for key_name, file_storage in req.files.items():
+                if file_storage is not None:
+                    file_name = file_storage.filename
+                    file_suffix = file_name.split(".")[-1]
+                    content_type = file_storage.content_type
+                    mime_type = file_storage.mimetype
+                    kwargs['file_name'] = file_name
+                    kwargs['file_suffix'] = file_suffix
+                    kwargs['content_type'] = content_type
+                    kwargs['mime_type'] = mime_type
+                    res = cls.save_cls(file_obj=file_storage, collection=collection, arg_name=key_name, **kwargs)
+                    if res is None:
+                        pass
+                    else:
+                        break
+        else:
+            file_storage = req.files.items.get(arg_name, None)
+            if file_storage is None:
+                pass
+            else:
+                file_name = file_storage.filename
+                file_suffix = file_name.split(".")[-1]
+                content_type = file_storage.content_type
+                mime_type = file_storage.mimetype
+                kwargs['file_name'] = file_name
+                kwargs['file_suffix'] = file_suffix
+                kwargs['content_type'] = content_type
+                kwargs['mime_type'] = mime_type
+                res = cls.save_cls(file_obj=file_storage, collection=collection, arg_name=arg_name, **kwargs)
+        return res
+
+    @classmethod
+    def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False, collection: str = None)\
+            -> (dict, None):
+        """
+        查找一个文件.cls.get_one_data的底层方法,
         :param filter_dict: 查找条件
         :param sort_dict: 排序条件
         :param instance: 是否返回实例?
@@ -978,7 +1032,8 @@ class BaseFile:
     @classmethod
     def get_one_data(cls, filter_dict: dict, sort_dict: dict = None, collection: str = None) -> bytes:
         """
-        根据条件,查询一个文件,
+        根据条件,查询一个文件,cls.find_one_cls的包装函数,和cls.find_one_cls不同,前者返回的是文档或者实例.本
+        函数只返回文件的内容(bytes).
         :param filter_dict: 查找条件
         :param sort_dict: 排序条件
         :param collection: 排序条件
@@ -1710,8 +1765,8 @@ class BaseDoc:
         instance = None
         try:
             instance = cls(**kwargs)
-        except TypeError:
-            logger.exception("Error! args: {}".format(str(kwargs)))
+        except TypeError as e:
+            logger.exception("Error! args:rease:{},kwargs: {}".format(e, str(kwargs)))
         finally:
             if instance is None:
                 return instance
@@ -2235,6 +2290,110 @@ class BaseDoc:
                 return None
             else:
                 return [x for x in res]
+
+    @classmethod
+    def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
+                      ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False,
+                      func: object = None, target: str = "dict") -> dict:
+        """
+        分页查询
+        :param filter_dict:  查询条件字典
+        :param sort_dict:  排序条件字典
+        :param projection:  投影数组,决定输出哪些字段?
+        :param page_size:
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
+        :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
+        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
+        :param target: 和func参数配合使用,指明func是对实例本身操作还是对doc进行操作(instance/dict)
+        :return: 字典对象.
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        """
+        if isinstance(page_size, int):
+            pass
+        elif isinstance(page_size, float):
+            page_size = int(page_size)
+        elif isinstance(page_size, str) and page_size.isdigit():
+            page_size = int(page_size)
+        else:
+            page_size = 10
+        page_size = 1 if page_size < 1 else page_size
+
+        if isinstance(page_index, int):
+            pass
+        elif isinstance(page_index, float):
+            page_index = int(page_index)
+        elif isinstance(page_index, str) and page_index.isdigit():
+            page_index = int(page_index)
+        else:
+            page_size = 1
+        page_index = 1 if page_index < 1 else page_index
+
+        skip = (page_index - 1) * page_size
+        if can_json:
+            to_dict = True
+        if sort_dict is not None:
+            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        else:
+            sort_list = None
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        args = {
+            "filter": filter_dict,
+            "sort": sort_list,   # 可能是None,但是没问题.
+            "projection": projection,
+            "skip": skip,
+            "limit": page_size
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        """开始计算分页数据"""
+        record_count = ses.count(filter=filter_dict)
+        page_count = math.ceil(record_count / page_size)  # 共计多少页?
+        delta = math.ceil(ruler / 2)
+        range_left = 1 if (page_index - delta) <= 1 else page_index - delta
+        range_right = page_count if (range_left + ruler) >= page_count else page_index + delta
+        pages = [x for x in range(range_left, int(range_right) + 1)]
+        """开始查询页面"""
+        res = list()
+        r = ses.find(**args)
+        if r is None:
+            pass
+        else:
+            if r.count() > 0:
+                if to_dict:
+                    if func and target == "dict":
+                        if can_json:
+                            res = [to_flat_dict(func(x)) for x in r]
+                        else:
+                            res = [func(x) for x in r]
+                    else:
+                        if can_json:
+                            res = [to_flat_dict(x) for x in r]
+                        else:
+                            res = [x for x in r]
+                else:
+                    if func and target == "instance":
+                        res = [func(cls(**x)) for x in r]
+                    else:
+                        res = [cls(**x) for x in r]
+            else:
+                pass
+        resp = {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        return resp
 
 
 """

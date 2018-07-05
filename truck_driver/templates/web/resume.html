@@ -7,7 +7,46 @@
 
     <div class="block_01">
         <div class="block_left">
-            <img src="data:image/jpeg;base64,{{ head_image | safe }}">
+            <div class="cell image">
+                <img class="big_img" src="{{ head_img_url }}">
+            </div>
+            <div class="cell base_info">
+                <div class="line">
+                    <span class="driver_name">
+                        {{ resume.real_name[0] }}{{ "先生" if resume.gender == "男" else "小姐" }}
+                    </span>
+                    <span class="age">{{ resume.age }}岁</span>
+                    <span class="education">{{ resume.education }}</span>
+                    <span class="married">{{ resume.married }}</span>
+                </div>
+                <div class="line">
+                    当前状态
+                    <span class="status">
+                        {{ resume.status }}
+                    </span>
+                </div>
+                <div class="line">
+                    常驾车型
+                    <span class="vehicle_type">
+                        {{ resume.vehicle_type }}
+                    </span>
+                </div>
+                <div class="line">
+                    驾照
+                    <span class="dl_license_class">
+                        {{ resume.dl_license_class }}
+                    </span>
+                </div>
+                <div class="line">
+                    驾龄
+                    <span class="driving_experience">
+                        {{ resume.driving_experience | string + "年" if resume.driving_experience else "" }}
+                    </span>
+                </div>
+                <div class="line">
+                    <span data-id="{{ resume._id }}" class="btn  favorite">收藏</span>
+                </div>
+            </div>
         </div>
         <div class="block_right"></div>
     </div>

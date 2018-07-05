@@ -65,6 +65,8 @@ class GlobalSignature(mongo_db.BaseDoc):
         :return: 取决于return_type参数.
         """
         f = dict()
+        now = datetime.datetime.now()
+        f['time'] = {"$gte": now - datetime.timedelta(seconds=6900)}
         s = {"time": -1}
         one = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
         """表为空或者没有有效的signature,重新生成一个signature"""
@@ -187,14 +189,17 @@ class GlobalSignature(mongo_db.BaseDoc):
                             ms = "signature验证失败"
                             print(ms)
                             logger.exception(ms)
+                            raise ValueError(ms)
                         else:
                             res = jwt.decode(jwt=jwt_str, key=old_secret, algorithm=algorithm)
                     except Exception as e:
                         print(e)
                         logger.exception(e)
+                        raise e
                 except Exception as e:
                     print(e)
                     logger.exception(e)
+                    raise e
                 finally:
                     if isinstance(res, bytes) and to_str:
                         res = res.decode(encoding="utf-8")

@@ -249,6 +249,21 @@ class WorkHistory(mongo_db.BaseDoc):
     type_dict["create_date"] = datetime.datetime  # 创建日期
 
 
+class Education(mongo_db.BaseDoc):
+    """
+    教育经历,用于在简历中表示一段教育历史,
+    和简历是多对一的关系
+    """
+    _table_name = "education"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
+    type_dict['level'] = str  # 用户选择,  小学/初中/高中/高等教育/培训机构/其他
+    type_dict['begin'] = datetime.datetime
+    type_dict['end'] = datetime.datetime
+    type_dict['school_name'] = str  # 学校名称
+
+
 class HeadImage(mongo_db.BaseFile):
     """
     用户头像
@@ -279,6 +294,7 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['real_name'] = str  # 真实姓名 ,可以从驾驶证取
     type_dict['head_image'] = DBRef  # 头像
     type_dict['gender'] = str   # 以驾驶证信息为准. 男/女
+    type_dict['married'] = int  # 婚否? 0/1/-1 未婚/已婚/离异  None 空白
     type_dict['birth_place'] = str   # 籍贯/出生地
     type_dict['living_place'] = str   # 居住地,
     type_dict['address'] = str  # 家庭地址
@@ -300,6 +316,8 @@ class DriverResume(mongo_db.BaseDoc):
     4. 高等教育(本科及以上)
     """
     type_dict['education'] = int  # 学历,学历代码见注释
+    """教育经历部分,是Education的DBRef的list对象"""
+    type_dict['education_history'] = list
     type_dict['status'] = int  # 任职/经营 状态. -1 个体经营/0 离职/ 1 在职
     """驾驶证信息 Driving License,简称dl"""
     type_dict['dl_image'] = DBRef  # 驾驶证图片,.
@@ -560,16 +578,17 @@ class DriverResume(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    """随机标记首次工作时间"""
     import random
-    r = DriverResume.find_plus(filter_dict=dict(), projection=["_id"], to_dict=True)
+    """添加用户头像"""
+    # with open("/home/walle/work/projects/truck_driver/static/image/web/default_rtqc_img.png", 'rb') as f:
+    #     r = HeadImage.save_cls(file_obj=f)
+    #     print(r)
+    """填充婚否"""
+    r = DriverResume.find_plus(filter_dict=dict(), to_dict=True)
     for x in r:
-        _id = x['_id']
-        u = {"$set": {
-            "first_work_date": mongo_db.get_datetime_from_str("201{}-01-01".format(random.randint(0, 8)))
-                }
-            }
-        DriverResume.find_one_and_update_plus(filter_dict={"_id": _id}, update_dict=u, upsert=False)
+        f = {"_id": x['_id']}
+        u = {"$set": {"married": random.randint(-1, 1)}}
+        DriverResume.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
     pass
 
 

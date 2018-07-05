@@ -6,6 +6,8 @@ if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 from flask.blueprints import Blueprint
 from flask import render_template
+from flask import send_file
+from flask import make_response
 from flask import abort
 import json
 from tools_module import *
@@ -14,19 +16,25 @@ from model.company_module import Company
 from model.company_module import ResumeFavorite
 from model.identity_validate import GlobalSignature
 from model.driver_module import DriverResume
+from model.driver_module import WorkHistory
+from model.driver_module import Honor
+from model.driver_module import Education
 from flask import request
 import os
 import random
 import base64
+from io import BytesIO
+from mongo_db import get_conn
 from mongo_db import db_name
 from mongo_db import DBRef
+from mongo_db import BaseFile
 
 
 """注册蓝图"""
 web_blueprint = Blueprint("web_blueprint", __name__, url_prefix="/web", template_folder="templates/web")
 
 
-"""用于站点部分的视图函数"""
+"""用于公司客户站点部分的视图函数"""
 
 
 def login_func():
@@ -266,14 +274,97 @@ def company_resume_func():
         resume_id = ObjectId(resume_id)
     if isinstance(company_id, ObjectId) and isinstance(resume_id, ObjectId):
         """查看简历"""
-        resume = DriverResume.find_by_id(o_id=resume_id, to_dict=True)
+        f = {"_id": resume_id}
+        ses = get_conn(table_name='driver_resume')
+        cursor = ses.find(filter=f)
+        cursor.next()
         head_image = resume.get("head_image")  # 头像
         if head_image is None:
-            iu = os.path.join(__project_dir__, 'static', 'image', 'web', '{}.png'.format(random.randint(1, 3)))
-            with open(iu, "rb") as f:
-                head_image = f.read()
-        head_image = base64.b64decode(head_image)
-        return render_template("web/resume.html", head_image=head_image)
+            head_img_url = ""
+        else:
+            head_img_url = "/web/file/get/{}?fid={}".format(head_image.collection, head_image.id)
+        """处理学历"""
+        resume['education'] = "" if (resume['education'] - 1) < 1 or (resume['education'] - 1) > 4 else \
+            ['小学', '中专', '大专', '本科'][resume['education'] - 1]
+        """处理婚否"""
+        married = {-1: "离异", 0: "未婚", 1: "已婚"}.get(resume['married'])
+        resume['married'] = married if married else ""
+        """处理状态"""
+        status = {-1: "个体经营", 0: "离职", 1: "在职"}.get(resume.get('status'))
+        resume['status'] = status if status else ""
+        """查询工作经历"""
+        work_history = resume.get("work_history")
+        vehicle_type = ""  # 常驾车型
+        if isinstance(work_history, list) and len(work_history) > 0:
+            """有工作经历"""
+            ids = [x.id for x in work_history]
+            work_history = WorkHistory.find_plus(filter_dict={"_id": {"$in": ids}}, to_dict=True)
+            for x in work_history:
+                y = x.get("work_history")
+                if work_history == "" and isinstance(y, str) and len(y) > 0:
+                    vehicle_type = y
+                    break
+                else:
+                    pass
+
+        else:
+            work_history = list()
+        return render_template("web/resume.html", resume=resume, head_img_url=head_img_url, work_history=work_history,
+                               vehicle_type=vehicle_type)
+    else:
+        return redirect(url_for("web_blueprint.login_func"))
+
+
+def file_func(action, table_name):
+    """
+    保存/获取文件,
+    :param action: 动作, save/get(保存/获取)
+    :param table_name: 文件类对应的表名.
+    :return:
+    """
+    company_id = get_platform_session_arg("user_id")
+    if isinstance(company_id, ObjectId):
+        mes = {"message": "success"}
+        """
+        tables表名,分别存储不同的类的实例.
+        1. base_info                  文件存储基础表,对应mongo_db.BaseFile
+        2. head_image                 司机头像类,对应model.driver_module.HeadImage
+        3. driving_license_image      驾照类,对应model.driver_module.DrivingLicenseImage
+        4. rtqc_image                 运输从也许可证类,对应model.driver_module.RTQCImage
+        """
+        tables = ['base_file', 'head_image', 'driving_license_image', 'rtqc_image']
+        table_name = table_name if table_name in tables else 'base_file'
+        if action == "save":
+            """保存文件"""
+            r = BaseFile.save_flask_file(req=request, collection=table_name)
+            if isinstance(r, ObjectId):
+                mes['_id'] = str(r)
+            else:
+                mes['message'] = "保存失败"
+        elif action == "get":
+            """获取文件"""
+            fid = get_arg(request, "fid", "")
+            if isinstance(fid, str) and len(fid) == 24:
+                fid = ObjectId(fid)
+                f = {"_id": fid}
+                r = BaseFile.find_one_cls(filter_dict=f, collection=table_name)
+                if r is None:
+                    return abort(404)
+                else:
+                    mime_type = "image/jpeg" if r.get('mime_type') is None else r['mime_type']
+                    file_name = "1.jpeg" if r.get('file_name') is None else r['file_name']
+                    """把文件名的中文从utf-8转成latin-1,这是防止中文的文件名造成的混乱"""
+                    file_name = file_name.encode().decode('latin-1')
+                    data = r['data']
+                    data = BytesIO(initial_bytes=data)
+                    resp = make_response(send_file(data, attachment_filename=file_name, as_attachment=True,
+                                                   mimetype=mime_type))
+                    return resp
+            else:
+                mes['message'] = '无效的id'
+        else:
+            mes['message'] = "不支持的操作"
+        return json.dumps(mes)
     else:
         return redirect(url_for("web_blueprint.login_func"))
 
@@ -289,3 +380,5 @@ web_blueprint.add_url_rule(rule="/favorite/<key>", view_func=resume_favorite_fun
 web_blueprint.add_url_rule(rule="/drivers", view_func=driver_page_func, methods=['get', 'post'])
 """公司客户查看司机简历"""
 web_blueprint.add_url_rule(rule="/company/resume", view_func=company_resume_func, methods=['get'])
+"""保存或者获取文件(mongodb存储)"""
+web_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['post', 'get'])

@@ -185,10 +185,17 @@ def produce_resume() -> None:
     base = random.randint(5, 10) * 1000
     u_id = ObjectId()
     ref = DBRef(database=mongo_db.db_name, collection=DriverResume.get_table_name(), id=u_id)
+    head_image = DBRef(database=mongo_db.db_name, collection=HeadImage.get_table_name(),
+                       id=ObjectId("5b3da3b74660d33ab86e8b54"))
+    dl_image = DBRef(database=mongo_db.db_name, collection=DrivingLicenseImage.get_table_name(),
+                       id=ObjectId("5b3da64d4660d33c4a8cbe78"))
+    rtqc_image = DBRef(database=mongo_db.db_name, collection=RTQCImage.get_table_name(),
+                       id=ObjectId("5b3da7774660d33db00758d2"))
     init = {
         "_id": u_id,
         "user_name": phone,
         "real_name": random.choice(p) + "某某",
+        "head_image": head_image,
         "gender": "男",
         "birth_place": "上海",
         "living_place": "上海",
@@ -207,7 +214,7 @@ def produce_resume() -> None:
         "dl_first_date": mongo_db.get_datetime_from_str("2008-1-1"),
         "dl_valid_begin": mongo_db.get_datetime_from_str("2018-1-1"),
         "dl_valid_duration": 5,
-        "rtqc_image": dl_image,
+        "rtqc_image": rtqc_image,
         "rtqc_license_class": "危险货物运输驾驶员",
         "rtqc_first_date": mongo_db.get_datetime_from_str("2010-1-1"),
         "rtqc_valid_begin": mongo_db.get_datetime_from_str("2015-1-1"),
