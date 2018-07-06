@@ -1,0 +1,104 @@
+.page_middle {
+  height: auto !important;
+}
+.page_middle .nav_div {
+  font-size: 1rem;
+  color: #bababa;
+  padding: 1em 0;
+}
+.page_middle .search_div {
+  font-size: 1rem;
+  background-color: #f4f4f4;
+  padding: 1.5em;
+}
+.page_middle .search_div .line_div {
+  padding: 10px 0;
+  display: flex;
+  flex-direction: row;
+}
+.page_middle .search_div .line_div .dropdown {
+  width: 40%;
+}
+.page_middle .search_div .line_div .dropdown > button {
+  width: 100%;
+  padding: 10px;
+  color: #bababa !important;
+  text-align: left !important;
+}
+.page_middle .search_div .line_div .dropdown > button > i {
+  float: right;
+  color: #bababa !important;
+  margin-top: 2px;
+}
+.page_middle .search_div .line_div .dropdown > ul {
+  width: 100%;
+  padding: 10px;
+  color: #bababa !important;
+  text-align: left !important;
+}
+.page_middle .search_div .line_div .dropdown > ul > li > a {
+  color: #bababa !important;
+}
+.page_middle .search_div .line_div label {
+  font-weight: 400;
+  color: #bababa;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+  align-items: center;
+  vertical-align: center;
+}
+.page_middle .search_div .line_div .left_margin {
+  margin-left: 1.5em;
+}
+.page_middle .search_div .line_div input {
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  padding: 0.8em 0.6em;
+}
+.page_middle .search_div .row_01 label {
+  width: 10%;
+}
+.page_middle .search_div .row_01 input {
+  width: 90%;
+/*input的placeholder的颜色*/
+}
+.page_middle .search_div .row_01 ::-webkit-input-placeholder {
+/* WebKit, Blink, Edge */
+  color: #bababa;
+}
+.page_middle .search_div .row_01 :-moz-placeholder {
+/* Mozilla Firefox 4 to 18 */
+  color: #bababa;
+}
+.page_middle .search_div .row_01 ::-moz-placeholder {
+/* Mozilla Firefox 19+ */
+  color: #bababa;
+}
+.page_middle .search_div .row_01 :-ms-input-placeholder {
+/* Internet Explorer 10-11 */
+  color: #bababa;
+}
+.page_middle .search_div .row_02 label {
+  width: 10%;
+}
+.page_middle .search_div .row_03 label {
+  width: 10%;
+}
+.page_middle .search_div .row_03 .small_select {
+  width: 15%;
+}
+.page_middle .search_div .my_center {
+  margin-top: 1em 0;
+  display: flex;
+  justify-content: center;
+}
+.page_middle .search_div .my_center #submit_search {
+  font-size: 1.2rem;
+}
+.page_middle .search_div .my_center #reset_condition {
+  font-size: 1rem;
+  border: none;
+  background: none;
+}

@@ -155,7 +155,7 @@ $(function(){
             let json = JSON.parse(resp);
             let mes = json['message'];
             if(mes === "success"){
-                // 收藏成功.
+                // 反收藏成功.
                 $this.hide().prev().show();
             }
             else{

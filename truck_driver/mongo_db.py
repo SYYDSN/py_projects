@@ -225,6 +225,22 @@ def get_fs(table_name: str, database: str = None) -> gridfs.GridFS:
     return gridfs.GridFS(database=get_db(database), collection=table_name)
 
 
+def expand_list(set_list: (list, tuple)) -> list:
+    """
+    展开嵌套的数组或者元组
+    :param set_list: 嵌套的元组或者数组
+    :return: 数组
+    调用方式 result = expand_list([1,2,[3,4],[5,6,7]])
+    """
+    res = list()
+    for arg in set_list:
+        if isinstance(arg, (list, tuple)):
+            res.extend(expand_list(arg))
+        else:
+            res.append(arg)
+    return res
+
+
 def other_can_json(obj):
     """
     把其他对象转换成可json,是to_flat_dict的内部函数
@@ -2344,7 +2360,7 @@ class BaseDoc:
         """开始计算分页数据"""
         record_count = ses.count(filter=filter_dict)
         page_count = math.ceil(record_count / page_size)  # 共计多少页?
-        delta = math.ceil(ruler / 2)
+        delta = int(ruler / 2)
         range_left = 1 if (page_index - delta) <= 1 else page_index - delta
         range_right = page_count if (range_left + ruler) >= page_count else page_index + delta
         pages = [x for x in range(range_left, int(range_right) + 1)]

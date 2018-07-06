@@ -216,6 +216,8 @@ class WorkHistory(mongo_db.BaseDoc):
     type_dict['begin'] = datetime.datetime
     type_dict['end'] = datetime.datetime
     type_dict['enterprise_name'] = str  # 企业名称
+    type_dict['enterprise_class'] = str  # 企业性质
+    type_dict['industry'] = str  # 所属行业
     """
     企业规模
     50/100/500/1000  50表示小于等于50人规模 -1表示大于1000人规模
@@ -262,6 +264,7 @@ class Education(mongo_db.BaseDoc):
     type_dict['begin'] = datetime.datetime
     type_dict['end'] = datetime.datetime
     type_dict['school_name'] = str  # 学校名称
+    type_dict['major'] = str  # 主修专业
 
 
 class HeadImage(mongo_db.BaseFile):

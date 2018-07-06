@@ -1,0 +1,106 @@
+{%  extends "web/template.html" %}
+
+{% block extend_css %}
+<link rel="stylesheet" href="/static/css/web/favorite.css">
+{% endblock %}
+
+{% block content %}
+    <div class="top_div">
+        <div>
+            共计收藏
+        <span class="count">
+            {{ total_record }}
+        </span>
+        个司机
+            <input type="radio" id="select_all" name="select"><label for="select_all">一键全选</label>
+            <input type="radio" id="un_select_all" name="select"><label for="select_all">全部取消</label>
+        </div>
+        <div class="right">
+            <button id="batch_remove">删除</button>
+        </div>
+    </div>
+
+    <div class="driver_list">
+        {% for resume in resumes %}
+            <div class="line_outer">
+                <div class="line_div" data-id="{{ resume._id }}">
+                    <div class="item base_info">
+                        <div class="cell">
+                            <span class="driver_name">{{ resume.real_name[0] }}{{ "先生" if resume.gender == "男" else "小姐" }}</span>
+                            <span class="want_job">{{ "hello" if not resume['want_job'] | safe else "希望跳槽" }}</span>
+                        </div>
+                        <div class="cell">
+                            <span class="gender">{{ resume.gender }}</span>
+                            <span class="age">{{ resume.age }}岁</span>
+                            <span class="status">{{ "在职" if resume.status == 1 else ("离职" if resume.status == 0 else "个体经营") }}</span>
+                            <span class="living">现居{{ resume.living_place }}</span>
+                        </div>
+                        <div  class="cell">
+                            <span class="expected_salary">期望薪资{{ resume.expected_salary }}</span>
+                        </div>
+                    </div>
+                    <div class="item truck_info">
+                        <div class="cell">
+                            <span class="rtqc_class">{{ resume.rtqc_license_class }}</span>
+                        </div>
+                        <div class="cell">
+                            驾照<span class="dl_class">{{ resume.dl_license_class }}</span>
+                        </div>
+                    </div>
+                    <div class="item exp_info">
+                        <div class="cell">
+                            驾龄 <span class="i_exp">{{ resume.driving_experience }}年</span>
+                        </div>
+                        <div class="cell">
+                            从业年限 <span class="d_exp">{{ resume.industry_experience }}年</span>
+                        </div>
+                    </div>
+                    <div class="item last">
+                        <div class="cell company_name">
+                            {{ resume.last_company }}
+                        </div>
+                        <div class="cell last_cell">
+                            <button style="{{"" if favorite_map[resume._id] == "no" else "display:none" }}" data-id="{{ resume._id }}" class="btn btn-default favorite">收藏此人</button>
+                            <button style="{{"" if favorite_map[resume._id] == "yes" else "display:none" }}"  data-id="{{ resume._id }}" class="btn btn-default un_favorite">已收藏</button>
+                            <button data-id="{{ resume._id }}" class="btn btn-default more_info">更多信息</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="select {{ "first" if loop.index == 1 else "" }}">
+                    <input data-id="{{ resume['_id'] }}" type="radio">
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!--翻页区域-->
+    <div class="page_area">
+        {% if pages[0] and pages[0] > 1 %}
+        <!--如果当前页码组中最小一个等于1,那就是不需要前一页这个标签-->
+            <a href="javascript:;" data-page="{{ pages[0] - 1 }}" class="prev">上一页</a>
+        {% endif %}
+        {% for page in pages %}
+            <a href="javascript:;" data-page="{{ page }}" class="num {{ "active" if page == page_index else "" }}">{{ page }}</a>
+
+        {% endfor %}
+        {% if pages[-1] and pages[-1] < total_page %}
+        <!--如果当前页码组中最大的一个大于等于最大页码,那就是不需要后一页这个标签-->
+            <a href="javascript:;" data-page="{{ pages[-1] + 1 }}" class="next">下一页</a>
+        {% endif %}
+        <span>共计{{ total_page }}页</span>
+        <!--
+        <a href="#" class="prev">上一页</a>
+        <a href="#" class="num">1</a>
+        <a href="#" class="num">2</a>
+        <a href="#" class="num active">3</a>
+        <a href="#" class="num">4</a>
+        <a href="#" class="next">下一页</a>
+        -->
+    </div>
+
+
+{% endblock %}
+
+{% block extend_js %}
+    <script src="/static/js/web/favorite.js"></script>
+{% endblock %}

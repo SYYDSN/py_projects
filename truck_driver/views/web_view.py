@@ -61,6 +61,12 @@ def login_func():
         return abort(405)
 
 
+def logout_func():
+    """登出函数"""
+    clear_platform_session()
+    return redirect(url_for("web_blueprint.login_func"))
+
+
 def resume_favorite_func(key):
     """
     对公司的简历搜藏夹的操作.目前主要是以下2种操作:
@@ -70,7 +76,8 @@ def resume_favorite_func(key):
     """
     mes = {"message": "success"}
     company_id = get_platform_session_arg("user_id")
-    if isinstance(company_id, ObjectId):
+    company = Company.find_by_id(company_id)
+    if isinstance(company, Company):
         if key == "add":
             """加入收藏夹"""
             resume_id = get_arg(request, "id", "")
@@ -107,6 +114,21 @@ def resume_favorite_func(key):
                     mes['message'] = "无效的id:{}".format(resume_id)
             else:
                 mes['message'] = "invalid id:{}".format(resume_id)
+        elif key == "batch_remove":
+            """从收藏夹批量移除"""
+            ids = get_arg(request, "ids", "")
+            if isinstance(ids, str) and len(ids) >= 24:
+                ids = ids.split(",")
+                fs = list()
+                for x in ids:
+                    if len(x) == 24:
+                        d_id = ObjectId(x)
+                        dbref = DBRef(database=db_name, collection=DriverResume.get_table_name(), id=d_id)
+                        fs.append(dbref)
+                f = {"company_id": company.get_dbref(), "resume_id": {"$in": fs}}
+                ResumeFavorite.delete_many(filter_dict=f)
+            else:
+                mes['message'] = "invalid ids:{}".format(ids)
         else:
             mes['message'] = "无效的操作:{}".format(key)
     else:
@@ -262,6 +284,46 @@ def driver_page_func():
         return redirect(url_for("web_blueprint.login_func"))
 
 
+def random_resume() -> str:
+    """
+    根据企业用户的id和当前简历的id,随机从数据库中跳出指定数量的简历并返回.
+    :return: json
+    """
+    company_id = get_platform_session_arg("user_id")
+    resume_id = get_arg(request, "id", "")
+    if isinstance(company_id, ObjectId) and isinstance(resume_id, str) and len(resume_id) == 24:
+        resume_id = ObjectId(resume_id)
+        num = get_arg(req=request, arg="num", default_value="2")
+        try:
+            num = int(num)
+        except Exception as e:
+            print(e)
+            num = 2
+        finally:
+            pass
+        mes = {"message": "success"}
+        """可以取出指定数量的随机的用户"""
+        key = "exclude_users_{}".format(str(company_id))
+        exclude_users = cache.get(key)
+        exclude_users = [resume_id] if exclude_users is None else exclude_users
+        ef = {"_id": {"$nin": exclude_users}}
+        ep = ['_id', 'head_image']
+        es = DriverResume.find_plus(filter_dict=ef, projection=ep, limit=num, to_dict=True)  # 随机用户
+        for x in es:
+            t = dict()
+            e_id = x['_id']
+            exclude_users.append(e_id)
+            x['_id'] = str(e_id)
+            img_dbref = x['head_image']
+            r_url = "/web/file/get/{}?fid={}".format(img_dbref.collection, img_dbref.id)
+            x['head_image'] = r_url
+        cache.set(key, exclude_users, timeout=1800)  # 已取过的随机用户缓存30分钟
+        mes['data'] = es
+        return json.dumps(mes)
+    else:
+        return abort(403)
+
+
 def company_resume_func():
     """
     公司客户操作司机简历的处理函数,目前的功能是:
@@ -273,44 +335,131 @@ def company_resume_func():
     if isinstance(resume_id, str) and len(resume_id) == 24:
         resume_id = ObjectId(resume_id)
     if isinstance(company_id, ObjectId) and isinstance(resume_id, ObjectId):
-        """查看简历"""
-        f = {"_id": resume_id}
-        ses = get_conn(table_name='driver_resume')
-        cursor = ses.find(filter=f)
-        cursor.next()
-        head_image = resume.get("head_image")  # 头像
-        if head_image is None:
-            head_img_url = ""
+        """查简历"""
+        resume = DriverResume.find_by_id(resume_id, to_dict=True)
+        if resume is None:
+            return abort(404)
         else:
-            head_img_url = "/web/file/get/{}?fid={}".format(head_image.collection, head_image.id)
-        """处理学历"""
-        resume['education'] = "" if (resume['education'] - 1) < 1 or (resume['education'] - 1) > 4 else \
-            ['小学', '中专', '大专', '本科'][resume['education'] - 1]
-        """处理婚否"""
-        married = {-1: "离异", 0: "未婚", 1: "已婚"}.get(resume['married'])
-        resume['married'] = married if married else ""
-        """处理状态"""
-        status = {-1: "个体经营", 0: "离职", 1: "在职"}.get(resume.get('status'))
-        resume['status'] = status if status else ""
-        """查询工作经历"""
-        work_history = resume.get("work_history")
-        vehicle_type = ""  # 常驾车型
-        if isinstance(work_history, list) and len(work_history) > 0:
-            """有工作经历"""
-            ids = [x.id for x in work_history]
-            work_history = WorkHistory.find_plus(filter_dict={"_id": {"$in": ids}}, to_dict=True)
-            for x in work_history:
-                y = x.get("work_history")
-                if work_history == "" and isinstance(y, str) and len(y) > 0:
-                    vehicle_type = y
-                    break
-                else:
-                    pass
+            """处理头像url"""
+            head_image = resume.get("head_image")  # 头像
+            if head_image is None:
+                head_img_url = ""
+            else:
+                head_img_url = "/web/file/get/{}?fid={}".format(head_image.collection, head_image.id)
+            """隐藏身份证后8位"""
+            id_num = resume.get("id_num")
+            if isinstance(id_num, str) and len(id_num) > 10:
+                id_num = id_num[0: 10] + "********"
+                resume['id_num'] = id_num
+            """处理学历"""
+            resume['education'] = "" if (resume['education'] - 1) < 1 or (resume['education'] - 1) > 4 else \
+                ['小学', '中专', '大专', '本科'][resume['education'] - 1]
+            """处理婚否"""
+            married = {-1: "离异", 0: "未婚", 1: "已婚"}.get(resume['married'])
+            resume['married'] = married if married else ""
+            """处理状态"""
+            status = {-1: "个体经营", 0: "离职", 1: "在职"}.get(resume.get('status'))
+            resume['status'] = status if status else ""
+            """查询工作经历"""
+            work_history = resume.get("work_history")
+            vehicle_type = ""  # 常驾车型
+            if isinstance(work_history, list) and len(work_history) > 0:
+                """有工作经历"""
+                ids = [x.id for x in work_history]
+                s = {"begin": -1}
+                work_history = WorkHistory.find_plus(filter_dict={"_id": {"$in": ids}}, sort_dict=s, to_dict=True)
+                for x in work_history:
+                    y = x.get("vehicle_type")
+                    x['begin'] = x['begin'].strftime("%F") if isinstance(x['begin'], datetime.datetime) else x['begin']
+                    x['end'] = x['end'].strftime("%F") if isinstance(x['end'], datetime.datetime) else x['end']
+                    if vehicle_type == "" and isinstance(y, str) and len(y) > 0:
+                        vehicle_type = y  # 把第一个找到的车型当作常驾车型
+                        resume['vehicle_type'] = vehicle_type
+                        break
+                    else:
+                        pass
+            else:
+                work_history = list()
+            """取教育经历"""
+            education_history = resume.get("education_history")
+            if isinstance(education_history, list) and len(education_history) > 0:
+                ids = [x.id for x in education_history]
+                s = {"begin": -1}
+                education_history = Education.find_plus(filter_dict={"_id": {"$in": ids}}, sort_dict=s, to_dict=True)
+                for x in education_history:
+                    x['begin'] = x['begin'].strftime("%F") if isinstance(x['begin'], datetime.datetime) else x['begin']
+                    x['end'] = x['end'].strftime("%F") if isinstance(x['end'], datetime.datetime) else x['end']
+            else:
+                education_history = list()
+            """取荣誉证书"""
+            honor_history = resume.get("honor")
+            if isinstance(honor_history, list) and len(honor_history) > 0:
+                ids = [x.id for x in honor_history]
+                s = {"time": -1}
+                honor_history = Honor.find_plus(filter_dict={"_id": {"$in": ids}}, sort_dict=s, to_dict=True)
+                for x in honor_history:
+                    x['time'] = x['time'].strftime("%F") if isinstance(x['time'], datetime.datetime) else x['time']
+            else:
+                honor_history = list()
+            """收藏映射"""
+            favorite_map = Company.in_favorite(company_id=company_id, drivers=[resume['_id']], to_str=False)
 
-        else:
-            work_history = list()
-        return render_template("web/resume.html", resume=resume, head_img_url=head_img_url, work_history=work_history,
-                               vehicle_type=vehicle_type)
+            return render_template("web/resume.html", resume=resume, head_img_url=head_img_url,
+                                   work_history=work_history, vehicle_type=vehicle_type, honor_history=honor_history,
+                                   education_history=education_history, favorite_map=favorite_map)
+    else:
+        return redirect(url_for("web_blueprint.login_func"))
+
+
+def favorite_func() -> str:
+    """公司客户收藏夹页面"""
+    company_id = get_platform_session_arg("user_id")
+    company = Company.find_by_id(company_id)
+    url_path = request.path  # 当前web路径
+    if isinstance(company, Company):
+        page_index = 1  # 页码
+        index = request.args.get("index", "1")  # 第几页
+        try:
+            page_index = int(index)
+        except Exception as e:
+            print(e)
+        company_dbref = company.get_dbref()
+        f = {"company_id": company_dbref}
+        s = {"time": -1}
+        p = ['_id', "resume_id"]
+        r = ResumeFavorite.query_by_page(filter_dict=f, sort_dict=s, projection=p, page_index=page_index, page_size=10)
+        ids = [x['resume_id'].id for x in r['data']]
+        f = {"_id": {"$in": ids}}
+        resumes = DriverResume.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
+        for x in resumes:
+            """转期望待遇的数组为字符串,以方便前端展示,此函数已集成在DriverResume类中"""
+            expected_salary = x.get("expected_salary")
+            if isinstance(expected_salary, list):
+                expected_salary = expected_salary[0:2]
+                if len(expected_salary) == 1:
+                    expected_salary = "{}k".format(round(expected_salary[0] / 1000, 1))
+                else:
+                    expected_salary = "{}k至{}k".format(round(expected_salary[0] / 1000, 1),
+                                                       round(expected_salary[1] / 1000, 1))
+            else:
+                expected_salary = "面议"
+            x['expected_salary'] = expected_salary
+
+        favorite_map = Company.in_favorite(company_id=company_id, drivers=ids, to_str=False)
+        return render_template("web/favorite.html", resumes=resumes, total_record=r['total_record'],
+                               total_page=r['total_page'], pages=r['pages'], page_index=page_index,
+                               favorite_map=favorite_map, url_path=url_path)
+    else:
+        return redirect(url_for("web_blueprint.login_func"))
+
+
+def consign_func() -> str:
+    """公司客户填写委托招聘的页面"""
+    company_id = get_platform_session_arg("user_id")
+    company = Company.find_by_id(company_id)
+    url_path = request.path  # 当前web路径
+    if isinstance(company, Company):
+        return render_template("web/consign.html", url_path=url_path)
     else:
         return redirect(url_for("web_blueprint.login_func"))
 
@@ -374,6 +523,8 @@ def file_func(action, table_name):
 
 """注册"""
 web_blueprint.add_url_rule(rule="/login", view_func=login_func, methods=['get', 'post'])
+"""登出"""
+web_blueprint.add_url_rule(rule="/logout", view_func=logout_func, methods=['get', 'post'])
 """对公司的简历收藏夹的操作"""
 web_blueprint.add_url_rule(rule="/favorite/<key>", view_func=resume_favorite_func, methods=['get', 'post'])
 """分页查询司机信息"""
@@ -382,3 +533,9 @@ web_blueprint.add_url_rule(rule="/drivers", view_func=driver_page_func, methods=
 web_blueprint.add_url_rule(rule="/company/resume", view_func=company_resume_func, methods=['get'])
 """保存或者获取文件(mongodb存储)"""
 web_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['post', 'get'])
+"""随机查询简历"""
+web_blueprint.add_url_rule(rule="/random/resume", view_func=random_resume, methods=['post', 'get'])
+"""公司客户收藏夹页面"""
+web_blueprint.add_url_rule(rule="/favorite", view_func=favorite_func, methods=['post', 'get'])
+"""公司客户填写委托招聘的页面"""
+web_blueprint.add_url_rule(rule="/consign", view_func=consign_func, methods=['post', 'get'])

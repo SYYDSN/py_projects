@@ -1,0 +1,99 @@
+font_color = #BABABA
+border_color = #dcdcdc
+default_blue = #3388FE
+light_grey = #f4f4f4
+deep_grey = #5C5F63
+
+
+.page_middle
+  height auto !important
+  .nav_div
+    font-size:1rem
+    color font_color
+    padding 1em 0
+
+  .search_div
+    font-size:1rem
+    background-color light_grey
+    padding 1.5em
+
+    .line_div
+      padding 10px 0
+      display flex
+      flex-direction row
+
+      .dropdown
+        width 40%
+
+        > button
+          width 100%
+          padding: 10px
+          color font_color !important
+          text-align left !important
+          > i
+            float:right
+            color font_color !important
+            margin-top 2px
+
+        > ul
+          width 100%
+          padding: 10px
+          color font_color !important
+          text-align left !important
+          > li > a
+            color font_color !important
+
+      label
+        font-weight 400
+        color font_color
+        display flex
+        flex-direction row
+        flex-wrap nowrap
+        justify-content space-around
+        align-items center
+        vertical-align center
+
+      .left_margin
+        margin-left 1.5em
+
+      input
+        border 1px solid border_color
+        border-radius 6px
+        padding 0.8em 0.6em
+
+    .row_01
+      label
+        width 10%
+      input
+        width 90%
+        /*input的placeholder的颜色*/
+      ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+        color:    font_color;
+      }
+      :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color:    font_color;
+      }
+      ::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color:    font_color;
+      }
+      :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color:    font_color;
+      }
+    .row_02
+      label
+        width 10%
+    .row_03
+      label
+        width 10%
+      .small_select
+        width 15%
+    .my_center
+      margin-top 1em 0
+      display: flex
+      justify-content center
+      #submit_search
+        font-size: 1.2rem
+      #reset_condition
+        font-size 1rem
+        border none
+        background none

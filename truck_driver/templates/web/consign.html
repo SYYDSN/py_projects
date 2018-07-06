@@ -1,0 +1,157 @@
+{%  extends "web/template.html" %}
+
+{% block extend_css %}
+<link rel="stylesheet" href="/static/css/web/consign.css">
+{% endblock %}
+
+{% block content %}
+    <div class="nav_div">
+    首页 <i class="fa fa-angle-right fa-1g"></i> 司机列表
+    </div>
+
+    <div class="search_div">
+        <div class="line_div row_01">
+            <label for="keywords">
+                <span>关</span>
+                <span>键</span>
+                <span>词</span>
+            </label>
+            <input type="text" id="keywords" placeholder="请输入关键词搜索">
+        </div>
+        <div class="line_div row_02">
+            <label for="i_exp">
+                <span>从</span>
+                <span>业</span>
+                <span>年</span>
+                <span>限</span>
+            </label>
+            <div class="dropdown">
+              <button id="i_exp"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择从业年限
+                    <i class="fa fa-list"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-val="" data-text="请选择从业年限" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-val="1" href="javascript:;">1年以上</a></li>
+                <li><a data-val="2" href="javascript:;">2年以上</a></li>
+                <li><a data-val="3" href="javascript:;">3年以上</a></li>
+                <li><a data-val="5" href="javascript:;">5年以上</a></li>
+                <li><a data-val="10" href="javascript:;">10年以上</a></li>
+              </ul>
+            </div>
+
+            <label class="left_margin" for="i_exp">
+                <span>驾</span>
+                <span>照</span>
+                <span>要</span>
+                <span>求</span>
+            </label>
+            <div class="dropdown">
+              <button id="dl_class"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择驾照类型
+                    <i class="fa fa-list"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-val="" data-text="请选择驾照类型" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-val="A1" href="javascript:;">A1驾照</a></li>
+                <li><a data-val="A2" href="javascript:;">A2驾照</a></li>
+                <li><a data-val="A3" href="javascript:;">A3驾照</a></li>
+                <li><a data-val="B1" href="javascript:;">B1驾照</a></li>
+                <li><a data-val="B2" href="javascript:;">B2驾照</a></li>
+                <li><a data-val="C1" href="javascript:;">C1驾照</a></li>
+                <li><a data-val="C2" href="javascript:;">C2驾照</a></li>
+                <li><a data-val="C3" href="javascript:;">C3驾照</a></li>
+                <li><a data-val="C4" href="javascript:;">C4驾照</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-val="N" href="javascript:;">N驾照</a></li>
+                <li><a data-val="P" href="javascript:;">P驾照</a></li>
+              </ul>
+            </div>
+        </div>
+        <div class="line_div row_03">
+            <label for="i_exp">
+                <span>期</span>
+                <span>望</span>
+                <span>待</span>
+                <span>遇</span>
+            </label>
+            <div class="dropdown">
+              <button id="salary"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择期望待遇(月)
+                    <i class="fa fa-list"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-val="" data-text="请选择期望待遇(月)" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-val="0,3000" href="#">3000元以下</a></li>
+                <li><a data-val="3000,5000" href="javascript:;">3000元到5000元</a></li>
+                <li><a data-val="5000,8000" href="javascript:;">5000元到8000元</a></li>
+                <li><a data-val="8000,10000" href="javascript:;">8000元到10000元</a></li>
+                <li><a data-val="10000,15000" href="javascript:;">10000元到15000元</a></li>
+                <li><a data-val="15000,20000" href="javascript:;">15000元到20000元</a></li>
+                <li><a data-val="15000,20000" href="javascript:;">15000元到20000元</a></li>
+                <li><a data-val="20000,30000" href="javascript:;">20000元到30000元</a></li>
+                <li><a data-val="30000,9999999" href="javascript:;">30000元以上</a></li>
+              </ul>
+            </div>
+            <label class="left_margin" for="education">
+                <span>学</span>
+                <span>历</span>
+                <span>要</span>
+                <span>求</span>
+            </label>
+            <div class="dropdown small_select">
+              <button id="education"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择学历
+                    <i class="fa fa-angle-down"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset"  data-val="" data-text="请选择学历" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-val="1" href="javascript:;">初中及以下</a></li>
+                <li><a data-val="2" href="javascript:;">高中及以下</a></li>
+                <li><a data-val="3" href="javascript:;">专科学历</a></li>
+                <li><a data-val="4" href="javascript:;">本科及以上</a></li>
+              </ul>
+            </div>
+            <label class="left_margin_small_label" for="education">
+                <span>工</span>
+                <span>作</span>
+                <span>经</span>
+                <span>验</span>
+            </label>
+            <div class="dropdown small_select">
+              <button id="work_exp"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择工作经验
+                    <i class="fa fa-angle-down"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-val="" data-text="请选择工作经验" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-val="1" href="javascript:;">1年以上</a></li>
+                <li><a data-val="2" href="javascript:;">2年以上</a></li>
+                <li><a data-val="5" href="javascript:;">5年以上</a></li>
+                <li><a data-val="10" href="javascript:;">10年以上</a></li>
+              </ul>
+            </div>
+        </div>
+
+        <div class="line_div my_center">
+            <div class="btn_area">
+                <button type="button" id="submit_search" class="btn btn-primary">&nbsp;搜索&nbsp;</button>
+                <button type="button" id="reset_condition" class="btn btn-default">清空搜索条件</button>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+{% endblock %}
+
+{% block extend_js %}
+    <script src="/static/js/web/consign.js"></script>
+{% endblock %}

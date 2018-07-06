@@ -15,6 +15,11 @@
                     <span class="driver_name">
                         {{ resume.real_name[0] }}{{ "先生" if resume.gender == "男" else "小姐" }}
                     </span>
+                </div>
+                <div class="line">
+                    <span class="gender">
+                        {{ resume.gender }}
+                    </span>
                     <span class="age">{{ resume.age }}岁</span>
                     <span class="education">{{ resume.education }}</span>
                     <span class="married">{{ resume.married }}</span>
@@ -44,13 +49,150 @@
                     </span>
                 </div>
                 <div class="line">
-                    <span data-id="{{ resume._id }}" class="btn  favorite">收藏</span>
+                    <span style="{{"" if favorite_map[resume._id] == "no" else "display:none" }}" data-id="{{ resume._id }}" class="btn  favorite">收藏</span>
+                    <button style="{{"" if favorite_map[resume._id] == "yes" else "display:none" }}"  data-id="{{ resume._id }}" class="btn btn-default un_favorite">已收藏</button>
                 </div>
             </div>
         </div>
-        <div class="block_right"></div>
+        <div class="block_right">
+            <div class="line title">
+                <span>猜你喜欢</span>
+                <span id="random">换一批</span>
+            </div>
+            <div class="line random_image">
+                <!--
+                <a href="#">
+                    <img src="/web/file/get/head_image?fid=5b3da3b74660d33ab86e8b54">
+                </a>
+                -->
+            </div>
+            <div class="line random_image">
+                <!--
+                <a href="#">
+                    <img src="/web/file/get/head_image?fid=5b3da3b74660d33ab86e8b54">
+                </a>
+                -->
+            </div>
+        </div>
     </div>
-    <div class="block_02"></div>
+    <div class="block_02">
+        <div class="line nav">
+            <table>
+                <tr>
+                    <td><span class="active"></span><a href="#person_info">个人信息</a></td>
+                    <td><span></span><a href="#work_history">工作经历</a></td>
+                    <td><span></span><a href="#education_history">教育经历</a></td>
+                    <td><span></span><a href="#honor_history">荣誉证书</a></td>
+                    <td class="last"><span></span><a href="#accident_history">有无事故</a></td>
+                </tr>
+            </table>
+        </div>
+        <div id="person_info" class="line base_info">
+            <div class="inner_line">
+                <span class="driver_name">
+                        {{ resume.real_name[0] }}{{ "先生" if resume.gender == "男" else "小姐" }}
+                </span>
+            </div>
+            <div class="inner_line">
+                <span class="gender">
+                        {{ resume.gender }}
+                </span>
+                <span class="age">{{ resume.age }}岁</span>
+                <span class="education">{{ resume.education }}</span>
+                <span class="married">{{ resume.married }}</span>
+            </div>
+            <div class="inner_line">
+                户籍:{{ resume.birth_place }}
+            </div>
+            <div class="inner_line">
+                现住地址:{{ resume.living_place }}
+            </div>
+            <div class="inner_line">
+                家庭地址:{{ resume.address }}
+            </div>
+            <div class="inner_line">
+                身份证号码:{{ resume.id_num }}
+            </div>
+        </div>
+        <div class="line sep" id="work_history">
+            工作经历
+        </div>
+        <div class="line">
+            {% for x in work_history %}
+                <div class="item {{ "first" if loop.index == 1 else "" }}">
+                    <div class="item_line">
+                        {{ x.begin }} -- {{ x.end if x.end else "至今" }}
+                    </div>
+                    <div class="item_line">
+                        公司名称:<span>{{ x.enterprise_name }}</span>
+                    </div>
+                    <div class="item_line">
+                        公司性质:<span>{{ x.enterprise_class }}</span>
+                    </div>
+                    <div class="item_line">
+                        所属行业:<span>{{ x.industry }}</span>
+                    </div>
+                    <div class="item_line">
+                        担任职务:<span>{{ x.post_name }}</span>
+                    </div>
+                    <div class="item_line">
+                        工作描述:<span>{{ x.description }}</span>
+                    </div>
+                    <div class="item_line">
+                        工作业绩:<span>{{ x.achievement }}</span>
+                    </div>
+                    <div class="item_line">
+                        下属人数:<span>{{ x.team_size }}</span>
+                    </div>
+                    <div class="item_line">
+                        驾驶车型:<span>{{ x.vehicle_type }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="line sep" id="education_history">
+            教育经历
+        </div>
+        <div class="line">
+            {% for x in education_history %}
+                <div class="item {{ "first" if loop.index == 1 else "" }}">
+                    <div class="item_line">
+                        毕业院校:<span>{{ x.school_name }}</span>
+                    </div>
+                    <div class="item_line">
+                        就读时间:<span>{{ x.begin }}--{{ x.end }}</span>
+                    </div>
+                    <div class="item_line">
+                        最高学历:<span>{{ x.level }}</span>
+                    </div>
+                    <div class="item_line">
+                        主修专业:<span>{{ x.major }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="line sep" id="honor_history">
+            荣誉证书
+        </div>
+        <div class="line">
+            {% for x in honor_history %}
+                <div class="item {{ "first" if loop.index == 1 else "" }}">
+                    <div class="item_line">
+                        获奖时间:<span>{{ x.time }}</span>
+                    </div>
+                    <div class="item_line">
+                        所获荣誉:<span>{{ x.info }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="line sep" id="accident_history">
+            有无事故
+        </div>
+        <div class="line">
+
+        </div>
+    </div>
 
 {% endblock %}
 

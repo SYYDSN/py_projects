@@ -1,0 +1,137 @@
+font_color = #9a9a9a
+border_color = #dcdcdc
+default_blue = #3388FE
+light_grey = #f4f4f4
+deep_grey = #5C5F63
+
+
+.page_middle
+  height auto !important
+  color font_color
+
+  .top_div
+    margin-top 2em
+    margin-bottom 1.2em
+    padding 1em 1em
+    background-color light_grey
+    display flex
+    flex-direction row
+    justify-content space-between
+    #select_all
+      margin-left 2em
+    label
+      font-weight 400
+      margin-right 1em
+    .right
+      #batch_remove
+        color: font_color
+        font-size 0.9rem
+        background-color white
+        border 1px solid border_color
+        border-radius 2px
+        padding 2px 20px !important
+
+  .driver_list
+    width 100%
+    padding-left 40px
+    height auto
+    border 1px solid #dedede
+    display flex
+    flex-direction column
+    .line_outer
+      display flex
+      flex-direction row
+      justify-content space-between
+      .line_div
+        width calc(100% - 40px)
+        display flex
+        flex-direction row
+        justify-content flex-start
+        padding 1em 0.1em
+        align-items center
+        border-bottom 1px solid #dedede
+        .item
+          width 20%
+          color #7d7d7d
+          .cell
+            padding 0.3em 0
+
+        .base_info
+          width 30%
+          .driver_name
+            font-size 1.2rem
+            color #333993
+            font-weight 700
+            border-bottom 1px solid #333993
+            margin-bottom 1px
+          .want_job
+            color #fe9f28
+            margin-left 1em
+          .sex,.age,.status,.living
+            font-size 1rem
+            padding 0 0.8em
+            border-right 1px solid font_color
+          .sex
+            padding-left 0
+          .living
+            border-right: none
+          .expected_salary
+            color #fe9f28
+        .last
+          border-left 1px solid #dedede
+          padding-left 2em
+          white-space nowrap
+          width 30%
+          .company_name
+            white-space nowrap
+            word-break break-all
+            overflow hidden
+            text-overflow ellipsis
+          .last_cell
+            padding-top 0.8em
+            padding-bottom 1em
+            .btn
+              padding 6px 16px !important
+            .favorite
+              color #fe9f28
+              border-color #fe9f28
+            .un_favorite
+              color border_color
+              border-color border_color
+            .more_info
+              margin-left 3px
+              color #47a9fe
+              border-color #47a9fe
+      .select
+        border-left 1px solid #dedede
+        border-top 1px solid #dedede
+        width 40px
+        display flex
+        flex-direction row
+        justify-content center
+        align-items center
+        input
+          width 20px
+          height 20px
+      .first
+        border-top none
+  .page_area
+    display flex
+    flex-direction row
+    flex-wrap nowrap
+    justify-content center
+    padding 1.2em 0
+    > a
+      color font_color
+      font-size 1rem
+      border 1px solid border_color
+      padding 0 5px
+      margin 0 6px
+      border-radius 4px
+      text-decoration none
+    .active
+      color #47a9fe
+    > span
+      color font_color
+      font-size 1rem
+      margin-left 1em

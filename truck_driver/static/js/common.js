@@ -183,6 +183,16 @@ function get_url_arg_dict(arg_url){
     return args;
 }
 
+function get_url_arg(arg_name){
+    // 根据arg_name,从url取对应的参数值,本函数依赖get_url_arg_dict函数,是前者的扩展之一
+    if(arg_name === undefined || arg_name === ""){
+        return undefined;
+    }
+    else{
+        return get_url_arg_dict()[arg_name];
+    }
+}
+
 function build_url(base_path, arg_dict){
     // 根据基础url和参数字典拼接url,
     base_path += "?";

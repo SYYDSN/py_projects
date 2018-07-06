@@ -98,25 +98,38 @@ def mes_func(key) -> str:
                 finally:
                     if isinstance(payload, dict):
                         """成功"""
-                        init = dict()
-                        for k, v in payload.items():
-                            if k in ['deposit_money', 'withdrawal_money']:
-                                k = 'money'
-                            elif k in ['operate_time', 'update_time']:
-                                k = 'time'
-                            elif k in ['deposit_order', 'withdrawal_order']:
-                                k = "order"
-                            else:
-                                k = k.lower()
-                            init[k] = v
-                        obj = PlatformEvent(**init)
-                        r = obj.save_plus()
-                        if isinstance(r, ObjectId):
-                            mes['id'] = str(r)
+                        data = payload.get("data")
+                        if data is None:
+                            mes['message'] = "载荷中没有发现data字段"
                         else:
-                            mes['message'] = "保存对象失败"
-                            ms = "保存对象失败,args:{}".format(init)
-                            logger.exception(ms)
+                            try:
+                                data = json.loads(data)
+                            except Exception as e:
+                                print(e)
+                                logger.exception(e)
+                            finally:
+                                if isinstance(data, dict):
+                                    init = dict()
+                                    for k, v in data.items():
+                                        if k in ['deposit_money', 'withdrawal_money']:
+                                            k = 'money'
+                                        elif k in ['operate_time', 'update_time']:
+                                            k = 'time'
+                                        elif k in ['deposit_order', 'withdrawal_order']:
+                                            k = "order"
+                                        else:
+                                            k = k.lower()
+                                        init[k] = v
+                                    obj = PlatformEvent(**init)
+                                    r = obj.save_plus()
+                                    if isinstance(r, ObjectId):
+                                        mes['id'] = str(r)
+                                    else:
+                                        mes['message'] = "保存对象失败"
+                                        ms = "保存对象失败,args:{}".format(init)
+                                        logger.exception(ms)
+                                else:
+                                    mes['message'] = "data转换失败"
                     else:
                         if mes['message'] == "success":
                             mes['message'] = "解码失败"

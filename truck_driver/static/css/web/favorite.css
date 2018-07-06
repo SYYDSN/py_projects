@@ -1,0 +1,160 @@
+.page_middle {
+  height: auto !important;
+  color: #9a9a9a;
+}
+.page_middle .top_div {
+  margin-top: 2em;
+  margin-bottom: 1.2em;
+  padding: 1em 1em;
+  background-color: #f4f4f4;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.page_middle .top_div #select_all {
+  margin-left: 2em;
+}
+.page_middle .top_div label {
+  font-weight: 400;
+  margin-right: 1em;
+}
+.page_middle .top_div .right #batch_remove {
+  color: #9a9a9a;
+  font-size: 0.9rem;
+  background-color: #fff;
+  border: 1px solid #dcdcdc;
+  border-radius: 2px;
+  padding: 2px 20px !important;
+}
+.page_middle .driver_list {
+  width: 100%;
+  padding-left: 40px;
+  height: auto;
+  border: 1px solid #dedede;
+  display: flex;
+  flex-direction: column;
+}
+.page_middle .driver_list .line_outer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.page_middle .driver_list .line_outer .line_div {
+  width: calc(100% - 40px);
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 1em 0.1em;
+  align-items: center;
+  border-bottom: 1px solid #dedede;
+}
+.page_middle .driver_list .line_outer .line_div .item {
+  width: 20%;
+  color: #7d7d7d;
+}
+.page_middle .driver_list .line_outer .line_div .item .cell {
+  padding: 0.3em 0;
+}
+.page_middle .driver_list .line_outer .line_div .base_info {
+  width: 30%;
+}
+.page_middle .driver_list .line_outer .line_div .base_info .driver_name {
+  font-size: 1.2rem;
+  color: #333993;
+  font-weight: 700;
+  border-bottom: 1px solid #333993;
+  margin-bottom: 1px;
+}
+.page_middle .driver_list .line_outer .line_div .base_info .want_job {
+  color: #fe9f28;
+  margin-left: 1em;
+}
+.page_middle .driver_list .line_outer .line_div .base_info .sex,
+.page_middle .driver_list .line_outer .line_div .base_info .age,
+.page_middle .driver_list .line_outer .line_div .base_info .status,
+.page_middle .driver_list .line_outer .line_div .base_info .living {
+  font-size: 1rem;
+  padding: 0 0.8em;
+  border-right: 1px solid #9a9a9a;
+}
+.page_middle .driver_list .line_outer .line_div .base_info .sex {
+  padding-left: 0;
+}
+.page_middle .driver_list .line_outer .line_div .base_info .living {
+  border-right: none;
+}
+.page_middle .driver_list .line_outer .line_div .base_info .expected_salary {
+  color: #fe9f28;
+}
+.page_middle .driver_list .line_outer .line_div .last {
+  border-left: 1px solid #dedede;
+  padding-left: 2em;
+  white-space: nowrap;
+  width: 30%;
+}
+.page_middle .driver_list .line_outer .line_div .last .company_name {
+  white-space: nowrap;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.page_middle .driver_list .line_outer .line_div .last .last_cell {
+  padding-top: 0.8em;
+  padding-bottom: 1em;
+}
+.page_middle .driver_list .line_outer .line_div .last .last_cell .btn {
+  padding: 6px 16px !important;
+}
+.page_middle .driver_list .line_outer .line_div .last .last_cell .favorite {
+  color: #fe9f28;
+  border-color: #fe9f28;
+}
+.page_middle .driver_list .line_outer .line_div .last .last_cell .un_favorite {
+  color: #dcdcdc;
+  border-color: #dcdcdc;
+}
+.page_middle .driver_list .line_outer .line_div .last .last_cell .more_info {
+  margin-left: 3px;
+  color: #47a9fe;
+  border-color: #47a9fe;
+}
+.page_middle .driver_list .line_outer .select {
+  border-left: 1px solid #dedede;
+  border-top: 1px solid #dedede;
+  width: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.page_middle .driver_list .line_outer .select input {
+  width: 20px;
+  height: 20px;
+}
+.page_middle .driver_list .line_outer .first {
+  border-top: none;
+}
+.page_middle .page_area {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  padding: 1.2em 0;
+}
+.page_middle .page_area > a {
+  color: #9a9a9a;
+  font-size: 1rem;
+  border: 1px solid #dcdcdc;
+  padding: 0 5px;
+  margin: 0 6px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+.page_middle .page_area .active {
+  color: #47a9fe;
+}
+.page_middle .page_area > span {
+  color: #9a9a9a;
+  font-size: 1rem;
+  margin-left: 1em;
+}
