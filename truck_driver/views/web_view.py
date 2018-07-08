@@ -76,64 +76,67 @@ def resume_favorite_func(key):
     """
     mes = {"message": "success"}
     company_id = get_platform_session_arg("user_id")
-    company = Company.find_by_id(company_id)
-    if isinstance(company, Company):
-        if key == "add":
-            """加入收藏夹"""
-            resume_id = get_arg(request, "id", "")
-            if isinstance(resume_id, str) and len(resume_id) == 24:
-                resume = DriverResume.find_by_id(resume_id)
-                if isinstance(resume, DriverResume):
-                    resume_dbref = resume.get_dbref()
-                    company_dbref = DBRef(database=db_name, collection=Company.get_table_name(), id=company_id)
-                    obj = ResumeFavorite(resume_id=resume_dbref, company_id=company_dbref)
-                    r = obj.save_plus()
-                    if isinstance(r, ObjectId):
-                        pass
-                    else:
-                        mes['message'] = "save fail"
-                else:
-                    mes['message'] = "无效的id:{}".format(resume_id)
-            else:
-                mes['message'] = "invalid id:{}".format(resume_id)
-        elif key == "remove":
-            """从收藏夹移除"""
-            resume_id = get_arg(request, "id", "")
-            if isinstance(resume_id, str) and len(resume_id) == 24:
-                resume = DriverResume.find_by_id(resume_id)
-                if isinstance(resume, DriverResume):
-                    resume_dbref = resume.get_dbref()
-                    company_dbref = DBRef(database=db_name, collection=Company.get_table_name(), id=company_id)
-                    f = {"company_id": company_dbref, "resume_id": resume_dbref}
-                    r = ResumeFavorite.find_one_and_delete(filter_dict=f)
-                    if r is None:
-                        mes['message'] = "移除失败"
-                    else:
-                        pass
-                else:
-                    mes['message'] = "无效的id:{}".format(resume_id)
-            else:
-                mes['message'] = "invalid id:{}".format(resume_id)
-        elif key == "batch_remove":
-            """从收藏夹批量移除"""
-            ids = get_arg(request, "ids", "")
-            if isinstance(ids, str) and len(ids) >= 24:
-                ids = ids.split(",")
-                fs = list()
-                for x in ids:
-                    if len(x) == 24:
-                        d_id = ObjectId(x)
-                        dbref = DBRef(database=db_name, collection=DriverResume.get_table_name(), id=d_id)
-                        fs.append(dbref)
-                f = {"company_id": company.get_dbref(), "resume_id": {"$in": fs}}
-                ResumeFavorite.delete_many(filter_dict=f)
-            else:
-                mes['message'] = "invalid ids:{}".format(ids)
-        else:
-            mes['message'] = "无效的操作:{}".format(key)
+    if company_id is None:
+        return abort(403)
     else:
-        mes['message'] = "authenticity validate fail"
-    return json.dumps(mes)
+        company = Company.find_by_id(company_id)
+        if isinstance(company, Company):
+            if key == "add":
+                """加入收藏夹"""
+                resume_id = get_arg(request, "id", "")
+                if isinstance(resume_id, str) and len(resume_id) == 24:
+                    resume = DriverResume.find_by_id(resume_id)
+                    if isinstance(resume, DriverResume):
+                        resume_dbref = resume.get_dbref()
+                        company_dbref = DBRef(database=db_name, collection=Company.get_table_name(), id=company_id)
+                        obj = ResumeFavorite(resume_id=resume_dbref, company_id=company_dbref)
+                        r = obj.save_plus()
+                        if isinstance(r, ObjectId):
+                            pass
+                        else:
+                            mes['message'] = "save fail"
+                    else:
+                        mes['message'] = "无效的id:{}".format(resume_id)
+                else:
+                    mes['message'] = "invalid id:{}".format(resume_id)
+            elif key == "remove":
+                """从收藏夹移除"""
+                resume_id = get_arg(request, "id", "")
+                if isinstance(resume_id, str) and len(resume_id) == 24:
+                    resume = DriverResume.find_by_id(resume_id)
+                    if isinstance(resume, DriverResume):
+                        resume_dbref = resume.get_dbref()
+                        company_dbref = DBRef(database=db_name, collection=Company.get_table_name(), id=company_id)
+                        f = {"company_id": company_dbref, "resume_id": resume_dbref}
+                        r = ResumeFavorite.find_one_and_delete(filter_dict=f)
+                        if r is None:
+                            mes['message'] = "移除失败"
+                        else:
+                            pass
+                    else:
+                        mes['message'] = "无效的id:{}".format(resume_id)
+                else:
+                    mes['message'] = "invalid id:{}".format(resume_id)
+            elif key == "batch_remove":
+                """从收藏夹批量移除"""
+                ids = get_arg(request, "ids", "")
+                if isinstance(ids, str) and len(ids) >= 24:
+                    ids = ids.split(",")
+                    fs = list()
+                    for x in ids:
+                        if len(x) == 24:
+                            d_id = ObjectId(x)
+                            dbref = DBRef(database=db_name, collection=DriverResume.get_table_name(), id=d_id)
+                            fs.append(dbref)
+                    f = {"company_id": company.get_dbref(), "resume_id": {"$in": fs}}
+                    ResumeFavorite.delete_many(filter_dict=f)
+                else:
+                    mes['message'] = "invalid ids:{}".format(ids)
+            else:
+                mes['message'] = "无效的操作:{}".format(key)
+        else:
+            mes['message'] = "authenticity validate fail"
+        return json.dumps(mes)
 
 
 def driver_page_func():
@@ -414,54 +417,60 @@ def company_resume_func():
 def favorite_func() -> str:
     """公司客户收藏夹页面"""
     company_id = get_platform_session_arg("user_id")
-    company = Company.find_by_id(company_id)
-    url_path = request.path  # 当前web路径
-    if isinstance(company, Company):
-        page_index = 1  # 页码
-        index = request.args.get("index", "1")  # 第几页
-        try:
-            page_index = int(index)
-        except Exception as e:
-            print(e)
-        company_dbref = company.get_dbref()
-        f = {"company_id": company_dbref}
-        s = {"time": -1}
-        p = ['_id', "resume_id"]
-        r = ResumeFavorite.query_by_page(filter_dict=f, sort_dict=s, projection=p, page_index=page_index, page_size=10)
-        ids = [x['resume_id'].id for x in r['data']]
-        f = {"_id": {"$in": ids}}
-        resumes = DriverResume.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
-        for x in resumes:
-            """转期望待遇的数组为字符串,以方便前端展示,此函数已集成在DriverResume类中"""
-            expected_salary = x.get("expected_salary")
-            if isinstance(expected_salary, list):
-                expected_salary = expected_salary[0:2]
-                if len(expected_salary) == 1:
-                    expected_salary = "{}k".format(round(expected_salary[0] / 1000, 1))
-                else:
-                    expected_salary = "{}k至{}k".format(round(expected_salary[0] / 1000, 1),
-                                                       round(expected_salary[1] / 1000, 1))
-            else:
-                expected_salary = "面议"
-            x['expected_salary'] = expected_salary
-
-        favorite_map = Company.in_favorite(company_id=company_id, drivers=ids, to_str=False)
-        return render_template("web/favorite.html", resumes=resumes, total_record=r['total_record'],
-                               total_page=r['total_page'], pages=r['pages'], page_index=page_index,
-                               favorite_map=favorite_map, url_path=url_path)
-    else:
+    if company_id is None:
         return redirect(url_for("web_blueprint.login_func"))
+    else:
+        company = Company.find_by_id(company_id)
+        url_path = request.path  # 当前web路径
+        if isinstance(company, Company):
+            page_index = 1  # 页码
+            index = request.args.get("index", "1")  # 第几页
+            try:
+                page_index = int(index)
+            except Exception as e:
+                print(e)
+            company_dbref = company.get_dbref()
+            f = {"company_id": company_dbref}
+            s = {"time": -1}
+            p = ['_id', "resume_id"]
+            r = ResumeFavorite.query_by_page(filter_dict=f, sort_dict=s, projection=p, page_index=page_index, page_size=10)
+            ids = [x['resume_id'].id for x in r['data']]
+            f = {"_id": {"$in": ids}}
+            resumes = DriverResume.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
+            for x in resumes:
+                """转期望待遇的数组为字符串,以方便前端展示,此函数已集成在DriverResume类中"""
+                expected_salary = x.get("expected_salary")
+                if isinstance(expected_salary, list):
+                    expected_salary = expected_salary[0:2]
+                    if len(expected_salary) == 1:
+                        expected_salary = "{}k".format(round(expected_salary[0] / 1000, 1))
+                    else:
+                        expected_salary = "{}k至{}k".format(round(expected_salary[0] / 1000, 1),
+                                                           round(expected_salary[1] / 1000, 1))
+                else:
+                    expected_salary = "面议"
+                x['expected_salary'] = expected_salary
+
+            favorite_map = Company.in_favorite(company_id=company_id, drivers=ids, to_str=False)
+            return render_template("web/favorite.html", resumes=resumes, total_record=r['total_record'],
+                                   total_page=r['total_page'], pages=r['pages'], page_index=page_index,
+                                   favorite_map=favorite_map, url_path=url_path)
+        else:
+            return redirect(url_for("web_blueprint.login_func"))
 
 
 def consign_func() -> str:
     """公司客户填写委托招聘的页面"""
     company_id = get_platform_session_arg("user_id")
-    company = Company.find_by_id(company_id)
-    url_path = request.path  # 当前web路径
-    if isinstance(company, Company):
-        return render_template("web/consign.html", url_path=url_path)
-    else:
+    if company_id is None:
         return redirect(url_for("web_blueprint.login_func"))
+    else:
+        company = Company.find_by_id(company_id)
+        url_path = request.path  # 当前web路径
+        if isinstance(company, Company):
+            return render_template("web/consign.html", url_path=url_path)
+        else:
+            return redirect(url_for("web_blueprint.login_func"))
 
 
 def file_func(action, table_name):

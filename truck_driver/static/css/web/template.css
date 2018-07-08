@@ -30,7 +30,7 @@ body .page_top .top_div .top_right > span {
   width: 6em;
 }
 body .page_top .top_div .top_right > span > a {
-  color: #bababa;
+  color: #9a9a9a;
   padding-bottom: 2px;
   text-decoration: none;
 }
@@ -54,7 +54,7 @@ body .page_bottom {
   height: 65px;
   background-color: #5c5f63;
   font-size: 0.8rem;
-  color: #bababa;
+  color: #9a9a9a;
   text-align: center;
   padding-top: 0.6em;
 }

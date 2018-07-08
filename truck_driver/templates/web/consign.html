@@ -1,24 +1,25 @@
 {%  extends "web/template.html" %}
 
 {% block extend_css %}
+<link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
 <link rel="stylesheet" href="/static/css/web/consign.css">
 {% endblock %}
 
 {% block content %}
     <div class="nav_div">
-    首页 <i class="fa fa-angle-right fa-1g"></i> 司机列表
+    基本要求
     </div>
-
     <div class="search_div">
+        <!--
         <div class="line_div row_01">
             <label for="keywords">
-                <span>关</span>
-                <span>键</span>
-                <span>词</span>
+                <span>标</span>
+                <span>题</span>
             </label>
-            <input type="text" id="keywords" placeholder="请输入关键词搜索">
+            <input type="text" id="title" placeholder="非必须">
         </div>
-        <div class="line_div row_02">
+        -->
+        <div class="line_div">
             <label for="i_exp">
                 <span>从</span>
                 <span>业</span>
@@ -28,7 +29,7 @@
             <div class="dropdown">
               <button id="i_exp"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 请选择从业年限
-                    <i class="fa fa-list"></i>
+                    <i class="fa fa-angle-down"></i>
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                 <li><a class="reset" data-val="" data-text="请选择从业年限" href="javascript:;">不限</a></li>
@@ -44,13 +45,13 @@
             <label class="left_margin" for="i_exp">
                 <span>驾</span>
                 <span>照</span>
-                <span>要</span>
-                <span>求</span>
+                <span>类</span>
+                <span>型</span>
             </label>
             <div class="dropdown">
               <button id="dl_class"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 请选择驾照类型
-                    <i class="fa fa-list"></i>
+                    <i class="fa fa-angle-down"></i>
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                 <li><a class="reset" data-val="" data-text="请选择驾照类型" href="javascript:;">不限</a></li>
@@ -69,21 +70,19 @@
                 <li><a data-val="P" href="javascript:;">P驾照</a></li>
               </ul>
             </div>
-        </div>
-        <div class="line_div row_03">
             <label for="i_exp">
-                <span>期</span>
-                <span>望</span>
-                <span>待</span>
-                <span>遇</span>
+                <span>工</span>
+                <span>作</span>
+                <span>地</span>
+                <span>区</span>
             </label>
             <div class="dropdown">
               <button id="salary"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                请选择期望待遇(月)
-                    <i class="fa fa-list"></i>
+                请选工作地区
+                    <i class="fa fa-angle-down"></i>
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <li><a class="reset" data-val="" data-text="请选择期望待遇(月)" href="javascript:;">不限</a></li>
+                <li><a class="reset" data-val="" data-text="请选工作地区" href="javascript:;">不限</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a data-val="0,3000" href="#">3000元以下</a></li>
                 <li><a data-val="3000,5000" href="javascript:;">3000元到5000元</a></li>
@@ -94,6 +93,28 @@
                 <li><a data-val="15000,20000" href="javascript:;">15000元到20000元</a></li>
                 <li><a data-val="20000,30000" href="javascript:;">20000元到30000元</a></li>
                 <li><a data-val="30000,9999999" href="javascript:;">30000元以上</a></li>
+              </ul>
+            </div>
+        </div>
+        <div class="line_div">
+            <label for="education">
+                <span>工</span>
+                <span>作</span>
+                <span>经</span>
+                <span>验</span>
+            </label>
+            <div class="dropdown small_select">
+              <button id="work_exp"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择工作经验
+                    <i class="fa fa-angle-down"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-val="" data-text="请选择工作经验" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-val="1" href="javascript:;">1年以上</a></li>
+                <li><a data-val="2" href="javascript:;">2年以上</a></li>
+                <li><a data-val="5" href="javascript:;">5年以上</a></li>
+                <li><a data-val="10" href="javascript:;">10年以上</a></li>
               </ul>
             </div>
             <label class="left_margin" for="education">
@@ -116,19 +137,59 @@
                 <li><a data-val="4" href="javascript:;">本科及以上</a></li>
               </ul>
             </div>
-            <label class="left_margin_small_label" for="education">
+            <label for="i_exp">
                 <span>工</span>
-                <span>作</span>
-                <span>经</span>
-                <span>验</span>
+                <span>资</span>
+                <span>待</span>
+                <span>遇</span>
             </label>
-            <div class="dropdown small_select">
-              <button id="work_exp"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                请选择工作经验
+            <div class="dropdown">
+              <button id="salary"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择工资待遇(月)
                     <i class="fa fa-angle-down"></i>
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <li><a class="reset" data-val="" data-text="请选择工作经验" href="javascript:;">不限</a></li>
+                <li><a class="reset" data-val="" data-text="请选择工资待遇(月)" href="javascript:;">不限</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a data-val="0,3000" href="#">3000元以下</a></li>
+                <li><a data-val="3000,5000" href="javascript:;">3000元到5000元</a></li>
+                <li><a data-val="5000,8000" href="javascript:;">5000元到8000元</a></li>
+                <li><a data-val="8000,10000" href="javascript:;">8000元到10000元</a></li>
+                <li><a data-val="10000,15000" href="javascript:;">10000元到15000元</a></li>
+                <li><a data-val="15000,20000" href="javascript:;">15000元到20000元</a></li>
+                <li><a data-val="15000,20000" href="javascript:;">15000元到20000元</a></li>
+                <li><a data-val="20000,30000" href="javascript:;">20000元到30000元</a></li>
+                <li><a data-val="30000,9999999" href="javascript:;">30000元以上</a></li>
+              </ul>
+            </div>
+        </div>
+
+        <div class="line_div">
+            <label for="i_exp">
+                <span>招</span>
+                <span>聘</span>
+                <span>人</span>
+                <span>数</span>
+            </label>
+            <input id="count" type="text" placeholder="请输入招聘人数">
+            <label class="left_margin" for="entry_date">
+                <span>入</span>
+                <span>职</span>
+                <span>日</span>
+                <span>期</span>
+            </label>
+            <input type="text" class="form-control" id="entry_date" placeholder="请选择入职日期">
+            <label class="left_margin_small_label" for="driving_exp">
+                <span>驾</span>
+                <span>龄</span>
+            </label>
+            <div class="dropdown small_select">
+              <button id="driving_exp"  class="btn btn-default dropdown-toggle show_area" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                请选择驾龄要求
+                    <i class="fa fa-angle-down"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a class="reset" data-val="" data-text="请选择驾龄要求" href="javascript:;">不限</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a data-val="1" href="javascript:;">1年以上</a></li>
                 <li><a data-val="2" href="javascript:;">2年以上</a></li>
@@ -138,20 +199,72 @@
             </div>
         </div>
 
-        <div class="line_div my_center">
-            <div class="btn_area">
-                <button type="button" id="submit_search" class="btn btn-primary">&nbsp;搜索&nbsp;</button>
-                <button type="button" id="reset_condition" class="btn btn-default">清空搜索条件</button>
-            </div>
-        </div>
-
     </div>
 
+    <div class="nav_div">
+    福利待遇
+    </div>
+    <div class="content welfare">
+        <div class="child">
+            <input id="insurance" type="checkbox">
+            <label for="insurance">五险一金</label>
+        </div>
+        <div class="child">
+            <input id="insurance" type="checkbox">
+            <label for="insurance">年底双薪</label>
+        </div>
+        <div class="child">
+            <input id="insurance" type="checkbox">
+            <label for="insurance">绩效奖金</label>
+        </div>
+        <div class="child">
+            <input id="insurance" type="checkbox">
+            <label for="insurance">提供住宿</label>
+        </div>
+        <div class="child">
+            <input id="insurance" type="checkbox">
+            <label for="insurance">带薪年假</label>
+        </div>
+        <div class="child">
+            <input id="insurance" type="checkbox">
+            <label for="insurance">弹性工作</label>
+        </div>
+        <div class="child">
+            <input id="insurance" type="checkbox">
+            <label for="insurance">节日福利</label>
+        </div>
+        <div class="child">
+            <input id="insurance" type="checkbox">
+            <label for="insurance">餐补</label>
+        </div>
+    </div>
 
+    <div class="nav_div">
+    职位描述
+    </div>
+    <div class="content">
+        <div class="title">
+            <label for="job_duty">岗位职责</label>
+        </div>
+        <div class="text" contenteditable="true" id="job_duty"></div>
+    </div>
+
+    <div class="nav_div">
+    信息备注
+    </div>
+    <div class="content">
+        <div class="text last" contenteditable="true" id="desc"></div>
+    </div>
+
+    <div class="submit_div">
+        <button id="submit">立即委托</button>
+    </div>
 
 
 {% endblock %}
 
 {% block extend_js %}
+    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
     <script src="/static/js/web/consign.js"></script>
 {% endblock %}

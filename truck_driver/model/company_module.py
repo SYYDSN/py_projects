@@ -245,5 +245,48 @@ class ResumeFavorite(mongo_db.BaseDoc):
         super(ResumeFavorite, self).__init__(**kwargs)
 
 
+class Consign(mongo_db.BaseDoc):
+    """
+    企业发出的（招聘）委托任务
+    """
+    _table_name = "consign"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['company_id'] = DBRef
+    type_dict['count'] = int   # 招聘人数
+    type_dict['gender'] = str   # 男/女
+    type_dict['married'] = int  # 婚否? 0/1/-1 未婚/已婚/离异  None 空白
+    type_dict['birth_place'] = str  # 籍贯/出生地
+    type_dict['age_range'] = list  # 年龄区间，必然是二元数组
+    type_dict['driving_experience'] = int  # 驾龄
+    type_dict['industry_experience'] = int  # 从业年限
+    type_dict['work_experience'] = int  # 工作年限
+    type_dict['dl_license_class'] = str  # 驾照最低等级要求，比如B2,英文大写
+    """
+    是否需要道路从业资格许可证？
+    1. 0/None 不要求
+    2. 1  要求道路从业资格许可证
+    3. 2  要求危险货物运输驾驶员许可证
+    """
+    type_dict['need_rtqc'] = int
+    type_dict['salary_range'] = list  # 待遇范围，二元数组
+    """
+    学历分以下几种:
+    1. 初等教育(小学及以下)
+    2. 中等教育(中学,含初中,高中,职高,中专,技校)
+    3. 高等教育(大专)
+    4. 高等教育(本科及以上)
+    """
+    type_dict['education'] = int  # 最低学历,学历代码见注释
+    type_dict['job_duty'] = str  # 岗位职责
+    type_dict['desc'] = str  # 补充说明
+    type_dict['update_date'] = datetime.datetime
+    type_dict['create_date'] = datetime.datetime
+
+    def __init__(self, **kwargs):
+
+
+
+
 if __name__ == "__main__":
     pass

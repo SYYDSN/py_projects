@@ -2362,7 +2362,7 @@ class BaseDoc:
         page_count = math.ceil(record_count / page_size)  # 共计多少页?
         delta = int(ruler / 2)
         range_left = 1 if (page_index - delta) <= 1 else page_index - delta
-        range_right = page_count if (range_left + ruler) >= page_count else page_index + delta
+        range_right = page_count if (range_left + ruler - 1) >= page_count else range_left + ruler - 1
         pages = [x for x in range(range_left, int(range_right) + 1)]
         """开始查询页面"""
         res = list()

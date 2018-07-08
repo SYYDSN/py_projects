@@ -1,4 +1,5 @@
-font_color = #BABABA
+font_color = #9A9A9A
+label_color = #636363
 border_color = #dcdcdc
 default_blue = #3388FE
 light_grey = #f4f4f4
@@ -7,23 +8,47 @@ deep_grey = #5C5F63
 
 .page_middle
   height auto !important
+  label
+    color label_color
+    font-weight 400
   .nav_div
     font-size:1rem
     color font_color
-    padding 1em 0
+    padding 1em 0 2em 0
 
   .search_div
     font-size:1rem
     background-color light_grey
-    padding 1.5em
+    padding-left 2em
 
     .line_div
       padding 10px 0
       display flex
       flex-direction row
 
+      input
+        width 20%
+        height auto
+        color font_color
+        border 1px solid border_color
+        border-radius 4px
+
+      /*input的placeholder的颜色,要比input高一级才生效*/
+      ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+        color:    font_color;
+      }
+      :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color:    font_color;
+      }
+      ::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color:    font_color;
+      }
+      :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color:    font_color;
+      }
+
       .dropdown
-        width 40%
+        width 20%
 
         > button
           width 100%
@@ -44,8 +69,7 @@ deep_grey = #5C5F63
             color font_color !important
 
       label
-        font-weight 400
-        color font_color
+        width 13%
         display flex
         flex-direction row
         flex-wrap nowrap
@@ -56,44 +80,34 @@ deep_grey = #5C5F63
       .left_margin
         margin-left 1.5em
 
-      input
-        border 1px solid border_color
-        border-radius 6px
-        padding 0.8em 0.6em
+  .content
+    width 100%
+    padding-left 2em
+    .text
+      border 1px solid border_color
+      height 20em
+      white-space pre-line
+      word-break break-all
+      overflow-y auto
+      margin-bottom 2em
+    .last
+      height 10em
 
-    .row_01
-      label
-        width 10%
-      input
-        width 90%
-        /*input的placeholder的颜色*/
-      ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-        color:    font_color;
-      }
-      :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-        color:    font_color;
-      }
-      ::-moz-placeholder { /* Mozilla Firefox 19+ */
-        color:    font_color;
-      }
-      :-ms-input-placeholder { /* Internet Explorer 10-11 */
-        color:    font_color;
-      }
-    .row_02
-      label
-        width 10%
-    .row_03
-      label
-        width 10%
-      .small_select
-        width 15%
-    .my_center
-      margin-top 1em 0
-      display: flex
-      justify-content center
-      #submit_search
-        font-size: 1.2rem
-      #reset_condition
-        font-size 1rem
-        border none
-        background none
+  .welfare
+    display flex
+    flex-direction row
+    justify-content flex-start
+    .child
+      width calc(100% / 8)
+
+  .submit_div
+    width 100%
+    padding 3em 2em 3em 2em
+    #submit
+      background-color #009EF9
+      color white
+      padding-top 1em
+      border 1px solid #009EF9
+      padding-bottom 1em
+      width 100%
+

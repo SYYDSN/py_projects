@@ -1,47 +1,74 @@
 .page_middle {
   height: auto !important;
 }
+.page_middle label {
+  color: #636363;
+  font-weight: 400;
+}
 .page_middle .nav_div {
   font-size: 1rem;
-  color: #bababa;
-  padding: 1em 0;
+  color: #9a9a9a;
+  padding: 1em 0 2em 0;
 }
 .page_middle .search_div {
   font-size: 1rem;
   background-color: #f4f4f4;
-  padding: 1.5em;
+  padding-left: 2em;
 }
 .page_middle .search_div .line_div {
   padding: 10px 0;
   display: flex;
   flex-direction: row;
+/*input的placeholder的颜色,要比input高一级才生效*/
+}
+.page_middle .search_div .line_div input {
+  width: 20%;
+  height: auto;
+  color: #9a9a9a;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+}
+.page_middle .search_div .line_div ::-webkit-input-placeholder {
+/* WebKit, Blink, Edge */
+  color: #9a9a9a;
+}
+.page_middle .search_div .line_div :-moz-placeholder {
+/* Mozilla Firefox 4 to 18 */
+  color: #9a9a9a;
+}
+.page_middle .search_div .line_div ::-moz-placeholder {
+/* Mozilla Firefox 19+ */
+  color: #9a9a9a;
+}
+.page_middle .search_div .line_div :-ms-input-placeholder {
+/* Internet Explorer 10-11 */
+  color: #9a9a9a;
 }
 .page_middle .search_div .line_div .dropdown {
-  width: 40%;
+  width: 20%;
 }
 .page_middle .search_div .line_div .dropdown > button {
   width: 100%;
   padding: 10px;
-  color: #bababa !important;
+  color: #9a9a9a !important;
   text-align: left !important;
 }
 .page_middle .search_div .line_div .dropdown > button > i {
   float: right;
-  color: #bababa !important;
+  color: #9a9a9a !important;
   margin-top: 2px;
 }
 .page_middle .search_div .line_div .dropdown > ul {
   width: 100%;
   padding: 10px;
-  color: #bababa !important;
+  color: #9a9a9a !important;
   text-align: left !important;
 }
 .page_middle .search_div .line_div .dropdown > ul > li > a {
-  color: #bababa !important;
+  color: #9a9a9a !important;
 }
 .page_middle .search_div .line_div label {
-  font-weight: 400;
-  color: #bababa;
+  width: 13%;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -52,53 +79,38 @@
 .page_middle .search_div .line_div .left_margin {
   margin-left: 1.5em;
 }
-.page_middle .search_div .line_div input {
+.page_middle .content {
+  width: 100%;
+  padding-left: 2em;
+}
+.page_middle .content .text {
   border: 1px solid #dcdcdc;
-  border-radius: 6px;
-  padding: 0.8em 0.6em;
+  height: 20em;
+  white-space: pre-line;
+  word-break: break-all;
+  overflow-y: auto;
+  margin-bottom: 2em;
 }
-.page_middle .search_div .row_01 label {
-  width: 10%;
+.page_middle .content .last {
+  height: 10em;
 }
-.page_middle .search_div .row_01 input {
-  width: 90%;
-/*input的placeholder的颜色*/
-}
-.page_middle .search_div .row_01 ::-webkit-input-placeholder {
-/* WebKit, Blink, Edge */
-  color: #bababa;
-}
-.page_middle .search_div .row_01 :-moz-placeholder {
-/* Mozilla Firefox 4 to 18 */
-  color: #bababa;
-}
-.page_middle .search_div .row_01 ::-moz-placeholder {
-/* Mozilla Firefox 19+ */
-  color: #bababa;
-}
-.page_middle .search_div .row_01 :-ms-input-placeholder {
-/* Internet Explorer 10-11 */
-  color: #bababa;
-}
-.page_middle .search_div .row_02 label {
-  width: 10%;
-}
-.page_middle .search_div .row_03 label {
-  width: 10%;
-}
-.page_middle .search_div .row_03 .small_select {
-  width: 15%;
-}
-.page_middle .search_div .my_center {
-  margin-top: 1em 0;
+.page_middle .welfare {
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: flex-start;
 }
-.page_middle .search_div .my_center #submit_search {
-  font-size: 1.2rem;
+.page_middle .welfare .child {
+  width: calc(100% / 8);
 }
-.page_middle .search_div .my_center #reset_condition {
-  font-size: 1rem;
-  border: none;
-  background: none;
+.page_middle .submit_div {
+  width: 100%;
+  padding: 3em 2em 3em 2em;
+}
+.page_middle .submit_div #submit {
+  background-color: #009ef9;
+  color: #fff;
+  padding-top: 1em;
+  border: 1px solid #009ef9;
+  padding-bottom: 1em;
+  width: 100%;
 }
