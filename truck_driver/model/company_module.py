@@ -252,12 +252,15 @@ class Consign(mongo_db.BaseDoc):
     _table_name = "consign"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['finish'] = int  # 完成状态,默认0,未完成,1为完成
     type_dict['company_id'] = DBRef
     type_dict['count'] = int   # 招聘人数
-    type_dict['gender'] = str   # 男/女
-    type_dict['married'] = int  # 婚否? 0/1/-1 未婚/已婚/离异  None 空白
+    type_dict['gender'] = str   # 男/女 None表示不限
+    type_dict['married'] = int  # 婚否? 0/1/-1 未婚/已婚/离异  None表示不限
     type_dict['birth_place'] = str  # 籍贯/出生地
+    type_dict['work_place'] = str  # 工作地, None表示未知/不限
     type_dict['age_range'] = list  # 年龄区间，必然是二元数组
+    type_dict['entry_date'] = datetime.datetime  # 入职日期
     type_dict['driving_experience'] = int  # 驾龄
     type_dict['industry_experience'] = int  # 从业年限
     type_dict['work_experience'] = int  # 工作年限
@@ -278,15 +281,40 @@ class Consign(mongo_db.BaseDoc):
     4. 高等教育(本科及以上)
     """
     type_dict['education'] = int  # 最低学历,学历代码见注释
+    type_dict['welfare'] = list # 福利待遇,字符串组成的数组
     type_dict['job_duty'] = str  # 岗位职责
     type_dict['desc'] = str  # 补充说明
     type_dict['update_date'] = datetime.datetime
     type_dict['create_date'] = datetime.datetime
 
     def __init__(self, **kwargs):
+        if "company_id" not in kwargs:
+            ms = "company_id不能为空"
+            raise ValueError(ms)
+        if "company_id" not in kwargs:
+            ms = "company_id不能为空"
+            raise ValueError(ms)
+        super(Consign, self).__init__(**kwargs)
 
+    @classmethod
+    def instance(cls, **kwargs):
+        """创建对象的时候使用的方法,添加了默认值"""
+        dl_license_class = kwargs['dl_license_class']
+        if isinstance(dl_license_class, str):
+            kwargs['dl_license_class'] = dl_license_class.upper()
+        now = datetime.datetime.now()
+        if "create_date" not in kwargs:
+            kwargs['create_date'] = now
+        if "update_date" not in kwargs:
+            kwargs['update_date'] = now
+        if "finish" not in kwargs:
+            kwargs['finish'] = 0
+        if "finish" not in kwargs:
+            kwargs['finish'] = 0
+        return cls(**kwargs)
 
 
 
 if __name__ == "__main__":
+    a = Consign.instance(name="jack")
     pass

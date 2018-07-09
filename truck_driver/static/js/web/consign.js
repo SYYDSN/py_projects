@@ -27,5 +27,83 @@ $(function(){
         });
     })();
 
+    // bootstrap下拉选择菜单选择事件.
+    $(".dropdown").each(function(){
+        let down = $(this);
+        let i = down.find(".fa");
+        let show_area = down.find(".show_area");  // 下拉菜单选中的值的显示区域
+        let options = down.find("ul > li > a");
+        options.each(function(){
+            let $this = $(this);
+            $this.click(function(){
+                if($this.hasClass("reset")){
+                    // 清空选择
+                    let text = $this.attr("data-text");
+                    show_area.text(text).append(i).attr("data-val", $this.attr("data-val"));
+                }
+                else{
+                    let text = $this.text();
+                     show_area.html(text).append(i).attr("data-val", $this.attr("data-val"));
+                }
+            });
+        });
+    });
+
+    // 提交委托事件
+    let submit_consign = function(){
+        let args = {};
+        /*先搜集基本要求*/
+        let industry_experience = parseInt($("#i_exp").attr("data-val"));             // 从业年限
+        let dl_license_class = $("#dl_class").attr("data-val");                       // 驾照最低等级要求
+        let work_place = $("#work_place").attr("data-val");                           // 工作地
+        let work_exp = parseInt($("#work_exp").attr("data-val"));                     // 工作经验
+        let education = parseInt($("#education").attr("data-val"));                   // 最低学历
+        let salary_range = $("#salary").attr("data-val");                             // 待遇范围
+        let count = parseInt($.trim($("#count").val()));                              // 招聘人数
+        let entry_date = $.trim($("#entry_date").val());                              // 入职日期
+        let driving_exp = parseInt($.trim($("#driving_exp").attr("data-val")));       // 驾龄
+        if(!isNaN(industry_experience)){
+            args['industry_experience'] = industry_experience;
+        }
+        if(dl_license_class !== ""){
+            args['dl_license_class'] = dl_license_class;
+        }
+        if(work_place !== ""){
+            args['work_place'] = work_place;
+        }
+        if(!isNaN(work_exp)){
+            args['work_exp'] = work_exp;
+        }
+        if(!isNaN(education)){
+            args['education'] = education;
+        }
+        if(salary_range !== ""){
+            args['salary_range'] = salary_range;
+        }
+        if(!isNaN(count)){
+            args['count'] = count;
+        }
+        let pattern = /^20[1-9][1-9]-[0-1]?[0-9]-[0-3]?[0-9]$/;
+        if(pattern.test(entry_date)){
+            args['entry_date'] = entry_date;
+        }
+        if(!isNaN(driving_exp)){
+            args['driving_exp'] = driving_exp;
+        }
+        /*取福利待遇*/
+        let children = $(".welfare input[type='checkbox']:checked");
+        let welfare = [];
+        for(let child of children){
+            let child = $(child);
+            welfare.push(child.next().text());
+        }
+        welfare = welfare.join(",");
+        args['welfare'] = welfare;
+        /*取岗位职责*/
+        let job_duty = $("#job_duty").val();
+        console.log(job_duty);
+
+    };
+
 // end!
 });

@@ -96,16 +96,6 @@ def clear_platform_session():
     return False
 
 
-def clear_platform_cors_session(sid: str) -> bool:
-    """
-    清除平台操作者跨域会话信息，注销使用。
-    :param sid: 用户会话id
-    :return: True / False
-    """
-    key = "session_key_{}".format(sid)
-    return bool(cache.delete(key=key))
-
-
 def check_platform_session(f):
     """检测管操作员是否登录的装饰器,本域和跨域用户共用"""
     @functools.wraps(f)

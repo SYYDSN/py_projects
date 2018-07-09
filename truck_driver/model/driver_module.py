@@ -25,9 +25,54 @@ class Region(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = int
     type_dict['name'] = str  # 名称
-    type_dict['code'] = int  # 六位数字
-    type_dict['region_path'] = str  # 六位数字,左右都有逗号
+    type_dict['code'] = int  # 六位数字,实际上用途不明.
+    type_dict['region_path'] = str  # 字符串,表明层级关系,不重要
     type_dict['parent_id'] = int  # 上级行政区域_id 如果是顶层的,这个值是0
+
+    @classmethod
+    def get_province(cls, can_json: bool = False) -> list:
+        """
+        获取全国的省和直辖市
+        : param can_json:
+        :return:
+        """
+        f = {"parent_id": 0}
+        res = cls.find_plus(filter_dict=f, to_dict=True ,can_json=can_json)
+        return res
+
+    @classmethod
+    def get_city(cls, province_code: int = None, province_name: str = None, can_json: bool = False) -> list:
+        """
+        根据省的code/名称获取其下一级的行政单位(市)
+        :param province_code: 省code
+        :param province_name: 省全名(比如湖南省)
+        :param can_json:
+        :return:
+        """
+        if isinstance(province_code, str) and province_code.isdigit():
+            province_code = int(province_code)
+        else:
+            pass
+        if not isinstance(province_code, int):
+            if isinstance(province_name, str):
+                f = {"name": province_name}
+                res = cls.find_one_plus(filter_dict=f, instance=False, can_json=False)
+                if res is None:
+                    ms = "province_name值不合法"
+                    raise ValueError(ms)
+                else:
+                    province_code = res['code']
+            else:
+                ms = "province_code和province_name参数名不合法"
+                raise ValueError(ms)
+        else:
+            """开始查找城市列表"""
+            if province_code in [1, 864, 22, 2476]:
+                province_code += 1
+            f = {"parent_id": province_code}
+            res = cls.find_plus(filter_dict=f, to_dict=True, can_json=can_json)
+            return res
+
 
     @classmethod
     def build_region_1(cls):
@@ -581,17 +626,10 @@ class DriverResume(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    import random
-    """添加用户头像"""
-    # with open("/home/walle/work/projects/truck_driver/static/image/web/default_rtqc_img.png", 'rb') as f:
-    #     r = HeadImage.save_cls(file_obj=f)
-    #     print(r)
-    """填充婚否"""
-    r = DriverResume.find_plus(filter_dict=dict(), to_dict=True)
-    for x in r:
-        f = {"_id": x['_id']}
-        u = {"$set": {"married": random.randint(-1, 1)}}
-        DriverResume.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+    """查询省和直辖市"""
+    print(Region.get_province())
+    a = Region.get_city(province_code=864)
+    print(a)
     pass
 
 

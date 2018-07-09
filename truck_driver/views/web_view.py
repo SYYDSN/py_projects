@@ -19,6 +19,7 @@ from model.driver_module import DriverResume
 from model.driver_module import WorkHistory
 from model.driver_module import Honor
 from model.driver_module import Education
+from model.driver_module import Region
 from flask import request
 import os
 import random
@@ -468,7 +469,9 @@ def consign_func() -> str:
         company = Company.find_by_id(company_id)
         url_path = request.path  # 当前web路径
         if isinstance(company, Company):
-            return render_template("web/consign.html", url_path=url_path)
+            """取省的列表"""
+            province_list = Region.get_province()
+            return render_template("web/consign.html", url_path=url_path, province_list=province_list)
         else:
             return redirect(url_for("web_blueprint.login_func"))
 
