@@ -14,6 +14,7 @@ from tools_module import *
 from bson.regex import Regex
 from model.company_module import Company
 from model.company_module import ResumeFavorite
+from model.company_module import Consign
 from model.identity_validate import GlobalSignature
 from model.driver_module import DriverResume
 from model.driver_module import WorkHistory
@@ -460,20 +461,118 @@ def favorite_func() -> str:
             return redirect(url_for("web_blueprint.login_func"))
 
 
-def consign_func() -> str:
+def add_consign_func() -> str:
     """公司客户填写委托招聘的页面"""
     company_id = get_platform_session_arg("user_id")
+    mes = {"message": "success"}
+    method = request.method.lower()
     if company_id is None:
-        return redirect(url_for("web_blueprint.login_func"))
+        if method == "get":
+            return redirect(url_for("web_blueprint.login_func"))
+        else:
+            mes['message'] = "authentication fail"
+            return json.dumps(mes)
     else:
         company = Company.find_by_id(company_id)
-        url_path = request.path  # 当前web路径
+        url_path = "/web/consign_list"  # 当前web路径,固定值,和我的委托共用url
         if isinstance(company, Company):
-            """取省的列表"""
-            province_list = Region.get_province()
-            return render_template("web/consign.html", url_path=url_path, province_list=province_list)
+            if method == "get":
+                """返回添加委托页面"""
+                province_list = Region.get_province()  # 取省的列表
+                """取sid,consign的id,如果这个id为空或者查找不到对应的对象,表示是新建委托"""
+                consign = request.args.get("s_id", None)
+                if isinstance(consign, str) and len(consign) == 24:
+                    consign = Consign.find_by_id(o_id=consign, can_json=True)
+                consign = dict() if consign is None else consign
+                return render_template("web/consign.html", url_path=url_path, province_list=province_list,
+                                       consign=consign)
+            else:
+                """添加/编辑委托的请求"""
+                args = get_args(request)
+                the_type = args.pop("type", None)
+                if the_type == "add":
+                    args.pop("_id", None)
+                    args['company_id'] = company.get_dbref()
+                    consign = Consign.instance(**args)
+                    """对参数进行处理"""
+                    driving_experience = args.pop("driving_exp", None)  # 驾龄
+                    if driving_experience is None:
+                        pass
+                    else:
+                        if isinstance(driving_experience, int):
+                            args['driving_experience'] = driving_experience
+                        elif isinstance(driving_experience, str) and driving_experience.isdigit():
+                            args['driving_experience'] = int(driving_experience)
+                        else:
+                            pass
+                    work_experience = args.pop("work_exp", None)  # 工作年限
+                    if work_experience is None:
+                        pass
+                    else:
+                        if isinstance(work_experience, int):
+                            args['work_experience'] = work_experience
+                        elif isinstance(work_experience, str) and work_experience.isdigit():
+                            args['work_experience'] = int(work_experience)
+                        else:
+                            pass
+                    """创建并保存对象"""
+                    object_id = None
+                    try:
+                        object_id = consign.save_plus()
+                    except Exception as e:
+                        print(e)
+                        logger.exception(e)
+                    finally:
+                        if isinstance(object_id, ObjectId):
+                            pass
+                        else:
+                            mes['message'] = "保存失败"
+                elif the_type == "update":
+                    """编辑委托"""
+                    pass
+                else:
+                    mes['message'] = "不支持的操作"
+                return json.dumps(mes)
+        else:
+            if method == "get":
+                return redirect(url_for("web_blueprint.login_func"))
+            else:
+                mes['message'] = "authentication fail"
+                return json.dumps(mes)
+
+
+def consign_list_func() -> str:
+    """公司客户委托列表的页面"""
+    company_id = get_platform_session_arg("user_id")
+    method = request.method.lower()
+    if method == "get" and isinstance(company_id, ObjectId):
+        company = Company.find_by_id(company_id)
+        url_path = "/web/consign_list"  # 当前web路径,固定值,和我的委托共用url
+        if isinstance(company, Company):
+            """页码"""
+            page_index = 1
+            index = request.args.get("index", "1")  # 第几页
+            try:
+                page_index = int(index)
+            except Exception as e:
+                print(e)
+            finally:
+                pass
+            f = {"company_id": company.get_dbref()}
+            s = {"update_date": -1}
+            page_size = 3
+            res = Consign.query_by_page(filter_dict=f, sort_dict=s, page_index=page_index, page_size=3)
+            consign_list = res['data']
+            current_page = res['current_page']
+            pages = res['pages']
+            total_page = res['total_page']
+            total_record = res['total_record']
+            return render_template("web/consign_list.html", url_path=url_path, consign_list=consign_list, pages=pages,
+                                   current_page=current_page, total_page=total_page, total_record=total_record)
         else:
             return redirect(url_for("web_blueprint.login_func"))
+    else:
+        return abort(405)
 
 
 def file_func(action, table_name):
@@ -550,4 +649,6 @@ web_blueprint.add_url_rule(rule="/random/resume", view_func=random_resume, metho
 """公司客户收藏夹页面"""
 web_blueprint.add_url_rule(rule="/favorite", view_func=favorite_func, methods=['post', 'get'])
 """公司客户填写委托招聘的页面"""
-web_blueprint.add_url_rule(rule="/consign", view_func=consign_func, methods=['post', 'get'])
+web_blueprint.add_url_rule(rule="/add_consign", view_func=add_consign_func, methods=['post', 'get'])
+"""公司客户委托招聘列表页面"""
+web_blueprint.add_url_rule(rule="/consign_list", view_func=consign_list_func, methods=['get'])

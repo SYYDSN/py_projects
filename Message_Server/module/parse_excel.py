@@ -292,23 +292,38 @@ def do_it(file_b: str = None, file_t: str = None, title: str = None, email: str 
     :param email: 邮件地址.
     :return:
     """
-    b_name = file_b if file_b else "5月出入金报表.xlsx"
-    t_name = file_t if file_t else "5月交易报表.xlsx"
+    """请事先检查列名顺序是否和上月的一致?"""
+    b_name = file_b if file_b else "6.1-6.30新老平台出入金数据 .xlsx"  # 每次修改,必须是xlsx,而不能是就办的xls文件
+    t_name = file_t if file_t else "6.1-6.30新老平台交易明细.xlsx"     # 每次修改,必须是xlsx,而不能是就办的xls文件
     if title is None:
-        title = "{}月份出入金和交易记录(客户已关系匹配)".format(datetime.datetime.now().year)
+        title = "{}月份出入金和交易记录(客户已关系匹配)".format(datetime.datetime.now().month - 1)
     email = email if email else "627853018@qq.com"
     file_path_balance = os.path.join(os.path.dirname(os.path.realpath(__file__)), "excel", b_name)
     file_path_transaction = os.path.join(os.path.dirname(os.path.realpath(__file__)), "excel", t_name)
     balance = read_excel(file_path_balance)
     transaction = read_excel(file_path_transaction)
     for x in balance:
+        print(x)
         for i, r in enumerate(x['data']):
             if i == 0:
+                """先找出mt4账户和客户姓名的列的索引"""
+                index_cus_name = 0  # 假定客户名索引是0
+                index_mt4_account = None  # 假定客户名索引是1
+                for j, col_name in enumerate(r):
+                    if "姓名" in col_name:
+                        index_cus_name = j
+                    if "账户" in col_name:
+                        index_mt4_account = j
                 r.extend(["销售", "经理", "总监"])
             else:
-                relation = query_relation(customer_name=r[0])
+                if index_mt4_account is None:
+                    """query_relation是优先以mt4_account为条件查询的,要避免误导函数"""
+                    relation = query_relation( customer_name=r[index_cus_name])
+                else:
+                    relation = query_relation(mt4_account=r[index_mt4_account], customer_name=r[index_cus_name])
                 r.extend([relation['sales_name'], relation['manager_name'], relation['director_name']])
     for x in transaction:
+        print(x)
         mi = 0  # mt4账户索引
         for i, r in enumerate(x['data']):
             if i == 0:
@@ -358,18 +373,19 @@ def do_it(file_b: str = None, file_t: str = None, title: str = None, email: str 
     content = """
     excel文件注意事项:
     1. 请统一使用xlsx格式保存表格.
-    2. 表格文件中,不同sheet中的列的顺序请保持一直.
+    2. 表格文件中,不同sheet中的列的顺序请保持一致.
     3. 返回的excel文件由于是自动生成,所以没有样式信息,请自行调整调试样式(比如列宽度,数值的小数点问题等)
-    
+    4. 出入金的列名顺序 :  姓名   mt4 账户 金额   时间
+    5. 交易的列名顺序:    订单号	MT账号	用户ID	用户姓名	开仓时间	平仓时间	交易类型	交易品种	SL	TP	成交量	开仓价位	平仓价位	外佣	隔夜利息	盈亏
     没有对应关系的客户名称:
     {}
     没有对应关系的MT4账户:
     {}
     """.format(" ".join(loss['customer_name']), " ".join(loss['mt4_account']))
     files = [{"path": b_path}, {"path": t_path}]
+    """发送邮件"""
     send_mail(to_email=email, title=title, content=content, files=files)
     send_mail(to_email="583736361@qq.com", title=title, content=content, files=files)
-
 
 
 if __name__ == "__main__":

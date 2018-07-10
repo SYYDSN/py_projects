@@ -512,7 +512,7 @@ def generator_password(raw: str)->str:
 
 def merge_dict(dict1: dict, dict2: dict) -> dict:
     """
-    把两个字典合并成一个字典。目的是保留尽可能多的信息
+    把两个字典合并成一个字典。和update方法不同,键相同的值不进行替换而是进行合并, 目的是保留尽可能多的信息
     一些合并时候的规则如下
     1. 有数据>''>None
     2. 数据长度大保留
@@ -2362,9 +2362,9 @@ class BaseDoc:
         """开始计算分页数据"""
         record_count = ses.count(filter=filter_dict)
         page_count = math.ceil(record_count / page_size)  # 共计多少页?
-        delta = math.ceil(ruler / 2)
+        delta = int(ruler / 2)
         range_left = 1 if (page_index - delta) <= 1 else page_index - delta
-        range_right = page_count if (range_left + ruler) >= page_count else page_index + delta
+        range_right = page_count if (range_left + ruler - 1) >= page_count else range_left + ruler - 1
         pages = [x for x in range(range_left, int(range_right) + 1)]
         """开始查询页面"""
         res = list()
@@ -2499,6 +2499,31 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
                            decimal_length))) if value_type == float else int(
         middle_value + step * (-5 if i < -5 else (5 if i > 5 else i))) for i in raw_range]
     return res
+
+
+class TransactionItem:
+    """
+    事务操作中的一个步骤. 未完成
+    """
+    def __init__(self, **kwargs):
+        handlers = ['insert', 'create', 'update', 'edit', 'delete', 'remove']
+        handler = kwargs.pop('handler')
+        if handler is not None and handler in handlers:
+            if handler in ['insert', 'create']:
+                self.handler = 'insert'
+            elif handler in ['update', 'edit']:
+                self.handler = 'update'
+            else:
+                self.handler = 'delete'
+        else:
+            ms = "错误的操作类型:{}".format(handler)
+
+
+class BaseTransaction:
+    """事务. 未完成"""
+    _table_name = "base_transaction_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
 
 
 if __name__ == "__main__":

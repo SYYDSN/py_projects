@@ -510,7 +510,7 @@ def generator_password(raw: str)->str:
 
 def merge_dict(dict1: dict, dict2: dict) -> dict:
     """
-    把两个字典合并成一个字典。目的是保留尽可能多的信息
+    把两个字典合并成一个字典。和update方法不同,键相同的值不进行替换而是进行合并, 目的是保留尽可能多的信息
     一些合并时候的规则如下
     1. 有数据>''>None
     2. 数据长度大保留
@@ -1245,7 +1245,8 @@ class BaseDoc:
                                 self.__dict__[k] = temp
                             except Exception as e:
                                 print(e)
-                                raise TypeError("{} 不是一个DBRef的实例".format(v))
+                                ms = "{} 不是一个DBRef的实例".format(v)
+                                raise TypeError(ms)
                         elif type_name.__name__ == "ObjectId" and v is None:
                             pass
                         elif type_name.__name__ == "GeoJSON" and isinstance(v, dict):

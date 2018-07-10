@@ -1,0 +1,99 @@
+{%  extends "web/template.html" %}
+
+{% block extend_css %}
+<link rel="stylesheet" href="/static/css/web/consign_list.css">
+{% endblock %}
+
+{% block content %}
+    <!--顶部的子导航-->
+    <div class="nav_top">
+        <ul class="nav nav-tabs" >
+            <li>
+                <a href="javascript:;" data-url="/web/add_consign">新建委托</a>
+            </li>
+            <li class="active">
+                <a href="javascript:;"  data-url="/web/consign_list">委托记录</a>
+            </li>
+            <li>
+                <a href="javascript:;" data-url="/web/view_consign">委托反馈</a>
+            </li>
+          </ul>
+    </div>
+
+    <!--委托列表显示区-->
+    <div class="list">
+    {% for consign in consign_list %}
+        <div class="consign">
+
+            <div class="consign_title">
+                <label>{{
+                        consign.create_date.year | string + "年" +
+                        consign.create_date.month | string + "月" +
+                        consign.create_date.day | string + "日 " +
+                        consign.create_date.hour | string + "时" +
+                        consign.create_date.minute | string + "分"
+                        if consign.create_date else ""
+                        }}
+                </label>
+            </div>
+
+            <div class="field">
+                <div class="key">
+                    基本要求
+                </div>
+                <div class="value">
+
+                    <div class="child_item">
+                        <span class="name">工作地区</span><span>{{ consign.work_place }}</span>
+                    </div>
+                    <div class="child_item">
+                        <span class="name">入职日期</span>
+                        <span>
+                            {{
+                            consign.entry_date.year | string + "年" +
+                            consign.entry_date.month | string + "月" +
+                            consign.entry_date.day | string + "日 "
+                            if consign.entry_date else ""
+                            }}
+                        </span>
+                    </div>
+                    <div class="child_item">
+                        <span class="name">驾照类型</span><span>{{ consign.dl_license_class }}</span>
+                    </div>
+                    <div class="child_item">
+                        <span class="name">学历要求</span>
+                        <span>{{ ["", "小学", "中学", "大专", "本科及以上"][consign.education] }}</span>
+                    </div>
+                    <div class="child_item">
+                        <span class="name">工作经验</span>
+                        <span>
+                            {{
+                                consign.work_experience | string + "年以上" if consign.work_experience else ""
+                            }}
+                        </span>
+                    </div>
+                    <div class="child_item">
+                        <span class="name">招聘人数</span><span>{{ consign.count }}</span>
+                    </div>
+                    <div class="child_item">
+                        <span class="name">驾龄</span>
+                        <span>
+                            {{ consign.driving_experience }}
+                            {{ consign.driving_experience | string + "年以上" if consign.driving_experience else "" }}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    {% endfor %}
+    </div>
+
+
+
+{% endblock %}
+
+{% block extend_js %}
+    <script src="/static/js/web/consign_list.js"></script>
+{% endblock %}

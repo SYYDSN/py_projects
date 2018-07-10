@@ -1,6 +1,19 @@
 .page_middle {
   height: auto !important;
 }
+.page_middle .nav_top {
+  margin: 0.8em 0;
+}
+.page_middle .nav_top .nav-tabs {
+  padding-left: 1em;
+}
+.page_middle .nav_top .nav-tabs li a {
+  color: #636363;
+  padding: 5px 15px;
+}
+.page_middle .nav_top .nav-tabs .active a {
+  color: #3388fe;
+}
 .page_middle label {
   color: #636363;
   font-weight: 400;
@@ -87,6 +100,7 @@
 .page_middle .content .text {
   border: 1px solid #dcdcdc;
   height: 20em;
+  width: 100%;
   white-space: pre-line;
   word-break: break-all;
   overflow-y: auto;

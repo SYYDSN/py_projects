@@ -1,4 +1,27 @@
 $(function(){
+    // 顶部 nav-tabs的点击事件
+    $(".nav_top .nav > li > a").each(function(){
+        let $this = $(this);
+        $this.click(function(){
+            location.href = $this.attr("data-url");
+        });
+    });
+
+    // 顶部 nav-tabs的页面ready事件
+    (function(){
+        let cur_path = location.pathname;
+        let lis = $(".nav_top .nav > li");
+        for(let li of lis){
+            let $li = $(li);
+            if($li.find("a").attr("data-url") === cur_path){
+                $li.addClass("active");
+            }
+            else{
+                 $li.removeClass("active");
+            }
+        }
+    })();
+
     // 日期选择器初始化函数
     (function () {
         /* 初始化日期函数,
@@ -94,16 +117,47 @@ $(function(){
         let children = $(".welfare input[type='checkbox']:checked");
         let welfare = [];
         for(let child of children){
-            let child = $(child);
-            welfare.push(child.next().text());
+            let $child = $(child);
+            welfare.push($child.next().text());
         }
         welfare = welfare.join(",");
         args['welfare'] = welfare;
         /*取岗位职责*/
-        let job_duty = $("#job_duty").val();
+        let job_duty = $.trim($("#job_duty").val());
+        args['job_duty'] = job_duty;
         console.log(job_duty);
-
+        /*备注*/
+        let desc = $("#desc").val();
+        args['desc'] = desc;
+        console.log(desc);
+        if(args['job_duty'] !== ""){
+            // 先检查是新建委托还是编辑委托?
+            let consign_id = $("#consign_id").text();
+            let type = "add";
+            if(typeof(consign_id) === "string" && consign_id.length === 24){
+                args['_id'] = consign_id;
+                type = "update";
+            }
+            args['type'] = type;
+            $.post("/web/add_consign", args, function(resp){
+                let json = JSON.parse(resp);
+                let status = json['message'];
+                if(status === "success"){
+                    alert("委托成功");
+                    location.href = "/web/consign_list";
+                }
+                else{
+                    alert(status);
+                    return false;
+                }
+            });
+        }
     };
+
+    // 立即委托按钮事件
+    $("#submit").click(function(){
+        submit_consign();
+    });
 
 // end!
 });

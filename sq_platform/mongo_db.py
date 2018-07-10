@@ -506,7 +506,7 @@ def generator_password(raw: str)->str:
 
 def merge_dict(dict1: dict, dict2: dict) -> dict:
     """
-    把两个字典合并成一个字典。目的是保留尽可能多的信息
+    把两个字典合并成一个字典。和update方法不同,键相同的值不进行替换而是进行合并, 目的是保留尽可能多的信息
     一些合并时候的规则如下
     1. 有数据>''>None
     2. 数据长度大保留
@@ -2357,9 +2357,9 @@ class BaseDoc:
         """开始计算分页数据"""
         record_count = ses.count(filter=filter_dict)
         page_count = math.ceil(record_count / page_size)  # 共计多少页?
-        delta = math.ceil(ruler / 2)
+        delta = int(ruler / 2)
         range_left = 1 if (page_index - delta) <= 1 else page_index - delta
-        range_right = page_count if (range_left + ruler) >= page_count else page_index + delta
+        range_right = page_count if (range_left + ruler - 1) >= page_count else range_left + ruler - 1
         pages = [x for x in range(range_left, int(range_right) + 1)]
         """开始查询页面"""
         res = list()

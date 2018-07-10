@@ -6,6 +6,22 @@
 {% endblock %}
 
 {% block content %}
+    <span style="display: none" id="consign_id">{{ consign._id }}</span>
+    <!--顶部的子导航-->
+    <div class="nav_top">
+        <ul class="nav nav-tabs" >
+            <li role="presentation">
+                <a href="javascript:;" data-url="/web/add_consign">新建委托</a>
+            </li>
+            <li class="active">
+                <a href="javascript:;"  data-url="/web/consign_list">委托记录</a>
+            </li>
+            <li role="presentation">
+                <a href="javascript:;" data-url="/web/view_consign">委托反馈</a>
+            </li>
+          </ul>
+    </div>
+
     <div class="nav_div">
     基本要求
     </div>
@@ -38,6 +54,7 @@
                 <li><a data-val="2" href="javascript:;">2年以上</a></li>
                 <li><a data-val="3" href="javascript:;">3年以上</a></li>
                 <li><a data-val="5" href="javascript:;">5年以上</a></li>
+                <li><a data-val="8" href="javascript:;">8年以上</a></li>
                 <li><a data-val="10" href="javascript:;">10年以上</a></li>
               </ul>
             </div>
@@ -107,7 +124,9 @@
                 <li role="separator" class="divider"></li>
                 <li><a data-val="1" href="javascript:;">1年以上</a></li>
                 <li><a data-val="2" href="javascript:;">2年以上</a></li>
+                <li><a data-val="3" href="javascript:;">3年以上</a></li>
                 <li><a data-val="5" href="javascript:;">5年以上</a></li>
+                <li><a data-val="8" href="javascript:;">8年以上</a></li>
                 <li><a data-val="10" href="javascript:;">10年以上</a></li>
               </ul>
             </div>
@@ -242,14 +261,14 @@
         <div class="title">
             <label for="job_duty">岗位职责</label>
         </div>
-        <div class="text" contenteditable="true" id="job_duty"></div>
+        <textarea class="text" id="job_duty"></textarea>
     </div>
 
     <div class="nav_div">
     信息备注
     </div>
     <div class="content">
-        <div class="text last" contenteditable="true" id="desc"></div>
+        <textarea class="text last" id="desc"></textarea>
     </div>
 
     <div class="submit_div">

@@ -281,7 +281,7 @@ class Consign(mongo_db.BaseDoc):
     4. 高等教育(本科及以上)
     """
     type_dict['education'] = int  # 最低学历,学历代码见注释
-    type_dict['welfare'] = list # 福利待遇,字符串组成的数组
+    type_dict['welfare'] = list  # 福利待遇,字符串组成的数组
     type_dict['job_duty'] = str  # 岗位职责
     type_dict['desc'] = str  # 补充说明
     type_dict['update_date'] = datetime.datetime
@@ -291,8 +291,8 @@ class Consign(mongo_db.BaseDoc):
         if "company_id" not in kwargs:
             ms = "company_id不能为空"
             raise ValueError(ms)
-        if "company_id" not in kwargs:
-            ms = "company_id不能为空"
+        if "entry_date" not in kwargs:
+            ms = "entry_date不能为空"
             raise ValueError(ms)
         super(Consign, self).__init__(**kwargs)
 
@@ -311,8 +311,8 @@ class Consign(mongo_db.BaseDoc):
             kwargs['finish'] = 0
         if "finish" not in kwargs:
             kwargs['finish'] = 0
-        return cls(**kwargs)
-
+        instance = cls(**kwargs)
+        return instance
 
 
 if __name__ == "__main__":
