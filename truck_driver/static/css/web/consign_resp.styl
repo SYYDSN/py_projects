@@ -1,0 +1,44 @@
+font_color = #9A9A9A
+label_color = #636363
+border_color = #dcdcdc
+default_blue = #3388FE
+light_grey = #f4f4f4
+deep_grey = #5C5F63
+
+
+.page_middle
+  height auto !important
+  .nav_top
+    padding 0.8em 0
+    .nav-tabs
+      li
+        a
+          color label_color
+          padding 5px 15px
+      .active
+        a
+          color default_blue
+
+  .list
+    color font_color
+
+  .page_area
+    display flex
+    flex-direction row
+    flex-wrap nowrap
+    justify-content center
+    padding 1.2em 0
+    > a
+      color font_color
+      font-size 1rem
+      border 1px solid border_color
+      padding 0 5px
+      margin 0 6px
+      border-radius 4px
+      text-decoration none
+    .active
+      color #47a9fe
+    > span
+      color font_color
+      font-size 1rem
+      margin-left 1em

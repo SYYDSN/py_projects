@@ -5,6 +5,7 @@ __project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
 from mongo_db import *
+import datetime
 
 
 """
@@ -33,3 +34,27 @@ class PlatformEvent(BaseDoc):
     type_dict['status'] = str
     type_dict['time'] = datetime.datetime    # 事件时间
     type_dict['create_time'] = datetime.datetime    # 创建
+
+    @classmethod
+    def instance(cls, **kwargs):
+        if "create_time" not in kwargs:
+            kwargs['create_time'] = datetime.datetime.now()
+        instance = cls(**kwargs)
+        return instance
+
+
+if __name__ == "__main__":
+    begin = get_datetime_from_str("2018-7-10 0:0:0")
+    end = get_datetime_from_str("2018-7-11 0:0:0")
+    f = dict()
+    f["time"] = {"$lt": end, "$gte": begin}
+    f['title'] = {"$in": ['入金成功', '提交入金']}
+    f['title'] = {"$in": ['待审核客户']}
+    rs = PlatformEvent.find_plus(filter_dict=f, to_dict=True)
+    money = 0
+    for x in rs:
+        print(x)
+        # print(x['title'], x['time'], x['user_parent_name'], x['money'])
+        # money += x['money']
+    print("{}笔入金,共计:{}".format(len(rs), money))
+    pass

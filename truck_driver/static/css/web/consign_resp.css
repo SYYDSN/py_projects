@@ -1,0 +1,40 @@
+.page_middle {
+  height: auto !important;
+}
+.page_middle .nav_top {
+  padding: 0.8em 0;
+}
+.page_middle .nav_top .nav-tabs li a {
+  color: #636363;
+  padding: 5px 15px;
+}
+.page_middle .nav_top .nav-tabs .active a {
+  color: #3388fe;
+}
+.page_middle .list {
+  color: #9a9a9a;
+}
+.page_middle .page_area {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  padding: 1.2em 0;
+}
+.page_middle .page_area > a {
+  color: #9a9a9a;
+  font-size: 1rem;
+  border: 1px solid #dcdcdc;
+  padding: 0 5px;
+  margin: 0 6px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+.page_middle .page_area .active {
+  color: #47a9fe;
+}
+.page_middle .page_area > span {
+  color: #9a9a9a;
+  font-size: 1rem;
+  margin-left: 1em;
+}

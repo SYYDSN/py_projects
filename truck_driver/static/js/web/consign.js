@@ -152,6 +152,10 @@ $(function(){
                 }
             });
         }
+        else{
+            alert("岗位职责不能为空");
+            return false;
+        }
     };
 
     // 立即委托按钮事件

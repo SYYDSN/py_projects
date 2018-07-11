@@ -15,6 +15,7 @@ from bson.regex import Regex
 from model.company_module import Company
 from model.company_module import ResumeFavorite
 from model.company_module import Consign
+from model.company_module import Resp
 from model.identity_validate import GlobalSignature
 from model.driver_module import DriverResume
 from model.driver_module import WorkHistory
@@ -143,7 +144,7 @@ def resume_favorite_func(key):
 
 def driver_page_func():
     """
-    分页显示页面信息
+    分页显示司机简历页面信息
     :return:
     """
     company_id = get_platform_session_arg("user_id")
@@ -490,11 +491,23 @@ def add_consign_func() -> str:
                 """添加/编辑委托的请求"""
                 args = get_args(request)
                 the_type = args.pop("type", None)
+                now = datetime.datetime.now()
                 if the_type == "add":
                     args.pop("_id", None)
+                    args['create_date'] = now
+                    args['update_date'] = now
                     args['company_id'] = company.get_dbref()
-                    consign = Consign.instance(**args)
                     """对参数进行处理"""
+                    industry_experience = args.pop('industry_experience', "")
+                    if isinstance(industry_experience, int):
+                        args['industry_experience'] = industry_experience
+                    elif isinstance(industry_experience, str) and industry_experience.isdigit():
+                        args['industry_experience'] = int(industry_experience)
+                    else:
+                        pass
+                    welfare = args.pop("welfare", "")  # 福利待遇
+                    welfare = [x.strip() for x in welfare.split(",")]
+                    args['welfare'] = welfare
                     driving_experience = args.pop("driving_exp", None)  # 驾龄
                     if driving_experience is None:
                         pass
@@ -516,6 +529,7 @@ def add_consign_func() -> str:
                         else:
                             pass
                     """创建并保存对象"""
+                    consign = Consign.instance(**args)
                     object_id = None
                     try:
                         object_id = consign.save_plus()
@@ -561,18 +575,91 @@ def consign_list_func() -> str:
             f = {"company_id": company.get_dbref()}
             s = {"update_date": -1}
             page_size = 3
-            res = Consign.query_by_page(filter_dict=f, sort_dict=s, page_index=page_index, page_size=3)
+            res = Consign.query_by_page(filter_dict=f, sort_dict=s, page_index=page_index, page_size=page_size)
             consign_list = res['data']
             current_page = res['current_page']
             pages = res['pages']
             total_page = res['total_page']
             total_record = res['total_record']
             return render_template("web/consign_list.html", url_path=url_path, consign_list=consign_list, pages=pages,
-                                   current_page=current_page, total_page=total_page, total_record=total_record)
+                                   total_page=total_page, total_record=total_record,
+                                   page_index=page_index)
         else:
             return redirect(url_for("web_blueprint.login_func"))
     else:
         return abort(405)
+
+
+def resp_page_func():
+    """
+    分页显示委托招聘的反馈页面信息
+    :return:
+    """
+    company_id = get_platform_session_arg("user_id")
+    method = request.method.lower()
+    if method == 'get':
+        if isinstance(company_id, ObjectId):
+            company = Company.find_by_id(company_id)
+            if isinstance(company, Company):
+                args = dict()
+                url_path = request.path  # 当前web路径
+                q = dict()  # 查询条件
+                projection = [
+                    "_id", "education", "work_experience", "industry_experience",
+                    "driving_experience", "gender", "real_name", "age", "status",
+                    "dl_license_class", "dl_first_date", "rtqc_license_class",
+                    "rtqc_first_date", "want_job", "expected_salary", "birth_date",
+                    "last_company", "first_work_date", "update_date"
+                ]
+                args['projection'] = projection  # 添加投影数组
+                """页码"""
+                page_index = 1
+                index = request.args.get("index", "1")  # 第几页
+                try:
+                    page_index = int(index)
+                except Exception as e:
+                    print(e)
+                finally:
+                    args['page_index'] = page_index
+                page_size = 10
+                args['page_size'] = page_size
+                f = {"company_id": company.get_dbref()}
+                consign_id = get_arg(request, "cid", "")  # consign的id,
+                if isinstance(consign_id, str) and len(consign_id) == 24:
+                    consign = Consign.find_by_id(consign_id)
+                    if isinstance(consign, Consign):
+                        f['consign_id'] = consign.get_dbref()
+                args['filter_dict'] = f
+                s = {"time": -1}
+                args['sort_dict'] = s
+                resp_dict = Resp.query_by_page(**args)
+                total_record = resp_dict['total_record']
+                total_page = resp_dict['total_page']
+                pages = resp_dict['pages']
+                ids = [x['resume_id'].id for x in resp_dict['data']]
+                if len(ids) == 0:
+                    resumes = list()
+                else:
+                    f = {"_id": {"$in": ids}}
+                    resumes = DriverResume.find_plus(filter_dict=f, to_dict=True)
+                return render_template("web/consign_resp.html", url_path=url_path, resumes=resumes,
+                                       total_record=total_record, total_page=total_page, pages=pages,
+                                       page_index=page_index)
+            else:
+                return redirect(url_for("web_blueprint.login_func"))
+        else:
+            return redirect(url_for("web_blueprint.login_func"))
+    else:
+        mes = {"message": "success"}
+        if isinstance(company_id, ObjectId):
+            company = Company.find_by_id(company_id)
+            if isinstance(company, Company):
+                pass
+            else:
+                mes['message'] = "authentication fail"
+        else:
+            mes['message'] = "authentication fail"
+        return json.dumps(mes)
 
 
 def file_func(action, table_name):
@@ -652,3 +739,5 @@ web_blueprint.add_url_rule(rule="/favorite", view_func=favorite_func, methods=['
 web_blueprint.add_url_rule(rule="/add_consign", view_func=add_consign_func, methods=['post', 'get'])
 """公司客户委托招聘列表页面"""
 web_blueprint.add_url_rule(rule="/consign_list", view_func=consign_list_func, methods=['get'])
+"""分页显示委托招聘的反馈页面信息"""
+web_blueprint.add_url_rule(rule="/consign_resp", view_func=resp_page_func, methods=['get', 'post'])

@@ -247,12 +247,21 @@ class ResumeFavorite(mongo_db.BaseDoc):
 
 class Consign(mongo_db.BaseDoc):
     """
-    企业发出的（招聘）委托任务
+    企业发出的（招聘）委托任务,委托创建后,逻辑上应该留一个缓冲时间(比如半小时)让
+    企业用户有机会修改或者撤回委托.超时后,运营人员就可以看见这封委托的内容了.
+    运营人员一旦确认接收委托,委托的状态就会转换成"委托已接受",这时企业就不能修改
+    或者撤回委托了.如果确有这方面的需求,走线下.
     """
     _table_name = "consign"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['finish'] = int  # 完成状态,默认0,未完成,1为完成
+    """
+    状态,默认0,
+    0 已创建未被接收的状态. 此时理论上可以删除或修改委托(删除未实现)
+    1 委托已被接收,正在执行的状态. 此时应不可撤回.
+    2 委托已完成.
+    """
+    type_dict['status'] = int
     type_dict['company_id'] = DBRef
     type_dict['count'] = int   # 招聘人数
     type_dict['gender'] = str   # 男/女 None表示不限
@@ -307,12 +316,41 @@ class Consign(mongo_db.BaseDoc):
             kwargs['create_date'] = now
         if "update_date" not in kwargs:
             kwargs['update_date'] = now
-        if "finish" not in kwargs:
-            kwargs['finish'] = 0
-        if "finish" not in kwargs:
-            kwargs['finish'] = 0
+        if "status" not in kwargs:
+            kwargs['status'] = 0
         instance = cls(**kwargs)
         return instance
+
+
+class Resp(mongo_db.BaseDoc):
+        """
+        Consign的反馈
+        """
+        _table_name = "resp"
+        type_dict = dict()
+        type_dict['_id'] = ObjectId
+        type_dict['consign_id'] = DBRef
+        type_dict['company_id'] = DBRef
+        type_dict['resume_id'] = DBRef
+        type_dict['time'] = datetime.datetime
+
+        def __init__(self, **kwargs):
+            if "consign_id" not in kwargs:
+                ms = "consign_id require"
+                raise ValueError(ms)
+            if "company_id" not in kwargs:
+                ms = "company_id require"
+                raise ValueError(ms)
+            if "resume_id" not in kwargs:
+                ms = "resume_id require"
+                raise ValueError(ms)
+            super(Resp, self).__init__(**kwargs)
+
+        @classmethod
+        def instance(cls, **kwargs):
+            if "time" not in kwargs:
+                kwargs['time'] = datetime.datetime.now()
+            return cls(**kwargs)
 
 
 if __name__ == "__main__":
