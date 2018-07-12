@@ -73,7 +73,6 @@ class Region(mongo_db.BaseDoc):
             res = cls.find_plus(filter_dict=f, to_dict=True, can_json=can_json)
             return res
 
-
     @classmethod
     def build_region_1(cls):
         """
@@ -199,8 +198,9 @@ class Honor(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
     type_dict['time'] = datetime.datetime  # 获奖时间
+    type_dict['title'] = str    # 荣誉称号
     type_dict['info'] = str    # 荣誉信息
-    type_dict['image'] = bytes  # 荣誉图片
+    type_dict['image_id'] = DBRef  # 荣誉图片
     type_dict['create_date'] = datetime.datetime  # 创建时间
 
 
@@ -213,7 +213,7 @@ class Vehicle(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
-    type_dict["image"] = bytes  # 车辆照片
+    type_dict["image_id"] = DBRef  # 车辆照片
     type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
     """
     相关标准参考GB1589
@@ -319,6 +319,20 @@ class HeadImage(mongo_db.BaseFile):
     _table_name = "head_image"
 
 
+class HonorImage(mongo_db.BaseFile):
+    """
+    荣誉证书照片
+    """
+    _table_name = "honor_image"
+
+
+class VehicleImage(mongo_db.BaseFile):
+    """
+    行车证(机动车)照片
+    """
+    _table_name = "vehicle_image"
+
+
 class DrivingLicenseImage(mongo_db.BaseFile):
     """
     驾驶证(驾照)图片
@@ -338,7 +352,8 @@ class DriverResume(mongo_db.BaseDoc):
     _table_name = "driver_resume"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['user_name'] = str  # 用户名,唯一判定,默认和手机相同
+    type_dict['app_id'] = str     # app客户端的id,
+    type_dict['user_name'] = str  # 用户名,唯一判定,默认和手机相同,可以登录司机招聘网(功能未实现)
     type_dict['real_name'] = str  # 真实姓名 ,可以从驾驶证取
     type_dict['head_image'] = DBRef  # 头像
     type_dict['gender'] = str   # 以驾驶证信息为准. 男/女
@@ -384,6 +399,7 @@ class DriverResume(mongo_db.BaseDoc):
     """求职意愿"""
     type_dict['want_job'] = bool  # 是否有求职意向?有求职意向的才会推荐工作,可以认为这是个开关.
     type_dict['remote'] = bool  # 是否原因在外地工作?
+    type_dict['target_city'] = str  # 期望工作城市,这是一个临时性的字段,地区编码库完善后,此阻断将由 expected_regions替代.
     """留下,暂时不用,只有愿意不愿意取外地工作这个选项"""
     type_dict['expected_regions'] = list    # 期望工作地区,list是区域代码的list,
     """
@@ -407,6 +423,9 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['create_date'] = datetime.datetime  # 简历的创建时间
 
     def __init__(self, **kwargs):
+        user_name = kwargs.pop("user_name", "")
+        if user_name == "":
+            kwargs['user_name'] = kwargs.get("phone")
         dl_license_class = kwargs.pop("dl_license_class", None)
         if isinstance(dl_license_class, str):
             kwargs['dl_license_class'] = dl_license_class.upper()

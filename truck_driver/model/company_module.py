@@ -247,19 +247,20 @@ class ResumeFavorite(mongo_db.BaseDoc):
 
 class Consign(mongo_db.BaseDoc):
     """
-    企业发出的（招聘）委托任务,委托创建后,逻辑上应该留一个缓冲时间(比如半小时)让
-    企业用户有机会修改或者撤回委托.超时后,运营人员就可以看见这封委托的内容了.
-    运营人员一旦确认接收委托,委托的状态就会转换成"委托已接受",这时企业就不能修改
-    或者撤回委托了.如果确有这方面的需求,走线下.
+    企业发出的（招聘）委托任务,委托创建后,在委托未被接收前
+    企业用户有机会撤回委托.超时后,运营人员就可以看见这封委托的内容了.
+    运营人员一旦确认接收委托,委托的状态就会转换成"委托已接受",这时企业就不能
+    撤回委托了.如果确有这方面的需求,走线下.
     """
     _table_name = "consign"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     """
-    状态,默认0,
-    0 已创建未被接收的状态. 此时理论上可以删除或修改委托(删除未实现)
-    1 委托已被接收,正在执行的状态. 此时应不可撤回.
-    2 委托已完成.
+    状态,默认1,
+    0  撤回状态,这个状态的委托不会被运营查看到.
+    1  已创建未被接收的状态. 可以撤回,
+    3  委托已被运营接收,正在执行的状态. 此时应不可撤回.在此之前,委托都可以被撤回
+    4  委托已完成.
     """
     type_dict['status'] = int
     type_dict['company_id'] = DBRef
@@ -317,7 +318,7 @@ class Consign(mongo_db.BaseDoc):
         if "update_date" not in kwargs:
             kwargs['update_date'] = now
         if "status" not in kwargs:
-            kwargs['status'] = 0
+            kwargs['status'] = 1
         instance = cls(**kwargs)
         return instance
 

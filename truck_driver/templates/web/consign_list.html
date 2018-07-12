@@ -38,11 +38,38 @@
                         if consign.create_date else ""
                         }}
                 </label>
-                <span class="delete_consign" data-id="{{ consign['_id'] }}" title="删除委托">
-                    <i class="fa fa-trash-o fa-1g"></i>
+                <span class="status_area">
+                        {% if consign.status == 0 %}
+                          <i title="已撤回" class="fa fa-pause fa-1g my_status my_stop"></i>
+                        {% elif consign.status == 1 %}
+                          <i title="已提交" class="fa fa-play fa-1g my_status"></i>
+                        {% elif consign.status == 2 %}
+                          <i title="执行中" class="fa fa-cog fa-spin my_status"></i>
+                        {% elif consign.status == 3 %}
+                          <i title="已完成" class="fa fa-check-square-o fa-1g my_status"></i>
+                        {% else %}
+                            <!--nothing-->
+                        {% endif %}
+
                 </span>
-                <span class="edit_consign" data-id="{{ consign['_id'] }}" title="编辑委托">
-                    <i class="fa fa-file-text-o fa-1g"></i>
+                {% if consign.status in [2, 3] %}
+                {% elif consign.status == 0 %}
+                    <span class="resume_consign" data-id="{{ consign['_id'] }}" title="重新提交">
+                    <i class="fa fa-play fa-1g my_status"></i>
+                    </span>
+                    <span class="edit_consign" data-id="{{ consign['_id'] }}" title="编辑">
+                        <i class="fa fa-file-text-o fa-1g"></i>
+                    </span>
+                {% else %}
+                    <span class="delete_consign" data-id="{{ consign['_id'] }}" title="撤回">
+                        <i class="fa fa-undo fa-1g"></i>
+                    </span>
+                    <span class="edit_consign" data-id="{{ consign['_id'] }}" title="编辑">
+                        <i class="fa fa-file-text-o fa-1g"></i>
+                    </span>
+                {% endif %}
+                <span class="icon_desc">
+                    <i class="fa fa-question-circle-o fa-1g"></i>
                 </span>
             </div>
 
@@ -150,6 +177,67 @@
         <a href="#" class="num">4</a>
         <a href="#" class="next">下一页</a>
         -->
+    </div>
+
+    <!--提醒模态框-->
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-lg" id="launch_tips" data-toggle="modal" data-target="#my_tips">
+      Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="my_tips" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">
+                委托招聘状态说明
+            </h4>
+          </div>
+          <div class="modal-body">
+              <div class="line_div">
+                  <div class="my_text">委托的状态分为以下几种</div>
+                  <div class="example_div">
+                      <div class="example">
+                          <i class="fa fa-pause fa-1g my_status my_stop"></i><span class="my_text">已撤回</span>
+                      </div>
+                      <div class="example">
+                          <i class="fa fa-play fa-1g my_status"></i><span class="my_text">已提交</span>
+                      </div>
+                      <div class="example">
+                          <i class="fa fa-cog fa-spin my_status"></i><span class="my_text">执行中</span>
+                      </div>
+                      <div class="example">
+                          <i class="fa fa-check-square-o fa-1g my_status"></i><span  class="my_text">已完成</span>
+                      </div>
+                  </div>
+              </div>
+              <div class="line_div a_line">
+                  1. 处于
+                  <i class="fa fa-pause fa-1g my_status my_stop"></i><span class="my_text">已撤回</span>
+                  状态的委托不会被系统接受. 你可以随时编辑处于撤回状态的委托并重新提交.
+              </div>
+              <div class="line_div a_line">
+                  2. 委托提交后,就处于
+                  <i class="fa fa-play fa-1g my_status"></i><span class="my_text">已提交</span>
+                  状态.这时候的委托有一个15分钟的缓冲期.用于检查,修改或撤回委托.超过缓冲期.委托将自动提进入处理队列.委托随时会被系统受理.
+              </div>
+              <div class="line_div a_line">
+                  3. 处于
+                  <i class="fa fa-cog fa-spin my_status"></i><span class="my_text">已提交</span>
+                  状态委托,表明系统正在处理你的委托任务,此时无法被撤回.
+              </div>
+              <div class="line_div a_line">
+                  4. <i class="fa fa-check-square-o fa-1g my_status"></i><span class="my_text">已完成</span>
+                  状态表明委托已成功完成.
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
 
 {% endblock %}

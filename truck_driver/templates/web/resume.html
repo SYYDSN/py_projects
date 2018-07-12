@@ -181,7 +181,7 @@
                         获奖时间:<span>{{ x.time }}</span>
                     </div>
                     <div class="item_line">
-                        所获荣誉:<span>{{ x.info }}</span>
+                        所获荣誉:<span>{{ x.title if x.title else x.info }}</span>
                     </div>
                 </div>
             {% endfor %}

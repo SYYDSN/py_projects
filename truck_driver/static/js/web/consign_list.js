@@ -22,6 +22,40 @@ $(function(){
         }
     })();
 
+    // 帮助图标点击事件
+    $(".icon_desc").each(function(){
+        let $this = $(this);
+        $this.click(function(){
+            $("#launch_tips").click();
+        });
+    });
+
+    // 撤回委托事件.
+    $(".delete_consign").each(function(){
+        let $this = $(this);
+        $this.click(function () {
+            let l = confirm("你确实要撤回这项委托吗?撤回后你也可重新编辑提交本委托.");
+            if(l){
+                let cid = $this.attr("data-id");
+                $.post("/web/consign/withdraw", {"cid": cid}, function(resp){
+                    let json = JSON.parse(resp);
+                    let status = json['message'];
+                    if(status === "success"){
+                        alert("撤回成功");
+                        location.reload();
+                    }
+                    else{
+                        alert(status);
+                        return false;
+                    }
+                });
+            }
+            else{
+                return false;
+            }
+        });
+    });
+
     // 页码区域的翻页事件
     $(".page_area a").click(function(){
         let args = get_url_arg_dict();

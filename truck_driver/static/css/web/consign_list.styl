@@ -29,14 +29,15 @@ deep_grey = #5C5F63
       padding-top 1em
       label
         color deep_grey
-      .delete_consign,.edit_consign
+      .status_area
+        margin-left 1em
+      .delete_consign,.edit_consign,.icon_desc,.resume_consign
         color font_color
-      .delete_consign,.edit_consign:hover
+      .delete_consign,.edit_consign,.icon_desc,.resume_consign:hover
         cursor pointer
-      .delete_consign
-        margin-left 3em
-        font-size 1.1em
-      .edit_consign
+      .delete_consign,.resume_consign
+        margin-left 2em
+      .edit_consign,.icon_desc
         margin-left 1em
       .field
         .key
@@ -90,3 +91,29 @@ deep_grey = #5C5F63
       color font_color
       font-size 1rem
       margin-left 1em
+
+  #my_tips
+    .modal-body
+      .line_div
+        display block
+        .example_div
+          margin 0.5em 0 1em 2em
+          .example
+            padding 2px 0
+            .fa
+              margin-right 2em
+      .a_line
+        margin 0 0 0.7em 0
+        color font_color
+        .my_text
+          font-weight 700
+
+  #launch_tips
+    display none
+
+  .my_text
+    color font_color
+  .my_status
+    color default_blue
+  .my_stop
+    color font_color

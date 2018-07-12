@@ -23,19 +23,27 @@
 .page_middle .list .consign label {
   color: #5c5f63;
 }
+.page_middle .list .consign .status_area {
+  margin-left: 1em;
+}
 .page_middle .list .consign .delete_consign,
-.page_middle .list .consign .edit_consign {
+.page_middle .list .consign .edit_consign,
+.page_middle .list .consign .icon_desc,
+.page_middle .list .consign .resume_consign {
   color: #9a9a9a;
 }
 .page_middle .list .consign .delete_consign,
-.page_middle .list .consign .edit_consign:hover {
+.page_middle .list .consign .edit_consign,
+.page_middle .list .consign .icon_desc,
+.page_middle .list .consign .resume_consign:hover {
   cursor: pointer;
 }
-.page_middle .list .consign .delete_consign {
-  margin-left: 3em;
-  font-size: 1.1em;
+.page_middle .list .consign .delete_consign,
+.page_middle .list .consign .resume_consign {
+  margin-left: 2em;
 }
-.page_middle .list .consign .edit_consign {
+.page_middle .list .consign .edit_consign,
+.page_middle .list .consign .icon_desc {
   margin-left: 1em;
 }
 .page_middle .list .consign .field .key {
@@ -99,4 +107,35 @@
   color: #9a9a9a;
   font-size: 1rem;
   margin-left: 1em;
+}
+.page_middle #my_tips .modal-body .line_div {
+  display: block;
+}
+.page_middle #my_tips .modal-body .line_div .example_div {
+  margin: 0.5em 0 1em 2em;
+}
+.page_middle #my_tips .modal-body .line_div .example_div .example {
+  padding: 2px 0;
+}
+.page_middle #my_tips .modal-body .line_div .example_div .example .fa {
+  margin-right: 2em;
+}
+.page_middle #my_tips .modal-body .a_line {
+  margin: 0 0 0.7em 0;
+  color: #9a9a9a;
+}
+.page_middle #my_tips .modal-body .a_line .my_text {
+  font-weight: 700;
+}
+.page_middle #launch_tips {
+  display: none;
+}
+.page_middle .my_text {
+  color: #9a9a9a;
+}
+.page_middle .my_status {
+  color: #3388fe;
+}
+.page_middle .my_stop {
+  color: #9a9a9a;
 }

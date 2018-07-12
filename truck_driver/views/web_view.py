@@ -559,35 +559,87 @@ def consign_list_func() -> str:
     """公司客户委托列表的页面"""
     company_id = get_platform_session_arg("user_id")
     method = request.method.lower()
-    if method == "get" and isinstance(company_id, ObjectId):
-        company = Company.find_by_id(company_id)
-        url_path = "/web/consign_list"  # 当前web路径,固定值,和我的委托共用url
-        if isinstance(company, Company):
-            """页码"""
-            page_index = 1
-            index = request.args.get("index", "1")  # 第几页
-            try:
-                page_index = int(index)
-            except Exception as e:
-                print(e)
-            finally:
-                pass
-            f = {"company_id": company.get_dbref()}
-            s = {"update_date": -1}
-            page_size = 3
-            res = Consign.query_by_page(filter_dict=f, sort_dict=s, page_index=page_index, page_size=page_size)
-            consign_list = res['data']
-            current_page = res['current_page']
-            pages = res['pages']
-            total_page = res['total_page']
-            total_record = res['total_record']
-            return render_template("web/consign_list.html", url_path=url_path, consign_list=consign_list, pages=pages,
-                                   total_page=total_page, total_record=total_record,
-                                   page_index=page_index)
+    if method == "get":
+        if isinstance(company_id, ObjectId):
+            company = Company.find_by_id(company_id)
+            url_path = "/web/consign_list"  # 当前web路径,固定值,和我的委托共用url
+            if isinstance(company, Company):
+                """页码"""
+                page_index = 1
+                index = request.args.get("index", "1")  # 第几页
+                try:
+                    page_index = int(index)
+                except Exception as e:
+                    print(e)
+                finally:
+                    pass
+                f = {"company_id": company.get_dbref()}
+                s = {"update_date": -1}
+                page_size = 3
+                res = Consign.query_by_page(filter_dict=f, sort_dict=s, page_index=page_index, page_size=page_size)
+                consign_list = res['data']
+                pages = res['pages']
+                total_page = res['total_page']
+                total_record = res['total_record']
+                return render_template("web/consign_list.html", url_path=url_path, consign_list=consign_list, pages=pages,
+                                       total_page=total_page, total_record=total_record,
+                                       page_index=page_index)
+            else:
+                return redirect(url_for("web_blueprint.login_func"))
         else:
             return redirect(url_for("web_blueprint.login_func"))
     else:
         return abort(405)
+
+
+def edit_consign_func(key):
+    """
+    公司账户对委托的撤回,修改
+    :return:
+    """
+    company_id = get_platform_session_arg("user_id")
+    method = request.method.lower()
+    if method == 'get':
+        return abort(405)
+    else:
+        if isinstance(company_id, ObjectId):
+            company = Company.find_by_id(o_id=company_id)
+            if isinstance(company, Company):
+                mes = {"message": "success"}
+                cid = get_arg(request, "cid", "")
+                if isinstance(cid, str) and len(cid) == 24:
+                    consign = Consign.find_by_id(o_id=cid)
+                    if isinstance(consign, Consign):
+                        if key == "withdraw":
+                            """撤回委托"""
+                            status = consign.get_attr("status", None)
+                            if status is None or status not in [0, 1, 2, 3]:
+                                mes['message'] = "委托的状态异常"
+                            else:
+                                if status in [2, 3]:
+                                    mes['message'] = "无法撤回"
+                                else:
+                                    consign.set_attr("status", 0)
+                                    r = consign.save_plus()
+                                    if r is None:
+                                        mes['message'] = '撤回失败'
+                                    else:
+                                        pass
+                        elif key == "resubmit":
+                            """重新提交"""
+                        elif key == "edit":
+                            """编辑委托"""
+                        else:
+                            mes['message'] = "不支持的操作"
+                    else:
+                        mes['message'] = "invalid cid"
+                else:
+                    mes['message'] = "cid参数错误"
+                return json.dumps(mes)
+            else:
+                return abort(401)
+        else:
+            return abort(403)
 
 
 def resp_page_func():
@@ -739,5 +791,7 @@ web_blueprint.add_url_rule(rule="/favorite", view_func=favorite_func, methods=['
 web_blueprint.add_url_rule(rule="/add_consign", view_func=add_consign_func, methods=['post', 'get'])
 """公司客户委托招聘列表页面"""
 web_blueprint.add_url_rule(rule="/consign_list", view_func=consign_list_func, methods=['get'])
+"""公司账户对委托的撤回,修改"""
+web_blueprint.add_url_rule(rule="/consign/<key>", view_func=edit_consign_func, methods=['post'])
 """分页显示委托招聘的反馈页面信息"""
 web_blueprint.add_url_rule(rule="/consign_resp", view_func=resp_page_func, methods=['get', 'post'])
