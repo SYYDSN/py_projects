@@ -25,3 +25,4 @@ class VirtualSignal(Signal):
     虚拟信号和原始喊单信号共用一个表。
     """
     def __init__(self, signal: Signal, direction: str, ):
+        pass

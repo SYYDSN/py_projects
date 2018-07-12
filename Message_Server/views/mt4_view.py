@@ -15,6 +15,7 @@ from module.event_module import PlatformEvent
 from module.identity_validate import GlobalSignature
 from module.item_module import RawRequestInfo
 from module.document_tools import markdown_to_html
+from mail_module import send_mail
 
 
 """接受mt4后台推送过来的信息2018-6-29"""
@@ -123,6 +124,19 @@ def mes_func(key) -> str:
                                     obj = PlatformEvent(**init)
                                     r = obj.save_plus()
                                     if isinstance(r, ObjectId):
+                                        send_result = False
+                                        try:
+                                            send_result = obj.send_message()  # 发送钉钉消息
+                                        except Exception as e:
+                                            t = "{} mt4_view模块发送钉钉消息失败".format(datetime.datetime.now())
+                                            send_mail(title=t)
+                                            logger.exception(e)
+                                        finally:
+                                            if not send_result:
+                                                t = "{} mt4_view模块发送钉钉消息返回了False".format(datetime.datetime.now())
+                                                send_mail(title=t)
+                                            else:
+                                                pass
                                         mes['id'] = str(r)
                                     else:
                                         mes['message'] = "保存对象失败"
