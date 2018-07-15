@@ -139,6 +139,15 @@ class Signal(mongo_db.BaseDoc):
     type_dict['token_name'] = str  # 固定  "策略助手 小迅"
 
     def __init__(self, **kwargs):
+        super(Signal, self).__init__(**kwargs)
+
+    @classmethod
+    def instance(cls, **kwargs):
+        """
+        从简道云发送过来的信号中创建对象
+        :param kwargs:
+        :return:
+        """
         op = kwargs.pop('op', None)
         data = kwargs.pop('data', None)
         if op is None:
@@ -155,15 +164,15 @@ class Signal(mongo_db.BaseDoc):
             arg_dict['op'] = op
             create_time = mongo_db.get_datetime_from_str(data.pop('createTime', None))
             if isinstance(create_time, datetime.datetime):
-                create_time = self.transform_time_zone(create_time)  # 调整时区
+                create_time = cls.transform_time_zone(create_time)  # 调整时区
                 arg_dict['create_time'] = create_time
             update_time = mongo_db.get_datetime_from_str(data.pop('updateTime', None))
             if isinstance(update_time, datetime.datetime):
-                update_time = self.transform_time_zone(update_time)  # 调整时区
+                update_time = cls.transform_time_zone(update_time)  # 调整时区
                 arg_dict['update_time'] = update_time
             delete_time = mongo_db.get_datetime_from_str(data.pop('deleteTime', None))
             if isinstance(delete_time, datetime.datetime):
-                delete_time = self.transform_time_zone(delete_time)  # 调整时区
+                delete_time = cls.transform_time_zone(delete_time)  # 调整时区
                 arg_dict['delete_time'] = delete_time
             t_s = data.pop("_widget_1514518782603", dict())  # 止盈止损
             if "_widget_1514518782614" in t_s:
@@ -233,7 +242,7 @@ class Signal(mongo_db.BaseDoc):
             for k, v in data.items():
                 if v is not None:
                     arg_dict[k] = v
-            super(Signal, self).__init__(**arg_dict)
+            return cls(**arg_dict)
 
     @staticmethod
     def transform_time_zone(a_time) -> datetime.datetime:
@@ -572,220 +581,33 @@ class MonthEstimate(mongo_db.BaseDoc):
             return estimate
 
 
-class VirtualTeacher(mongo_db.BaseDoc):
+class Trade(Signal):
     """
-    虚拟老师
-    {
-      'op': 'data_create',
-      'data': {
-        'creator': {
-          'name': '徐立杰',
-          '_id': '5a684c9b42f8c1bffc68f4b4'
-        },
-        'deleteTime': None,
-        'updater': {
-          'name': '徐立杰',
-          '_id': '5a684c9b42f8c1bffc68f4b4'
-        },
-        'appId': '5a446c355a8c99236975be09',
-        '_widget_1525161353511': [
-          {
-            '_widget_1525161353528': '正向',
-            '_widget_1525161353525': '黄金',
-            '_widget_1525161353522': {
-              'name': '高特',
-              '_id': '5a1e680642f8c1bffc5dbd6b'
-            }
-          },
-          {
-            '_widget_1525161353528': '反向',
-            '_widget_1525161353525': '恒指',
-            '_widget_1525161353522': {
-              'name': '常阳',
-              '_id': '5a1e680642f8c1bffc5dbd69'
-            }
-          },
-          {
-            '_widget_1525161353528': '正向',
-            '_widget_1525161353525': '全部',
-            '_widget_1525161353522': {
-              'name': '高巍',
-              '_id': '5aab3ea4340c1749505a2819'
-            }
-          }
-        ],
-        'createTime': '2018-05-08T22:13:32.952Z',
-        'label': '',
-        '_widget_1525161353498': 'robot1',
-        'formName': '机器人分析师控制台',
-        '_id': '5af2210c58b42122eba5abf0',
-        'submitPrompt': {
-          'content': ''
-        },
-        'deleter': None,
-        'updateTime': '2018-05-08T22:13:32.952Z',
-        'entryId': '5ae81d8bdd481029da358eaf'
-      }
-    }
-
-    {
-      'op': 'data_update',
-      'data': {
-        'creator': {
-          'name': '徐立杰',
-          '_id': '5a684c9b42f8c1bffc68f4b4'
-        },
-        'deleteTime': None,
-        'updater': {
-          'name': '徐立杰',
-          '_id': '5a684c9b42f8c1bffc68f4b4'
-        },
-        'appId': '5a446c355a8c99236975be09',
-        '_widget_1525161353511': [
-          {
-            '_widget_1525161353528': '正向',
-            '_widget_1525161353525': '原油',
-            '_widget_1525161353522': {
-              'name': '语昂',
-              '_id': '5a1e680642f8c1bffc5dbd6f'
-            }
-          },
-          {
-            '_widget_1525161353528': '反向',
-            '_widget_1525161353525': '恒指',
-            '_widget_1525161353522': {
-              'name': '常阳',
-              '_id': '5a1e680642f8c1bffc5dbd69'
-            }
-          },
-          {
-            '_widget_1525161353528': '正向',
-            '_widget_1525161353525': '全部',
-            '_widget_1525161353522': {
-              'name': '高巍',
-              '_id': '5aab3ea4340c1749505a2819'
-            }
-          }
-        ],
-        'createTime': '2018-05-08T22:13:32.952Z',
-        'label': '',
-        '_widget_1525161353498': 'robot1',
-        'formName': '机器人分析师控制台',
-        '_id': '5af2210c58b42122eba5abf0',
-        'submitPrompt': {
-          'content': ''
-        },
-        'deleter': None,
-        'updateTime': '2018-05-08T22:15:53.546Z',
-        'entryId': '5ae81d8bdd481029da358eaf'
-      }
-    }
-    {
-      'op': 'data_remove',
-      'data': {
-        'formName': '机器人分析师控制台',
-        '_id': '5af2210c58b42122eba5abf0',
-        'appId': '5a446c355a8c99236975be09',
-        'deleter': {
-          'name': '徐立杰',
-          '_id': '5a684c9b42f8c1bffc68f4b4'
-        },
-        'deleteTime': '2018-05-08T22:16:13.417Z',
-        'entryId': '5ae81d8bdd481029da358eaf'
-      }
-    }
-
+    （老师的喊单）交易
     """
-    _table_name = "virtual_teacher_info"
+    _table_name = "trade"
     type_dict = dict()
-    type_dict['_id'] = ObjectId  # 此id从信号获得
-    type_dict['creator_name'] = str
-    type_dict['creator_id'] = str
-    type_dict['create_time'] = datetime.datetime
-    type_dict['updater_name'] = str
-    type_dict['updater_id'] = str
-    type_dict['update_time'] = datetime.datetime
-    type_dict['deleter_name'] = str
-    type_dict['deleter_id'] = str
-    type_dict['delete_time'] = datetime.datetime
-    type_dict['teachers'] = list()
+    type_dict['_id'] = ObjectId
+    type_dict['create_time'] = datetime.datetime  # 创建时间
+    type_dict['open_time'] = datetime.datetime  # 开单时间
+    type_dict['close_time'] = datetime.datetime  # 平仓时间
+    type_dict['the_type'] = str  # 订单类型
+    type_dict['teacher_name'] = str  #
+    type_dict['teacher_id'] = str  #
+    type_dict['product'] = str  # 产品名称
+    type_dict['direction'] = str  # 方向
+    type_dict['exit_reason'] = str  # 离场理由
+    type_dict['enter_price'] = float  # 建仓价
+    type_dict['exit_price'] = float  # 平仓价
+    type_dict['profit'] = float  # 获利/盈亏
+    type_dict['each_profit'] = float  # 每手实际获利
+    type_dict['each_profit_dollar'] = float  # 每手获利/美金
+    type_dict['each_cost'] = float  # 每手成本
+    type_dict['t_coefficient'] = float  # （交易）系数
+    type_dict['p_coefficient'] = float  # （点值）系数
 
     def __init__(self, **kwargs):
-        super(VirtualTeacher, self).__init__(**kwargs)
-
-    @classmethod
-    def instance(cls, **kwargs):
-        """接收简道云的信号时，请用此方法替代init"""
-        if "_id" in kwargs:
-            kwargs['_id'] = ObjectId(kwargs['_id'])
-        if "createTime" in kwargs:
-            create_time = cls.transform_time_zone(kwargs.pop('createTime', None))
-            if create_time is not None:
-                kwargs['create_time'] = create_time
-        if "updateTime" in kwargs:
-            update_time = cls.transform_time_zone(kwargs.pop('updateTime', None))
-            if update_time is not None:
-                kwargs['update_time'] = update_time
-        if "deleteTime" in kwargs:
-            delete_time = cls.transform_time_zone(kwargs.pop('deleteTime', None))
-            if delete_time is not None:
-                kwargs['delete_time'] = delete_time
-        creator = kwargs.pop("creator", None)
-        if creator is not None:
-            creator_name = creator.pop('name', None)
-            if creator_name is not None:
-                kwargs['creator_name'] = creator_name
-            creator_id = creator.pop('_id', None)
-            if creator_id is not None:
-                kwargs['creator_id'] = creator_id
-        updater = kwargs.pop("updater", None)
-        if updater is not None:
-            updater_name = updater.pop('name', None)
-            if updater_name is not None:
-                kwargs['updater_name'] = updater_name
-            updater_id = updater.pop('_id', None)
-            if updater_id is not None:
-                kwargs['updater_id'] = updater_id
-        deleter = kwargs.pop("deleter", None)
-        if deleter is not None:
-            deleter_name = creator.pop('name', None)
-            if deleter_name is not None:
-                kwargs['deleter_name'] = deleter_name
-            deleter_id = creator.pop('_id', None)
-            if deleter_id is not None:
-                kwargs['deleter_id'] = deleter_id
-        if "_widget_1525161353511" in kwargs:
-            teachers = kwargs.pop("_widget_1525161353511", None)
-            if teachers is not None:
-                teachers = [create_teacher(**x) for x in teachers]
-                kwargs['teachers'] = teachers
-        return cls(**kwargs)
-
-    @staticmethod
-    def create_teacher(**kwargs):
-        """
-        生成喊单的老师的字典
-        """
-        d = dict()
-        d['direction'] = kwargs['_widget_1525161353528']
-        d['product'] = kwargs['_widget_1525161353525']
-        d['teacher_id'] = kwargs['_widget_1525161353522']['_id']
-        d['teacher_name'] = kwargs['_widget_1525161353522']['name']
-        return d
-
-    @staticmethod
-    def transform_time_zone(a_time: (str, datetime.datetime)) -> (datetime.datetime, None):
-        """
-        转换时区，把时间+8个小时
-        :param a_time:
-        :return:
-        """
-        if isinstance(a_time, str):
-            a_time = mongo_db.get_datetime_from_str(a_time)
-        if not isinstance(a_time, datetime.datetime):
-            return None
-        else:
-            return a_time + datetime.timedelta(hours=8)  # 调整时区
+        super(Signal, self).__init__(**kwargs)
 
 
 if __name__ == "__main__":
@@ -805,10 +627,14 @@ if __name__ == "__main__":
     #                  }
     #         }
     # """初始化喊单信号并发送"""
-    # d = Signal(**data)
+    # d = Signal.instance(**data)
     # d.send()
     """补全老师的id"""
     # Signal.supplement_teacher_id()
     """查看老师的月胜率"""
-    print(MonthEstimate.get_instance("5a1e680642f8c1bffc5dbd6f", "2018-04"))
+    # print(MonthEstimate.get_instance("5a1e680642f8c1bffc5dbd6f", "2018-06"))
+    """生成一个虚拟信号"""
+    signal1 = Signal.find_by_id(ObjectId("5b485ebbf313841fc0eaf2ad"))
+    trade1 = Trade(**signal1.get_dict())
+    print(trade1)
     pass

@@ -75,7 +75,7 @@ def listen_func(key):
         ms = "signal_test check secret is {}".format(check)
         logger.info(ms)
         print(ms)
-        signal = Signal(**data)
+        signal = Signal.instance(**data)
         signal.send()
     elif key == "virtual_teacher":
         """虚拟老师的增删改"""
