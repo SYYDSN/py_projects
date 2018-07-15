@@ -5,7 +5,7 @@ from flask import session
 from flask_session import Session
 import os
 import datetime
-from views.flask_view import flash_blueprint
+from views.flash_view import flash_blueprint
 
 
 """训练服务器"""
