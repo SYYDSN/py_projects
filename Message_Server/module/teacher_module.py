@@ -5,7 +5,6 @@ __project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
 import mongo_db
-from module.item_module import Signal
 from bson.objectid import ObjectId
 import datetime
 
@@ -21,9 +20,9 @@ class Teacher(mongo_db.BaseDoc):
     """
     _table_name = "teacher"
     type_dict = dict()
-    """真实老师的id可能取自简道云"""
+    """真实老师的id取自简道云"""
     type_dict['_id'] = ObjectId
-    """真实老师的name可能取自简道云"""
+    """真实老师的name可能取自简道云(也可再修改)"""
     type_dict['name'] = str   # 展示的名字，比如青云老师等
     type_dict['real_name'] = str  # 真实姓名，非必须
     type_dict['level'] = str  # 老师等级
@@ -91,9 +90,9 @@ class Teacher(mongo_db.BaseDoc):
         print(native)
         for k, v in native.items():
             t = {"_id": k, "name": v, "native": True}
-            t1 = {"name": "{}_正向".format(v), "native": True, "from_id": k, "direction": "follow"}
-            t2 = {"name": "{}_反向".format(v), "native": True, "from_id": k, "direction": "reverse"}
-            t3 = {"name": "{}_随机".format(v), "native": True, "from_id": k, "direction": "random"}
+            t1 = {"name": "{}_正向".format(v), "native": False, "from_id": k, "direction": "follow"}
+            t2 = {"name": "{}_反向".format(v), "native": False, "from_id": k, "direction": "reverse"}
+            t3 = {"name": "{}_随机".format(v), "native": False, "from_id": k, "direction": "random"}
             cls(**t).save_plus()
             cls(**t1).save_plus()
             cls(**t2).save_plus()

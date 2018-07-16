@@ -5,12 +5,14 @@ __project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
 from log_module import get_logger
+from module.teacher_module import *
 from send_moudle import *
 import mongo_db
 from flask import request
 from tools_module import get_real_ip
 import datetime
 import calendar
+import random
 from mail_module import send_mail
 
 logger = get_logger()
@@ -588,6 +590,8 @@ class Trade(Signal):
     _table_name = "trade"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['native'] = bool  # 这个记录是原生的吗?
+    type_dict['native_id'] = ObjectId # 原记录的id,指向Signal的record_id属性
     type_dict['create_time'] = datetime.datetime  # 创建时间
     type_dict['open_time'] = datetime.datetime  # 开单时间
     type_dict['close_time'] = datetime.datetime  # 平仓时间
@@ -609,32 +613,102 @@ class Trade(Signal):
     def __init__(self, **kwargs):
         super(Signal, self).__init__(**kwargs)
 
+    @classmethod
+    def sync_from_signal(cls, signal: Signal):
+        """
+        根据实际开仓信号,参照老师列表.生成真实老师和虚拟老师的喊单记录,存入trade表
+        :param signal:
+        :return:
+        """
+        native_id = signal.get_attr("record_id")
+        create_time = signal.get_attr("create_time")
+        the_type = signal.get_attr("the_type")
+        product = signal.get_attr("product")
+        direction = signal.get_attr("direction")
+        exit_reason = signal.get_attr("exit_reason")
+        enter_price = signal.get_attr("enter_price")
+        exit_price = signal.get_attr("exit_price")
+        profit = signal.get_attr("profit")
+        each_profit = signal.get_attr("each_profit")
+        each_profit_dollar = signal.get_attr("each_profit_dollar")
+        each_cost = signal.get_attr("each_cost")
+        t_coefficient = signal.get_attr("t_coefficient")
+        p_coefficient = signal.get_attr("p_coefficient")
+        # a_coefficient = random.randint(-4, 4)  # a系数, 用于模拟随机的计算盈利的系数
+        # b_coefficient = random.randint(-4, 4)   # b系数, 用于模拟随机的计算盈利的系数
+        args = {
+            "native_id": native_id, "create_time": create_time,
+            "the_type": the_type, "product": product,
+            "direction": direction, "exit_reason": exit_reason,
+            "enter_price": enter_price, "exit_price": exit_price,
+            "profit": profit, "each_profit": each_profit,
+            "each_profit_dollar": each_profit_dollar,
+            "each_cost": each_cost, "t_coefficient": t_coefficient,
+            "p_coefficient": p_coefficient
+        }
+        """取老师列表"""
+        ts = Teacher.find_plus(filter_dict=dict(), to_dict=True)
+        for t in ts:
+            teacher_id = t['_id']
+            teacher_name = t['name']
+            native = t['native']
+            args['teacher_id'] = teacher_id
+            args['teacher_name'] = teacher_name
+            args['native'] = native
+            t_direction = t['direction']
+            if t_direction == "reserve":
+                args['direction'] = "卖出" if direction == "买入" else "买入"
+            elif t_direction == "random":
+                args['direction'] = random.choice(['买入', '卖出'])
+
+            if native:
+                init = args
+            else:
+
+
+
+
 
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
-    # data = {'op': 'data_create',
-    #         'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
-    #                  'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
-    #                  '_widget_1520843763126': 1190, 'formName': '发信号测试',
-    #                  '_widget_1514518782504': '2018-03-29T21:40:19.000Z', 'label': '', '_widget_1514518782592': 120,
-    #                  'createTime': '2018-03-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
-    #                  '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
-    #                  'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'}, '_widget_1520843228626': 1000,
-    #                  '_id': '7abd5d81493acc231b27af1c', 'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
-    #                  '_widget_1514518782603': [{'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
-    #                  'updateTime': '2018-03-29T21:41:21.491Z', '_widget_1514518782514': '原油',
-    #                  'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
-    #                  }
-    #         }
+    create_data = {'op': 'data_create',
+            'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
+                     'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
+                     '_widget_1520843763126': 1190, 'formName': '发信号测试',
+                     '_widget_1514518782504': '2018-07-29T21:40:19.000Z', 'label': '', '_widget_1514518782592': 120,
+                     'createTime': '2018-07-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
+                     '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
+                     'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'}, '_widget_1520843228626': 1000,
+                     '_id': '7abd5d81493acc231b27af1c', 'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
+                     '_widget_1514518782603': [{'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
+                     'updateTime': '2018-07-29T21:41:21.491Z', '_widget_1514518782514': '原油',
+                     'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
+                     }
+            }
+    update_data = {'op': 'data_update',
+                   'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
+                            'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
+                            '_widget_1520843763126': 1190, 'formName': '发信号测试',
+                            '_widget_1514518782504': '2018-07-29T21:40:19.000Z', 'label': '',
+                            '_widget_1514518782592': 120,
+                            'createTime': '2018-07-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
+                            '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
+                            'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
+                            '_widget_1520843228626': 1000,
+                            '_id': '7abd5d81493acc231b27af1c',
+                            'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
+                            '_widget_1514518782603': [
+                                {'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
+                            'updateTime': '2018-07-29T21:41:21.491Z', '_widget_1514518782514': '原油',
+                            'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
+                            }
+                   }
     # """初始化喊单信号并发送"""
-    # d = Signal.instance(**data)
+    d = Signal.instance(**create_data)
     # d.send()
-    """补全老师的id"""
-    # Signal.supplement_teacher_id()
     """查看老师的月胜率"""
     # print(MonthEstimate.get_instance("5a1e680642f8c1bffc5dbd6f", "2018-06"))
     """生成一个虚拟信号"""
-    signal1 = Signal.find_by_id(ObjectId("5b485ebbf313841fc0eaf2ad"))
-    trade1 = Trade(**signal1.get_dict())
-    print(trade1)
+    # signal1 = Signal.find_by_id(ObjectId("5b485ebbf313841fc0eaf2ad"))
+    Trade.sync_from_signal(d)
     pass
