@@ -597,9 +597,10 @@ class Trade(Signal):
     type_dict['close_time'] = datetime.datetime  # 平仓时间
     type_dict['the_type'] = str  # 订单类型
     type_dict['teacher_name'] = str  #
-    type_dict['teacher_id'] = str  #
+    type_dict['teacher_id'] = ObjectId  #
     type_dict['product'] = str  # 产品名称
-    type_dict['direction'] = str  # 方向
+    type_dict['direction'] = str  # 方向（实际方向）
+    type_dict['native_direction'] = str  # 原始订单的方向
     type_dict['exit_reason'] = str  # 离场理由
     type_dict['enter_price'] = float  # 建仓价
     type_dict['exit_price'] = float  # 平仓价
@@ -621,10 +622,12 @@ class Trade(Signal):
         :return:
         """
         native_id = signal.get_attr("record_id")
+        teacher_id = ObjectId(signal.get_attr("creator_id"))
+        teacher_name = signal.get_attr("creator_name")
         create_time = signal.get_attr("create_time")
         the_type = signal.get_attr("the_type")
         product = signal.get_attr("product")
-        direction = signal.get_attr("direction")
+        native_direction = signal.get_attr("direction")
         exit_reason = signal.get_attr("exit_reason")
         enter_price = signal.get_attr("enter_price")
         exit_price = signal.get_attr("exit_price")
@@ -639,31 +642,36 @@ class Trade(Signal):
         args = {
             "native_id": native_id, "create_time": create_time,
             "the_type": the_type, "product": product,
-            "direction": direction, "exit_reason": exit_reason,
+            "direction": native_direction,
+            "native_direction": native_direction,
+            "exit_reason": exit_reason,
             "enter_price": enter_price, "exit_price": exit_price,
             "profit": profit, "each_profit": each_profit,
             "each_profit_dollar": each_profit_dollar,
             "each_cost": each_cost, "t_coefficient": t_coefficient,
-            "p_coefficient": p_coefficient
+            "p_coefficient": p_coefficient,
+            "teacher_name": teacher_name,
+            "teacher_id": teacher_id
         }
         """取老师列表"""
         ts = Teacher.find_plus(filter_dict=dict(), to_dict=True)
+        t_dict = dict()
         for t in ts:
-            teacher_id = t['_id']
-            teacher_name = t['name']
-            native = t['native']
-            args['teacher_id'] = teacher_id
-            args['teacher_name'] = teacher_name
-            args['native'] = native
-            t_direction = t['direction']
-            if t_direction == "reserve":
-                args['direction'] = "卖出" if direction == "买入" else "买入"
-            elif t_direction == "random":
-                args['direction'] = random.choice(['买入', '卖出'])
-
-            if native:
-                init = args
-            else:
+            d = t.get("direction")
+            if d is not None:
+                if d in t_dict:
+                    t_dict[d].append(t)
+                else:
+                    t_dict[d] = [t]
+        data = [args]  # 真实老师不对信号做任何处理
+        for k, v in t_dict.items():
+            """
+            虚拟老师对原始信号佑如下的处理方式：
+            1. 正向
+            2. 反向
+            3. 随机
+            每个类型中，都要挑一个随机的老师出来对信号进行跟踪。
+            """
 
 
 
