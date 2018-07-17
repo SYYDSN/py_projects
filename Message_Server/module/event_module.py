@@ -116,7 +116,8 @@ class PlatformEvent(BaseDoc):
         """
         resp = self.get_message_dict(test_mode=test_mode)
         markdown = resp['args']
-        robot_name = resp['robot_name']
+        # robot_name = resp['robot_name']
+        robot_name = "努力拼搏 消息助手"
         data = dict()
         data['msgtype'] = "markdown"
         data['markdown'] = markdown

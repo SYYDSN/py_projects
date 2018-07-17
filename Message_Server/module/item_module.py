@@ -437,6 +437,17 @@ class Signal(mongo_db.BaseDoc):
                     conn = mongo_db.get_conn(self._table_name)
                     r = conn.find_one_and_update(filter=f, update=u, upsert=True)
                     print(r)
+                    """记录原始信号并生成虚拟信号"""
+                    try:
+                        Trade.sync_from_signal(signal=self, signal_type=the_type)
+                    except Exception as e:
+                        print(e)
+                        logger.exception(e)
+                        title = "{}同步AI操盘手出错".format(datetime.datetime.now())
+                        content = "cause: {}".format(e)
+                        send_mail(title=title, content=content)
+                    finally:
+                        pass
             else:
                 pass
 
@@ -595,6 +606,7 @@ class Trade(Signal):
     type_dict['create_time'] = datetime.datetime  # 创建时间
     type_dict['open_time'] = datetime.datetime  # 开单时间
     type_dict['close_time'] = datetime.datetime  # 平仓时间
+    type_dict['update_time'] = datetime.datetime  # 平仓时间,为了兼容报表的冗余字段
     type_dict['the_type'] = str  # 订单类型
     type_dict['teacher_name'] = str  #
     type_dict['teacher_id'] = ObjectId  #
@@ -610,15 +622,19 @@ class Trade(Signal):
     type_dict['each_cost'] = float  # 每手成本
     type_dict['t_coefficient'] = float  # （交易）系数
     type_dict['p_coefficient'] = float  # （点值）系数
+    type_dict['a_coefficient'] = float  # a系数,用来随机运算的
+    type_dict['b_coefficient'] = float  # b系数,用来随机运算的
+    type_dict['re_calculate'] = bool  # 标识平仓的时候是否需要重新计算?
 
     def __init__(self, **kwargs):
         super(Signal, self).__init__(**kwargs)
 
     @classmethod
-    def sync_from_signal(cls, signal: Signal):
+    def sync_from_signal(cls, signal: Signal, signal_type: str):
         """
         根据实际开仓信号,参照老师列表.生成真实老师和虚拟老师的喊单记录,存入trade表
         :param signal:
+        :param signal_type: 平仓提醒/建仓提醒  操作类型
         :return:
         """
         native_id = signal.get_attr("record_id")
@@ -644,7 +660,7 @@ class Trade(Signal):
             "the_type": the_type, "product": product,
             "direction": native_direction,
             "native_direction": native_direction,
-            "exit_reason": exit_reason,
+            "exit_reason": exit_reason, "native": True,
             "enter_price": enter_price, "exit_price": exit_price,
             "profit": profit, "each_profit": each_profit,
             "each_profit_dollar": each_profit_dollar,
@@ -653,27 +669,129 @@ class Trade(Signal):
             "teacher_name": teacher_name,
             "teacher_id": teacher_id
         }
-        """取老师列表"""
-        ts = Teacher.find_plus(filter_dict=dict(), to_dict=True)
-        t_dict = dict()
-        for t in ts:
-            d = t.get("direction")
-            if d is not None:
-                if d in t_dict:
-                    t_dict[d].append(t)
+        if signal_type == "建仓提醒":
+            """建仓的数据无需计算"""
+            data = list()
+            """取老师列表"""
+            ts = Teacher.find_plus(filter_dict=dict(), to_dict=True)
+            t_dict = dict()  # 方向和老师的字典
+            for t in ts:
+                d = t.get("direction")
+                if d is not None:
+                    if d in t_dict:
+                        t_dict[d].append(t)
+                    else:
+                        t_dict[d] = [t]
+            already_process = []  # 已经处理过的老师的容器
+            args['re_calculate'] = False  # 不需要另外计算?re_calculate是否需要重新计算的参数
+            data.append(args)  # 真实老师不对信号做任何处理
+            for k, v in t_dict.items():
+                """
+                虚拟老师对原始信号佑如下的处理方式：
+                1. 正向
+                2. 反向
+                3. 随机
+                每个类型中，都要挑一个随机的老师出来对信号进行跟踪。
+                """
+                temp = args.copy()
+                temp['native'] = False
+                if k == "reverse":
+                    """反向"""
+                    re_calculate = True
+                    temp['direction'] = "卖出" if temp['native_direction'] == "买入" else "买入"
+                    temp['re_calculate'] = re_calculate
+
+                elif k == "follow":
+                    pass
+                elif k == "random":
+                    old_direction = temp['direction']
+                    new_direction = random.choice(['买入', '卖出'])
+                    temp['direction'] = new_direction
+                    if new_direction == old_direction:
+                        pass
+                    else:
+                        re_calculate = True
+                        temp['re_calculate'] = re_calculate
                 else:
-                    t_dict[d] = [t]
-        data = [args]  # 真实老师不对信号做任何处理
-        for k, v in t_dict.items():
-            """
-            虚拟老师对原始信号佑如下的处理方式：
-            1. 正向
-            2. 反向
-            3. 随机
-            每个类型中，都要挑一个随机的老师出来对信号进行跟踪。
-            """
+                    pass
+                container = [x for x in v if ['_id'] not in already_process]
+                container = v if len(container) == 0 else container
+                teacher = random.choice(container)
+                teacher_id = teacher['_id']
+                already_process.append(teacher_id)
+                temp['teacher_id'] = teacher_id
+                temp['teacher_name'] = teacher['name']
+                data.append(temp)
+            for x in data:
+                obj = cls(**x)
+                obj.save_plus()
+        else:
+            """平仓数据"""
+            native_id = args['native_id']
+            f = {"native_id": native_id if isinstance(native_id, ObjectId) else ObjectId(native_id)}
+            u = {
+                "exit_reason": signal.get_attr("exit_reason"),
+                "exit_price": signal.get_attr("exit_price"),
+                "close_time": signal.get_attr("update_time"),
+                "update_time": signal.get_attr("update_time"),
+                "profit": signal.get_attr("profit"),
+                "each_profit": signal.get_attr("each_profit"),
+                "each_profit_dollar": signal.get_attr("each_profit_dollar"),
+                "each_cost": signal.get_attr("each_cost"),
+                "t_coefficient": signal.get_attr("t_coefficient"),
+                "p_coefficient": signal.get_attr("p_coefficient")
+            }
+            trades = cls.find_plus(filter_dict=f, to_dict=True)
+            for trade in trades:
+                re_calculate = trade.get("re_calculate")
+                if re_calculate:
+                    """需要重新i计算"""
+                    Open = args.get("enter_price")  # 建仓价
+                    Close = args.get("exit_price")  # 平仓价
+                    N = 1                           # 交易量
+                    M = 0.00001                     # 最小波动价格
+                    D = args.get("t_coefficient")   # 点差,目前取的是（交易）系数
+                    T = args.get("p_coefficient")   # 点值
+                    direction = trade.get("direction")
+                    if direction == "卖出":
+                        a_coefficient = random.randint(-4, 4)
+                        b_coefficient = random.randint(-4, 4)
+                        u['a_coefficient'] = a_coefficient
+                        u['b_coefficient'] = b_coefficient
+                        enter_price = Open - D + a_coefficient * M
+                        exit_price = Close + D + b_coefficient * M
+                        profit = (enter_price - exit_price - 2 * D + (a_coefficient - b_coefficient) * M) * T * N
+                        u['enter_price'] = enter_price
+                        u['exit_price'] = exit_price
+                        u['profit'] = profit
+                    else:
+                        a_coefficient = random.randint(-4, 4)
+                        b_coefficient = random.randint(-4, 4)
+                        u['a_coefficient'] = a_coefficient
+                        u['b_coefficient'] = b_coefficient
+                        enter_price = Open + D + a_coefficient * M
+                        exit_price = Close - D + b_coefficient * M
+                        profit = (exit_price - enter_price - 2 * D + (b_coefficient - a_coefficient) * M) * T * N
+                        u['enter_price'] = enter_price
+                        u['exit_price'] = exit_price
+                        u['profit'] = profit
+                    f2 = {"_id": trade['_id']}
+                    up = {"$set": u}
+                    r = cls.find_one_and_update_plus(filter_dict=f2, update_dict=up, upsert=True)
+                    if isinstance(r, dict):
+                        pass
+                    else:
+                        ms = "更新失败,f={},u={}".format(f2, up)
+                        print(ms)
 
-
+                else:
+                    """无需重新计算"""
+                    r = cls.find_one_and_update_plus(filter_dict=f, update_dict={"$set": u}, upsert=False)
+                if isinstance(r, dict):
+                    pass
+                else:
+                    ms = "插入失败,f={},u={}".format(f, u)
+                    print(ms)
 
 
 
@@ -718,5 +836,5 @@ if __name__ == "__main__":
     # print(MonthEstimate.get_instance("5a1e680642f8c1bffc5dbd6f", "2018-06"))
     """生成一个虚拟信号"""
     # signal1 = Signal.find_by_id(ObjectId("5b485ebbf313841fc0eaf2ad"))
-    Trade.sync_from_signal(d)
+    Trade.sync_from_signal(d, signal_type="建仓提醒")
     pass

@@ -49,7 +49,7 @@ mongodb_setting = {
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
-    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
+    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
     "username": user,       # 用户名
     "password": password    # 密码
@@ -2509,29 +2509,32 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
     return res
 
 
-class T1(BaseDoc):
-    _table_name = "t1"
-
-
-class T2(BaseDoc):
-    _table_name = "t2"
-
-    def __init__(self, **kwargs):
-        a = {}['name']
-        super(T2, self).__init__(**kwargs)
-
 if __name__ == "__main__":
-    client = get_client()
-    orders = client.db.orders
-    d = client.db
-    print(dir(d))
-    inventory = client.db.inventory
-    with client.start_session(causal_consistency=True) as session:
-        t = T1(name='jack')
-        g = t.get_dict()
-        collection = client.db.collection
-        collection
-        t2 = T2(name='tom')
-        t2.save_plus()
+    """
+    多文档事务演示
+    t1和t2请提前创建,事务不会自己创建collection,不然会报
+    Cannot create namespace mq_db.t1 in multi-document transaction
+    的错误
+    """
+    # class T1(BaseDoc):
+    #     _table_name = "t1"
+    #
+    #
+    # class T2(BaseDoc):
+    #     _table_name = "t2"
+    #
+    #     def __init__(self, **kwargs):
+    #         a = {}['name']
+    #         super(T2, self).__init__(**kwargs)
+    # client = get_client()
+    # t1 = client[db_name]['t1']  # 操作t1表的collection,db_name是你的数据库名,你可以这么写client.db_name.collection_name
+    # t2 = client[db_name]['t2']  # # 操作t2表的collection
+    # with client.start_session(causal_consistency=True) as session:
+    #     """事物必须在session下执行,with保证了session的正常关闭"""
+    #     with session.start_transaction():
+    #         """一旦出现异常会自动调用session.abort_transaction()"""
+    #         t1.insert_one(document={"name": "jack"}, session=session)  # 注意多了session这个参数
+    #         k = dict()['name']  # 制造一个错误,你会发现t1和t2的插入都不会成功.
+    #         t2.insert_one(document={"name": "jack2"}, session=session)
     pass
 
