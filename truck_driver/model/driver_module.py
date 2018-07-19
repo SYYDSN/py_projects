@@ -201,6 +201,7 @@ class Honor(mongo_db.BaseDoc):
     type_dict['title'] = str    # 荣誉称号
     type_dict['info'] = str    # 荣誉信息
     type_dict['image_id'] = DBRef  # 荣誉图片
+    type_dict['image_url'] = str  # 荣誉图片的地址,这个字段是计算出来的,不保存实际的值.
     type_dict['create_date'] = datetime.datetime  # 创建时间
 
 
@@ -214,6 +215,7 @@ class Vehicle(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
     type_dict["image_id"] = DBRef  # 车辆照片
+    type_dict["image_url"] = str  # 车辆照片的url,这个字段是计算出来的,不保存实际的值.
     type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
     """
     相关标准参考GB1589
@@ -319,6 +321,13 @@ class HeadImage(mongo_db.BaseFile):
     _table_name = "head_image"
 
 
+class IdImage(mongo_db.BaseFile):
+    """
+    身份证图片
+    """
+    _table_name = "id_image"
+
+
 class HonorImage(mongo_db.BaseFile):
     """
     荣誉证书照片
@@ -365,6 +374,7 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['email'] = str  # 邮箱
     type_dict['birth_date'] = datetime.datetime  # 出生日期,以身份证号码为准
     type_dict['id_num'] = str  # 身份证号码
+    type_dict['id_image'] = DBRef  # 身份证图片
     type_dict['age'] = int  # 年龄 以身份证号码为准
     """以下3个字段因为是动态的,需要在每次查询doc的时候进行计算,以保证准确性"""
     type_dict['driving_experience'] = int  # 驾龄 单位 年 用驾驶证信息中的首次领证日期计算
