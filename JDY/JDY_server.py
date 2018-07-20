@@ -434,6 +434,8 @@ def login_func():
             if isinstance(res, dict):
                 if res['message'] == "success":
                     save_platform_session(**res['data'])
+                else:
+                    mes = res
             else:
                 mes = {"message": "登录错误"}
             return json.dumps(mes)

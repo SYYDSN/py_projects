@@ -49,7 +49,7 @@ mongodb_setting = {
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
-    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
+    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
     "username": user,       # 用户名
     "password": password    # 密码
@@ -871,7 +871,7 @@ class BaseFile:
     """
     保存文件到mongodb数据库的GridFS操作基础类,
     这一类函数都不推荐使用init创建实例.而是使用
-    cls.save_cls以及其延伸的方法cls.save_flask_file来保存文件.
+    cls.save_cls以及其眼神的方法cls.save_flask_file来保存文件.
     """
     _table_name = "base_file"
     type_dict = dict()
@@ -957,13 +957,9 @@ class BaseFile:
         :return: 失败返回None,成功返回_id/str
         """
         fs = cls.fs_cls(collection)
-        if "file_name" not in kwargs:
-            ms = "file_name 参数必须"
-            raise ValueError(ms)
-        else:
-            r = fs.put(data=file_obj, **kwargs)
-            file_obj.close()
-            return r
+        r = fs.put(data=file_obj, **kwargs)
+        file_obj.close()
+        return r
 
     @classmethod
     def save_flask_file(cls, req: request, collection: str = None, arg_name: str = None, **kwargs) -> (str, ObjectId, None):
@@ -2587,36 +2583,32 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
     return res
 
 
-class TransactionItem:
-    """
-    事务操作中的一个步骤. 未完成
-    """
-    def __init__(self, **kwargs):
-        handlers = ['insert', 'create', 'update', 'edit', 'delete', 'remove']
-        handler = kwargs.pop('handler')
-        if handler is not None and handler in handlers:
-            if handler in ['insert', 'create']:
-                self.handler = 'insert'
-            elif handler in ['update', 'edit']:
-                self.handler = 'update'
-            else:
-                self.handler = 'delete'
-        else:
-            ms = "错误的操作类型:{}".format(handler)
-
-
-class BaseTransaction:
-    """事务. 未完成"""
-    _table_name = "base_transaction_info"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-
-
 if __name__ == "__main__":
-    f = "/home/walle/java_error_in_PYCHARM_.log"
-    c = open(f, 'rb')
-    e = BaseFile.save_cls(c, **{"file_name":"hello", "file_type":"text"})
-    e = BaseFile.find_one_cls(filter_dict={"file_name":"hello"}, instance=True)
-    print(e)
+    """
+    多文档事务演示
+    t1和t2请提前创建,事务不会自己创建collection,不然会报
+    Cannot create namespace mq_db.t1 in multi-document transaction
+    的错误
+    """
+    # class T1(BaseDoc):
+    #     _table_name = "t1"
+    #
+    #
+    # class T2(BaseDoc):
+    #     _table_name = "t2"
+    #
+    #     def __init__(self, **kwargs):
+    #         a = {}['name']
+    #         super(T2, self).__init__(**kwargs)
+    # client = get_client()
+    # t1 = client[db_name]['t1']  # 操作t1表的collection,db_name是你的数据库名,你可以这么写client.db_name.collection_name
+    # t2 = client[db_name]['t2']  # # 操作t2表的collection
+    # with client.start_session(causal_consistency=True) as session:
+    #     """事物必须在session下执行,with保证了session的正常关闭"""
+    #     with session.start_transaction():
+    #         """一旦出现异常会自动调用session.abort_transaction()"""
+    #         t1.insert_one(document={"name": "jack"}, session=session)  # 注意多了session这个参数
+    #         k = dict()['name']  # 制造一个错误,你会发现t1和t2的插入都不会成功.
+    #         t2.insert_one(document={"name": "jack2"}, session=session)
     pass
 

@@ -26,8 +26,8 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持
 SESSION_TYPE = "redis"
 Session(app)
 port = 8080
-app_id = "wx0caf19ad3fd15e71"
-app_secret = "f372a66d288958d5cc031637e8257543"
+app_id = "wx0caf19ad3fd15e71"                       # 盛汇app_id
+app_secret = "f372a66d288958d5cc031637e8257543"     # 盛汇app_secret
 
 
 def get_all_args(req) -> dict:
@@ -42,6 +42,38 @@ def get_all_args(req) -> dict:
     jsons = dict() if json_data is None else {k: v for k, v in json_data.items()}
     data = {"args": args, 'form': form, "json": jsons}
     return data
+
+
+def validate_token(timestamp: str, nonce: str, signature: str) -> bool:
+    """
+    验证微信服务器的的配置
+
+    1. 将token、timestamp、nonce三个参数进行字典序排序
+    2. 将三个参数字符串拼接成一个字符串进行sha1加密
+    3. 开发者获得加密后的字符串可与signature对比
+
+    若确认此次GET请求来自微信服务器，请原样返回echostr参数内容，
+    则接入生效，成为开发者成功，否则接入失败.
+    :param timestamp:时间戳
+    :param nonce: 随机数
+    :param signature:微信加密签名
+    :return: bool
+    """
+    res = False
+    token = "0cceb6c6157747dcab9791569418799a"
+    if isinstance(timestamp, str) and isinstance(nonce, str) and isinstance(signature, str):
+        l = [token, timestamp, nonce]
+        l.sort()
+        s = "".join(l)
+        sha = hashlib.sha1(s.encode(encoding="utf-8"))
+        sha = sha.hexdigest()
+        if sha == signature:
+            res = True
+        else:
+            pass
+    else:
+        pass
+    return res
 
 
 def get_code(req) -> dict:

@@ -1013,6 +1013,17 @@ class BaseFile:
                 res = cls.save_cls(file_obj=file_storage, collection=collection, arg_name=arg_name, **kwargs)
         return res
 
+    @staticmethod
+    def get_dict_from_fs(return_obj: gridfs.GridFS) -> dict:
+        """
+        从一个gridfs.GridFS对象中取回完整的字典。
+        :param return_obj:
+        :return:
+        """
+        r = return_obj._file
+        r['data'] = return_obj.read()
+        return r
+
     @classmethod
     def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False, collection: str = None)\
             -> (dict, None):
@@ -1033,8 +1044,7 @@ class BaseFile:
         if one is None:
             pass
         else:
-            r = one._file
-            r['data'] = one.read()
+            r = cls.get_dict_from_fs(one)
             one.close()
             return cls(**r) if instance else r
 
@@ -1083,25 +1093,98 @@ class BaseFile:
         :param collection:
         :return:
         """
-        temp = dict()
-        f_id = doc['_id']
-        temp['_id'] = f_id
-        f_name = doc.get('file_name', '')
-        temp['file_name'] = f_name
-        f_type = doc.get('file_type', '')
-        temp['file_type'] = f_type
-        f_desc = doc.get('description', '')
-        temp['desc'] = f_desc
-        f_md5 = doc.get('md5', '')
-        temp['md5'] = f_md5
-        f_time = doc.get('uploadDate').strftime("%Y-%m-%d %H:%M:%S")
-        temp['time'] = f_time
-        if include_data:
-            f_data = doc.get('data')
+        f_data = doc.pop("data", None)
+        temp = to_flat_dict(doc)
+        if include_data and f_data is not None:
             temp['data'] = f_data
-        f_url = cls.format_url(file_id=f_id, file_name=f_name, collection=collection)
+        f_url = cls.format_url(file_id=temp['_id'], file_name=temp['file_name'], collection=collection)
         temp['url'] = f_url
         return temp
+
+    @classmethod
+    def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
+                      ruler: int = 5, page_index: int = 1, func: object = None) -> dict:
+        """
+        分页查询,注意这个方法和BaseDoc.query_by_page方法不同，本方法没有to_dict和can_json参数，
+        但默认传入这两个参数，目的是因为处理分页查询图片主要是为了前端呈现，这样是简化操作。
+        :param filter_dict:  查询条件字典
+        :param sort_dict:  排序条件字典
+        :param projection:  投影数组,决定输出哪些字段?
+        :param page_size:
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
+        :return: 字典对象.
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        """
+        if isinstance(page_size, int):
+            pass
+        elif isinstance(page_size, float):
+            page_size = int(page_size)
+        elif isinstance(page_size, str) and page_size.isdigit():
+            page_size = int(page_size)
+        else:
+            page_size = 10
+        page_size = 1 if page_size < 1 else page_size
+
+        if isinstance(page_index, int):
+            pass
+        elif isinstance(page_index, float):
+            page_index = int(page_index)
+        elif isinstance(page_index, str) and page_index.isdigit():
+            page_index = int(page_index)
+        else:
+            page_size = 1
+        page_index = 1 if page_index < 1 else page_index
+
+        skip = (page_index - 1) * page_size
+        if sort_dict is not None:
+            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        else:
+            sort_list = None
+        table_name = cls._table_name
+        ses = get_conn(table_name="{}.files".format(table_name))
+        args = {
+            "filter": filter_dict,
+            "sort": sort_list,  # 可能是None,但是没问题.
+            "projection": projection,
+            "skip": skip,
+            "limit": page_size
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        """开始计算分页数据"""
+        record_count = ses.count(filter=filter_dict)
+        page_count = math.ceil(record_count / page_size)  # 共计多少页?
+        delta = int(ruler / 2)
+        range_left = 1 if (page_index - delta) <= 1 else page_index - delta
+        range_right = page_count if (range_left + ruler - 1) >= page_count else range_left + ruler - 1
+        pages = [x for x in range(range_left, int(range_right) + 1)]
+        """开始查询页面"""
+        res = list()
+        ses = cls.fs_cls()
+        r = ses.find(**args)
+        if r is None:
+            pass
+        else:
+            if func:
+                res = [func(cls.transform(doc=cls.get_dict_from_fs(x))) for x in r]
+            else:
+                res = [cls.transform(doc=cls.get_dict_from_fs(x)) for x in r]
+        resp = {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        return resp
 
 
 class BaseDoc:

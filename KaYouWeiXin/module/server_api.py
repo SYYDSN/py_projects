@@ -12,8 +12,8 @@ import requests
 
 ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
-app_id = "wx0caf19ad3fd15e71"                    # 盛汇app_id
-app_secret = "f372a66d288958d5cc031637e8257543"  # 盛汇app_secret
+app_id = "wx0caf19ad3fd15e71"
+app_secret = "f372a66d288958d5cc031637e8257543"
 
 
 """和微信服务器相关的功能"""

@@ -1,22 +1,22 @@
-# -*- coding: utf-8 -*-
 from flask import Flask
-from flask import request
+from flask import abort
 from flask import send_from_directory
+from flask import render_template
+from flask import request
 from flask import session
 from flask_session import Session
-from flask import abort
-import os
-import requests
+from flask import redirect
+import json
 import datetime
+import os
+import json
+import requests
+from module.item_module import RawWebChatMessage
+from module.item_module import WXUserInfo
 from tools_module import *
-from modules.item_module import RawWebChatMessage
-from views.flash_view import flash_blueprint
+from mongo_db import cache
 
 
-"""训练服务器"""
-
-
-port = 5678
 key_str = os.urandom(24)  # 生成密钥，为session服务。
 app = Flask(__name__)
 app.config['SECRET_KEY'] = key_str  # 配置会话密钥
@@ -24,14 +24,42 @@ app.config['SESSION_TYPE'] = "redis"  # session类型为redis
 app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持久化的会话的生存时间
 SESSION_TYPE = "redis"
-app.config.from_object(__name__)
-app.register_blueprint(flash_blueprint)  # 注册闪卡训练蓝图
 Session(app)
-app_id = "wxd89f1f72776053ad"                       # app_id
-app_secret = "66a4200979bf09dd565180f1bd9c38d4"     # app_secret
+port = 8080
+app_id = "wx0caf19ad3fd15e71"
+app_secret = "f372a66d288958d5cc031637e8257543"
 
 
-"""工具函数"""
+def validate_token(timestamp: str, nonce: str, signature: str) -> bool:
+    """
+    验证微信服务器的的配置
+
+    1. 将token、timestamp、nonce三个参数进行字典序排序
+    2. 将三个参数字符串拼接成一个字符串进行sha1加密
+    3. 开发者获得加密后的字符串可与signature对比
+
+    若确认此次GET请求来自微信服务器，请原样返回echostr参数内容，
+    则接入生效，成为开发者成功，否则接入失败.
+    :param timestamp:时间戳
+    :param nonce: 随机数
+    :param signature:微信加密签名
+    :return: bool
+    """
+    res = False
+    token = "0cceb6c6157747dcab9791569418799a"
+    if isinstance(timestamp, str) and isinstance(nonce, str) and isinstance(signature, str):
+        l = [token, timestamp, nonce]
+        l.sort()
+        s = "".join(l)
+        sha = hashlib.sha1(s.encode(encoding="utf-8"))
+        sha = sha.hexdigest()
+        if sha == signature:
+            res = True
+        else:
+            pass
+    else:
+        pass
+    return res
 
 
 def get_all_args(req) -> dict:
@@ -96,6 +124,61 @@ def refresh_access_token(refresh_token: str) -> dict:
     return json.dumps(res)
 
 
+def get_user_info(access_token: str, open_id: str) -> dict:
+    """
+    根据用户id获取用户的信息
+    :param access_token:
+    :param open_id:
+    :return:
+    返回的字段说明:
+    openid   	用户的唯一标识
+    nickname	用户昵称
+    sex	        用户的性别，值为1时是男性，值为2时是女性，值为0时是未知
+    province	用户个人资料填写的省份
+    city	    普通用户个人资料填写的城市
+    country	    国家，如中国为CN
+    headimgurl	用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可选，0代表640*640正方形头像），
+                用户没有头像时该项为空。若用户更换头像，原有头像URL将失效。
+    privilege	用户特权信息，json 数组，如微信沃卡用户为（chinaunicom）
+    unionid	    只有在用户将公众号绑定到微信开放平台帐号后，才会出现该字段。
+    """
+    res = {"message": "未知错误"}
+    u = "https://api.weixin.qq.com/sns/userinfo?access_token={}&openid={}&lang=zh_CN". \
+        format(access_token, open_id)
+    resp = requests.get(u)
+    status = resp.status_code
+    if status != 200:
+        res['message'] = "服务器返回了异常的状态码:{}".format(status)
+    else:
+        # data = resp.json()
+        """json返回的内容,requests不好推断编码,所以使用了原始的返回体,自己解码"""
+        content = resp.content
+        data = json.loads(s=content.decode(), encoding="utf-8")
+        print(data)
+        res['message'] = "success"
+        res['data'] = data
+    return res
+
+
+@app.route('/')
+def hello_world():
+    mes = {"message": "success"}
+    data = get_all_args(req=request)
+    mes['data'] = data
+    return json.dumps(mes)
+
+
+@app.route("/MP_verify_rWljXjuoyFTJhTDk.txt")
+def wx_validate_file_func():
+    """微信服务器回调域名验证"""
+    return send_from_directory(directory="static/file/", filename="MP_verify_rWljXjuoyFTJhTDk.txt")
+
+
+@app.route("/welcome")
+def welcome_func():
+    return render_template("welcome.html")
+
+
 def get_access_token(code_str: str) -> dict:
     """
     获取微信服务器的页面授权access_token
@@ -122,54 +205,43 @@ def get_access_token(code_str: str) -> dict:
     return res
 
 
-def validate_token(timestamp: str, nonce: str, signature: str) -> bool:
+@app.route("/user_info_demo")
+def user_info_demo_func():
     """
-    验证微信服务器的的配置
-
-    1. 将token、timestamp、nonce三个参数进行字典序排序
-    2. 将三个参数字符串拼接成一个字符串进行sha1加密
-    3. 开发者获得加密后的字符串可与signature对比
-
-    若确认此次GET请求来自微信服务器，请原样返回echostr参数内容，
-    则接入生效，成为开发者成功，否则接入失败.
-    :param timestamp:时间戳
-    :param nonce: 随机数
-    :param signature:微信加密签名
-    :return: bool
+    一个获取用户信息的的页面.
+    :return:
     """
-    res = False
-    token = "0cceb6c6157747dcab9791569418799a"
-    if isinstance(timestamp, str) and isinstance(nonce, str) and isinstance(signature, str):
-        l = [token, timestamp, nonce]
-        l.sort()
-        s = "".join(l)
-        sha = hashlib.sha1(s.encode(encoding="utf-8"))
-        sha = sha.hexdigest()
-        if sha == signature:
-            res = True
+    """第一步,获取code"""
+    code = get_all_args(req=request)['args']['code']
+    """
+    第二步, 获取access_token,
+    data的值说明:
+    access_token:	网页授权接口调用凭证,注意：此access_token与基础支持的access_token不同
+    expires_in:   	access_token接口调用凭证超时时间，单位（秒）
+    refresh_token:	用户刷新access_token
+    openid:         用户唯一标识，请注意，在未关注公众号时，用户访问公众号的网页，也会产生一个用户和公众号唯一的OpenID
+    scope:      	用户授权的作用域，使用逗号（,）分隔
+    """
+    error_reason = ""
+    data = get_access_token(code_str=code)['data']
+    access_token = ""  
+    open_id = ""
+    try:
+        access_token = data['access_token']
+        open_id = data['openid']
+    except KeyError as e:
+        error_reason = "code已过期或者使用过"
+    finally:
+        if error_reason != "":
+            resp = {"message": error_reason}
         else:
-            pass
-    else:
-        pass
-    return res
-
-
-"""开始视图函数"""
-
-
-@app.route('/')
-def hello_world():
-    return 'Hello Baby!'
-
-
-@app.route("/MP_verify_Y2yMSCJbTbMwSml6.txt")
-def wx_validate_file_func():
-    """
-    微信服务器回调域名验证
-    验证JS接口安全域名时使用.
-    微信公众平台->设置->公众号设置->功能设置->JS接口安全域名(点击设置按钮)
-    """
-    return send_from_directory(directory="static/file/", filename="MP_verify_Y2yMSCJbTbMwSml6.txt")
+            """第三步,获取用户信息"""
+            resp = get_user_info(access_token=access_token, open_id=open_id)
+        # return json.dumps(resp)
+        data = resp.get("data", dict())
+        user_info = WXUserInfo(**data)
+        user_info.save_plus(upsert=True)
+        return render_template("user_info_demo.html", data=data)
 
 
 @app.route("/message", methods=['post', 'get'])
@@ -219,5 +291,4 @@ def logger_request_info():
 
 
 if __name__ == '__main__':
-    if __name__ == '__main__':
-        app.run(host="0.0.0.0", port=port, debug=True, threaded=True)  # 一般调试模式
+    app.run(host="0.0.0.0", port=port, debug=True, threaded=True)
