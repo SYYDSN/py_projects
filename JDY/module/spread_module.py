@@ -50,7 +50,7 @@ class SpreadKeyword(mongo_db.BaseDoc):
         :param english: 英文词汇
         :return: 中文关键词
         """
-        filter_dict = {"english": english}
+        filter_dict = {"english": english.lower()}
         res = cls.find_one_plus(filter_dict=filter_dict, projection=['chinese'])
         return res
 
