@@ -27,7 +27,7 @@ class WXUserInfo(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['nick_name'] = str
     type_dict['sex'] = int
-    type_dict['open_id'] = str
+    type_dict['openid'] = str
     type_dict['country'] = str  # 国家
     type_dict['province'] = str  # 省份
     type_dict['city'] = str
