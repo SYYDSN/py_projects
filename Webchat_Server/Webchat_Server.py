@@ -28,6 +28,8 @@ Session(app)
 port = 8080
 app_id = "wx0caf19ad3fd15e71"                       # 盛汇app_id
 app_secret = "f372a66d288958d5cc031637e8257543"     # 盛汇app_secret
+app_id = "wx66711dbfd84a50c4"                       # 汇赢app_id
+app_secret = "d9186b6cef15534427c02f6ee7085a9f"     # 汇赢app_secret
 
 
 def get_all_args(req) -> dict:
@@ -168,15 +170,15 @@ def hello_world():
     return json.dumps(mes)
 
 
-@app.route("/MP_verify_rWljXjuoyFTJhTDk.txt")
+@app.route("/MP_verify_sMgcu97iNJMwM7WI.txt")
 def wx_validate_file_func():
     """微信服务器回调域名验证"""
-    return send_from_directory(directory="static/file/", filename="MP_verify_rWljXjuoyFTJhTDk.txt")
+    return send_from_directory(directory="static/file/", filename="MP_verify_sMgcu97iNJMwM7WI.txt")
 
 
 @app.route("/welcome")
 def welcome_func():
-    return render_template("welcome.html")
+    return render_template("welcome.html", app_id=app_id)
 
 
 def get_access_token(code_str: str) -> dict:
@@ -208,7 +210,7 @@ def get_access_token(code_str: str) -> dict:
 @app.route("/user_info_demo")
 def user_info_demo_func():
     """
-    一个获取用户信息的的页面.
+    一个获取用户信息的的示范页面.注意,不能直接访问此页面,而是需要从welcome页面进入
     :return:
     """
     """第一步,获取code"""

@@ -9,6 +9,7 @@ from log_module import get_logger
 from celery_module import to_jiandao_cloud_and_send_mail
 from werkzeug.contrib.cache import SimpleCache
 import datetime
+from browser.firefox_module import to_jiandao_cloud
 from module.send_moudle import send_signal
 from module.spread_module import SpreadChannel
 
@@ -127,7 +128,8 @@ class Customer(mongo_db.BaseDoc):
                 customer = cls(**kwargs)
                 save = None
                 try:
-                    save = customer.save()
+                    save = customer.save()  # 调试请关闭
+                    # save = ObjectId()  # 调试请开打
                 except Exception as e:
                     print(e)
                     message['message'] = str(e)
@@ -138,12 +140,12 @@ class Customer(mongo_db.BaseDoc):
                         """发送到钉钉机器人"""
                         today_count = cls.today_register_count()
                         reg_dict['today_count'] = today_count
-                        cls.send_signal(reg_dict)
+                        cls.send_signal(reg_dict)   # 调试请关闭
                         """转发到简道云"""
                         ms = "用户已保存,开始调用to_jiandao_cloud_and_send_mail, arg={}".format(reg_dict)
                         logger.info(ms)
-                        to_jiandao_cloud_and_send_mail.delay(**reg_dict)
-                        # add_job("reg", reg_dict)
+                        # to_jiandao_cloud(**reg_dict)  # 调试请开打
+                        to_jiandao_cloud_and_send_mail.delay(**reg_dict)  # 调试请关闭
                     else:
                         pass
             else:
@@ -400,6 +402,22 @@ if __name__ == "__main__":
     # scheme = DistributionScheme(**scheme_init)
     # scheme.save_plus()
     """测试分组统计方法"""
-    r = DistributionScheme.next_group()
-    print(r)
+    # r = DistributionScheme.next_group()
+    # print(r)
+    args = {
+        "_id" : ObjectId("5b554a76451353150ce742b6"),
+        "search_keyword" : "",
+        "user_name" : "王满石",
+        "group_count" : 0,
+        "page_url" : "http://qhrj.sxzctec015.cn/20180719gjs/index.html?channel=360A-pc-hqrj-byds",
+        "description" : "页面标题:",
+        "referrer" : "https://www.so.com/s?ie=utf-8&src=hao_360so_suggest_b&shb=1&hsid=fc569f7380160a98&eci=407b847fad15303c&nlpv=suggest_3.2.2&q=%E5%8D%9A%E5%BC%88%E5%A4%A7%E5%B8%88%E5%AE%98%E7%BD%91%E4%B8%8B%E8%BD%BD",
+        "group_by" : "0",
+        "phone" : [
+            "19971422786"
+        ],
+        "user_agent" : "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36",
+        "time" : "2018-12-12 0:0:0"
+    }
+    Customer.reg(**args)
     pass

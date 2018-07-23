@@ -10,6 +10,7 @@ import json
 import datetime
 import os
 import json
+from views.wx_view import wx_blueprint
 import requests
 from module.item_module import RawWebChatMessage
 from module.item_module import WXUserInfo
@@ -23,11 +24,12 @@ app.config['SECRET_KEY'] = key_str  # 配置会话密钥
 app.config['SESSION_TYPE'] = "redis"  # session类型为redis
 app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持久化的会话的生存时间
+app.register_blueprint(wx_blueprint)
 SESSION_TYPE = "redis"
 Session(app)
 port = 8080
-app_id = "wx0caf19ad3fd15e71"
-app_secret = "f372a66d288958d5cc031637e8257543"
+app_id = "wx50cbcc5725601880"
+app_secret = "1aa28cda9bbb187acb9e1f7464d2b15a"
 
 
 def validate_token(timestamp: str, nonce: str, signature: str) -> bool:
@@ -168,10 +170,10 @@ def hello_world():
     return json.dumps(mes)
 
 
-@app.route("/MP_verify_rWljXjuoyFTJhTDk.txt")
+@app.route("/MP_verify_DsFnF8udEBEA4gAI.txt")
 def wx_validate_file_func():
     """微信服务器回调域名验证"""
-    return send_from_directory(directory="static/file/", filename="MP_verify_rWljXjuoyFTJhTDk.txt")
+    return send_from_directory(directory="static/file/", filename="MP_verify_DsFnF8udEBEA4gAI.txt")
 
 
 @app.route("/welcome")

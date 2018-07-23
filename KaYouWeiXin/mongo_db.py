@@ -31,9 +31,9 @@ from pymongo.errors import DuplicateKeyError
 
 cache = RedisCache()
 logger = get_logger()
-user = "mes_root"              # 数据库用户名
-password = "MyMes*18"       # 数据库密码
-db_name = "message_db"        # 库名称
+user = "kywx_root"              # 数据库用户名
+password = "Kywx@18"       # 数据库密码
+db_name = "kywx_db"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 
 """mongodb配置信息"""
@@ -42,8 +42,7 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
 """
 mongodb_setting = {
-    # "host": "127.0.0.1:27017",   # 数据库服务器地址            mongos 1
-    "host": "47.106.68.161:27017",   # 数据库服务器地址
+    "host": "project.safego.org:27017",   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.

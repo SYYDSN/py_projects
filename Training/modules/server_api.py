@@ -12,10 +12,8 @@ import requests
 
 ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
-app_id = "wx0caf19ad3fd15e71"                    # 盛汇app_id
-app_secret = "f372a66d288958d5cc031637e8257543"  # 盛汇app_secret
-app_id = "wx66711dbfd84a50c4"                       # 汇赢app_id
-app_secret = "d9186b6cef15534427c02f6ee7085a9f"     # 汇赢app_secret
+app_id = "wxd89f1f72776053ad"                       # app_id
+app_secret = "66a4200979bf09dd565180f1bd9c38d4"     # app_secret
 
 
 """和微信服务器相关的功能"""
@@ -105,15 +103,6 @@ class AccessToken(mongo_db.BaseDoc):
         else:
             res['message'] = "服务器返回错误的状态:{}".format(r.status_code)
         return res
-
-
-class PageAuthorization(mongo_db.BaseDoc):
-    """
-    页面的授权
-    """
-    _table_name = "page_authorization"
-    type_dict = dict()
-
 
 
 def get_templates() -> list:
