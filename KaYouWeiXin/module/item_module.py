@@ -20,34 +20,69 @@ class RawWebChatMessage(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
 
 
-class WXUserInfo(mongo_db.BaseDoc):
+class WXUser(mongo_db.BaseDoc):
     """从微信接口获取的用户身份信息,目前的用户是测试"""
-    _table_name = "wx_user_info"
+    _table_name = "wx_user"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['nick_name'] = str
     type_dict['sex'] = int
-    type_dict['open_id'] = str
+    type_dict['openid'] = str
     type_dict['country'] = str  # 国家
     type_dict['province'] = str  # 省份
     type_dict['city'] = str
     type_dict['head_img_url'] = str  # 头像地址
-    type_dict['union_id'] = str
-    type_dict['create_date'] = datetime.datetime
+    type_dict['unionid'] = str
+    type_dict['subscribe'] = int   # 是否已关注本微信号
+    type_dict['subscribe_scene'] = str   # 用户关注的渠道来源
+    type_dict['subscribe_time'] = datetime.datetime   # 用户关注的时间
+    type_dict['access_token'] = str  # 访问access_token
+    type_dict['expires_in'] = int  # access_token的过期时间
+    type_dict['time'] = datetime.datetime  # access_token的获取时间
+    type_dict['refresh_token'] = str  # access_token的refresh_token
 
     def __init__(self, **kwargs):
         nick_name = kwargs.pop("nickname", "")
         if nick_name != "":
             kwargs['nick_name'] = nick_name
-        open_id = kwargs.pop("openid", "")
-        if open_id != "":
-            kwargs['open_id'] = open_id
         head_img_url = kwargs.pop("headimgurl", "")
         if head_img_url != "":
             kwargs['head_img_url'] = head_img_url
-        union_id = kwargs.pop("unionid", "")
-        if union_id != "":
-            kwargs['union_id'] = union_id
         if "create_date" not in kwargs:
             kwargs['create_date'] = datetime.datetime.now()
-        super(WXUserInfo, self).__init__(**kwargs)
+        super(WXUser, self).__init__(**kwargs)
+
+    @classmethod
+    def instance(cls, **raw_dict):
+        """
+        从为新获取到的用户信息的字典创建一个对象.
+        :param raw_dict:
+        :return:
+        """
+        subscribe_time = raw_dict.pop("subscribe_time", None)
+        if isinstance(subscribe_time, (int, float)):
+            raw_dict['subscribe_time'] = datetime.datetime.fromtimestamp(subscribe_time)
+        elif isinstance(subscribe_time, str) and subscribe_time.isdigit():
+            raw_dict['subscribe_time'] = datetime.datetime.fromtimestamp(int(subscribe_time))
+        else:
+            pass
+        return cls(**raw_dict)
+
+    @classmethod
+    def wx_login(cls, **info_dict: dict) -> dict:
+        """
+        微信用户登录,如果是新用户,那就创建,否则,那就修改.
+        :param info_dict:
+        :return:
+        """
+        openid = info_dict.pop("openid")
+        res = None
+        if openid is None:
+            pass
+        else:
+            f = {"openid": openid}
+            init = cls.instance(**info_dict)
+            init = init.get_dict(ignore=['_id', "openid"])
+            u = {"$set": init}
+            res = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+        return res

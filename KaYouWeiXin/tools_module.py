@@ -13,10 +13,10 @@ import datetime
 import json
 import re
 import numpy as np
+import base64
 import random
 import hashlib
 from uuid import uuid4
-import base64
 import urllib.request
 import os
 from uuid import uuid4
@@ -76,35 +76,6 @@ def save_platform_session(**kwargs) -> bool:
         return True
 
 
-def save_platform_cors_session(**kwargs) -> (str, None):
-    """保存平台操作者跨域会话信息
-    :kwargs 必须包含 user_id user_name user_password,sid四个参数
-    return 会话id
-    """
-    user_id = kwargs.get('user_id')
-    user_name = kwargs.get('user_name')
-    user_password = kwargs.get('user_password')
-    sid = kwargs.get('sid')  # 会话id
-    create_date = kwargs.get('create_date')  # 会话创建时间
-    result = False
-    if user_id is None or None or user_name is None or user_password is None:
-        pass
-    else:
-        """验证信息写入session"""
-        now = datetime.datetime.now()
-        kwargs['create_date'] = create_date if create_date else now
-        kwargs['last_update_date'] = now
-        sid = sid if sid else uuid4().hex
-        key = "session_key_{}".format(sid)
-        """
-        timeout是会话刷新间隔,用来确认用户是否还在线?如果在timeout的时间内,
-        没有收到用户页面发来的心跳信号,就认为用户已经离线,会删除用户的会话信息.
-        默认的心跳信号(会话刷新)间隔为10分钟
-        """
-        result = sid if cache.set(key, kwargs, timeout=cors_session_timeout) else result
-    return result
-
-
 def clear_platform_session():
     """清除平台操作者会话信息，注销使用。
     return None
@@ -115,46 +86,18 @@ def clear_platform_session():
     return False
 
 
-def clear_platform_cors_session(sid: str) -> bool:
-    """
-    清除平台操作者跨域会话信息，注销使用。
-    :param sid: 用户会话id
-    :return: True / False
-    """
-    key = "session_key_{}".format(sid)
-    return bool(cache.delete(key=key))
-
-
 def check_platform_session(f):
     """检测管操作员是否登录的装饰器"""
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
-        user_name = session.get("user_name")  # 检测session中的user_name
-        user_password = session.get("user_password")  # user_password
-        user_id = session.get("user_id")  # 检测session中的user_id
-        if not (user_password and user_name and user_id):
-            return redirect(url_for("manage_blueprint.login_func"))
+        wx_user = session.get("wx_user")  # 检测session中的wx_user
+        print("wx_user: {}".format(wx_user))
+        if wx_user is None:
+            ref = request.full_path
+            ref = base64.urlsafe_b64encode(ref.encode())
+            return redirect(url_for("wx_blueprint.get_code_and_redirect", ref=ref))
         else:
-            checked_user_obj = CompanyAdmin.find_one(user_name=user_name, user_password=user_password)
-            if checked_user_obj is None:
-                """用户名和密码不正确"""
-                return redirect(url_for("manage_blueprint.login_func"))
-            else:
-                if str(checked_user_obj.get_id()) == user_id:
-                    """检查时不是只读管理员,如果是,进行path检查,只允许访问规定的path"""
-                    if get_platform_session_arg("only_view"):
-                        """是只读管理员,检查当前访问大的path"""
-                        allow_paths = ["/manage/online_report"]
-                        cur_path = request.path
-                        if cur_path in allow_paths:
-                            return f(*args, **kwargs)
-                        else:
-                            """不在许可路径列表内"""
-                            return redirect(url_for("manage_blueprint.login_func"))
-                    else:
-                        return f(*args, **kwargs)
-                else:
-                    return redirect(url_for("manage_blueprint.login_func"))
+            return f(*args, **kwargs)
     return decorated_function
 
 
