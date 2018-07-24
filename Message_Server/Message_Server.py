@@ -78,7 +78,7 @@ def listen_func(key):
         signal = Signal.instance(**data)
         signal.send()
     elif key == "virtual_teacher":
-        """虚拟老师的增删改"""
+        """虚拟老师的增删改,这个操作是简道云发来的，将来不一定使用这种方式"""
         secret_str = 'xRJKhty0IxbP5uBKotyDOS7r'
         check = validate_signature(request, secret_str, signature)
         ms = "signal_test check secret is {}".format(check)

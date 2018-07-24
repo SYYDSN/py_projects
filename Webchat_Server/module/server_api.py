@@ -9,6 +9,8 @@ from mail_module import send_mail
 import datetime
 import json
 import requests
+import hashlib
+from uuid import uuid4
 from log_module import get_logger
 
 
@@ -23,6 +25,112 @@ host_name = "http://wx.91master.cn"
 
 
 """和微信服务器相关的功能"""
+
+
+class JSAPITicket(mongo_db.BaseDoc):
+    """
+    微信jsapi_ticket对象,因为一天的请求jsapi_ticket的次数有限,所以一旦获取了jsapi_ticket后,
+    需要自行保存在数据库中.
+    """
+    _table_name = "js_api_ticket"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['ticket'] = str
+    type_dict['expires'] = int
+    type_dict['time'] = datetime.datetime
+
+    @classmethod
+    def get_ticket(cls) -> (str, None):
+        """
+        从本机获取一个jsapi_ticket. 并注意过期时间.
+        这是应用程序获取jsapi_ticket的主要方法.
+        :return:
+        """
+        res = None
+        f = dict()
+        s = {"time": -1}
+        one = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+        flag = False
+        if one is None:
+            flag = True
+        else:
+            """检查access_token是否过期"""
+            generate_time = one['time']
+            expires = one['expires']
+            token = one['ticket']
+            now = datetime.datetime.now()
+            delta = (now - generate_time).total_seconds()
+            timeout = expires - delta
+            if timeout <= 0:
+                """超期了"""
+                flag = True
+            elif 0 <= timeout <= 300:
+                """可以开始申请了"""
+                flag = True
+                res = token
+            else:
+                res = token
+        if flag:
+            """从互联网查询"""
+            resp = cls.get_ticket_from_api()
+            mes = resp['message']
+            if mes != "success":
+                """从互联网查询失败"""
+                title = "查询access_token失败,错误原因:{}, {}".format(mes, datetime.datetime.now())
+                send_mail(title=title)
+            else:
+                data = resp['data']
+                res = data['ticket']
+        return res
+
+    @classmethod
+    def get_ticket_from_api(cls) -> dict:
+        """
+        从微信服务器获取一个jsapi_ticket对象.应用程序不应该直接调用本方法.而是使用cls.get_ticket方法来获取jsapi_ticket.
+        注意,获取jsapi_ticket需要用到服务器的基础access_token,也就是AccessToken
+        :return: dict
+        """
+        res = {"message": "success"}
+        u = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={}" \
+            "&type=jsapi".format(AccessToken.get_token())
+        r = requests.get(u)
+        if r.status_code == 200:
+            resp = r.json()
+            error_code = resp.get("errcode")  # 如果返回值是一个int类型,那就代表有错,否则这个值不存在(None)
+            if error_code != 0:
+                error_reason = resp['errmsg']
+                res['message'] = error_reason
+            else:
+                ticket = resp['ticket']
+                expires = resp['expires_in']
+                data = dict()
+                data['time'] = datetime.datetime.now()
+                data['ticket'] = ticket
+                data['expires'] = expires
+                cls.insert_one(**data)
+                res['data'] = data
+        else:
+            res['message'] = "服务器返回错误的状态:{}".format(r.status_code)
+        return res
+
+    @classmethod
+    def get_signature(cls, cur_url: str) -> dict:
+        """
+        计算并返回一个签名对象
+        签名算法验证页面 https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=jsapisign
+        :param cur_url:当前网页的URL，不包含#及其后面部分
+        :return:
+        """
+        noncestr = uuid4().hex
+        jsapi_ticket = cls.get_ticket()
+        timestamp = int(datetime.datetime.now().timestamp())
+        timestamp_str = str(int(datetime.datetime.now().timestamp()))
+        l = [("noncestr", noncestr), ("jsapi_ticket", jsapi_ticket), ("timestamp", timestamp_str), ("url", cur_url)]
+        l.sort(key=lambda obj: obj[0], reverse=False)
+        s = "&".join(["=".join(x) for x in l])
+
+        signature = hashlib.sha1(s.encode()).hexdigest()
+        return {"signature": signature, "timestamp": timestamp, "noncestr": noncestr}
 
 
 class AccessToken(mongo_db.BaseDoc):
@@ -137,7 +245,7 @@ class PageAuthorization(mongo_db.BaseDoc):
         """
         根据基础授权的code，获取用户的页面授权信息。 底层函数
         :param code: 基础授权的code
-        :return: 
+        :return:
         """
         u = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={}&secret={}&code={}&grant_type=authorization_code". \
             format(app_id, app_secret, code)
@@ -316,5 +424,7 @@ def send_template_message():
 
 
 if __name__ == "__main__":
-    get_templates()
+    """获取jsapi_ticket"""
+    ticket = JSAPITicket.get_ticket()
+    JSAPITicket.get_signature("http://temp.safego.org/wx/")
     pass

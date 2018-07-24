@@ -25,6 +25,7 @@ class WXUser(mongo_db.BaseDoc):
     _table_name = "wx_user"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['phone'] = str
     type_dict['nick_name'] = str
     type_dict['sex'] = int
     type_dict['openid'] = str

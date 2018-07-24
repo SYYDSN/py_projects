@@ -16,7 +16,12 @@ import datetime
 
 class Teacher(mongo_db.BaseDoc):
     """
-    老师
+    老师,微信项目（Webchat_Server）有一个同名的类，不同的是：
+    Message_Server项目下的Teacher类主要负责item_module.Trade.sync_from_signal(生成虚拟老师交易信号)时取老师列表。
+    Webchat_Server项目项目下的Teacher类，主要负责老师的管理。（属性，头像的修改）
+    两个类属性的字段相同即可.
+    Webchat_Server项目项目下的teacher_module更丰富一些。
+    你会在2个项目下分别看到这两个模块。
     """
     _table_name = "teacher"
     type_dict = dict()
@@ -25,6 +30,8 @@ class Teacher(mongo_db.BaseDoc):
     """真实老师的name可能取自简道云(也可再修改)"""
     type_dict['name'] = str   # 展示的名字，比如青云老师等
     type_dict['real_name'] = str  # 真实姓名，非必须
+    type_dict['head_img'] = str  # 头像文件相当与项目根目录的路径
+    type_dict['img'] = str  # 半身像文件相当与项目根目录的路径
     type_dict['level'] = str  # 老师等级
     type_dict['motto'] = str  # 座右铭
     type_dict['feature'] = str  # 特性，风格，特点
