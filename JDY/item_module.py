@@ -171,10 +171,11 @@ class Customer(mongo_db.BaseDoc):
         n = "" if reg_info.get("user_name") is None else reg_info.get("user_name")
         p = "" if reg_info.get("phone") is None else reg_info.get("phone")
         c = 0 if reg_info.get("today_count") is None else reg_info.get("today_count")
+        keywords = reg_info.get("search_keyword", "")
         title = "用户注册"
         markdown['title'] = title
-        markdown['text'] = "#### {}  \n > {}  \n > 注册通道：{}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 分组：{}  \n > 计数：{}/{}".\
-            format(title, d, channel_str, n, p, reg_info['group_by'], reg_info['group_count'] + 1, c)
+        markdown['text'] = "#### {}  \n > {}  \n > 注册通道：{}  \n > 搜索关键词： {}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 分组：{}  \n > 计数：{}/{}".\
+            format(title, d, channel_str, keywords, n, p, reg_info['group_by'], reg_info['group_count'] + 1, c)
         out_put['markdown'] = markdown
         out_put['at'] = {'atMobiles': [], 'isAtAll': False}
         res = send_signal(out_put, token_name=token_name)
@@ -406,7 +407,7 @@ if __name__ == "__main__":
     # print(r)
     args = {
         "_id" : ObjectId("5b554a76451353150ce742b6"),
-        "search_keyword" : "",
+        "search_keyword" : "迅迭 测试",
         "user_name" : "王满石",
         "group_count" : 0,
         "page_url" : "http://qhrj.sxzctec015.cn/20180719gjs/index.html?channel=360A-pc-hqrj-byds",

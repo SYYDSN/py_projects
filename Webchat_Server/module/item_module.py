@@ -6,9 +6,12 @@ if __project_path not in sys.path:
     sys.path.append(__project_path)
 import mongo_db
 import datetime
+from log_module import get_logger
+from uuid import uuid4
 
 
 ObjectId = mongo_db.ObjectId
+logger = get_logger()
 
 
 class RawWebChatMessage(mongo_db.BaseDoc):

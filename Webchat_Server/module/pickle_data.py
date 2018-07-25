@@ -27,7 +27,7 @@ p_list = ['加元', '白银', '澳元', '日元', '英镑', '欧元', '恒指', 
 
 def draw_data_dict_from_db(begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
     """
-    从数据库获取分析师的喊单信号。以老师名为一级key,产品名为二级key打包成dict并返回
+    细分产品种类，从数据库获取分析师的喊单信号。以老师名为一级key,产品名为二级key打包成dict并返回
     :param begin: 开始时间
     :param end:  截至时间
     :return:
@@ -73,6 +73,57 @@ def draw_data_dict_from_db(begin: datetime.datetime = None, end: datetime.dateti
             t_value[product] = p_value
             records[teacher] = t_value
             count += 1
+    print("共计{}条记录".format(count))
+    return records
+
+
+def draw_data_dict_from_db_mix(begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
+    """
+    不细分产品种类，从数据库获取分析师的喊单信号。以老师名为一级key,产品名为二级key打包成dict并返回
+    :param begin: 开始时间
+    :param end:  截至时间
+    :return:
+    """
+    records = dict()
+    now = datetime.datetime.now()
+    f = {
+        "each_profit": {"$exists": True, "$ne": None},
+        "exit_price": {"$exists": True, "$ne": None},
+        "update_time": {"$exists": True, "$type": 9}
+    }
+    if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
+        if end <= begin:
+            pass
+        else:
+            f['datetime'] = {
+                "$exists": True, "$type": 9,
+                "$lte": end, "$gte": begin
+            }
+    elif isinstance(begin, datetime.datetime) and end is None:
+        f['datetime'] = {
+            "$exists": True, "$type": 9,
+            "$lte": now, "$gte": begin
+        }
+    elif isinstance(end, datetime.datetime) and begin is None:
+        f['datetime'] = {"$exists": True, "$type": 9, "$lte": end}
+    else:
+        pass
+
+    ses = mongo_db.get_conn("signal_info")
+    signals = ses.find(filter=f)
+    count = 0
+    if signals.count() > 0:
+        for x in signals:
+            if x.get("product") in p_list:
+                count += 1
+                teacher = ObjectId(x['creator_id']) if isinstance(x['creator_id'], str) else x['creator_id']
+                t_value = records.get(teacher)
+                t_value = list() if t_value is None else t_value
+                t_value.append(x)
+                records[teacher] = t_value
+            else:
+                pass
+
     print("共计{}条记录".format(count))
     return records
 
@@ -138,7 +189,7 @@ def draw_data_list_from_db(begin: datetime.datetime = None, end: datetime.dateti
 
 def calculate_win_per_by_teacher(begin: str = None, end: str = None) -> dict:
     """
-    以老师为分组依据计算的胜率
+    以老师为分组依据计算的胜率，分每个产品的胜率
     :param begin: 开始时间
     :param end:  截至时间
     :return:
@@ -164,6 +215,41 @@ def calculate_win_per_by_teacher(begin: str = None, end: str = None) -> dict:
             p_dict["per"] = p_win_per
             p_dict['count'] = p_count
             t_dict[p_name] = p_dict
+        res[t_name] = t_dict
+    return res
+
+
+def calculate_win_per_by_teacher_mix(begin: str = None, end: str = None) -> dict:
+    """
+    以老师为分组依据计算的胜率,不再细分每个产品的胜率，而是统一计算
+    :param begin: 开始时间
+    :param end:  截至时间
+    :return:
+    """
+    if end is None:
+        end = datetime.datetime.now()
+    else:
+        end = mongo_db.get_datetime_from_str(end)
+    if begin is None:
+        begin = end - datetime.timedelta(days=30)
+    else:
+        begin = mongo_db.get_datetime_from_str(begin)
+
+    raw = draw_data_dict_from_db_mix(begin, end)
+    res = dict()
+    for t_name, t_value in raw.items():
+        t_dict = dict()
+        p_win_count = 0
+        for record in t_value:
+            if record['each_profit'] >= 0:
+                p_win_count += 1
+            else:
+                pass
+        p_count = len(t_value)
+        p_win_per = p_win_count / p_count
+
+        t_dict["per"] = p_win_per
+        t_dict['count'] = p_count
         res[t_name] = t_dict
     return res
 
@@ -307,6 +393,7 @@ def query_chart_data(chart_type: str = "teacher", begin: str = None, end: str = 
 
 if __name__ == "__main__":
     # calculate_win_per_by_product()
-    calculate_win_per_by_month()
+    # calculate_win_per_by_teacher()
+    calculate_win_per_by_teacher_mix()
     pass
 

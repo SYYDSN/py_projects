@@ -137,6 +137,7 @@ def logger_request_info():
     now = datetime.datetime.now()
     data = {
         "ip": ip,
+        "url": request.url,
         "headers": headers,
         "args": args,
         "form": form,

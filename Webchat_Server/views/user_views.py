@@ -223,7 +223,7 @@ def wx_js_api_demo():
     return render_template("wx_js_api_demo.html")
 
 
-@check_platform_session
+# @check_platform_session
 def common_view_func(html_name: str):
     """
     通用页面视图

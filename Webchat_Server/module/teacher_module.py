@@ -6,6 +6,7 @@ if __project_path not in sys.path:
     sys.path.append(__project_path)
 import mongo_db
 import datetime
+from module.pickle_data import *
 
 
 ObjectId = mongo_db.ObjectId
@@ -107,8 +108,46 @@ class Teacher(mongo_db.BaseDoc):
             cls(**t2).save_plus()
             cls(**t3).save_plus()
 
+    @classmethod
+    def follow_count(cls) -> dict:
+        """
+        按老师分组统计跟随人数。
+        :return:
+        """
+        f = dict()
+        p = ["_id", "name"]
+        ts = cls.find_plus(filter_dict=f, to_dict=True)
+        t_ids = [x['_id'] for x in ts]
+        ses = mongo_db.get_conn(table_name="wx_user")
+        m = {"$match": {"follow": {"$elemMatch": {"$in": t_ids}}}}
+        u = {"$unwind": "$follow"}
+        g = {"$group": {"_id": "$_id", "total": {"$sum": 1}}}
+        pipeline = [m, u, g]
+        r = ses.aggregate(pipeline=pipeline)
+        count = {x['_id']: x['total'] for x in r}
+        ts = {x['_id']: x['name'] for x in ts}
+        res = dict()
+        for k, v in ts.items():
+            temp = dict()
+            temp['total'] = count.get(k, 0)
+            temp['name'] = v
+            res[k] = temp
+        return res
+
+
+
+    @classmethod
+    def index(cls):
+        """
+        返回首页所用的信息
+        :return:
+        """
+        """查询近30天的胜率数据"""
+        data = calculate_win_per_by_teacher_mix()
+        """查询老师的跟随人数"""
+        cls.follow_count()
+
 
 if __name__ == "__main__":
-    """重建老师列表"""
-    Teacher.rebuild()
+    Teacher.index()
     pass
