@@ -45,24 +45,11 @@ class WXUser(mongo_db.BaseDoc):
     type_dict['time'] = datetime.datetime  # access_token的获取时间
     type_dict['refresh_token'] = str  # access_token的refresh_token
     type_dict['role'] = int  # 角色: 1为销售人员 2为中介商 3为黄牛 为空/0是一般人员
-    """
-    用户的唯一号码,中介商用于展示在二维码上,关联一般用户用,保证唯一.
-    中介商是1--100000的数字,使用了整数类型.
-    一般用户这个值一个uuid字符串
-    """
-    type_dict['only'] = str
     """以下是一般用户/司机专有属性"""
     type_dict['relate_time'] = datetime.datetime  # 和人力资源中介的关联时间
-    type_dict['relate_id'] = int  # 人力资源中介的num,也就是Sales.num,用于判断归属.
+    type_dict['relate_id'] = ObjectId  # 人力资源中介_id,也就是Sales._id,用于判断归属.
 
     def __init__(self, **kwargs):
-        only = kwargs.get("only")
-        if isinstance(only, str) and len(only) == 32:
-            pass
-        else:
-            ms = "{} 不是一个有效的uuid".format(only)
-            logger.exception(ms)
-            raise ValueError(ms)
         nick_name = kwargs.pop("nickname", "")
         if nick_name != "":
             kwargs['nick_name'] = nick_name
@@ -87,15 +74,6 @@ class WXUser(mongo_db.BaseDoc):
             raw_dict['subscribe_time'] = datetime.datetime.fromtimestamp(int(subscribe_time))
         else:
             pass
-        only = raw_dict.get("only")
-        if only is None:
-            raw_dict['only'] = uuid4().hex
-        elif isinstance(only, str) and len(only) == 32:
-            pass
-        else:
-            ms = "{} 不是一个有效的uuid".format(only)
-            logger.exception(ms)
-            raise ValueError(ms)
         return cls(**raw_dict)
 
     @classmethod
@@ -150,6 +128,48 @@ class WXUser(mongo_db.BaseDoc):
         doc = ses.find_one_and_update(filter=f, update=u, upsert=True, return_document=return_doc)
         return True if doc else False
 
+    @classmethod
+    def relate(cls, u_id: str = None, open_id: str = None, s_id: str = None) -> bool:
+        """
+        建立用户和中介的关联
+        :param u_id: 用户_id 优先用_id查询
+        :param open_id: 用户openid
+        :param s_id:  中介_id
+        :return:
+        """
+        if (u_id is None and open_id is None) or s_id is None:
+            ms = "参数错误! u_id:{}, openid: {}, s_id: {}".format(u_id, open_id, s_id)
+            logger.exception(ms)
+            raise ValueError(ms)
+        else:
+            if isinstance(u_id, str) and len(u_id) == 24:
+                user = cls.find_by_id(o_id=u_id, to_dict=True)
+            else:
+                user = cls.find_one_plus(filter_dict={"openid": open_id}, instance=False)
+            sale = cls.find_by_id(o_id=s_id, to_dict=True)
+            if isinstance(user, dict) and isinstance(sale, dict):
+                role = sale.get("role", 0)
+                if isinstance(role, int) and role < 1:
+                    relate_time = datetime.datetime.now()
+                    relate_id = sale['_id']
+                    f = {"_id": user['_id']}
+                    u = {"$set": {"relate_id": relate_id, "relate_time": relate_time}}
+                    r = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                    if r is None:
+                        return False
+                    else:
+                        return True
+                else:
+                    ms = "用户角色不合法:{}".format(role)
+                    logger.exception(ms)
+                    raise ValueError(ms)
+            else:
+                ms = "至少一个用户id无效:{}{}".format(u_id, s_id)
+                logger.exception(ms)
+                raise ValueError(ms)
+
+
+
 
 class Sales(WXUser):
     """
@@ -183,7 +203,8 @@ class Sales(WXUser):
     """
     type_dict['only'] = int
     """以下Sales类专有属性"""
-    type_dict['name'] = str  # 中介商名字.用于展示在二维码上
+    type_dict['name'] = str  # 中介商名字/销售真实姓名.用于展示在二维码上
+    type_dict['identity_code'] = str  # 中介商执照号码/销售真实身份证id.用于部分展示在二维码上
 
     def __init__(self, **kwargs):
         only = kwargs.get("only")

@@ -399,6 +399,37 @@ class PageAuthorization(mongo_db.BaseDoc):
         return code_dict
 
 
+def generator_relate_img(user_id: str) -> str:
+    """
+    生成一个永久的,关联中间商的二维码图片.
+    请自行检查原来的图片是否有效
+    :param user_id: 中间商/销售/黄牛的id.
+    :return:
+    """
+    user_id = user_id if isinstance(user_id, str) else str(user_id)
+    scene_str = "relate_{}".format(user_id)
+    param = {"action_name": "QR_LIMIT_STR_SCENE", "action_info": {"scene": {"scene_str": scene_str}}}
+    param = json.dumps(param)
+    u = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={}".format(AccessToken.get_token())
+    r = requests.post(u, data=param)
+    status = r.status_code
+    if status != 200:
+        ms = "服务器没有正确响应,错误码:{}".format(status)
+        logger.exception(ms)
+        raise ValueError(ms)
+    else:
+        resp = r.json()
+        error = resp.get("errmsg", "")
+        ticket = resp.get("ticket", "")
+        if ticket == "":
+            ms = "获取关联二维码失败,错误原因:{}".format(error)
+            logger.exception(ms)
+            raise ValueError(ms)
+        else:
+            img_u = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={}".format(ticket)
+            return img_u
+
+
 def get_templates() -> list:
     """
     获取全部的模板信息
@@ -423,6 +454,8 @@ def send_template_message():
 
 if __name__ == "__main__":
     """获取jsapi_ticket"""
-    ticket = JSAPITicket.get_ticket()
-    JSAPITicket.get_signature("http://temp.safego.org/wx/")
+    # ticket = JSAPITicket.get_ticket()
+    # JSAPITicket.get_signature("http://temp.safego.org/wx/")
+    """测试获取关联二维码"""
+    print(generator_relate_img("5b56bdba7b3128ec21daa4c7"))
     pass

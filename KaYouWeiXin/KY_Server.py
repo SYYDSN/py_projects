@@ -2,6 +2,7 @@ from flask import Flask
 from flask import abort
 from flask import send_from_directory
 from flask import render_template
+from flask import make_response
 from flask import request
 from flask import session
 from flask_session import Session
@@ -10,6 +11,7 @@ import json
 import datetime
 import os
 import json
+from module.item_module import WXUser
 from views.wx_view import wx_blueprint
 import requests
 from module.item_module import RawWebChatMessage
@@ -266,8 +268,47 @@ def message_func():
             return abort(403)
     elif request.method.lower() == "post":
         """微信服务器推送的消息"""
-        mes = {"message": "success"}
-        return json.dumps(mes)
+        """
+        微信服务器推送的消息的放在xml,同时args里面也有参数
+        xml的内容取出后是一个有序字典:
+        OrderedDict([('xml',
+          OrderedDict([('ToUserName', 'gh_134657758ddf'),
+                       ('FromUserName', 'oBBcR1T5r6FCqOo2WNxMqPUqvK_I'),
+                       ('CreateTime', '1532479965'),
+                       ('MsgType', 'event'),
+                       ('Event', 'SCAN'),
+                       ('EventKey', '123'),
+                       ('Ticket',
+                        'gQHB8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAybmhTSjBKNG5jaGwxMDAwMHcwM0wAAgQYwlZbAwQAAAAA')]))])
+
+        """
+        xml_data = request.data.decode(encoding="utf-8")
+        if xml_data != "":
+            xml = xmltodict.parse(xml_data)
+            xml = xml['xml']
+            print(xml)
+            event = xml.get("Event")
+            client_id = xml.get("FromUserName")
+            if event.lower() == "scan":
+                """扫码事件"""
+                event_key = xml.get("EventKey", "")
+                if event_key.startswith("relate_"):
+                    sale_id = event_key.split("_")[-1]
+                    print("client_id: {}, client_id: {}".format(client_id, sale_id))
+                    WXUser.relate(open_id=client_id, s_id=sale_id)
+            elif event.lower() == "subscribe":
+                """
+                订阅事件,用户未关注的时候的扫带参数二维码就会生成这个事件.
+                """
+            elif event.lower() == "view":
+                """浏览页面事件"""
+            else:
+                pass
+        else:
+            pass
+
+        return "success"  # 规定的返回字符串
+
     else:
         return abort(405)
 
