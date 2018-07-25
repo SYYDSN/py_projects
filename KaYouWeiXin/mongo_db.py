@@ -2599,25 +2599,25 @@ if __name__ == "__main__":
     Cannot create namespace mq_db.t1 in multi-document transaction
     的错误
     """
-    # class T1(BaseDoc):
-    #     _table_name = "t1"
-    #
-    #
-    # class T2(BaseDoc):
-    #     _table_name = "t2"
-    #
-    #     def __init__(self, **kwargs):
-    #         a = {}['name']
-    #         super(T2, self).__init__(**kwargs)
-    # client = get_client()
-    # t1 = client[db_name]['t1']  # 操作t1表的collection,db_name是你的数据库名,你可以这么写client.db_name.collection_name
-    # t2 = client[db_name]['t2']  # # 操作t2表的collection
-    # with client.start_session(causal_consistency=True) as session:
-    #     """事物必须在session下执行,with保证了session的正常关闭"""
-    #     with session.start_transaction():
-    #         """一旦出现异常会自动调用session.abort_transaction()"""
-    #         t1.insert_one(document={"name": "jack"}, session=session)  # 注意多了session这个参数
-    #         k = dict()['name']  # 制造一个错误,你会发现t1和t2的插入都不会成功.
-    #         t2.insert_one(document={"name": "jack2"}, session=session)
+    class T1(BaseDoc):
+        _table_name = "t1"
+
+
+    class T2(BaseDoc):
+        _table_name = "t2"
+
+        def __init__(self, **kwargs):
+            a = {}['name']
+            super(T2, self).__init__(**kwargs)
+    client = get_client()
+    t1 = client[db_name]['t1']  # 操作t1表的collection,db_name是你的数据库名,你可以这么写client.db_name.collection_name
+    t2 = client[db_name]['t2']  # # 操作t2表的collection
+    with client.start_session(causal_consistency=True) as session:
+        """事物必须在session下执行,with保证了session的正常关闭"""
+        with session.start_transaction():
+            """一旦出现异常会自动调用session.abort_transaction()"""
+            t1.insert_one(document={"name": "jack"}, session=session)  # 注意多了session这个参数
+            k = dict()['name']  # 制造一个错误,你会发现t1和t2的插入都不会成功.
+            t2.insert_one(document={"name": "jack2"}, session=session)
     pass
 

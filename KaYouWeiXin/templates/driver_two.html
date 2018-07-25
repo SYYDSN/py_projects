@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>基本信息</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<style>
+   
+        .div_info p{
+            line-height: 6em;
+            border-bottom:1px solid #ccc; 
+        }
+        .div_info p input{
+            outline: none;
+            border: none;
+            height: 100%;
+            width: 100%;
+        }
+        .div_info a{
+            width: 45px;
+            line-height: 6em;
+        }
+        .div_info i{
+            line-height: 6em;
+            font-size：3rem;
+        }
+        .div_info_btn{
+            position: relative;
+        }
+        .div_info_btn p{
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #ccc;
+            line-height: 2.5em;
+            border-radius: 6px;
+        }
+    </style>
+<body>
+
+        <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p>行车证 <i class="glyphicon glyphicon-plus-sign pull-right" onclick="take_a_photo()"></i></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p>驾驶证 <i class="glyphicon glyphicon-plus-sign pull-right" onclick="take_a_photo()"></i></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p>本人照片 <i class="glyphicon glyphicon-plus-sign pull-right" onclick="take_a_photo()"></i></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p id="myModal">性别 <i class="glyphicon glyphicon-menu-right pull-right" ></i></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p>年龄 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p>户籍 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
+                    </div> 
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p><input type="text" placeholder="身份证号"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p><input type="text" placeholder="邮箱"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p>家庭住址 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p> 现居地址 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
+                       <a href="./resume.html"> <p>完成</p></a>
+                    </div>                          
+                </div>
+            </div>
+
+            <!--模态框 -->
+
+                <div class="modal fade" tabindex="-1" role="dialog">
+                        <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">性别</h4>
+                            </div>
+                            <div class="modal-body">
+                            <p><input type="checkbox" name="sex"><span>男</span>   <input type="checkbox" name="sex"> <span>女</span></p>
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary">确认</button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                        </div><!-- /.modal-dialog -->
+                    </div><!-- /.modal -->
+        <script src="/static/js/jquery.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <script src="/static/js/wexin.js"></script>
+        <script src="/wx/js_sdk_init?debug=1&api=chooseImage"></script>
+        <script>
+            $('#myModal').click(function(){
+                $('.modal').modal();
+            })
+//             $(function(){
+//                 get_wx_config();
+//             });
+//             function get_wx_config(){
+//                 wx.config({
+//                 debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+//                 appId: 'wx50cbcc5725601880', // 必填，公众号的唯一标识
+//                 timestamp: 1532409742, // 必填，生成签名的时间戳
+//                 nonceStr: '9AUVToQ5IB5WPzDFSSmGHQBkPyhDF2vELcl1ItZEWLO', // 必填，生成签名的随机串
+//                 signature: '560f6c3f0ce13bbeee4677c89082e3c06738b0bc',// 必填，签名
+//                 jsApiList: [
+//                     "chooseImage"
+//                            ] // 必填，需要使用的JS接口列表
+//             });
+//             wx.ready(function(){
+//                 console.log("wx.config success.");
+//             });
+            
+//             // 处理调用失败的接口
+//             wx.error(function(res){
+//                 alert("wx.config failed.");
+//                 //alert(res);
+//                 // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，
+//                 // 也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+//             });
+//             }
+
+            function take_a_photo(){
+                wx.chooseImage({
+                count: 1, // 默认9
+                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                success: function (res) {
+                var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                }
+                });
+            }
+
+        </script>
+</body>
+</html>
