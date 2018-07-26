@@ -115,7 +115,7 @@ class Teacher(mongo_db.BaseDoc):
         :return:
         """
         f = dict()
-        p = ["_id", "name"]
+        p = ["_id", "name", "head_img"]
         ts = cls.find_plus(filter_dict=f, to_dict=True)
         t_ids = [x['_id'] for x in ts]
         ses = mongo_db.get_conn(table_name="wx_user")
@@ -125,27 +125,37 @@ class Teacher(mongo_db.BaseDoc):
         pipeline = [m, u, g]
         r = ses.aggregate(pipeline=pipeline)
         count = {x['_id']: x['total'] for x in r}
-        ts = {x['_id']: x['name'] for x in ts}
+        ts = {x['_id']: {"name": x['name'], "head_img": '/static/images/img1.png' if x.get('head_img', '') == '' else x['head_img']} for x in ts}
         res = dict()
         for k, v in ts.items():
             temp = dict()
-            temp['total'] = count.get(k, 0)
-            temp['name'] = v
+            temp['follow'] = count.get(k, 0)
+            temp['name'] = v['name']
+            temp['head_img'] = v['head_img']
             res[k] = temp
         return res
 
-
-
     @classmethod
-    def index(cls):
+    def index(cls, can_json: bool = True) -> list:
         """
-        返回首页所用的信息
-        :return:
+        返回首页所用的信息,本来是要计算胜率和收益率的，由于目前不知道收益率的计算公式，暂时只用胜率
+        :return:[{_id: {"name":"名字"， “win”：70,“count”：200, “follow”：120}}, ...]
         """
         """查询近30天的胜率数据"""
         data = calculate_win_per_by_teacher_mix()
         """查询老师的跟随人数"""
-        cls.follow_count()
+        data2 = cls.follow_count()
+        res = list()
+        for k, v in data.items():
+            v.update(data2[k])
+            if can_json:
+                v['_id'] = str(k)
+            else:
+                v['_id'] = k
+            res.append(v)
+        res.sort(key=lambda obj: obj.get("win"), reverse=True)
+        return res
+
 
 
 if __name__ == "__main__":

@@ -12,10 +12,12 @@ from flask import abort
 from tools_module import *
 from mongo_db import BaseFile
 from io import BytesIO
+from mongo_db import to_flat_dict
 import json
 from tools_module import *
 from module.server_api import *
 from module.item_module import *
+from module.teacher_module import Teacher
 
 
 """注册蓝图"""
@@ -214,7 +216,7 @@ def wx_js_func():
     return resp
 
 
-# @check_platform_session
+@check_platform_session
 def wx_js_api_demo():
     """
     一个演示页面,用于测试wx的js-sdk接口的初始化工作(测试wx_js_func函数)
@@ -223,23 +225,36 @@ def wx_js_api_demo():
     return render_template("wx_js_api_demo.html")
 
 
-# @check_platform_session
+@check_platform_session
 def common_view_func(html_name: str):
     """
     通用页面视图
     param html_name:  html文件名,包含目录路径
     :return:
     """
+    user = get_platform_session_arg("wx_user")
+    u_id = user['_id']
     template_dir = os.path.join(__project_dir__, 'templates', 'wx')
     file_names = os.listdir(template_dir)
     if html_name in file_names:
         kwargs = dict()  # 页面传参数
+        kwargs['user'] = to_flat_dict(user)
         """
-        传参数的步骤
+        传参数的步骤暂时省略
         """
+        data = dict()  # 基本数据容器
         if html_name == "index.html":
             """战绩榜单"""
-            pass
+            data = Teacher.index()
+
+        elif html_name == "user.html":
+            """个人中心"""
+            user_info = WXUser.find_by_id(o_id=u_id, to_dict=True)
+            if user_info is None or len(user_info) == 0:
+                pass
+            else:
+                data = to_flat_dict(user_info, ignore_columns=["openid", 'uniconid'])
+        kwargs['data'] = data
         html_name = "wx/{}".format(html_name)
         return render_template(html_name, **kwargs)
     else:
