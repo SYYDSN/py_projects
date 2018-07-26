@@ -31,9 +31,9 @@ from pymongo.errors import DuplicateKeyError
 
 cache = RedisCache()
 logger = get_logger()
-user = "kywx_root"              # 数据库用户名
-password = "Kywx@18"       # 数据库密码
-db_name = "kywx_db"        # 库名称
+user = "d_root"              # 数据库用户名
+password = "Driver@0619"       # 数据库密码
+db_name = "driver_site"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 
 """mongodb配置信息"""
@@ -42,7 +42,7 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
 """
 mongodb_setting = {
-    "host": "project.safego.org:27017",   # 数据库服务器地址
+    "host": "47.97.174.221:27017",   # 数据库服务器地址  注意这个数据库是3.6版本的
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
@@ -1855,6 +1855,7 @@ class BaseDoc:
     def insert_one(cls, **kwargs):
         """
         把参数转换为对象并插入
+        :param obj: 字典参数
         :return: ObjectId
         """
         instance = None
@@ -2598,25 +2599,25 @@ if __name__ == "__main__":
     Cannot create namespace mq_db.t1 in multi-document transaction
     的错误
     """
-    class T1(BaseDoc):
-        _table_name = "t1"
-
-
-    class T2(BaseDoc):
-        _table_name = "t2"
-
-        def __init__(self, **kwargs):
-            a = {}['name']
-            super(T2, self).__init__(**kwargs)
-    client = get_client()
-    t1 = client[db_name]['t1']  # 操作t1表的collection,db_name是你的数据库名,你可以这么写client.db_name.collection_name
-    t2 = client[db_name]['t2']  # # 操作t2表的collection
-    with client.start_session(causal_consistency=True) as session:
-        """事物必须在session下执行,with保证了session的正常关闭"""
-        with session.start_transaction():
-            """一旦出现异常会自动调用session.abort_transaction()"""
-            t1.insert_one(document={"name": "jack"}, session=session)  # 注意多了session这个参数
-            k = dict()['name']  # 制造一个错误,你会发现t1和t2的插入都不会成功.
-            t2.insert_one(document={"name": "jack2"}, session=session)
+    # class T1(BaseDoc):
+    #     _table_name = "t1"
+    #
+    #
+    # class T2(BaseDoc):
+    #     _table_name = "t2"
+    #
+    #     def __init__(self, **kwargs):
+    #         a = {}['name']
+    #         super(T2, self).__init__(**kwargs)
+    # client = get_client()
+    # t1 = client[db_name]['t1']  # 操作t1表的collection,db_name是你的数据库名,你可以这么写client.db_name.collection_name
+    # t2 = client[db_name]['t2']  # # 操作t2表的collection
+    # with client.start_session(causal_consistency=True) as session:
+    #     """事物必须在session下执行,with保证了session的正常关闭"""
+    #     with session.start_transaction():
+    #         """一旦出现异常会自动调用session.abort_transaction()"""
+    #         t1.insert_one(document={"name": "jack"}, session=session)  # 注意多了session这个参数
+    #         k = dict()['name']  # 制造一个错误,你会发现t1和t2的插入都不会成功.
+    #         t2.insert_one(document={"name": "jack2"}, session=session)
     pass
 

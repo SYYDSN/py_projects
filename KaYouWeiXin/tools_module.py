@@ -125,7 +125,7 @@ def check_phone(phone):
         return False
     elif isinstance(phone, str) or isinstance(phone, int):
         phone = str(phone).strip()
-        if len(phone) == 11 and phone.startswith("1"):
+        if len(phone) == 11 and phone.isdigit() and phone.startswith("1"):
             try:
                 int(phone)
                 return True

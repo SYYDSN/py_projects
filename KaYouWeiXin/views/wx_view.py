@@ -12,6 +12,8 @@ from flask import abort
 from tools_module import *
 from mongo_db import BaseFile
 from io import BytesIO
+from mongo_db import to_flat_dict
+from module.sms_module import *
 from module.server_api import *
 from module.item_module import *
 import json
@@ -214,7 +216,7 @@ def wx_js_func():
     return resp
 
 
-# @check_platform_session
+@check_platform_session
 def wx_js_api_demo():
     """
     一个演示页面,用于测试wx的js-sdk接口的初始化工作(测试wx_js_func函数)
@@ -224,22 +226,93 @@ def wx_js_api_demo():
 
 
 @check_platform_session
+def sms_func(key):
+    """
+    发送/校验短信
+    :return:
+    """
+    mes = {"message": "success"}
+    user = get_platform_session_arg("wx_user", None)
+    if user is None:
+        mes['message'] = "未登录"
+    else:
+        _id = user['_id']
+        phone = get_arg(request, "phone", "")
+        if key in ["get", "send"]:
+            """发送短信"""
+            if check_phone(phone):
+                mes = send_sms(phone)
+            else:
+                mes['message'] = "错误的手机号码"
+        elif key == "check":
+            """校验短信"""
+            code = get_arg(request, "code", "")
+            mes = validate_sms(phone, code)
+            if mes['message'] == "success":
+                """清除短信"""
+                # clear_sms_code(phone)
+                pass
+            """更新手机绑定信息"""
+            f = {"_id": _id}
+            u = {"$set": {"phone": phone}}
+            r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+            if isinstance(r, dict):
+                """成功"""
+                pass
+            else:
+                mes['message'] = "绑定手机失败"
+        else:
+            mes['message'] = "未知的操作:{}".format(key)
+    ms = "sms_func 返回的消息:{}".format(mes)
+    logger.info(ms)
+    print(ms)
+    return json.dumps(mes)
+
+
+@check_platform_session
+def resume_opt_func():
+    """
+    操作(查看/添加/修改,但是不能删除)简历
+    :return:
+    """
+    mes = {"success": "error"}
+    user = get_platform_session_arg("wx_user")
+    u_id = user['_id']
+    resume_args = get_args(request)
+    try:
+        mes = WXUser.opt_resume(u_id=u_id, resume_args=resume_args)
+    except Exception as e:
+        ms = "发生错误:{}".format(str(e))
+        print(ms)
+        logger.exception(mes=ms)
+        mes['message'] = ms
+    finally:
+        return json.dumps(mes)
+
+
+@check_platform_session
 def common_view_func(html_name: str):
     """
     通用页面视图
     param html_name:  html文件名,包含目录路径
     :return:
     """
+    user = get_platform_session_arg("wx_user")
+    u_id = user['_id']
     template_dir = os.path.join(__project_dir__, 'templates')
     file_names = os.listdir(template_dir)
     if html_name in file_names:
         kwargs = dict()  # 页面传参数
+        kwargs['user'] = to_flat_dict(user)
         """
         传参数的步骤暂时省略
         """
         return render_template(html_name, **kwargs)
     else:
         return abort(404)
+
+
+
 
 
 """集中注册函数"""
@@ -249,8 +322,6 @@ def common_view_func(html_name: str):
 wx_blueprint.add_url_rule(rule="/hello", view_func=hello, methods=['get', 'post'])
 """保存或者获取文件(mongodb存储)"""
 wx_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['post', 'get'])
-"""通用页面视图"""
-wx_blueprint.add_url_rule(rule="/html/<html_name>", view_func=common_view_func, methods=['post', 'get'])
 """获取用户授权页面"""
 wx_blueprint.add_url_rule(rule="/auth_demo/<key>", view_func=auth_demo, methods=['post', 'get'])
 """页面授权示范页"""
@@ -263,3 +334,9 @@ wx_blueprint.add_url_rule(rule="/draw_user_info", view_func=draw_user_info, meth
 wx_blueprint.add_url_rule(rule="/js_sdk_init", view_func=wx_js_func, methods=['post', 'get'])
 """JS-SDK初始化用脚本的演示页面"""
 wx_blueprint.add_url_rule(rule="/js_sdk_init_demo", view_func=wx_js_api_demo, methods=['get'])
+"""发送/校验短信"""
+wx_blueprint.add_url_rule(rule="/sms/<key>", view_func=sms_func, methods=['post', 'get'])
+"""操作(查看/添加/修改,但是不能删除)简历"""
+wx_blueprint.add_url_rule(rule="/resume/opt", view_func=resume_opt_func, methods=['post', 'get'])
+"""通用页面视图"""
+wx_blueprint.add_url_rule(rule="/html/<html_name>", view_func=common_view_func, methods=['post', 'get'])

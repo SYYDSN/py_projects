@@ -4,14 +4,18 @@ import sys
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
-import mongo_db
+import mongo_db2
 import requests
 import datetime
 import re
+from log_module import get_logger
+from pymongo.results import InsertOneResult
+from pymongo.results import UpdateResult
+from pymongo.results import DeleteResult
 
 
-ObjectId = mongo_db.ObjectId
-DBRef = mongo_db.DBRef
+ObjectId = mongo_db2.ObjectId
+logger = get_logger()
 
 
 """
@@ -22,7 +26,7 @@ DBRef = mongo_db.DBRef
 """
 
 
-class Region(mongo_db.BaseDoc):
+class Region(mongo_db2.BaseDoc):
     """
     行政区域代码  http://cnis.7east.com/
     """
@@ -173,7 +177,7 @@ class Region(mongo_db.BaseDoc):
         return r
 
 
-class Route(mongo_db.BaseDoc):
+class Route(mongo_db2.BaseDoc):
     """
     (熟悉)线路类,注意,这个和保驾犬的TrafficRoute类不同.
     本例只是为了标记司机熟悉的城市线路.只要城市节点相同,不分顺序和来往,都是一条线路.
@@ -182,7 +186,7 @@ class Route(mongo_db.BaseDoc):
     _table_name = "route_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId  # id，是一个ObjectId对象，唯一
-    type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
+    type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
     type_dict['cities'] = list  # 城市名称(str)组成的list
     type_dict['create_date'] = datetime.datetime  # 创建时间
 
@@ -194,23 +198,23 @@ class Route(mongo_db.BaseDoc):
         super(Route, self).__init__(**kwargs)
 
 
-class Honor(mongo_db.BaseDoc):
+class Honor(mongo_db2.BaseDoc):
     """
     荣誉证书信息,和简历是多对一的关系.
     """
     _table_name = "honor_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
+    type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
     type_dict['time'] = datetime.datetime  # 获奖时间
     type_dict['title'] = str    # 荣誉称号
     type_dict['info'] = str    # 荣誉信息
-    type_dict['image_id'] = DBRef  # 荣誉图片
+    type_dict['image_id'] = ObjectId  # 荣誉图片
     type_dict['image_url'] = str  # 荣誉图片的地址,这个字段是计算出来的,不保存实际的值.
     type_dict['create_date'] = datetime.datetime  # 创建时间
 
 
-class Vehicle(mongo_db.BaseDoc):
+class Vehicle(mongo_db2.BaseDoc):
     """
     车辆信息,某些司机可能自己有车辆.
     与保驾犬不同,司机招聘网站的车辆信息和司机(简历)是多对一的关系
@@ -218,8 +222,8 @@ class Vehicle(mongo_db.BaseDoc):
     _table_name = "vehicle_license_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
-    type_dict["image_id"] = DBRef  # 车辆照片
+    type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
+    type_dict["image_id"] = ObjectId  # 车辆照片
     type_dict["image_url"] = str  # 车辆照片的url,这个字段是计算出来的,不保存实际的值.
     type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
     """
@@ -256,7 +260,7 @@ class Vehicle(mongo_db.BaseDoc):
         super(Vehicle, self).__init__(**kwargs)
 
 
-class WorkHistory(mongo_db.BaseDoc):
+class WorkHistory(mongo_db2.BaseDoc):
     """
     工作经历,用于在简历中表示一段工作历史,
     和简历是多对一的关系
@@ -264,7 +268,7 @@ class WorkHistory(mongo_db.BaseDoc):
     _table_name = "work_history"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
+    type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
     type_dict['begin'] = datetime.datetime
     type_dict['end'] = datetime.datetime
     type_dict['enterprise_name'] = str  # 企业名称
@@ -303,7 +307,7 @@ class WorkHistory(mongo_db.BaseDoc):
     type_dict["create_date"] = datetime.datetime  # 创建日期
 
 
-class Education(mongo_db.BaseDoc):
+class Education(mongo_db2.BaseDoc):
     """
     教育经历,用于在简历中表示一段教育历史,
     和简历是多对一的关系
@@ -311,7 +315,7 @@ class Education(mongo_db.BaseDoc):
     _table_name = "education"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['driver_id'] = DBRef  # 关键的(司机)简历的DBRef对象
+    type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
     type_dict['level'] = str  # 用户选择,  小学/初中/高中/高等教育/培训机构/其他
     type_dict['begin'] = datetime.datetime
     type_dict['end'] = datetime.datetime
@@ -319,57 +323,58 @@ class Education(mongo_db.BaseDoc):
     type_dict['major'] = str  # 主修专业
 
 
-class HeadImage(mongo_db.BaseFile):
+class HeadImage(mongo_db2.BaseFile):
     """
     用户头像
     """
     _table_name = "head_image"
 
 
-class IdImage(mongo_db.BaseFile):
+class IdImage(mongo_db2.BaseFile):
     """
     身份证图片
     """
     _table_name = "id_image"
 
 
-class HonorImage(mongo_db.BaseFile):
+class HonorImage(mongo_db2.BaseFile):
     """
     荣誉证书照片
     """
     _table_name = "honor_image"
 
 
-class VehicleImage(mongo_db.BaseFile):
+class VehicleImage(mongo_db2.BaseFile):
     """
     行车证(机动车)照片
     """
     _table_name = "vehicle_image"
 
 
-class DrivingLicenseImage(mongo_db.BaseFile):
+class DrivingLicenseImage(mongo_db2.BaseFile):
     """
     驾驶证(驾照)图片
     """
     _table_name = "driving_license_image"
 
 
-class RTQCImage(mongo_db.BaseFile):
+class RTQCImage(mongo_db2.BaseFile):
     """
     公路运输从业资格证图片
     """
     _table_name = "rtqc_image"
 
 
-class DriverResume(mongo_db.BaseDoc):
+class DriverResume(mongo_db2.BaseDoc):
     """司机简历"""
     _table_name = "driver_resume"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['app_id'] = str     # app客户端的id,
+    type_dict['app_id'] = ObjectId     # app用户的id,
+    type_dict['wx_id'] = ObjectId     # 微信用户的id,
     type_dict['user_name'] = str  # 用户名,唯一判定,默认和手机相同,可以登录司机招聘网(功能未实现)
     type_dict['real_name'] = str  # 真实姓名 ,可以从驾驶证取
-    type_dict['head_image'] = DBRef  # 头像
+    type_dict['head_image'] = ObjectId  # 头像
     type_dict['gender'] = str   # 以驾驶证信息为准. 男/女
     type_dict['married'] = int  # 婚否? 0/1/-1 未婚/已婚/离异  None 空白
     type_dict['birth_place'] = str   # 籍贯/出生地
@@ -379,7 +384,7 @@ class DriverResume(mongo_db.BaseDoc):
     type_dict['email'] = str  # 邮箱
     type_dict['birth_date'] = datetime.datetime  # 出生日期,以身份证号码为准
     type_dict['id_num'] = str  # 身份证号码
-    type_dict['id_image'] = DBRef  # 身份证图片
+    type_dict['id_image'] = ObjectId  # 身份证图片
     type_dict['age'] = int  # 年龄 以身份证号码为准
     """以下3个字段因为是动态的,需要在每次查询doc的时候进行计算,以保证准确性"""
     type_dict['driving_experience'] = int  # 驾龄 单位 年 用驾驶证信息中的首次领证日期计算
@@ -394,23 +399,23 @@ class DriverResume(mongo_db.BaseDoc):
     4. 高等教育(本科及以上)
     """
     type_dict['education'] = int  # 学历,学历代码见注释
-    """教育经历部分,是Education的DBRef的list对象"""
+    """教育经历部分,是Education的ObjectId的list对象"""
     type_dict['education_history'] = list
     type_dict['status'] = int  # 任职/经营 状态. -1 个体经营/0 离职/ 1 在职
     """驾驶证信息 Driving License,简称dl"""
-    type_dict['dl_image'] = DBRef  # 驾驶证图片,.
+    type_dict['dl_image'] = ObjectId  # 驾驶证图片,.
     type_dict['dl_license_class'] = str  # 驾驶证信息.驾驶证类型,准驾车型 英文字母一律大写
     type_dict['dl_first_date'] = datetime.datetime  # 驾驶证信息 首次领证日期
     type_dict['dl_valid_begin'] = datetime.datetime  # 驾驶证信息 驾照有效期的开始时间
     type_dict['dl_valid_duration'] = int  # 驾驶证信息 驾照有效持续期,单位年
     """道路运输从业资格证部分,Road transport qualification certificate 简称rtqc"""
-    type_dict['rtqc_image'] = DBRef  # 道路运输从业资格证信息,照片
+    type_dict['rtqc_image'] = ObjectId  # 道路运输从业资格证信息,照片
     type_dict['rtqc_license_class'] = str  # 道路运输从业资格证信息.货物运输驾驶员/危险货物运输驾驶员
     type_dict['rtqc_first_date'] = datetime.datetime  # 道路运输从业资格证信息 首次领证日期,用于推定从业年限
     type_dict['rtqc_valid_begin'] = datetime.datetime  # 道路运输从业资格证信息 资格证的有效期的开始时间
     type_dict['rtqc_valid_end'] = datetime.datetime  # 道路运输从业资格证信息 资格证的有效期的结束时间
     """某些司机自己有车辆"""
-    type_dict['vehicle'] = list  # 车辆信息, Vehicle.的DBRef对象
+    type_dict['vehicle'] = list  # 车辆信息, Vehicle.的ObjectId对象
     """求职意愿"""
     type_dict['want_job'] = bool  # 是否有求职意向?有求职意向的才会推荐工作,可以认为这是个开关.
     type_dict['remote'] = bool  # 是否原因在外地工作?
@@ -426,11 +431,18 @@ class DriverResume(mongo_db.BaseDoc):
     """
     type_dict['expected_salary'] = list   # 期望待遇
     """熟悉线路"""
-    type_dict['routes'] = list  # 熟悉线路,Route的DBRef的list
-    """工作履历部分,是WorkHistory.的DBRef的list对象"""
+    type_dict['routes'] = list  # 熟悉线路,城市名称组成的数组的的list
+    """工作履历部分,是WorkHistory.的ObjectId的list对象"""
     type_dict['work_history'] = list
     type_dict['last_company'] = str  # 最后工作的公司,仅仅为列表页而添加,需要更新工作经历时同步
     type_dict['first_work_date'] = datetime.datetime  # 最早的工作时间,由最早的工作经历确定.可以用来计算工龄.需要更新工作经历时同步
+    """
+    最后的工作截至时间. 需要配合status字段使用:
+    1. 如果这个值不存在.status==1,那就是在职没添加过工作简历. 
+    1. 如果这个值不存在.status!=1,那就是离职没添加过工作简历. 
+    由于目前的ORM的datetime字段不能赋值为None,所以在清除所有的工作经历时需要删掉此字段
+    """
+    type_dict['end_work_date'] = datetime.datetime
     type_dict['self_evaluation'] = str  # 自我评价
     """获奖/荣誉证书 Honor._id的list对象"""
     type_dict['honor'] = list
@@ -478,7 +490,7 @@ class DriverResume(mongo_db.BaseDoc):
         if isinstance(birth_date, datetime.datetime):
             kwargs['birth_date'] = birth_date
         elif isinstance(birth_date, str):
-            birth_date = mongo_db.get_datetime_from_str(birth_date)
+            birth_date = mongo_db2.get_datetime_from_str(birth_date)
             if isinstance(birth_date, datetime.datetime):
                 kwargs['birth_date'] = birth_date
             else:
@@ -490,7 +502,7 @@ class DriverResume(mongo_db.BaseDoc):
             """身份证号码正确"""
             y, m, d = id_num[6: 10], id_num[10: 12], id_num[12: 14]
             age = now.year - int(y)
-            bd = mongo_db.get_datetime_from_str("{}-{}-{}".format(y, m, d))
+            bd = mongo_db2.get_datetime_from_str("{}-{}-{}".format(y, m, d))
             kwargs['id_num'] = id_num
             kwargs['birth_date'] = bd
             kwargs['age'] = age
@@ -498,7 +510,7 @@ class DriverResume(mongo_db.BaseDoc):
             pass
         dl_first_date = kwargs.pop("dl_first_date", None)  # 驾照首次申领日期
         if isinstance(dl_first_date, str):
-            dl_first_date = mongo_db.get_datetime_from_str(dl_first_date)
+            dl_first_date = mongo_db2.get_datetime_from_str(dl_first_date)
         else:
             pass
         if isinstance(dl_first_date, datetime.datetime):
@@ -509,7 +521,7 @@ class DriverResume(mongo_db.BaseDoc):
             pass
         rtqc_first_date = kwargs.pop("rtqc_first_date", None)  # 运输许可证首次申领日期
         if isinstance(rtqc_first_date, str):
-            rtqc_first_date = mongo_db.get_datetime_from_str(rtqc_first_date)
+            rtqc_first_date = mongo_db2.get_datetime_from_str(rtqc_first_date)
         else:
             pass
         if isinstance(rtqc_first_date, datetime.datetime):
@@ -539,7 +551,7 @@ class DriverResume(mongo_db.BaseDoc):
         dl_first_date = raw.pop("dl_first_date", None)  # 驾照首次申领日期
         if isinstance(dl_first_date, str) or isinstance(dl_first_date, datetime.datetime):
             dl_first_date = dl_first_date if isinstance(dl_first_date,
-                                                        datetime.datetime) else mongo_db.get_datetime_from_str(
+                                                        datetime.datetime) else mongo_db2.get_datetime_from_str(
                 dl_first_date)
             if isinstance(dl_first_date, datetime.datetime):
                 driving_experience = now.year - dl_first_date.year
@@ -552,7 +564,7 @@ class DriverResume(mongo_db.BaseDoc):
         rtqc_first_date = raw.pop("rtqc_first_date", None)  # 运输许可证首次申领日期
         if isinstance(rtqc_first_date, str) or isinstance(rtqc_first_date, datetime.datetime):
             rtqc_first_date = rtqc_first_date if isinstance(rtqc_first_date, datetime.datetime) else \
-                mongo_db.get_datetime_from_str(rtqc_first_date)
+                mongo_db2.get_datetime_from_str(rtqc_first_date)
             if isinstance(rtqc_first_date, datetime.datetime):
                 industry_experience = now.year - rtqc_first_date.year
                 raw['industry_experience'] = industry_experience
@@ -564,8 +576,7 @@ class DriverResume(mongo_db.BaseDoc):
         first_work_date = raw.pop("first_work_date", None)  # 首次工作时间
         if first_work_date is None:
             """查工作履历"""
-            f = {"driver_id": DBRef(database=mongo_db.db_name, collection=DriverResume.get_table_name(),
-                                       id=raw['_id'])}
+            f = {"driver_id": raw['_id']}
             s = {"begin": 1}
             projection = ['begin']
             r = WorkHistory.find_one_plus(filter_dict=f, sort_dict=s, projection=projection, instance=False)
@@ -581,7 +592,7 @@ class DriverResume(mongo_db.BaseDoc):
             pass
         if isinstance(first_work_date, str) or isinstance(first_work_date, datetime.datetime):
             first_work_date = first_work_date if isinstance(first_work_date, datetime.datetime) else \
-                mongo_db.get_datetime_from_str(first_work_date)
+                mongo_db2.get_datetime_from_str(first_work_date)
             if isinstance(first_work_date, datetime.datetime):
                 work_experience = now.year - first_work_date.year
                 raw['work_experience'] = work_experience
@@ -642,28 +653,283 @@ class DriverResume(mongo_db.BaseDoc):
                                      can_json=can_json, func=func, target=target)
 
     @classmethod
-    def add_work_history(cls, history_args: dict) -> ObjectId:
+    def add_work_history(cls, resume_id: (str, ObjectId), history_args: dict) -> ObjectId:
         """
-        增加工作经历,在增加工作经历的同时,根据工作经历的时间,进行如下判断:
+        添加工作经历,在添加工作经历的后,进行一下字段的更新:
+        1. work_history 工作经历列表
+        2. last_company 最后工作过的公司
+        3. first_work_date 最早的工作开始时间
+        4. end_work_date 最后的工作截至时间
 
-        判断是不是最后一段工作经历?,
-        1. 如果是最后的工作经历(截至时间最晚),更新last_company字段.
-        2. 如果不是最后的工作经历,忽视.
-        3. 如果最后的工作经历出现重复(1个以上截止时间是now的).更新(简单说,和1一样,比较截至时间)
-
-        判断是不是最早一段工作经历?
-        1. 如果是最早的工作经历(截至时间最晚),更新.first_work_date字段
-
+        :param resume_id:
         :param history_args:  WorkHistory的init字典
         :return: ObjectId, WorkHistory._id
         """
+        res = None
+        work = WorkHistory(**history_args).get_dict()
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(work, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            resume_id = resume['_id']
+            driver_id = work.get("driver_id", "")
+            if isinstance(driver_id, str) and len(driver_id) == 24:
+                driver_id = ObjectId(driver_id)
+            elif isinstance(driver_id, ObjectId):
+                pass
+            else:
+                driver_id = resume_id
+            work['driver_id'] = driver_id
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][WorkHistory.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    r = None
+                    try:
+                        r = handler1.insert_one(document=work, session=ses)
+                    except Exception as e:
+                        ms = "插入工作经历失败:{}".format(str(e))
+                        logger.exception(msg=ms)
+                        ses.abort_transaction()
+                    work_id = r.inserted_id if isinstance(r, InsertOneResult) else r
+                    if isinstance(work_id, ObjectId):
+                        """
+                        确认是否更新last_company,first_work_date,end_work_date三个字段
+                        """
+                        u = {"$set": {}}
+                        last_company = resume.get("last_company", "")
+                        first_work_date = resume.get("first_work_date", None)
+                        end_work_date = resume.get("end_work_date", None)
+                        f = {"driver_id": resume_id}
+                        s = [("begin", -1)]
+                        ws = handler1.find(filter=f, sort=s)
+                        ws = [x for x in ws]
+                        ws.append(work)
+                        u['$set'] = {"work_history": [x['_id'] for x in ws]}
+                        if len(ws) == 0:
+                            unset = {"last_company": "", "first_work_date": "", "end_work_date": ""}
+                            u['$unset'] = unset
+                        else:
+                            end_work_date2 = ws[0].get('end')
+                            if end_work_date2 != end_work_date:
+                                set_d = u['$set']
+                                set_d['end_work_date'] = end_work_date2
+                                u['$set'] = set_d
+                            last_company2 = ws[0].get('enterprise_name')
+                            if last_company2 != last_company:
+                                set_d = u['$set']
+                                set_d['last_company'] = last_company2
+                                u['$set'] = set_d
+                            first_work_date2 = ws[-1].get('begin')
+                            if first_work_date2 != first_work_date:
+                                set_d = u['$set']
+                                set_d['first_work_date'] = first_work_date2
+                                u['$set'] = set_d
+                        """更新简历"""
+                        f = {"_id": resume_id}
+                        handler2.update_one(filter=f, update=u, upsert=False, session=ses)
+                        res = work_id
+                    else:
+                        ms = "事务错误: resume_id: {}, history_args: {}".format(resume_id, history_args)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, history_args: {}".format(resume_id, history_args)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def update_work_history(cls, resume_id: (str, ObjectId), work_id: (str, ObjectId), update_args: dict) -> ObjectId:
+        """
+        修改工作经历,在修改工作经历的后,进行一下字段的更新:
+        1. work_history 工作经历列表
+        2. last_company 最后工作过的公司
+        3. first_work_date 最早的工作开始时间
+        4. end_work_date 最后的工作截至时间
+
+        :param resume_id:
+        :param work_id:  工作经历的id
+        :param update_args:  update字典
+        :return: ObjectId, WorkHistory._id
+        """
+        res = None
+        work = WorkHistory.find_by_id(o_id=work_id, to_dict=True)
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(work, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            work_id = work['_id']
+            resume_id = resume['_id']
+            update_args['driver_id'] = resume_id
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][WorkHistory.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    f = {"driver_id": resume_id}
+                    s = [("begin", -1)]
+                    ws = handler1.find(filter=f, sort=s)
+                    ws = [x for x in ws]
+                    if work_id not in [x['_id'] for x in ws]:
+                        ms = "非本简历的工作经历! id:{}".format(work_id)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+                    else:
+                        r = None
+                        try:
+                            f = {"_id": work_id}
+                            u = {"$set": update_args}
+                            r = handler1.update_one(filter=f, update=u, session=ses)
+                        except Exception as e:
+                            ms = "插入工作经历失败:{}".format(str(e))
+                            logger.exception(msg=ms)
+                            ses.abort_transaction()
+                        match_count = r.matched_count if isinstance(r, UpdateResult) else r
+                        if match_count == 1:
+                            """
+                            确认是否更新last_company,first_work_date,end_work_date三个字段
+                            """
+                            u = {"$set": {}}
+                            last_company = resume.get("last_company", "")
+                            first_work_date = resume.get("first_work_date", None)
+                            end_work_date = resume.get("end_work_date", None)
+
+                            # ws.append(work)  # 更新工作建立不需要这个操作
+                            u['$set'] = {"work_history": [x['_id'] for x in ws]}
+                            if len(ws) == 0:
+                                unset = {"last_company": "", "first_work_date": "", "end_work_date": ""}
+                                u['$unset'] = unset
+                            else:
+                                end_work_date2 = ws[0].get('end')
+                                if end_work_date2 != end_work_date:
+                                    set_d = u['$set']
+                                    set_d['end_work_date'] = end_work_date2
+                                    u['$set'] = set_d
+                                last_company2 = ws[0].get('enterprise_name')
+                                if last_company2 != last_company:
+                                    set_d = u['$set']
+                                    set_d['last_company'] = last_company2
+                                    u['$set'] = set_d
+                                first_work_date2 = ws[-1].get('begin')
+                                if first_work_date2 != first_work_date:
+                                    set_d = u['$set']
+                                    set_d['first_work_date'] = first_work_date2
+                                    u['$set'] = set_d
+                            """更新简历"""
+                            f = {"_id": resume_id}
+                            handler2.update_one(filter=f, update=u, upsert=False, session=ses)
+                            res = work_id
+                        else:
+                            ms = "事务错误: resume_id: {}, history_args: {}".format(resume_id, update_args)
+                            logger.exception(msg=ms)
+                            raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, history_args: {}".format(resume_id, update_args)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def delete_work_history(cls, resume_id: (str, ObjectId), work_id: (str, ObjectId)) -> ObjectId:
+        """
+        删除工作经历,在删除工作经历的后,进行一下字段的更新:
+        1. work_history 工作经历列表
+        2. last_company 最后工作过的公司
+        3. first_work_date 最早的工作开始时间
+        4. end_work_date 最后的工作截至时间
+
+        :param resume_id:
+        :param work_id:  工作经历的id
+        :return: ObjectId, WorkHistory._id
+        """
+        res = None
+        work = WorkHistory.find_by_id(o_id=work_id, to_dict=True)
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(work, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            work_id = work['_id']
+            resume_id = resume['_id']
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][WorkHistory.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    f = {"driver_id": resume_id}
+                    s = [("begin", -1)]
+                    ws = handler1.find(filter=f, sort=s)
+                    ws = [x for x in ws]
+                    if work_id not in [x['_id'] for x in ws]:
+                        ms = "非本简历的工作经历! id:{}".format(work_id)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+                    else:
+                        r = None
+                        try:
+                            f = {"_id": work_id}
+                            r = handler1.delete_one(filter=f, session=ses)
+                        except Exception as e:
+                            ms = "插入工作经历失败:{}".format(str(e))
+                            logger.exception(msg=ms)
+                            ses.abort_transaction()
+                        deleted_count = r.deleted_count if isinstance(r, DeleteResult) else r
+                        if deleted_count == 1:
+                            ws = [x for x in ws if x['_id'] != work_id]
+                            """
+                            确认是否更新last_company,first_work_date,end_work_date三个字段
+                            """
+                            u = {"$set": {}}
+                            last_company = resume.get("last_company", "")
+                            first_work_date = resume.get("first_work_date", None)
+                            end_work_date = resume.get("end_work_date", None)
+                            u['$set'] = {"work_history": [x['_id'] for x in ws]}
+                            if len(ws) == 0:
+                                unset = {"last_company": "", "first_work_date": "", "end_work_date": ""}
+                                u['$unset'] = unset
+                            else:
+                                end_work_date2 = ws[0].get('end')
+                                if end_work_date2 != end_work_date:
+                                    set_d = u['$set']
+                                    set_d['end_work_date'] = end_work_date2
+                                    u['$set'] = set_d
+                                last_company2 = ws[0].get('enterprise_name')
+                                if last_company2 != last_company:
+                                    set_d = u['$set']
+                                    set_d['last_company'] = last_company2
+                                    u['$set'] = set_d
+                                first_work_date2 = ws[-1].get('begin')
+                                if first_work_date2 != first_work_date:
+                                    set_d = u['$set']
+                                    set_d['first_work_date'] = first_work_date2
+                                    u['$set'] = set_d
+                            """更新简历"""
+                            f = {"_id": resume_id}
+                            handler2.update_one(filter=f, update=u, upsert=False, session=ses)
+                            res = work_id
+                        else:
+                            ms = "事务错误: resume_id: {}, work_id: {}".format(resume_id, work_id)
+                            logger.exception(msg=ms)
+                            raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, work_id: {}".format(resume_id, work_id)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
 
 
 if __name__ == "__main__":
     """查询省和直辖市"""
-    print(Region.get_province())
-    a = Region.get_city(province_code=864)
-    print(a)
+    # print(Region.get_province())
+    # a = Region.get_city(province_code=864)
+    # print(a)
+    """添加简历"""
+    args = {"_id": ObjectId("5b5969df99e87f46d93c1c13")}
+    work_id = ObjectId("5b597b6099e87f5219329c45")
+    args = {
+        "begin": "2016-1-1",
+        "end": "2017-1-1",
+        "enterprise_name": "BBB公司"
+    }
+    DriverResume.delete_work_history(resume_id="5b3da7d84660d33df4a40a81", work_id=work_id)
     pass
 
 
