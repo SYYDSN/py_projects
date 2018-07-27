@@ -206,8 +206,17 @@ class WXUser(mongo_db.BaseDoc):
                     mes['data'] = r
                 else:
                     mes['message'] = "查询失败"
+            else:
+                mes['message'] = "简历id不匹配"
+        elif len(resume_args) == 0:
+            """字典中没有_id字段表示新用户查看简历,创建一个临时的"""
+            resume_init = dict()
+            resume_init['wx_id'] = u_id
+            resume_init['phone'] = user.get("phone")
         else:
             """添加或者修改"""
+            if "phone" not in resume_args:
+                resume_args['phone'] = user.get("phone")
             if isinstance(_id, ObjectId):
                 """resume_args里有_id视为修改修改简历"""
                 if resume_id == _id:
@@ -247,9 +256,14 @@ class WXUser(mongo_db.BaseDoc):
                         can_json: bool = True) -> dict:
         """
         操作(查看/添加/修改/删除)简历的扩展信息,扩展信息包含如下内容:
-        1. 添加工作经历  add_work  DriverResume.add_work_history
-        1. 编辑工作经历  update_work  DriverResume.update_work_history
-        1. 删除工作经历  delete_work  DriverResume.delete_work_history
+        1. 添加工作经历  add_work     DriverResume.add_work_history
+        2. 编辑工作经历  update_work  DriverResume.update_work_history
+        3. 删除工作经历  delete_work  DriverResume.delete_work_history
+
+        4. 添加教育经历  add_education  DriverResume.add_education
+        5. 修改教育经历  update_education  DriverResume.update_education
+        6. 删除教育经历  delete_education  DriverResume.delete_education
+
 
         :param u_id:  用户id
         :param resume_id:  简历的字典
@@ -257,6 +271,11 @@ class WXUser(mongo_db.BaseDoc):
         :param arg_dict:  其他参数组成的字典
         :param can_json:
         :return:
+        多种返回结果:
+        工作经历: {"message": "success", "_id": WorkHistory._id}
+        教育经历: {"message": "success", "_id": Education._id}
+        车辆信息: {"message": "success", "_id": Vehicle._id}
+        所获荣誉: {"message": "success", "_id": Honor._id}
         """
         mes = {"message": "success"}
         user = cls.find_by_id(o_id=u_id, to_dict=True)
@@ -264,28 +283,44 @@ class WXUser(mongo_db.BaseDoc):
             if str(resume_id) == str(user.get("resume_id", "")):
                 if opt == "add_work":
                     """添加工作经历"""
-                    work_dict = arg_dict.get("init", None)
-                    if work_dict is None:
-                        mes['message'] = "缺少必要的参数:init"
-                    else:
-                        mes = DriverResume.add_work_history(resume_id=resume_id, history_args=work_dict)
+                    _id = DriverResume.add_work_history(resume_id=resume_id, history_args=arg_dict)
+                    mes['_id'] = str(_id) if can_json else _id
                 elif opt == "update_work":
                     """修改工作经历"""
-                    u_dict = arg_dict.get("update", None)
-                    w_id = arg_dict.get("work_id", None)
-                    if u_dict is None:
-                        mes['message'] = "缺少必要的参数:update"
-                    elif w_id is None:
-                        mes['message'] = "缺少必要的参数:work_id"
-                    else:
-                        mes = DriverResume.update_work_history(resume_id=resume_id, work_id=w_id, update_args=u_dict)
-                elif opt == "delete_work":
-                    """删除工作经历"""
-                    w_id = arg_dict.get("work_id", None)
+                    w_id = arg_dict.pop("work_id", None)
                     if w_id is None:
                         mes['message'] = "缺少必要的参数:work_id"
                     else:
-                        mes = DriverResume.delete_work_history(resume_id=resume_id, work_id=w_id)
+                        _id = DriverResume.update_work_history(resume_id=resume_id, work_id=w_id, update_args=arg_dict)
+                        mes['_id'] = str(_id) if can_json else _id
+                elif opt == "delete_work":
+                    """删除工作经历"""
+                    w_id = arg_dict.pop("work_id", None)
+                    if w_id is None:
+                        mes['message'] = "缺少必要的参数:work_id"
+                    else:
+                        _id = DriverResume.delete_work_history(resume_id=resume_id, work_id=w_id)
+                        mes['_id'] = str(_id) if can_json else _id
+                elif opt == "add_education":
+                    """添加教育经历"""
+                    _id = DriverResume.add_education(resume_id=resume_id, init_args=arg_dict)
+                    mes['_id'] = str(_id) if can_json else _id
+                elif opt == "update_education":
+                    """修改教育经历"""
+                    e_id = arg_dict.pop("e_id", None)
+                    if e_id is None:
+                        mes['message'] = "缺少必要的参数:e_id"
+                    else:
+                        _id = DriverResume.update_education(resume_id=resume_id, e_id=e_id, update_args=arg_dict)
+                        mes['_id'] = str(_id) if can_json else _id
+                elif opt == "delete_education":
+                    """删除教育经历"""
+                    e_id = arg_dict.pop("e_id", None)
+                    if e_id is None:
+                        mes['message'] = "缺少必要的参数:e_id"
+                    else:
+                        _id = DriverResume.delete_education(resume_id=resume_id, e_id=e_id)
+                        mes['_id'] = str(_id) if can_json else _id
                 else:
                     ms = "未知的操作:{}".format(opt)
                     logger.exception(msg=ms)

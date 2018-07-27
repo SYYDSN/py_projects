@@ -62,7 +62,7 @@ class WXUser(mongo_db.BaseDoc):
     @classmethod
     def instance(cls, **raw_dict):
         """
-        从为新获取到的用户信息的字典创建一个对象.
+        当微信用户登录时,获取用户信息的字典并创建一个对象.
         :param raw_dict:
         :return:
         """
@@ -93,3 +93,4 @@ class WXUser(mongo_db.BaseDoc):
             u = {"$set": init}
             res = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
         return res
+

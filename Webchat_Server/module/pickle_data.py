@@ -8,7 +8,6 @@ import mongo_db
 import datetime
 from log_module import get_logger
 import re
-import math
 import pandas as pd
 
 
@@ -80,7 +79,7 @@ def draw_data_dict_from_db(begin: datetime.datetime = None, end: datetime.dateti
 
 def draw_data_dict_from_db_mix(begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
     """
-    不细分产品种类，从数据库获取分析师的喊单信号。以老师id为key,交易记录的list为val并返回
+    不细分产品种类，从数据库获取分析师的喊单信号。以老师名为一级key,产品名为二级key打包成dict并返回
     :param begin: 开始时间
     :param end:  截至时间
     :return:
@@ -222,7 +221,7 @@ def calculate_win_per_by_teacher(begin: str = None, end: str = None) -> dict:
 
 def calculate_win_per_by_teacher_mix(begin: str = None, end: str = None) -> dict:
     """
-    以老师为分组依据计算的胜率,不再细分每个产品的胜率，而是统一计算，注意这个k是老师的id
+    以老师为分组依据计算的胜率,不再细分每个产品的胜率，而是统一计算
     :param begin: 开始时间
     :param end:  截至时间
     :return:
@@ -248,9 +247,8 @@ def calculate_win_per_by_teacher_mix(begin: str = None, end: str = None) -> dict
                 pass
         p_count = len(t_value)
         p_win_per = p_win_count / p_count
-        p_win_per = round(p_win_per * 100, 1)
 
-        t_dict["win"] = p_win_per
+        t_dict["per"] = p_win_per
         t_dict['count'] = p_count
         res[t_name] = t_dict
     return res

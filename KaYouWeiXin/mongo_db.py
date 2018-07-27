@@ -880,7 +880,7 @@ class BaseFile:
     """
     保存文件到mongodb数据库的GridFS操作基础类,
     这一类函数都不推荐使用init创建实例.而是使用
-    cls.save_cls以及其眼神的方法cls.save_flask_file来保存文件.
+    cls.save_cls以及其延伸的方法cls.save_flask_file来保存文件.
     """
     _table_name = "base_file"
     type_dict = dict()

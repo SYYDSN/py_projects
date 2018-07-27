@@ -384,7 +384,10 @@ class DriverResume(mongo_db2.BaseDoc):
     type_dict['email'] = str  # 邮箱
     type_dict['birth_date'] = datetime.datetime  # 出生日期,以身份证号码为准
     type_dict['id_num'] = str  # 身份证号码
-    type_dict['id_image'] = ObjectId  # 身份证图片
+    type_dict['id_image_face'] = ObjectId  # 身份证正面图片
+    type_dict['id_image_face_url'] = str  # 身份证正面图片
+    type_dict['id_image_back'] = ObjectId  # 身份证背面图片
+    type_dict['id_image_back_url'] = str  # 身份证背面图片
     type_dict['age'] = int  # 年龄 以身份证号码为准
     """以下3个字段因为是动态的,需要在每次查询doc的时候进行计算,以保证准确性"""
     type_dict['driving_experience'] = int  # 驾龄 单位 年 用驾驶证信息中的首次领证日期计算
@@ -398,18 +401,20 @@ class DriverResume(mongo_db2.BaseDoc):
     3. 高等教育(大专)
     4. 高等教育(本科及以上)
     """
-    type_dict['education'] = int  # 学历,学历代码见注释
+    type_dict['education'] = int  # (最高)学历,学历代码见注释
     """教育经历部分,是Education的ObjectId的list对象"""
     type_dict['education_history'] = list
     type_dict['status'] = int  # 任职/经营 状态. -1 个体经营/0 离职/ 1 在职
     """驾驶证信息 Driving License,简称dl"""
     type_dict['dl_image'] = ObjectId  # 驾驶证图片,.
+    type_dict['dl_image_url'] = str  # 驾驶证图片的地址,.
     type_dict['dl_license_class'] = str  # 驾驶证信息.驾驶证类型,准驾车型 英文字母一律大写
     type_dict['dl_first_date'] = datetime.datetime  # 驾驶证信息 首次领证日期
     type_dict['dl_valid_begin'] = datetime.datetime  # 驾驶证信息 驾照有效期的开始时间
     type_dict['dl_valid_duration'] = int  # 驾驶证信息 驾照有效持续期,单位年
     """道路运输从业资格证部分,Road transport qualification certificate 简称rtqc"""
     type_dict['rtqc_image'] = ObjectId  # 道路运输从业资格证信息,照片
+    type_dict['rtqc_image_url'] = str  # 道路运输从业资格证信息照片的地址
     type_dict['rtqc_license_class'] = str  # 道路运输从业资格证信息.货物运输驾驶员/危险货物运输驾驶员
     type_dict['rtqc_first_date'] = datetime.datetime  # 道路运输从业资格证信息 首次领证日期,用于推定从业年限
     type_dict['rtqc_valid_begin'] = datetime.datetime  # 道路运输从业资格证信息 资格证的有效期的开始时间
@@ -781,7 +786,7 @@ class DriverResume(mongo_db2.BaseDoc):
                             u = {"$set": update_args}
                             r = handler1.update_one(filter=f, update=u, session=ses)
                         except Exception as e:
-                            ms = "插入工作经历失败:{}".format(str(e))
+                            ms = "修改工作经历失败:{}".format(str(e))
                             logger.exception(msg=ms)
                             ses.abort_transaction()
                         match_count = r.matched_count if isinstance(r, UpdateResult) else r
@@ -911,6 +916,177 @@ class DriverResume(mongo_db2.BaseDoc):
                             raise ValueError(ms)
         else:
             ms = "参数错误: resume_id: {}, work_id: {}".format(resume_id, work_id)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def add_education(cls, resume_id: (str, ObjectId), init_args: dict) -> ObjectId:
+        """
+        添加教育经历
+        :param resume_id:
+        :param init_args:  Education的init字典
+        :return: ObjectId, Education._id
+        """
+        res = None
+        education = Education(**init_args).get_dict()
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(education, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            resume_id = resume['_id']
+            driver_id = education.get("driver_id", "")
+            if isinstance(driver_id, str) and len(driver_id) == 24:
+                driver_id = ObjectId(driver_id)
+            elif isinstance(driver_id, ObjectId):
+                pass
+            else:
+                driver_id = resume_id
+            education['driver_id'] = driver_id
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][Education.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    r = None
+                    try:
+                        r = handler1.insert_one(document=education, session=ses)
+                    except Exception as e:
+                        ms = "插入教育经历失败:{}".format(str(e))
+                        logger.exception(msg=ms)
+                        ses.abort_transaction()
+                    e_id = r.inserted_id if isinstance(r, InsertOneResult) else r
+                    if isinstance(e_id, ObjectId):
+                        """
+                        更新education_history字段
+                        """
+                        u = dict()
+                        f = {"driver_id": resume_id}
+                        ws = handler1.find(filter=f)
+                        ws = [x for x in ws]
+                        ws.append(education)
+                        u['$set'] = {"education_history": [x['_id'] for x in ws]}
+                        """更新简历"""
+                        f = {"_id": resume_id}
+                        handler2.update_one(filter=f, update=u, upsert=False, session=ses)
+                        res = work_id
+                    else:
+                        ms = "事务错误: resume_id: {}, init_args: {}".format(resume_id, init_args)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, init_args: {}".format(resume_id, init_args)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def update_education(cls, resume_id: (str, ObjectId), e_id: (str, ObjectId), update_args: dict) -> ObjectId:
+        """
+        修改教育经历
+
+        :param resume_id:
+        :param e_id:  教育经历的id
+        :param update_args:  update字典
+        :return: ObjectId, Education._id
+        """
+        res = None
+        education = Education.find_by_id(o_id=e_id, to_dict=True)
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(education, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            e_id = education['_id']
+            resume_id = resume['_id']
+            update_args['driver_id'] = resume_id
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][Education.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    f = {"driver_id": resume_id}
+                    ws = handler1.find(filter=f)
+                    ws = [x for x in ws]
+                    if e_id not in [x['_id'] for x in ws]:
+                        ms = "非本简历的教育经历! id:{}".format(e_id)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+                    else:
+                        r = None
+                        try:
+                            f = {"_id": e_id}
+                            u = {"$set": update_args}
+                            r = handler1.update_one(filter=f, update=u, session=ses)
+                        except Exception as e:
+                            ms = "修改教育经历失败:{}".format(str(e))
+                            logger.exception(msg=ms)
+                            ses.abort_transaction()
+                        match_count = r.matched_count if isinstance(r, UpdateResult) else r
+                        if match_count == 1:
+                            res = e_id
+                        else:
+                            ms = "事务错误: resume_id: {}, e_id: {}, update_args: {}".format(resume_id, e_id, update_args)
+                            logger.exception(msg=ms)
+                            raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, e_id:{}, update_args: {}".format(resume_id, e_id, update_args)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def delete_education(cls, resume_id: (str, ObjectId), e_id: (str, ObjectId)) -> ObjectId:
+        """
+        删除教育经历
+
+        :param resume_id:
+        :param e_id:  教育经历的id
+        :return: ObjectId, Education._id
+        """
+        res = None
+        education = Education.find_by_id(o_id=e_id, to_dict=True)
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(education, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            e_id = education['_id']
+            resume_id = resume['_id']
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][Education.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    f = {"driver_id": resume_id}
+                    ws = handler1.find(filter=f)
+                    ws = [x for x in ws]
+                    if e_id not in [x['_id'] for x in ws]:
+                        ms = "非本简历的教育经历! id:{}".format(e_id)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+                    else:
+                        r = None
+                        try:
+                            f = {"_id": e_id}
+                            r = handler1.delete_one(filter=f, session=ses)
+                        except Exception as e:
+                            ms = "删除教育经历失败:{}".format(str(e))
+                            logger.exception(msg=ms)
+                            ses.abort_transaction()
+                        deleted_count = r.deleted_count if isinstance(r, DeleteResult) else r
+                        if deleted_count == 1:
+                            ws = [x['_id'] for x in ws if x['_id'] != e_id]
+                            """
+                            更新education_history字段
+                            """
+                            u = dict()
+                            u['$set'] = {"education_history": ws}
+                            """更新简历"""
+                            f = {"_id": resume_id}
+                            handler2.update_one(filter=f, update=u, upsert=False, session=ses)
+                            res = e_id
+                        else:
+                            ms = "事务错误: resume_id: {},e_id: {}".format(resume_id,e_id)
+                            logger.exception(msg=ms)
+                            raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, e_id: {}".format(resume_id, e_id)
             logger.exception(msg=ms)
             raise ValueError(ms)
         return res

@@ -430,6 +430,27 @@ def generator_relate_img(user_id: str) -> str:
             return img_u
 
 
+def download_image(u_id: (str, ObjectId), table_name: str, media_id: str) -> dict:
+    """
+    从微信服务器下载素材/图片
+    :param u_id:   用户id
+    :param table_name: 图片对应的表名
+    :param media_id:    媒体id
+    :return: {"message":"success", "_id": _id, "url": url}
+    """
+    tables = ['base_file', 'head_image', 'id_image', 'honor_image', 'vehicle_image',
+              'driving_license_image', 'rtqc_image']
+    mes = {"message": "success"}
+    if table_name not in tables:
+        ms = "错误的表名: {}".format(table_name)
+        logger.exception(msg=ms)
+        mes['message'] = ms
+        print(ms)
+    else:
+        pass
+    return mes
+
+
 def get_templates() -> list:
     """
     获取全部的模板信息

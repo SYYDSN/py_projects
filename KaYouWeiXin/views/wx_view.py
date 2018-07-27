@@ -11,12 +11,14 @@ from flask import make_response
 from flask import abort
 from tools_module import *
 from mongo_db import BaseFile
+from mongo_db2 import BaseFile as BaseFile2
 from io import BytesIO
 from mongo_db import to_flat_dict
 from module.sms_module import *
 from module.server_api import *
 from module.item_module import *
 import json
+from module.driver_module import DriverResume
 import requests
 
 
@@ -45,8 +47,7 @@ def file_func(action, table_name):
     mes = {"message": "success"}
     """
     tables表名,分别存储不同的类的实例.
-    1. base_info                  文件存储基础表,对应mongo_db.BaseFile
-    2. flash_image                闪卡图片类,对应model.flash_image.FlashImage
+    1. base_info                  文件存储基础表,BaseFile
     """
     tables = ['base_file', 'flash_image']
     table_name = table_name if table_name in tables else 'base_file'
@@ -80,6 +81,80 @@ def file_func(action, table_name):
             mes['message'] = '无效的id'
     else:
         mes['message'] = "不支持的操作"
+    return json.dumps(mes)
+
+
+@check_platform_session
+def resume_image_func(action, table_name):
+    """
+    保存/获取简历的图片,
+    :param action: 动作, save/get(保存/获取)
+    :param table_name: 文件类对应的表名.
+    :return:
+    """
+    mes = {"message": "success"}
+    """
+    tables表名,分别存储不同的类的实例.
+    1. base_info                  文件存储基础表,BaseFile
+    """
+    tables = ['base_file', 'head_image', 'id_image', 'honor_image', 'vehicle_image', 'driving_license_image',
+              'rtqc_image']
+    table_name = table_name if table_name in tables else 'base_file'
+    if action == "save":
+        """保存文件"""
+        r = BaseFile2.save_flask_file(req=request, collection=table_name)
+        if isinstance(r, ObjectId):
+            mes['url'] = "/wx/resume_image/view/{}?fid={}".format(table_name, str(r))
+        else:
+            mes['message'] = "保存失败"
+    elif action == "view":
+        """获取文件"""
+        fid = get_arg(request, "fid", "")
+        if isinstance(fid, str) and len(fid) == 24:
+            fid = ObjectId(fid)
+            f = {"_id": fid}
+            r = BaseFile2.find_one_cls(filter_dict=f, collection=table_name)
+            if r is None:
+                return abort(404)
+            else:
+                mime_type = "image/jpeg" if r.get('mime_type') is None else r['mime_type']
+                file_name = "1.jpeg" if r.get('file_name') is None else r['file_name']
+                """把文件名的中文从utf-8转成latin-1,这是防止中文的文件名造成的混乱"""
+                file_name = file_name.encode().decode('latin-1')
+                data = r['data']
+                data = BytesIO(initial_bytes=data)
+                resp = make_response(send_file(data, attachment_filename=file_name, as_attachment=True,
+                                               mimetype=mime_type))
+                return resp
+        else:
+            mes['message'] = '无效的id'
+    else:
+        mes['message'] = "不支持的操作"
+    return json.dumps(mes)
+
+
+@check_platform_session
+def download_image_func(table_name):
+    """
+    从微信服务器下载图片,
+    :param table_name: 文件类对应的表名.
+    :return:
+    """
+    mes = {"message": "success"}
+    """
+    tables表名,分别存储不同的类的实例.
+    1. base_info                  文件存储基础表,BaseFile
+    """
+    tables = ['base_file', 'head_image', 'id_image', 'honor_image', 'vehicle_image', 'driving_license_image',
+              'rtqc_image']
+    table_name = table_name if table_name in tables else 'base_file'
+
+    """保存文件"""
+    r = BaseFile2.save_flask_file(req=request, collection=table_name)
+    if isinstance(r, ObjectId):
+        mes['url'] = "/wx/resume_image/view/{}?fid={}".format(table_name, str(r))
+    else:
+        mes['message'] = "保存失败"
     return json.dumps(mes)
 
 
@@ -258,7 +333,7 @@ def sms_func(key):
             r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
             if isinstance(r, dict):
                 """成功"""
-                pass
+                session['wx_user'] = r
             else:
                 mes['message'] = "绑定手机失败"
         else:
@@ -291,22 +366,82 @@ def resume_opt_func():
 
 
 @check_platform_session
+def extend_info_func():
+    """
+    对简历的扩展信息的操作.
+    简历的扩展信息包括:
+    1.
+    :return:
+    """
+    mes = {"success": "error"}
+    user = get_platform_session_arg("wx_user", dict())
+    u_id = user['_id']
+    # u_id = ObjectId("5b56bdba7b3128ec21daa4c7")
+    arg_dict = get_args(request)
+    resume_id = arg_dict.pop("resume_id", "")
+    if isinstance(resume_id, str) and len(resume_id) == 24:
+        resume_id = ObjectId(resume_id)
+        opt = arg_dict.pop("opt", "")
+        if opt in ['add_work', 'update_work', 'delete_work']:
+            """对工作经历的操作"""
+            mes = WXUser.opt_extend_info(u_id=u_id, resume_id=resume_id, opt=opt, arg_dict=arg_dict)
+        else:
+            mes['message'] = "错误的opt: {}".format(opt)
+    else:
+        mes['message'] = "简历id错误"
+    return json.dumps(mes)
+
+
+# @check_platform_session
 def common_view_func(html_name: str):
     """
     通用页面视图
     param html_name:  html文件名,包含目录路径
     :return:
     """
-    user = get_platform_session_arg("wx_user")
+    user = get_platform_session_arg("wx_user", dict())
+    user = {
+        "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
+        "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
+        "access_token": "12_ypF7a9ujmbnNYnbtZF8eyLyy23H9YmST6pMPYAuYefQizi4CrFOupAlLXKMe2dfRGa2Ezt0ApdHHTz-LdX8qtYVS8qTq2OQtnW5ZXtvUCGQ",
+        "city": "闵行",
+        "country": "中国",
+        "expires_in": 7200,
+        "groupid": 0,
+        "head_img_url": "http://thirdwx.qlogo.cn/mmopen/dUtvxcibjGMKAzSRePkx3ZGZnRMsDyzU6f8fNjxtrS2nXCcwMPQUbZM4YYfS1vhWoObUHQaErCDEjNrStKszkiaA/132",
+        "language": "zh_CN",
+        "nick_name": "徐立杰",
+        "province": "上海",
+        "qr_scene": 0,
+        "qr_scene_str": "",
+        "refresh_token": "12_7h-zJ5RYfKWjYp7AQOiIe7VdFaZxw7gPFe3xxVVx4eEGdtuaYYK4st9HgSADdvJo_QpSLkF2JLP4Royzd_NfLde291LetISRV32TjtRweMQ",
+        "remark": "",
+        "scope": "snsapi_userinfo",
+        "sex": 1,
+        "subscribe": 1,
+        "subscribe_scene": "ADD_SCENE_SEARCH",
+        "tagid_list": [],
+        "relate_img": "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQF78DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyQm9HVjAxNG5jaGwxMDAwME0wN2QAAgQmRFhbAwQAAAAA",
+        "phone": "15618317376",
+        "resume_id": ObjectId("5b5a96d9bede684e68049f01")
+    }
     u_id = user['_id']
     template_dir = os.path.join(__project_dir__, 'templates')
     file_names = os.listdir(template_dir)
     if html_name in file_names:
         kwargs = dict()  # 页面传参数
         kwargs['user'] = to_flat_dict(user)
-        """
-        传参数的步骤暂时省略
-        """
+        if html_name == "register_info.html":
+            """简历的简要信息"""
+            resume_id = user.get("resume_id", "")
+            if resume_id == "":
+                resume = dict()
+            else:
+                resume = DriverResume.find_by_id(o_id=resume_id, to_dict=True)
+            kwargs['resume'] = resume
+        else:
+            pass
+        print(kwargs)  # 打印参数
         return render_template(html_name, **kwargs)
     else:
         return abort(404)
@@ -322,6 +457,8 @@ def common_view_func(html_name: str):
 wx_blueprint.add_url_rule(rule="/hello", view_func=hello, methods=['get', 'post'])
 """保存或者获取文件(mongodb存储)"""
 wx_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['post', 'get'])
+"""保存或者获取简历相关的图片(mongodb存储)"""
+wx_blueprint.add_url_rule(rule="/resume_image/<action>/<table_name>", view_func=resume_image_func, methods=['post'])
 """获取用户授权页面"""
 wx_blueprint.add_url_rule(rule="/auth_demo/<key>", view_func=auth_demo, methods=['post', 'get'])
 """页面授权示范页"""

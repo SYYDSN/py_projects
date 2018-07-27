@@ -871,12 +871,12 @@ class BaseFile:
     """
     保存文件到mongodb数据库的GridFS操作基础类,
     这一类函数都不推荐使用init创建实例.而是使用
-    cls.save_cls以及其眼神的方法cls.save_flask_file来保存文件.
+    cls.save_cls以及其延伸的方法cls.save_flask_file来保存文件.
     """
     _table_name = "base_file"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['owner'] = DBRef   # 拥有者id,一般是指向user_info的_id
+    type_dict['owner'] = ObjectId   # 拥有者id,一般是指向user_info的_id
     type_dict['file_name'] = str
     type_dict['file_type'] = str  # 文件类型
     type_dict['description'] = str
@@ -898,8 +898,8 @@ class BaseFile:
             ms = "_id参数不合法:{}".format(_id)
             raise ValueError(ms)
         owner = kwargs.get("owner", None)
-        if not isinstance(owner, DBRef):
-            ms = "owner只能是DBRef类型,期待DBRef,得到:{}".format(type(owner))
+        if not isinstance(owner, ObjectId):
+            ms = "owner只能是ObjectId类型,期待ObjectId得到:{}".format(type(owner))
             raise ValueError(ms)
         else:
             pass
