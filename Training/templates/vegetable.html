@@ -1,0 +1,51 @@
+{% extends "standard_template.html" %}
+{% block extend_css %}
+    <link rel="stylesheet" href="/static/css/vegetable.css">
+{% endblock %}
+{% block container %}
+    <div class="show_row">
+            <div class="show_text">
+                <div id="current_title" class="title">
+                    {{ images[0]['name'] }}
+                </div>
+                <div id="current_desc" class="desc">
+                    {{ images[0]['desc'] }}
+                </div>
+            </div>
+            <div class="show_img">
+                <div class=" show_img_inner">
+                    <img id="current_img" src="{{ images[0]['img_url'] }}">
+                </div>
+            </div>
+
+    </div>
+    <div class="img_nav">
+        <div class=" img_nav_inner">
+            {% for x in images %}
+                <div class="nav_item">
+                    <img data-title="{{ x.name }}" data-desc="{{ x.desc }}" src="{{ x.img_url }}">
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="page_area">
+        {% if pages[0] and pages[0] > 1 %}
+            <!--如果当前页码组中最小一个等于1,那就是不需要前一页这个标签-->
+            <a href="javascript:;" data-page="{{ pages[0] - 1 }}" class="prev">上一页</a>
+        {% endif %}
+        {% for page in pages %}
+            <a href="javascript:;" data-page="{{ page }}" class="num {{ "active" if page == page_index else "" }}">{{ page }}</a>
+
+        {% endfor %}
+        {% if pages[-1] and pages[-1] < total_page %}
+            <!--如果当前页码组中最大的一个大于等于最大页码,那就是不需要后一页这个标签-->
+            <a href="javascript:;" data-page="{{ pages[-1] + 1 }}" class="next">下一页</a>
+        {% endif %}
+        <span>{{ "共计" + total_page | string + "页" if total_page > 1 else "" }}</span>
+    </div>
+
+{% endblock %}
+{% block extend_js %}
+<script src="/static/js/vegetable.js"></script>
+{% endblock %}

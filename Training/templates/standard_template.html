@@ -16,10 +16,9 @@
     <title>{{ "飞天小龙" if page_title ==  "" or  page_title is none else page_title }}</title>
 </head>
 <body>
-<div class="container-fluid">
     {% block container %}
     {% endblock %}
-</div>
+
 </body>
 {% block extend_js %}
 {% endblock %}

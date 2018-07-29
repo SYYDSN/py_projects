@@ -47,6 +47,23 @@
 					<div class="bd" id="tabBox1-bd">
 						<div class="con">
 							<ul>
+                                {%  for x in data %}
+                                    <li>
+                                        <p class="p-img">
+                                            <img src="{{ x.head_img }}" />{{ x.name }}
+                                        </p>
+                                        <p class="num">
+                                            <span>{{ x.win }}</span>近30天准确率
+                                        </p>
+                                        <p class="history">
+                                            <span>{{ x.follow }}</span>历史跟随
+                                        </p>
+                                        <p class="p-btn">
+                                            <a href="currentCrunchy.html?t_id={{ x._id }}" class="button-link">跟踪高手</a>
+                                        </p>
+                                    </li>
+                                {% endfor %}
+                                <!--
 								<li>
 									<p class="p-img">
 										<img src="/static/images/img1.png" />收益高手1号
@@ -103,10 +120,28 @@
 										<a href="currentCrunchy.html" class="button-link">跟踪高手</a>
 									</p>
 								</li>
+                                -->
 							</ul>
 						</div>
 						<div class="con">
 							<ul>
+                                {%  for x in data %}
+                                    <li>
+                                        <p class="p-img">
+                                            <img src="{{ x.head_img }}" />{{ x.name }}
+                                        </p>
+                                        <p class="num">
+                                            <span>{{ x.win }}</span>近30天准确率
+                                        </p>
+                                        <p class="history">
+                                            <span>{{ x.follow }}</span>历史跟随
+                                        </p>
+                                        <p class="p-btn">
+                                            <a href="currentCrunchy.html?t_id={{ x._id }}" class="button-link">跟踪高手</a>
+                                        </p>
+                                    </li>
+                                {% endfor %}
+                                <!--
 								<li>
 									<p class="p-img">
 										<img src="/static/images/img1.png" />收益高手1号
@@ -219,6 +254,7 @@
 										<a href="currentCrunchy.html" class="button-link">跟踪高手</a>
 									</p>
 								</li>
+								-->
 							</ul>
 						</div>
 						<div></div>

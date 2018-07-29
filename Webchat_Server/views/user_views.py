@@ -16,6 +16,7 @@ import json
 from tools_module import *
 from module.server_api import *
 from module.item_module import *
+from module.teacher_module import *
 
 
 """注册蓝图"""
@@ -239,6 +240,26 @@ def common_view_func(html_name: str):
         """
         if html_name == "index.html":
             """战绩榜单"""
+            data = Teacher.index()
+            kwargs['data'] = data
+        elif html_name == "currentCrunchy.html":
+            """当前老师页面"""
+            t_id = get_arg(request, "t_id", "")
+            if isinstance(t_id, str) and len(t_id) == 24:
+                info = Teacher.find_by_id(o_id=t_id, to_dict=True, can_json=True)
+                if info.get("head_img") is None or info.get("head_img") == "":
+                    info['head_img'] = "/static/images/head_image/t3.jpg"
+                data = Teacher.single_info(t_id)
+                chart = data['chart']
+                history = data.get("history", list())
+                hold = data.get('hold', list())
+                kwargs['chart'] = chart
+                kwargs['history'] = history
+                kwargs['hold'] = hold
+                kwargs['info'] = info
+            else:
+                return abort(404)
+        else:
             pass
         html_name = "wx/{}".format(html_name)
         return render_template(html_name, **kwargs)

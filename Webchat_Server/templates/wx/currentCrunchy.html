@@ -11,174 +11,236 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<title>战绩榜单</title>
-		<link rel="stylesheet" type="text/css" href="css/index.css" />
-		<script type="text/javascript" src="js/common.js"></script>
-		<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="/static/css/index.css" />
+        <link rel="stylesheet" href="/static/css/currentCrunchy.css">
+		<script type="text/javascript" src="/static/js/common.js"></script>
+		<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+        <script src="/static/js/echarts.min.js"></script>
 	</head>
 
-	<body>
-		<div class="wrapIn">
+    <body>
+    <div class="wrapIn">
 
-			<div class="crunchyWrap">
-				<div class="crunchy-topText">
-					<div class="p-img">
-	<img src="images/bannerbg.png"/>
-</div>
-<div class="right-text">
-	<p class="name">
-		<span>收益高手1号</span># 机会准 持单短
-	</p>
-	<p class="num">
-		<span>2.11%</span>近30天收益率
-	</p>
-</div>
-				</div>
-<ul class="crunchy-tabList">
-		<li><a href="index.html">数据统计</a></li>
-			<li class="on"><a href="currentCrunchy.html">当前交易</a></li>
-	<li><a href="currentCrunchy.html">历史交易</a></li>
-
-
-</ul>
-	<div class="crunchy-InfoText">
-		<div class="crunchy-wrap">
-<ul class="currentCrunchy">
-	<li>
-		<div class="textList">
-			<p>卖出黄金</p>持仓3小时
-		</div>
-		<div class="priceText">
-			<p>1227.28</p>开仓价
-		</div>
-		<div class="priceText">
-			<p>1228.71</p>现价
-		</div>
-		<div class="earnings">
-			<p class="color12cb1b">$-71.50</p>收益
-		</div>
-	</li>	<li>
-		<div class="textList">
-			<p>卖出黄金</p>持仓3小时
-		</div>
-		<div class="priceText">
-			<p>1227.28</p>开仓价
-		</div>
-		<div class="priceText">
-			<p>1228.71</p>现价
-		</div>
-		<div class="earnings">
-			<p>$71.50</p>收益
-		</div>
-	</li>	<li>
-		<div class="textList">
-			<p>卖出黄金</p>持仓3小时
-		</div>
-		<div class="priceText">
-			<p>1227.28</p>开仓价
-		</div>
-		<div class="priceText">
-			<p>1228.71</p>现价
-		</div>
-		<div class="earnings">
-			<p>$71.50</p>收益
-		</div>
-	</li>	<li>
-		<div class="textList">
-			<p>卖出黄金</p>持仓3小时
-		</div>
-		<div class="priceText">
-			<p>1227.28</p>开仓价
-		</div>
-		<div class="priceText">
-			<p>1228.71</p>现价
-		</div>
-		<div class="earnings">
-			<p>$71.50</p>收益
-		</div>
-	</li>	<li>
-		<div class="textList">
-			<p>卖出黄金</p>持仓3小时
-		</div>
-		<div class="priceText">
-			<p>1227.28</p>开仓价
-		</div>
-		<div class="priceText">
-			<p>1228.71</p>现价
-		</div>
-		<div class="earnings">
-			<p>$71.50</p>收益
-		</div>
-	</li>	<li>
-		<div class="textList">
-			<p>卖出黄金</p>持仓3小时
-		</div>
-		<div class="priceText">
-			<p>1227.28</p>开仓价
-		</div>
-		<div class="priceText">
-			<p>1228.71</p>现价
-		</div>
-		<div class="earnings">
-			<p>$71.50</p>收益
-		</div>
-	</li>	<li>
-		<div class="textList">
-			<p>卖出黄金</p>持仓3小时
-		</div>
-		<div class="priceText">
-			<p>1227.28</p>开仓价
-		</div>
-		<div class="priceText">
-			<p>1228.71</p>现价
-		</div>
-		<div class="earnings">
-			<p>$71.50</p>收益
-		</div>
-	</li>	<li>
-		<div class="textList">
-			<p>卖出黄金</p>持仓3小时
-		</div>
-		<div class="priceText">
-			<p>1227.28</p>开仓价
-		</div>
-		<div class="priceText">
-			<p>1228.71</p>现价
-		</div>
-		<div class="earnings">
-			<p>$71.50</p>收益
-		</div>
-	</li>	<li>
-		<div class="textList">
-			<p>卖出黄金</p>持仓3小时
-		</div>
-		<div class="priceText">
-			<p>1227.28</p>开仓价
-		</div>
-		<div class="priceText">
-			<p>1228.71</p>现价
-		</div>
-		<div class="earnings">
-			<p>$71.50</p>收益
-		</div>
-	</li>
-</ul>
-		</div>
-		<div class="crunchy-btn">
-		<button type="button" class="button-link" onclick="location.href='standings.html'">跟踪高手</button>
-		</div>
-	</div>
-			</div>
-			<div class="userFooter">
-				<li>
-
-					<a href="index.html"> <img src="images/icon3.png" />跟单</a>
-				</li>
-				<li>
-					<a href="user.html"><img src="images/icon4.png" />我的</a>
-				</li>
-			</div>
-		</div>
-	</body>
+        <div class="crunchyWrap">
+            <div class="crunchy-topText">
+                <div class="p-img">
+                    <img src="{{ info.head_img }}"/>
+                </div>
+                <div class="right-text">
+                    <p class="name">
+                        <span>{{ info.name }}</span>#  {{ info.feature if info.feature else '机会准 持单短' }}
+                    </p>
+                    <p class="num">
+                        <span>2.11%</span>近60天收益率
+                    </p>
+                </div>
+            </div>
+            <ul class="crunchy-tabList">
+                <li><a href="index.html">数据统计</a></li>
+                <li class="on"><a href="/user/html/currentCrunchy.html">当前交易</a></li>
+                <li><a href="/user/html/currentCrunchy.html">历史交易</a></li>
 
 
+            </ul>
+            <div class="crunchy-InfoText">
+                <div class="chart_wrap">
+                    <!--胜率统计图-->
+
+                </div>
+                <div class="crunchy-wrap">
+                    <ul class="currentCrunchy">
+                        <li>
+                            <div class="textList">
+                                <p>卖出黄金</p>持仓3小时
+                            </div>
+                            <div class="priceText">
+                                <p>1227.28</p>开仓价
+                            </div>
+                            <div class="priceText">
+                                <p>1228.71</p>现价
+                            </div>
+                            <div class="earnings">
+                                <p class="color12cb1b">$-71.50</p>收益
+                            </div>
+                        </li>	<li>
+                        <div class="textList">
+                            <p>卖出黄金</p>持仓3小时
+                        </div>
+                        <div class="priceText">
+                            <p>1227.28</p>开仓价
+                        </div>
+                        <div class="priceText">
+                            <p>1228.71</p>现价
+                        </div>
+                        <div class="earnings">
+                            <p>$71.50</p>收益
+                        </div>
+                    </li>	<li>
+                        <div class="textList">
+                            <p>卖出黄金</p>持仓3小时
+                        </div>
+                        <div class="priceText">
+                            <p>1227.28</p>开仓价
+                        </div>
+                        <div class="priceText">
+                            <p>1228.71</p>现价
+                        </div>
+                        <div class="earnings">
+                            <p>$71.50</p>收益
+                        </div>
+                    </li>	<li>
+                        <div class="textList">
+                            <p>卖出黄金</p>持仓3小时
+                        </div>
+                        <div class="priceText">
+                            <p>1227.28</p>开仓价
+                        </div>
+                        <div class="priceText">
+                            <p>1228.71</p>现价
+                        </div>
+                        <div class="earnings">
+                            <p>$71.50</p>收益
+                        </div>
+                    </li>	<li>
+                        <div class="textList">
+                            <p>卖出黄金</p>持仓3小时
+                        </div>
+                        <div class="priceText">
+                            <p>1227.28</p>开仓价
+                        </div>
+                        <div class="priceText">
+                            <p>1228.71</p>现价
+                        </div>
+                        <div class="earnings">
+                            <p>$71.50</p>收益
+                        </div>
+                    </li>	<li>
+                        <div class="textList">
+                            <p>卖出黄金</p>持仓3小时
+                        </div>
+                        <div class="priceText">
+                            <p>1227.28</p>开仓价
+                        </div>
+                        <div class="priceText">
+                            <p>1228.71</p>现价
+                        </div>
+                        <div class="earnings">
+                            <p>$71.50</p>收益
+                        </div>
+                    </li>	<li>
+                        <div class="textList">
+                            <p>卖出黄金</p>持仓3小时
+                        </div>
+                        <div class="priceText">
+                            <p>1227.28</p>开仓价
+                        </div>
+                        <div class="priceText">
+                            <p>1228.71</p>现价
+                        </div>
+                        <div class="earnings">
+                            <p>$71.50</p>收益
+                        </div>
+                    </li>	<li>
+                        <div class="textList">
+                            <p>卖出黄金</p>持仓3小时
+                        </div>
+                        <div class="priceText">
+                            <p>1227.28</p>开仓价
+                        </div>
+                        <div class="priceText">
+                            <p>1228.71</p>现价
+                        </div>
+                        <div class="earnings">
+                            <p>$71.50</p>收益
+                        </div>
+                    </li>	<li>
+                        <div class="textList">
+                            <p>卖出黄金</p>持仓3小时
+                        </div>
+                        <div class="priceText">
+                            <p>1227.28</p>开仓价
+                        </div>
+                        <div class="priceText">
+                            <p>1228.71</p>现价
+                        </div>
+                        <div class="earnings">
+                            <p>$71.50</p>收益
+                        </div>
+                    </li>
+                    </ul>
+                </div>
+                <div class="crunchy-btn">
+                    <button type="button" class="button-link" onclick="location.href='standings.html'">跟踪高手</button>
+                </div>
+            </div>
+        </div>
+        <div class="userFooter">
+            <li>
+
+                <a href="/user/html/index.html"> <img src="/static/images/icon3.png" />跟单</a>
+            </li>
+            <li>
+                <a href="/user/html/user.html"><img src="/static/images/icon4.png" />我的</a>
+            </li>
+        </div>
+    </div>
+    </body>
+
+<script>
+    $(function(){
+        chart = {{ chart | safe }};
+        console.log(chart);
+
+        // 生成一个线图
+        line = function($obj, data){
+            // $obj warp容器
+            // data数据
+            var x = [];
+            var y = [];
+            var d = data['data'];
+            var l = d.length;
+            var p_name = data['product'];
+            var count = 0;
+            var sub = [];
+            for(var i=0; i<l; i++){
+                var temp = d[i];
+                count += temp['all_count'];
+                x.push(temp['week']);
+                y.push(temp['win_per']);
+                if(i == 0 || i == (l - 1)){
+                    sub.push(temp['week']);
+                }
+            }
+            sub.reverse();
+            var option = {
+                title:{
+                    text: p_name,
+                    subtext: `${sub.join("-")} 共计 ${count}单`
+                },
+                xAxis: {
+                    type: 'category',
+                    data: x
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: y,
+                    type: 'line'
+                }]
+            };
+            var chart_div = $("<div class='chart_div'></div>");
+            $obj.append(chart_div);
+            let charts = echarts.init(chart_div[0]);
+            charts.setOption(option);
+        };
+        for(var x of chart){
+            line($(".chart_wrap"), x);
+        }
+
+
+
+    // end!
+    });
+</script>
 </html>

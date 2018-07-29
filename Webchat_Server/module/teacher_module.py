@@ -115,8 +115,8 @@ class Teacher(mongo_db.BaseDoc):
         :return:
         """
         f = dict()
-        p = ["_id", "name"]
-        ts = cls.find_plus(filter_dict=f, to_dict=True)
+        p = ["_id", "name", "head_img"]
+        ts = cls.find_plus(filter_dict=f, projection=p, to_dict=True)
         t_ids = [x['_id'] for x in ts]
         ses = mongo_db.get_conn(table_name="wx_user")
         m = {"$match": {"follow": {"$elemMatch": {"$in": t_ids}}}}
@@ -125,16 +125,15 @@ class Teacher(mongo_db.BaseDoc):
         pipeline = [m, u, g]
         r = ses.aggregate(pipeline=pipeline)
         count = {x['_id']: x['total'] for x in r}
-        ts = {x['_id']: x['name'] for x in ts}
+        ts = {x['_id']: {"name": x['name'], "head_img": x.get("head_img", "/static/images/head_image/t1.jpg")} for x in ts}
         res = dict()
         for k, v in ts.items():
             temp = dict()
             temp['total'] = count.get(k, 0)
-            temp['name'] = v
+            temp['name'] = v['name']
+            temp['head_img'] = v["head_img"]
             res[k] = temp
         return res
-
-
 
     @classmethod
     def index(cls):
@@ -145,7 +144,35 @@ class Teacher(mongo_db.BaseDoc):
         """查询近30天的胜率数据"""
         data = calculate_win_per_by_teacher_mix()
         """查询老师的跟随人数"""
-        cls.follow_count()
+        d = cls.follow_count()
+        res = list()
+        for t_id, v in data.items():
+            temp = v
+            temp.update(d.get(t_id))
+            temp['_id'] = t_id
+            res.append(temp)
+        res.sort(key=lambda obj: obj['win'], reverse=True)
+        return res
+
+    @classmethod
+    def single_info(cls, t_id: (str, ObjectId), begin: (str, datetime.datetime) = None, end: (str, datetime.datetime) = None) -> dict:
+        """
+        老师的个人页面，有图标，持仓和历史数据
+        :param t_id:
+        :param begin:
+        :param end:
+        :return:
+        """
+        t_id = t_id if isinstance(t_id, ObjectId) else ObjectId(t_id)
+        now = datetime.datetime.now()
+        begin = mongo_db.get_datetime_from_str(begin)
+        end = mongo_db.get_datetime_from_str(end)
+        if end is None:
+            end = now
+        if begin is None:
+            begin = now - datetime.timedelta(days=60)
+        data = calculate_win_per_by_week_single(t_id=t_id, begin=begin, end=end)
+        return data
 
 
 if __name__ == "__main__":
