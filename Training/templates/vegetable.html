@@ -4,21 +4,20 @@
 {% endblock %}
 {% block container %}
     <div class="show_row">
-            <div class="show_text">
-                <div id="current_title" class="title">
-                    {{ images[0]['name'] }}
-                </div>
-                <div id="current_desc" class="desc">
-                    {{ images[0]['desc'] }}
-                </div>
+        <div class="show_text">
+            <div id="current_title" class="title">
+                {{ images[0]['name'] }}
             </div>
-            <div class="show_img">
-                <div class=" show_img_inner">
-                    <img id="current_img" src="{{ images[0]['img_url'] }}">
-                </div>
+            <div id="current_desc" class="desc">
+                {{ images[0]['desc'] }}
             </div>
+        </div>
+        <div class="show_img">
+            <img id="current_img" src="{{ images[0]['img_url'] }}">
+        </div>
 
     </div>
+
     <div class="img_nav">
         <div class=" img_nav_inner">
             {% for x in images %}

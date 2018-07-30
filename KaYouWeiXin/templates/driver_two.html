@@ -26,7 +26,6 @@
         }
         .div_info i{
             line-height: 6em;
-            font-size：3rem;
         }
         .div_info_btn{
             position: relative;
@@ -38,22 +37,44 @@
             line-height: 2.5em;
             border-radius: 6px;
         }
+        .iimg {
+            display: inline-block;
+            width: 60px;
+            height: 6em;
+            overflow: hidden;
+        }
+        .imgs{
+            width: 100%;
+            height:2.5em;
+        }
     </style>
 <body>
 
         <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p>行车证 <i class="glyphicon glyphicon-plus-sign pull-right" onclick="take_a_photo()"></i></p>
+                        <p>行车证
+                            <i class="pull-right iimg">
+                                    <img class="imgs" id="imgs_one"  src="/static/images/poto.png" alt="">
+                            </i>
+                        </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p>驾驶证 <i class="glyphicon glyphicon-plus-sign pull-right" onclick="take_a_photo()"></i></p>
+                        <p>驾驶证
+                            <i class="pull-right iimg">
+                                <img class="imgs" id="imgs_two"  src="/static/images/poto.png" alt="">
+                        </i>
+                    </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p>本人照片 <i class="glyphicon glyphicon-plus-sign pull-right" onclick="take_a_photo()"></i></p>
+                        <p>本人照片
+                            <i class="pull-right iimg">
+                                <img class="imgs" id="imgs_three" src="/static/images/poto.png" alt="">
+                            </i>
+                    </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p id="myModal">性别 <i class="glyphicon glyphicon-menu-right pull-right" ></i></p>
+                        <p id="myModal">性别 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
                         <p>年龄 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
@@ -74,7 +95,7 @@
                         <p> 现居地址 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
-                       <a href="./resume.html"> <p>完成</p></a>
+                       <a id="submt" href="javascript:;"> <p>完成</p></a>
                     </div>                          
                 </div>
             </div>
@@ -101,48 +122,67 @@
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
         <script src="/static/js/wexin.js"></script>
-        <script src="/wx/js_sdk_init?debug=1&api=chooseImage"></script>
+        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
         <script>
             $('#myModal').click(function(){
                 $('.modal').modal();
-            })
-//             $(function(){
-//                 get_wx_config();
-//             });
-//             function get_wx_config(){
-//                 wx.config({
-//                 debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-//                 appId: 'wx50cbcc5725601880', // 必填，公众号的唯一标识
-//                 timestamp: 1532409742, // 必填，生成签名的时间戳
-//                 nonceStr: '9AUVToQ5IB5WPzDFSSmGHQBkPyhDF2vELcl1ItZEWLO', // 必填，生成签名的随机串
-//                 signature: '560f6c3f0ce13bbeee4677c89082e3c06738b0bc',// 必填，签名
-//                 jsApiList: [
-//                     "chooseImage"
-//                            ] // 必填，需要使用的JS接口列表
-//             });
-//             wx.ready(function(){
-//                 console.log("wx.config success.");
-//             });
-            
-//             // 处理调用失败的接口
-//             wx.error(function(res){
-//                 alert("wx.config failed.");
-//                 //alert(res);
-//                 // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，
-//                 // 也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
-//             });
-//             }
+            });
 
-            function take_a_photo(){
+             var imgs_one_num = -1;
+             var imgs_two_num = -1;
+             var imgs_three_num = -1;
+            function take_a_photo($obj){
                 wx.chooseImage({
                 count: 1, // 默认9
                 sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
                 sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
                 success: function (res) {
                 var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    $obj.attr('src',localIds);
+                    if($obj.attr("id")== "imgs_one"){
+                           imgs_one_num = localIds;
+                       }
+                    else if($obj.attr("id")== "imgs_two"){
+                            imgs_two_num =localIds;
+                    }
+                     else if($obj.attr("id")== "imgs_three"){
+                            imgs_three_num = localIds;
+                    }
+//                    syncUpload(localIds);
                 }
                 });
             }
+            $('.iimg').each(function(){
+                var $this = $(this);
+                $this.click(function(){
+                    var img = $this.find("img:first");
+                    take_a_photo(img);
+                })
+            });
+//         上传提交信息
+            $('#submt').click(function syncUpload(localIds){
+                
+//                 var localId = localIds.pop();
+                
+                var localId = [imgs_one_num,imgs_two_num,imgs_three_num];
+//                 alert(localId);
+                if(imgs_one_num!==-1 && imgs_two_num!==-1 && imgs_three_num!==-1){
+                 wx.uploadImage({
+                    localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
+                    isShowProgressTips: 1, // 默认为1，显示进度提示
+                    success: function (res) {
+                    var serverId = res.serverId; // 返回图片的服务器端ID
+                        alert(serverId);
+                    }
+                    });
+                }
+
+//                 alert(localIds);
+            });
+
+  wx.error(function(){
+            alert(error)
+        });
 
         </script>
 </body>

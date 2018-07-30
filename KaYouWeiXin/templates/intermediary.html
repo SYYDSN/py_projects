@@ -13,9 +13,14 @@
             padding: 0;
             font-size: 14px;
         }
-
+        body{
+            background: #f5f5f5;
+        }
         p{
             margin: 0;
+        }
+        .div_info{
+            background: #fff;
         }
         .div_info p{
             line-height: 4em;
@@ -31,15 +36,15 @@
             border: none;
             height: 100%;
             width: 100%;
-            background: #f5f5f5;
+            /* background: #f5f5f5; */
         }
         .div_info a{
             width: 45px;
         }
         .div_info_btn{
-            position: absolute;
-            bottom: 0;
+            margin-top: 10em;
             margin-bottom: 2em;
+            background: #f5f5f5;
         }
         .div_info_btn p{
             margin-top: 20px;
@@ -50,32 +55,83 @@
             background: #417FFF;
             color: #fff;
         }
+        .p_text{
+            text-align: center;
+        }
+        .p_text img{
+            margin-top: 1em;
+            width: 96%;
+            height:12em;
+            pointer-events: none;
+        }
         .div_bg{
-            background: #f5f5f5;
+            /* background: #f5f5f5; */
         }
         .div_bg input{
-            background: #f5f5f5;
+            /* background: #f5f5f5; */
+        }
+        .container-fluid{
+           
+        }
+        .div_marg{
+            margin-top: 2rem;
+        }
+        .inp_one{
+            border-bottom: 1px solid #ccc;
         }
     </style>
 <body>
         <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p><img src="#" alt=""></p>
-                        <p>上传营业执照</p>
+                        <p class="p_text" onclick="photo_img()"><img id="imgs"  src="/static/images/poto.png" alt=""></p>
+                        <p class="p_text">上传营业执照</p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg  div_marg">
+
+                        <p class="inp_one"><input type="text" placeholder="联系人"></p>
+                    </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                        <p><input type="text" placeholder="联系人"></p>
-                        <p><input type="text" placeholder="邮箱"></p>
+
+                            <p><input type="text" placeholder="邮箱"></p>
+    
+                        </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
-                            <a href="./resume.html"> <p>完成</p></a>
+                            <a href="./resume.html"> <p>提交</p></a>
                     </div>
                 </div>
             </div>
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script src="/wx/js_sdk_init?debug=0&api=chooseImage getLocalImgData"></script>
         <script>
+            function photo_img(){
+                wx.chooseImage({
+                count: 1, // 默认9
+                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                success: function (res) {
+//                      alert(res.localIds);
+                var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    
+                    var $img = $('#imgs');
+                    var $src = $img[0].src;
+                    $img.attr('src',localIds);
+                }
+                });
+                wx.getLocalImgData({
+                    localId: '', // 图片的localID
+                    success: function (res) {
+                        alert(res.localData);
+                    var localData = res.localData; // localData是图片的base64数据，可以用img标签显示
+                         alert(localData);
+                    }
+                   });
+            };
+            
         </script>
 </body>
 </html>

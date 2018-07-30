@@ -17,7 +17,7 @@ import json
 
 
 """注册蓝图"""
-vegetable_blueprint = Blueprint("vegetable_blueprint", __name__, url_prefix="/vegetable", template_folder="templates")
+vegetable_blueprint = Blueprint("vegetable_blueprint", __name__, url_prefix="/img", template_folder="templates")
 
 
 """蔬菜的视图函数"""
@@ -101,4 +101,4 @@ vegetable_blueprint.add_url_rule(rule="/hello", view_func=hello, methods=['get',
 """保存或者获取文件(mongodb存储)"""
 vegetable_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['post', 'get'])
 """分页显示蔬菜"""
-vegetable_blueprint.add_url_rule(rule="/page", view_func=page_vegetable_images, methods=['post', 'get'])
+vegetable_blueprint.add_url_rule(rule="/vegetable", view_func=page_vegetable_images, methods=['post', 'get'])

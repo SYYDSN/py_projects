@@ -122,7 +122,7 @@ class Vegetable(mongo_db.BaseDoc):
         :param item:
         :return:
         """
-        item['img_url'] = "/vegetable/file/view/vegetable_image?fid={}".format(str(item['data']))
+        item['img_url'] = "/img/file/view/vegetable_image?fid={}".format(str(item['data']))
         return item
 
 

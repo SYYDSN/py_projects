@@ -52,6 +52,8 @@
         }
         .div_info p img{
             width: 88%;
+            height: 16em;
+            pointer-events: none;
         }
         .p_mag {
             margin-top: 1em;
@@ -61,24 +63,113 @@
         <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_p ">
-                        <p class="p_mag"><img src="/static/images/poto.png" alt=""></p>
+                        <p class="p_mag"><img class="imgs" id="id_image_face" src="/static/images/poto.png" alt=""></p>
                         <p>请上传身份证正面照</p>
                     </div>
                 <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_p">
-                        <p><img src="/static/images/poto.png" alt=""></p>
+                        <p class="p_mag"><img class="imgs" id="id_image_back" src="/static/images/poto.png" alt=""></p>
                         <p>请上传身份证反面照</p>
                 </div>
+                    <div id="res"></div>
                 <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
-                        <a href="code.html"><p>完成</p></a>
+                        <a id="submit" href="javascript:;"><p>完成</p></a>
                 </div>
                 </div>
             </div>
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
-        <!--<script src="../js/wexin.js"></script>-->
-        <script>
-       
-        </script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
+        <!--<script src="/static/js/wx_custom.js"></script>-->
+    <script>
+    $(function(){
+        var id_image_face_num = -1;
+        var id_image_back_num = -1;
+        function photo_img($obj){
+            wx.chooseImage({
+            count: 1, // 默认9
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            success: function (res) {
+           //  alert(res.localIds);
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    $obj.attr('src',localIds);
+                    if($obj.attr("id") == "id_image_face"){
+                        id_image_face_num = localIds;
+                    }
+                    else{
+                        id_image_back_num = localIds;
+                    }
+                }
+            });
+            /*
+            wx.getLocalImgData({
+                localId: '', // 图片的localID
+                success: function (res) {
+                    alert(res.localData);
+                var localData = res.localData; // localData是图片的base64数据，可以用img标签显示
+                     alert(localData);
+
+                }
+               });
+           */     
+        }
+        
+        // 点击选择事件
+        $(".p_mag").each(function(){
+            var $this = $(this);
+            $this.click(function(){
+                var img = $this.find("img:first");
+                photo_img(img);
+            });
+        });
+        
+        // 上传事件
+        $("#submit").click(function(){
+                var server_ids = {};
+                if(id_image_face_num != -1){
+                        wx.uploadImage({
+                        localId: id_image_face_num,
+                        isShowProgressTips: 1,
+                        success: function(res){
+                            var id = res.serverId;
+                            alert(id);
+                            server_ids['id_image_face'] = id;
+                        }
+                    });
+                }
+                if(id_image_back_num != -1){
+                        wx.uploadImage({
+                        localId: id_image_back_num,
+                        isShowProgressTips: 1,
+                        success: function(res){
+                            var id = res.serverId;
+                            alert(id);
+                            server_ids['id_image_back'] = id;
+                        }
+                    });
+                }
+                if(server_ids['id_image_face'] != undefined || server_ids['id_image_back_num']){
+                    var args = {
+                        "table_name": "id_image",
+                        "db": "mongo_db2"
+                    };
+                    if(server_ids['id_image_face'] != undefined){
+                        args['server_id_a'] = server_ids['id_image_face'];
+                    }
+                    if(server_ids['id_image_back'] != undefined){
+                        args['server_id_b'] = server_ids['id_image_back'];
+                    }
+                    $.post("/wx/")
+                }
+
+            
+            
+        });
+        
+        
+    // end!
+    });
+    </script>
 </body>
 </html>

@@ -264,6 +264,10 @@ class WXUser(mongo_db.BaseDoc):
         5. 修改教育经历  update_education  DriverResume.update_education
         6. 删除教育经历  delete_education  DriverResume.delete_education
 
+        7. 添加荣誉  add_honor  DriverResume.add_honor
+        8. 修改荣誉  update_honor  DriverResume.update_honor
+        9. 删除荣誉  delete_honor  DriverResume.delete_honor
+
 
         :param u_id:  用户id
         :param resume_id:  简历的字典
@@ -320,6 +324,26 @@ class WXUser(mongo_db.BaseDoc):
                         mes['message'] = "缺少必要的参数:e_id"
                     else:
                         _id = DriverResume.delete_education(resume_id=resume_id, e_id=e_id)
+                        mes['_id'] = str(_id) if can_json else _id
+                elif opt == "add_honor":
+                    """添加荣誉"""
+                    _id = DriverResume.add_honor(resume_id=resume_id, init_args=arg_dict)
+                    mes['_id'] = str(_id) if can_json else _id
+                elif opt == "update_honor":
+                    """修改荣誉"""
+                    h_id = arg_dict.pop("h_id", None)
+                    if h_id is None:
+                        mes['message'] = "缺少必要的参数:h_id"
+                    else:
+                        _id = DriverResume.update_honor(resume_id=resume_id, h_id=h_id, update_args=arg_dict)
+                        mes['_id'] = str(_id) if can_json else _id
+                elif opt == "delete_honor":
+                    """删除荣誉"""
+                    h_id = arg_dict.pop("h_id", None)
+                    if h_id is None:
+                        mes['message'] = "缺少必要的参数:h_id"
+                    else:
+                        _id = DriverResume.delete_education(resume_id=resume_id, h_id=h_id)
                         mes['_id'] = str(_id) if can_json else _id
                 else:
                     ms = "未知的操作:{}".format(opt)

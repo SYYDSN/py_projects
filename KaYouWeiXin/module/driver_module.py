@@ -968,7 +968,7 @@ class DriverResume(mongo_db2.BaseDoc):
                         """更新简历"""
                         f = {"_id": resume_id}
                         handler2.update_one(filter=f, update=u, upsert=False, session=ses)
-                        res = work_id
+                        res = e_id
                     else:
                         ms = "事务错误: resume_id: {}, init_args: {}".format(resume_id, init_args)
                         logger.exception(msg=ms)
@@ -999,7 +999,6 @@ class DriverResume(mongo_db2.BaseDoc):
             update_args['driver_id'] = resume_id
             client = mongo_db2.get_client()
             handler1 = client[mongo_db2.db_name][Education.get_table_name()]
-            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
             with client.start_session(causal_consistency=True) as ses:
                 with ses.start_transaction():
                     f = {"driver_id": resume_id}
@@ -1090,6 +1089,177 @@ class DriverResume(mongo_db2.BaseDoc):
             logger.exception(msg=ms)
             raise ValueError(ms)
         return res
+
+    @classmethod
+    def add_honor(cls, resume_id: (str, ObjectId), init_args: dict) -> ObjectId:
+        """
+        添加荣誉
+        :param resume_id:
+        :param init_args:  Honor的init字典
+        :return: ObjectId, Honor._id
+        """
+        res = None
+        honor = Honor(**init_args).get_dict()
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(honor, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            resume_id = resume['_id']
+            driver_id = honor.get("driver_id", "")
+            if isinstance(driver_id, str) and len(driver_id) == 24:
+                driver_id = ObjectId(driver_id)
+            elif isinstance(driver_id, ObjectId):
+                pass
+            else:
+                driver_id = resume_id
+            honor['driver_id'] = driver_id
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][Honor.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    r = None
+                    try:
+                        r = handler1.insert_one(document=honor, session=ses)
+                    except Exception as e:
+                        ms = "插入荣誉失败:{}".format(str(e))
+                        logger.exception(msg=ms)
+                        ses.abort_transaction()
+                    h_id = r.inserted_id if isinstance(r, InsertOneResult) else r
+                    if isinstance(h_id, ObjectId):
+                        """
+                        更新honor字段
+                        """
+                        u = dict()
+                        f = {"driver_id": resume_id}
+                        ws = handler1.find(filter=f)
+                        ws = [x for x in ws]
+                        ws.append(honor)
+                        u['$set'] = {"honor": [x['_id'] for x in ws]}
+                        """更新简历"""
+                        f = {"_id": resume_id}
+                        handler2.update_one(filter=f, update=u, upsert=False, session=ses)
+                        res = h_id
+                    else:
+                        ms = "事务错误: resume_id: {}, init_args: {}".format(resume_id, init_args)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, init_args: {}".format(resume_id, init_args)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def update_honor(cls, resume_id: (str, ObjectId), h_id: (str, ObjectId), update_args: dict) -> ObjectId:
+        """
+        修改荣誉
+
+        :param resume_id:
+        :param h_id:  荣誉的id
+        :param update_args:  update字典
+        :return: ObjectId, Honor._id
+        """
+        res = None
+        honor = Honor.find_by_id(o_id=h_id, to_dict=True)
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(honor, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            h_id = honor['_id']
+            resume_id = resume['_id']
+            update_args['driver_id'] = resume_id
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][Honor.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    f = {"driver_id": resume_id}
+                    ws = handler1.find(filter=f)
+                    ws = [x for x in ws]
+                    if h_id not in [x['_id'] for x in ws]:
+                        ms = "非本简历的荣誉! id:{}".format(h_id)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+                    else:
+                        r = None
+                        try:
+                            f = {"_id": h_id}
+                            u = {"$set": update_args}
+                            r = handler1.update_one(filter=f, update=u, session=ses)
+                        except Exception as e:
+                            ms = "修改荣誉失败:{}".format(str(e))
+                            logger.exception(msg=ms)
+                            ses.abort_transaction()
+                        match_count = r.matched_count if isinstance(r, UpdateResult) else r
+                        if match_count == 1:
+                            res = h_id
+                        else:
+                            ms = "事务错误: resume_id: {}, e_id: {}, update_args: {}".format(resume_id, h_id, update_args)
+                            logger.exception(msg=ms)
+                            raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, e_id:{}, update_args: {}".format(resume_id, h_id, update_args)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def delete_education(cls, resume_id: (str, ObjectId), h_id: (str, ObjectId)) -> ObjectId:
+        """
+        删除荣誉
+
+        :param resume_id:
+        :param h_id:  荣誉的id
+        :return: ObjectId, Honor._id
+        """
+        res = None
+        honor = Honor.find_by_id(o_id=h_id, to_dict=True)
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(honor, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            h_id = honor['_id']
+            resume_id = resume['_id']
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][Honor.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    f = {"driver_id": resume_id}
+                    ws = handler1.find(filter=f)
+                    ws = [x for x in ws]
+                    if h_id not in [x['_id'] for x in ws]:
+                        ms = "非本简历的荣誉! id:{}".format(h_id)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+                    else:
+                        r = None
+                        try:
+                            f = {"_id": h_id}
+                            r = handler1.delete_one(filter=f, session=ses)
+                        except Exception as e:
+                            ms = "删除荣誉失败:{}".format(str(e))
+                            logger.exception(msg=ms)
+                            ses.abort_transaction()
+                        deleted_count = r.deleted_count if isinstance(r, DeleteResult) else r
+                        if deleted_count == 1:
+                            ws = [x['_id'] for x in ws if x['_id'] != h_id]
+                            """
+                            更新honor字段
+                            """
+                            u = dict()
+                            u['$set'] = {"honor": ws}
+                            """更新简历"""
+                            f = {"_id": resume_id}
+                            handler2.update_one(filter=f, update=u, upsert=False, session=ses)
+                            res = h_id
+                        else:
+                            ms = "事务错误: resume_id: {},e_id: {}".format(resume_id, h_id)
+                            logger.exception(msg=ms)
+                            raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, e_id: {}".format(resume_id, h_id)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
 
 
 if __name__ == "__main__":

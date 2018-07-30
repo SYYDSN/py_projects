@@ -19,6 +19,7 @@ from module.server_api import *
 from module.item_module import *
 import json
 from module.driver_module import DriverResume
+from module.server_api import *
 import requests
 
 
@@ -141,6 +142,7 @@ def download_image_func(table_name):
     :return:
     """
     mes = {"message": "success"}
+    wx_user = get_platform_session_arg("wx_user")
     """
     tables表名,分别存储不同的类的实例.
     1. base_info                  文件存储基础表,BaseFile
@@ -150,11 +152,36 @@ def download_image_func(table_name):
     table_name = table_name if table_name in tables else 'base_file'
 
     """保存文件"""
-    r = BaseFile2.save_flask_file(req=request, collection=table_name)
-    if isinstance(r, ObjectId):
-        mes['url'] = "/wx/resume_image/view/{}?fid={}".format(table_name, str(r))
+    db_str = get_arg(request, "db", "mongo_db2")
+    handler_map = {"mongo_db": BaseFile, "mongo_db2": BaseFile2}
+    handler = handler_map.get(db_str) if handler_map.get(db_str) else BaseFile2
+    if table_name == "id_image":
+        """
+        上传身份证图片,注意有正反面两张
+        """
     else:
-        mes['message'] = "保存失败"
+        server_id = get_arg(request, "server_id", "")
+        if server_id == "":
+            mes['message'] = "没有server_id"
+        else:
+            """从微信服务器下载图片"""
+            u = "https://api.weixin.qq.com/cgi-bin/media/get?access_token={}&media_id={}".format(
+                AccessToken.get_token(), server_id)
+            resp = requests.get(u)
+            status = resp.status_code
+            if status != 200:
+                mes['message'] = "微信图片服务器没有正确响应:{}".format(status)
+            else:
+                content = resp.content
+                if isinstance(content, bytes):
+                    img = BytesIO(initial_bytes=content)
+                    r = handler.save_cls(file_obj=img, owner=wx_user['_id'])
+                    if isinstance(r, ObjectId):
+                        mes['url'] = "/wx/resume_image/view/{}?fid={}".format(table_name, str(r))
+                    else:
+                        mes['message'] = "保存失败"
+                else:
+                    mes['message'] = "没有获取到图片二进制文件"
     return json.dumps(mes)
 
 

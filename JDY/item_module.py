@@ -146,6 +146,8 @@ class Customer(mongo_db.BaseDoc):
                         logger.info(ms)
                         # to_jiandao_cloud(**reg_dict)  # 调试请开打
                         to_jiandao_cloud_and_send_mail.delay(**reg_dict)  # 调试请关闭
+                        ms = "用户已发送到简道云, arg={}".format(reg_dict)
+                        logger.info(ms)
                     else:
                         pass
             else:
