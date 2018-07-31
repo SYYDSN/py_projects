@@ -210,7 +210,7 @@ class Honor(mongo_db2.BaseDoc):
     type_dict['title'] = str    # 荣誉称号
     type_dict['info'] = str    # 荣誉信息
     type_dict['image_id'] = ObjectId  # 荣誉图片
-    type_dict['image_url'] = str  # 荣誉图片的地址,这个字段是计算出来的,不保存实际的值.
+    type_dict['image_url'] = str  # 荣誉图片的地址,.
     type_dict['create_date'] = datetime.datetime  # 创建时间
 
 
@@ -224,7 +224,7 @@ class Vehicle(mongo_db2.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
     type_dict["image_id"] = ObjectId  # 车辆照片
-    type_dict["image_url"] = str  # 车辆照片的url,这个字段是计算出来的,不保存实际的值.
+    type_dict["image_url"] = str  # 车辆照片的url,.
     type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
     """
     相关标准参考GB1589

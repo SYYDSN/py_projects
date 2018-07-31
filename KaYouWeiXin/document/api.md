@@ -56,9 +56,11 @@
     type_dict['email'] = str  # 邮箱
     type_dict['birth_date'] = datetime.datetime  # 出生日期,以身份证号码为准
     type_dict['id_num'] = str  # 身份证号码
-    type_dict['id_image'] = str  # 身份证图片id.24位字符串
+    type_dict['id_image_face'] = ObjectId  # 身份证正面图片
+    type_dict['id_image_face_url'] = str  # 身份证正面图片
+    type_dict['id_image_back'] = ObjectId  # 身份证背面图片
+    type_dict['id_image_back_url'] = str  # 身份证背面图片
     type_dict['age'] = int  # 年龄 以身份证号码为准
-    """以下3个字段因为是动态的,需要在每次查询doc的时候进行计算,以保证准确性"""
     type_dict['driving_experience'] = int  # 驾龄 单位 年 用驾驶证信息中的首次领证日期计算
     type_dict['industry_experience'] = int  # 从业年限 单位 年 用道路运输从业资格证信息中的首次领证日期计算
     type_dict['work_experience'] = int  # 工作年限 单位 年 依赖first_work_date属性
@@ -210,7 +212,208 @@
 {"message": "错误原因"}
 ```
 
-### 上传图片
+### 添加/修改简历基本信息
+
+以下信息属于扩展信息：
+
+1. 工作经历
+2. 所获荣誉
+3. 自有车辆
+4. 教育经历
+
+说明:
+
+* 简历分为基础信息和扩展信息2部分,本接口是对扩展信息的操作
+* 扩展信息可以增加/删除/修改
+  
+地址: /wx/resume/extend
+方法: post/get
+参数:
+此接口的参数分为三大类：
+
+1. resume_id 简历id， 由后台传入，取简历id的方法如下：
+```html
+<body>
+    ...
+    <span id="resume_id" style="display:none">{{ user.resume_id }}</span>
+    ...
+</body>
+<script>
+...
+var resume_id = $("#resume_id").text();  
+/*
+注意：扩展信息接口的简历id的参数名叫：resume_id,
+基本信息接口的简历id的参数叫_id
+*/
+...
+</script>
+```
+
+2. opt 操作类型， 字符串。目前共有9类，代表不同的操作。还在不断扩展中
+
+```javascript
+1. 添加工作经历  add_work
+2. 编辑工作经历  update_work
+3. 删除工作经历  delete_work  
+
+4. 添加教育经历  add_education  
+5. 修改教育经历  update_education  
+6. 删除教育经历  delete_education  
+
+7. 添加荣誉  add_honor  
+8. 修改荣誉  update_honor  
+9. 删除荣誉  delete_honor 
+```
+
+3. 其他参数部分，如果是删除操作，就不需要其他参数，如果是添加扩展信息，这里就是扩展信息的对应的字段。
+
+* 所有简历的扩展信息的字段都可以作为字段传入,字段请参考对应的模型
+
+举例说明:
+
+```javascript
+    // 新增一段工作经历
+    let args = {
+        "resume": "你的简历id",
+        "opt": “add_work”,    // 表明这是新增工作经历
+        "begin": "2010-12-1",  // 工作开始时间
+        "end": "2015-12-1",  // 工作结束时间
+        "enterprise_name": "顺丰速运"， // 公司名称
+        "post_name": "司机"         // 岗位名称
+        ...
+    }
+    $.post("/wx/resume/extend", args, function(resp){
+        let json = JSON.parse(resp);
+        if(json['message'] === "success"){
+            // 成功
+        }
+        else{
+            // 失败
+        }
+    });
+```
+
+返回类型: json
+成功返回:
+
+```javascript
+{"message": "success"}
+```
+
+失败返回:
+
+```javascript
+{"message": "错误原因"}
+```
+
+#### 简历扩展信息的数据模型。
+注意，其中涉及的driver_id参数后台会自动抓取。一般不需要传递
+
+##### 工作经历
+
+```python3
+    type_dict['_id'] = ObjectId
+    type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
+    type_dict['begin'] = datetime.datetime
+    type_dict['end'] = datetime.datetime
+    type_dict['enterprise_name'] = str  # 企业名称
+    type_dict['enterprise_class'] = str  # 企业性质
+    type_dict['industry'] = str  # 所属行业
+    """
+    企业规模
+    50/100/500/1000  50表示小于等于50人规模 -1表示大于1000人规模
+    """
+    type_dict['enterprise_scale'] = int  # 企业规模
+    type_dict['dept_name'] = str  # 部门名称
+    """
+    预置几个岗位名称,留给客户自己填写的机会.
+    驾驶员/车队经理/其他
+    """
+    type_dict['post_name'] = str  # 岗位名称.
+    type_dict['team_size'] = int  # 团队/下属人数
+    """
+    相关标准参考GB1589
+    车型提供下拉选项,也可以手动填写.
+    小型轿车、小型客车、中型客车、大型客车、平板式货车、栏板式货车、厢式货车、仓栅式货车、罐式车、自卸车、其他（手动填写）
+    """
+    type_dict['vehicle_type'] = str  # 车型
+    """
+    载重量,只有货车有这个选项.
+    1.8/6/14三档 6代表1.8<t<6,以此类推,None代表没有此项数据,-1代表大于14
+    """
+    type_dict['vehicle_load'] = float  # 车辆载重量,单位吨.
+    """
+    车长,只有货车有这个选项.
+    6/9.6/17.5 三档 None代表没有此项数据,-1代表大于17.5
+    """
+    type_dict['vehicle_length'] = float  # 车辆载重量,单位米.
+    type_dict['description'] = str  # 工作描述.带换行符和空格的字符串格式.
+    type_dict['achievement'] = str  # 工作业绩.带换行符和空格的字符串格式.
+    type_dict['create_date'] = datetime.datetime  # 创建时间
+```
+
+##### 所获荣誉
+
+```python3
+    type_dict['_id'] = ObjectId
+    type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
+    type_dict['time'] = datetime.datetime  # 获奖时间
+    type_dict['title'] = str    # 荣誉称号
+    type_dict['info'] = str    # 荣誉信息
+    type_dict['image_id'] = ObjectId  # 荣誉图片
+    type_dict['image_url'] = str  # 荣誉图片的地址,
+    type_dict['create_date'] = datetime.datetime  # 创建时间
+```
+
+##### 车辆信息
+
+```python3
+    type_dict['_id'] = ObjectId
+    type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
+    type_dict["image_id"] = ObjectId  # 车辆照片
+    type_dict["image_url"] = str  # 车辆照片的url,.
+    type_dict["plate_number"] = str  # 车辆号牌, 英文字母必须大写,允许空,不做唯一判定
+    """
+    相关标准参考GB1589
+    直接扫描行车证可得到,另外修正时提供下拉选项, 也可以手动填写.
+    小型轿车、小型客车、中型客车、大型客车、平板式货车、栏板式货车、厢式货车、仓栅式货车、罐式车、自卸车、其他（手动填写）
+    """
+    type_dict["vehicle_type"] = str  # 车辆类型
+    """
+    载重量,只有货车有这个选项.
+    1.8/6/14三档 6代表1.8<t<6,以此类推,None代表没有此项数据,-1代表大于14
+    """
+    type_dict['vehicle_load'] = float  # 车辆载重量,单位吨.
+    """
+    车长,只有货车有这个选项.
+    6/9.6/17.5 三档 None代表没有此项数据,-1代表大于17.5
+    """
+    type_dict['vehicle_length'] = float  # 车辆载重量,单位米.
+    type_dict["owner_name"] = str  # 车主姓名/不一定是驾驶员
+    type_dict["address"] = str  # 地址
+    type_dict["vehicle_model"] = str  # 车辆型号  比如 一汽解放J6
+    type_dict["vin_id"] = str  # 车辆识别码/车架号的后六位 如果大于6，查询违章的时候就用后6位查询
+    type_dict["engine_id"] = str  # 发动机号
+    type_dict["register_date"] = datetime.datetime  # 注册日期
+    type_dict["issued_date"] = datetime.datetime  # 发证日期
+    type_dict["create_date"] = datetime.datetime
+```
+
+##### 教育经历
+
+```python3
+    type_dict['_id'] = ObjectId
+    type_dict['driver_id'] = ObjectId  # 关键的(司机)简历的ObjectId
+    type_dict['level'] = str  # 用户选择,  小学/初中/高中/高等教育/培训机构/其他
+    type_dict['begin'] = datetime.datetime
+    type_dict['end'] = datetime.datetime
+    type_dict['school_name'] = str  # 学校名称
+    type_dict['major'] = str  # 主修专业
+```
+
+### 上传图片(暂停使用)
+
+>##### <span style="color: red">由于微信强制先上传文件到微信服务器，然后再下载到本地的模式，所以在公众号上传图片无法使用此接口，此接口保留，以备他用</span>
 
 上传简历头像地址: /wx/resume_image/save/head_image
 上传身份证地址: /wx/resume_image/save/id_image
@@ -234,101 +437,157 @@
 {"message": "错误原因"}
 ```
 
-不依赖form上传文件的例子(完全版)
+### 上传图片
+
+微信上传图片的步骤
+
+1. 打开摄像头或者本地图片并选择。
+2. 上传到微信服务器，获得微信服务器返回的serverId
+3. 按照发送serverId给本api对应的接口
+4. 专用api根据serverId去下载图片，成功后返回图片的id和url
+5. 前端接收到id和url后，提交到对应的接口（一般是）
+6. 保存_id和url等待提交
+
+上传简历头像地址: /wx/resume_image/save/head_image
+参数：
+_id： 简历id ，会由后端传值到页面，详情见update_id.html
+id_image_face： 身份证正面图片的id，由自身服务器传回，24位字符串
+id_image_face_url： 身份证正面图片的url，由自身服务器传回
+id_image_back： 身份证背面图片的id，由自身服务器传回，24位字符串
+id_image_back_url： 身份证背面图片的url，由自身服务器传回
+
+上传身份证地址: /wx/resume_image/save/id_image
+上传荣誉证书图片地址: /wx/resume_image/save/honor_image
+上传车辆照片地址: /wx/resume_image/save/vehicle_image
+上传驾照图片地址: /wx/resume_image/save/driving_license_image
+上传从业许可证地址: /wx/resume_image/save/rtqc_image
+
+方法: post
+
+返回类型: json
+成功返回:
+
 ```javascript
-function upload_progress(event){
-    /*
-    上传进度处理函数,这里只是一个示范函数,实际中要重写此函数.
-    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
-    :return: nothing
-    */
-    if (event.lengthComputable) {
-        var complete_percent = Math.round(event.loaded * 100 / event.total);
-        console.log(`完成度:${complete_percent}`);
-    }else{}
-}
+{"message": "success", "url": "图片地址"}
+```
 
-function upload_complete(event){
-    /*
-    上传文件success时的事件,根据实际需要可以覆盖.
-    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
-    :return: nothing
-    */
-    let json = {"message": "未知的错误"};
-    let status = event.target.status;
-    if(status !== 200){
-        json = {"message": `服务器没有作出正确的回应,返回码:${status}`};
-    }
-    else{
-        let str = event.target.responseText;
-        if(str === undefined){
-            json['message'] = "上传成功,但服务器没有回应任何消息";
-        }
-        else{
-            json = JSON.parse(str);
-        }
-    }
-    console.log(json);
-    if(json['message'] === "success"){
-        alert("上传成功!");
-        // 以下为定制脚本
-        $("#return_url").attr("src", json['data']['url']);
-    }
-    else{
-        alert(json['message']);
-    }
-}
+失败返回:
 
-function upload_error(event){
-    /*
-    上传文件失败时的事件,根据实际需要可以覆盖.
-    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
-    :return: nothing
-    */
-    let json = {"message": "error"};
-    console.log(json);
-}
+```javascript
+{"message": "错误原因"}
+```
 
-function upload_abort(event){
-    /*
-    上传文件被中止时的事件,根据实际需要可以覆盖.
-    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
-    :return: nothing
-    */
-    let json = {"message": "abort"};
-    console.log(json);
-}
+现在以上传身份证图片举例说明，这里是javascript代码片段。还需要html作出对应修改。详情请参考update_id.html页面
 
-function upload(file_name, $obj, action_url, header_dict){
-    /*
-    上传文件.
-    :params file_name:   文件名.
-    :params $obj:        input的jquery对象.
-    :params action_url:  上传的服务器url
-    :params header_dict: 放入header的参数,是键值对形式的字典,键名不要用下划线,因为那是个禁忌
-    :return:             dict类型. 一个字典对象,一般是{"message": "success"}
-    */
-    let data = new FormData();
-    data.append(file_name, $obj[0].files[0]);
-    /*
-    有关XMLHttpRequest对象的详细信息,请参考.
-    https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest
-    */
-    let req = new XMLHttpRequest();
-    req.upload.addEventListener("progress", upload_progress, false);
-    req.addEventListener("load", upload_complete, false);
-    req.addEventListener("error", upload_error, false);
-    req.addEventListener("abort", upload_abort, false);
-    req.open("post", action_url);
-    // 必须在open之后才能给请求头赋值
-    if(header_dict){
-        /*
-        * 传送请求头信息,目前服务端还未做对应的处理.这只是与被给后来使用的.
+```javascript
+/*
+        * 整体逻辑如下：
+        * 1. 上传图片到然后，得到微信服务器返回的serverId                       chose_and_upload 函数
+        * 2. 把serverId发给自身服务器，通知自身服务器去微信服务器下载临时素材。     chose_and_upload 函数
+        * 3. 等待自身服务器返回的图片id和url                                   chose_and_upload 函数
+        * 4. 把字符串格式的id和url作为参数提交到简历基础/扩展接口                 $("#submit").click() 提交事件
         * */
-        for(let k in header_dict){
-            req.setRequestHeader(k, header_dict[k]);
-        }
-    }
-    req.send(data);
-}
+
+        var chose_and_upload = function($dom){
+            /*
+            * 选择图片并上传：
+            * 1. 打开摄像头或者本地图片并选择。
+            * 2. 上传到微信服务器
+            * 3. 发送serverId给专用的api
+            * 4. 专用api根据serverId去下载临时素材
+            * 5. api下载完毕后回传_id和url。
+            * 6. 保存_id和url等待提交
+            * */
+            wx.chooseImage({
+                count: 1, // 默认9
+                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                success: function (res) {
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    $dom.attr('src',localIds);
+                    // 上传图片到微信服务器
+                    wx.uploadImage({
+                        localId: localIds[0],  // 微信官方文档有误，请照此填写
+                        isShowProgressTips: 1,
+                        success: function(res){
+                            // alert("localIds: " + res.serverId);
+
+                            var id = res.serverId;
+                            // alert("server_id: "+ id);
+
+                            // 请求api接口去下载临时素材
+                            var table_name = "id_image";  // 上传身份证对应的表名
+                            var args = {
+                                "server_id": id,    // server_id 下载素材用
+                                "db": "mongo_db2"            // 库名，固定
+                            }
+                            var url = "/wx/auto_download/" + table_name;
+                            $.post(url, args, function(resp){
+                                var json = JSON.parse(resp);
+                                var status = json['message'];
+                                console.log(json);
+                                if(status == "success"){
+                                    // 成功，保存返回值
+                                    $dom.attr("data-id", json[table_name]);
+                                    $dom.attr("data-url", json[table_name + "_url"]);
+                                }
+                                else{
+                                    alert(status);
+                                }
+                            });
+
+                        }
+                    });
+
+                }
+            });
+        };
+
+        // 给上传按钮加上事件
+        $(".p_mag").each(function(){
+            var $this = $(this);
+            $this.click(function(){
+                chose_and_upload($this.find(".imgs"));
+            });
+        });
+
+        // 提交事件
+        $("#submit").click(function(){
+            var $id_image_face = $("#id_image_face");
+            var $id_image_back = $("#id_image_back");
+            var args = {};
+            var need_submit = false;
+            var id_image_face = $id_image_face.attr("data-id");
+            if(id_image_face){
+                need_submit = true;
+                args['id_image_face'] = id_image_face;
+                args['id_image_face_url'] = $id_image_face.attr("data-url");
+            }
+            var id_image_back = $id_image_back.attr("data-id");
+            if(id_image_back){
+                need_submit = true;
+                args['id_image_face'] = id_image_back;
+                args['id_image_back_url'] = $id_image_back.attr("data-url");
+            }
+            if(need_submit){
+                args['_id'] = $("#resume_id").text();  // 简历id，这里是修改简历
+                var url = "/wx/resume/opt";
+                $.post(url, args, function(resp){
+                    var json = JSON.parse(resp);
+                    var status = json['message'];
+                    console.log(json);
+                    if(status == "success"){
+                        // 成功，下一步
+                        alert("上传成功");
+                        location.href = "/wx/html/resume.html";
+                    }
+                    else{
+                        alert(status);
+                    }
+                });
+            }
+            else{
+                location.href = "/wx/html/resume.html";
+            }
+        });
 ```

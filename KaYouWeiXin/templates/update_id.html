@@ -61,6 +61,7 @@
     </style>
 <body>
         <div class="container-fluid">
+                <span style="display: none" id="resume_id">{{ user.resume_id }}</span>
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_p ">
                         <p class="p_mag"><img class="imgs" id="id_image_face" src="/static/images/poto.png" alt=""></p>
@@ -83,92 +84,119 @@
         <!--<script src="/static/js/wx_custom.js"></script>-->
     <script>
     $(function(){
-        var id_image_face_num = -1;
-        var id_image_back_num = -1;
-        function photo_img($obj){
-            wx.chooseImage({
-            count: 1, // 默认9
-            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-            success: function (res) {
-           //  alert(res.localIds);
-                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-                    $obj.attr('src',localIds);
-                    if($obj.attr("id") == "id_image_face"){
-                        id_image_face_num = localIds;
-                    }
-                    else{
-                        id_image_back_num = localIds;
-                    }
-                }
-            });
+        /*
+        * 整体逻辑如下：
+        * 1. 上传图片到然后，得到微信服务器返回的serverId                       chose_and_upload 函数
+        * 2. 把serverId发给自身服务器，通知自身服务器去微信服务器下载临时素材。     chose_and_upload 函数
+        * 3. 等待自身服务器返回的图片id和url                                   chose_and_upload 函数
+        * 4. 把字符串格式的id和url作为参数提交到简历基础/扩展接口                 $("#submit").click() 提交事件
+        * */
+
+        var chose_and_upload = function($dom){
             /*
-            wx.getLocalImgData({
-                localId: '', // 图片的localID
+            * 选择图片并上传：
+            * 1. 打开摄像头或者本地图片并选择。
+            * 2. 上传到微信服务器
+            * 3. 发送serverId给专用的api
+            * 4. 专用api根据serverId去下载临时素材
+            * 5. api下载完毕后回传_id和url。
+            * 6. 保存_id和url等待提交
+            * */
+            wx.chooseImage({
+                count: 1, // 默认9
+                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
                 success: function (res) {
-                    alert(res.localData);
-                var localData = res.localData; // localData是图片的base64数据，可以用img标签显示
-                     alert(localData);
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    $dom.attr('src',localIds);
+                    // 上传图片到微信服务器
+                    wx.uploadImage({
+                        localId: localIds[0],  // 微信官方文档有误，请照此填写
+                        isShowProgressTips: 1,
+                        success: function(res){
+                            // alert("localIds: " + res.serverId);
+
+                            var id = res.serverId;
+                            // alert("server_id: "+ id);
+
+                            // 请求api接口去下载临时素材
+                            var table_name = "id_image";  // 上传身份证对应的表名
+                            var args = {
+                                "server_id": id,    // server_id 下载素材用
+                                "table_name": table_name,
+                                "db": "mongo_db2"            // 库名，固定
+                            }
+                            var url = "/wx/auto_download/" + table_name;
+                            $.post(url, args, function(resp){
+                                var json = JSON.parse(resp);
+                                var status = json['message'];
+                                console.log(json);
+                                if(status == "success"){
+                                    // 成功，保存返回值
+                                    $dom.attr("data-id", json[table_name]);
+                                    $dom.attr("data-url", json[table_name + "_url"]);
+                                }
+                                else{
+                                    alert(status);
+                                }
+                            });
+
+                        }
+                    });
 
                 }
-               });
-           */     
-        }
-        
-        // 点击选择事件
+            });
+        };
+
+        // 给上传按钮加上事件
         $(".p_mag").each(function(){
             var $this = $(this);
             $this.click(function(){
-                var img = $this.find("img:first");
-                photo_img(img);
+                chose_and_upload($this.find(".imgs"));
             });
         });
-        
-        // 上传事件
-        $("#submit").click(function(){
-                var server_ids = {};
-                if(id_image_face_num != -1){
-                        wx.uploadImage({
-                        localId: id_image_face_num,
-                        isShowProgressTips: 1,
-                        success: function(res){
-                            var id = res.serverId;
-                            alert(id);
-                            server_ids['id_image_face'] = id;
-                        }
-                    });
-                }
-                if(id_image_back_num != -1){
-                        wx.uploadImage({
-                        localId: id_image_back_num,
-                        isShowProgressTips: 1,
-                        success: function(res){
-                            var id = res.serverId;
-                            alert(id);
-                            server_ids['id_image_back'] = id;
-                        }
-                    });
-                }
-                if(server_ids['id_image_face'] != undefined || server_ids['id_image_back_num']){
-                    var args = {
-                        "table_name": "id_image",
-                        "db": "mongo_db2"
-                    };
-                    if(server_ids['id_image_face'] != undefined){
-                        args['server_id_a'] = server_ids['id_image_face'];
-                    }
-                    if(server_ids['id_image_back'] != undefined){
-                        args['server_id_b'] = server_ids['id_image_back'];
-                    }
-                    $.post("/wx/")
-                }
 
-            
-            
+        // 提交事件
+        $("#submit").click(function(){
+            var $id_image_face = $("#id_image_face");
+            var $id_image_back = $("#id_image_back");
+            var args = {};
+            var need_submit = false;
+            var id_image_face = $id_image_face.attr("data-id");
+            if(id_image_face){
+                need_submit = true;
+                args['id_image_face'] = id_image_face;
+                args['id_image_face_url'] = $id_image_face.attr("data-url");
+            }
+            var id_image_back = $id_image_back.attr("data-id");
+            if(id_image_back){
+                need_submit = true;
+                args['id_image_face'] = id_image_back;
+                args['id_image_back_url'] = $id_image_back.attr("data-url");
+            }
+            if(need_submit){
+                args['_id'] = $("#resume_id").text();  // 简历id，这里是修改简历
+                var url = "/wx/resume/opt";
+                $.post(url, args, function(resp){
+                    var json = JSON.parse(resp);
+                    var status = json['message'];
+                    console.log(json);
+                    if(status == "success"){
+                        // 成功，下一步
+                        alert("上传成功");
+                        location.href = "/wx/html/resume.html";
+                    }
+                    else{
+                        alert(status);
+                    }
+                });
+            }
+            else{
+                location.href = "/wx/html/resume.html";
+            }
         });
-        
-        
-    // end!
+
+        // end!
     });
     </script>
 </body>

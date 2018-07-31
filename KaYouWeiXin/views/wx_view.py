@@ -20,6 +20,7 @@ from module.item_module import *
 import json
 from module.driver_module import DriverResume
 from module.server_api import *
+from pdb import set_trace
 import requests
 
 
@@ -114,6 +115,7 @@ def resume_image_func(action, table_name):
         if isinstance(fid, str) and len(fid) == 24:
             fid = ObjectId(fid)
             f = {"_id": fid}
+            print("table_name: {}, fid: {}".format(table_name, fid))
             r = BaseFile2.find_one_cls(filter_dict=f, collection=table_name)
             if r is None:
                 return abort(404)
@@ -155,33 +157,34 @@ def download_image_func(table_name):
     db_str = get_arg(request, "db", "mongo_db2")
     handler_map = {"mongo_db": BaseFile, "mongo_db2": BaseFile2}
     handler = handler_map.get(db_str) if handler_map.get(db_str) else BaseFile2
-    if table_name == "id_image":
-        """
-        上传身份证图片,注意有正反面两张
-        """
+
+    server_id = get_arg(request, "server_id", "")
+    if server_id == "":
+        mes['message'] = "没有server_id"
     else:
-        server_id = get_arg(request, "server_id", "")
-        if server_id == "":
-            mes['message'] = "没有server_id"
+        field_name = get_arg(request, "field_name", "")
+        print("table_name: {}, db: {}, field_name: {}, server_id: {}".format(table_name, db_str, field_name, server_id))
+        """从微信服务器下载图片"""
+        u = "https://api.weixin.qq.com/cgi-bin/media/get?access_token={}&media_id={}".format(
+            AccessToken.get_token(), server_id)
+        resp = requests.get(u)
+        status = resp.status_code
+        if status != 200:
+            mes['message'] = "微信图片服务器没有正确响应:{}".format(status)
         else:
-            """从微信服务器下载图片"""
-            u = "https://api.weixin.qq.com/cgi-bin/media/get?access_token={}&media_id={}".format(
-                AccessToken.get_token(), server_id)
-            resp = requests.get(u)
-            status = resp.status_code
-            if status != 200:
-                mes['message'] = "微信图片服务器没有正确响应:{}".format(status)
-            else:
-                content = resp.content
-                if isinstance(content, bytes):
-                    img = BytesIO(initial_bytes=content)
-                    r = handler.save_cls(file_obj=img, owner=wx_user['_id'])
-                    if isinstance(r, ObjectId):
-                        mes['url'] = "/wx/resume_image/view/{}?fid={}".format(table_name, str(r))
-                    else:
-                        mes['message'] = "保存失败"
+            content = resp.content
+            # set_trace()
+            if isinstance(content, bytes):
+                img = BytesIO(initial_bytes=content)
+                r = handler.save_cls(file_obj=img, collection=table_name, owner=wx_user['_id'])
+                if isinstance(r, ObjectId):
+                    mes[field_name + '_url'] = "/wx/resume_image/view/{}?fid={}".format(table_name, str(r))
+                    mes[field_name] = str(r)
                 else:
-                    mes['message'] = "没有获取到图片二进制文件"
+                    mes['message'] = "保存失败"
+            else:
+                mes['message'] = "没有获取到图片二进制文件"
+    print(mes)
     return json.dumps(mes)
 
 
@@ -419,7 +422,7 @@ def extend_info_func():
     return json.dumps(mes)
 
 
-# @check_platform_session
+@check_platform_session
 def common_view_func(html_name: str):
     """
     通用页面视图
@@ -427,6 +430,7 @@ def common_view_func(html_name: str):
     :return:
     """
     user = get_platform_session_arg("wx_user", dict())
+    """
     user = {
         "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
         "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
@@ -453,6 +457,7 @@ def common_view_func(html_name: str):
         "resume_id": ObjectId("5b5a96d9bede684e68049f01")
     }
     u_id = user['_id']
+    """
     template_dir = os.path.join(__project_dir__, 'templates')
     file_names = os.listdir(template_dir)
     if html_name in file_names:
@@ -485,7 +490,9 @@ wx_blueprint.add_url_rule(rule="/hello", view_func=hello, methods=['get', 'post'
 """保存或者获取文件(mongodb存储)"""
 wx_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['post', 'get'])
 """保存或者获取简历相关的图片(mongodb存储)"""
-wx_blueprint.add_url_rule(rule="/resume_image/<action>/<table_name>", view_func=resume_image_func, methods=['post'])
+wx_blueprint.add_url_rule(rule="/resume_image/<action>/<table_name>", view_func=resume_image_func, methods=['post', 'get'])
+"""下载微信服务器上的素材并保存(mongodb存储)"""
+wx_blueprint.add_url_rule(rule="/auto_download/<table_name>", view_func=download_image_func, methods=['post'])
 """获取用户授权页面"""
 wx_blueprint.add_url_rule(rule="/auth_demo/<key>", view_func=auth_demo, methods=['post', 'get'])
 """页面授权示范页"""
@@ -500,7 +507,9 @@ wx_blueprint.add_url_rule(rule="/js_sdk_init", view_func=wx_js_func, methods=['p
 wx_blueprint.add_url_rule(rule="/js_sdk_init_demo", view_func=wx_js_api_demo, methods=['get'])
 """发送/校验短信"""
 wx_blueprint.add_url_rule(rule="/sms/<key>", view_func=sms_func, methods=['post', 'get'])
-"""操作(查看/添加/修改,但是不能删除)简历"""
+"""操作(查看/添加/修改,但是不能删除)简历基本信息"""
 wx_blueprint.add_url_rule(rule="/resume/opt", view_func=resume_opt_func, methods=['post', 'get'])
+"""操作(查看/添加/修改/删除)简历扩展信息"""
+wx_blueprint.add_url_rule(rule="/resume/extend", view_func=extend_info_func, methods=['post', 'get'])
 """通用页面视图"""
 wx_blueprint.add_url_rule(rule="/html/<html_name>", view_func=common_view_func, methods=['post', 'get'])

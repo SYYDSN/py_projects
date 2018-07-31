@@ -49,7 +49,6 @@
         }
     </style>
 <body>
-
         <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
@@ -77,7 +76,7 @@
                         <p id="myModal">性别 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p>年龄 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
+                        <p>年龄<i class="glyphicon glyphicon-menu-right pull-right"></i></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
                         <p>户籍 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
@@ -139,6 +138,7 @@
                 success: function (res) {
                 var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
                     $obj.attr('src',localIds);
+                    syncUpload(localIds);
                     if($obj.attr("id")== "imgs_one"){
                            imgs_one_num = localIds;
                        }
@@ -148,6 +148,7 @@
                      else if($obj.attr("id")== "imgs_three"){
                             imgs_three_num = localIds;
                     }
+
 //                    syncUpload(localIds);
                 }
                 });
@@ -160,14 +161,8 @@
                 })
             });
 //         上传提交信息
-            $('#submt').click(function syncUpload(localIds){
-                
-//                 var localId = localIds.pop();
-                
-                var localId = [imgs_one_num,imgs_two_num,imgs_three_num];
-//                 alert(localId);
-                if(imgs_one_num!==-1 && imgs_two_num!==-1 && imgs_three_num!==-1){
-                 wx.uploadImage({
+            function syncUpload(localId){
+                wx.uploadImage({
                     localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
                     isShowProgressTips: 1, // 默认为1，显示进度提示
                     success: function (res) {
@@ -175,10 +170,37 @@
                         alert(serverId);
                     }
                     });
-                }
+            }
+//             $('#submt').click(function syncUpload(localIds){
+// //                 var localId = localIds.pop();
+//                 var localId = [imgs_one_num,imgs_two_num,imgs_three_num];
+// //                 alert(localId);
+//                 if(imgs_one_num!==-1 && imgs_two_num!==-1 && imgs_three_num!==-1){
+//                  wx.uploadImage({
+//                     localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
+//                     isShowProgressTips: 1, // 默认为1，显示进度提示
+//                     success: function (res) {
+//                     var serverId = res.serverId; // 返回图片的服务器端ID
+//                         alert(serverId);
+//                     }
+//                     });
+//                 }
 
-//                 alert(localIds);
-            });
+// //                 alert(localIds);
+//             });
+             $('#submt').click(function syncUpload(localIds){
+
+                 var ags = [];
+               $.post("/wx/resume/opt", args, function(resp){
+                    let json = JSON.parse(resp);
+                    if(json['message'] === "success"){
+                        // 成功
+                    }
+                    else{
+                        // 失败
+                    }
+                });
+             })
 
   wx.error(function(){
             alert(error)
