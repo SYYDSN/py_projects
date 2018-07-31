@@ -1,3 +1,15 @@
+/*
+ * @Author: mikey.zhaopeng 
+ * @Date: 2018-07-31 09:39:07 
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2018-07-31 13:17:47
+ */
+/*
+ * @Author: mikey.zhaopeng 
+ * @Date: 2018-07-31 09:38:58 
+ * @Last Modified by:   mikey.zhaopeng 
+ * @Last Modified time: 2018-07-31 09:38:58 
+ */
 
 
 ### 微信用户的数据结构
@@ -439,16 +451,38 @@ var resume_id = $("#resume_id").text();
 
 ### 上传图片
 
-微信上传图片的步骤
+主要分两步： 1.上传图片到微信服务器并通知自家服务器下载 2. 更新对应的建立信息
+
+微信上传图片的详细步骤
 
 1. 打开摄像头或者本地图片并选择。
 2. 上传到微信服务器，获得微信服务器返回的serverId
 3. 按照发送serverId给本api对应的接口
 4. 专用api根据serverId去下载图片，成功后返回图片的id和url
-5. 前端接收到id和url后，提交到对应的接口（一般是）
+5. 前端接收到id和url后，提交到对应的接口
 6. 保存_id和url等待提交
 
-上传简历头像地址: /wx/resume_image/save/head_image
+**简历头像**
+
+1. 通知下载图片地址: /wx/auto_download/head_image
+参数：
+table_name : head_image 固定值
+server_id: 微信服务器回传的图片id
+
+2. 修改简历头像信息地址：/wx/resume/opt
+参数：
+_id： 简历id ，会由后端传值到页面
+head_image 简历头像信息的id，由自身服务器传回，24位字符串
+head_image_url： 简历头像信息的url，由自身服务器传回
+
+**身份证**
+
+1. 通知下载图片地址: /wx/auto_download/id_image
+参数：
+table_name : id_image 固定值
+server_id: 微信服务器回传的图片id
+
+2. 修改身份证信息地址：/wx/resume/opt
 参数：
 _id： 简历id ，会由后端传值到页面，详情见update_id.html
 id_image_face： 身份证正面图片的id，由自身服务器传回，24位字符串
@@ -456,11 +490,63 @@ id_image_face_url： 身份证正面图片的url，由自身服务器传回
 id_image_back： 身份证背面图片的id，由自身服务器传回，24位字符串
 id_image_back_url： 身份证背面图片的url，由自身服务器传回
 
-上传身份证地址: /wx/resume_image/save/id_image
-上传荣誉证书图片地址: /wx/resume_image/save/honor_image
-上传车辆照片地址: /wx/resume_image/save/vehicle_image
-上传驾照图片地址: /wx/resume_image/save/driving_license_image
-上传从业许可证地址: /wx/resume_image/save/rtqc_image
+**荣誉证书图片**
+
+1. 通知下载图片地址: /wx/auto_download/honor_image
+参数：
+table_name : honor_image 固定值
+server_id: 微信服务器回传的图片id
+
+2. 修改荣誉证书图片信息地址：/wx/resume/extend
+参数：
+resume_id： 简历id ，
+h_id: 荣誉证书对象的_id,
+opt: add_hobor/update_honor  操作类型，添加/修改
+honor_image 荣誉证书图片的id，由自身服务器传回，24位字符串
+honor_image_url： 荣誉证书图片的url，由自身服务器传回
+... 其他参数
+
+**车辆照片**: *<span style="color:orange">尚未实现</span>*
+
+1. 通知下载图片地址: /wx/auto_download/vehicle_image
+参数：
+table_name : vehicle_image 固定值
+server_id: 微信服务器回传的图片id
+
+2. 修改车辆照片信息地址：/wx/resume/extend
+参数：
+resume_id： 简历id ，
+v_id: 车辆对象的_id,
+opt: add_vehicle/update_vehicle  操作类型，添加/修改
+honor_image 车辆照片的id，由自身服务器传回，24位字符串
+honor_image_url： 车辆照片的url，由自身服务器传回
+... 其他参数
+
+**驾照图片**driving_license_image
+
+1. 通知下载图片地址: /wx/auto_download/driving_license_image
+参数：
+table_name : driving_license_image 固定值
+server_id: 微信服务器回传的图片id
+
+2. 修改驾照图片地址：/wx/resume/opt
+参数：
+_id： 简历id ，会由后端传值到页面
+dl_image 驾照图片的id，由自身服务器传回，24位字符串
+dl_image_url： 驾照图片的url，由自身服务器传回
+
+**从业许可证** /wx/resume_image/save/rtqc_image
+
+1. 通知下载图片地址: /wx/auto_download/rtqc_image
+参数：
+table_name : rtqc_image 固定值
+server_id: 微信服务器回传的图片id
+
+2. 修改从业许可证信息地址：/wx/resume/opt
+参数：
+_id： 简历id ，会由后端传值到页面
+rtqc_image 从业许可证图片的id，由自身服务器传回，24位字符串
+rtqc_image_url： 从业许可证片的url，由自身服务器传回
 
 方法: post
 
@@ -480,7 +566,7 @@ id_image_back_url： 身份证背面图片的url，由自身服务器传回
 现在以上传身份证图片举例说明，这里是javascript代码片段。还需要html作出对应修改。详情请参考update_id.html页面
 
 ```javascript
-/*
+        /*
         * 整体逻辑如下：
         * 1. 上传图片到然后，得到微信服务器返回的serverId                       chose_and_upload 函数
         * 2. 把serverId发给自身服务器，通知自身服务器去微信服务器下载临时素材。     chose_and_upload 函数
@@ -538,7 +624,6 @@ id_image_back_url： 身份证背面图片的url，由自身服务器传回
 
                         }
                     });
-
                 }
             });
         };
