@@ -13,7 +13,7 @@ ObjectId = mongo_db.ObjectId
 
 
 """
-此模块用于根据老师喊单的信号，生成对应的虚拟喊单信号
+此模块用于根据老师喊单的信号，生成对应的虚拟老师数据
 """
 
 
@@ -23,7 +23,7 @@ class Teacher(mongo_db.BaseDoc):
     Message_Server项目下的Teacher类主要负责item_module.Trade.sync_from_signal(生成虚拟老师交易信号)时取老师列表。
     Webchat_Server项目项目下的Teacher类，主要负责老师的管理。（属性，头像的修改）
     两个类属性的字段相同即可.
-    Webchat_Server项目项目下的teacher_module更丰富一些。
+    Webchat_Server项目项目下的teacher_module函数更丰富一些。
     你会在2个项目下分别看到这两个模块。
     """
     _table_name = "teacher"
@@ -43,6 +43,10 @@ class Teacher(mongo_db.BaseDoc):
     type_dict['native'] = bool  # 是否是真实的teacher？
     type_dict['from_id'] = ObjectId  # 虚拟老师专有，发源老师id，保持不连，除非修改
     type_dict['direction'] = str  # 虚拟老师专有，跟的方向，有三种 follow/reverse/random
+    type_dict['profit_ratio'] = float  # 盈利率, 每次close时候计算
+    type_dict['profit_amount'] = float  # 总额.每次close时候计算
+    type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
+    type_dict['lots_range'] = list  # 手数范围.
 
     @classmethod
     def instance(cls, **kwargs):
@@ -136,13 +140,13 @@ class Teacher(mongo_db.BaseDoc):
         return res
 
     @classmethod
-    def index(cls):
+    def index(cls, begin: datetime.datetime = None, end: datetime.datetime = None):
         """
-        返回首页所用的信息
+        返回首页所用的信息,一个以胜率排序的列表,元素包含胜率.和跟随人数
         :return:
         """
-        """查询近30天的胜率数据"""
-        data = calculate_win_per_by_teacher_mix()
+        """默认查询近30天的胜率数据"""
+        data = calculate_win_per_by_teacher_mix(begin=begin, end=end)
         """查询老师的跟随人数"""
         d = cls.follow_count()
         res = list()

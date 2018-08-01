@@ -7,11 +7,29 @@ if __project_path not in sys.path:
 import mongo_db
 from bson.objectid import ObjectId
 import datetime
+from log_module import get_logger
+from werkzeug.contrib.cache import SimpleCache
+
+
+simple_cache = SimpleCache()
+logger = get_logger()
 
 
 """
-此模块用于根据老师喊单的信号，生成对应的虚拟喊单信号
+此模块用于根据老师喊单的信号，生成对应的虚拟老师数据
 """
+
+
+class Deposit(mongo_db.BaseFile):
+    """
+    入金/存款(记录),当老师做单的时候,如果资金不足,就会激发入金行为
+    """
+    _table_name = "deposit"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['t_id'] = ObjectId  # 老师id
+    type_dict['dollar'] = float  # 入金金额.
+    type_dict['time'] = datetime.datetime
 
 
 class Teacher(mongo_db.BaseDoc):
@@ -20,7 +38,7 @@ class Teacher(mongo_db.BaseDoc):
     Message_Server项目下的Teacher类主要负责item_module.Trade.sync_from_signal(生成虚拟老师交易信号)时取老师列表。
     Webchat_Server项目项目下的Teacher类，主要负责老师的管理。（属性，头像的修改）
     两个类属性的字段相同即可.
-    Webchat_Server项目项目下的teacher_module更丰富一些。
+    Webchat_Server项目项目下的teacher_module函数更丰富一些。
     你会在2个项目下分别看到这两个模块。
     """
     _table_name = "teacher"
@@ -40,6 +58,10 @@ class Teacher(mongo_db.BaseDoc):
     type_dict['native'] = bool  # 是否是真实的teacher？
     type_dict['from_id'] = ObjectId  # 虚拟老师专有，发源老师id，保持不连，除非修改
     type_dict['direction'] = str  # 虚拟老师专有，跟的方向，有三种 follow/reverse/random
+    type_dict['profit_ratio'] = float  # 盈利率, 每次close时候计算
+    type_dict['profit_amount'] = float  # 总额.每次close时候计算
+    type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
+    type_dict['lots_range'] = list  # 手数范围.
 
     @classmethod
     def instance(cls, **kwargs):
@@ -54,12 +76,71 @@ class Teacher(mongo_db.BaseDoc):
         return cls(**kwargs)
 
     @classmethod
+    def init_head_image_list(cls) -> None:
+        """
+        初始化头像列表
+        :return:
+        """
+        d = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        p = os.path.join(d, "static", 'images', 'head_image')
+        ns = os.listdir(p)
+        res = list()
+        for name in ns:
+            u = os.path(p, name)
+            res.append(u)
+        key = "t_head_img"
+        simple_cache.set(key=key, )
+
+    @classmethod
+    def pop_head_image(cls) -> str:
+        """
+        尽量不重复的生成老师的头像,如果头像资源用尽,那就重头来.
+        :return:
+        """
+
+    @classmethod
+    def generator_init(cls, t_id: (str, ObjectId), t_name: str, create_time: datetime.datetime) -> list:
+        """
+        根据一个老师的id,名字和创建时间.生成3个虚拟的老师,加上原始的真实老师,一起返回(4个doc)
+        type_dict['name'] = str   # 展示的名字，比如青云老师等
+        type_dict['real_name'] = str  # 真实姓名，非必须
+        type_dict['head_img'] = str  # 头像文件相当与项目根目录的路径
+        type_dict['img'] = str  # 半身像文件相当与项目根目录的路径
+        type_dict['level'] = str  # 老师等级
+        type_dict['motto'] = str  # 座右铭
+        type_dict['feature'] = str  # 特性，风格，特点
+        type_dict['resume'] = str  # 简历
+        type_dict['create_date'] = datetime.datetime
+        type_dict['native'] = bool  # 是否是真实的teacher？
+        type_dict['from_id'] = ObjectId  # 虚拟老师专有，发源老师id，保持不连，除非修改
+        type_dict['direction'] = str  # 虚拟老师专有，跟的方向，有三种 follow/reverse/random
+        type_dict['profit_ratio'] = float  # 盈利率, 每次close时候计算
+        type_dict['profit_amount'] = float  # 总额.每次close时候计算
+        type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
+        type_dict['lots_range'] = list  # 手数范围.
+        [{"_id": k, "name": v, "native": True},
+         {"name": "{}_正向".format(v), "native": False, "from_id": k, "direction": "follow"},
+            t2 = {"name": "{}_反向".format(v), "native": False, "from_id": k, "direction": "reverse"}
+            t3 = {"name": "{}_随机".format(v), "native": False, "from_id": k, "direction": "random"}
+        :param t_id:
+        :param t_name:
+        :param create_time:
+        :return:
+        """
+        raw = {
+            "_id": ObjectId(t_id) if isinstance(t_id, str) and len(t_id) == 24 else t_id,
+            "name": t_name,
+
+        }
+
+    @classmethod
     def rebuild(cls) -> None:
         """
-        从交易信号中，初始化老师，如果你想重置所有的老师，请手动清空旧的老师列表,
+        从交易信号中，初始化老师，这个动作会清除所有的老师记录.
         仅在初始化时候使用。
         :return:
         """
+        t_list = []  # 存放生成的老师的容器
         f = dict()
         s = [("create_time", -1)]
         p = ['creator_id', 'creator_name', 'create_time']
@@ -105,8 +186,25 @@ class Teacher(mongo_db.BaseDoc):
             cls(**t2).save_plus()
             cls(**t3).save_plus()
 
+    @classmethod
+    def direction_map(cls) -> dict:
+        """
+        获取以方向为key,老师的doc的list为val的字典.
+        用于在生成虚拟信号的时候提供随机特性
+        :return:
+        """
+        ts = Teacher.find_plus(filter_dict=dict(), to_dict=True)
+        t_dict = dict()  # 方向和老师的字典
+        for t in ts:
+            d = t.get("direction")
+            if d is not None:
+                if d in t_dict:
+                    t_dict[d].append(t)
+                else:
+                    t_dict[d] = [t]
+        return t_dict
+
 
 if __name__ == "__main__":
-    """重建老师列表"""
-    Teacher.rebuild()
+    Teacher.init_head_image_list()
     pass

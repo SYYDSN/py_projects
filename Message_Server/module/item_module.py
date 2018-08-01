@@ -596,7 +596,7 @@ class MonthEstimate(mongo_db.BaseDoc):
 
 class Trade(Signal):
     """
-    （老师的喊单）交易
+    （老师的喊单）交易, 包括虚拟老师和真实老师的都会保存在这里.
     """
     _table_name = "trade"
     type_dict = dict()
@@ -628,6 +628,14 @@ class Trade(Signal):
 
     def __init__(self, **kwargs):
         super(Signal, self).__init__(**kwargs)
+
+    @classmethod
+    def get_instance_from_signal(cls, signal: dict) -> :
+        """
+        从老师的原始喊单信号派生出来虚拟信号
+        :param signal:
+        :return:
+        """
 
     @classmethod
     def sync_from_signal(cls, signal: Signal, signal_type: str):
@@ -687,7 +695,7 @@ class Trade(Signal):
             data.append(args)  # 真实老师不对信号做任何处理
             for k, v in t_dict.items():
                 """
-                虚拟老师对原始信号佑如下的处理方式：
+                虚拟老师对原始信号做如下的处理方式：
                 1. 正向
                 2. 反向
                 3. 随机

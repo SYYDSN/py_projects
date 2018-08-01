@@ -167,7 +167,7 @@ class WXUser(mongo_db.BaseDoc):
                 else:
                     ms = "用户角色不合法:{}".format(role)
                     logger.exception(ms)
-                    raise ValueError(ms)
+                    print(ms)
             else:
                 ms = "至少一个用户id无效:{}{}".format(u_id, s_id)
                 logger.exception(ms)

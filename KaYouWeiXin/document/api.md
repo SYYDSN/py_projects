@@ -480,6 +480,7 @@ head_image_url： 简历头像信息的url，由自身服务器传回
 1. 通知下载图片地址: /wx/auto_download/id_image
 参数：
 table_name : id_image 固定值
+field_name： id_image_face/id_image_back  身份证正面/背面
 server_id: 微信服务器回传的图片id
 
 2. 修改身份证信息地址：/wx/resume/opt
@@ -495,6 +496,7 @@ id_image_back_url： 身份证背面图片的url，由自身服务器传回
 1. 通知下载图片地址: /wx/auto_download/honor_image
 参数：
 table_name : honor_image 固定值
+field_name： image_id 固定值
 server_id: 微信服务器回传的图片id
 
 2. 修改荣誉证书图片信息地址：/wx/resume/extend
@@ -502,8 +504,8 @@ server_id: 微信服务器回传的图片id
 resume_id： 简历id ，
 h_id: 荣誉证书对象的_id,
 opt: add_hobor/update_honor  操作类型，添加/修改
-honor_image 荣誉证书图片的id，由自身服务器传回，24位字符串
-honor_image_url： 荣誉证书图片的url，由自身服务器传回
+image_id 荣誉证书图片的id，由自身服务器传回，24位字符串
+image_url： 荣誉证书图片的url，由自身服务器传回
 ... 其他参数
 
 **车辆照片**: *<span style="color:orange">尚未实现</span>*
@@ -511,6 +513,7 @@ honor_image_url： 荣誉证书图片的url，由自身服务器传回
 1. 通知下载图片地址: /wx/auto_download/vehicle_image
 参数：
 table_name : vehicle_image 固定值
+field_name： image_id 固定值
 server_id: 微信服务器回传的图片id
 
 2. 修改车辆照片信息地址：/wx/resume/extend
@@ -518,8 +521,8 @@ server_id: 微信服务器回传的图片id
 resume_id： 简历id ，
 v_id: 车辆对象的_id,
 opt: add_vehicle/update_vehicle  操作类型，添加/修改
-honor_image 车辆照片的id，由自身服务器传回，24位字符串
-honor_image_url： 车辆照片的url，由自身服务器传回
+image_id 车辆照片的id，由自身服务器传回，24位字符串
+image_url： 车辆照片的url，由自身服务器传回
 ... 其他参数
 
 **驾照图片**driving_license_image
@@ -527,6 +530,7 @@ honor_image_url： 车辆照片的url，由自身服务器传回
 1. 通知下载图片地址: /wx/auto_download/driving_license_image
 参数：
 table_name : driving_license_image 固定值
+field_name： dl_image 固定值
 server_id: 微信服务器回传的图片id
 
 2. 修改驾照图片地址：/wx/resume/opt
@@ -540,6 +544,7 @@ dl_image_url： 驾照图片的url，由自身服务器传回
 1. 通知下载图片地址: /wx/auto_download/rtqc_image
 参数：
 table_name : rtqc_image 固定值
+field_name： rtqc_image 固定值
 server_id: 微信服务器回传的图片id
 
 2. 修改从业许可证信息地址：/wx/resume/opt
@@ -603,8 +608,11 @@ rtqc_image_url： 从业许可证片的url，由自身服务器传回
 
                             // 请求api接口去下载临时素材
                             var table_name = "id_image";  // 上传身份证对应的表名
+                            var field_name = $dom.attr("id");
                             var args = {
                                 "server_id": id,    // server_id 下载素材用
+                                "table_name": table_name,
+                                "field_name": field_name,  // 字段名
                                 "db": "mongo_db2"            // 库名，固定
                             }
                             var url = "/wx/auto_download/" + table_name;
@@ -614,8 +622,8 @@ rtqc_image_url： 从业许可证片的url，由自身服务器传回
                                 console.log(json);
                                 if(status == "success"){
                                     // 成功，保存返回值
-                                    $dom.attr("data-id", json[table_name]);
-                                    $dom.attr("data-url", json[table_name + "_url"]);
+                                    $dom.attr("data-id", json[field_name]);
+                                    $dom.attr("data-url", json[field_name + "_url"]);
                                 }
                                 else{
                                     alert(status);

@@ -8,10 +8,13 @@ import mongo_db
 import datetime
 from log_module import get_logger
 from uuid import uuid4
+from werkzeug.contrib.cache import SimpleCache
+from module.pickle_data import calculate_win_per_by_teacher_mix
 
 
 ObjectId = mongo_db.ObjectId
 logger = get_logger()
+simple_cache = SimpleCache()
 
 
 class RawWebChatMessage(mongo_db.BaseDoc):
@@ -33,10 +36,7 @@ class TeacherRank(mongo_db.BaseDoc):
     _table_name = "teacher_rank"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['rank'] = int  # 排位
-    type_dict['win'] = float  # 胜率
-    type_dict['t_id'] = ObjectId  # 老师id
-    type_dict['t_name'] = str  # 老师名字
+    type_dict['rank'] = list  # 排行榜[{"t_id": _id, "win": win},...]
     type_dict['year'] = int  # 年
     type_dict['week'] = int  # 一年中的第几周
     type_dict['begin'] = datetime.datetime  # 排行开始日期，主要查询条件
@@ -44,16 +44,54 @@ class TeacherRank(mongo_db.BaseDoc):
     type_dict['time'] = datetime.datetime  # 创建时间
 
     @classmethod
-    def get_rank(cls, cur_time: datetime.datetime, prev_week: int = 1) -> dict:
+    def get_rank(cls, cur_time: datetime.datetime, prev_week: int = 1, re_build: bool = False) -> dict:
         """
-        根据日期，返回日期所在的周（或者往前推几周）的排行字典
+        根据日期，返回日期所在的周（或者往前推几周）的排行字典,请调用此函数,有缓存
         :param cur_time:
         :param prev_week:往前提前几周？默认是1,也就是上一周的排行，0就是取本周的排行
+        :param re_build:强制重新生成排行榜?
+        :return:{t_id: {"rank": rank, "win": win},...}
+        """
+        y, w, d = cur_time.isocalendar()  # 年, 全年的第几周? 这天是星期几?
+        key = "week_rank_{}_{}_{}".format(y, w, prev_week)
+        res = simple_cache.get(key)
+        if res is None or re_build:
+            res = cls._get_rank(cur_time=cur_time, prev_week=prev_week, re_build=re_build)
+            simple_cache.set(key=key, value=res, timeout=3600)
+        return res
+
+    @classmethod
+    def _get_rank(cls, cur_time: datetime.datetime, prev_week: int = 1, re_build: bool = False) -> dict:
+        """
+        根据日期，返回日期所在的周（或者往前推几周）的排行字典,底层函数,无缓存
+        :param cur_time:
+        :param prev_week:往前提前几周？默认是1,也就是上一周的排行，0就是取本周的排行
+        :param re_build:强制重新生成排行榜?
         :return:{t_id: {"rank": rank, "win": win},...}
         """
         the_time = cur_time - datetime.timedelta(days=7 * prev_week)
-        wd = the_time.weekday()
-
+        y, w, d = the_time.isocalendar()  # 年, 全年的第几周? 这天是星期几?
+        f = {"year": y, "week": w}
+        res = cls.find_one_plus(filter_dict=f, instance=False)
+        if res is None or re_build:
+            """没有查到/强行重新生成,生成一个新的记录"""
+            begin = mongo_db.get_datetime_from_str("{}".format((the_time - datetime.timedelta(days=d - 1)).strftime("%F")))
+            end = mongo_db.get_datetime_from_str("{} 23:59:59.999999".format((the_time + datetime.timedelta(days=(7 - d))).strftime("%F")))
+            rank_dict = calculate_win_per_by_teacher_mix(begin, end)
+            """
+            {
+                ObjectId('5a1e680642f8c1bffc5dbd69'): {'win': 50.0, 'count': 8}, 
+                ObjectId('5a1e680642f8c1bffc5dbd6f'): {'win': 75.0, 'count': 16}, 
+                ObjectId('5b4c01fffd259807ff92ad65'): {'win': 66.7, 'count': 15}
+            }
+            """
+            rank = [{"t_id": k, "win": v['win']} for k, v in rank_dict.items()]
+            rank.sort(key=lambda obj: obj['win'], reverse=True)
+            u = {"$set": {"begin": begin, "end": end, "time": datetime.datetime.now(), "rank": rank}}
+            res = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+        else:
+            pass
+        return res
 
 
 class Score(mongo_db.BaseDoc):
@@ -117,67 +155,134 @@ class Score(mongo_db.BaseDoc):
         return cls(**kwargs)
 
     @classmethod
-    def calculate(cls, u_id: (str, ObjectId) = None, u_dict: dict = None, re_begin: bool = False) -> int:
+    def re_calculate(cls, u_id: (str, ObjectId) = None, u_dict: dict = None) -> int:
         """
-        计算用户积分并写入记录。会逐一检查用户的积分记录：
+        重新计算用户积分并写入记录。会逐一检查用户的积分记录,重新初始化用户积分的时候使用
         1. 补齐缺少的积分增减记录
-        2. 检查follow积分并追加记录
+        2. 计算相关的的记录的积分
         3. 返回最后的分值，
         :param u_id:
         :param u_dict:
-        :param re_begin:
         :return:
         """
         user_dict = u_dict if isinstance(u_dict, dict) and "_id" in u_dict else \
             WXUser.find_by_id(o_id=u_id, to_dict=True)
         if isinstance(user_dict, dict) and "_id" in user_dict:
-            score = user_dict.get("score", None)
             user_id = user_dict['_id']
-            need_init = False  # 是否需要从头计算积分？
-            if isinstance(score, (int, float)) and not re_begin:
-                pass
-            else:
-                need_init = True
-            inserts = list()  # 需要追加的记录
-            if need_init:
-                """重新计算历史积分"""
-                f = {"user_id": user_id}
-                s = {"time": -1}
-                rs = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
-                rd = dict()
-                score = 0
-                init = False  # 初始化过？
-                bind_phone = False  # 绑定手机过？
-                for x in rs:
-                    score += x.get("num", 0)
-                    if x['type'] == "init":
-                        init = True
-                    elif x['type'] == 'bind_phone':
-                        bind_phone = True
-                    else:
-                        pass
-                now = datetime.datetime.now()
-                if init:
-                    temp = {
-                        "type": "init", "num": 0, "user_id": user_id,
-                        "desc": "用户初始化", "time": now
-                    }
-                    inserts.append(temp)
-                if bind_phone:
-                    temp = {
-                        "type": "bind_phone", "num": 100, "user_id": user_id,
-                        "desc": "绑定手机", "time": now
-                    }
-                    inserts.append(temp)
+            """重新计算历史积分"""
+            f = {"user_id": user_id}
+            s = {"time": -1}
+            rs = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
+            score = 0
+            inserts = list()
+            init = False  # 初始化过？
+            bind_phone = False  # 绑定手机过？
+            for x in rs:
+                score += x.get("num", 0)
+                if x['type'] == "init":
+                    init = True
+                elif x['type'] == 'bind_phone':
+                    bind_phone = True
+                else:
+                    score += x['num']
+            now = datetime.datetime.now()
+            if init:
+                temp = {
+                    "type": "init", "num": 0, "user_id": user_id,
+                    "desc": "用户初始化", "time": now
+                }
+                inserts.append(temp)
+            if bind_phone:
+                score += 1
+                temp = {
+                    "type": "bind_phone", "num": 100, "user_id": user_id,
+                    "desc": "绑定手机", "time": now
+                }
+                inserts.append(temp)
             else:
                 pass
-            """计算是否需要扣除跟单积分"""
-
-
+            """事务,开始添加扣分记录和更新用户积分"""
+            client = mongo_db.get_client()
+            t1 = client[mongo_db.db_name][cls.get_table_name()]
+            t2 = client[mongo_db.db_name][WXUser.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    t1.insert_many(documents=inserts, session=ses)
+                    f = {"_id": user_id}
+                    u = {"$set": {"score": score}}
+                    t2.find_one_and_update(filter=f, update=u, upsert=False, session=ses)
+            return score
         else:
             ms = "无效的用户! u_id:{}, u_dict: {}".format(u_id, user_dict)
             logger.exception(msg=ms)
             raise ValueError(ms)
+
+    @classmethod
+    def every_week_mon_check(cls) -> list:
+        """
+        每个星期一,对本周还在关注老师的用户进行扣分.(先扣分),生产环境下,这是给celery的定时任务使用的
+        :return: 操作情况的数组  [{"_id": user_id, "num":-500, "follow": True },...]
+        """
+        res = list()
+        f = {"follow.0": {"$exists": True}}  # 有关注老师的用户
+        p = ['_id', "follow", 'score']
+        us = WXUser.find_plus(filter_dict=f, projection=p, to_dict=True)
+        now = datetime.datetime.now()
+        rank = TeacherRank.get_rank(cur_time=now)
+        """扣分:上周排行第一 -500, 第二 -300, 第三-200, 第四第五-100， >6 -50"""
+        num_dict = {0: -500, 1: -300, 2: -200, 3: -100, 4: -100}
+        rank_dict = dict()
+        for i, x in enumerate(rank):
+            rank_dict[x['_id']] = {"index": i, "num": num_dict[i]}
+        for x in us:
+            u_id = x['_id']
+            f_id = x.get("follow", list())
+            f_id = None if len(f_id) == 0 else f_id[0]
+            score = x.get("score")
+            if score is None:
+                score = cls.re_calculate(u_dict=x)
+            if f_id in rank:
+                """关注的老师在上周的排行榜内"""
+                s = rank_dict[f_id]
+                num = s['num']
+                if score >= abs(num):
+                    """积分够本周扣分"""
+                    score += num
+                    temp = {
+                        "type": "follow", "num": num, "user_id": u_id,
+                        "desc": "跟随老师 {}, 排名: {}".format(f_id, s['index'] + 1),
+                        "time": now
+                    }
+                    """事务,添加一条扣分记录,并修改用户积分"""
+                    client = mongo_db.get_client()
+                    t1 = client[mongo_db.db_name][cls.get_table_name()]
+                    t2 = client[mongo_db.db_name][WXUser.get_table_name()]
+                    with client.start_session(causal_consistency=True) as ses:
+                        with ses.start_transaction():
+                            t1.insert_one(document=temp, session=ses)
+                            f = {"_id": u_id}
+                            u = {"$set": {"score": score}}
+                            r = t2.find_one_and_update(filter=f, update=u, upsert=False, session=ses)
+                            if r is None:
+                                ms = "用户:{} 关注扣分失败".format(u_id)
+                                print(ms)
+                                logger.exception(msg=ms)
+                                res.append({"_id": u_id, "error": ms})
+                            else:
+                                res.append({"_id": u_id, "num": num, "follow": True})
+                else:
+                    """积分不够扣分的,直接解除关注就行了"""
+                    f = {"_id": u_id}
+                    u = {"$set": {"follow": []}}
+                    r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                    if r is None:
+                        ms = "用户:{} 解除关注失败".format(u_id)
+                        print(ms)
+                        logger.exception(msg=ms)
+                        res.append({"_id": u_id, "error": ms})
+                    else:
+                        res.append({"_id": u_id, "num": 0, "follow": False})
+        return res
 
 
 class WXUser(mongo_db.BaseDoc):
@@ -252,33 +357,128 @@ class WXUser(mongo_db.BaseDoc):
         return res
 
     @classmethod
-    def follow(cls, user_id: (str, ObjectId), t_id: (str, ObjectId)) -> bool:
+    def un_follow(cls, user_id: (str, ObjectId)) -> dict:
+        """
+        取消跟踪老师
+        :param user_id:
+        :return:
+        """
+        mes = {"message": "取消跟踪失败"}
+        user = cls.find_by_id(o_id=user_id, to_dict=True)
+        if isinstance(user, dict):
+            f = {"_id": user['_id']}
+            u = {"$set": {"follow": []}}
+            r = cls.find_one_and_update_plus(filter_dict=f, upsert=False, update_dict=u)
+            if r is None:
+                mes['message'] = "保存数据失败"
+            else:
+                mes['message'] = "success"
+        else:
+            ms = "错误的用户id: {}".format(user_id)
+            logger.exception(msg=ms)
+            print(ms)
+            mes['message'] = "用户id错误"
+
+    @classmethod
+    def follow(cls, user_id: (str, ObjectId), t_id: (str, ObjectId)) -> dict:
         """
         用户跟单行为。
         1. 如果用户积分不足，那就不能跟单
-        2. 如果用户已经跟随了一位老师，那就换人。
-        目前还不允许取消跟单。
+        2. 如果用户已经跟随了一位老师，那就换人。同时扣分
         :param user_id:
         :param t_id: 老师id
         :return:
         """
+        """计算是否需要扣除跟单积分"""
+        user = cls.find_by_id(o_id=user_id, to_dict=True)
+        if isinstance(user, dict):
+            user_id = user['_id']
+            score = user.get("score", None)
+            if score is None:
+                score = Score.re_calculate(u_dict=user)
+            f_id = ObjectId(t_id) if isinstance(t_id, str) and len(t_id) == 24 else t_id
+            now = datetime.datetime.now()
+            res = {"message": "关注失败"}
+            """
+            跟单扣分制度:
+            参考上一周的老师胜率排行榜
+            第一 -500, 第二 -300, 第三-200, 第四第五-100， >6 -50
+            """
+            num_dict = {0: -500, 1: -300, 2: -200, 3: -100, 4: -100}
+            for i, x in enumerate(TeacherRank.get_rank(cur_time=now)):
+                t_id = x['t_id']
+                if f_id == t_id:
+                    num = num_dict.get(i, -50)
+                    if score >= abs(num):
+                        score += num
+                        temp = {
+                            "type": "follow", "num": num, "user_id": user_id,
+                            "desc": "跟随老师 {}, 排名: {}".format(t_id, i + 1),
+                            "time": now
+                        }
+                        """事务,开始添加扣分记录和更新用户积分"""
+                        client = mongo_db.get_client()
+                        t1 = client[mongo_db.db_name][cls.get_table_name()]
+                        t2 = client[mongo_db.db_name][WXUser.get_table_name()]
+                        with client.start_session(causal_consistency=True) as ses:
+                            with ses.start_transaction():
+                                t1.insert_one(document=temp, session=ses)
+                                f = {"_id": user_id}
+                                u = {"$set": {"score": score}, "follow": [f_id]}
+                                t2.find_one_and_update(filter=f, update=u, upsert=False, session=ses)
+                                res['message'] = "success"
+                        break
+                    else:
+                        res['message'] = "积分不足"
+                else:
+                    pass
+            return res
+        else:
+            ms = "错误的user_id: {}".format(user_id)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
 
     @classmethod
-    def check_score(cls, user_id: (str, ObjectId)) -> None:
+    def check_score(cls, user_id: (str, ObjectId)) -> int:
         """
-        检查用户的积分，对其进行计算。
+        检查用户的积分，对其进行重新计算。
         :param user_id:
-        :return:
+        :return: 返回积分
         """
+        return Score.re_calculate(u_id=user_id)
 
     @classmethod
-    def hold_level(cls, user_id: (str, ObjectId), t_id: (str, ObjectId)) -> int:
+    def hold_level(cls, user_id: (str, ObjectId), t_id: (str, ObjectId)) -> dict:
         """
         计算某个用户查看指定老师持仓的级别。返回int。
         1. -1 无法查看， 一般是未绑定手机的用户
         2. 0  只能查看是否有持仓和持仓数量。 一般是绑定手机用户查看非follow的老师状态
-        3. 1   可以查看持仓详情。 积分满足最低要求的，处于follow状态的老师。
+        3. 1   可以查看持仓详情。 处于follow状态的老师。
         :param user_id:
         :param t_id:
-        :return: 老师id
+        :return:
         """
+        mes = {"message": "未知的错误", "level": -1}
+        user = cls.find_by_id(o_id=user_id, to_dict=True)
+        if isinstance(user, dict):
+            follow = user.get("follow", list())
+            if len(follow) == 0:
+                mes['level'] = 0
+            else:
+                f_id = follow[0]
+                t_id = ObjectId(t_id)if isinstance(t_id, str) and len(t_id) == 24 else t_id
+                if f_id == t_id:
+                    mes['level'] = 1
+                else:
+                    pass
+        else:
+            ms = "错误的user_id: {}".format(user_id)
+            mes['message'] = ms
+            logger.exception(msg=ms)
+            print(ms)
+        return mes
+
+
+if __name__ == "__main__":
+    Score.every_week_mon_check()
+    pass

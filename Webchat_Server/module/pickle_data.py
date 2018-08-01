@@ -131,7 +131,7 @@ def draw_data_dict_from_db_mix(begin: datetime.datetime = None, end: datetime.da
 
 def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetime = None, end: datetime.datetime = None) -> list:
     """
-    从数据库获取分析师的喊单信号。返回数据的list对象
+    从数据库获取分析师的(已经close)喊单信号。返回数据的list对象
     :param t_id: 老师id
     :param begin: 开始时间
     :param end:  截至时间
@@ -402,7 +402,7 @@ def calculate_win_per_by_teacher_mix(begin: str = None, end: str = None) -> dict
 
     raw = draw_data_dict_from_db_mix(begin, end)
     res = dict()
-    for t_name, t_value in raw.items():
+    for t_id, t_value in raw.items():
         t_dict = dict()
         p_win_count = 0
         for record in t_value:
@@ -415,7 +415,7 @@ def calculate_win_per_by_teacher_mix(begin: str = None, end: str = None) -> dict
         p_win_per = round(p_win_per * 100, 1)
         t_dict["win"] = p_win_per
         t_dict['count'] = p_count
-        res[t_name] = t_dict
+        res[t_id] = t_dict
     return res
 
 
