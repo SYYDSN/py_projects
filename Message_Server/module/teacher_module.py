@@ -141,27 +141,6 @@ class Teacher(mongo_db.BaseDoc):
     def generator_init(cls, t_id: (str, ObjectId), t_name: str, create_date: datetime.datetime) -> list:
         """
         根据一个老师的id,名字和创建时间.生成3个虚拟的老师,加上原始的真实老师,一起返回(4个doc)
-        type_dict['name'] = str   # 展示的名字，比如青云老师等
-        type_dict['real_name'] = str  # 真实姓名，非必须
-        type_dict['head_img'] = str  # 头像文件相当与项目根目录的路径
-        type_dict['img'] = str  # 半身像文件相当与项目根目录的路径
-        type_dict['level'] = str  # 老师等级
-        type_dict['motto'] = str  # 座右铭
-        type_dict['feature'] = str  # 特性，风格，特点
-        type_dict['resume'] = str  # 简历
-        type_dict['create_date'] = datetime.datetime
-        type_dict['native'] = bool  # 是否是真实的teacher？
-        type_dict['from_id'] = ObjectId  # 虚拟老师专有，发源老师id，保持不连，除非修改
-        type_dict['direction'] = str  # 虚拟老师专有，跟的方向，有三种 follow/reverse/random
-        type_dict['profit_ratio'] = float  # 盈利率, 每次close时候计算
-        type_dict['profit_amount'] = float  # 总额.每次close时候计算
-        type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
-        type_dict['lots_range'] = list  # 手数范围.
-        #########################################
-        [{"_id": k, "name": v, "native": True},
-         {"name": "{}_正向".format(v), "native": False, "from_id": k, "direction": "follow"},
-            t2 = {"name": "{}_反向".format(v), "native": False, "from_id": k, "direction": "reverse"}
-            t3 = {"name": "{}_随机".format(v), "native": False, "from_id": k, "direction": "random"}
         :param t_id:
         :param t_name:
         :param create_date:
@@ -172,17 +151,67 @@ class Teacher(mongo_db.BaseDoc):
         raw = {
             "_id": t_id,  # 老师id
             "name": t_name,
+            "direction": "raw",
             "head_img": cls.pop_head_image(),
             "create_date": create_date,
             "native": True,  # 真实老师
-            "lots_range": cls.generator_lots_range(), # 手数范围,和性格有关
-            "deposit": 0.0,     # 存款,初始资金,都是0
+            "lots_range": cls.generator_lots_range(),  # 手数范围,和性格有关
+            "deposit": 0.0,     # 当前存款,初始资金,都是0
+            "deposit_amount": 0.0,     # 历史存款累计，用于计算盈利率
             "profit_ratio": 0.0,   # 盈利率, 每次close时候计算,profit_amount/deposit得出.百分比数值
             "profit_amount": 0,        # 盈利总额.每次close时候计算,初始0,
             # "from_id": t_id,  # 发源老师id, 主要是名字来源,没有其他方面的意义
+
         }
         """正向"""
-        follow =
+        follow = {
+            "_id": ObjectId(),  # 老师id
+            "name": "{}_follow".format(t_name),
+            "direction": "follow",
+            "head_img": cls.pop_head_image(),
+            "create_date": create_date,
+            "native": False,  # 真实老师
+            "lots_range": cls.generator_lots_range(), # 手数范围,和性格有关
+            "deposit": 0.0,     # 当前存款,初始资金,都是0
+            "deposit_amount": 0.0,  # 历史存款累计，用于计算盈利率
+            "profit_ratio": 0.0,   # 盈利率, 每次close时候计算,profit_amount/deposit得出.百分比数值
+            "profit_amount": 0,        # 盈利总额.每次close时候计算,初始0,
+            "from_id": t_id,  # 发源老师id, 主要是名字来源,没有其他方面的意义
+            "direction": "follow"
+        }
+        """反向"""
+        reverse = {
+            "_id": ObjectId(),  # 老师id
+            "name": "{}_reverse".format(t_name),
+            "direction": "reverse",
+            "head_img": cls.pop_head_image(),
+            "create_date": create_date,
+            "native": False,  # 真实老师
+            "lots_range": cls.generator_lots_range(),  # 手数范围,和性格有关
+            "deposit": 0.0,  # 当前存款,初始资金,都是0
+            "deposit_amount": 0.0,  # 历史存款累计，用于计算盈利率
+            "profit_ratio": 0.0,  # 盈利率, 每次close时候计算,profit_amount/deposit得出.百分比数值
+            "profit_amount": 0,  # 盈利总额.每次close时候计算,初始0,
+            "from_id": t_id,  # 发源老师id, 主要是名字来源,没有其他方面的意义
+            "direction": "reverse"
+        }
+        """随机"""
+        rand = {
+            "_id": ObjectId(),  # 老师id
+            "name": "{}_random".format(t_name),
+            "direction": "random",
+            "head_img": cls.pop_head_image(),
+            "create_date": create_date,
+            "native": False,  # 真实老师
+            "lots_range": cls.generator_lots_range(),  # 手数范围,和性格有关
+            "deposit": 0.0,  # 当前存款,初始资金,都是0
+            "deposit_amount": 0.0,  # 历史存款累计，用于计算盈利率
+            "profit_ratio": 0.0,  # 盈利率, 每次close时候计算,profit_amount/deposit得出.百分比数值
+            "profit_amount": 0,  # 盈利总额.每次close时候计算,初始0,
+            "from_id": t_id,  # 发源老师id, 主要是名字来源,没有其他方面的意义
+            "direction": "random"
+        }
+        return [raw, follow, reverse, rand]
 
     @classmethod
     def rebuild(cls) -> None:
@@ -191,8 +220,9 @@ class Teacher(mongo_db.BaseDoc):
         仅在初始化时候使用。
         :return:
         """
-        t_list = []  # 存放生成的老师的容器
-        f = dict()
+        t = datetime.datetime.now()
+        t = t - datetime.timedelta(days=90)
+        f = {"create_time": {"$gte": t}}
         s = [("create_time", -1)]
         p = ['creator_id', 'creator_name', 'create_time']
         ses = mongo_db.get_conn(table_name="signal_info")
@@ -212,8 +242,8 @@ class Teacher(mongo_db.BaseDoc):
                 except KeyError as e:
                     print(e)
                     print(x)
-            if isinstance(_id, str) and len(_id) == 24:
-                _id = ObjectId(_id)
+            if (isinstance(_id, str) and len(_id) == 24) or isinstance(_id, ObjectId):
+                _id = _id if isinstance(_id, ObjectId) else ObjectId(_id)
                 if _id not in native:
                     native[_id] = name
                 else:
@@ -227,15 +257,17 @@ class Teacher(mongo_db.BaseDoc):
                 ms = "异常的_id：{}".format(_id)
                 print(ms)
         print(native)
+
+        res = list()
+        now = datetime.datetime.now()
         for k, v in native.items():
-            t = {"_id": k, "name": v, "native": True}
-            t1 = {"name": "{}_正向".format(v), "native": False, "from_id": k, "direction": "follow"}
-            t2 = {"name": "{}_反向".format(v), "native": False, "from_id": k, "direction": "reverse"}
-            t3 = {"name": "{}_随机".format(v), "native": False, "from_id": k, "direction": "random"}
-            cls(**t).save_plus()
-            cls(**t1).save_plus()
-            cls(**t2).save_plus()
-            cls(**t3).save_plus()
+            res.extend(cls.generator_init(t_id=k, t_name=v, create_date=now))
+        client = mongo_db.get_client()
+        t = client[mongo_db.db_name][cls.get_table_name()]
+        with client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction():
+                t.delete_many(filter=dict(), session=ses)
+                t.insert_many(documents=res, session=ses)
 
     @classmethod
     def direction_map(cls) -> dict:
@@ -257,5 +289,5 @@ class Teacher(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    Teacher.init_head_image_list()
+    Teacher.rebuild()
     pass

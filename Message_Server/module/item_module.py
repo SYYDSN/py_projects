@@ -34,196 +34,249 @@ product_map = {
 }
 
 
-def generator_signal(raw_signal: dict, real_time: bool = True) -> list:
+def _generator_signal(raw_signal: str, change: str) -> dict:
     """
-    根据原始喊单信号和方向,生成新的(正向/反向/任意)信号字典(生成的同时如果是离场信号的话就要计算盈利).
-    最后返回这四个信号字典的数组
-    注意raw_signal必须有record_id字段,过早的信号没有这个字段.
-    :param raw_signal: 原始信号字典
-    :param real_time: 实时生成的虚拟信号还是批量?默认是True,实时信号,这时候一旦是离场,就要从数据库查询以前那的开单信号
-    ,如果是批量生成,那就不存在修改开单信号的问题.即使是离场信号页也无需查询后修改.
+    根据原始喊单信号和方向,生成新的(正向/反向/任意)(单个)信号字典
+    :param raw_signal:
+    :param change: 对信号的改变方向，由老师的direction决定
     :return:
     """
-    now = datetime.datetime.now()
-    op = raw_signal.get("op")
-    record_id = raw_signal['record_id']
+    res = raw_signal.copy()
+    op = res.get("op")
+    record_id = res['record_id']
     record_id = ObjectId(record_id) if isinstance(record_id, str) and len(record_id) == 24 else record_id
-    native_direction = raw_signal['direction']  # 原始订单的方向
-    create_time = raw_signal['create_time']  # 创建时间
-    enter_time = raw_signal['enter_time']  # 开单时间
-    enter_price = raw_signal['enter_price']  # 建仓价
-    exit_time = raw_signal.get('exit_time')  # 平仓时间
-    exit_price = raw_signal.get('exit_price')  # 平仓价
-    update_time = raw_signal.get('update_time')  # 平仓时间,为了兼容报表的冗余字段
-    the_type = raw_signal['the_type']  # 订单类型
-    teacher_name = raw_signal['creator_name']  # 老师名
-    teacher_id = raw_signal['creator_id']  # 老师id
+    res['record_id'] = record_id
+    native_direction = res.pop('direction')  # 原始订单的方向
+    res['native_direction'] = native_direction
+    teacher_name = res.pop('creator_name')  # 老师名
+    res['teacher_name'] = teacher_name
+    teacher_id = res.pop('creator_id')  # 老师id
     teacher_id = ObjectId(teacher_id) if isinstance(teacher_id, str) and len(teacher_id) == 24 else teacher_id
-    exit_reason = raw_signal.get("exit_reason")  # 离场理由
-    product = raw_signal['product']  # 产品名称
-    args = product_map.get(product)
-    p_coefficient = args['p_arg']  # 点值
-    each_cost = args['cost']  # 每手成本
-    each_profit_dollar = raw_signal.get("each_profit_dollar")  # 每手毛利美金
-    each_cost = []  # 每手成本
-    each_profit = raw_signal.get("each_profit")  # 每手实际获利美金
+    res['teacher_id'] = teacher_id
+    res['change'] = change
+    res['enter_time'] = res.pop("create_time")
+    res['exit_time'] = res.pop("update_time")
+    enter_price = res['enter_price']
+    exit_price = res['exit_price']
+    product = res['product']
 
-    t_coefficient = raw_signal.get("t_coefficient")  #  交易系数 -1/1
-    a_coefficient = raw_signal.get("a_coefficient")  # 开仓价随机系数
-    b_coefficient = raw_signal.get("b_coefficient")  # 平仓价随机系数
+    if change == "raw":
+        res['native'] = True
+        res['direction'] = native_direction
+    else:
+        res['native'] = False
+        if change == "follow":
+            res['direction'] = native_direction
+        elif change == "reverse" and native_direction == "买入":
+            res['direction'] = "卖出"
+        elif change == "reverse" and native_direction == "卖出":
+            res['direction'] = "买入"
+        else:
+            res['direction'] = random.choice(["买入", "卖出"])
+        a_coefficient = random.randint(-4, 4)  # 开仓价随机系数
+        res['a_coefficient'] = a_coefficient
+        """当前没有点差"""
+        new_enter_price = enter_price + (1 / product_map[product]['p_arg']) * a_coefficient
+        res['enter_price'] = new_enter_price
 
-    if op == "data_update" and enter_price is not None and exit_price is not None:
-        """平仓的信号"""
-        if real_time:
-            """实时信号,先从数据库查以前的开单信号,然后修改之"""
-            f = {"native_id": record_id}
-            rs = Trade.find_plus(filter_dict=f, to_dict=True)
-            """
-            对原始信号的改变共计四种. raw/follow/reverse/random
-            1. raw 原生,不做任何改变
-            2. follow 跟随, 直接的copy,但是浮动了开盘和收盘价格.
-            3. reverse 反向, 改变的订单方向,浮动了开盘和收盘价格.
-            4. random , 随机改变的订单方向,浮动了开盘和收盘价格.
-            """
-            rs = {x['change']: x for x in rs}
-            """原生"""
-            record = rs.get("raw")  # 原始信号
-            if record is None:
-                teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
-                lots_range = teacher['lots_range']
-                lots = random.randint(lots_range[0], lots_range[-1])  # 交易手数
-                the_profit = lots * each_profit   # 本次交易盈利
-                deposit = teacher.get("deposit", 0)  # 老师本金
-                deposit_amount = teacher.get("deposit_amount", 0)  # 历次存款总额
-                profit_amount = teacher.get("profit_amount", 0)  # 盈利总额
-                surplus = the_profit + deposit  # 盈利和本金的和,
-                if surplus <= 0:
-                    """本金不足,需要加金"""
-                    num = Deposit.generator_deposit(surplus)
-                    deposit += num
-                    deposit_amount += num
-                    deposit = {"_id": ObjectId(), "t_id": teacher_id, "num": num, "time": now}
-                else:
-                    deposit = None
-                """计算盈利总额,盈利率"""
-                profit_amount += the_profit
-                profit_ratio = round((profit_amount / deposit_amount) * 100, 2)  # 盈利率
+    if op == "data_update" and isinstance(enter_price, (int, float)) and isinstance(exit_price, (int, float)):
+        """
+        平仓信号,现在生成
+        1. a/b系数。
+        2. 可能的方向重设
+        3. 进场/离场价格
+        剩下的：
+        1. 手数生成
+        2. 资金计算
+        3. 盈利率计算
+        4. 胜负计算（用于计算胜率）
+        则留到close_case环节处理。
+        """
+        res['need_calculate'] = True
+        b_coefficient = random.randint(-4, 4)  # 平仓价随机系数
+        res['b_coefficient'] = b_coefficient
+        new_exit_price = exit_price + (1 / product_map[product]['p_arg']) * b_coefficient
+        res['exit_price'] = new_exit_price
+    else:
+        pass
+    return res
 
-                f = {"_id": ObjectId()}
-                u = {"$set": {
-                    "teacher_id": teacher_id,
-                    "teacher_name": teacher_name,
-                    "native": True,
-                    "native_id": record_id,
-                    "native_direction": native_direction,
-                    "change": "raw",
-                    "direction": native_direction,
-                    "create_time": create_time,
-                    "update_time": update_time,
-                    "the_type": the_type,
-                    "product": product,
-                    "enter_time": enter_time,
-                    "enter_price": enter_price,
-                    "exit_time": exit_time,
-                    "exit_price": exit_price,
-                    "exit_reason": exit_reason,
-                    "each_profit_dollar": each_profit_dollar,      # 每手毛利美金
-                    "each_cost": each_cost,                        # 每手成本
-                    "each_profit": each_profit,                    # 没有实际盈利(单位:美元)
-                    "lots": lots,                                  # 手数
-                    "p_coefficient": p_coefficient,                # 点值
-                    "a_coefficient": a_coefficient,                # 交易系数
-                    "profit_amount": the_profit                    # 本次交易总盈利
-                }}
-                """开始保存数据,事务"""
-                client = mongo_db.get_client()
-                t1 = client[mongo_db.db_name][Deposit.get_table_name()]
-                t2 = client[mongo_db.db_name][Trade.get_table_name()]
-                t3 = client[mongo_db.db_name][Teacher.get_table_name()]
-                with client.start_session(causal_consistency=True) as ses:
-                    with ses.start_transaction():
-                        if deposit is None:
-                            pass
-                        else:
-                            t1.insert_one(document=deposit, session=ses)
-                        t2.find_one_and_update(filter=f, update=u, upsert=True)
-                        f = {"_id": teacher_id}
-                        u = {"$set": {
-                            "deposit": deposit,
-                            "deposit_amount": deposit_amount,
-                            "profit_amount": profit_amount,
-                            "profit_ratio": profit_ratio,
-                        }}
-                        t3.find_one_and_update(filter=f, update=u, upsert=False)
-            """正向"""
-            record = rs.get("follow")  # 正向
-            if record is None:
-                teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
-                lots_range = teacher['lots_range']
-                lots = random.randint(lots_range[0], lots_range[-1])  # 交易手数
-                the_profit = lots * each_profit  # 本次交易盈利
-                deposit = teacher.get("deposit", 0)  # 老师本金
-                deposit_amount = teacher.get("deposit_amount", 0)  # 历次存款总额
-                profit_amount = teacher.get("profit_amount", 0)  # 盈利总额
-                surplus = the_profit + deposit  # 盈利和本金的和,
-                if surplus <= 0:
-                    """本金不足,需要加金"""
-                    num = Deposit.generator_deposit(surplus)
-                    deposit += num
-                    deposit_amount += num
-                    deposit = {"_id": ObjectId(), "t_id": teacher_id, "num": num, "time": now}
-                else:
-                    deposit = None
-                """计算盈利总额,盈利率"""
-                profit_amount += the_profit
-                profit_ratio = round((profit_amount / deposit_amount) * 100, 2)  # 盈利率
 
-                f = {"_id": ObjectId()}
-                u = {"$set": {
-                    "teacher_id": teacher_id,
-                    "teacher_name": teacher_name,
-                    "native": True,
-                    "native_id": record_id,
-                    "native_direction": native_direction,
-                    "change": "raw",
-                    "direction": native_direction,
-                    "create_time": create_time,
-                    "update_time": update_time,
-                    "the_type": the_type,
-                    "product": product,
-                    "enter_time": enter_time,
-                    "enter_price": enter_price,
-                    "exit_time": exit_time,
-                    "exit_price": exit_price,
-                    "exit_reason": exit_reason,
-                    "each_profit_dollar": each_profit_dollar,  # 每手毛利美金
-                    "each_cost": each_cost,  # 每手成本
-                    "each_profit": each_profit,  # 没有实际盈利(单位:美元)
-                    "lots": lots,  # 手数
-                    "p_coefficient": p_coefficient,  # 点值
-                    "a_coefficient": a_coefficient,  # 交易系数
-                    "profit_amount": the_profit  # 本次交易总盈利
-                }}
-                """开始保存数据,事务"""
-                client = mongo_db.get_client()
-                t1 = client[mongo_db.db_name][Deposit.get_table_name()]
-                t2 = client[mongo_db.db_name][Trade.get_table_name()]
-                t3 = client[mongo_db.db_name][Teacher.get_table_name()]
-                with client.start_session(causal_consistency=True) as ses:
-                    with ses.start_transaction():
-                        if deposit is None:
-                            pass
-                        else:
-                            t1.insert_one(document=deposit, session=ses)
-                        t2.find_one_and_update(filter=f, update=u, upsert=True)
-                        f = {"_id": teacher_id}
-                        u = {"$set": {
-                            "deposit": deposit,
-                            "deposit_amount": deposit_amount,
-                            "profit_amount": profit_amount,
-                            "profit_ratio": profit_ratio,
-                        }}
-                        t3.find_one_and_update(filter=f, update=u, upsert=False)
+def generator_signal(raw_signal: dict) -> list:
+    """
+    根据原始喊单信号,生成新的(正向/反向/任意)信号字典(生成的同时如果是离场信号的话就要计算盈利).
+    最后返回这四个信号字典的数组
+    注意raw_signal必须有record_id字段,过早的信号没有这个字段.
+    :param raw_signal: 原始信号字典.
+    :return:
+    """
+    res = list()
+    t_map = Teacher.direction_map()
+    t_list = [_generator_signal(raw_signal, x) for x in t_map.keys()]
+    need_calculate = t_list[0]['need_calculate']
+    if not need_calculate:
+        pass
+    else:
+        f = {"record_id": t_list[0]['record_id']}
+        rs = Trade.find_plus(filter_dict=f, to_dict=True)
+        rs = {x['change']: x for x in rs}
+        for x in t_list:
+            change = x['change']
+
+
+
+
+        if x['']:
+            """平仓的信号"""
+
+                """先从数据库查以前的开单信号,然后修改之"""
+
+                """
+                对原始信号的改变共计四种. raw/follow/reverse/random
+                1. raw 原生,不做任何改变
+                2. follow 跟随, 直接的copy,但是浮动了开盘和收盘价格.
+                3. reverse 反向, 改变的订单方向,浮动了开盘和收盘价格.
+                4. random , 随机改变的订单方向,浮动了开盘和收盘价格.
+                """
+                rs = {x['change']: x for x in rs}
+                """原生"""
+                record = rs.get("raw")  # 原始信号
+                if record is None:
+                    teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
+                    lots_range = teacher['lots_range']
+                    lots = random.randint(lots_range[0], lots_range[-1])  # 交易手数
+                    the_profit = lots * each_profit   # 本次交易盈利
+                    deposit = teacher.get("deposit", 0)  # 老师本金
+                    deposit_amount = teacher.get("deposit_amount", 0)  # 历次存款总额
+                    profit_amount = teacher.get("profit_amount", 0)  # 盈利总额
+                    surplus = the_profit + deposit  # 盈利和本金的和,
+                    if surplus <= 0:
+                        """本金不足,需要加金"""
+                        num = Deposit.generator_deposit(surplus)
+                        deposit += num
+                        deposit_amount += num
+                        deposit = {"_id": ObjectId(), "t_id": teacher_id, "num": num, "time": now}
+                    else:
+                        deposit = None
+                    """计算盈利总额,盈利率"""
+                    profit_amount += the_profit
+                    profit_ratio = round((profit_amount / deposit_amount) * 100, 2)  # 盈利率
+
+                    f = {"_id": ObjectId()}
+                    u = {"$set": {
+                        "teacher_id": teacher_id,
+                        "teacher_name": teacher_name,
+                        "native": True,
+                        "record_id": record_id,
+                        "native_direction": native_direction,
+                        "change": "raw",
+                        "direction": native_direction,
+                        "create_time": create_time,
+                        "update_time": update_time,
+                        "the_type": the_type,
+                        "product": product,
+                        "enter_time": enter_time,
+                        "enter_price": enter_price,
+                        "exit_time": exit_time,
+                        "exit_price": exit_price,
+                        "exit_reason": exit_reason,
+                        "each_profit_dollar": each_profit_dollar,      # 每手毛利美金
+                        "each_cost": each_cost,                        # 每手成本
+                        "each_profit": each_profit,                    # 没有实际盈利(单位:美元)
+                        "lots": lots,                                  # 手数
+                        "p_coefficient": p_coefficient,                # 点值
+                        "a_coefficient": a_coefficient,                # 交易系数
+                        "profit_amount": the_profit                    # 本次交易总盈利
+                    }}
+                    """开始保存数据,事务"""
+                    client = mongo_db.get_client()
+                    t1 = client[mongo_db.db_name][Deposit.get_table_name()]
+                    t2 = client[mongo_db.db_name][Trade.get_table_name()]
+                    t3 = client[mongo_db.db_name][Teacher.get_table_name()]
+                    with client.start_session(causal_consistency=True) as ses:
+                        with ses.start_transaction():
+                            if deposit is None:
+                                pass
+                            else:
+                                t1.insert_one(document=deposit, session=ses)
+                            t2.find_one_and_update(filter=f, update=u, upsert=True)
+                            f = {"_id": teacher_id}
+                            u = {"$set": {
+                                "deposit": deposit,
+                                "deposit_amount": deposit_amount,
+                                "profit_amount": profit_amount,
+                                "profit_ratio": profit_ratio,
+                            }}
+                            t3.find_one_and_update(filter=f, update=u, upsert=False)
+                """正向"""
+                record = rs.get("follow")  # 正向
+                if record is None:
+                    teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
+                    lots_range = teacher['lots_range']
+                    lots = random.randint(lots_range[0], lots_range[-1])  # 交易手数
+                    the_profit = lots * each_profit  # 本次交易盈利
+                    deposit = teacher.get("deposit", 0)  # 老师本金
+                    deposit_amount = teacher.get("deposit_amount", 0)  # 历次存款总额
+                    profit_amount = teacher.get("profit_amount", 0)  # 盈利总额
+                    surplus = the_profit + deposit  # 盈利和本金的和,
+                    if surplus <= 0:
+                        """本金不足,需要加金"""
+                        num = Deposit.generator_deposit(surplus)
+                        deposit += num
+                        deposit_amount += num
+                        deposit = {"_id": ObjectId(), "t_id": teacher_id, "num": num, "time": now}
+                    else:
+                        deposit = None
+                    """计算盈利总额,盈利率"""
+                    profit_amount += the_profit
+                    profit_ratio = round((profit_amount / deposit_amount) * 100, 2)  # 盈利率
+
+                    f = {"_id": ObjectId()}
+                    u = {"$set": {
+                        "teacher_id": teacher_id,
+                        "teacher_name": teacher_name,
+                        "native": True,
+                        "record_id": record_id,
+                        "native_direction": native_direction,
+                        "change": "raw",
+                        "direction": native_direction,
+                        "create_time": create_time,
+                        "update_time": update_time,
+                        "the_type": the_type,
+                        "product": product,
+                        "enter_time": enter_time,
+                        "enter_price": enter_price,
+                        "exit_time": exit_time,
+                        "exit_price": exit_price,
+                        "exit_reason": exit_reason,
+                        "each_profit_dollar": each_profit_dollar,  # 每手毛利美金
+                        "each_cost": each_cost,  # 每手成本
+                        "each_profit": each_profit,  # 没有实际盈利(单位:美元)
+                        "lots": lots,  # 手数
+                        "p_coefficient": p_coefficient,  # 点值
+                        "a_coefficient": a_coefficient,  # 交易系数
+                        "profit_amount": the_profit  # 本次交易总盈利
+                    }}
+                    """开始保存数据,事务"""
+                    client = mongo_db.get_client()
+                    t1 = client[mongo_db.db_name][Deposit.get_table_name()]
+                    t2 = client[mongo_db.db_name][Trade.get_table_name()]
+                    t3 = client[mongo_db.db_name][Teacher.get_table_name()]
+                    with client.start_session(causal_consistency=True) as ses:
+                        with ses.start_transaction():
+                            if deposit is None:
+                                pass
+                            else:
+                                t1.insert_one(document=deposit, session=ses)
+                            t2.find_one_and_update(filter=f, update=u, upsert=True)
+                            f = {"_id": teacher_id}
+                            u = {"$set": {
+                                "deposit": deposit,
+                                "deposit_amount": deposit_amount,
+                                "profit_amount": profit_amount,
+                                "profit_ratio": profit_ratio,
+                            }}
+                            t3.find_one_and_update(filter=f, update=u, upsert=False)
 
 
 def calculate_profit(product: str, enter_price: float, exit_price: float, p_arg: float, cost: float, t_arg: int) -> dict:
@@ -829,7 +882,7 @@ class Trade(Signal):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['native'] = bool  # 这个记录是原生的吗?
-    type_dict['native_id'] = ObjectId # 原记录的id,指向Signal的record_id属性
+    type_dict['record_id'] = ObjectId # 原记录的id,指向Signal的record_id属性
     type_dict['native_direction'] = str  # 原始订单的方向
     type_dict['change'] = str  # 改变方式  raw/follow/reverse/random
     type_dict['direction'] = str  # 方向（实际方向）
@@ -853,13 +906,14 @@ class Trade(Signal):
     type_dict['p_coefficient'] = float  # （点值）系数
     type_dict['a_coefficient'] = float  # 开仓价随机系数
     type_dict['b_coefficient'] = float  # 平仓价随机系数
+    type_dict['need_calculate'] = bool  # 平仓信号特有。提醒系统计算盈利
 
 
     def __init__(self, **kwargs):
         super(Signal, self).__init__(**kwargs)
 
     @classmethod
-    def get_instance_from_signal(cls, signal: dict) -> :
+    def get_instance_from_signal(cls, signal: dict) -> None:
         """
         从老师的原始喊单信号派生出来虚拟信号
         :param signal:
@@ -874,7 +928,7 @@ class Trade(Signal):
         :param signal_type: 平仓提醒/建仓提醒  操作类型
         :return:
         """
-        native_id = signal.get_attr("record_id")
+        record_id = signal.get_attr("record_id")
         teacher_id = ObjectId(signal.get_attr("creator_id"))
         teacher_name = signal.get_attr("creator_name")
         create_time = signal.get_attr("create_time")
@@ -893,7 +947,7 @@ class Trade(Signal):
         # a_coefficient = random.randint(-4, 4)  # a系数, 用于模拟随机的计算盈利的系数
         # b_coefficient = random.randint(-4, 4)   # b系数, 用于模拟随机的计算盈利的系数
         args = {
-            "native_id": native_id,
+            "record_id": record_id,
             "create_time": create_time,
             "the_type": the_type,
             "product": product,
@@ -970,8 +1024,8 @@ class Trade(Signal):
                 obj.save_plus()
         else:
             """平仓数据"""
-            native_id = args['native_id']
-            f = {"native_id": native_id if isinstance(native_id, ObjectId) else ObjectId(native_id)}
+            record_id = args['record_id']
+            f = {"record_id": record_id if isinstance(record_id, ObjectId) else ObjectId(record_id)}
             u = {
                 "exit_reason": signal.get_attr("exit_reason"),
                 "exit_price": signal.get_attr("exit_price"),
@@ -1040,44 +1094,47 @@ class Trade(Signal):
 
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
-    create_data = {'op': 'data_create',
-            'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
-                     'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
-                     '_widget_1520843763126': 1190, 'formName': '发信号测试',
-                     '_widget_1514518782504': '2018-07-29T21:40:19.000Z', 'label': '', '_widget_1514518782592': 120,
-                     'createTime': '2018-07-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
-                     '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
-                     'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'}, '_widget_1520843228626': 1000,
-                     '_id': '7abd5d81493acc231b27af1c', 'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
-                     '_widget_1514518782603': [{'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
-                     'updateTime': '2018-07-29T21:41:21.491Z', '_widget_1514518782514': '原油',
-                     'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
-                     }
-            }
-    update_data = {'op': 'data_update',
-                   'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
-                            'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
-                            '_widget_1520843763126': 1190, 'formName': '发信号测试',
-                            '_widget_1514518782504': '2018-07-29T21:40:19.000Z', 'label': '',
-                            '_widget_1514518782592': 120,
-                            'createTime': '2018-07-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
-                            '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
-                            'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
-                            '_widget_1520843228626': 1000,
-                            '_id': '7abd5d81493acc231b27af1c',
-                            'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
-                            '_widget_1514518782603': [
-                                {'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
-                            'updateTime': '2018-07-29T21:41:21.491Z', '_widget_1514518782514': '原油',
-                            'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
-                            }
-                   }
-    # """初始化喊单信号并发送"""
-    d = Signal.instance(**create_data)
-    # d.send()
-    """查看老师的月胜率"""
-    # print(MonthEstimate.get_instance("5a1e680642f8c1bffc5dbd6f", "2018-06"))
-    """生成一个虚拟信号"""
-    # signal1 = Signal.find_by_id(ObjectId("5b485ebbf313841fc0eaf2ad"))
-    Trade.sync_from_signal(d, signal_type="建仓提醒")
+    # create_data = {'op': 'data_create',
+    #         'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
+    #                  'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
+    #                  '_widget_1520843763126': 1190, 'formName': '发信号测试',
+    #                  '_widget_1514518782504': '2018-07-29T21:40:19.000Z', 'label': '', '_widget_1514518782592': 120,
+    #                  'createTime': '2018-07-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
+    #                  '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
+    #                  'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'}, '_widget_1520843228626': 1000,
+    #                  '_id': '7abd5d81493acc231b27af1c', 'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
+    #                  '_widget_1514518782603': [{'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
+    #                  'updateTime': '2018-07-29T21:41:21.491Z', '_widget_1514518782514': '原油',
+    #                  'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
+    #                  }
+    #         }
+    # update_data = {'op': 'data_update',
+    #                'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
+    #                         'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
+    #                         '_widget_1520843763126': 1190, 'formName': '发信号测试',
+    #                         '_widget_1514518782504': '2018-07-29T21:40:19.000Z', 'label': '',
+    #                         '_widget_1514518782592': 120,
+    #                         'createTime': '2018-07-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
+    #                         '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
+    #                         'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
+    #                         '_widget_1520843228626': 1000,
+    #                         '_id': '7abd5d81493acc231b27af1c',
+    #                         'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
+    #                         '_widget_1514518782603': [
+    #                             {'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
+    #                         'updateTime': '2018-07-29T21:41:21.491Z', '_widget_1514518782514': '原油',
+    #                         'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
+    #                         }
+    #                }
+    # # """初始化喊单信号并发送"""
+    # d = Signal.instance(**create_data)
+    # # d.send()
+    # """查看老师的月胜率"""
+    # # print(MonthEstimate.get_instance("5a1e680642f8c1bffc5dbd6f", "2018-06"))
+    # """生成一个虚拟信号"""
+    # # signal1 = Signal.find_by_id(ObjectId("5b485ebbf313841fc0eaf2ad"))
+    # Trade.sync_from_signal(d, signal_type="建仓提醒")
+    close_case = Signal.find_by_id(o_id=ObjectId("5b6303dac5aee8250b3ad592"), to_dict=True)
+    open_case = Signal.find_by_id(o_id=ObjectId("5ae22fdf09d20f1765fa62a4"), to_dict=True)
+    generator_signal(close_case, False)
     pass
