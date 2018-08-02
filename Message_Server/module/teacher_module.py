@@ -7,6 +7,7 @@ if __project_path not in sys.path:
 import mongo_db
 from bson.objectid import ObjectId
 import datetime
+import random
 from log_module import get_logger
 from werkzeug.contrib.cache import SimpleCache
 
@@ -20,7 +21,7 @@ logger = get_logger()
 """
 
 
-class Deposit(mongo_db.BaseFile):
+class Deposit(mongo_db.BaseDoc):
     """
     入金/存款(记录),当老师做单的时候,如果资金不足,就会激发入金行为
     """
@@ -28,8 +29,25 @@ class Deposit(mongo_db.BaseFile):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['t_id'] = ObjectId  # 老师id
-    type_dict['dollar'] = float  # 入金金额.
+    type_dict['num'] = float  # 入金金额.
     type_dict['time'] = datetime.datetime
+
+    @classmethod
+    def generator_deposit(cls, min_money: float) -> float:
+        """
+        生成一个加金的数字
+        :param min_money: 最低额度.加金金额必须大于此额度.
+        :return: 实际的加金额度.
+        """
+        l = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000,  15000, 20000, 30000, 50000, 100000]
+        r = 0
+        for x in l:
+            if min_money * 2 <= x:
+                r = x
+                break
+            else:
+                pass
+        return r
 
 
 class Teacher(mongo_db.BaseDoc):
@@ -59,8 +77,9 @@ class Teacher(mongo_db.BaseDoc):
     type_dict['from_id'] = ObjectId  # 虚拟老师专有，发源老师id，保持不连，除非修改
     type_dict['direction'] = str  # 虚拟老师专有，跟的方向，有三种 follow/reverse/random
     type_dict['profit_ratio'] = float  # 盈利率, 每次close时候计算
-    type_dict['profit_amount'] = float  # 总额.每次close时候计算
+    type_dict['profit_amount'] = float  # 盈利总额.每次close时候计算
     type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
+    type_dict['deposit_amount'] = float  # 历次存款总额,每次close时候计算
     type_dict['lots_range'] = list  # 手数范围.
 
     @classmethod
@@ -76,7 +95,7 @@ class Teacher(mongo_db.BaseDoc):
         return cls(**kwargs)
 
     @classmethod
-    def init_head_image_list(cls) -> None:
+    def init_head_image_list(cls) -> list:
         """
         初始化头像列表
         :return:
@@ -86,10 +105,11 @@ class Teacher(mongo_db.BaseDoc):
         ns = os.listdir(p)
         res = list()
         for name in ns:
-            u = os.path(p, name)
+            u = os.path.join(p, name)
             res.append(u)
         key = "t_head_img"
-        simple_cache.set(key=key, )
+        simple_cache.set(key=key, value=res, timeout=900)
+        return res
 
     @classmethod
     def pop_head_image(cls) -> str:
@@ -97,9 +117,28 @@ class Teacher(mongo_db.BaseDoc):
         尽量不重复的生成老师的头像,如果头像资源用尽,那就重头来.
         :return:
         """
+        key = "t_head_img"
+        m = simple_cache.get(key)
+        if m is None or len(m) == 0:
+            m = cls.init_head_image_list()
+        else:
+            pass
+        url = m.pop(random.randint(0, len(m) - 1))
+        simple_cache.set(key=key, value=m, timeout=900)
+        return url
 
     @classmethod
-    def generator_init(cls, t_id: (str, ObjectId), t_name: str, create_time: datetime.datetime) -> list:
+    def generator_lots_range(cls) -> list:
+        """
+        虚拟一个手数范围
+        :return:
+        """
+        begin = random.choice([1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3])
+        step = random.choice([2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 7, 7])
+        return [begin, begin + step]
+
+    @classmethod
+    def generator_init(cls, t_id: (str, ObjectId), t_name: str, create_date: datetime.datetime) -> list:
         """
         根据一个老师的id,名字和创建时间.生成3个虚拟的老师,加上原始的真实老师,一起返回(4个doc)
         type_dict['name'] = str   # 展示的名字，比如青云老师等
@@ -118,20 +157,32 @@ class Teacher(mongo_db.BaseDoc):
         type_dict['profit_amount'] = float  # 总额.每次close时候计算
         type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
         type_dict['lots_range'] = list  # 手数范围.
+        #########################################
         [{"_id": k, "name": v, "native": True},
          {"name": "{}_正向".format(v), "native": False, "from_id": k, "direction": "follow"},
             t2 = {"name": "{}_反向".format(v), "native": False, "from_id": k, "direction": "reverse"}
             t3 = {"name": "{}_随机".format(v), "native": False, "from_id": k, "direction": "random"}
         :param t_id:
         :param t_name:
-        :param create_time:
+        :param create_date:
         :return:
         """
+        t_id = ObjectId(t_id) if isinstance(t_id, str) and len(t_id) == 24 else t_id
+        """原始的老师的init字典"""
         raw = {
-            "_id": ObjectId(t_id) if isinstance(t_id, str) and len(t_id) == 24 else t_id,
+            "_id": t_id,  # 老师id
             "name": t_name,
-
+            "head_img": cls.pop_head_image(),
+            "create_date": create_date,
+            "native": True,  # 真实老师
+            "lots_range": cls.generator_lots_range(), # 手数范围,和性格有关
+            "deposit": 0.0,     # 存款,初始资金,都是0
+            "profit_ratio": 0.0,   # 盈利率, 每次close时候计算,profit_amount/deposit得出.百分比数值
+            "profit_amount": 0,        # 盈利总额.每次close时候计算,初始0,
+            # "from_id": t_id,  # 发源老师id, 主要是名字来源,没有其他方面的意义
         }
+        """正向"""
+        follow =
 
     @classmethod
     def rebuild(cls) -> None:

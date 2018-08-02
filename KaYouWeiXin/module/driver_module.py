@@ -1202,7 +1202,7 @@ class DriverResume(mongo_db2.BaseDoc):
         return res
 
     @classmethod
-    def delete_education(cls, resume_id: (str, ObjectId), h_id: (str, ObjectId)) -> ObjectId:
+    def delete_honor(cls, resume_id: (str, ObjectId), h_id: (str, ObjectId)) -> ObjectId:
         """
         删除荣誉
 
@@ -1251,15 +1251,183 @@ class DriverResume(mongo_db2.BaseDoc):
                             handler2.update_one(filter=f, update=u, upsert=False, session=ses)
                             res = h_id
                         else:
-                            ms = "事务错误: resume_id: {},e_id: {}".format(resume_id, h_id)
+                            ms = "事务错误: resume_id: {},h_id: {}".format(resume_id, h_id)
                             logger.exception(msg=ms)
                             raise ValueError(ms)
         else:
-            ms = "参数错误: resume_id: {}, e_id: {}".format(resume_id, h_id)
+            ms = "参数错误: resume_id: {}, h_id: {}".format(resume_id, h_id)
             logger.exception(msg=ms)
             raise ValueError(ms)
         return res
 
+    @classmethod
+    def add_vehicle(cls, resume_id: (str, ObjectId), init_args: dict) -> ObjectId:
+        """
+        添加自有车辆
+        :param resume_id:
+        :param init_args:  Vehicle的init字典
+        :return: ObjectId, Vehicle._id
+        """
+        res = None
+        vehicle = Vehicle(**init_args).get_dict()
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(vehicle, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            resume_id = resume['_id']
+            driver_id = vehicle.get("driver_id", "")
+            if isinstance(driver_id, str) and len(driver_id) == 24:
+                driver_id = ObjectId(driver_id)
+            elif isinstance(driver_id, ObjectId):
+                pass
+            else:
+                driver_id = resume_id
+            vehicle['driver_id'] = driver_id
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][Vehicle.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    r = None
+                    try:
+                        r = handler1.insert_one(document=vehicle, session=ses)
+                    except Exception as e:
+                        ms = "插入车辆失败:{}".format(str(e))
+                        logger.exception(msg=ms)
+                        ses.abort_transaction()
+                    h_id = r.inserted_id if isinstance(r, InsertOneResult) else r
+                    if isinstance(h_id, ObjectId):
+                        """
+                        更新vehicle字段
+                        """
+                        u = dict()
+                        f = {"driver_id": resume_id}
+                        ws = handler1.find(filter=f)
+                        ws = [x for x in ws]
+                        ws.append(vehicle)
+                        u['$set'] = {"vehicle": [x['_id'] for x in ws]}
+                        """更新简历"""
+                        f = {"_id": resume_id}
+                        handler2.update_one(filter=f, update=u, upsert=False, session=ses)
+                        res = h_id
+                    else:
+                        ms = "事务错误: resume_id: {}, init_args: {}".format(resume_id, init_args)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, init_args: {}".format(resume_id, init_args)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def update_vehicle(cls, resume_id: (str, ObjectId), v_id: (str, ObjectId), update_args: dict) -> ObjectId:
+        """
+        修改车辆
+        :param resume_id:
+        :param v_id:  车辆的id
+        :param update_args:  update字典
+        :return: ObjectId, Vehicle._id
+        """
+        res = None
+        vehicle = Vehicle.find_by_id(o_id=v_id, to_dict=True)
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(vehicle, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            v_id = vehicle['_id']
+            resume_id = resume['_id']
+            update_args['driver_id'] = resume_id
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][Vehicle.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    f = {"driver_id": resume_id}
+                    ws = handler1.find(filter=f)
+                    ws = [x for x in ws]
+                    if v_id not in [x['_id'] for x in ws]:
+                        ms = "非本简历的车辆! id:{}".format(v_id)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+                    else:
+                        r = None
+                        try:
+                            f = {"_id": v_id}
+                            u = {"$set": update_args}
+                            r = handler1.update_one(filter=f, update=u, session=ses)
+                        except Exception as e:
+                            ms = "修改车辆失败:{}".format(str(e))
+                            logger.exception(msg=ms)
+                            ses.abort_transaction()
+                        match_count = r.matched_count if isinstance(r, UpdateResult) else r
+                        if match_count == 1:
+                            res = v_id
+                        else:
+                            ms = "事务错误: resume_id: {}, v_id: {}, update_args: {}".format(resume_id, v_id, update_args)
+                            logger.exception(msg=ms)
+                            raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, v_id:{}, update_args: {}".format(resume_id, v_id, update_args)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def delete_vehicle(cls, resume_id: (str, ObjectId), v_id: (str, ObjectId)) -> ObjectId:
+        """
+        删除车辆
+
+        :param resume_id:
+        :param v_id:  荣誉的id
+        :return: ObjectId, Vehicle._id
+        """
+        res = None
+        vehicle = Vehicle.find_by_id(o_id=v_id, to_dict=True)
+        resume = cls.find_by_id(o_id=resume_id, to_dict=True)
+        if isinstance(vehicle, dict) and isinstance(resume, dict):
+            """开始事务操作"""
+            v_id = vehicle['_id']
+            resume_id = resume['_id']
+            client = mongo_db2.get_client()
+            handler1 = client[mongo_db2.db_name][Vehicle.get_table_name()]
+            handler2 = client[mongo_db2.db_name][cls.get_table_name()]
+            with client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    f = {"driver_id": resume_id}
+                    ws = handler1.find(filter=f)
+                    ws = [x for x in ws]
+                    if v_id not in [x['_id'] for x in ws]:
+                        ms = "非本简历的车辆! id:{}".format(v_id)
+                        logger.exception(msg=ms)
+                        raise ValueError(ms)
+                    else:
+                        r = None
+                        try:
+                            f = {"_id": v_id}
+                            r = handler1.delete_one(filter=f, session=ses)
+                        except Exception as e:
+                            ms = "删除车辆失败:{}".format(str(e))
+                            logger.exception(msg=ms)
+                            ses.abort_transaction()
+                        deleted_count = r.deleted_count if isinstance(r, DeleteResult) else r
+                        if deleted_count == 1:
+                            ws = [x['_id'] for x in ws if x['_id'] != v_id]
+                            """
+                            更新vehicle字段
+                            """
+                            u = dict()
+                            u['$set'] = {"vehicle": ws}
+                            """更新简历"""
+                            f = {"_id": resume_id}
+                            handler2.update_one(filter=f, update=u, upsert=False, session=ses)
+                            res = v_id
+                        else:
+                            ms = "事务错误: resume_id: {},v_id: {}".format(resume_id, v_id)
+                            logger.exception(msg=ms)
+                            raise ValueError(ms)
+        else:
+            ms = "参数错误: resume_id: {}, v_id: {}".format(resume_id, v_id)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        return res
 
 
 if __name__ == "__main__":

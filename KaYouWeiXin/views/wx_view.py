@@ -408,17 +408,20 @@ def extend_info_func():
     u_id = user['_id']
     # u_id = ObjectId("5b56bdba7b3128ec21daa4c7")
     arg_dict = get_args(request)
-    resume_id = arg_dict.pop("resume_id", "")
-    if isinstance(resume_id, str) and len(resume_id) == 24:
-        resume_id = ObjectId(resume_id)
-        opt = arg_dict.pop("opt", "")
-        if opt in ['add_work', 'update_work', 'delete_work']:
-            """对工作经历的操作"""
-            mes = WXUser.opt_extend_info(u_id=u_id, resume_id=resume_id, opt=opt, arg_dict=arg_dict)
-        else:
-            mes['message'] = "错误的opt: {}".format(opt)
+    if arg_dict is None or len(arg_dict) == 0:
+        mes['message'] = "参数不能为空"
     else:
-        mes['message'] = "简历id错误"
+        resume_id = arg_dict.pop("resume_id", "")
+        if isinstance(resume_id, str) and len(resume_id) == 24:
+            resume_id = ObjectId(resume_id)
+            opt = arg_dict.pop("opt", "")
+            if opt in ['add_work', 'update_work', 'delete_work']:
+                """对工作经历的操作"""
+                mes = WXUser.opt_extend_info(u_id=u_id, resume_id=resume_id, opt=opt, arg_dict=arg_dict)
+            else:
+                mes['message'] = "错误的opt: {}".format(opt)
+        else:
+            mes['message'] = "简历id错误"
     return json.dumps(mes)
 
 
@@ -463,14 +466,43 @@ def common_view_func(html_name: str):
     if html_name in file_names:
         kwargs = dict()  # 页面传参数
         kwargs['user'] = to_flat_dict(user)
-        if html_name == "register_info.html":
+        resume_pages = [                              # 需要传递简历信息的页面
+            "register_info.html",
+            "resume.html",
+            "additional.html",
+            "driver_three.html",
+            "driver_two.html",
+            "part_time.html",
+            "update_id.html",
+        ]
+        resume_id = user.get("resume_id", "")
+        if html_name in resume_pages:
             """简历的简要信息"""
-            resume_id = user.get("resume_id", "")
             if resume_id == "":
                 resume = dict()
             else:
                 resume = DriverResume.find_by_id(o_id=resume_id, to_dict=True)
             kwargs['resume'] = resume
+        elif html_name == "add_info_jilu.html":  # 添加荣誉
+            if resume_id == "":
+                return abort(403)
+            else:
+                h_id = get_arg(request, "h_id", "")
+                if isinstance(h_id, str) and len(h_id) == 24:
+                    honor = Honor.find_by_id(o_id=h_id, can_json=True)
+                else:
+                    honor = dict()
+                kwargs['honor'] = honor
+        elif html_name == "resume_info.html":  # 添加工作经验
+            if resume_id == "":
+                return abort(403)
+            else:
+                w_id = get_arg(request, "w_id", "")
+                if isinstance(w_id, str) and len(w_id) == 24:
+                    work = WorkHistory.find_by_id(o_id=w_id, can_json=True)
+                else:
+                    work = dict()
+                kwargs['work'] = work
         else:
             pass
         print(kwargs)  # 打印参数

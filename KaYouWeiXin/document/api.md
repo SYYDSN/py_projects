@@ -266,15 +266,19 @@ var resume_id = $("#resume_id").text();
 ```javascript
 1. 添加工作经历  add_work
 2. 编辑工作经历  update_work
-3. 删除工作经历  delete_work  
+3. 删除工作经历  delete_work
 
-4. 添加教育经历  add_education  
-5. 修改教育经历  update_education  
-6. 删除教育经历  delete_education  
+4. 添加教育经历  add_education
+5. 修改教育经历  update_education
+6. 删除教育经历  delete_education
 
-7. 添加荣誉  add_honor  
-8. 修改荣誉  update_honor  
-9. 删除荣誉  delete_honor 
+7. 添加荣誉  add_honor
+8. 修改荣誉  update_honor
+9. 删除荣誉  delete_honor
+
+10. 添加车辆  add_vehicle
+11. 修改车辆  update_vehicle
+12. 删除车辆  delete_vehicle
 ```
 
 3. 其他参数部分，如果是删除操作，就不需要其他参数，如果是添加扩展信息，这里就是扩展信息的对应的字段。
@@ -284,16 +288,108 @@ var resume_id = $("#resume_id").text();
 举例说明:
 
 ```javascript
-    // 新增一段工作经历
+    // 新增一段工作履历
     let args = {
-        "resume": "你的简历id",
-        "opt": “add_work”,    // 表明这是新增工作经历
+        "resume_id": "你的简历id",
+        "opt": "add_work",    // 表明这是新增工作经历
         "begin": "2010-12-1",  // 工作开始时间
         "end": "2015-12-1",  // 工作结束时间
-        "enterprise_name": "顺丰速运"， // 公司名称
-        "post_name": "司机"         // 岗位名称
+        "enterprise_name": "顺丰速运", // 公司名称
+        "post_name": "司机",       // 岗位名称
         ...
     }
+    // 修改一段工作经历
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "update_work",    // 表明这是修改工作经历
+        "w_id": "rrt4545454121212",  // 履历id
+        "begin": "2010-12-1",  // 工作开始时间
+        "end": "2015-12-1",  // 工作结束时间
+        "enterprise_name": "顺丰速运", // 公司名称
+        "post_name": "司机",       // 岗位名称
+        ...
+    }
+    // 删除一段工作经历
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "delete_work",    // 表明这是修改工作经历
+        "w_id": "rrt4545454121212",  // 履历id
+    }
+    // 新增一段教育经历
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "add_education",    // 表明这是新增教育经历
+        "begin": "2010-12-1",  // 开始时间
+        "end": "2015-12-1",  // 结束时间
+        "school_name": "xx大学", // 教育机构名称
+        ...
+    }
+    // 修改一段教育经历
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "update_education",    // 表明这是修改教育经历
+        "e_id": "rrt4545454121212",  // 教育经历id
+        "begin": "2010-12-1",  // 开始时间
+        "end": "2015-12-1",  // 结束时间
+        "school_name": "xx大学", // 教育机构名称
+        ...
+    }
+    // 删除一段教育经历
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "delete_education",    // 表明这是删除教育经历
+        "e_id": "rrt4545454121212",  // 教育经历id
+    }
+    // 新增一段荣誉
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "add_honor",    // 表明这是新增荣誉
+        "begin": "2010-12-1",  // 开始时间
+        "end": "2015-12-1",  // 结束时间
+        "title": "先进工作者", // 荣誉名称
+        ...
+    }
+    // 修改一段荣誉
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "update_honor",    // 表明这是修改荣誉
+        "h_id": "rrt4545454121212",  // 荣誉id
+        "begin": "2010-12-1",  // 开始时间
+        "end": "2015-12-1",  // 结束时间
+        "title": "先进工作者", // 荣誉名称
+        ...
+    }
+    // 删除一段荣誉
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "delete_honor",    // 表明这是删除荣誉
+        "h_id": "rrt4545454121212",  // 荣誉id
+    }
+    // 新增车辆
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "add_vehicle",    // 表明这是新增车辆
+        "vehicle_model": "一汽解放J6",  // 车辆型号
+        "plate_number": "沪A12345", // 车牌
+        ...
+    }
+    // 修改车辆
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "update_vehicle",    // 表明这是修改车辆
+        "v_id": "rrt4545454121212",  // 车辆id
+        "vehicle_model": "一汽解放J6",  // 车辆型号
+        "plate_number": "沪A12345", // 车牌
+        ...
+    }
+    // 删除车辆
+    let args = {
+        "resume_id": "你的简历id",
+        "opt": "delete_vehicle",    // 表明这是删除车辆
+        "v_id": "rrt4545454121212",  // 车辆id
+    }
+
+    // 扩展信息的增/删/改的提交方式都是一样的.
     $.post("/wx/resume/extend", args, function(resp){
         let json = JSON.parse(resp);
         if(json['message'] === "success"){
@@ -508,7 +604,7 @@ image_id 荣誉证书图片的id，由自身服务器传回，24位字符串
 image_url： 荣誉证书图片的url，由自身服务器传回
 ... 其他参数
 
-**车辆照片**: *<span style="color:orange">尚未实现</span>*
+**车辆照片**: 
 
 1. 通知下载图片地址: /wx/auto_download/vehicle_image
 参数：

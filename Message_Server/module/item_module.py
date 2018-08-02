@@ -20,6 +20,227 @@ ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
 
 
+"""产品参数"""
+product_map = {
+    "加元": {"p_arg": 100000, "cost": 80},  # p_arg/p_coefficient 点值,cost(每手)成本
+    "澳元": {"p_arg": 100000, "cost": 80},
+    "日元": {"p_arg": 1000, "cost": 80},
+    "英镑": {"p_arg": 100000, "cost": 80},
+    "欧元": {"p_arg": 100000, "cost": 70},
+    "恒指": {"p_arg": 10, "cost": 100},
+    "原油": {"p_arg": 1000, "cost": 100},
+    "白银": {"p_arg": 5000, "cost": 250},
+    "黄金": {"p_arg": 100, "cost": 100}
+}
+
+
+def generator_signal(raw_signal: dict, real_time: bool = True) -> list:
+    """
+    根据原始喊单信号和方向,生成新的(正向/反向/任意)信号字典(生成的同时如果是离场信号的话就要计算盈利).
+    最后返回这四个信号字典的数组
+    注意raw_signal必须有record_id字段,过早的信号没有这个字段.
+    :param raw_signal: 原始信号字典
+    :param real_time: 实时生成的虚拟信号还是批量?默认是True,实时信号,这时候一旦是离场,就要从数据库查询以前那的开单信号
+    ,如果是批量生成,那就不存在修改开单信号的问题.即使是离场信号页也无需查询后修改.
+    :return:
+    """
+    now = datetime.datetime.now()
+    op = raw_signal.get("op")
+    record_id = raw_signal['record_id']
+    record_id = ObjectId(record_id) if isinstance(record_id, str) and len(record_id) == 24 else record_id
+    native_direction = raw_signal['direction']  # 原始订单的方向
+    create_time = raw_signal['create_time']  # 创建时间
+    enter_time = raw_signal['enter_time']  # 开单时间
+    enter_price = raw_signal['enter_price']  # 建仓价
+    exit_time = raw_signal.get('exit_time')  # 平仓时间
+    exit_price = raw_signal.get('exit_price')  # 平仓价
+    update_time = raw_signal.get('update_time')  # 平仓时间,为了兼容报表的冗余字段
+    the_type = raw_signal['the_type']  # 订单类型
+    teacher_name = raw_signal['creator_name']  # 老师名
+    teacher_id = raw_signal['creator_id']  # 老师id
+    teacher_id = ObjectId(teacher_id) if isinstance(teacher_id, str) and len(teacher_id) == 24 else teacher_id
+    exit_reason = raw_signal.get("exit_reason")  # 离场理由
+    product = raw_signal['product']  # 产品名称
+    args = product_map.get(product)
+    p_coefficient = args['p_arg']  # 点值
+    each_cost = args['cost']  # 每手成本
+    each_profit_dollar = raw_signal.get("each_profit_dollar")  # 每手毛利美金
+    each_cost = []  # 每手成本
+    each_profit = raw_signal.get("each_profit")  # 每手实际获利美金
+
+    t_coefficient = raw_signal.get("t_coefficient")  #  交易系数 -1/1
+    a_coefficient = raw_signal.get("a_coefficient")  # 开仓价随机系数
+    b_coefficient = raw_signal.get("b_coefficient")  # 平仓价随机系数
+
+    if op == "data_update" and enter_price is not None and exit_price is not None:
+        """平仓的信号"""
+        if real_time:
+            """实时信号,先从数据库查以前的开单信号,然后修改之"""
+            f = {"native_id": record_id}
+            rs = Trade.find_plus(filter_dict=f, to_dict=True)
+            """
+            对原始信号的改变共计四种. raw/follow/reverse/random
+            1. raw 原生,不做任何改变
+            2. follow 跟随, 直接的copy,但是浮动了开盘和收盘价格.
+            3. reverse 反向, 改变的订单方向,浮动了开盘和收盘价格.
+            4. random , 随机改变的订单方向,浮动了开盘和收盘价格.
+            """
+            rs = {x['change']: x for x in rs}
+            """原生"""
+            record = rs.get("raw")  # 原始信号
+            if record is None:
+                teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
+                lots_range = teacher['lots_range']
+                lots = random.randint(lots_range[0], lots_range[-1])  # 交易手数
+                the_profit = lots * each_profit   # 本次交易盈利
+                deposit = teacher.get("deposit", 0)  # 老师本金
+                deposit_amount = teacher.get("deposit_amount", 0)  # 历次存款总额
+                profit_amount = teacher.get("profit_amount", 0)  # 盈利总额
+                surplus = the_profit + deposit  # 盈利和本金的和,
+                if surplus <= 0:
+                    """本金不足,需要加金"""
+                    num = Deposit.generator_deposit(surplus)
+                    deposit += num
+                    deposit_amount += num
+                    deposit = {"_id": ObjectId(), "t_id": teacher_id, "num": num, "time": now}
+                else:
+                    deposit = None
+                """计算盈利总额,盈利率"""
+                profit_amount += the_profit
+                profit_ratio = round((profit_amount / deposit_amount) * 100, 2)  # 盈利率
+
+                f = {"_id": ObjectId()}
+                u = {"$set": {
+                    "teacher_id": teacher_id,
+                    "teacher_name": teacher_name,
+                    "native": True,
+                    "native_id": record_id,
+                    "native_direction": native_direction,
+                    "change": "raw",
+                    "direction": native_direction,
+                    "create_time": create_time,
+                    "update_time": update_time,
+                    "the_type": the_type,
+                    "product": product,
+                    "enter_time": enter_time,
+                    "enter_price": enter_price,
+                    "exit_time": exit_time,
+                    "exit_price": exit_price,
+                    "exit_reason": exit_reason,
+                    "each_profit_dollar": each_profit_dollar,      # 每手毛利美金
+                    "each_cost": each_cost,                        # 每手成本
+                    "each_profit": each_profit,                    # 没有实际盈利(单位:美元)
+                    "lots": lots,                                  # 手数
+                    "p_coefficient": p_coefficient,                # 点值
+                    "a_coefficient": a_coefficient,                # 交易系数
+                    "profit_amount": the_profit                    # 本次交易总盈利
+                }}
+                """开始保存数据,事务"""
+                client = mongo_db.get_client()
+                t1 = client[mongo_db.db_name][Deposit.get_table_name()]
+                t2 = client[mongo_db.db_name][Trade.get_table_name()]
+                t3 = client[mongo_db.db_name][Teacher.get_table_name()]
+                with client.start_session(causal_consistency=True) as ses:
+                    with ses.start_transaction():
+                        if deposit is None:
+                            pass
+                        else:
+                            t1.insert_one(document=deposit, session=ses)
+                        t2.find_one_and_update(filter=f, update=u, upsert=True)
+                        f = {"_id": teacher_id}
+                        u = {"$set": {
+                            "deposit": deposit,
+                            "deposit_amount": deposit_amount,
+                            "profit_amount": profit_amount,
+                            "profit_ratio": profit_ratio,
+                        }}
+                        t3.find_one_and_update(filter=f, update=u, upsert=False)
+            """正向"""
+            record = rs.get("follow")  # 正向
+            if record is None:
+                teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
+                lots_range = teacher['lots_range']
+                lots = random.randint(lots_range[0], lots_range[-1])  # 交易手数
+                the_profit = lots * each_profit  # 本次交易盈利
+                deposit = teacher.get("deposit", 0)  # 老师本金
+                deposit_amount = teacher.get("deposit_amount", 0)  # 历次存款总额
+                profit_amount = teacher.get("profit_amount", 0)  # 盈利总额
+                surplus = the_profit + deposit  # 盈利和本金的和,
+                if surplus <= 0:
+                    """本金不足,需要加金"""
+                    num = Deposit.generator_deposit(surplus)
+                    deposit += num
+                    deposit_amount += num
+                    deposit = {"_id": ObjectId(), "t_id": teacher_id, "num": num, "time": now}
+                else:
+                    deposit = None
+                """计算盈利总额,盈利率"""
+                profit_amount += the_profit
+                profit_ratio = round((profit_amount / deposit_amount) * 100, 2)  # 盈利率
+
+                f = {"_id": ObjectId()}
+                u = {"$set": {
+                    "teacher_id": teacher_id,
+                    "teacher_name": teacher_name,
+                    "native": True,
+                    "native_id": record_id,
+                    "native_direction": native_direction,
+                    "change": "raw",
+                    "direction": native_direction,
+                    "create_time": create_time,
+                    "update_time": update_time,
+                    "the_type": the_type,
+                    "product": product,
+                    "enter_time": enter_time,
+                    "enter_price": enter_price,
+                    "exit_time": exit_time,
+                    "exit_price": exit_price,
+                    "exit_reason": exit_reason,
+                    "each_profit_dollar": each_profit_dollar,  # 每手毛利美金
+                    "each_cost": each_cost,  # 每手成本
+                    "each_profit": each_profit,  # 没有实际盈利(单位:美元)
+                    "lots": lots,  # 手数
+                    "p_coefficient": p_coefficient,  # 点值
+                    "a_coefficient": a_coefficient,  # 交易系数
+                    "profit_amount": the_profit  # 本次交易总盈利
+                }}
+                """开始保存数据,事务"""
+                client = mongo_db.get_client()
+                t1 = client[mongo_db.db_name][Deposit.get_table_name()]
+                t2 = client[mongo_db.db_name][Trade.get_table_name()]
+                t3 = client[mongo_db.db_name][Teacher.get_table_name()]
+                with client.start_session(causal_consistency=True) as ses:
+                    with ses.start_transaction():
+                        if deposit is None:
+                            pass
+                        else:
+                            t1.insert_one(document=deposit, session=ses)
+                        t2.find_one_and_update(filter=f, update=u, upsert=True)
+                        f = {"_id": teacher_id}
+                        u = {"$set": {
+                            "deposit": deposit,
+                            "deposit_amount": deposit_amount,
+                            "profit_amount": profit_amount,
+                            "profit_ratio": profit_ratio,
+                        }}
+                        t3.find_one_and_update(filter=f, update=u, upsert=False)
+
+
+def calculate_profit(product: str, enter_price: float, exit_price: float, p_arg: float, cost: float, t_arg: int) -> dict:
+    """
+    计算盈利
+    :param product: 产品名称
+    :param enter_price: 进场价格
+    :param exit_price:  离场价格
+    :param p_arg:  点值
+    :param cost:  每手成本
+    :param t_arg:  t系数,就是t_coefficient,空单为-1, 多单为1
+    :return:
+    """
+    min_price = 1 / p_arg  # 最小价格波动
+    gross_profit = t_arg * (enter_price - exit_price) * p_arg  # (每手)毛利润
+
+
 class RawSignal(mongo_db.BaseDoc):
     """
     原始信号的记录,目前用来监听简道云发送过来的消息
@@ -113,6 +334,12 @@ class Signal(mongo_db.BaseDoc):
     _table_name = "signal_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    """
+    原始操作类型
+    1. data_create 一定是开单操作
+    2. data_update 可能是离场操作,但也可能是修改订单
+    """
+    type_dict['op'] = str  # 原始操作类型
     type_dict['datetime'] = datetime.datetime  # 表单的日期时间字段。
     type_dict['receive_time'] = datetime.datetime  # 接收消息时间
     type_dict['create_time'] = datetime.datetime  # 创建时间
@@ -132,7 +359,7 @@ class Signal(mongo_db.BaseDoc):
     type_dict['exit_reason'] = str  # 离场理由
     type_dict['enter_price'] = float  # 建仓价
     type_dict['exit_price'] = float  # 平仓价
-    type_dict['profit'] = float  # 获利/盈亏
+    type_dict['profit'] = float  # 获利/盈亏,旧字段,将废弃,
     type_dict['each_profit'] = float  # 每手实际获利
     type_dict['each_profit_dollar'] = float  # 每手获利/美金
     type_dict['each_cost'] = float  # 每手成本
@@ -603,28 +830,30 @@ class Trade(Signal):
     type_dict['_id'] = ObjectId
     type_dict['native'] = bool  # 这个记录是原生的吗?
     type_dict['native_id'] = ObjectId # 原记录的id,指向Signal的record_id属性
+    type_dict['native_direction'] = str  # 原始订单的方向
+    type_dict['change'] = str  # 改变方式  raw/follow/reverse/random
+    type_dict['direction'] = str  # 方向（实际方向）
     type_dict['create_time'] = datetime.datetime  # 创建时间
-    type_dict['open_time'] = datetime.datetime  # 开单时间
-    type_dict['close_time'] = datetime.datetime  # 平仓时间
+    type_dict['enter_time'] = datetime.datetime  # 开单时间
+    type_dict['exit_time'] = datetime.datetime  # 平仓时间
     type_dict['update_time'] = datetime.datetime  # 平仓时间,为了兼容报表的冗余字段
     type_dict['the_type'] = str  # 订单类型
     type_dict['teacher_name'] = str  #
     type_dict['teacher_id'] = ObjectId  #
     type_dict['product'] = str  # 产品名称
-    type_dict['direction'] = str  # 方向（实际方向）
-    type_dict['native_direction'] = str  # 原始订单的方向
     type_dict['exit_reason'] = str  # 离场理由
     type_dict['enter_price'] = float  # 建仓价
     type_dict['exit_price'] = float  # 平仓价
-    type_dict['profit'] = float  # 获利/盈亏
-    type_dict['each_profit'] = float  # 每手实际获利
-    type_dict['each_profit_dollar'] = float  # 每手获利/美金
+    type_dict['each_profit_dollar'] = float  # 每手毛利美金
     type_dict['each_cost'] = float  # 每手成本
-    type_dict['t_coefficient'] = float  # （交易）系数
+    type_dict['each_profit'] = float  # 每手实际获利美金
+    type_dict['lots'] = int  # 交易手数
+    type_dict['profit_amount'] = float  # 本次交易总盈利 lots*each_profit
+    type_dict['t_coefficient'] = float  # （交易）系数 -1/1
     type_dict['p_coefficient'] = float  # （点值）系数
-    type_dict['a_coefficient'] = float  # a系数,用来随机运算的
-    type_dict['b_coefficient'] = float  # b系数,用来随机运算的
-    type_dict['re_calculate'] = bool  # 标识平仓的时候是否需要重新计算?
+    type_dict['a_coefficient'] = float  # 开仓价随机系数
+    type_dict['b_coefficient'] = float  # 平仓价随机系数
+
 
     def __init__(self, **kwargs):
         super(Signal, self).__init__(**kwargs)
@@ -664,15 +893,21 @@ class Trade(Signal):
         # a_coefficient = random.randint(-4, 4)  # a系数, 用于模拟随机的计算盈利的系数
         # b_coefficient = random.randint(-4, 4)   # b系数, 用于模拟随机的计算盈利的系数
         args = {
-            "native_id": native_id, "create_time": create_time,
-            "the_type": the_type, "product": product,
+            "native_id": native_id,
+            "create_time": create_time,
+            "the_type": the_type,
+            "product": product,
             "direction": native_direction,
             "native_direction": native_direction,
-            "exit_reason": exit_reason, "native": True,
-            "enter_price": enter_price, "exit_price": exit_price,
-            "profit": profit, "each_profit": each_profit,
+            "exit_reason": exit_reason,
+            "native": True,
+            "enter_price": enter_price,
+            "exit_price": exit_price,
+            "profit": profit,
+            "each_profit": each_profit,
             "each_profit_dollar": each_profit_dollar,
-            "each_cost": each_cost, "t_coefficient": t_coefficient,
+            "each_cost": each_cost,
+            "t_coefficient": t_coefficient,
             "p_coefficient": p_coefficient,
             "teacher_name": teacher_name,
             "teacher_id": teacher_id

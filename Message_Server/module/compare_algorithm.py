@@ -43,7 +43,7 @@ a = {
 b = {
     "_id" : ObjectId("5b4d7c46a7a7513eacde2e0b"),
     "p_coefficient" : 100.0,
-    "direction" : "卖出",
+    "direction": "卖出",
     "each_profit_dollar" : 144.0,
     "re_calculate" : False,
     "native_direction" : "卖出",

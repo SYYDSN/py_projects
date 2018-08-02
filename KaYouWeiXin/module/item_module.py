@@ -260,13 +260,17 @@ class WXUser(mongo_db.BaseDoc):
         2. 编辑工作经历  update_work  DriverResume.update_work_history
         3. 删除工作经历  delete_work  DriverResume.delete_work_history
 
-        4. 添加教育经历  add_education  DriverResume.add_education
+        4. 添加教育经历  add_education     DriverResume.add_education
         5. 修改教育经历  update_education  DriverResume.update_education
         6. 删除教育经历  delete_education  DriverResume.delete_education
 
-        7. 添加荣誉  add_honor  DriverResume.add_honor
+        7. 添加荣誉  add_honor     DriverResume.add_honor
         8. 修改荣誉  update_honor  DriverResume.update_honor
         9. 删除荣誉  delete_honor  DriverResume.delete_honor
+
+        10. 添加车辆  add_vehicle     DriverResume.add_vehicle
+        11. 修改车辆  update_vehicle  DriverResume.update_vehicle
+        12. 删除车辆  delete_vehicle  DriverResume.delete_vehicle
 
 
         :param u_id:  用户id
@@ -343,7 +347,27 @@ class WXUser(mongo_db.BaseDoc):
                     if h_id is None:
                         mes['message'] = "缺少必要的参数:h_id"
                     else:
-                        _id = DriverResume.delete_education(resume_id=resume_id, h_id=h_id)
+                        _id = DriverResume.delete_honor(resume_id=resume_id, h_id=h_id)
+                        mes['_id'] = str(_id) if can_json else _id
+                elif opt == "add_vehicle":
+                    """添加车辆"""
+                    _id = DriverResume.add_vehicle(resume_id=resume_id, init_args=arg_dict)
+                    mes['_id'] = str(_id) if can_json else _id
+                elif opt == "update_vehicle":
+                    """修改车辆"""
+                    v_id = arg_dict.pop("v_id", None)
+                    if v_id is None:
+                        mes['message'] = "缺少必要的参数:v_id"
+                    else:
+                        _id = DriverResume.update_vehicle(resume_id=resume_id, v_id=v_id, update_args=arg_dict)
+                        mes['_id'] = str(_id) if can_json else _id
+                elif opt == "delete_vehicle":
+                    """删除车辆"""
+                    v_id = arg_dict.pop("v_id", None)
+                    if v_id is None:
+                        mes['message'] = "缺少必要的参数:v_id"
+                    else:
+                        _id = DriverResume.delete_vehicle(resume_id=resume_id, v_id=v_id)
                         mes['_id'] = str(_id) if can_json else _id
                 else:
                     ms = "未知的操作:{}".format(opt)
