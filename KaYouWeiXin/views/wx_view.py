@@ -21,6 +21,7 @@ import json
 from module.driver_module import DriverResume
 from module.server_api import *
 from pdb import set_trace
+from uuid import uuid4
 import requests
 
 
@@ -356,16 +357,17 @@ def sms_func(key):
             if mes['message'] == "success":
                 """清除短信"""
                 # clear_sms_code(phone)
-                pass
-            """更新手机绑定信息"""
-            f = {"_id": _id}
-            u = {"$set": {"phone": phone}}
-            r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
-            if isinstance(r, dict):
-                """成功"""
-                session['wx_user'] = r
+                """更新手机绑定信息"""
+                f = {"_id": _id}
+                u = {"$set": {"phone": phone}}
+                r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                if isinstance(r, dict):
+                    """成功"""
+                    session['wx_user'] = r
+                else:
+                    mes['message'] = "绑定手机失败"
             else:
-                mes['message'] = "绑定手机失败"
+                pass
         else:
             mes['message'] = "未知的操作:{}".format(key)
     ms = "sms_func 返回的消息:{}".format(mes)
@@ -415,11 +417,7 @@ def extend_info_func():
         if isinstance(resume_id, str) and len(resume_id) == 24:
             resume_id = ObjectId(resume_id)
             opt = arg_dict.pop("opt", "")
-            if opt in ['add_work', 'update_work', 'delete_work']:
-                """对工作经历的操作"""
-                mes = WXUser.opt_extend_info(u_id=u_id, resume_id=resume_id, opt=opt, arg_dict=arg_dict)
-            else:
-                mes['message'] = "错误的opt: {}".format(opt)
+            mes = WXUser.opt_extend_info(u_id=u_id, resume_id=resume_id, opt=opt, arg_dict=arg_dict)
         else:
             mes['message'] = "简历id错误"
     return json.dumps(mes)
@@ -463,12 +461,14 @@ def common_view_func(html_name: str):
     """
     template_dir = os.path.join(__project_dir__, 'templates')
     file_names = os.listdir(template_dir)
+    ver = uuid4().hex
     if html_name in file_names:
         kwargs = dict()  # 页面传参数
+        kwargs['version'] = ver
         kwargs['user'] = to_flat_dict(user)
         resume_pages = [                              # 需要传递简历信息的页面
-            "register_info.html",
             "resume.html",
+            "register_info.html",
             "additional.html",
             "driver_three.html",
             "driver_two.html",
@@ -482,6 +482,7 @@ def common_view_func(html_name: str):
                 resume = dict()
             else:
                 resume = DriverResume.find_by_id(o_id=resume_id, to_dict=True)
+            kwargs['work'] = dict()
             kwargs['resume'] = resume
         elif html_name == "add_info_jilu.html":  # 添加荣誉
             if resume_id == "":
@@ -506,6 +507,7 @@ def common_view_func(html_name: str):
         else:
             pass
         print(kwargs)  # 打印参数
+        print("html_name is {}".format(html_name))
         return render_template(html_name, **kwargs)
     else:
         return abort(404)

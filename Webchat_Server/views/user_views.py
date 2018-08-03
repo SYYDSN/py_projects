@@ -13,10 +13,13 @@ from tools_module import *
 from mongo_db import BaseFile
 from io import BytesIO
 import json
+from uuid import uuid4
 from tools_module import *
 from module.server_api import *
 from module.item_module import *
 from module.teacher_module import *
+from sms_module import check_sms_code
+from sms_module import send_sms
 
 
 """注册蓝图"""
@@ -31,6 +34,50 @@ def hello() -> str:
     """hello world"""
     wx_user = get_platform_session_arg("wx_user")
     return "hello baby <a href='/wx/auth/info'>去授权</a><br><h2>{}</h2>".format(str(wx_user))
+
+
+#@check_platform_session # 调试注销
+def sms_func(key):
+    """
+    发送/校验短信
+    :return:
+    """
+    mes = {"message": "success"}
+    user = get_platform_session_arg("wx_user", None)
+    user = {"_id": ObjectId("5b56bdba7b3128ec21daa4c7")}  # 调试打开,正式注销
+    if user is None:
+        mes['message'] = "未登录"
+    else:
+        _id = user['_id']
+        phone = get_arg(request, "phone", "")
+        if key in ["get", "send"]:
+            """发送短信"""
+            if check_phone(phone):
+                mes = send_sms(phone)
+            else:
+                mes['message'] = "错误的手机号码"
+        elif key == "check":
+            """校验短信"""
+            code = get_arg(request, "code", "")
+            res = check_sms_code(phone, code)
+            if res:
+                """更新手机绑定信息"""
+                f = {"_id": _id}
+                u = {"$set": {"phone": phone}}
+                r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                if isinstance(r, dict):
+                    """成功"""
+                    session['wx_user'] = r
+                else:
+                    mes['message'] = "绑定手机失败"
+            else:
+                mes['message'] = "短信验证失败"
+        else:
+            mes['message'] = "未知的操作:{}".format(key)
+    ms = "sms_func 返回的消息:{}".format(mes)
+    logger.info(ms)
+    print(ms)
+    return json.dumps(mes)
 
 
 @check_platform_session
@@ -235,6 +282,8 @@ def common_view_func(html_name: str):
     file_names = os.listdir(template_dir)
     if html_name in file_names:
         kwargs = dict()  # 页面传参数
+        ver = uuid4().hex
+        kwargs['version'] = ver
         """
         传参数的步骤
         """
@@ -272,6 +321,8 @@ def common_view_func(html_name: str):
 
 """hello"""
 user_blueprint.add_url_rule(rule="/hello", view_func=hello, methods=['get', 'post'])
+"""短信的发送和验证  send/check"""
+user_blueprint.add_url_rule(rule="/sms/<key>", view_func=sms_func, methods=['get', 'post'])
 """保存或者获取文件(mongodb存储)"""
 user_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['post', 'get'])
 """通用页面视图"""

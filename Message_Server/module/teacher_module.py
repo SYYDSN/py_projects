@@ -39,7 +39,7 @@ class Deposit(mongo_db.BaseDoc):
         :param min_money: 最低额度.加金金额必须大于此额度.
         :return: 实际的加金额度.
         """
-        l = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000,  15000, 20000, 30000, 50000, 100000]
+        l = [10000,  15000, 20000, 30000, 50000, 100000]
         r = 0
         for x in l:
             if min_money * 2 <= x:
@@ -76,6 +76,9 @@ class Teacher(mongo_db.BaseDoc):
     type_dict['native'] = bool  # 是否是真实的teacher？
     type_dict['from_id'] = ObjectId  # 虚拟老师专有，发源老师id，保持不连，除非修改
     type_dict['direction'] = str  # 虚拟老师专有，跟的方向，有三种 follow/reverse/random
+    type_dict['win_ratio'] = float  # 胜率率, 每次close时候计算
+    type_dict['case_count'] = int  # 总单数, 每次close时候计算
+    type_dict['win_count'] = int  # 盈利的单数, 每次close时候计算
     type_dict['profit_ratio'] = float  # 盈利率, 每次close时候计算
     type_dict['profit_amount'] = float  # 盈利总额.每次close时候计算
     type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算

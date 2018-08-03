@@ -425,6 +425,8 @@ def send_template_message():
 
 if __name__ == "__main__":
     """获取jsapi_ticket"""
-    ticket = JSAPITicket.get_ticket()
-    JSAPITicket.get_signature("http://temp.safego.org/wx/")
+    # ticket = JSAPITicket.get_ticket()
+    # JSAPITicket.get_signature("http://temp.safego.org/wx/")
+    """获取全部的模板信息"""
+    get_templates()
     pass
