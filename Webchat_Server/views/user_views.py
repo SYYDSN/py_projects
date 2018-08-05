@@ -36,7 +36,7 @@ def hello() -> str:
     return "hello baby <a href='/wx/auth/info'>去授权</a><br><h2>{}</h2>".format(str(wx_user))
 
 
-#@check_platform_session # 调试注销
+@check_platform_session  # 调试注销
 def sms_func(key):
     """
     发送/校验短信
@@ -44,7 +44,8 @@ def sms_func(key):
     """
     mes = {"message": "success"}
     user = get_platform_session_arg("wx_user", None)
-    user = {"_id": ObjectId("5b56bdba7b3128ec21daa4c7")}  # 调试打开,正式注销
+    print("user: {}".format(user))
+    # user = {"_id": ObjectId("5b56bdba7b3128ec21daa4c7")}  # 调试打开,正式注销
     if user is None:
         mes['message'] = "未登录"
     else:
@@ -262,7 +263,7 @@ def wx_js_func():
     return resp
 
 
-# @check_platform_session
+@check_platform_session
 def wx_js_api_demo():
     """
     一个演示页面,用于测试wx的js-sdk接口的初始化工作(测试wx_js_func函数)
@@ -271,17 +272,51 @@ def wx_js_api_demo():
     return render_template("wx_js_api_demo.html")
 
 
-# @check_platform_session
+@check_platform_session
 def common_view_func(html_name: str):
     """
     通用页面视图
     param html_name:  html文件名,包含目录路径
     :return:
     """
+    user = get_platform_session_arg("wx_user", dict())
+    # user = {
+    #     "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
+    #     "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
+    #     "access_token": "12_ypF7a9ujmbnNYnbtZF8eyLyy23H9YmST6pMPYAuYefQizi4CrFOupAlLXKMe2dfRGa2Ezt0ApdHHTz-LdX8qtYVS8qTq2OQtnW5ZXtvUCGQ",
+    #     "city": "闵行",
+    #     "country": "中国",
+    #     "expires_in": 7200,
+    #     "groupid": 0,
+    #     "head_img_url": "http://thirdwx.qlogo.cn/mmopen/dUtvxcibjGMKAzSRePkx3ZGZnRMsDyzU6f8fNjxtrS2nXCcwMPQUbZM4YYfS1vhWoObUHQaErCDEjNrStKszkiaA/132",
+    #     "language": "zh_CN",
+    #     "nick_name": "徐立杰",
+    #     "province": "上海",
+    #     "qr_scene": 0,
+    #     "qr_scene_str": "",
+    #     "refresh_token": "12_7h-zJ5RYfKWjYp7AQOiIe7VdFaZxw7gPFe3xxVVx4eEGdtuaYYK4st9HgSADdvJo_QpSLkF2JLP4Royzd_NfLde291LetISRV32TjtRweMQ",
+    #     "remark": "",
+    #     "scope": "snsapi_userinfo",
+    #     "sex": 1,
+    #     "subscribe": 1,
+    #     "subscribe_scene": "ADD_SCENE_SEARCH",
+    #     "tagid_list": [],
+    #     "relate_img": "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQF78DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyQm9HVjAxNG5jaGwxMDAwME0wN2QAAgQmRFhbAwQAAAAA",
+    #     "phone": "15618317376",
+    #     "resume_id": ObjectId("5b5a96d9bede684e68049f01")
+    # }
+
+    print("user: {}".format(user))
     template_dir = os.path.join(__project_dir__, 'templates', 'wx')
     file_names = os.listdir(template_dir)
     if html_name in file_names:
         kwargs = dict()  # 页面传参数
+        kwargs['user'] = user
+        user_follow = [str(x) for x in user.get("follow", list())]
+        kwargs['follow'] = user_follow
+        print("user_id is {}".format(user['_id']))
+        print(user)
+        print("follow is {}".format(user_follow))
         ver = uuid4().hex
         kwargs['version'] = ver
         """
@@ -290,11 +325,21 @@ def common_view_func(html_name: str):
         if html_name == "index.html":
             """战绩榜单"""
             data = Teacher.index()
-            kwargs['data'] = data
+            win = data.copy()
+            profit = data.copy()
+            win.sort(key=lambda obj: obj['win_ratio'], reverse=True)
+            profit.sort(key=lambda obj: obj['profit_ratio'], reverse=True)
+            kwargs['win'] = win
+            kwargs['profit'] = profit
         elif html_name == "currentCrunchy.html":
             """当前老师页面"""
             t_id = get_arg(request, "t_id", "")
             if isinstance(t_id, str) and len(t_id) == 24:
+                view = WXUser.hold_level(user_id=user['_id'], t_id=t_id)
+                if view['message'] == "success":
+                    view_level = view['level']
+                else:
+                    view_level = -1
                 info = Teacher.find_by_id(o_id=t_id, to_dict=True, can_json=True)
                 if info.get("head_img") is None or info.get("head_img") == "":
                     info['head_img'] = "/static/images/head_image/t3.jpg"
@@ -306,14 +351,53 @@ def common_view_func(html_name: str):
                 kwargs['history'] = history
                 kwargs['hold'] = hold
                 kwargs['info'] = info
+                kwargs['t_id'] = t_id
+                kwargs['view_level'] = view_level
+                kwargs['profit_ratio'] = data['profit_ratio']
             else:
-                return abort(404)
+                return abort(403)
+        elif html_name == "user.html":
+            """用户个人页面"""
+            pass
         else:
             pass
         html_name = "wx/{}".format(html_name)
         return render_template(html_name, **kwargs)
     else:
         return abort(404)
+
+
+@check_platform_session
+def follow_teacher():
+    """
+    跟随和反跟随老师
+    :return:
+    """
+    user = get_platform_session_arg("wx_user", dict())
+    mes = {"message": "未知的错误"}
+    the_type = get_arg(request, "type", "")
+    if the_type == "follow":
+        """跟随老师"""
+        t_id = get_arg(request, 't_id', "")
+        if isinstance(t_id, str) and len(t_id) == 24:
+            mes = WXUser.follow(user_id=user['_id'], t_id=t_id)
+        else:
+            ms = "错误的t_id: {}".format(t_id)
+            logger.exception(msg=ms)
+            mes['message'] = ms
+    elif the_type == "un_follow":
+        """反跟随老师"""
+        mes = WXUser.un_follow(user_id=user['_id'])
+    else:
+        ms = "未知的操作：{}".format(the_type)
+        logger.exception(msg=ms)
+        mes['message'] = ms
+    if mes['message'] == "success":
+        user = WXUser.find_by_id(o_id=user['_id'], to_dict=True)
+        session["wx_user"] = user  # 写入会话
+    else:
+        pass
+    return json.dumps(mes)
 
 
 """集中注册函数"""
@@ -339,3 +423,5 @@ user_blueprint.add_url_rule(rule="/draw_user_info", view_func=draw_user_info, me
 user_blueprint.add_url_rule(rule="/js_sdk_init", view_func=wx_js_func, methods=['post', 'get'])
 """JS-SDK初始化用脚本的演示页面"""
 user_blueprint.add_url_rule(rule="/js_sdk_init_demo", view_func=wx_js_api_demo, methods=['get'])
+"""跟随和反跟随老师"""
+user_blueprint.add_url_rule(rule="/follow_teacher", view_func=follow_teacher, methods=['get', 'post'])

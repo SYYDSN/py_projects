@@ -419,8 +419,132 @@ def get_templates() -> list:
         data
 
 
-def send_template_message():
-    pass
+def score_change_message(open_id: str, nick_name: str, change_num: int, score_amount: int) -> bool:
+    """
+    发送积分变动模板消息
+    :param open_id:
+    :param nick_name:
+    :param change_num: 增加/减少的积分数
+    :param score_amount:  剩余的积分总额
+    :return:
+    """
+    u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
+    args = {
+        "touser": open_id,
+        "template_id": "9AFXOFvi4B5cANxuTuSoDYAVjNzCOAvqLdrZYdl_2Ds",
+        "url": "http://wx.91master.cn/user/html/index.html",
+        "data": {
+            "first": {
+                "value": "你的积分发生变动",
+                "color": "grey",
+            },
+            "FieldName": {
+                "value": "尊敬的用户",
+                "color": "grey",
+            },
+            "Account": {
+                "value": nick_name,
+                "color": "lightgrey",
+            },
+            "change": {
+                "value": "变动",
+                "color": "red",
+            },
+            "CreditChange": {
+                "value": change_num,
+                "color": "red",
+            },
+            "CreditTotal": {
+                "value": score_amount,
+                "color": "#173177"
+            },
+            "remark": {
+                "value": "点击“详情”查看完整信息",
+                "color": "#173177"
+            }
+        }
+    }
+    r = requests.post(u, data=json.dumps(args))
+    status = r.status_code
+    if status != 200:
+        ms = "服务器返回了错误的状态码：{}".format(status)
+        logger.exception(msg=ms)
+        print(ms)
+        return False
+    else:
+        resp = r.json()
+        error_code = resp['errcode']
+        if error_code != 0:
+            ms = "服务器返回了错误的消息：{}, code: {}".format(resp['errmsg'], error_code)
+            logger.exception(msg=ms)
+            print(ms)
+            return False
+        else:
+            return True
+
+
+def new_order_message(open_id: str, nick_name: str, change_num: int, score_amount: int) -> bool:
+    """
+    新订单模板消息
+    :param open_id:
+    :param nick_name:
+    :param change_num: 增加/减少的积分数
+    :param score_amount:  剩余的积分总额
+    :return:
+    """
+    u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
+    args = {
+        "touser": open_id,
+        "template_id": "9AFXOFvi4B5cANxuTuSoDYAVjNzCOAvqLdrZYdl_2Ds",
+        "url": "http://wx.91master.cn/user/html/index.html",
+        "data": {
+            "first": {
+                "value": "你的积分发生变动",
+                "color": "grey",
+            },
+            "FieldName": {
+                "value": "尊敬的用户",
+                "color": "grey",
+            },
+            "Account": {
+                "value": nick_name,
+                "color": "lightgrey",
+            },
+            "change": {
+                "value": "变动",
+                "color": "red",
+            },
+            "CreditChange": {
+                "value": change_num,
+                "color": "red",
+            },
+            "CreditTotal": {
+                "value": score_amount,
+                "color": "#173177"
+            },
+            "remark": {
+                "value": "点击“详情”查看完整信息",
+                "color": "#173177"
+            }
+        }
+    }
+    r = requests.post(u, data=json.dumps(args))
+    status = r.status_code
+    if status != 200:
+        ms = "服务器返回了错误的状态码：{}".format(status)
+        logger.exception(msg=ms)
+        print(ms)
+        return False
+    else:
+        resp = r.json()
+        error_code = resp['errcode']
+        if error_code != 0:
+            ms = "服务器返回了错误的消息：{}, code: {}".format(resp['errmsg'], error_code)
+            logger.exception(msg=ms)
+            print(ms)
+            return False
+        else:
+            return True
 
 
 if __name__ == "__main__":
@@ -428,5 +552,8 @@ if __name__ == "__main__":
     # ticket = JSAPITicket.get_ticket()
     # JSAPITicket.get_signature("http://temp.safego.org/wx/")
     """获取全部的模板信息"""
-    get_templates()
+    # get_templates()
+    """发送积分变动消息"""
+    o = "oTM13007rYSmNGXQyeNxzLQuksU4"
+    score_change_message(o, "徐立杰", 100, 800)
     pass

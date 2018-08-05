@@ -12,8 +12,9 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<title>战绩榜单</title>
 		<link rel="stylesheet" type="text/css" href="/static/css/index.css" />
-        <link rel="stylesheet" href="/static/css/currentCrunchy.css">
+        <link rel="stylesheet" href="/static/css/currentCrunchy.css?v={{ version }}">
 		<script type="text/javascript" src="/static/js/common.js"></script>
+        <script src="/static/js/tools.js"></script>
 		<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
         <script src="/static/js/echarts.min.js"></script>
 	</head>
@@ -31,24 +32,74 @@
                         <span>{{ info.name }}</span>#  {{ info.feature if info.feature else '机会准 持单短' }}
                     </p>
                     <p class="num">
-                        <span>2.11%</span>近60天收益率
+                        <span>{{ profit_ratio }}%</span>累计收益率
                     </p>
                 </div>
             </div>
             <ul class="crunchy-tabList">
-                <li><a href="index.html">数据统计</a></li>
-                <li class="on"><a href="/user/html/currentCrunchy.html">当前交易</a></li>
-                <li><a href="/user/html/currentCrunchy.html">历史交易</a></li>
+                <li class="on chart_li"><a href="javascript:;">数据统计</a></li>
+                <li class="hold_li"><a href="javascript:;">当前持仓</a></li>
+                <li class="history_li"><a href="javascript:;">历史交易</a></li>
 
 
             </ul>
             <div class="crunchy-InfoText">
-                <div class="chart_wrap">
+            {{ view_level }}
+                <div class="wrap chart_wrap">
                     <!--胜率统计图-->
 
                 </div>
-                <div class="crunchy-wrap">
+                <div class="wrap hold_wrap">
+                    <!--当前持仓-->
+                    {% if view_level == 1 %}
+                        <ul class="currentCrunchy">
+                        {% for x in hold %}
+                            <li>
+                                <div class="textList">
+                                    <p>{{ x.direction + x.product }}</p>
+                                </div>
+                                <div class="priceText">
+                                    <p>{{ x.enter_price }}</p>开仓价
+                                </div>
+                                <div class="priceText">
+                                    <p>{{ x.hold_hour }}小时</p>持仓时间
+                                </div>
+                                <div class="earnings">
+                                    <p class="color12cb1b">持仓中</p>状态
+                                </div>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% elif view_level == 0 %}
+                        <h3 class="hold_tips">{{ hold | length }}个持仓</h3>
+                    {% else %}
+                        <h3>
+                            绑定手机号码成为我们的会员后方能查看老师跟单。<a class="bind_a" href="/user/html/bind_phone.html">现在就去绑定手机</a>
+                        </h3>
+
+                    {% endif %}
+
+                </div>
+                <div class="wrap crunchy-wrap">
+                    <!--历史记录-->
                     <ul class="currentCrunchy">
+                        {% for x in history %}
+                            <li>
+                                <div class="textList">
+                                    <p>{{ x.direction + x.product }}</p>
+                                </div>
+                                <div class="priceText">
+                                    <p>{{ x.enter_price }}</p>开仓价
+                                </div>
+                                <div class="priceText">
+                                    <p>{{ x.exit_price }}</p>收盘价
+                                </div>
+                                <div class="earnings">
+                                    <p class="color12cb1b">${{ x.each_profit }}</p>收益
+                                </div>
+                            </li>
+                        {% endfor %}
+                        <!--
                         <li>
                             <div class="textList">
                                 <p>卖出黄金</p>持仓3小时
@@ -167,10 +218,11 @@
                             <p>$71.50</p>收益
                         </div>
                     </li>
+                        -->
                     </ul>
                 </div>
                 <div class="crunchy-btn">
-                    <button type="button" class="button-link" onclick="location.href='standings.html'">跟踪高手</button>
+                    <button type="button" id="follow_btn" data-follow="{{ follow }}" class="button-link">跟踪高手</button>
                 </div>
             </div>
         </div>
@@ -185,62 +237,6 @@
         </div>
     </div>
     </body>
-
-<script>
-    $(function(){
-        chart = {{ chart | safe }};
-        console.log(chart);
-
-        // 生成一个线图
-        line = function($obj, data){
-            // $obj warp容器
-            // data数据
-            var x = [];
-            var y = [];
-            var d = data['data'];
-            var l = d.length;
-            var p_name = data['product'];
-            var count = 0;
-            var sub = [];
-            for(var i=0; i<l; i++){
-                var temp = d[i];
-                count += temp['all_count'];
-                x.push(temp['week']);
-                y.push(temp['win_per']);
-                if(i == 0 || i == (l - 1)){
-                    sub.push(temp['week']);
-                }
-            }
-            sub.reverse();
-            var option = {
-                title:{
-                    text: p_name,
-                    subtext: `${sub.join("-")} 共计 ${count}单`
-                },
-                xAxis: {
-                    type: 'category',
-                    data: x
-                },
-                yAxis: {
-                    type: 'value'
-                },
-                series: [{
-                    data: y,
-                    type: 'line'
-                }]
-            };
-            var chart_div = $("<div class='chart_div'></div>");
-            $obj.append(chart_div);
-            let charts = echarts.init(chart_div[0]);
-            charts.setOption(option);
-        };
-        for(var x of chart){
-            line($(".chart_wrap"), x);
-        }
-
-
-
-    // end!
-    });
-</script>
+<script>chart = {{ chart | safe }}; user_follow = {{ follow | safe }};</script>
+<script src="/static/js/currentCrunchy.js?v={{ version }}"></script>
 </html>

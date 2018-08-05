@@ -155,6 +155,17 @@ class Score(mongo_db.BaseDoc):
         return cls(**kwargs)
 
     @classmethod
+    def add_num(cls, u_id: (str, ObjectId), num: int) -> bool:
+        """
+        加分 未完成
+        :param u_id:
+        :param num:
+        :return:
+        """
+        user = WXUser.find_by_id(o_id=u_id, to_dict=True)
+
+
+    @classmethod
     def re_calculate(cls, u_id: (str, ObjectId) = None, u_dict: dict = None) -> int:
         """
         重新计算用户积分并写入记录。会逐一检查用户的积分记录,重新初始化用户积分的时候使用
@@ -186,14 +197,14 @@ class Score(mongo_db.BaseDoc):
                 else:
                     score += x['num']
             now = datetime.datetime.now()
-            if init:
+            if not init:
                 temp = {
                     "type": "init", "num": 0, "user_id": user_id,
                     "desc": "用户初始化", "time": now
                 }
                 inserts.append(temp)
-            if bind_phone:
-                score += 1
+            if not bind_phone:
+                score += 1000
                 temp = {
                     "type": "bind_phone", "num": 100, "user_id": user_id,
                     "desc": "绑定手机", "time": now
@@ -405,33 +416,57 @@ class WXUser(mongo_db.BaseDoc):
             第一 -500, 第二 -300, 第三-200, 第四第五-100， >6 -50
             """
             num_dict = {0: -500, 1: -300, 2: -200, 3: -100, 4: -100}
-            for i, x in enumerate(TeacherRank.get_rank(cur_time=now)):
-                t_id = x['t_id']
-                if f_id == t_id:
-                    num = num_dict.get(i, -50)
-                    if score >= abs(num):
-                        score += num
+            ses = mongo_db.get_conn(table_name="teacher")
+            f = dict()
+            s = [("win_ratio", -1)]
+            p = ['_id', "win_ratio"]
+            rank = ses.find(filter=f, sort=s, projection=p)
+            rank = {x['_id']: {"index": i + 1, "num": num_dict.get(i, -50)} for i, x in enumerate(rank)}
+            x = rank[f_id]
+            num = x['num']
+            i = x['index']
+            if score >= abs(num):
+                score += num
+                temp = {
+                    "type": "follow", "num": num, "user_id": user_id,
+                    "desc": "跟随老师 {}, 排名: {}".format(t_id, i),
+                    "time": now
+                }
+                """事务,开始添加扣分记录和更新用户积分"""
+                client = mongo_db.get_client()
+                t1 = client[mongo_db.db_name][Score.get_table_name()]
+                t2 = client[mongo_db.db_name][WXUser.get_table_name()]
+                t3 = client[mongo_db.db_name][FollowRecord.get_table_name()]
+                with client.start_session(causal_consistency=True) as ses:
+                    with ses.start_transaction():
+                        t1.insert_one(document=temp, session=ses)
+                        f = {"_id": user_id}
+                        u = {"$set": {"score": score, "follow": [f_id]}}
+                        t2.find_one_and_update(filter=f, update=u, upsert=False, session=ses)
+                        """
+                        检查用户以前是否有跟踪老师？
+                        检查的方式是：检查用户的follow记录。如果有，更新再新建。没有，新建。
+                        """
+                        follow = user.get("follow", dict())
+                        if len(follow) == 0:
+                            """没有跟随过老师"""
+                            pass
+                        else:
+                            """有跟随过老师，需要先终结以前的跟随关系。"""
+                            f2 = {"user_id": user_id, "t_id": f_id}
+                            u2 = {"$set": {"end": now}}
+                            t3.find_one_and_update(filter=f2, update=u2, upsert=False, session=ses)
+                        """添加一条跟随老师的记录"""
                         temp = {
-                            "type": "follow", "num": num, "user_id": user_id,
-                            "desc": "跟随老师 {}, 排名: {}".format(t_id, i + 1),
-                            "time": now
+                            "_id": ObjectId(),
+                            "user_id": user_id,
+                            "t_id": f_id,
+                            "begin": now
                         }
-                        """事务,开始添加扣分记录和更新用户积分"""
-                        client = mongo_db.get_client()
-                        t1 = client[mongo_db.db_name][cls.get_table_name()]
-                        t2 = client[mongo_db.db_name][WXUser.get_table_name()]
-                        with client.start_session(causal_consistency=True) as ses:
-                            with ses.start_transaction():
-                                t1.insert_one(document=temp, session=ses)
-                                f = {"_id": user_id}
-                                u = {"$set": {"score": score}, "follow": [f_id]}
-                                t2.find_one_and_update(filter=f, update=u, upsert=False, session=ses)
-                                res['message'] = "success"
-                        break
-                    else:
-                        res['message'] = "积分不足"
-                else:
-                    pass
+                        t3.insert_one(document=temp, session=ses)
+                        res['message'] = "success"
+            else:
+                res['message'] = "积分不足"
             return res
         else:
             ms = "错误的user_id: {}".format(user_id)
@@ -448,7 +483,7 @@ class WXUser(mongo_db.BaseDoc):
         return Score.re_calculate(u_id=user_id)
 
     @classmethod
-    def hold_level(cls, user_id: (str, ObjectId), t_id: (str, ObjectId)) -> dict:
+    def hold_level(cls, user_id: (str, ObjectId), t_id: (str, ObjectId) = None) -> dict:
         """
         计算某个用户查看指定老师持仓的级别。返回int。
         1. -1 无法查看， 一般是未绑定手机的用户
@@ -461,16 +496,22 @@ class WXUser(mongo_db.BaseDoc):
         mes = {"message": "未知的错误", "level": -1}
         user = cls.find_by_id(o_id=user_id, to_dict=True)
         if isinstance(user, dict):
-            follow = user.get("follow", list())
-            if len(follow) == 0:
+            phone = user['phone']
+            mes['message'] = "success"
+            if isinstance(phone, str) and len(phone) == 11:
                 mes['level'] = 0
-            else:
-                f_id = follow[0]
-                t_id = ObjectId(t_id)if isinstance(t_id, str) and len(t_id) == 24 else t_id
-                if f_id == t_id:
-                    mes['level'] = 1
-                else:
+                follow = user.get("follow", list())
+                if len(follow) == 0:
                     pass
+                else:
+                    f_id = follow[0]
+                    t_id = ObjectId(t_id)if isinstance(t_id, str) and len(t_id) == 24 else t_id
+                    if f_id == t_id:
+                        mes['level'] = 1
+                    else:
+                        pass
+            else:
+                mes['level'] = -1
         else:
             ms = "错误的user_id: {}".format(user_id)
             mes['message'] = ms
@@ -479,6 +520,21 @@ class WXUser(mongo_db.BaseDoc):
         return mes
 
 
+class FollowRecord(mongo_db.BaseDoc):
+    """
+    用户跟踪老师的记录
+    """
+    _table_name = "follow_record"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['user_id'] = ObjectId
+    type_dict['t_id'] = ObjectId
+    type_dict['begin'] = datetime.datetime
+    type_dict['end'] = datetime.datetime
+
+
+
 if __name__ == "__main__":
-    Score.every_week_mon_check()
+    # Score.every_week_mon_check()
+    WXUser.follow(ObjectId("5b57a770f313841fc0effef7"), "5b65f2d9dbea625d78469f1b")
     pass

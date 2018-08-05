@@ -129,6 +129,48 @@ def draw_data_dict_from_db_mix(begin: datetime.datetime = None, end: datetime.da
     return records
 
 
+def draw_data_dict_from_db_mix2(t_id: (str, ObjectId), begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
+    """
+    不细分产品种类，从数据库trade获取分析师的喊单信号。
+    :param t_id:
+    :param begin: 开始时间
+    :param end:  截至时间
+    :return:
+    """
+    records = dict()
+    now = datetime.datetime.now()
+    f = {
+        "teacher_id": ObjectId(t_id) if isinstance(t_id, str) else t_id,
+        "each_profit": {"$exists": True, "$ne": None},
+        "exit_price": {"$exists": True, "$ne": None},
+        "exit_time": {"$exists": True, "$type": 9}
+    }
+    if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
+        if end <= begin:
+            pass
+        else:
+            f['exit_time'] = {
+                "$exists": True, "$type": 9,
+                "$lte": end, "$gte": begin
+            }
+    elif isinstance(begin, datetime.datetime) and end is None:
+        f['exit_time'] = {
+            "$exists": True, "$type": 9,
+            "$lte": now, "$gte": begin
+        }
+    elif isinstance(end, datetime.datetime) and begin is None:
+        f['exit_time'] = {"$exists": True, "$type": 9, "$lte": end}
+    else:
+        pass
+
+    ses = mongo_db.get_conn("trade")
+    s = [('exit_time', -1)]
+    signals = ses.find(filter=f, sort=s)
+    signals = [x for x in signals]
+    print("共计{}条记录".format(len(signals)))
+    return signals
+
+
 def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetime = None, end: datetime.datetime = None) -> list:
     """
     从数据库获取分析师的(已经close)喊单信号。返回数据的list对象
@@ -138,7 +180,7 @@ def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
     :return:
     """
     table_name = "trade"
-    table_name = "signal_info"
+    # table_name = "signal_info"
     records = list()
     now = datetime.datetime.now()
     if isinstance(t_id, ObjectId) or (isinstance(t_id, str) and len(t_id) == 24):
@@ -154,7 +196,7 @@ def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
                 "teacher_id": ObjectId(t_id) if isinstance(t_id, str) else t_id,
                 "each_profit": {"$exists": True, "$ne": None},
                 "exit_price": {"$exists": True, "$ne": None},
-                "close_time": {"$exists": True, "$type": 9}
+                "exit_time": {"$exists": True, "$type": 9}
             }
     else:
         if table_name == "signal_info":
@@ -167,7 +209,7 @@ def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
             f = {
                 "each_profit": {"$exists": True, "$ne": None},
                 "exit_price": {"$exists": True, "$ne": None},
-                "close_time": {"$exists": True, "$type": 9}
+                "exit_time": {"$exists": True, "$type": 9}
             }
     if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
         if end <= begin:
@@ -179,7 +221,7 @@ def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
                     "$lte": end, "$gte": begin
                 }
             else:
-                f['enter_price'] = {
+                f['enter_time'] = {
                     "$exists": True, "$type": 9,
                     "$lte": end, "$gte": begin
                 }
@@ -190,7 +232,7 @@ def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
                 "$lte": now, "$gte": begin
             }
         else:
-            f['enter_price'] = {
+            f['enter_time'] = {
                 "$exists": True, "$type": 9,
                 "$lte": now, "$gte": begin
             }
@@ -198,7 +240,7 @@ def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
         if table_name == "signal_info":
             f['datetime'] = {"$exists": True, "$type": 9, "$lte": end}
         else:
-            f['enter_price'] = {"$exists": True, "$type": 9, "$lte": end}
+            f['enter_time'] = {"$exists": True, "$type": 9, "$lte": end}
     else:
         pass
 
@@ -206,7 +248,7 @@ def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
     if table_name == "signal_info":
         s = [("update_time", -1)]
     else:
-        s = [("close_time", -1)]
+        s = [("exit_time", -1)]
     signals = ses.find(filter=f, sort=s)
     if signals.count() > 0:
         signals = [x for x in signals if x.get("product") in p_list]
@@ -220,18 +262,21 @@ def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
             if table_name == "signal_info":
                 enter_time = signal['datetime']
             else:
-                enter_time = signal['create_time']
+                enter_time = signal['enter_time']
             if table_name == "signal_info":
                 exit_time = signal['update_time']
             else:
-                exit_time = signal['close_time']
+                exit_time = signal['exit_time']
             win = 1 if each_profit >= 0 else 0
             temp = dict()
             temp['teacher'] = teacher
             temp['product'] = product
-            temp['each_profit'] = each_profit  # 每手实际盈利
-            temp['enter_date'] = enter_time.strftime("%F")  # 进场日
-            temp['exit_date'] = exit_time.strftime("%F")  # 出场日
+            temp['direction'] = signal['direction']
+            temp['enter_price'] = signal['enter_price']
+            temp['exit_price'] = signal['exit_price']
+            temp['each_profit'] = round(each_profit, 1)  # 每手实际盈利
+            temp['enter_time'] = enter_time.strftime("%F")  # 进场日
+            temp['exit_time'] = exit_time.strftime("%F")  # 出场日
             temp['timestamp'] = exit_time.timestamp()  # 出场日的timestamp对象，用于排序
             week_list = exit_time.isocalendar()
             temp['week'] = "{}年{}周".format(week_list[0], week_list[1])
@@ -252,7 +297,7 @@ def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
     :return:
     """
     table_name = "trade"
-    table_name = "signal_info"
+    # table_name = "signal_info"
     records = list()
     now = datetime.datetime.now()
     if isinstance(t_id, ObjectId) or (isinstance(t_id, str) and len(t_id) == 24):
@@ -265,8 +310,7 @@ def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
         else:
             f = {
                 "teacher_id": ObjectId(t_id) if isinstance(t_id, str) else t_id,
-                "exit_price": {"$exists": False},
-                "close_time": {"$exists": False}
+                "exit_price": {"$exists": False}
             }
     else:
         if table_name == "signal_info":
@@ -275,8 +319,7 @@ def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
             }
         else:
             f = {
-                "exit_price": {"$exists": False},
-                "close_time": {"$exists": False}
+                "exit_price": {"$exists": False}
             }
     if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
         if end <= begin:
@@ -288,7 +331,7 @@ def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
                     "$lte": end, "$gte": begin
                 }
             else:
-                f['enter_price'] = {
+                f['enter_time'] = {
                     "$exists": True, "$type": 9,
                     "$lte": end, "$gte": begin
                 }
@@ -299,7 +342,7 @@ def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
                 "$lte": now, "$gte": begin
             }
         else:
-            f['enter_price'] = {
+            f['enter_time'] = {
                 "$exists": True, "$type": 9,
                 "$lte": now, "$gte": begin
             }
@@ -307,7 +350,7 @@ def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
         if table_name == "signal_info":
             f['datetime'] = {"$exists": True, "$type": 9, "$lte": end}
         else:
-            f['enter_price'] = {"$exists": True, "$type": 9, "$lte": end}
+            f['enter_time'] = {"$exists": True, "$type": 9, "$lte": end}
     else:
         pass
 
@@ -329,17 +372,20 @@ def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
             if table_name == "signal_info":
                 enter_time = signal['datetime']
             else:
-                enter_time = signal['create_time']
+                enter_time = signal['enter_time']
             if table_name == "signal_info":
-                exit_time = signal['update_time']
+                exit_time = signal.get('update_time')
             else:
-                exit_time = signal['close_time']
+                exit_time = signal['exit_time']
             win = 1 if each_profit >= 0 else 0
             temp = dict()
             temp['teacher'] = teacher
             temp['product'] = product
+            temp['direction'] = signal['direction']
             temp['each_profit'] = each_profit  # 每手实际盈利
-            temp['enter_date'] = enter_time.strftime("%F")  # 进场日
+            temp['enter_time'] = enter_time.strftime("%F")  # 进场日
+            temp['hold_hour'] = round((now - enter_time).total_seconds() / 3600, 0)  # 持仓时间
+            temp['enter_price'] = signal['enter_price']
             temp['exit_date'] = exit_time.strftime("%F")  # 出场日
             temp['timestamp'] = exit_time.timestamp()  # 出场日的timestamp对象，用于排序
             week_list = exit_time.isocalendar()
@@ -416,6 +462,39 @@ def calculate_win_per_by_teacher_mix(begin: str = None, end: str = None) -> dict
         t_dict["win"] = p_win_per
         t_dict['count'] = p_count
         res[t_id] = t_dict
+    return res
+
+
+def calculate_win_per_by_teacher_mix(t_id: (str, ObjectId), begin: str = None, end: str = None) -> dict:
+    """
+    计算老师的胜率和应利率,不再细分每个产品的胜率，而是统一计算
+    :param t_id:
+    :param begin: 开始时间
+    :param end:  截至时间
+    :return:
+    """
+    if end is None:
+        end = datetime.datetime.now()
+    else:
+        end = mongo_db.get_datetime_from_str(end)
+    if begin is None:
+        begin = end - datetime.timedelta(days=30)
+    else:
+        begin = mongo_db.get_datetime_from_str(begin)
+
+    raw = draw_data_dict_from_db_mix2(t_id, begin, end)
+    res = dict()
+    p_win_count = 0
+    p_count = len(raw)
+    for x in raw:
+        if x['each_profit'] >= 0:
+            p_win_count += 1
+        else:
+            pass
+    p_win_per = p_win_count / p_count
+    p_win_per = round(p_win_per * 100, 1)
+    res['t_id'] = t_id
+    res['win_ratio'] = p_win_per
     return res
 
 
@@ -583,6 +662,64 @@ def calculate_win_per_by_week_single(t_id: (str, ObjectId) = None, begin: str = 
         temp['data'] = d
         r.append(temp)
     r.sort(key=lambda obj: len(obj['data']), reverse=True)
+    data = {"chart": r, "history": raw[0: 20], "hold": hold[0: 10]}
+    return data
+
+
+def calculate_win_per_by_week_single2(t_id: (str, ObjectId) = None, begin: str = None, end: str = None) -> dict:
+    """
+    以时间（周）切分，查询单个老师的， 以产品分类计算的胜率
+    和calculate_win_per_by_week_single函数不同，这个是指向trade表的
+    :param t_id:
+    :param begin: 开始时间
+    :param end:  截至时间
+    :return:
+    """
+    begin = mongo_db.get_datetime_from_str(begin)
+    end = mongo_db.get_datetime_from_str(end)
+    raw = draw_data_list_from_db(t_id, begin, end)
+    hold = draw_hold_list_from_db(t_id, begin, end)
+    res = dict()
+    for record in raw:
+        p_name = record['product']
+        t_id = record['teacher']
+
+        p_dict = res.get(p_name)
+        p_dict = dict() if p_dict is None else p_dict
+        # t_dict = p_dict.get(t_id)
+        # t_dict = dict() if t_dict is None else t_dict
+        week = record['week']
+        # w_dict = dict() if t_dict.get(week) is None else t_dict[week]
+        w_dict = dict() if p_dict.get(week) is None else p_dict[week]
+
+        win_count = 0 if w_dict.get("win_count") is None else w_dict['win_count']
+        all_count = 0 if w_dict.get("all_count") is None else w_dict['all_count']
+        all_count += 1
+        if record['win'] == 1:
+            win_count += 1
+        else:
+            pass
+        w_dict['win_count'] = win_count
+        w_dict['all_count'] = all_count
+        w_dict['timestamp'] = record['timestamp']
+        # t_dict[week] = w_dict
+        p_dict[week] = w_dict
+        # p_dict[t_id] = t_dict
+        res[p_name] = p_dict
+    r = list()
+    for k, v in res.items():
+        temp = dict()
+        temp['_t_id'] = str(t_id)
+        temp['product'] = k
+        d = [{
+            "week": k, "all_count": v['all_count'],
+            "win_count": v['win_count'], "timestamp": v['timestamp'],
+            "win_per": 0 if v['all_count'] == 0 else round((v['win_count'] / v['all_count']) * 100, 1)
+            } for k, v in v.items()]
+        d.sort(key=lambda obj: obj['timestamp'], reverse=True)
+        temp['data'] = d
+        r.append(temp)
+    r.sort(key=lambda obj: len(obj['data']), reverse=True)
     data = {"chart": r, "history": raw, "hold": hold}
     return data
 
@@ -617,6 +754,6 @@ if __name__ == "__main__":
     # calculate_win_per_by_product()
     # calculate_win_per_by_teacher()
     # calculate_win_per_by_teacher_mix()
-    calculate_win_per_by_week_single(ObjectId("5aab3ea4340c1749505a2819"))
+    calculate_win_per_by_week_single(ObjectId("5a1e680642f8c1bffc5dbd69"))
     pass
 

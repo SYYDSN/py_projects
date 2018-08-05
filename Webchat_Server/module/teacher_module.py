@@ -146,7 +146,8 @@ class Teacher(mongo_db.BaseDoc):
         :return:
         """
         """默认查询近30天的胜率数据"""
-        data = calculate_win_per_by_teacher_mix(begin=begin, end=end)
+        data = cls.find_plus(filter_dict=dict(), to_dict=True)
+        data = {x["_id"]: x for x in data}
         """查询老师的跟随人数"""
         d = cls.follow_count()
         res = list()
@@ -155,7 +156,6 @@ class Teacher(mongo_db.BaseDoc):
             temp.update(d.get(t_id))
             temp['_id'] = t_id
             res.append(temp)
-        res.sort(key=lambda obj: obj['win'], reverse=True)
         return res
 
     @classmethod
@@ -176,9 +176,12 @@ class Teacher(mongo_db.BaseDoc):
         if begin is None:
             begin = now - datetime.timedelta(days=60)
         data = calculate_win_per_by_week_single(t_id=t_id, begin=begin, end=end)
+        t = Teacher.find_by_id(o_id=t_id, can_json=True)
+        data.update(t)
         return data
 
 
 if __name__ == "__main__":
-    Teacher.index()
+    # Teacher.index()
+    Teacher.single_info(t_id=ObjectId("5b65f2d9dbea625d78469f1b"))
     pass

@@ -108,7 +108,7 @@ class Teacher(mongo_db.BaseDoc):
         ns = os.listdir(p)
         res = list()
         for name in ns:
-            u = os.path.join(p, name)
+            u = os.path.join("/static/images/head_image", name)
             res.append(u)
         key = "t_head_img"
         simple_cache.set(key=key, value=res, timeout=900)
