@@ -26,13 +26,13 @@
 					<a href=""><img src="/static/images/icon2.png" /></a>
 				</p>
 				<div class="topUserlist">
-					<p class="p-head"><img src="/static/images/img1.png" /><span>{{ user.openid }}</span></p>
+					<p class="p-head"><img src="{{ user.head_img_url if user.head_img_url else '/static/images/img1.png' }}" /><span>{{ user.nick_name }}</span></p>
 					<ul class="integral-list">
 						<li>
-							<p>2000.00积分</p>资产总额
+							<p>积分</p>资产总额
 						</li>
 						<li>
-							<p>00积分</p>零钱包 >
+							<p>{{ user.score if user.score else 0 }}积分</p>零钱包
 						</li>
 					</ul>
 					<div class="applyFor-btn">

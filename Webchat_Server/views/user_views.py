@@ -375,28 +375,32 @@ def follow_teacher():
     """
     user = get_platform_session_arg("wx_user", dict())
     mes = {"message": "未知的错误"}
-    the_type = get_arg(request, "type", "")
-    if the_type == "follow":
-        """跟随老师"""
-        t_id = get_arg(request, 't_id', "")
-        if isinstance(t_id, str) and len(t_id) == 24:
-            mes = WXUser.follow(user_id=user['_id'], t_id=t_id)
+    phone = user.get("phone")
+    if phone is None:
+        mes['message'] = "请先绑定手机号码"
+    else:
+        the_type = get_arg(request, "type", "")
+        if the_type == "follow":
+            """跟随老师"""
+            t_id = get_arg(request, 't_id', "")
+            if isinstance(t_id, str) and len(t_id) == 24:
+                mes = WXUser.follow(user_id=user['_id'], t_id=t_id)
+            else:
+                ms = "错误的t_id: {}".format(t_id)
+                logger.exception(msg=ms)
+                mes['message'] = ms
+        elif the_type == "un_follow":
+            """反跟随老师"""
+            mes = WXUser.un_follow(user_id=user['_id'])
         else:
-            ms = "错误的t_id: {}".format(t_id)
+            ms = "未知的操作：{}".format(the_type)
             logger.exception(msg=ms)
             mes['message'] = ms
-    elif the_type == "un_follow":
-        """反跟随老师"""
-        mes = WXUser.un_follow(user_id=user['_id'])
-    else:
-        ms = "未知的操作：{}".format(the_type)
-        logger.exception(msg=ms)
-        mes['message'] = ms
-    if mes['message'] == "success":
-        user = WXUser.find_by_id(o_id=user['_id'], to_dict=True)
-        session["wx_user"] = user  # 写入会话
-    else:
-        pass
+        if mes['message'] == "success":
+            user = WXUser.find_by_id(o_id=user['_id'], to_dict=True)
+            session["wx_user"] = user  # 写入会话
+        else:
+            pass
     return json.dumps(mes)
 
 

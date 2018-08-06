@@ -9,6 +9,7 @@ from mail_module import send_mail
 import datetime
 import json
 import requests
+import aiohttp
 import hashlib
 from uuid import uuid4
 from log_module import get_logger
@@ -419,6 +420,65 @@ def get_templates() -> list:
         data
 
 
+def custom_menu() -> None:
+    """
+    自定义菜单,由于此函数使用频率低,请在使用的时候自行修改参数
+    :return:
+    """
+    u = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token={}".format(AccessToken.get_token())
+    menu = {
+        "button":
+            [
+                {
+                    "name": "战绩榜单",
+                    "sub_button":
+                        [
+                            {
+                                "name": "战绩榜单",
+                                "type": "view",
+                                "url": "http://wx.91master.cn/user/html/index.html"
+                            }
+                        ]
+                },
+                {
+                    "name": "个人中心",
+                    "sub_button":
+                        [
+                            {
+                                "name": "个人中心",
+                                "type": "view",
+                                "url": "http://wx.91master.cn/user/html/user.html"
+                            }
+                        ]
+                },
+                {
+                    "name": "联系我们",
+                    "sub_button":
+                        [
+                            {
+                                "name": "联系我们",
+                                "type": "view",
+                                "url": "http://wx.91master.cn/user/html/help.html"
+                            },
+                            {
+                                "name": "绑定手机",
+                                "type": "view",
+                                "url": "http://wx.91master.cn/user/html/bind_phone.html"
+                            },
+                            {
+                                "name": "帮助",
+                                "type": "view",
+                                "url": "http://wx.91master.cn/user/html/help.html"
+                            }
+                        ]
+                }
+
+            ]
+        }
+    r = requests.post(u, data=json.dumps(menu, ensure_ascii=False).encode())
+    print(r.json())
+
+
 def score_change_message(open_id: str, nick_name: str, change_num: int, score_amount: int) -> bool:
     """
     发送积分变动模板消息
@@ -439,24 +499,22 @@ def score_change_message(open_id: str, nick_name: str, change_num: int, score_am
                 "color": "grey",
             },
             "FieldName": {
-                "value": "尊敬的用户",
-                "color": "grey",
+                "value": "尊敬的用户"
             },
             "Account": {
                 "value": nick_name,
-                "color": "lightgrey",
+                "color": "#82B6F4",
             },
             "change": {
-                "value": "变动",
-                "color": "red",
+                "value": "变动"
             },
             "CreditChange": {
                 "value": change_num,
-                "color": "red",
+                "color": "#82B6F4",
             },
             "CreditTotal": {
                 "value": score_amount,
-                "color": "#173177"
+                "color": "#82B6F4"
             },
             "remark": {
                 "value": "点击“详情”查看完整信息",
@@ -483,44 +541,38 @@ def score_change_message(open_id: str, nick_name: str, change_num: int, score_am
             return True
 
 
-def new_order_message(open_id: str, nick_name: str, change_num: int, score_amount: int) -> bool:
+def new_order_message(open_id: str, nick_name: str, order_type: str, t_name: str) -> bool:
     """
-    新订单模板消息
+    新订单模板消息,使用requests,一般是单次发送.
     :param open_id:
     :param nick_name:
-    :param change_num: 增加/减少的积分数
-    :param score_amount:  剩余的积分总额
+    :param order_type: 订单类型  进场/离场
+    :param t_name:  老师名字
     :return:
     """
+    now = datetime.datetime.now()
+    now = now.strftime("%Y-%m-%d %H:%M:%S")
     u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
     args = {
         "touser": open_id,
-        "template_id": "9AFXOFvi4B5cANxuTuSoDYAVjNzCOAvqLdrZYdl_2Ds",
+        "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
         "url": "http://wx.91master.cn/user/html/index.html",
         "data": {
             "first": {
-                "value": "你的积分发生变动",
+                "value": "你关注的{}老师有新的操作".format(t_name),
                 "color": "grey",
             },
-            "FieldName": {
-                "value": "尊敬的用户",
-                "color": "grey",
+            "tradeDateTime": {
+                "value": now,
+                "color": "#82B6F4",
             },
-            "Account": {
+            "orderType": {
+                "value": order_type,
+                "color": "#82B6F4",
+            },
+            "customerInfo": {
                 "value": nick_name,
-                "color": "lightgrey",
-            },
-            "change": {
-                "value": "变动",
-                "color": "red",
-            },
-            "CreditChange": {
-                "value": change_num,
-                "color": "red",
-            },
-            "CreditTotal": {
-                "value": score_amount,
-                "color": "#173177"
+                "color": "#82B6F4",
             },
             "remark": {
                 "value": "点击“详情”查看完整信息",
@@ -545,6 +597,107 @@ def new_order_message(open_id: str, nick_name: str, change_num: int, score_amoun
             return False
         else:
             return True
+
+
+class TemplateMessageResponse(mongo_db.BaseDoc):
+    """
+    模板消息发送的状态,用于查看消息是否发送成功?
+    """
+    _table_name = "template_message_response"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['openid'] = str
+    type_dict['nick_name'] = str
+    type_dict['t_id'] = ObjectId
+    type_dict['t_name'] = str
+    type_dict['time'] = datetime.datetime
+
+
+async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
+    """
+    新订单模板消息,使用grequests,批量发送.
+    :param t_id:  老师id
+    :param order_type: 订单类型  进场/离场
+    :return:
+    """
+    ses = mongo_db.get_conn("teacher")
+    t_id = ObjectId(t_id) if isinstance(t_id, str) else t_id
+    f = {"_id": t_id}
+    p = {"_id", "name"}
+    t = ses.find_one(filter=f, projection=p)
+    if t is None:
+        ms = "发送模板消息出错,无效的t_id:{}".format(t_id)
+        logger.exception(msg=ms)
+        send_mail(title=ms)
+        return False
+    else:
+        t_id = t['_id']
+        t_name = t['name']
+        f = {"follow": {"$elemMatch": {"$in": [t_id]}}}
+        p = ['_id', "openid", "nick_name"]
+        now = datetime.datetime.now()
+        ses = mongo_db.get_conn(table_name="wx_user")
+        us = ses.find(filter=f, projection=p)
+        us = [x for x in us]
+        us_l = len(us)
+        if us_l > 0:
+            ms = "准备发送{}条模板消息,老师id={}".format(us_l, t_id)
+            logger.info(msg=ms)
+
+            now = now.strftime("%Y-%m-%d %H:%M:%S")
+            u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
+            info = {
+                "t_id": t_id,
+                "t_name": t_name,
+                "time": now
+            }
+            async with aiohttp.ClientSession() as session:
+                for x in us:
+                    openid = x['openid']
+                    nick_name = x['nick_name']
+                    info['openid'] = openid
+                    info['nick_name'] = nick_name
+                    args = {
+                        "touser": openid,
+                        "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
+                        "url": "http://wx.91master.cn/user/html/index.html",
+                        "data": {
+                            "first": {
+                                "value": "你关注的{}老师有新的操作".format(t_name),
+                                "color": "grey",
+                            },
+                            "tradeDateTime": {
+                                "value": now,
+                                "color": "#82B6F4",
+                            },
+                            "orderType": {
+                                "value": order_type,
+                                "color": "#82B6F4",
+                            },
+                            "customerInfo": {
+                                "value": nick_name,
+                                "color": "#82B6F4",
+                            },
+                            "remark": {
+                                "value": "点击“详情”查看完整信息",
+                                "color": "#173177"
+                            }
+                        }
+                    }
+                    async with session.post(url=u, data=json.dumps(args), timeout=5) as response:
+                        resp = await response.json()
+                        if isinstance(resp, dict):
+                            info['return'] = "success"
+                            info.update(resp)
+                        else:
+                            info['return'] = "error"
+                        info['_id'] = ObjectId()
+                        ses = TemplateMessageResponse.get_collection()
+                        ses.insert_one(document=info)
+
+            return True
+        else:
+            return False
 
 
 if __name__ == "__main__":
@@ -555,5 +708,9 @@ if __name__ == "__main__":
     # get_templates()
     """发送积分变动消息"""
     o = "oTM13007rYSmNGXQyeNxzLQuksU4"
-    score_change_message(o, "徐立杰", 100, 800)
+    # score_change_message(o, "徐立杰", 100, 800)
+    # new_order_message(o, "徐立杰", "进场", "语昂")
+    # new_order_message2(ObjectId("5b65f2d9dbea625d78469f1b"), "进场")
+    """自定义菜单"""
+    custom_menu()
     pass

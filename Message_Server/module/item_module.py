@@ -12,8 +12,11 @@ from flask import request
 from tools_module import get_real_ip
 import datetime
 import calendar
+import requests
+from pymongo import ReturnDocument
 import random
 from mail_module import send_mail
+
 
 logger = get_logger()
 ObjectId = mongo_db.ObjectId
@@ -49,12 +52,14 @@ def _generator_signal(raw_signal: dict, change: dict) -> dict:
     res['record_id'] = record_id
     native_direction = res.pop('direction')  # 原始订单的方向
     res['native_direction'] = native_direction
-    teacher_name = res.pop('creator_name')  # 老师名
+    teacher_name = res.pop('creator_name', None)  # 老师名
+    teacher_name = res.pop('updater_name') if teacher_name is None else teacher_name
     res['teacher_name'] = teacher_name
-    teacher_id = res.pop('creator_id')  # 老师id
+    teacher_id = res.pop('creator_id', None)  # 老师id
+    teacher_id = res.pop('updater_id') if teacher_id is None else teacher_id
     teacher_id = ObjectId(teacher_id) if isinstance(teacher_id, str) and len(teacher_id) == 24 else teacher_id
     res['teacher_id'] = teacher_id
-    teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
+    # teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
     res['change'] = change
     res['enter_time'] = res.pop("create_time")
     res['exit_time'] = res.pop("update_time")
@@ -111,7 +116,12 @@ def _generator_signal(raw_signal: dict, change: dict) -> dict:
                 t2.find_one_and_update(filter=t_f, update=t_u, upsert=True)
     else:
         pass
-
+    """待发送的模板消息字典"""
+    template_message = {
+        "t_id": str(teacher_id),
+        'mes_type': 'new_order_message2',
+        'signature': 'template_message'
+    }
     if op == "data_update" and isinstance(enter_price, (int, float)) and isinstance(exit_price, (int, float)):
         """
         平仓信号,现在生成
@@ -130,6 +140,18 @@ def _generator_signal(raw_signal: dict, change: dict) -> dict:
         res['b_coefficient'] = b_coefficient
         new_exit_price = exit_price + (1 / product_map[product]['p_arg']) * b_coefficient
         res['exit_price'] = new_exit_price
+        template_message['order_type'] = "平仓"  # 模板消息类型
+    else:
+        template_message['order_type'] = "开仓"  # 模板消息类型
+        pass
+    u = "http://127.0.0.1:8080/template_message"
+    r = requests.post(u, data=template_message, timeout=2)
+    status = r.status_code
+    if status != 200:
+        ms = "申请模板消息出错:{}, {}".format(status, datetime.datetime.now())
+        logger.exception(msg=ms)
+        print(ms)
+        send_mail(title=ms)
     else:
         pass
     return res
@@ -675,16 +697,17 @@ class Signal(mongo_db.BaseDoc):
                     f = {"datetime": date_time, "creator_name": creator_name}
                     u = {"$set": u}
                     conn = mongo_db.get_conn(self._table_name)
-                    r = conn.find_one_and_update(filter=f, update=u, upsert=True)
+                    r = conn.find_one_and_update(filter=f, update=u, upsert=True, return_document=ReturnDocument.AFTER)
                     print(r)
                     """记录原始信号并生成虚拟信号"""
                     try:
-                        Trade.sync_from_signal(signal=self)
+                        # Trade.sync_from_signal(signal=self)
+                        Trade.sync_from_signal(signal=r)
                     except Exception as e:
                         print(e)
                         logger.exception(e)
                         title = "{}同步AI操盘手出错".format(datetime.datetime.now())
-                        content = "cause: {}".format(e)
+                        content = "cause: {}, dict:{}".format(e, self.get_dict())
                         send_mail(title=title, content=content)
                     finally:
                         pass
@@ -898,47 +921,37 @@ class Trade(Signal):
 
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
-    # create_data = {'op': 'data_create',
-    #         'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
-    #                  'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
-    #                  '_widget_1520843763126': 1190, 'formName': '发信号测试',
-    #                  '_widget_1514518782504': '2018-07-29T21:40:19.000Z', 'label': '', '_widget_1514518782592': 120,
-    #                  'createTime': '2018-07-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
-    #                  '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
-    #                  'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'}, '_widget_1520843228626': 1000,
-    #                  '_id': '7abd5d81493acc231b27af1c', 'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
-    #                  '_widget_1514518782603': [{'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
-    #                  'updateTime': '2018-07-29T21:41:21.491Z', '_widget_1514518782514': '原油',
-    #                  'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
-    #                  }
-    #         }
-    # update_data = {'op': 'data_update',
-    #                'data': {'_widget_1514518782557': '买入', '_widget_1514887799459': 1, '_widget_1514887799231': 121.19,
-    #                         'deleteTime': None, '_widget_1516245169208': '非农', '_widget_1522117404041': 1090,
-    #                         '_widget_1520843763126': 1190, 'formName': '发信号测试',
-    #                         '_widget_1514518782504': '2018-07-29T21:40:19.000Z', 'label': '',
-    #                         '_widget_1514518782592': 120,
-    #                         'createTime': '2018-07-29T21:41:21.491Z', 'appId': '5a45b8436203d26b528c7881',
-    #                         '_widget_1522134222811': 100, '_widget_1514887799261': '保护利润，提前离场',
-    #                         'updater': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
-    #                         '_widget_1520843228626': 1000,
-    #                         '_id': '7abd5d81493acc231b27af1c',
-    #                         'creator': {'name': '徐立杰', '_id': '5a684c9b42f8c1bffc68f4b4'},
-    #                         '_widget_1514518782603': [
-    #                             {'_widget_1514518782614': 121.21, '_widget_1514518782632': 119.11}],
-    #                         'updateTime': '2018-07-29T21:41:21.491Z', '_widget_1514518782514': '原油',
-    #                         'entryId': '5abc4febed763c754248e1cb', '_widget_1514518782842': 1190, 'deleter': None
-    #                         }
-    #                }
-    # # """初始化喊单信号并发送"""
-    # d = Signal.instance(**create_data)
-    # # d.send()
-    # """查看老师的月胜率"""
-    # # print(MonthEstimate.get_instance("5a1e680642f8c1bffc5dbd6f", "2018-06"))
-    # """生成一个虚拟信号"""
-    # # signal1 = Signal.find_by_id(ObjectId("5b485ebbf313841fc0eaf2ad"))
-    # Trade.sync_from_signal(d, signal_type="建仓提醒")
-    close_case = Signal.find_by_id(o_id=ObjectId("5b63b3dac5aee8250b3b18fe"), to_dict=True)
-    # Trade.sync_from_signal(close_case)
-    Trade.re_build()
+    a = {
+    "_id" : ObjectId("5b67a444c5aee8250b3e142b"),
+    "creator_name" : "语昂",
+    "datetime" : "2018-08-06T01:28:25.000Z",
+    "app_id" : "5a45b8436203d26b528c7881",
+    "app_name" : "分析师交易记录",
+    "create_time" : "2018-08-06T09:28:31.843Z",
+    "creator_id" : "5a1e680642f8c1bffc5dbd6f",
+    "direction" : "买入",
+    "each_cost" : 100.0,
+    "each_profit" : 700.0,
+    "each_profit_dollar" : 800.0,
+    "enter_price" : 27800.0,
+    "entry_id" : "5a45b90254ca00466b3c0cd1",
+    "op" : "data_update",
+    "p_coefficient" : 10.0,
+    "product" : "恒指",
+    "profit" : 800.0,
+    "receive_time" : "2018-08-06T09:44:48.707Z",
+    "record_id" : "5b67a43fed59cc4e636bf822",
+    "send_time_enter" : "2018-08-06T09:28:36.158Z",
+    "t_coefficient" : 1.0,
+    "the_type" : "普通",
+    "token_name" : "策略助手 小迅",
+    "update_time" : "2018-08-06T09:44:47.899Z",
+    "updater_id" : "5a1e680642f8c1bffc5dbd6f",
+    "updater_name" : "语昂",
+    "exit_price" : 27880.0,
+    "exit_reason" : "保护利润，提前离场",
+    "send_time_exit" : "2018-08-06T09:44:48.824Z"
+}
+    s = Signal(**a)
+    Trade.sync_from_signal(s)
     pass

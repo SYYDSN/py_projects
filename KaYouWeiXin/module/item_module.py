@@ -23,12 +23,16 @@ class RawWebChatMessage(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
 
 
+class BusinessLicenseImage
+
+
 class WXUser(mongo_db.BaseDoc):
     """从微信接口获取的用户身份信息,目前的用户是测试"""
     _table_name = "wx_user"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['phone'] = str
+    type_dict['email'] = str
     type_dict['nick_name'] = str
     type_dict['sex'] = int
     type_dict['openid'] = str
@@ -50,8 +54,10 @@ class WXUser(mongo_db.BaseDoc):
     type_dict['relate_time'] = datetime.datetime  # 和人力资源中介的关联时间
     type_dict['relate_id'] = ObjectId  # 人力资源中介_id,也就是Sales._id,用于判断归属.
     """以下Sales类专有属性"""
+    type_dict['relate_image'] = str  # 中介商名字/销售二维码图片地址
     type_dict['name'] = str  # 中介商名字/销售真实姓名.用于展示在二维码上
     type_dict['identity_code'] = str  # 中介商执照号码/销售真实身份证id.用于部分展示在二维码上
+    type_dict['license_image'] = str  # 营业执照照片
 
     def __init__(self, **kwargs):
         nick_name = kwargs.pop("nickname", "")
@@ -102,7 +108,12 @@ class WXUser(mongo_db.BaseDoc):
     @classmethod
     def change_role(cls, user_id: (str, ObjectId), role: int) -> bool:
         """
-        改变一个用户的角色
+        改变一个用户的角色,
+        如果是从普通用户变成销售/黄牛/中介.除了修改role之外,还需要使用server_api.generator_relate_img生成一张二维码,
+        销售/黄牛/中介变成普通用户,只需要修改role即可.
+        注意,使用server_api.generator_relate_img生成二维码的方法
+        还没有写!!!!!
+
         :param user_id:
         :param role:
         :return:

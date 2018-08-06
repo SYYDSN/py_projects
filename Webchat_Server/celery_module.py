@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
-from log_module import recode
 from celery import Celery
-import telnetlib
 from kombu import Exchange, Queue
 from mail_module import send_mail
-import requests
+import datetime
+import asyncio
+from module.item_module import Score
+from module.server_api import new_order_message2
 
 
 """
@@ -77,12 +78,38 @@ def test(self, *args, **kwargs):
 
 
 @app.task(bind=False)
+def send_template_message(mes_type: str, mes_dict: dict) -> None:
+    """
+    发送模板消息
+    :param mes_type: 消息类型
+    :param mes_dict: 消息字典
+    :return:
+    """
+    type_map = {
+        "new_order_message2": new_order_message2
+    }
+    now = datetime.datetime.now()
+    if mes_type not in type_map:
+        ms = "错误的消息模板名称: {}, {}".format(mes_type, now)
+        send_mail(title=ms)
+    else:
+        handler = type_map[mes_type]
+        print(mes_dict)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(handler(**mes_dict))
+
+
+@app.task(bind=False)
 def calculate_score_and_send_mail():
     """
     每周一计算微信用户的积分并发送邮件.
     :return:
     """
-    send_mail(title="test")
+    l = Score.every_week_mon_check()
+    now = datetime.datetime.now()
+    title = "{}, 扣分报告".format(now)
+    content = "{}".format(l)
+    send_mail(title=title, content=content)
 
 
 if __name__ == "__main__":

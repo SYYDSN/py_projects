@@ -74,9 +74,9 @@ $(function(){
     // 跟踪老师事件
     $("#follow_btn").click(function(){
         var t_id = get_url_arg("t_id");
-        alert(user_follow)
-        alert(t_id)
-        alert(user_follow.indexOf(t_id))
+        // alert(user_follow)
+        // alert(t_id)
+        // alert(user_follow.indexOf(t_id))
         var args = {"t_id": t_id};
         if(user_follow.length == 0){
             // 以前没有关注过老师

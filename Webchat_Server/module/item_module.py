@@ -496,7 +496,7 @@ class WXUser(mongo_db.BaseDoc):
         mes = {"message": "未知的错误", "level": -1}
         user = cls.find_by_id(o_id=user_id, to_dict=True)
         if isinstance(user, dict):
-            phone = user['phone']
+            phone = user.get('phone', None)
             mes['message'] = "success"
             if isinstance(phone, str) and len(phone) == 11:
                 mes['level'] = 0

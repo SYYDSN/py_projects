@@ -18,10 +18,10 @@ app.conf.CELERYBEAT_SCHEDULE = {
     注意时区问题,ubuntu没有修正过的时区,和我们真正的时区相差8小时,win不受此影响
     在此影响下,程序会比预订的时间晚8个小时运行.
     """
-    """每5分钟检查一下内网的shard服务器是否可以从外网访问"""
+    """每周1检查扣分情况一次"""
     'every_monday_calculate_score': {
         'task': 'celery_module.calculate_score_and_send_mail',
-        'schedule': crontab(day_of_week="5", minute="*/5", hour="*"),  # 每周五每5分钟检查一次
+        'schedule': crontab(day_of_week="1", minute="0", hour="6"),  # 每周1检查扣分情况一次
         'args': ()
     }
 }

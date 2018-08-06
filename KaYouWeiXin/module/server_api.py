@@ -478,5 +478,8 @@ if __name__ == "__main__":
     # ticket = JSAPITicket.get_ticket()
     # JSAPITicket.get_signature("http://temp.safego.org/wx/")
     """测试获取关联二维码"""
-    print(generator_relate_img("5b56bdba7b3128ec21daa4c7"))
+    # print(generator_relate_img("5b56bdba7b3128ec21daa4c7"))
+    u2 = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token={}".format(AccessToken.get_token())
+    r = requests.get(u2)
+    print(r.json())
     pass
