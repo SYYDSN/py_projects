@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>上传身份证</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
 </head>
 <style>
         *{
@@ -81,6 +82,7 @@
         <script src="/static/js/bootstrap.min.js"></script>
         <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
         <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
+        <script src="/static/js/jquery-weui.min.js"></script>
         <!--<script src="/static/js/wx_custom.js"></script>-->
     <script>
     $(function(){
@@ -121,9 +123,11 @@
 
                             // 请求api接口去下载临时素材
                             var table_name = "id_image";  // 上传身份证对应的表名
+                            var field_name = $dom.attr("id");
                             var args = {
                                 "server_id": id,    // server_id 下载素材用
                                 "table_name": table_name,
+                                "field_name": field_name,  // 字段名
                                 "db": "mongo_db2"            // 库名，固定
                             }
                             var url = "/wx/auto_download/" + table_name;
@@ -133,8 +137,8 @@
                                 console.log(json);
                                 if(status == "success"){
                                     // 成功，保存返回值
-                                    $dom.attr("data-id", json[table_name]);
-                                    $dom.attr("data-url", json[table_name + "_url"]);
+                                    $dom.attr("data-id", json[field_name]);
+                                    $dom.attr("data-url", json[field_name + "_url"]);
                                 }
                                 else{
                                     alert(status);
@@ -183,7 +187,7 @@
                     console.log(json);
                     if(status == "success"){
                         // 成功，下一步
-                        alert("上传成功");
+                        alert("操作成功");
                         location.href = "/wx/html/resume.html";
                     }
                     else{

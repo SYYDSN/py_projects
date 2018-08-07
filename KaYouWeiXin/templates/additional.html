@@ -4,45 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>车辆信息填写</title>
+    <title>附加信息</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <style>
-
         .div_info_btn{
-            position: absolute;
-            bottom: 0;
             margin-bottom: 2em;
         }
-        
+        .div_info_btn{
+            position: relative;
+        }
     </style>
 <body>
         <div class="container-fluid">
                 <div class="row">
+                        <span id="resume_id" style="display:none">{{ user.resume_id }}</span>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><input type="text" placeholder="当前状态"></p>
+                        <p><input id="status" class="inp_add" type="text" placeholder="当前状态"></p>
                     </div>  
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><input type="text" placeholder="期望城市"></p>
+                        <p><input id="expected_regions" class="inp_add" type="text" placeholder="期望城市"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><input type="text" placeholder="期望薪资"></p>
+                        <p><input id="expected_salary" class="inp_add" type="text" placeholder="期望薪资"></p>
                     </div>
+                    <!-- <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <p><input id="" class="inp_add" type="text" placeholder="驾照信息"></p>
+                    </div> -->
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><input type="text" placeholder="驾照信息"></p>
-                    </div>
-                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><input type="text" placeholder="驾龄"></p>
+                        <p><input id="driving_experience" class="inp_add" type="text" placeholder="驾龄"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
-                        <a href="./resume.html"> <p>完成</p></a>
+                        <a href="javascript:;" id="submit"> <p>完成</p></a>
                     </div>
                 </div>
             </div>
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
         <script>
+            function submit(class_name){
+                let doms = $(`.${class_name}`);
+                let args = {};
+                let is_null = false;
+                for(let dom of doms){
+                    let obj = $(dom);
+                    let tag_name = obj[0].tagName.toLowerCase();
+                    let arg_name = obj.attr('id');
+                    if(tag_name == 'input'){
+                        let val = $.trim(obj.val());
+                        if(val){
+                            args[arg_name] =val;
+                            is_null = true;
+                        };
+                    };
+                };
+                return is_null? args:null;
+            };
+            $('#submit').on('touchstart', function(){
+                let args = submit("inp_add");
+                if(args){
+                    var resume_id = $("#resume_id").text();  
+                    args['_id'] = resume_id;
+                    $.post("/wx/resume/opt", args, function(resp){
+                        let json = JSON.parse(resp);
+                        if(json['message'] == 'success'){
+                            alert('保存成功！');
+                            location.href = "/wx/html/resume.html";
+                        }else{
+                            alert('保存失败');
+                        }
+                    })
+                }else{
+                    alert('未修改信息！');
+                }
+            })
         </script>
 </body>
 </html>

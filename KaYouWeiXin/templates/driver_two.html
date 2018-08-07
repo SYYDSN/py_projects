@@ -48,27 +48,28 @@
             height:2.5em;
         }
     </style>
+    <script>user = {{ user | safe }};</script>
 <body>
         <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
                         <p>行车证
                             <i class="pull-right iimg">
-                                    <img class="imgs" id="imgs_one"  src="/static/images/poto.png" alt="">
+                                    <img class="imgs class_agr" id="imgs_one"  src="/static/images/poto.png" alt="">
                             </i>
                         </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
                         <p>驾驶证
                             <i class="pull-right iimg">
-                                <img class="imgs" id="imgs_two"  src="/static/images/poto.png" alt="">
+                                <img class="imgs class_agr" id="imgs_two"  src="/static/images/poto.png" alt="">
                         </i>
                     </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
                         <p>本人照片
                             <i class="pull-right iimg">
-                                <img class="imgs" id="imgs_three" src="/static/images/poto.png" alt="">
+                                <img class="imgs class_agr" id="imgs_three" src="/static/images/poto.png" alt="">
                             </i>
                     </p>
                     </div>
@@ -76,31 +77,40 @@
                         <p id="myModal">性别 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p>年龄<i class="glyphicon glyphicon-menu-right pull-right"></i></p>
+                        <p> <input class="class_agr" id="age" type="text" placeholder="年龄">
+                             <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
+                        </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p>户籍 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
+                            <p> <input class="class_agr" id="birth_place" type="text" placeholder="户籍">
+                                <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
+                           </p>
                     </div> 
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p><input type="text" placeholder="身份证号"></p>
+                            <p> <input class="class_agr" id="id_num" type="text" placeholder="身份证号">
+                                <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
+                           </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p><input type="text" placeholder="邮箱"></p>
+                        
+                        <p><input class="class_agr" id="email" type="text" placeholder="邮箱"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p>家庭住址 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
+                            <p> <input id="address" type="text" placeholder="家庭住址">
+                                <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
+                           </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p> 现居地址 <i class="glyphicon glyphicon-menu-right pull-right"></i></p>
+                            <p> <input class="class_agr" id="living_place" type="text" placeholder="现居地址">
+                                <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
+                           </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
                        <a id="submt" href="javascript:;"> <p>完成</p></a>
-                    </div>                          
+                    </div>                       
                 </div>
             </div>
-
             <!--模态框 -->
-
                 <div class="modal fade" tabindex="-1" role="dialog">
                         <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -109,11 +119,11 @@
                             <h4 class="modal-title">性别</h4>
                             </div>
                             <div class="modal-body">
-                            <p><input type="checkbox" name="sex"><span>男</span>   <input type="checkbox" name="sex"> <span>女</span></p>
+                            <p><input type="radio" name="sex" value="男"><span>男</span><input type="radio" value="女" name="sex"> <span>女</span></p>
                             </div>
                             <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                            <button type="button" class="btn btn-primary">确认</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">确认</button>
                             </div>
                         </div><!-- /.modal-content -->
                         </div><!-- /.modal-dialog -->
@@ -138,74 +148,136 @@
                 success: function (res) {
                 var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
                     $obj.attr('src',localIds);
-                    syncUpload(localIds);
-                    if($obj.attr("id")== "imgs_one"){
-                           imgs_one_num = localIds;
-                       }
-                    else if($obj.attr("id")== "imgs_two"){
-                            imgs_two_num =localIds;
-                    }
-                     else if($obj.attr("id")== "imgs_three"){
-                            imgs_three_num = localIds;
-                    }
+                    wx.uploadImage({
+                        localId:localIds[0],
+                        isShowProgressTips: 1,
+                        success:function(res){
+                            // alert("localIds: " + res.serverId);
+                            var id = res.serverId;
+                            //请求api接口  传入对应的接口信息
+                            if($obj.attr("id")== "imgs_one"){
+                                var table_name = "vehicle_image";
+                            }
+                            else if($obj.attr("id")== "imgs_two"){
+                                var table_name = "driving_license_image";
+                            }
+                            else if($obj.attr("id")== "imgs_three"){
+                                var table_name = "head_image";
+                            }
+                            var field_name = "dl_image";
+                            //上传图片对应的  id信息
+                            var args = {
+                                "server_id":id,
+                                "table_name": table_name,
+                                "field_name": field_name,
+                                "db":"mongo_db2" // 库名，固定
+                            };
+                            var url = "/wx/auto_download/" + table_name;
 
-//                    syncUpload(localIds);
+                            $.post(url, args, function(resp){
+                                var json = JSON.parse(resp);
+                                var status = json['message'];
+                                console.log(url);
+                                if(status == 'success'){
+                                    $obj.attr("data-id", json[field_name]);
+                                    $obj.attr("data-url",json[field_name + "_url"]);
+                                }
+                                else{
+                                    alert(status);
+                                }
+                            })
+                        }
+                    })
                 }
                 });
             }
+            // 微信上传图片
+            function syncUpload(){
+            }
+
             $('.iimg').each(function(){
                 var $this = $(this);
                 $this.click(function(){
-                    var img = $this.find("img:first");
+                    var img = $this.find(".imgs");
                     take_a_photo(img);
                 })
             });
-//         上传提交信息
-            function syncUpload(localId){
-                wx.uploadImage({
-                    localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
-                    isShowProgressTips: 1, // 默认为1，显示进度提示
-                    success: function (res) {
-                    var serverId = res.serverId; // 返回图片的服务器端ID
-                        alert(serverId);
+
+            // 循环要提交的内容
+            function submit(class_name){
+                var doms = $(`.${class_name}`);
+                let args  = {};
+                let is_null = false;
+                for(let dom of doms){
+                    let obj = $(dom);
+                    let tag_name = obj[0].tagName.toLowerCase();
+                    let arg_name = obj.attr('id');
+                    if(tag_name == 'input'){
+                        let val = $.trim(obj.val());
+                        if(val){
+                          args[arg_name] = val;
+                          is_null = true;
+                        }
                     }
-                    });
-            }
-//             $('#submt').click(function syncUpload(localIds){
-// //                 var localId = localIds.pop();
-//                 var localId = [imgs_one_num,imgs_two_num,imgs_three_num];
-// //                 alert(localId);
-//                 if(imgs_one_num!==-1 && imgs_two_num!==-1 && imgs_three_num!==-1){
-//                  wx.uploadImage({
-//                     localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
-//                     isShowProgressTips: 1, // 默认为1，显示进度提示
-//                     success: function (res) {
-//                     var serverId = res.serverId; // 返回图片的服务器端ID
-//                         alert(serverId);
-//                     }
-//                     });
-//                 }
-
-// //                 alert(localIds);
-//             });
-             $('#submt').click(function syncUpload(localIds){
-
-                 var ags = [];
-               $.post("/wx/resume/opt", args, function(resp){
+                    else {
+                        if(arg_name == 'imgs_one'){
+                            let img_id = obj.attr('data-id');
+                            if(img_id){
+                            }
+                        }
+                        else if(arg_name == 'imgs_two'){
+                            let img_id = obj.attr('data-id');
+                            if(img_id){
+                                is_null = true;
+                                args['dl_image'] = img_id;
+                                args['dl_image_url'] = obj.attr('data-url');
+                                
+                            }
+                        }
+                        else if(arg_name == 'imgs_three'){
+                            let img_id = obj.attr('data-id');
+                            if(img_id){
+                                is_null = true;
+                                args['head_image'] = img_id;
+                                args['head_image'] = obj.attr('data-url');
+                                }
+                            }
+                    }
+                }
+                return is_null? args: null;
+            };
+            //提交/修改 简历信息
+             $('#submt').click(function (){
+                let args = submit("class_agr");
+                if(args){
+                    args['_id'] = user.resume_id;
+                    $.post("/wx/resume/opt", args, function(resp){
                     let json = JSON.parse(resp);
-                    if(json['message'] === "success"){
-                        // 成功
-                    }
-                    else{
-                        // 失败
-                    }
-                });
-             })
+                        if(json['message'] === "success"){
+                            console.log(args);
+                            // 成功
+                            alert('成功');
+                            location.href = "/wx/html/resume.html";
+                        }
+                        else{
+                            // 失败
+                            alert('保存失败！');
+                        }
+                    }); 
+                }else{
+                    alert('未修改信息！')
+                }
+             });
 
+             //  修改
+             ($(function(){
+                 
+                console.log(user);
+             }));
+             
   wx.error(function(){
             alert(error)
         });
-
         </script>
 </body>
 </html>

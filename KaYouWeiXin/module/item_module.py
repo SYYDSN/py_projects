@@ -7,6 +7,7 @@ if __project_path not in sys.path:
 import mongo_db
 import datetime
 from log_module import get_logger
+from module.server_api import generator_relate_img
 from module.driver_module import *
 
 
@@ -23,7 +24,11 @@ class RawWebChatMessage(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
 
 
-class BusinessLicenseImage
+class BusinessLicenseImage(mongo_db.BaseFile):
+    """
+    保存营业执照的图片
+    """
+    _table_name = "business_license_image"
 
 
 class WXUser(mongo_db.BaseDoc):
@@ -33,6 +38,7 @@ class WXUser(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['phone'] = str
     type_dict['email'] = str
+    type_dict['address'] = str  # 地址
     type_dict['nick_name'] = str
     type_dict['sex'] = int
     type_dict['openid'] = str
@@ -40,7 +46,7 @@ class WXUser(mongo_db.BaseDoc):
     type_dict['country'] = str  # 国家
     type_dict['province'] = str  # 省份
     type_dict['city'] = str
-    type_dict['head_img_url'] = str  # 头像地址
+    type_dict['head_img_url'] = str  # 头像图片地址
     type_dict['subscribe'] = int   # 是否已关注本微信号
     type_dict['subscribe_scene'] = str   # 用户关注的渠道来源
     type_dict['subscribe_time'] = datetime.datetime   # 用户关注的时间
@@ -54,10 +60,12 @@ class WXUser(mongo_db.BaseDoc):
     type_dict['relate_time'] = datetime.datetime  # 和人力资源中介的关联时间
     type_dict['relate_id'] = ObjectId  # 人力资源中介_id,也就是Sales._id,用于判断归属.
     """以下Sales类专有属性"""
-    type_dict['relate_image'] = str  # 中介商名字/销售二维码图片地址
+    type_dict['authenticity'] = bool # 中介商/黄牛/销售 的真实性确认. 在审核通过后这个字段为真
+    type_dict['relate_image'] = str  # 中介商名字/销售二维码图片地址,这个图片保存在微信服务器上.
     type_dict['name'] = str  # 中介商名字/销售真实姓名.用于展示在二维码上
     type_dict['identity_code'] = str  # 中介商执照号码/销售真实身份证id.用于部分展示在二维码上
-    type_dict['license_image'] = str  # 营业执照照片
+    type_dict['business_license_image_url'] = str  # 营业执照照片的地址,
+    type_dict['business_license_image'] = ObjectId  # 营业执照照片的id, 指向BusinessLicenseImage._id
 
     def __init__(self, **kwargs):
         nick_name = kwargs.pop("nickname", "")
@@ -118,14 +126,14 @@ class WXUser(mongo_db.BaseDoc):
         :param role:
         :return:
         """
-        if isinstance(user_id, ObjectId):
+        user = cls.find_by_id(o_id=user_id, to_dict=True)
+        if isinstance(user, cls):
             pass
-        elif isinstance(user_id, str) and len(user_id) == 24:
-            user_id = ObjectId(user_id)
         else:
             ms = "错误的user_id:{}".format(user_id)
             logger.exception(ms)
             raise ValueError(ms)
+        user_id = user['_id']
         if isinstance(role, float):
             role = int(role)
         elif isinstance(role, int):

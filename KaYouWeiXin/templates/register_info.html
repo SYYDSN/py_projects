@@ -6,8 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>基本信息填写</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-<!--     <link rel="stylesheet" href="/staticcss/font-awesome.min.css">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
 </head>
 
 <style>
@@ -90,6 +88,9 @@ body,html{
     line-height: 2em;
     padding:1rem 0;
 }
+.ubmit_modify{
+    display: none;
+}
 </style>
 <script> user = {{ user | safe }}; </script>
 <body>
@@ -115,6 +116,7 @@ body,html{
         <div class="row row_three">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <a id="submit_btn" href="javascript:;"> <p class="anniu">提交</p> </a>
+                <a id="submit_modify" class="submit_modify" href="javascript:;"> <p class="anniu">修改</p> </a>
             </div>
         </div>
     </div>
@@ -122,7 +124,7 @@ body,html{
     <script src="/static/js/jquery.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script>
-        if(user['phone'] !== ''){
+        if( user['phone'] !== ''){
             $('.jiantou').css({
                 'display':'block'
             });
@@ -131,8 +133,9 @@ body,html{
                 'padding': '10px'+ '12px',
                 'backgroundColor': '#f5f5f5',
             });
-            $('.anniu').text('编辑');
-        }
+            $('#submit_btn').css('display','none');
+            $('.ubmit_modify').css('display','block');
+            }
     $(function(){
         // 提交按钮事件
         $("#submit_btn").click(function(){
@@ -160,7 +163,33 @@ body,html{
             });
             
         });
-
+        // 修改按钮
+        $("#submit_modify").click(function(){
+            var input_list = $("#submit_form .submit_arg");
+            var args = {};
+            
+            input_list.each(function(){
+                var $this = $(this);
+                var k = $this.attr("id");
+                var v = $.trim($this.val());
+                args[k] = v;
+            });
+            // alert(JSON.stringify(args));
+            // return false;
+            args['_id'] = user.resume_id
+            $.post("/wx/resume/opt", args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status == "success"){
+                    location.href = "/wx/html/resume.html";
+                }
+                else{
+                    alert("修改失败！");
+                    return false;
+                }
+            });
+            
+        });
     // end!
     });
     </script>

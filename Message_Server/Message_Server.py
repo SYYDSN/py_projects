@@ -8,6 +8,7 @@ from module.data.pickle_data import query_chart_data
 from tools_module import *
 from module.item_module import *
 from views.mt4_view import mt4_blueprint
+from views.quotations_view import quotations_blueprint
 import os
 
 
@@ -19,6 +20,7 @@ app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览�
 # app.config['SERVER_NAME'] = "127.0.0.1:8001"  此域名下的所有子域名的session都会接受
 app.config.from_object(__name__)
 app.register_blueprint(mt4_blueprint)  # 注册监听mt4后台发送过来的消息的蓝图
+app.register_blueprint(quotations_blueprint)  # 注册监听报价行情推送的消息的蓝图
 Session(app)
 
 
@@ -148,14 +150,9 @@ def logger_request_info():
     监控所有的请求信息
     :return:
     """
-    headers = "headers: {}".format(request.headers)
-    args = "args: {}".format(request.args)
-    form = "form: {}".format(request.form)
-    json = "json: {}".format(request.json)
-    logger.info(headers)
-    logger.info(args)
-    logger.info(form)
-    logger.info(json)
+    data = RawRequestInfo.get_init_dict(req=request)
+    mes = RawRequestInfo(**data)
+    mes.save_plus()
 
 
 if __name__ == '__main__':

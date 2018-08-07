@@ -16,6 +16,7 @@ import requests
 from pymongo import ReturnDocument
 import random
 from mail_module import send_mail
+import xmltodict
 
 
 logger = get_logger()
@@ -299,8 +300,9 @@ class RawRequestInfo(mongo_db.BaseDoc):
     type_dict['args'] = dict
     type_dict['form'] = dict
     type_dict['json'] = dict
+    type_dict['xml'] = dict
     type_dict['headers'] = dict
-    type_dict['event_date'] = datetime.datetime
+    type_dict['time'] = datetime.datetime
 
     def __init__(self, **kwargs):
         if "event_date" not in kwargs:
@@ -314,14 +316,26 @@ class RawRequestInfo(mongo_db.BaseDoc):
         :param req:
         :return:
         """
-        args = dict()
-        args['ip'] = get_real_ip(req)
-        args['path'] = req.path
-        args['method'] = req.method.lower()
-        args['args'] = {k: v for k, v in req.args.items()}
-        args['form'] = {k: v for k, v in req.form.items()}
-        args['json'] = req.json
-        args['headers'] = {k: v for k, v in req.headers.items()}
+        headers = {k: v for k, v in req.headers.items()}
+        args = {k: v for k, v in req.args.items()}
+        form = {k: v for k, v in req.form.items()}
+        json_data = None if req.json is None else {k: v for k, v in req.headers.items()}
+        xml_data = req.data.decode(encoding="utf-8")
+        xml = xmltodict.parse(xml_data) if xml_data != "" else dict()
+        ip = get_real_ip(req)
+        now = datetime.datetime.now()
+        args = {
+            "ip": ip,
+            "method": req.method.lower(),
+            "url": req.url,
+            "path": req.path,
+            "headers": headers,
+            "args": args,
+            "form": form,
+            "json": json_data,
+            "xml": xml,
+            "time": now
+        }
         return args
 
     @classmethod

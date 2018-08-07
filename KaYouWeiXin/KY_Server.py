@@ -179,6 +179,7 @@ def logger_request_info():
     data = {
         "ip": ip,
         "url": request.url,
+        "method": request.method.lower(),
         "headers": headers,
         "args": args,
         "form": form,

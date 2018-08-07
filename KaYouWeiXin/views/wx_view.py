@@ -151,7 +151,7 @@ def download_image_func(table_name):
     1. base_info                  文件存储基础表,BaseFile
     """
     tables = ['base_file', 'head_image', 'id_image', 'honor_image', 'vehicle_image', 'driving_license_image',
-              'rtqc_image']
+              'rtqc_image', 'business_license_image']
     table_name = table_name if table_name in tables else 'base_file'
 
     """保存文件"""
@@ -179,7 +179,12 @@ def download_image_func(table_name):
                 img = BytesIO(initial_bytes=content)
                 r = handler.save_cls(file_obj=img, collection=table_name, owner=wx_user['_id'])
                 if isinstance(r, ObjectId):
-                    mes[field_name + '_url'] = "/wx/resume_image/view/{}?fid={}".format(table_name, str(r))
+                    if db_str == "mongo_db2":
+                        """简历相关的图片和文件"""
+                        mes[field_name + '_url'] = "/wx/resume_image/view/{}?fid={}".format(table_name, str(r))
+                    else:
+                        """非简历相关的图片和文件"""
+                        mes[field_name + '_url'] = "/wx/file/view/{}?fid={}".format(table_name, str(r))
                     mes[field_name] = str(r)
                 else:
                     mes['message'] = "保存失败"
@@ -235,7 +240,7 @@ def get_code_and_redirect() -> str:
 
 def draw_user_info():
     """
-    这是一个重定向的视图,在实际生产中用于获取用户信息.
+    这是一个重定向的视图,在实际生产中用于获取用户微信相关信息.
     :return:
     """
     ref = get_arg(request, "state", "")
@@ -253,6 +258,67 @@ def draw_user_info():
             # return render_template("page_auth.html", ref=ref, data=data)
         else:
             return abort(403)
+
+
+@check_platform_session
+def self_info_func(key):
+    """
+    用户对用户信息的有限的操作,对一些允许的字段的添加和修改,
+     这里,既不能新增用户,也不能删除用户,只有修改和查看
+    :return:
+    """
+    user = get_platform_session_arg("wx_user", "")
+    if not isinstance(user, dict):
+        return abort(404)
+    else:
+        mes = {"message": "unknown error"}
+        if key == "view":
+            """查看用户信息"""
+            ignore_fields = [
+                'openid', 'unionid', 'subscribe', 'subscribe_scene', 'subscribe_time',
+                'access_token', 'expires_in', 'time', 'refresh_token'
+            ]
+            mes['data'] = mongo_db.to_flat_dict(user, ignore_columns=ignore_fields)
+        elif key == "update":
+            """更新/修改用户信息"""
+            ignore_fields = [
+                'openid', 'unionid', 'subscribe', 'subscribe_scene', 'subscribe_time',
+                'access_token', 'expires_in', 'time', 'refresh_token', 'role',
+                'resume_id', 'relate_time', 'relate_id', 'relate_image', 'authenticity',
+                'relate_image', 'name', 'identity_code', 'business_license_image_url',
+                'business_license_image'
+            ]
+            args = get_args(request)
+            s = dict()
+            names = WXUser.type_dict.keys()
+            for k, v in args.items():
+                if k in names:
+                    if k in ignore_fields:
+                        pass
+                    else:
+                        s[k] = v
+                else:
+                    """忽略不在字段定义中的参数"""
+                    pass
+            if len(s) == 0:
+                mes['message'] = "缺少必要的参数"
+            else:
+                f = {"_id": user['_id']}
+                u = {"$set": s}
+                r = WXUser.find_one_and_update_plus(filter_dict=f, upsert=False, update_dict=u)
+                if r is None:
+                    ms = "修改数据失败! f:{}, u: {}".format(f, u)
+                    logger.exception(msg=ms)
+                    print(ms)
+                    mes['message'] = "修改数据失败"
+                else:
+                    pass
+        else:
+            ms = "未知的key: {}".format(key)
+            logger.exception(msg=ms)
+            print(ms)
+            mes['message'] = mes
+        return json.dumps(mes)
 
 
 def wx_js_func():
@@ -398,7 +464,7 @@ def resume_opt_func():
 
 
 @check_platform_session
-def extend_info_func():
+def resume_extend_info_func():
     """
     对简历的扩展信息的操作.
     简历的扩展信息包括:
@@ -504,6 +570,16 @@ def common_view_func(html_name: str):
                 else:
                     work = dict()
                 kwargs['work'] = work
+        elif html_name == "educational_experience.html":  # 添加教育经历
+            if resume_id == "":
+                return abort(403)
+            else:
+                e_id = get_arg(request, "e_id", "")
+                if isinstance(e_id, str) and len(e_id) == 24:
+                    education = Education.find_by_id(o_id=e_id, can_json=True)
+                else:
+                    education = dict()
+                kwargs['education'] = education
         else:
             pass
         print(kwargs)  # 打印参数
@@ -533,7 +609,7 @@ wx_blueprint.add_url_rule(rule="/auth_demo/<key>", view_func=auth_demo, methods=
 wx_blueprint.add_url_rule(rule="/page_auth_demo", view_func=page_auth_demo, methods=['post', 'get'])
 """生产环境,获取用户code"""
 wx_blueprint.add_url_rule(rule="/get_code_and_redirect", view_func=get_code_and_redirect, methods=['post', 'get'])
-"""生产环境,获取用户信息"""
+"""生产环境,获取用户微信信息"""
 wx_blueprint.add_url_rule(rule="/draw_user_info", view_func=draw_user_info, methods=['post', 'get'])
 """生产环境,获取JS-SDK初始化用的脚本"""
 wx_blueprint.add_url_rule(rule="/js_sdk_init", view_func=wx_js_func, methods=['post', 'get'])
@@ -541,9 +617,11 @@ wx_blueprint.add_url_rule(rule="/js_sdk_init", view_func=wx_js_func, methods=['p
 wx_blueprint.add_url_rule(rule="/js_sdk_init_demo", view_func=wx_js_api_demo, methods=['get'])
 """发送/校验短信"""
 wx_blueprint.add_url_rule(rule="/sms/<key>", view_func=sms_func, methods=['post', 'get'])
+"""用户自己操作(查看/修改)自己的(微信)用户信息"""
+wx_blueprint.add_url_rule(rule="/self_info/<key>", view_func=self_info_func, methods=['post', 'get'])
 """操作(查看/添加/修改,但是不能删除)简历基本信息"""
 wx_blueprint.add_url_rule(rule="/resume/opt", view_func=resume_opt_func, methods=['post', 'get'])
 """操作(查看/添加/修改/删除)简历扩展信息"""
-wx_blueprint.add_url_rule(rule="/resume/extend", view_func=extend_info_func, methods=['post', 'get'])
+wx_blueprint.add_url_rule(rule="/resume/extend", view_func=resume_extend_info_func, methods=['post', 'get'])
 """通用页面视图"""
 wx_blueprint.add_url_rule(rule="/html/<html_name>", view_func=common_view_func, methods=['post', 'get'])

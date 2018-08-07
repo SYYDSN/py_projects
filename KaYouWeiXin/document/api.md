@@ -15,17 +15,18 @@
 ### 微信用户的数据结构
 
 ```python3
-
-    type_dict['_id'] = ObjectId  # 用户id
-    type_dict['phone'] = str    # 手机号码
+    type_dict['_id'] = ObjectId
+    type_dict['phone'] = str
+    type_dict['email'] = str
+    type_dict['address'] = str  # 地址
     type_dict['nick_name'] = str
     type_dict['sex'] = int
     type_dict['openid'] = str
     type_dict['unionid'] = str
     type_dict['country'] = str  # 国家
     type_dict['province'] = str  # 省份
-    type_dict['city'] = str   # 城市
-    type_dict['head_img_url'] = str  # 头像地址
+    type_dict['city'] = str
+    type_dict['head_img_url'] = str  # 头像图片地址
     type_dict['subscribe'] = int   # 是否已关注本微信号
     type_dict['subscribe_scene'] = str   # 用户关注的渠道来源
     type_dict['subscribe_time'] = datetime.datetime   # 用户关注的时间
@@ -39,8 +40,11 @@
     type_dict['relate_time'] = datetime.datetime  # 和人力资源中介的关联时间
     type_dict['relate_id'] = ObjectId  # 人力资源中介_id,也就是Sales._id,用于判断归属.
     """以下Sales类专有属性"""
+    type_dict['relate_image'] = str  # 中介商名字/销售二维码图片地址,这个图片保存在微信服务器上.
     type_dict['name'] = str  # 中介商名字/销售真实姓名.用于展示在二维码上
     type_dict['identity_code'] = str  # 中介商执照号码/销售真实身份证id.用于部分展示在二维码上
+    type_dict['business_license_image_url'] = str  # 营业执照照片的地址,
+    type_dict['business_license_image'] = ObjectId  # 营业执照照片的id, 指向BusinessLicenseImage._id
 ```
 
 ### 简历模型
@@ -621,7 +625,7 @@ image_id 车辆照片的id，由自身服务器传回，24位字符串
 image_url： 车辆照片的url，由自身服务器传回
 ... 其他参数
 
-**驾照图片**driving_license_image
+**驾照图片** driving_license_image
 
 1. 通知下载图片地址: /wx/auto_download/driving_license_image
 参数：
@@ -635,7 +639,7 @@ _id： 简历id ，会由后端传值到页面
 dl_image 驾照图片的id，由自身服务器传回，24位字符串
 dl_image_url： 驾照图片的url，由自身服务器传回
 
-**从业许可证** /wx/resume_image/save/rtqc_image
+**从业许可证图片**  rtqc_image
 
 1. 通知下载图片地址: /wx/auto_download/rtqc_image
 参数：
@@ -648,6 +652,21 @@ server_id: 微信服务器回传的图片id
 _id： 简历id ，会由后端传值到页面
 rtqc_image 从业许可证图片的id，由自身服务器传回，24位字符串
 rtqc_image_url： 从业许可证片的url，由自身服务器传回
+
+**营业执照图片** business_license_image
+
+1. 通知下载图片地址: /wx/auto_download/business_license_image
+参数：
+db: mongo_db   固定值 **特有参数** 
+table_name : business_license_image 固定值
+field_name： business_license_image 固定值
+server_id: 微信服务器回传的图片id
+
+1. 修改营业执照图片信息地址：/wx/resume/opt
+参数：
+_id： 简历id ，会由后端传值到页面
+business_license_image 营业执照图片的id，由自身服务器传回，24位字符串
+business_license_image_url： 营业执照图片的url，由自身服务器传回
 
 方法: post
 
@@ -780,3 +799,34 @@ rtqc_image_url： 从业许可证片的url，由自身服务器传回
             }
         });
 ```
+
+### 用户查看或者修改自己的信息
+
+> 这个接口是提供给用户自己调用的,用于用户查看自己的信息或者修改自己的私人资料,所以进行了限制,屏蔽了一些字段
+
+#### 用户查看自己的身份新消息
+
+url: /wx/self_info/view
+参数: 无
+method: post/get
+返回类型: json
+成功: {"message": "success", 'data': 用户个人信息的字典}
+失败: {"message": "错误原因"}
+由于安全原因,下列字段被忽略这些字段将不会被返回:
+'openid', 'unionid', 'subscribe', 'subscribe_scene', 'subscribe_time',
+'access_token', 'expires_in', 'time', 'refresh_token'
+
+#### 用户修改自己的身份新消息
+
+url: /wx/self_info/update
+参数: wx_user数据模型中,不在被忽略字段中的都可以作为参数.
+method: post/get
+返回类型: json
+成功: {"message": "success", 'data': 用户个人信息的字典}
+失败: {"message": "错误原因"}
+由于安全原因,下列字段被忽略,对他们的修改无效:
+'openid', 'unionid', 'subscribe', 'subscribe_scene', 'subscribe_time',
+'access_token', 'expires_in', 'time', 'refresh_token', 'role',
+'resume_id', 'relate_time', 'relate_id', 'relate_image', 'authenticity',
+'relate_image', 'name', 'identity_code', 'business_license_image_url',
+'business_license_image'

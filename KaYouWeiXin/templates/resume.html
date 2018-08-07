@@ -4,217 +4,325 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>履历信息</title>
+    <title>简历</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/index.css">
-    <link rel="stylesheet" href="/static/css/LCalendar.min.css">
-    <link rel="stylesheet" href="/static/css/pickout.min.css">
-    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
-    <link rel="stylesheet" href="/static/css/weui.min.css">
 </head>
 <style>
-        .div_info_btn{
-            position: relative;
-            bottom: 0;
-            margin-bottom: 1em;
-        }
-        .div_info_btn p{
-            margin-top: 20px;
-            text-align: center;
-            border: 1px solid #ccc;
-            line-height: 2.5em;
-            border-radius: 6px;
-        }
-        #times{
-            width: 30% !important;
-            margin-top: 34px;
-        }
-        .time_inp{
-            width: 30% !important;
-            margin-top: 34px;
-        }
-        .p_alert{
-        width: 100%;
-        /* position: relative; */
-        }
-        .pk-input{
-            line-height: 6em;
-            margin-top: 1.7em;
-        }
-        .pk-arrow {
-            margin: 0 auto;
-            line-height: 195%;
-        }
-        .inp_widh{
-            width: 30% !important;
-            margin-top: 2.1em;
-        }
-        .dele{
-            text-align: center;
-            width: 100% !important;
-            position: relative;
-            display: inline-block;
-            height: 3em;
-        }
-        .dele i{
-            text-align: center;
-            width: 3em;
-            height: 3em;
-            color: red;
-            line-height: 3em;
-            font-size: 1rem;
-        }
-    </style>
-<body>
 
-        <div class="container-fluid">
-                <div class="row">
-                        <span id="resume_id" style="display:none">{{ user.resume_id }}</span>
-                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><input id="enterprise_name" value="{{work['enterprise_name']}}" class="inp_add" type="text" placeholder="公司名称"></p>
-                    </div>
-                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p>
-                            工作开始时间
-                            <i class="glyphicon glyphicon-menu-right pull-right"></i>
-                            <input class="inp_add pull-right time_inp" id="begin" value="{{ work.begin }}"  type="text" readonly="" placeholder="日期选择" data-lcalendar="2016-05-11,2016-05-11" />
-                        </p>
-                    </div>
-                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p>工作结束时间
-                                <i class="glyphicon glyphicon-menu-right pull-right"></i>
-                                <input class="pull-right time_inp inp_add" id="end" type="text" readonly="" placeholder="日期选择" data-lcalendar="2016-05-11,2016-05-11" />
-                            </p>
-                    </div>
-                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p class="p_alert"> 
-                                <select name="state" id="state" class="state pickout inps" placeholder="选择车辆类型">
-                                        <option value="pe">小型轿车</option>
-                                        <option value="pb">小型客车</option>
-                                        <option value="ba">中型客车</option>
-                                        <option value="sp">大型客车</option>
-                                        <option value="qd">平板式货车</option>
-                                        <option value="qd">栏板式货车</option>
-                                        <option value="qd">厢式货车</option>
-                                        <option value="qd">仓栅式货车</option>
-                                        <option value="qd">罐式车</option>
-                                        <option value="qd">自卸车</option>
-                                        <option value="qd"></option>
-                                </select>
-                            </p>
-                    </div>
-                    
-                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><input id="vehicle_load" class="inp_add"  type="text" placeholder="吨位"></p>
-                    </div>
-                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><input id="description" class="inp_add" type="text" placeholder="工作描述">
-                        </p>
-                    </div>
-                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
-                        <a href="javascript:;" id="submit"> <p>完成</p></a>
-                        <a id="delete" class="dele" href="javascript:;"><i class="glyphicon glyphicon-trash"></i></a>
-                    </div>
+    .header{
+        padding: 2em 15px;
+        text-align: center;
+    }
+    p{
+        margin: 0;
+    }
+    .div_info{
+        background: #F4F2F3;
+        margin-bottom: 1em;
+    }
+    .div_info a{
+        width: 40%;
+        color: #333;
+    }
+    .jiantou{
+/*     display: none; */
+      font-size: 2rem;
+/*     line-height: 2em; */
+/*     padding:1rem 0; */
+    }
+    .jiantou_mag{
+        position:relative;
+    }
+    .div_info .img_succes{
+        width: 60px;
+        height: 2.5em;
+        line-height: 6em;
+        margin-top: 1.6em;
+    }
+    /* 履历信息 */
+    .div_work{
+        background: #F4F2F3;
+        margin-bottom: 1em;
+        height: 10em;
+    }
+    .work_dvs_for{
+        height: 2em;
+        overflow: hidden;
+    }
+    .work_dvs{
+        height: 2em;
+        text-align: center;
+    }
+    .pannel_clic{
+        text-align: center;
+        height: 2em;
+        /* background: #007ACC; */
+    }
+    .pannel_clic i{
+        line-height: 0em;
+        height: 2em;
+        padding: 1em 4em;
+        color: #fff;
+        background: #007ACC;
+        border-radius: 6px;
+    }
+/* 荣誉证件 */
+    .div_honor{
+        background: #F4F2F3;
+        margin-bottom: 1em;
+        height: 10em;
+    }
+    .honor{
+        height: 2em;
+        overflow: hidden;
+    }
+    .div_honor_divs{
+        height: 2em;
+        text-align: center;
+    }
+    .pannel_clic_honor{
+        text-align: center;
+        height: 2em;
+        /* background: #007ACC; */
+    }
+    .pannel_clic_honor i{
+        line-height: 0em;
+        height: 2em;
+        padding: 1em 4em;
+        color: #fff;
+        background: #007ACC;
+        border-radius: 6px;
+    }
+    /* 教育经历 */
+    .div_educational, .div_vehicle{
+        background: #F4F2F3;
+        margin-bottom: 1em;
+        height: 10em;
+    }
+    .educational, .vehicle{
+        height: 2em;
+        overflow: hidden;
+    }
+    .div_eduacational_divs, .div_vehicle_divs{
+        height: 2em;
+        text-align: center;
+    }
+    .pannel_educational , .pannel_vehicle{
+        text-align: center;
+        height: 2em;
+    }
+    .pannel_educational>i, .pannel_vehicle>i{
+        line-height: 0em;
+        height: 2em;
+        padding: 1em 4em;
+        color: #fff;
+        background: #007ACC;
+        border-radius: 6px;
+    }
+    /* 车辆信息 */
+</style>
+<body>
+    <!-- 简历完成度 -->
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 header">
+                
+                <p>
+                    <a href="/wx/html/register_info.html"><i class="glyphicon glyphicon-menu-left pull-left jiantou"></i></a>
+                    简历完成度越高越容易找到合适的工作呦！
+                    <a href="javascript:window.history.back(-1);"><i class="glyphicon glyphicon-menu-right pull-right jiantou jiantou_mag"></i></a>
+                </p>
+            </div>
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                <p>上传身份证 <a href="./update_id.html" class="pull-right"> 
+                    <span class="pull-right"> 添加 </span>
+                    <img class="img_succes pull-right" src="{{ resume.id_image_face_url }}">
+                    </a>
+                </p>
+            </div>
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                <p>基本信息 <a href="./driver_two.html"> <span class="pull-right"> 添加 </span></a></p>
+            </div>
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_vehicle">
+
+                <p>车辆信息 <a href="./driver_three.html"> <span class="pull-right"> 添加 </span></a></p>
+                <div class="vehicle">
+                    {% for x in resume.vehicle %}
+                        <div class="div_vehicle_divs"><a class="pull-right" href="./driver_three.html?w_id={{ x }}">{{loop.index}}</a></div>
+                    {% endfor %}
+                </div>
+                <div class="pannel_vehicle">
+                    <i class="glyphicon glyphicon-chevron-down"></i>
                 </div>
             </div>
-        <script src="/static/js/jquery.js"></script>
-        <script src="/static/js/bootstrap.min.js"></script>
-        <script src="/static/js/LCalendar.min.js"></script>
-        <script src="/static/js/pickout.min.js"></script>
-        <script src="/static/js/jquery-weui.min.js"></script>
-        <script src="/static/js/wexin.js"></script>
-        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
-        <script>
-            pickout.to({
-			el:'.state',
-			theme: 'clean',
-		    });
-            $('.pk-input').attr('id','vehicle_type');
-            $('.pk-input').addClass('inps');
-            $('.txt').append('<input type="text">');
-        </script>
-        <script>
-            var lcalendar = new LCalendar();
-            lcalendar.init({
-                'trigger': '#begin', //标签id
-                'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
-                'minDate': '1900-1-1', //最小日期
-                'maxDate': '2022-1-1'
-            });
-            var lcalendar2 = new LCalendar();
-            lcalendar2.init({
-                'trigger': '#end', //标签id
-                'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
-                'minDate': '1900-1-1', //最小日期
-                'maxDate': '2022-1-1'
-            });
-        </script>
-        <script>
-             function submit(class_name){
-                let doms = $(`.${class_name}`);
-                let args = {};
-                let is_null = false;
-                for(let dom of doms){
-                    let obj = $(dom);
-                    let tag_name = obj[0].tagName.toLowerCase();
-                    let arg_name = obj.attr('id');
-                    if(tag_name == 'input'){
-                        let val = $.trim(obj.val());
-                        if(val){
-                            args[arg_name] =val;
-                            is_null = true;
-                        };
-                    };
-                };
-                return is_null? args:null;
-            };
-            $('#submit').on('touchstart', function(){
-                let args = submit("inp_add");
-                if(args){
-                    var resume_id = $("#resume_id").text();
-                    args['resume_id'] = resume_id;
-                    args['opt'] = "add_work";
-                    $.post("/wx/resume/extend", args, function(resp){
-                        let json = JSON.parse(resp);
-                        if(json['message'] == 'success'){
-                            alert('保存成功！');
-                            location.href = '/wx/html/resume.html';
-                        }else{
-                            alert('保存失败');
-                        }
-                    }) 
-                }else{
-                    alert('未修改信息');
-                }
-            })
-        </script>
-        <!-- 微信 提示 -->
-        <script>
-            $("#delete").on("touchstart",function(){
-                $.confirm("您确定删除本条信息？",function(){
-                    // 删除操作
-                    // let url_head = location.search; //获取url中含"?"符后的字串
-                    let args = {};
-                    var resume_id = $("#resume_id").text();
-                    // let work_id = $("#work_id").text();
-                    args['resume_id'] = resume_id;
-                    // args['work_id'] = work_id;
-                    args["opt"] = "delete_work";
-                    $.post("/wx/resume/extend", args, function(resp){
-                        let json = JSON.parse(resp);
-                        if(json['message'] == 'success'){
-                            $.toast("删除成功！");
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                <p>附加信息 <a href="./additional.html"> <span class="pull-right"> 添加 </span></a></p>
+            </div>
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_work">
+                <p>
+                    履历信息
+                    <a href="./resume_info.html"> <span class="pull-right"> 添加 </span></a>
+                </p>
+                <div class="work_dvs_for">
 
-                            setTimeout(function(){location.href = '/wx/html/resume.html';},1000);
-                        }else{
-                            alert('删除失败！');
-                        }
-                    })
-                    
-                },function(){ 
-                    //取消c操作
+                    {% for x in resume.work_history %}
+                        <div class="work_dvs"><a class="pull-right" href="./resume_info.html?w_id={{ x }}">{{loop.index}}</a></div>
+                    {% endfor %}
+                </div>
+                <div class="pannel_clic">
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_honor">
+                <p>荣誉情况
+                    <a href="./add_info_jilu.html">
+                    <span class="pull-right"> 添加 </span></a>
+                </p>
+                <div class="honor">
+                        {% for x in resume.honor %}
+                            <div class="div_honor_divs"><a class="pull-right" href="./add_info_jilu.html?h_id={{ x }}">{{loop.index}}</a></div>
+                        {% endfor %}
+                </div>
+                <div class="pannel_clic_honor">
+                        <i class="glyphicon glyphicon-chevron-down"></i>
+                    </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_educational">
+                <p>教育经历
+                     <a href="./educational_experience.html"> <span class="pull-right"> 添加 </span></a>
+                    </p>
+                    <div class="educational">
+                            {% for x in resume.education_history %}
+                                <div class="div_eduacational_divs"> <a class="pull-right" href="./educational_experience.html?e_id={{ x }}">{{loop.index}} </a></div>
+                           {% endfor %}
+                    </div>
+                    <div class="pannel_educational">
+                            <i class="glyphicon glyphicon-chevron-down"></i>
+                        </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                <!-- <p>预览简历</p> -->
+            </div>                    
+        </div>
+    </div>
+
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script>
+                
+        // 车辆信息
+        $(function(){
+            console.log($(".work_dvs_for").children());
+                if($(".div_vehicle_divs").children().length == "0"){
+                   let div_vehicle = $(".div_vehicle");
+                div_work.css({
+                    height: "6em"
                 })
-            })
-        </script>
+                $(".pannel_vehicle").css("display", "none");
+            }else{
+                 $(".pannel_vehicle").on("touchstart",function(){
+                    let div_vehicle = $(".div_vehicle");
+                    if(div_vehicle.height() == "140"){
+                        
+                        let num_length = $(".div_vehicle_divs").length*2;
+                        div_vehicle.css('height',num_length + 8 +'em');
+                        $(".vehicle").animate({
+                            height: num_length + 'em'
+                        })
+                    }else{
+                        div_vehicle.css('height','10em');
+                        $(".vehicle").animate({
+                            height: "2em"
+                        })
+                    }
+                });
+            }
+        });
+        // 履历信息
+        $(function(){
+            console.log($(".work_dvs_for").children());
+                if($(".work_dvs_for").children().length == "0"){
+                   let div_work = $(".div_work");
+                div_work.css({
+                    height: "6em"
+                })
+                $(".pannel_clic").css("display", "none");
+            }else{
+                 $(".pannel_clic").on("touchstart",function(){
+                    let div_work = $(".div_work");
+                    if(div_work.height() == "140"){
+                        
+                        let num_length = $(".work_dvs").length*2;
+                        div_work.css('height',num_length + 8 +'em');
+                        $(".work_dvs_for").animate({
+                            height: num_length + 'em'
+                        })
+                    }else{
+                        div_work.css('height','10em');
+                        $(".work_dvs_for").animate({
+                            height: "2em"
+                        })
+                    }
+                });
+            }
+        });
+    // 荣誉情况
+    $(function(){
+                if($(".honor").children().length == "0"){
+                   let div_honor = $(".div_honor");
+                   div_honor.css({
+                    height: "6em"
+                });
+                $(".pannel_clic_honor").css("display", "none");
+            }else{
+                 $(".pannel_clic_honor").on("touchstart",function(){
+                    let div_honor = $(".div_honor");
+                    if(div_honor.height() == "140"){
+                        
+                        let num_length = $(".div_honor_divs").length*2;
+                        div_honor.css('height',num_length + 8 +'em');
+                        $(".honor").animate({
+                            height: num_length + 'em'
+                        })
+                    }else{
+                        div_honor.css('height','10em');
+                        $(".honor").animate({
+                            height: "2em"
+                        })
+                    }
+                });
+            }
+        });
+    //  教育经历 div_eduacational_divs
+    $(function(){
+                if($(".educational").children().length == "0"){
+                   let div_honor = $(".div_educational");
+                   div_honor.css({
+                    height: "6em"
+                });
+                $(".pannel_educational").css("display", "none");
+            }else{
+                 $(".pannel_educational").on("touchstart",function(){
+                    let div_educational = $(".div_educational");
+                    if(div_educational.height() == "140"){
+                        
+                        let num_length = $(".div_eduacational_divs").length*2;
+                        div_educational.css('height',num_length + 8 +'em');
+                        $(".educational").animate({
+                            height: num_length + 'em'
+                        })
+                    }else{
+                        div_educational.css('height','10em');
+                        $(".educational").animate({
+                            height: "2em"
+                        })
+                    }
+                });
+            }
+        });
+        
+    </script>
 </body>
 </html>

@@ -196,6 +196,7 @@ def get_args(req):
         arg_dict = {k: v for k, v in req.args.items()}
     if len(arg_dict) == 0:
         arg_dict = req.json
+    arg_dict = dict() if arg_dict is None else arg_dict
     return arg_dict
 
 
