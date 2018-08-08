@@ -456,9 +456,13 @@ def custom_menu() -> None:
                     "sub_button":
                         [
                             {
-                                "name": "联系我们",
+                                "name": "关于我们",
                                 "type": "view",
-                                "url": "http://wx.91master.cn/user/html/help.html"
+                                "url": "https://mp.weixin.qq.com/s?__biz=MzU0Nzg0MzkxNg==&mid=2247483728&idx=1&sn=a6d39"
+                                       "11a3aa8c834bfe4f0bf5aff47ed&chksm=fb497b73cc3ef2657f701fd966ed846011405fcba186"
+                                       "2d19cc3033b2da78f6122a8c389476c1&mpshare=1&scene=1&srcid=0807TBYXpKVAKOd9iLNmt"
+                                       "eiT&pass_ticket=AkDgOJN05hDSXCaAMcgovXP9IbWlKpOjYAV8%2Fy621LvxwVGF0L92Exlywggp"
+                                       "7H%2BZ#rd"
                             },
                             {
                                 "name": "绑定手机",

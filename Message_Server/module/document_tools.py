@@ -12,13 +12,14 @@ import markdown
 """
 
 
-def get_md() -> str:
+def get_md(file_name: str = None) -> str:
     """
     获取文档的内容
-    :param md_path: 文档的绝对路径
+    :param file_name: 文档的名字
     :return:
     """
-    md_path = os.path.join(__project_path, "document", "api.md")
+    file_name = "platform_api.md" if file_name is None else file_name
+    md_path = os.path.join(__project_path, "document", file_name)
     res = ""
     if os.path.exists(md_path) and os.path.isfile(md_path):
         f = open(md_path, "r", encoding="utf-8")
@@ -29,13 +30,13 @@ def get_md() -> str:
     return res
 
 
-def markdown_to_html() -> str:
+def markdown_to_html(file_name: str = None) -> str:
     """
     转换markdown到html,python-markdown必须  pip3/pip install markdown
-    :param raw:
+    :param file_name:
     :return:
     """
-    raw = get_md()
+    raw = get_md(file_name)
     exts = ['markdown.extensions.extra', 'markdown.extensions.codehilite', 'markdown.extensions.tables',
             'markdown.extensions.toc']
     r = markdown.markdown(raw,  output_format='html5', extensions=exts)

@@ -35,6 +35,27 @@ app_id = "wx50cbcc5725601880"
 app_secret = "1aa28cda9bbb187acb9e1f7464d2b15a"
 
 
+"""扩展jinja2过滤器"""
+
+
+def str_time(val: datetime.datetime, fmt: str = None) -> str:
+    """
+    自定义的jinja2的格式化时间的方式.
+    :param val:
+    :param fmt:
+    :return:
+    """
+    fmt = "%F" if fmt is None else fmt
+
+    return val.strftime(fmt)
+
+
+app.jinja_env.filters['str_time'] = str_time
+
+
+"""辅助函数"""
+
+
 def get_all_args(req) -> dict:
     """
     获取一次请求的所有参数.

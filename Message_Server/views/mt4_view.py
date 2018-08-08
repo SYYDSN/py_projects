@@ -41,10 +41,16 @@ def md_view():
     if request.method.lower() == "get":
         sid = get_arg(request, "sid", "")
         if sid == "bbb5fd48094942be80dbf0467be3d6f6":
-            content = markdown_to_html()
-            return render_template("md.html", content=content)
+            file_name = "platform_api.md"  # 交易平台文档
+        elif sid == "bbb5fd48094942be80dbf0467be3d6f7":
+            file_name = "quotations_api.md"  # 行情服务推送文档
         else:
+            file_name = ""
+        if file_name == "":
             return abort(404)
+        else:
+            content = markdown_to_html(file_name=file_name)
+            return render_template("md.html", content=content)
     else:
         return abort(405)
 

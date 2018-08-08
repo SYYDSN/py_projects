@@ -658,6 +658,81 @@ class DriverResume(mongo_db2.BaseDoc):
                                      can_json=can_json, func=func, target=target)
 
     @classmethod
+    def get_full_info(cls, resume_id: (str, ObjectId)) -> dict:
+        """
+        获取一个简历的全部信息,包含嵌套的子元素和子类型
+        :param resume_id:
+        :return: {"message": "success", "data": data_dict}
+        """
+        mes = {"message": "success"}
+        ses = cls.get_collection()
+        o_id = ObjectId(resume_id) if isinstance(resume_id, str) and len(resume_id) == 24 else resume_id
+        """
+        使用聚合管道进行join查询的时候,要注意以下几个事项:
+        1. $lookup阶段,尽量使用pipeline以提高查询灵活性.
+        2. 空值的处理使用$ifNull,注意他接收的是一个二元数组作为参数.$ifNull相当于三元表达式.
+        3. let在赋值阶段,左值不需要$符号,右值需要$符号.
+        4. 如果要取let创建的变量,需要前面加$$和文档本身的字段区别一下.
+        5. 聚合管道中的$in需要一个二元数组作为参数.
+        6. $cond不能使用不存在的字段名做条件判断,所以如果一个字段名不是确认存在的话,请使用$ifNull替代.
+        """
+
+        pipeline = [
+            {"$match": {"_id": o_id}},
+            {"$lookup": {
+                "from": "honor_info",
+                "let": {"honor_ids": {"$ifNull": ["$honor", []]}},  # 注意这里的$ifNull的用法,这相当于三元表达式
+                "pipeline": [
+                    {"$match": {"$expr": {"$in": ["$_id", "$$honor_ids"]}}}  # 注意这里的$in的用法
+                ],
+                "as": "honor_list"
+            }},
+            {"$lookup": {
+                "from": "work_history",
+                "let": {"work_ids": {"$ifNull": ["$work_history", []]}},  # 注意这里的$ifNull的用法,这相当于三元表达式
+                "pipeline": [
+                    {"$match": {"$expr": {"$in": ["$_id", "$$work_ids"]}}}  # 注意这里的$in的用法
+                ],
+                "as": "work_list"
+            }},
+            {"$lookup": {
+                "from": "education",
+                "let": {
+                    "education_ids": {"$ifNull": ["$education_history", []]}  # 注意这里的$ifNull的用法,这相当于三元表达式
+                },
+                "pipeline": [
+                    {"$match": {"$expr": {"$in": ["$_id", "$$education_ids"]}}}  # 注意这里的$in的用法
+                ],
+                "as": "education_list"
+            }},
+            {"$lookup": {
+                "from": "vehicle_license_info",
+                "let": {
+                    "vehicle_ids": {"$ifNull": ["$vehicle", []]}  # 注意这里的$ifNull的用法,这相当于三元表达式
+                },
+                "pipeline": [
+                    {"$match": {"$expr": {"$in": ["$_id", "$$vehicle_ids"]}}}  # 注意这里的$in的用法
+                ],
+                "as": "vehicle_list"
+            }}
+        ]
+        resume = ses.aggregate(pipeline=pipeline)
+        resume = [x for x in resume]
+        if len(resume) == 0:
+            ms = "错误的resume_id: {}".format(resume_id)
+            logger.exception(msg=ms)
+            mes['message'] = ms
+        else:
+            resume = resume[0]
+            resume.pop("honor", None)
+            resume.pop("work_history", None)
+            resume.pop("education_history", None)
+            resume.pop("vehicle", None)
+            mes['data'] = resume
+        return mes
+
+
+    @classmethod
     def add_work_history(cls, resume_id: (str, ObjectId), history_args: dict) -> ObjectId:
         """
         添加工作经历,在添加工作经历的后,进行一下字段的更新:
@@ -1436,14 +1511,16 @@ if __name__ == "__main__":
     # a = Region.get_city(province_code=864)
     # print(a)
     """添加简历"""
-    args = {"_id": ObjectId("5b5969df99e87f46d93c1c13")}
-    work_id = ObjectId("5b597b6099e87f5219329c45")
-    args = {
-        "begin": "2016-1-1",
-        "end": "2017-1-1",
-        "enterprise_name": "BBB公司"
-    }
-    DriverResume.delete_work_history(resume_id="5b3da7d84660d33df4a40a81", work_id=work_id)
+    # args = {"_id": ObjectId("5b5969df99e87f46d93c1c13")}
+    # work_id = ObjectId("5b597b6099e87f5219329c45")
+    # args = {
+    #     "begin": "2016-1-1",
+    #     "end": "2017-1-1",
+    #     "enterprise_name": "BBB公司"
+    # }
+    # DriverResume.delete_work_history(resume_id="5b3da7d84660d33df4a40a81", work_id=work_id)
+    """查询简历的全部信息"""
+    DriverResume.get_full_info('5b5a96d9bede684e68049f01')
     pass
 
 

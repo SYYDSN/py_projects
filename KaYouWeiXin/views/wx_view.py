@@ -22,6 +22,7 @@ from module.driver_module import DriverResume
 from module.server_api import *
 from pdb import set_trace
 from uuid import uuid4
+from pdb import set_trace
 import requests
 
 
@@ -548,7 +549,19 @@ def common_view_func(html_name: str):
                 resume = dict()
             else:
                 resume = DriverResume.find_by_id(o_id=resume_id, to_dict=True)
-            kwargs['work'] = dict()
+            # kwargs['work'] = dict()
+            if html_name == "resume.html":
+                """这个页面是显示简历全部信息的地方,需要额外详细的简历信息"""
+                info = DriverResume.get_full_info(resume_id=resume_id)
+                message = info['message']
+                if message == "success":
+                    resume = info['data']
+                else:
+                    ms = "获取简历详细信息错误,错误原因:{}".format(message)
+                    logger.exception(msg=ms)
+            else:
+                pass
+            # set_trace()
             kwargs['resume'] = resume
         elif html_name == "add_info_jilu.html":  # 添加荣誉
             if resume_id == "":
@@ -589,7 +602,9 @@ def common_view_func(html_name: str):
         return abort(404)
 
 
-
+def share_wx_func():
+    """分享微信的单独页面,用于外链"""
+    return render_template("share_wx.html")
 
 
 """集中注册函数"""
@@ -597,6 +612,8 @@ def common_view_func(html_name: str):
 
 """hello"""
 wx_blueprint.add_url_rule(rule="/hello", view_func=hello, methods=['get', 'post'])
+"""分享微信的单独页面,用于外链"""
+wx_blueprint.add_url_rule(rule="/share_wx", view_func=share_wx_func, methods=['get'])
 """保存或者获取文件(mongodb存储)"""
 wx_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['post', 'get'])
 """保存或者获取简历相关的图片(mongodb存储)"""

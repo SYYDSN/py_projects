@@ -38,14 +38,15 @@ def listen_func() -> str:
     """
 
     headers = request.headers
+    mes = {"message": "success"}
     headers = {k.lower(): (v.lower() if isinstance(v, str) else v) for k, v in headers.items()}
     auth_req = headers.get("x-auth", "")
     auth_str = "274e9735e2c94d60bd903e45c96fc3b6"
-    if auth_str != auth_req:
-        return abort(404)
-    else:
-        mes = {"message": "success"}
-        return json.dumps(mes)
+    # if auth_str != auth_req:
+    #     return abort(404)
+    # else:
+    #     mes = {"message": "success"}
+    return json.dumps(mes)
     
 
 
