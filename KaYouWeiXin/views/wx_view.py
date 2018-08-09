@@ -489,7 +489,7 @@ def resume_extend_info_func():
     return json.dumps(mes)
 
 
-@check_platform_session
+# @check_platform_session
 def common_view_func(html_name: str):
     """
     通用页面视图
@@ -497,8 +497,7 @@ def common_view_func(html_name: str):
     :return:
     """
     user = get_platform_session_arg("wx_user", dict())
-    """
-    user = {
+    user2 = {
         "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
         "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
         "access_token": "12_ypF7a9ujmbnNYnbtZF8eyLyy23H9YmST6pMPYAuYefQizi4CrFOupAlLXKMe2dfRGa2Ezt0ApdHHTz-LdX8qtYVS8qTq2OQtnW5ZXtvUCGQ",
@@ -523,15 +522,15 @@ def common_view_func(html_name: str):
         "phone": "15618317376",
         "resume_id": ObjectId("5b5a96d9bede684e68049f01")
     }
-    u_id = user['_id']
-    """
+    user = user2 if len(user) == 0 else user
     template_dir = os.path.join(__project_dir__, 'templates')
     file_names = os.listdir(template_dir)
     ver = uuid4().hex
+    kwargs = dict()  # 页面传参数
+    kwargs['version'] = ver
+    kwargs['user'] = to_flat_dict(user)
     if html_name in file_names:
-        kwargs = dict()  # 页面传参数
-        kwargs['version'] = ver
-        kwargs['user'] = to_flat_dict(user)
+        """页面存在"""
         resume_pages = [                              # 需要传递简历信息的页面
             "resume.html",
             "register_info.html",
@@ -592,6 +591,38 @@ def common_view_func(html_name: str):
                 else:
                     education = dict()
                 kwargs['education'] = education
+        elif html_name == "my_resource.html":  # 中介/销售/黄牛 查看自己的推荐的资源
+            # 测试时为了获取资源,生产环境请注销
+            # kwargs['user'] = WXUser.find_by_id(o_id=ObjectId("5b56c0f87b3128ec21daa693"), to_dict=True)
+            now = datetime.datetime.now()
+            y = get_arg(request, "y", now.year)
+            m = get_arg(request, "m", now.month)
+            b = mongo_db.get_datetime_from_str("{}-{}-1 0:0:0".format(y, m))
+            f = {"relate_time": {"$gte": b, "$lte": now}}
+            page_index = get_arg(request, "index", 1)
+            res = WXUser.page_resource(u_id=kwargs['user']['_id'], filter_dict=f, page_index=page_index)
+            total_record = res.get("total_record", 0)
+            total_page = res.get("total_page", 0)
+            data = res.get("data", list())
+            current_page = res.get("current_page", 1)
+            pages = res.get("pages", list())
+            page_title = "我的资源"
+            # pages = [1, 2, 3, 4]  # 生产环境注销
+            # total_record = 50  # 生产环境注销
+            # total_page = 5  # 生产环境注销
+            # page_index = 2  # 生产环境注销
+            kwargs['data'] = data
+            kwargs['current_page'] = current_page
+            kwargs['pages'] = pages
+            kwargs['page_index'] = page_index
+            kwargs['page_title'] = page_title
+            kwargs['total_record'] = total_record
+            kwargs['total_page'] = total_page
+            kwargs['y'] = y
+            kwargs['m'] = m
+        elif html_name == "help_job.html":  # 我的二维码页面, 中介/销售/黄牛专用页面
+            # 测试时为了获取资源,生产环境请注销
+            kwargs['user'] = WXUser.find_by_id(o_id=ObjectId("5b56c0f87b3128ec21daa693"), to_dict=True)
         else:
             pass
         print(kwargs)  # 打印参数

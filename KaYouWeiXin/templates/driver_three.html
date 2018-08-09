@@ -347,11 +347,11 @@
                 $.confirm("您确定删除本条信息？",function(){
                     // 删除操作
                     let url_head = location.search; //获取url中含"?"符后的字串
-                    let h_id = url_head.substring(6);
+                    let v_id = url_head.substring(6);
                     let args = {};
                     // let work_id = $("#work_id").text();
                     args['resume_id'] = user.resume_id;
-                    args['h_id'] = h_id;
+                    args['v_id'] = v_id;
                     args["opt"] = "delete_vehicle";
                     $.post("/wx/resume/extend", args, function(resp){
                         let json = JSON.parse(resp);

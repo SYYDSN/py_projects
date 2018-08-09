@@ -125,7 +125,6 @@ class WXUser(mongo_db.BaseDoc):
         如果是从普通用户变成销售/黄牛/中介.除了修改role之外,还需要使用server_api.generator_relate_img生成一张二维码,
         销售/黄牛/中介变成普通用户,只需要修改role即可.
         注意,使用server_api.generator_relate_img生成二维码的方法
-        还没有写!!!!!
 
         :param user_id:
         :param role:
@@ -151,7 +150,15 @@ class WXUser(mongo_db.BaseDoc):
             raise ValueError(ms)
         ses = cls.get_collection()
         f = {"_id": user_id}
-        u = {"$set": {"role": role}}
+        s = {"role": role}
+        relate_img = user.get("relate_image", "")
+        if isinstance(relate_img, str) and len(relate_img) > 40:
+            pass
+        else:
+            """生成一张关联二维码并保存url"""
+            relate_img = generator_relate_img(user_id=user_id)
+            s['relate_img'] = relate_img
+        u = {"$set": s}
         return_doc = mongo_db.ReturnDocument.AFTER
         doc = ses.find_one_and_update(filter=f, update=u, upsert=True, return_document=return_doc)
         return True if doc else False
@@ -407,7 +414,50 @@ class WXUser(mongo_db.BaseDoc):
             mes['message'] = ms
         return mes
 
-
+    @classmethod
+    def page_resource(cls, u_id: (str, ObjectId), filter_dict: dict = None, projection: list = None, page_size: int = 10,
+                      ruler: int = 5, page_index: int = 1) -> dict:
+        """
+        按月查询,分页显示中介下面的关联的用户资源.
+        :param u_id: 中介id
+        :param filter_dict: 查询条件字典 默认关联时间倒序
+        :param projection:  投影数组,决定输出哪些字段?
+        :param page_size:   一页有多少条记录?
+        :param ruler:       翻页器最多显示几个页码？
+        :param page_index:  当前页码
+        :return: 字典对象
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        """
+        res = dict()
+        user = cls.find_by_id(o_id=u_id, to_dict=True)
+        if isinstance(user, dict):
+            user_id = user['_id']
+            f = {"relate_id": user_id}
+            if isinstance(filter_dict, dict):
+                f.update(filter_dict)
+            s = {"relate_time": -1}
+            if projection is None:
+                p = ["_id", 'head_img_url', "nick_name", "relate_time"]
+            else:
+                p = projection
+            args = {
+                "filter_dict": f, "sort_dict": s, "projection": p,
+                "page_size": page_size, "ruler": ruler,
+                "page_index": page_index
+            }
+            res = cls.query_by_page(**args)
+        else:
+            ms = "用户id不存在:{}".format(u_id)
+            logger.exception(msg=ms)
+            print(ms)
+        return res
 
 
 
@@ -415,5 +465,7 @@ class WXUser(mongo_db.BaseDoc):
 
 if __name__ == "__main__":
     """变更用户角色,从一般用户变更为中介"""
-    WXUser.change_role(user_id=ObjectId("5b56c0f87b3128ec21daa693"), role=2)
+    # WXUser.change_role(user_id=ObjectId("5b56c0f87b3128ec21daa693"), role=2)
+    """按月查询,分页显示中介下面的关联的用户资源"""
+    WXUser.page_resource(u_id=ObjectId("5b56c0f87b3128ec21daa693"))
     pass

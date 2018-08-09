@@ -51,6 +51,11 @@
         .div_info_p{
             text-align: center;
         }
+       .jiantou{
+         font-size: 1rem;
+           font-size: 16px;
+          margin-top: 8px;
+        }
         .div_info p img{
             width: 88%;
             height: 16em;
@@ -64,13 +69,20 @@
         <div class="container-fluid">
                 <span style="display: none" id="resume_id">{{ user.resume_id }}</span>
                 <div class="row">
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                        <a href="/wx/html/resume.html">
+                            <i class="glyphicon glyphicon-menu-left pull-left jiantou">返回</i> 
+                        </a>
+                    </div>    
+                </div>
+                <div class="row">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_p ">
-                        <p class="p_mag"><img class="imgs" id="id_image_face" src="/static/images/poto.png" alt=""></p>
-                        <p>请上传身份证正面照</p>
+                        <p class="p_mag"><img class="imgs" id="id_image_face" src="{{ resume.id_image_face_url if resume.id_image_face_url else '/static/images/poto.png'}}" alt=""></p>
+                        <p>{{ '点击上图重新上传身份证正面照片' if resume.id_image_face_url else '请上传身份证正面照' }}</p>
                     </div>
                 <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_p">
-                        <p class="p_mag"><img class="imgs" id="id_image_back" src="/static/images/poto.png" alt=""></p>
-                        <p>请上传身份证反面照</p>
+                        <p class="p_mag"><img class="imgs" id="id_image_back" src="{{ resume.id_image_back_url if resume.id_image_back_url else '/static/images/poto.png'}}" alt=""></p>
+                        <p>{{ '点击上图重新上传身份证反面照片' if resume.id_image_back_url else '请上传身份证反面照' }}</p>
                 </div>
                     <div id="res"></div>
                 <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
