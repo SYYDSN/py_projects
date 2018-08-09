@@ -40,8 +40,8 @@ def get_signature(nonce, payload, secret, timestamp):
 def validate_signature(req, secret, signature) -> bool:
     """验证简道云发来的消息的签名是否正确？"""
     payload = req.data.decode('utf-8')
-    nonce = req.args['nonce']
-    timestamp = req.args['timestamp']
+    nonce = req.args.get('nonce', '')
+    timestamp = req.args.get('timestamp', '')
     if signature != get_signature(nonce, payload, secret, timestamp):
         return False
     else:
@@ -61,11 +61,12 @@ def listen_func(key):
     event_id = headers.get("X-JDY-DeliverId")
     signature = headers.get("X-JDY-Signature")
     data = request.json
+    data = data if isinstance(data, dict) else json.loads(data)
     print(event_id)
     print(signature)
     print(data)
     raw = RawSignal(**data)
-    raw.save_plus()  # 保存原始数据
+    raw.save_plus()  # 保存原始喊单数据格式
     if key == "test":
         """测试消息"""
         secret_str = "ckFqpdtIr45aXwPkSITuW2iY"  # 不同的消息定义的secret不同，用来验证消息的合法性
@@ -150,9 +151,18 @@ def logger_request_info():
     监控所有的请求信息
     :return:
     """
-    data = RawRequestInfo.get_init_dict(req=request)
-    mes = RawRequestInfo(**data)
-    mes.save_plus()
+    data = None
+    try:
+        data = RawRequestInfo.get_init_dict(req=request)
+        mes = RawRequestInfo(**data)
+        mes.save_plus()
+    except Exception as e:
+        ms = "Error: {}, data: {}".format(e, data)
+        logger.exception(msg=ms)
+        send_mail(title="{}Message_Server监听请求出错".format(datetime.datetime.now()), content=ms)
+    finally:
+        if request.url.startswith("http://www.baidu.com"):
+            return abort(404)
 
 
 if __name__ == '__main__':

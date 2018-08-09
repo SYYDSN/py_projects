@@ -286,8 +286,7 @@ def self_info_func(key):
                 'openid', 'unionid', 'subscribe', 'subscribe_scene', 'subscribe_time',
                 'access_token', 'expires_in', 'time', 'refresh_token', 'role',
                 'resume_id', 'relate_time', 'relate_id', 'relate_image', 'authenticity',
-                'relate_image', 'name', 'identity_code', 'business_license_image_url',
-                'business_license_image'
+                'relate_image', 'name', 'identity_code'
             ]
             args = get_args(request)
             s = dict()
@@ -313,7 +312,7 @@ def self_info_func(key):
                     print(ms)
                     mes['message'] = "修改数据失败"
                 else:
-                    pass
+                    mes['message'] = "success"
         else:
             ms = "未知的key: {}".format(key)
             logger.exception(msg=ms)

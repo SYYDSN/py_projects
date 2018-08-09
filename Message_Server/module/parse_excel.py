@@ -209,7 +209,7 @@ def query_relation_from_db(filter_dict: dict) -> dict:
     :return:
     """
     ses = get_conn(database="my_crm_db", table_name="customer_manager_relation")
-    r = ses.find(filter=filter_dict)
+    r = ses.find(filter=filter_dict, sort=[('create_date', -1)])
     r = [x for x in r]
     if len(r) > 1:
         ms = "查询条件:{}查询到{}结果".format(filter_dict, len(r))
@@ -283,6 +283,65 @@ def query_relation(mt4_account: str = None, customer_name: str = None) -> dict:
     return res
 
 
+def parse_relation_excel() -> dict:
+    """
+    解析客户归属关系的表格,返回客户关系的dict,客户账户作为key
+    这个客户归属关系的表格每月从简道云下载
+    :return:
+    """
+    d = os.path.dirname(os.path.realpath(__file__))
+    f_p = os.path.join(d, 'excel', '开户激活_20180809084712.xlsx')
+    res = read_excel(f_p)
+    res = res[0]['data']
+    """
+    2. 客户姓名, 5. mt4 6. 平台名称 7. 所属员工 8.所属经理 9.所属总监 14 更新时间
+    """
+    account_dict = dict()
+    res.pop(0)
+    for x in res:
+        customer_name = x[2]
+        mt4_account = str(x[5])
+        platform = x[6]
+        sales_name = x[7]
+        manager_name = x[8]
+        director_name = x[9]
+        create_date = x[14]
+        temp = {
+            "customer_name": customer_name, "mt4_account": mt4_account, "platform": platform,
+            "sales_name": sales_name, "manager_name": manager_name, "director_name": director_name,
+            "create_date": create_date
+        }
+        if mt4_account in account_dict:
+            print("重复的 account: {}".format(mt4_account))
+            old_time = account_dict[mt4_account]['create_date']
+            if create_date > old_time:
+                print("{} > {} 更新".format(create_date, old_time))
+                account_dict[mt4_account] = temp
+            else:
+                print("{} <= {} 忽略".format(create_date, old_time))
+        else:
+            account_dict[mt4_account] = temp
+    return account_dict
+
+
+def from_excel_save_relation() -> None:
+    """
+    读取每月的客户关系表, 清空原始数据库并保存excel表中的内容:
+    1. 读取数据库中的客户关系,去重.
+    2. 用表格中的数据和数据库中的数据比较,更新,写入
+    :return:
+    """
+    ses = get_conn(database="my_crm_db", table_name="customer_manager_relation")
+    ses.delete_many(filter=dict())
+    excel_dict = parse_relation_excel()
+    excel_list = list(excel_dict.values())
+    ses.insert_many(documents=excel_list)
+
+
+
+
+
+
 def do_it(file_b: str = None, file_t: str = None, title: str = None, email: str = None) -> None:
     """
     匹配月度的交易记录和出入金记录中的的客户关系. 并发送到指定的邮箱.
@@ -293,8 +352,8 @@ def do_it(file_b: str = None, file_t: str = None, title: str = None, email: str 
     :return:
     """
     """请事先检查列名顺序是否和上月的一致?"""
-    b_name = file_b if file_b else "6.1-6.30新老平台出入金数据 .xlsx"  # 每次修改,必须是xlsx,而不能是就办的xls文件
-    t_name = file_t if file_t else "6.1-6.30新老平台交易明细.xlsx"     # 每次修改,必须是xlsx,而不能是就办的xls文件
+    b_name = file_b if file_b else "7月入金统计.xlsx"  # 每次修改,必须是xlsx,而不能是xls文件
+    t_name = file_t if file_t else "7月交易量.xlsx"     # 每次修改,必须是xlsx,而不能是xls文件
     if title is None:
         title = "{}月份出入金和交易记录(客户已关系匹配)".format(datetime.datetime.now().month - 1)
     email = email if email else "627853018@qq.com"
@@ -395,4 +454,6 @@ if __name__ == "__main__":
     2. 运行do_it函数
     """
     do_it()
+    """临时测试"""
+    # from_excel_save_relation()
     pass

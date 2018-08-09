@@ -47,11 +47,14 @@ class Teacher(mongo_db.BaseDoc):
     type_dict['profit_amount'] = float  # 总额.每次close时候计算
     type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
     type_dict['lots_range'] = list  # 手数范围.
+    # type_dict['show'] = bool  # 是否显示?默认显示
 
     @classmethod
     def instance(cls, **kwargs):
         if "create_date" not in kwargs:
             kwargs['create_date'] = datetime.datetime.now()
+        # if "show" not in kwargs:
+        #     kwargs['show'] = True
         if "name" not in kwargs:
             ms = "name必须"
             raise ValueError(ms)
@@ -183,5 +186,5 @@ class Teacher(mongo_db.BaseDoc):
 
 if __name__ == "__main__":
     # Teacher.index()
-    Teacher.single_info(t_id=ObjectId("5b65f2d9dbea625d78469f1b"))
+    Teacher.single_info(t_id=ObjectId("5aab3ea4340c1749505a2819"))
     pass

@@ -60,9 +60,14 @@ class WXUser(mongo_db.BaseDoc):
     type_dict['relate_time'] = datetime.datetime  # 和人力资源中介的关联时间
     type_dict['relate_id'] = ObjectId  # 人力资源中介_id,也就是Sales._id,用于判断归属.
     """以下Sales类专有属性"""
-    type_dict['authenticity'] = bool # 中介商/黄牛/销售 的真实性确认. 在审核通过后这个字段为真
+    type_dict['checked'] = int  # 是否已通过兼职/销售/中介的审核? 0/不存在忽略, 1是申请中未通过. 2是申请通过, -1是驳回.
+    type_dict['reject_reason'] = str  # 申请驳回原因,只有在checked字段是-1状态,本字段才有效
+    type_dict['authenticity'] = bool  # 中介商/黄牛/销售 的真实性确认. 在审核通过后这个字段为真
     type_dict['relate_image'] = str  # 中介商名字/销售二维码图片地址,这个图片保存在微信服务器上.
     type_dict['name'] = str  # 中介商名字/销售真实姓名.用于展示在二维码上
+    type_dict['contacts'] = str  # 中介公司联系人,如果是黄牛/销售,那么这里可以和注册用户的real_name是同一人
+    type_dict['contacts_num'] = str  # 中介公司联系电话,如果是黄牛/销售,那么这里可以和注册用户的phone一致
+    type_dict['contacts_email'] = str  # 中介公司/黄牛/销售联系邮箱,这个是专门用来发送结算信息的
     type_dict['identity_code'] = str  # 中介商执照号码/销售真实身份证id.用于部分展示在二维码上
     type_dict['business_license_image_url'] = str  # 营业执照照片的地址,
     type_dict['business_license_image'] = ObjectId  # 营业执照照片的id, 指向BusinessLicenseImage._id
@@ -127,7 +132,7 @@ class WXUser(mongo_db.BaseDoc):
         :return:
         """
         user = cls.find_by_id(o_id=user_id, to_dict=True)
-        if isinstance(user, cls):
+        if isinstance(user, dict):
             pass
         else:
             ms = "错误的user_id:{}".format(user_id)
@@ -409,4 +414,6 @@ class WXUser(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
+    """变更用户角色,从一般用户变更为中介"""
+    WXUser.change_role(user_id=ObjectId("5b56c0f87b3128ec21daa693"), role=2)
     pass

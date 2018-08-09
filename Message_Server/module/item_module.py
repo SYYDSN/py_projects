@@ -34,7 +34,8 @@ product_map = {
     "恒指": {"p_arg": 10, "cost": 100},
     "原油": {"p_arg": 1000, "cost": 100},
     "白银": {"p_arg": 5000, "cost": 250},
-    "黄金": {"p_arg": 100, "cost": 100}
+    "黄金": {"p_arg": 100, "cost": 100},
+    "测试": {"p_arg": 100, "cost": 100}
 }
 
 
@@ -296,11 +297,11 @@ class RawRequestInfo(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['ip'] = str
+    type_dict['url'] = str
     type_dict['path'] = str
     type_dict['args'] = dict
     type_dict['form'] = dict
     type_dict['json'] = dict
-    type_dict['xml'] = dict
     type_dict['headers'] = dict
     type_dict['time'] = datetime.datetime
 
@@ -319,9 +320,7 @@ class RawRequestInfo(mongo_db.BaseDoc):
         headers = {k: v for k, v in req.headers.items()}
         args = {k: v for k, v in req.args.items()}
         form = {k: v for k, v in req.form.items()}
-        json_data = None if req.json is None else {k: v for k, v in req.headers.items()}
-        xml_data = req.data.decode(encoding="utf-8")
-        xml = xmltodict.parse(xml_data) if xml_data != "" else dict()
+        json_data = None if req.json is None else (req.json if isinstance(req.json, dict) else json.loads(req.json))
         ip = get_real_ip(req)
         now = datetime.datetime.now()
         args = {
@@ -333,7 +332,6 @@ class RawRequestInfo(mongo_db.BaseDoc):
             "args": args,
             "form": form,
             "json": json_data,
-            "xml": xml,
             "time": now
         }
         return args
@@ -717,6 +715,7 @@ class Signal(mongo_db.BaseDoc):
                     try:
                         # Trade.sync_from_signal(signal=self)
                         Trade.sync_from_signal(signal=r)
+                        pass
                     except Exception as e:
                         print(e)
                         logger.exception(e)
