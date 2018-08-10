@@ -19,7 +19,7 @@ from module.sms_module import *
 from module.server_api import *
 from module.item_module import *
 import json
-from module.driver_module import DriverResume
+from module.driver_module import *
 from module.server_api import *
 from pdb import set_trace
 from uuid import uuid4
@@ -558,7 +558,6 @@ def common_view_func(html_name: str):
             "resume.html",
             "register_info.html",
             "additional.html",
-            "driver_three.html",
             "driver_two.html",
             "part_time.html",
             "update_id.html",
@@ -584,6 +583,13 @@ def common_view_func(html_name: str):
                 pass
             # set_trace()
             kwargs['resume'] = resume
+        elif html_name == "driver_three.html":  # 车辆信息
+            v_id = get_arg(request, "v_id", "")
+            if isinstance(v_id, str) and len(v_id) == 24:
+                vehicle = Vehicle.find_by_id(o_id=v_id, to_dict=True)
+            else:
+                vehicle = dict()
+            kwargs['vehicle'] = vehicle
         elif html_name == "add_info_jilu.html":  # 添加荣誉
             if resume_id == "":
                 return abort(403)

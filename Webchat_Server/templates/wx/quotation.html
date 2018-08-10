@@ -1,0 +1,28 @@
+{% extends "wx/template.html" %}
+{% block css %}
+    <link rel="stylesheet" href="/static/css/quotation.css?v={{ version }}">
+{% endblock %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 top_block">
+                <h3 class="left">实时报价</h3>
+                <h3 class="right">行情走势</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 middle_block">
+                <div class="price_list">
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/socket.io.js"></script>
+    <script src="/static/js/quotation.js?v={{ version }}"></script>
+{% endblock %}

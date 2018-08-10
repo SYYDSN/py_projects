@@ -1,3 +1,4 @@
+# -*-coding:utf-8-*-
 from flask import Flask
 from flask import request
 from flask import session
@@ -7,7 +8,6 @@ from flask import render_template
 from flask_socketio import SocketIO
 import json
 from module.quotations_module import Quotation
-import random
 
 
 port = 8001
@@ -59,6 +59,22 @@ def quotations_func(mes):
         socket_io.server.disconnect(sid)
     else:
         socket_io.emit(event="login", data=json.dumps({"message": "connect success!"}))
+
+
+"""示范部分"""
+
+
+@app.route("/listen", methods=['post', 'get'])
+def listen_func():
+    """"监听发送来的消息,并使用socketio向所有客户端发送消息"""
+    mes = {"message": "unknown error"}
+    data = request.args['data'] if request.args.get('data') else request.form.get('data')
+    if data is not None:
+        socket_io.emit(data=data, event="mes")
+        mes['message'] = "success"
+    else:
+        pass
+    return json.dumps(mes)
 
 
 @app.route("/test")

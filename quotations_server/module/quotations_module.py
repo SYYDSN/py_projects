@@ -47,6 +47,8 @@ class Quotation(mongo_db.BaseDoc):
         form = req.form
         form = {k: v for k, v in form.items()}
         platform_name = form.get("platform_name", "")
+        if platform_name == "":
+            platform_name = form.get("platform_name ", "")
         platform_account = form.get("platform_account", "")
         platform_time = form.get("platform_time", now)
         platform_time = platform_time.replace(".", "-") if isinstance(platform_time, str) else platform_time

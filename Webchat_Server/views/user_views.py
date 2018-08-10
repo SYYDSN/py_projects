@@ -272,40 +272,40 @@ def wx_js_api_demo():
     return render_template("wx_js_api_demo.html")
 
 
-@check_platform_session
+# @check_platform_session
 def common_view_func(html_name: str):
     """
     通用页面视图
     param html_name:  html文件名,包含目录路径
     :return:
     """
-    user = get_platform_session_arg("wx_user", dict())
-    # user = {
-    #     "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
-    #     "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
-    #     "access_token": "12_ypF7a9ujmbnNYnbtZF8eyLyy23H9YmST6pMPYAuYefQizi4CrFOupAlLXKMe2dfRGa2Ezt0ApdHHTz-LdX8qtYVS8qTq2OQtnW5ZXtvUCGQ",
-    #     "city": "闵行",
-    #     "country": "中国",
-    #     "expires_in": 7200,
-    #     "groupid": 0,
-    #     "head_img_url": "http://thirdwx.qlogo.cn/mmopen/dUtvxcibjGMKAzSRePkx3ZGZnRMsDyzU6f8fNjxtrS2nXCcwMPQUbZM4YYfS1vhWoObUHQaErCDEjNrStKszkiaA/132",
-    #     "language": "zh_CN",
-    #     "nick_name": "徐立杰",
-    #     "province": "上海",
-    #     "qr_scene": 0,
-    #     "qr_scene_str": "",
-    #     "refresh_token": "12_7h-zJ5RYfKWjYp7AQOiIe7VdFaZxw7gPFe3xxVVx4eEGdtuaYYK4st9HgSADdvJo_QpSLkF2JLP4Royzd_NfLde291LetISRV32TjtRweMQ",
-    #     "remark": "",
-    #     "scope": "snsapi_userinfo",
-    #     "sex": 1,
-    #     "subscribe": 1,
-    #     "subscribe_scene": "ADD_SCENE_SEARCH",
-    #     "tagid_list": [],
-    #     "relate_img": "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQF78DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyQm9HVjAxNG5jaGwxMDAwME0wN2QAAgQmRFhbAwQAAAAA",
-    #     "phone": "15618317376",
-    #     "resume_id": ObjectId("5b5a96d9bede684e68049f01")
-    # }
-
+    user = get_platform_session_arg("wx_user", None)
+    user2 = {
+        "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
+        "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
+        "access_token": "12_ypF7a9ujmbnNYnbtZF8eyLyy23H9YmST6pMPYAuYefQizi4CrFOupAlLXKMe2dfRGa2Ezt0ApdHHTz-LdX8qtYVS8qTq2OQtnW5ZXtvUCGQ",
+        "city": "闵行",
+        "country": "中国",
+        "expires_in": 7200,
+        "groupid": 0,
+        "head_img_url": "http://thirdwx.qlogo.cn/mmopen/dUtvxcibjGMKAzSRePkx3ZGZnRMsDyzU6f8fNjxtrS2nXCcwMPQUbZM4YYfS1vhWoObUHQaErCDEjNrStKszkiaA/132",
+        "language": "zh_CN",
+        "nick_name": "徐立杰",
+        "province": "上海",
+        "qr_scene": 0,
+        "qr_scene_str": "",
+        "refresh_token": "12_7h-zJ5RYfKWjYp7AQOiIe7VdFaZxw7gPFe3xxVVx4eEGdtuaYYK4st9HgSADdvJo_QpSLkF2JLP4Royzd_NfLde291LetISRV32TjtRweMQ",
+        "remark": "",
+        "scope": "snsapi_userinfo",
+        "sex": 1,
+        "subscribe": 1,
+        "subscribe_scene": "ADD_SCENE_SEARCH",
+        "tagid_list": [],
+        "relate_img": "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQF78DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyQm9HVjAxNG5jaGwxMDAwME0wN2QAAgQmRFhbAwQAAAAA",
+        "phone": "15618317376",
+        "resume_id": ObjectId("5b5a96d9bede684e68049f01")
+    }
+    user = user2 if user is None else user
     print("user: {}".format(user))
     template_dir = os.path.join(__project_dir__, 'templates', 'wx')
     file_names = os.listdir(template_dir)
@@ -359,6 +359,14 @@ def common_view_func(html_name: str):
         elif html_name == "user.html":
             """用户个人页面"""
             pass
+        elif html_name == "bind_phone.html":
+            """绑定手机页面"""
+            page_title = "绑定手机"
+            kwargs['page_title'] = page_title
+        elif html_name == "quotation.html":
+            """行情页面"""
+            page_title = "行情"
+            kwargs['page_title'] = page_title
         else:
             pass
         html_name = "wx/{}".format(html_name)
