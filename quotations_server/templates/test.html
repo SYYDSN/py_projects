@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script src="/static/js/socket.io.js"></script>
+<script>
+    var url = "http://" + document.domain + ':' + location.port;
+    console.log(url);
+    var io_client = io.connect(url);
+    io_client.on('connect', function() {
+        io_client.emit('login', {data: 'I\'m connected!'});
+    });
+
+
+    io_client.on("price", function(resp){
+        console.log(resp);
+    });
+    io_client.on("login", function(resp){
+        console.log(resp);
+    });
+</script>
+</html>

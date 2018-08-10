@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>车辆信息填写</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/LArea.css">
+</head>
+<style>
+    .div_spn{
+        padding: 0 60px;
+    }
+
+    .div_spn p span{
+        display: inline-block;
+        width: 49%;
+    }
+</style>
+<body>
+        <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <p> <span>有无车辆</span>  <i class="icon_lin pull-right glyphicon glyphicon-menu-right" data-toggle="modal" data-toggle="modal" data-target="#myModal"></i></p>
+                    </div>  
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <p><input type="text" placeholder="驾驶范围"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <p><input type="text" placeholder="熟悉路线"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian div_spn">
+                        <p><span class="">
+                            <input id="city_one" type="text" readonly="" name="input_area" placeholder="景德">
+                            <input id="value1" type="hidden"/>
+                            </span> 
+                            <i></i> 
+                            <span class="pull-right">
+                            <input id="city_two" type="text" readonly="" name="input_two" placeholder="景德">
+                            <input id="value2" type="hidden"/>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info text_cen">
+                        <p>继续添加路线</p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
+                        <a href="./resume.html"> <p>完成</p></a>
+                    </div>                          
+                </div>
+            </div>
+            <!-- 模态框 -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">有无车辆</h4>
+                    </div>
+                    <div class="modal-body" >
+                        <div style="display: inline-block;width: 50%"><input type="radio" name="rad">有</div>
+                        <div style="display: inline-block;width: 48%"><input type="radio" name="rad">无</div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary">确认</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+        <script src="../js/jquery.js"></script>
+        <script src="../js/bootstrap.min.js"></script>
+        <script src="../js/LAreaData1.js"></script>
+        <script src="../js/LAreaData1.js"></script>
+        <script src="../js/LArea.js"></script>
+
+        <script>
+            var area = new LArea();
+                area.init({
+                    'trigger': '#city_one',//触发选择控件的文本框，同时选择完毕后name属性输出到该位置
+                    'valueTo':'#value1',//选择完毕后id属性输出到该位置
+                    'keys':{id:'id',name:'name'},//绑定数据源相关字段 id对应valueTo的value属性输出 name对应trigger的value属性输出
+                    'type':1,//数据源类型
+                    'data':LAreaData//数据源
+                });
+                var area2 = new LArea();
+                area2.init({
+                    'trigger': '#city_two',//触发选择控件的文本框，同时选择完毕后name属性输出到该位置
+                    'valueTo':'#value2',//选择完毕后id属性输出到该位置
+                    'keys':{id:'id',name:'name'},//绑定数据源相关字段 id对应valueTo的value属性输出 name对应trigger的value属性输出
+                    'type':1,//数据源类型
+                    'data':LAreaData//数据源
+                });
+        </script>
+</body>
+</html>

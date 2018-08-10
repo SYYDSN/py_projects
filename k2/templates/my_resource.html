@@ -1,0 +1,76 @@
+{% extends "template.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/my_resource.css?v={{ version }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="top col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <h3>{{ y }}年{{ m }}月</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="middle col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="user_list">
+                    {% for x in data %}
+                        <div class="line">
+                            <div class="cell">
+                                <img src="{{ x.head_img_url }}">
+                            </div>
+                            <div class="cell">
+                                {{ x.nick_name }}
+                            </div>
+                            <div class="cell">
+                                {{ x.relate_time | str_time }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="bottom col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="page_area">
+                    <!--改进版的页码区域,本例适应移动端-->
+                    {% if pages[0] and pages[0] > 1 %}
+                    <!--如果当前页码组中最小一个等于1,那就是不需要前一页这个标签-->
+                        <a href="?index={{ page_index - 1 }}&y={{ y }}&m={{ m }}" class="prev">上一页</a>
+                    {% endif %}
+                    {% for page in pages %}
+                        <a href="?index={{ page }}&y={{ y }}&m={{ m }}" class="num {{ "active" if page == page_index else "" }}">{{ page }}</a>
+
+                    {% endfor %}
+                    {% if pages[-1] and pages[-1] < total_page %}
+                    <!--如果当前页码组中最大的一个大于等于最大页码,那就是不需要后一页这个标签-->
+                        <a href="?index={{ page_index + 1 }}&y={{ y }}&m={{ m }}"  class="next">下一页</a>
+                    {% endif %}
+                    <span>{{ "共计" + total_page | string + "页" if total_page > 1 else "" }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        role = {{ user.role if user.role else 0 }};
+        if(role >= 1 && role <= 3){
+            // 这是中介/销售/黄牛 ,nothing
+        }
+        else{
+            var referrer = location.referrer;
+            if(referrer == undefined || referrer == ""){
+                referrer = "/wx/html/resume.html";
+            }else{}
+            alert("权限不足");
+            location.href = referrer;
+        }
+    </script>
+    <script src="/static/js/my_resource.js?v={{ version }}"></script>
+{% endblock %}

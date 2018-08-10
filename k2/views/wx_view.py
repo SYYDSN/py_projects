@@ -9,7 +9,6 @@ from flask import render_template
 from flask import send_file
 from flask import make_response
 from flask import abort
-from bson.objectid import ObjectId
 from tools_module import *
 from mongo_db import BaseFile
 from mongo_db2 import BaseFile as BaseFile2
@@ -25,7 +24,6 @@ from pdb import set_trace
 from uuid import uuid4
 from pdb import set_trace
 import requests
-from mongo_db import get_datetime_from_str
 
 
 """注册蓝图"""
@@ -454,23 +452,6 @@ def resume_opt_func():
     user = get_platform_session_arg("wx_user")
     u_id = user['_id']
     resume_args = get_args(request)
-    if "time" in resume_args:
-        resume_args['time'] = get_datetime_from_str(resume_args['time'])
-    if "relate_time" in resume_args:
-        resume_args['relate_time'] = get_datetime_from_str(resume_args['relate_time'])
-    if "relate_id" in resume_args:
-        relate_id = resume_args['relate_id']
-        resume_args['relate_id'] = relate_id if isinstance(relate_id, ObjectId) else ObjectId(relate_id)
-    if "resume_id" in resume_args:
-        resume_id = resume_args['resume_id']
-        resume_args['resume_id'] = resume_id if isinstance(resume_id, ObjectId) else ObjectId(resume_id)
-    if "business_license_image" in resume_args:
-        business_license_image = resume_args['business_license_image']
-        resume_args['business_license_image'] = business_license_image if isinstance(business_license_image, ObjectId) \
-            else ObjectId(business_license_image)
-    if "authenticity" in resume_args:
-        authenticity = resume_args['authenticity']
-        resume_args['authenticity'] = authenticity if isinstance(authenticity, bool) else bool(authenticity)
     try:
         mes = WXUser.opt_resume(u_id=u_id, resume_args=resume_args)
     except Exception as e:
@@ -495,10 +476,6 @@ def resume_extend_info_func():
     u_id = user['_id']
     # u_id = ObjectId("5b56bdba7b3128ec21daa4c7")
     arg_dict = get_args(request)
-    if "begin" in arg_dict:
-        arg_dict['begin'] = get_datetime_from_str(arg_dict['begin'])
-    if "end" in arg_dict:
-        arg_dict['end'] = get_datetime_from_str(arg_dict['end'])
     if arg_dict is None or len(arg_dict) == 0:
         mes['message'] = "参数不能为空"
     else:

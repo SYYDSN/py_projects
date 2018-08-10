@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>荣誉证件</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/LCalendar.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/weui.min.css">
+</head>
+<script src="/static/js/jquery.js"></script>
+<script>
+        $(function(){
+                    let url_head = location.search;
+                   if(url_head) {
+                       $(".submit").css({
+                           display: "none"
+                       });
+                   }else{
+                       $(".modify").css({
+                           display:"none"
+                       })
+                   }
+            })
+</script>
+<style>
+
+        .div_info_btn{
+            position: relative;
+            margin-bottom: 1em;
+            height: 4em;
+        }
+        .div_info_btn p{
+            margin-top: 2em;
+            text-align: center;
+            border: 1px solid #ccc;
+            line-height: 2.5em;
+            border-radius: 6px;
+        }
+        input{
+            width: 35% !important;
+            line-height: 6em;
+        }
+        #times{
+            margin-top: 34px;
+        }
+        .iimg {
+            display: inline-block;
+            width: 60px;
+            height: 6em;
+            overflow: hidden;
+        }
+        .imgs{
+            width: 100%;
+            height:2.5em;
+        }
+        .time_inp{
+            width:30% !important;
+            margin-top: 34px;
+        }
+        .inp_wid{
+            width: 100% !important;
+        }
+       .dele{
+            text-align: center;
+            width: 100% !important;
+            position: relative;
+            display: inline-block;
+            height: 3em;
+        }
+        .dele i{
+            text-align: center;
+            width: 3em;
+            height: 3em;
+            color: red;
+            line-height: 3em;
+            font-size: 1rem;
+        }
+    </style>
+<script>
+    user = {{ user | safe }}; honor = {{ honor | safe }};
+</script>
+<body>
+
+        <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <p>荣誉</p>
+                    </div>  
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <p>获奖时间 
+                            <i class="glyphicon glyphicon-menu-right pull-right"></i>
+                            <input class="inp_add pull-right time_inp" id="time" type="text" readonly="" value = "{{ honor.time }}" placeholder="日期选择" data-lcalendar="2016-05-11,2016-05-11" />
+                        </p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <p><input class="inp_add inp_wid" id="title" value="{{ honor.title }}" type="text" placeholder="荣誉名称"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                            <p><input class="inp_add inp_wid" id="info" value="{{ honor.info }}" type="text" placeholder="荣誉信息"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <p>
+                            <span>荣誉证件</span>
+                            <i class="pull-right iimg">
+                                <img id="image_id" class="imgs inp_add"  src="/static/images/poto.png" alt="">
+                            </i>
+                        </p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
+                        <a id="submit" class="submit" href="javascript:;"> <p>完成</p></a>
+                        <a href="javascript:;" id="modify" class="modify"> <p>修改</p></a>
+                        <a id="delete" class="dele" href="javascript:;"><i class="glyphicon glyphicon-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+
+        <script src="/static/js/jquery.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <script src="/static/js/LCalendar.min.js"></script>
+        <script src="/static/js/wexin.js"></script>
+        <script src="/static/js/jquery-weui.min.js"></script>
+        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
+        <script>
+            var calendar = new LCalendar();
+            calendar.init({
+                'trigger': '#time', //标签id
+                'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
+                'minDate': '1900-1-1', //最小日期
+                'maxDate': new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() //最大日期
+            });
+        </script>
+        <script>
+            function img_honor($obj){
+                wx.chooseImage({
+                        count: 1, // 默认9
+                        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                        sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                        success: function (res) {
+                        var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                         $obj.attr('src',localIds);
+                         wx.uploadImage({
+                            localId: localIds[0], // 需要上传的图片的本地ID，由chooseImage接口获得
+                            isShowProgressTips: 1, // 默认为1，显示进度提示
+                            success: function (res) {
+                                var serverId = res.serverId; // 返回图片的服务器端ID
+                                if($obj.attr('id') == 'image_id'){
+                                    var table_name = "honor_image";
+                                }
+                               var  field_name =  "image_id";
+                                 //上传图片对应的  id信息
+                                var args = {
+                                    "server_id":serverId,
+                                    "table_name": table_name,
+                                    "field_name": field_name,
+                                    "db":"mongo_db2" // 库名，固定
+                                };
+                                var url = "/wx/auto_download/" + table_name;
+                                $.post(url, args,function(resp){
+                                    let  json = JSON.parse(resp);
+                                    let status = json['message'];
+                                    if(status == 'success'){
+                                        $obj.attr("data-id", json[field_name]);
+                                        $obj.attr("data-url", json[field_name + "_url"]);
+                                        console.log($obj)
+                                    }else{
+                                        alert(status);
+                                    }
+                                })
+                            }
+                            });
+                        }
+                    });
+            };
+            $('.iimg').each(function(){
+                let $this = $(this);
+                $this.click(function(){
+                    let img = $this.find('.imgs');
+                    img_honor(img)
+                })
+            })
+
+            function submit(class_name){
+                let doms = $(`.${class_name}`);
+                let args = {};
+                let is_null = false;
+                for(let dom of doms){
+                    let obj = $(dom);
+                    let tag_name = obj[0].tagName.toLowerCase();
+                    let arg_name = obj.attr('id');
+                    if(tag_name == 'input'){
+                        let val = $.trim(obj.val());
+                        if(val){
+                            args[arg_name] =val;
+                            is_null = true;
+                        };
+                    }else {
+                        if(arg_name == 'image_id'){
+                            let image_id = obj.attr("data-id");
+                            if(image_id){
+                                is_null = true;
+                                args["image_id"] = image_id;
+                                args["imge_url"] = obj.attr("data-url");
+                            }
+                        }
+                    }
+                };
+                return is_null? args:null;
+            };
+          // 添加信息            
+            $('#submit').on('touchstart', function(){
+                let args = submit("inp_add");
+
+                if(args){
+                    args['resume_id'] = user.resume_id;
+                    args['opt'] = "add_honor";
+                    $.post("/wx/resume/extend", args, function(resp){
+                        let json = JSON.parse(resp);
+                        if(json['message'] == 'success'){
+                            $.toast("保存成功！");
+                            setTimeout(function(){location.href = '/wx/html/resume.html';},1000);
+                        }else{
+                            alert('保存失败');
+                        }
+                    }) 
+                }else{
+                    alert('未保存信息！');
+                }
+            });
+            //修改信息
+            $('#modify').on('touchstart', function(){
+                let args = submit("inp_add");
+                if(args){
+                    let url_head = location.search; //获取url中含"?"符后的字串
+                    let h_id = url_head.substring(6); //履历id
+                    args['h_id'] = h_id;
+                    args['resume_id'] = user.resume_id;
+                    args['opt'] = "update_honor";
+                    $.post("/wx/resume/extend", args, function(resp){
+                        let json = JSON.parse(resp);
+                        if(json['message'] == 'success'){
+                            alert('修改成功！');
+                            location.href = '/wx/html/resume.html';
+                        }else{
+                            alert('修改失败');
+                        }
+                    }) 
+                }else{
+                    alert('未修改信息');
+                }
+            });
+            
+        </script>
+        <!-- 微信 提示 删除按钮-->
+        <script>
+            $("#delete").on("touchstart",function(){
+                $.confirm("您确定删除本条信息？",function(){
+                    // 删除操作
+                    let url_head = location.search; //获取url中含"?"符后的字串
+                    let h_id = url_head.substring(6);
+                    let args = {};
+                    // let work_id = $("#work_id").text();
+                    args['resume_id'] = user.resume_id;
+                    args['h_id'] = h_id;
+                    args["opt"] = "delete_honor";
+                    $.post("/wx/resume/extend", args, function(resp){
+                        let json = JSON.parse(resp);
+                        if(json['message'] == 'success'){
+                            $.toast("删除成功！");
+                            setTimeout(function(){location.href = '/wx/html/resume.html';},1000);
+                        }else{
+                            alert('删除失败！');
+                        }
+                    })
+                    
+                },function(){ 
+                    //取消c操作
+                })
+            })
+        </script>
+</body>
+</html>

@@ -12,7 +12,7 @@ ObjectId = mongo_db.ObjectId
 logger = get_logger()
 
 
-"""行情模块"""
+"""行情模块,本项目中,这个模块只是示范,用于测试环境,生产环境下,请参考quotations_server.module.quotations_module模块"""
 
 
 class Quotation(mongo_db.BaseDoc):
