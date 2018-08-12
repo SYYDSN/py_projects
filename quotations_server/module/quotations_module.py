@@ -95,3 +95,9 @@ class Quotation(mongo_db.BaseDoc):
         mes = [mongo_db.to_flat_dict(x) for x in init_list]
         data = json.dumps(mes)
         io.emit(event=event, data=data)
+
+
+class KLine(mongo_db.BaseDoc):
+    """
+    :k线数据，从5分钟开始。
+    """
