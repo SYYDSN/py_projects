@@ -97,6 +97,12 @@ class Quotation(mongo_db.BaseDoc):
         io.emit(event=event, data=data)
 
 
+class ProviderStatus(mongo_db.BaseDoc):
+    """
+    报价提供者(提供报价的服务器/应用程序)(在线/工作)状态
+    """
+
+
 class KLine(mongo_db.BaseDoc):
     """
     :k线数据，从5分钟开始。

@@ -1,25 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>注册</title>
     <script src="/static/js/common.js"></script>
     <!-- <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/mui.min.css"> -->
 </head>
-      <script>
-          user = {{ user | safe }};
-//            (function(){
-//             if(user['phone'] !==''){
-//                window.location.href="javascript:WeixinJSBridge.call('closeWindow');";//返回到公众号窗口首页
-//                return;
-//             }
-//         })();
-    </script>
-    
-    
 <style>
     *{
         margin: 0;
@@ -39,7 +30,7 @@
     .inp_txt p{
         margin: 0 auto;
         text-align: center;
-        
+
         background: #fff;
         height: 42px;
 
@@ -65,14 +56,14 @@
     }
     .inp_txt p:nth-child(2) {
         word-break:keep-all;
-        white-space:nowrap; 
+        white-space:nowrap;
     }
     .inp_txt p:nth-child(2)  span{
         display: inline-block;
         color: #FFB93C;
         width: 18%;
         word-break:keep-all;
-        white-space:nowrap; 
+        white-space:nowrap;
         height: 100%;
         line-height: 42px;
         /* #427DFF */
@@ -92,7 +83,7 @@
         line-height: 42px;
     }
     .inp_txt p:nth-child(4) input{
-       height: 12px;
+        height: 12px;
 
     }
     .login{
@@ -121,115 +112,114 @@
         display:none;
     }
     .tishi2{
-         width: 100%;
+        width: 100%;
         position: relative;
         top: 1em;
         text-align: center;
         color: rgb(255, 97, 124);
-/*         display:none; */
+        /*         display:none; */
     }
 </style>
 <script> user = {{ user | safe }}; </script>
 <body>
-    <div class="register">
+<div class="register">
 
-        <div class="login">
-            <span class="spn"><img src="/static/images/logins.jpeg" alt=""></span>
-            <p  id="inp"></p> 
-        </div>
-        <div class="inp_txt">
-            <p><input id="phone_number" type="text" placeholder="手机号" value=""></p> 
-
-            <p><input type="text" id="code" placeholder="验证码"> <span id="ver_code">获取验证码</span></p> 
-
-            <p><a id="ahref"><input type="button" value="注册/登录"> </a></p> 
-
-            <p><input id="cheb" type="checkbox">点击登录 &#47; 注册，即表示同意卡佑用户协议</p> 
-        </div>
+    <div class="login">
+        <span class="spn"><img src="/static/images/logins.jpeg" alt=""></span>
+        <p  id="inp"></p>
     </div>
+    <div class="inp_txt">
+        <p><input id="phone_number" type="text" placeholder="手机号" value="{{ user.phone }}"></p>
 
-    <div class="tishi">抱歉！请您正确输入手机号</div>
-    <div class="tishi2"></div>
-    <script src="/static/js/jquery.js"></script>
+        <p><input type="text" id="code" placeholder="验证码"> <span id="ver_code">获取验证码</span></p>
 
-    <script>
-//         //判断是否已经注册如过注册返回窗口
-        $().ready(function(){
-               if(user['phone'] !==''){
-                   $('.register').css('display','none');
-                   top.location = "/wx/html/register_info.html";
-                   alert('您已注册！');
-               return;
+        <p><a id="ahref"><input type="button" value="注册"> </a></p>
+
+        <p><input id="cheb" type="checkbox">点击注册，即表示同意卡佑用户协议</p>
+    </div>
+</div>
+
+<div class="tishi">
+    <div class="show1">抱歉！请您正确输入手机号</div>
+    <div class="tips_bottom">
+        <button>确定</button>
+    </div>
+</div>
+<div class="tishi2"></div>
+<script src="/static/js/jquery.js"></script>
+
+<script>
+    $(function(){
+        // 关闭手机号码不正确的模态框提示
+        $(".tishi .show1 .tips_bottom button").click(function(){$(".tishi").hide();});
+
+        //判断是否已经注册如过注册返回窗口
+        (function(){
+            if(user['phone'] !== undefined && user['phone'].length == 11){
+                top.location = "/wx/html/register_info.html";
+                alert('您已注册！');
+                return;
             }
-        });
-        // $('#inp').text(user['openid']);
-        //获取输入框
+        })();
+
         var $phone_number = $('#phone_number');
-        $phone_number.on('blur',function(){
-            //正则匹配手机号
-            var pattern = /^((1[3,5,8][0-9])|(14[5,7])|(17[0,6,7,8])|(19[7]))\d{8}$/;
-            if(pattern.test($phone_number.val()) == true ){
-                return $phone_number.val();
-            }else if(pattern.test($phone_number.val()) == false){
-                $('.tishi').css('display','block');
-                setTimeout(function(){
-                $('.tishi').css('display','none');
-                },3000);
-            };
-        //    console.log(pattern.test($phone_number.val()))
-        });
         //点击获取验证码按钮
         $('#ver_code').click(function(){
             console.log($phone_number.val());
             // 倒计时
             var countdown =60;
             function settime(cb){
-                    //当等于0时重新赋值
-                    if(countdown == 0){
+                //当等于0时重新赋值
+                if(countdown == 0){
                     this.$('#ver_code').text("获取验证码");
-                    countdown = 60; 
+                    countdown = 60;
                     return;
-                }else { 
+                }else {
                     this.$('#ver_code').text("倒计时(" + countdown + ")");
-                    countdown--; 
+                    countdown--;
                     this.$('#ver_code').click(function(){
-                        
+
                     });
-                    console.log(countdown)
-                    setTimeout(function() { 
-                        settime() }
+                    console.log(countdown);
+                    setTimeout(function() {
+                            settime() }
                         ,1000);
                 }
             }
             settime();
             //  倒计时进入  发送post请求
             var phone = $.trim($phone_number.val());
-                 $.post('/wx/sms/send',{"phone": phone}, function(res){
-//                     $('#inp').text(res);
-                    $('#ver_code');
-                  });
+            $.post('/wx/sms/send',{"phone": phone}, function(res){
+                var resp = JSON.parse(res);
+                var status = resp['message'];
+                if(status == "success"){
+                    // 成功
+                }
+                else{
+                    // 失败
+                }
+            });
         });
         //点击注册验证
         $("#ahref").click(function(){
-            //判断是否已经注册
-           if(user['phone'] !== ''){
-               window.location.href="javascript:WeixinJSBridge.call('closeWindow');";//返回到公众号窗口首页
-               alert('您已注册！');
-               return;
-           };
             var phone = $.trim($("#phone_number").val());// 手机号
             var code = $.trim($("#code").val()); // 验证码
             if(!validate_phone(phone)){
-                $('.tishi').css('display','block');
-                setTimeout(function(){
-                $('.tishi').css('display','none');
-                },3000);
+                // 手机号码验证不通过
+                $(".tishi").show(300);
                 return false;
             }
             else if(code.length != 4){
-                 $('.tishi2').text('验证码错误');
-                 setTimeout(function(){
-                     $('.tishi2').text('');
+                $('.tishi2').text('验证码错误');
+                setTimeout(function(){
+                    $('.tishi2').text('');
+                },3000)
+                return false;
+            }
+            else if($('#cheb').is(':checked') == false){
+                $('.tishi2').text('未勾选卡佑协议');
+                setTimeout(function(){
+                    $('.tishi2').text('');
                 },3000)
                 return false;
             }
@@ -238,25 +228,21 @@
                 $.post("/wx/sms/check", args, function(resp){
                     var json = JSON.parse(resp);
                     var status = json['message'];
-                    if( status == "success" && $('#cheb').is(':checked') == true){
+                    if( status == "success"){
                         window.location.href="/wx/html/register_info.html";
                     }
                     else{
-                        if(status == 'success'){
-                            $('.tishi2').text('未同意卡佑协议');
-                        }
-                        else{
-                            $('.tishi2').text(status);
-                        }
+                        alert(status);
                         return false;
                     }
                 });
-                setTimeout(function(){
-                     $('.tishi2').text('');
-                },3000);
             }
         });
-    </script>
+
+        // end!!!
+    });
+
+</script>
 </body>
 </html>
 

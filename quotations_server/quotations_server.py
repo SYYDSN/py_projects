@@ -29,7 +29,19 @@ def hello_world():
 
 @app.route("/quotations/listen", methods=['post', 'get'])
 def quotations_func():
-    """"监听发送来的报价,并使用socketio向所有客户端发送消息"""
+    """"
+    监听发送来的报价,并使用socketio向所有客户端发送消息,注意:
+    1. 平台有优先级.优先级可以人为排序.
+    2. 同一时间,只允许根据一个报价服务器的报价发布.
+    3. 每次接收到报价都要检查一下当前的报价服务器是否是允许发布报价的服务器.
+        如果是,那就发布报价,如果不是就竞争发布权.
+            发布报价时:
+                     比较上一次的报价,如果全部相等.并持续超过5秒,认为停盘.
+                     确认停盘后,让出发布权.直到所有的服务器处于停盘状态.
+            竞争发布权时:
+                    如果当前的发布服务器超过2秒没有发布报价.则竞争发布权成功.
+                    否则保持沉默. 保持沉默的报价,不写入数据库.
+    """
     mes = {"message": "unknown error"}
     price_list = Quotation.analysis_request(req=request, auto_save=True)
     if isinstance(price_list, list):

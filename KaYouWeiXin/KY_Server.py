@@ -187,6 +187,12 @@ def message_func():
         return abort(405)
 
 
+@app.route("/temp_message", methods=['post', 'get'])
+def temp_message():
+    mes = {"message": "success"}
+    return json.dumps(mes)
+
+
 @app.before_request
 def logger_request_info():
     """
