@@ -9,6 +9,7 @@ from flask import render_template
 from flask import send_file
 from flask import make_response
 from flask import abort
+from bson.objectid import ObjectId
 from tools_module import *
 from mongo_db import BaseFile
 from mongo_db2 import BaseFile as BaseFile2
@@ -18,12 +19,13 @@ from module.sms_module import *
 from module.server_api import *
 from module.item_module import *
 import json
-from module.driver_module import DriverResume
+from module.driver_module import *
 from module.server_api import *
 from pdb import set_trace
 from uuid import uuid4
 from pdb import set_trace
 import requests
+from mongo_db import get_datetime_from_str
 
 
 """注册蓝图"""
@@ -36,8 +38,8 @@ wx_blueprint = Blueprint("wx_blueprint", __name__, url_prefix="/wx", template_fo
 @check_platform_session
 def hello() -> str:
     """hello world"""
-    wx_user = get_platform_session_arg("wx_user")
-    return "hello baby <a href='/wx/auth/info'>去授权</a><br><h2>{}</h2>".format(str(wx_user))
+    user_id = get_platform_session_arg("user_id")
+    return "hello baby <a href='/wx/auth/info'>去授权</a><br><h2>{}</h2>".format(str(user_id))
 
 
 @check_platform_session
@@ -146,7 +148,8 @@ def download_image_func(table_name):
     :return:
     """
     mes = {"message": "success"}
-    wx_user = get_platform_session_arg("wx_user")
+    user_id = get_platform_session_arg("user_id", None)
+    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     """
     tables表名,分别存储不同的类的实例.
     1. base_info                  文件存储基础表,BaseFile
@@ -178,7 +181,7 @@ def download_image_func(table_name):
             # set_trace()
             if isinstance(content, bytes):
                 img = BytesIO(initial_bytes=content)
-                r = handler.save_cls(file_obj=img, collection=table_name, owner=wx_user['_id'])
+                r = handler.save_cls(file_obj=img, collection=table_name, owner=user['_id'])
                 if isinstance(r, ObjectId):
                     if db_str == "mongo_db2":
                         """简历相关的图片和文件"""
@@ -254,7 +257,7 @@ def draw_user_info():
         if "openid" in data:
             """成功"""
             obj = WXUser.wx_login(**data)
-            session["wx_user"] = obj
+            session["user_id"] = obj['_id']
             return redirect(ref)
             # return render_template("page_auth.html", ref=ref, data=data)
         else:
@@ -268,7 +271,8 @@ def self_info_func(key):
      这里,既不能新增用户,也不能删除用户,只有修改和查看
     :return:
     """
-    user = get_platform_session_arg("wx_user", "")
+    user_id = get_platform_session_arg("user_id", None)
+    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     if not isinstance(user, dict):
         return abort(404)
     else:
@@ -404,7 +408,8 @@ def sms_func(key):
     :return:
     """
     mes = {"message": "success"}
-    user = get_platform_session_arg("wx_user", None)
+    user_id = get_platform_session_arg("user_id", None)
+    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     if user is None:
         mes['message'] = "未登录"
     else:
@@ -429,7 +434,8 @@ def sms_func(key):
                 r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
                 if isinstance(r, dict):
                     """成功"""
-                    session['wx_user'] = r
+                    session['user_id'] = r['_id']
+                    session.pop('wx_user', None)
                 else:
                     mes['message'] = "绑定手机失败"
             else:
@@ -449,9 +455,27 @@ def resume_opt_func():
     :return:
     """
     mes = {"success": "error"}
-    user = get_platform_session_arg("wx_user")
+    user_id = get_platform_session_arg("user_id", None)
+    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     u_id = user['_id']
     resume_args = get_args(request)
+    if "time" in resume_args:
+        resume_args['time'] = get_datetime_from_str(resume_args['time'])
+    if "relate_time" in resume_args:
+        resume_args['relate_time'] = get_datetime_from_str(resume_args['relate_time'])
+    if "relate_id" in resume_args:
+        relate_id = resume_args['relate_id']
+        resume_args['relate_id'] = relate_id if isinstance(relate_id, ObjectId) else ObjectId(relate_id)
+    if "resume_id" in resume_args:
+        resume_id = resume_args['resume_id']
+        resume_args['resume_id'] = resume_id if isinstance(resume_id, ObjectId) else ObjectId(resume_id)
+    if "business_license_image" in resume_args:
+        business_license_image = resume_args['business_license_image']
+        resume_args['business_license_image'] = business_license_image if isinstance(business_license_image, ObjectId) \
+            else ObjectId(business_license_image)
+    if "authenticity" in resume_args:
+        authenticity = resume_args['authenticity']
+        resume_args['authenticity'] = authenticity if isinstance(authenticity, bool) else bool(authenticity)
     try:
         mes = WXUser.opt_resume(u_id=u_id, resume_args=resume_args)
     except Exception as e:
@@ -472,10 +496,15 @@ def resume_extend_info_func():
     :return:
     """
     mes = {"success": "error"}
-    user = get_platform_session_arg("wx_user", dict())
+    user_id = get_platform_session_arg("user_id", None)
+    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     u_id = user['_id']
     # u_id = ObjectId("5b56bdba7b3128ec21daa4c7")
     arg_dict = get_args(request)
+    if "begin" in arg_dict:
+        arg_dict['begin'] = get_datetime_from_str(arg_dict['begin'])
+    if "end" in arg_dict:
+        arg_dict['end'] = get_datetime_from_str(arg_dict['end'])
     if arg_dict is None or len(arg_dict) == 0:
         mes['message'] = "参数不能为空"
     else:
@@ -496,7 +525,8 @@ def common_view_func(html_name: str):
     param html_name:  html文件名,包含目录路径
     :return:
     """
-    user = get_platform_session_arg("wx_user", dict())
+    user_id = get_platform_session_arg("user_id", None)
+    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     user2 = {
         "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
         "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
@@ -535,7 +565,6 @@ def common_view_func(html_name: str):
             "resume.html",
             "register_info.html",
             "additional.html",
-            "driver_three.html",
             "driver_two.html",
             "part_time.html",
             "update_id.html",
@@ -561,6 +590,13 @@ def common_view_func(html_name: str):
                 pass
             # set_trace()
             kwargs['resume'] = resume
+        elif html_name == "driver_three.html":  # 车辆信息
+            v_id = get_arg(request, "v_id", "")
+            if isinstance(v_id, str) and len(v_id) == 24:
+                vehicle = Vehicle.find_by_id(o_id=v_id, to_dict=True)
+            else:
+                vehicle = dict()
+            kwargs['vehicle'] = vehicle
         elif html_name == "add_info_jilu.html":  # 添加荣誉
             if resume_id == "":
                 return abort(403)

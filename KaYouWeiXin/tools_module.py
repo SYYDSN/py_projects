@@ -14,6 +14,7 @@ import json
 import re
 import numpy as np
 import base64
+from module.item_module import WXUser
 import random
 import hashlib
 from uuid import uuid4
@@ -90,13 +91,19 @@ def check_platform_session(f):
     """检测管操作员是否登录的装饰器"""
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
-        wx_user = session.get("wx_user")  # 检测session中的wx_user
-        print("wx_user: {}".format(wx_user))
-        if wx_user is None:
+        session.pop("wx_user", None)  # 去除以前的会话内容
+        user_id = session.get("user_id")  # 检测session中的user_id
+        if isinstance(user_id, ObjectId):
+            user = WXUser.find_by_id(o_id=user_id, to_dict=True)
+        else:
+            user = None
+        print("user_id: {}".format(user_id))
+        if user is None:
             ref = request.full_path
             ref = base64.urlsafe_b64encode(ref.encode())
             return redirect(url_for("wx_blueprint.get_code_and_redirect", ref=ref))
         else:
+            kwargs['user'] = user
             return f(*args, **kwargs)
     return decorated_function
 
