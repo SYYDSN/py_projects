@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="format-detection" content="email=no">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+		<meta name="screen-orientation" content="portrait" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<title>战绩榜单</title>
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		<script type="text/javascript" src="js/common.js"></script>
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+	</head>
+
+	<body>
+		<div class="wrapIn">
+
+			<div class="crunchyWrap">
+				<div class="crunchy-topText">
+					<div class="p-img">
+						<img src="images/bannerbg.png" />
+					</div>
+					<div class="right-text">
+						<p class="name">
+							<span>收益高手1号</span># 机会准 持单短
+						</p>
+						<p class="num">
+							<span>2.11%</span>近30天收益率
+						</p>
+					</div>
+				</div>
+				<ul class="crunchy-tabList">
+					<li class="on">
+						<a href="crunchy.html">数据统计</a>
+					</li>
+					<li>
+						<a href="currentCrunchy.html">当前交易</a>
+					</li>
+					<li>
+						<a href="currentCrunchy.html">历史交易</a>
+					</li>
+				</ul>
+				<div class="crunchy-InfoText">
+					<div class="crunchy-wrap">
+						<div class="textTop">
+							<p>表现</p>数据将于每天北京时间00:00更新
+						</div>
+						<img src="images/img2.jpg" />
+						<p class="textHint">*历史表现并不代表未来交易的成功率，您需要理智的做出判断</p>
+						<p class="tongjiTitle">数据统计</p>
+						<ul class="tongji">
+							<li>
+								<p>87.10%</p>准确率
+							</li>
+							<li>
+								<p>484笔</p>盈利订单
+							</li>
+							<li>
+								<p>558笔</p>总平仓交易
+							</li>
+							<li>
+								<p>2天09时17分</p>平均持仓时间
+							</li>
+							<li>
+								<p>71笔</p>亏损订单
+							</li>
+
+						</ul>
+					</div>
+					<div class="crunchy-btn">
+						<button type="button" class="button-link" onclick="location.href='standings.html'">跟踪高手</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<!--弹层-->
+		<div class="fixedWin">
+			<!--积分不足-->
+			<div class="wrapWin" style="display: none;">
+				<h3 class="textTitle">跟确认踪  <span class="close"></span></h3>
+				<div class="corlor9f9f9f ptb03">系统将使用跟单专用帐号复制高手，无跟单帐号复制时将自动生成， 所有复制操作均使用该跟单帐号进行；
+					<br /> 若复制金额低于建议充值积分，否则可能会导致跟单失败。
+				</div>
+				<fieldset>
+
+					<legend>跟踪积分</legend>
+					<p class="text">0.00</p>
+				</fieldset>
+				<div class="textlist">
+					<dl>
+						<dt>可用积分</dt>
+						<dd>0.00</dd>
+					</dl>
+					<dl>
+						<dt>建议跟踪积分</dt>
+						<dd>200.00</dd>
+					</dl>
+					<dl>
+						<dt>剩余可跟踪积分</dt>
+						<dd>2000000.00</dd>
+					</dl>
+				</div>
+				<p class="textCenter pt03">
+					<a href="" class="btnLinks">可用积分不足，去充值</a>
+				</p>
+			</div>
+			<!--确认积分-->
+			<div class="wrapWin" style="display: none;">
+				<h3 class="textTitle">跟确认踪  <span class="close"></span></h3>
+				<div class="corlor9f9f9f ptb03">系统将使用跟单专用帐号复制高手，无跟单帐号复制时将自动生成， 所有复制操作均使用该跟单帐号进行；
+					<br /> 若复制金额低于建议充值积分，否则可能会导致跟单失败。
+				</div>
+				<fieldset>
+
+					<legend>跟踪积分</legend>
+					<p class="text">0.00</p>
+				</fieldset>
+				<div class="textlist">
+					<dl>
+						<dt>可用积分</dt>
+						<dd>0.00</dd>
+					</dl>
+					<dl>
+						<dt>建议跟踪积分</dt>
+						<dd>200.00</dd>
+					</dl>
+					<dl>
+						<dt>剩余可跟踪积分</dt>
+						<dd>2000000.00</dd>
+					</dl>
+				</div>
+				<p class="textCenter pt03"><button type="button" class="button-text">确认积分</button></p>
+
+			</div>
+			<!--跟踪成功-->
+			<div class="wrapWin">
+				<h3 class="textTitle"> <span class="close"></span></h3>
+
+				<h2 class="succeedText">跟踪成功</h2>
+				<div class="textlist borderNone">
+					<dl>
+						<dt>可用积分</dt>
+						<dd>0.00</dd>
+					</dl>
+
+					<dl>
+						<dt>剩余可跟踪积分</dt>
+						<dd>2000000.00</dd>
+					</dl>
+				</div>
+				<p class="textCenter pt03">
+					<a href="" class="button-text">返回</a>
+				</p>
+
+			</div>
+
+		</div>
+	</body>
+
+</html>
