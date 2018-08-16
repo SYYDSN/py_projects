@@ -36,16 +36,18 @@ wx_blueprint = Blueprint("wx_blueprint", __name__, url_prefix="/wx", template_fo
 
 
 @check_platform_session
-def hello() -> str:
-    """hello world"""
-    user_id = get_platform_session_arg("user_id")
-    return "hello baby <a href='/wx/auth/info'>去授权</a><br><h2>{}</h2>".format(str(user_id))
+def hello(user: dict = None) -> str:
+    """hello world
+    :param user:  用户字典
+    """
+    return "hello baby <a href='/wx/auth/info'>{}去授权</a><br><h2>{}</h2>".format(user.get("nick_name"), str(user['_id']))
 
 
 @check_platform_session
-def file_func(action, table_name):
+def file_func(user: dict = None, action: str = "get", table_name: str = "base_info"):
     """
-    保存/获取文件,
+    保存/获取文件, 此函数目前不常用,是对微信用户数据库的操作.
+    :param user:  用户字典
     :param action: 动作, save/get(保存/获取)
     :param table_name: 文件类对应的表名.
     :return:
@@ -59,7 +61,7 @@ def file_func(action, table_name):
     table_name = table_name if table_name in tables else 'base_file'
     if action == "save":
         """保存文件"""
-        r = BaseFile.save_flask_file(req=request, collection=table_name)
+        r = BaseFile.save_flask_file(req=request, collection=table_name, owner=user['_id'])
         if isinstance(r, ObjectId):
             mes['_id'] = str(r)
         else:
@@ -91,9 +93,10 @@ def file_func(action, table_name):
 
 
 @check_platform_session
-def resume_image_func(action, table_name):
+def resume_image_func(user: dict = None, action: str = 'get', table_name: str = "base_file"):
     """
     保存/获取简历的图片,
+    :param user:  用户字典
     :param action: 动作, save/get(保存/获取)
     :param table_name: 文件类对应的表名.
     :return:
@@ -108,7 +111,7 @@ def resume_image_func(action, table_name):
     table_name = table_name if table_name in tables else 'base_file'
     if action == "save":
         """保存文件"""
-        r = BaseFile2.save_flask_file(req=request, collection=table_name)
+        r = BaseFile2.save_flask_file(req=request, collection=table_name, owner=user['_id'])
         if isinstance(r, ObjectId):
             mes['url'] = "/wx/resume_image/view/{}?fid={}".format(table_name, str(r))
         else:
@@ -141,15 +144,14 @@ def resume_image_func(action, table_name):
 
 
 @check_platform_session
-def download_image_func(table_name):
+def download_image_func(user: dict = None, table_name: str = "base_file"):
     """
     从微信服务器下载图片,
+    param user:  用户字典
     :param table_name: 文件类对应的表名.
     :return:
     """
     mes = {"message": "success"}
-    user_id = get_platform_session_arg("user_id", None)
-    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     """
     tables表名,分别存储不同的类的实例.
     1. base_info                  文件存储基础表,BaseFile
@@ -265,14 +267,14 @@ def draw_user_info():
 
 
 @check_platform_session
-def self_info_func(key):
+def self_info_func(user: dict = None, key: str = "view"):
     """
     用户对用户信息的有限的操作,对一些允许的字段的添加和修改,
      这里,既不能新增用户,也不能删除用户,只有修改和查看
+     param user:  用户字典
+     param key:  操作类型
     :return:
     """
-    user_id = get_platform_session_arg("user_id", None)
-    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     if not isinstance(user, dict):
         return abort(404)
     else:
@@ -393,23 +395,24 @@ def wx_js_func():
 
 
 @check_platform_session
-def wx_js_api_demo():
+def wx_js_api_demo(user: dict = None):
     """
     一个演示页面,用于测试wx的js-sdk接口的初始化工作(测试wx_js_func函数)
+    param user:  用户字典
     :return:
     """
     return render_template("wx_js_api_demo.html")
 
 
 @check_platform_session
-def sms_func(key):
+def sms_func(user: dict = None, key: str = 'check'):
     """
     发送/校验短信
+    param user:  用户字典
+    param key: 操作类型
     :return:
     """
     mes = {"message": "success"}
-    user_id = get_platform_session_arg("user_id", None)
-    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     if user is None:
         mes['message'] = "未登录"
     else:
@@ -449,14 +452,13 @@ def sms_func(key):
 
 
 @check_platform_session
-def resume_opt_func():
+def resume_opt_func(user: dict = None):
     """
     操作(查看/添加/修改,但是不能删除)简历
+    param user:  用户字典
     :return:
     """
     mes = {"success": "error"}
-    user_id = get_platform_session_arg("user_id", None)
-    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     u_id = user['_id']
     resume_args = get_args(request)
     if "time" in resume_args:
@@ -488,16 +490,15 @@ def resume_opt_func():
 
 
 @check_platform_session
-def resume_extend_info_func():
+def resume_extend_info_func(user: dict = None):
     """
+    param user:  用户字典
     对简历的扩展信息的操作.
     简历的扩展信息包括:
     1.
     :return:
     """
     mes = {"success": "error"}
-    user_id = get_platform_session_arg("user_id", None)
-    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     u_id = user['_id']
     # u_id = ObjectId("5b56bdba7b3128ec21daa4c7")
     arg_dict = get_args(request)
@@ -519,14 +520,13 @@ def resume_extend_info_func():
 
 
 @check_platform_session
-def common_view_func(html_name: str):
+def common_view_func(user: dict = None, html_name: str = ''):
     """
     通用页面视图
+    param user:  用户字典
     param html_name:  html文件名,包含目录路径
     :return:
     """
-    user_id = get_platform_session_arg("user_id", None)
-    user = WXUser.find_by_id(o_id=user_id, to_dict=True)
     user2 = {
         "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
         "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
@@ -564,6 +564,7 @@ def common_view_func(html_name: str):
         resume_pages = [                              # 需要传递简历信息的页面
             "resume.html",
             "register_info.html",
+            "resume_detail.html",
             "additional.html",
             "driver_two.html",
             "part_time.html",
@@ -577,7 +578,7 @@ def common_view_func(html_name: str):
             else:
                 resume = DriverResume.find_by_id(o_id=resume_id, to_dict=True)
             # kwargs['work'] = dict()
-            if html_name == "resume.html":
+            if html_name in ["resume.html", "resume_detail.html"]:
                 """这个页面是显示简历全部信息的地方,需要额外详细的简历信息"""
                 info = DriverResume.get_full_info(resume_id=resume_id)
                 message = info['message']

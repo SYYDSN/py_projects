@@ -564,6 +564,7 @@ def common_view_func(user: dict = None, html_name: str = ''):
         resume_pages = [                              # 需要传递简历信息的页面
             "resume.html",
             "register_info.html",
+            "resume_detail.html",
             "additional.html",
             "driver_two.html",
             "part_time.html",
@@ -577,7 +578,7 @@ def common_view_func(user: dict = None, html_name: str = ''):
             else:
                 resume = DriverResume.find_by_id(o_id=resume_id, to_dict=True)
             # kwargs['work'] = dict()
-            if html_name == "resume.html":
+            if html_name in ["resume.html", "resume_detail.html"]:
                 """这个页面是显示简历全部信息的地方,需要额外详细的简历信息"""
                 info = DriverResume.get_full_info(resume_id=resume_id)
                 message = info['message']
