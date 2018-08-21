@@ -18,7 +18,6 @@ from uuid import uuid4
 import base64
 import urllib.request
 import os
-import user_module
 from uuid import uuid4
 from log_module import get_logger
 from werkzeug.contrib.cache import RedisCache

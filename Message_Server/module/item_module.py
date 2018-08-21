@@ -16,6 +16,7 @@ import requests
 from pymongo import ReturnDocument
 import random
 from mail_module import send_mail
+from celery_module import send_virtual_trade
 import xmltodict
 
 
@@ -24,30 +25,90 @@ ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
 
 
-"""产品参数"""
+"""
+产品参数
+参数	黄金	白银	原油	恒指	英镑	欧元	日元	澳元	瑞士法郎	纽元	加元
+产品代码	XAUUSD	XAGUSD	XTIUSD	HK50	GBPUSD	EURUSD	USDJPY	AUDUSD	USDCHF	NZDUSD	USDCAD
+点差	45	41	70	20	22	22	19	21	25	21	22
+佣金	50	50	50	80	50	50	50	50	50	50	50
+点值	1	5	5	10	1	1	1	1	1	1	1
+系数	100	1000	1000	1	100000	100000	1000	10000	10000	100000	100000
+ p_arg 点值系数,p_val点值,p_diff点差，comm佣金
+"""
+
+
 product_map = {
-    "加元": {"p_arg": 100000, "cost": 80},  # p_arg/p_coefficient 点值,cost(每手)成本
-    "澳元": {"p_arg": 100000, "cost": 80},
-    "日元": {"p_arg": 1000, "cost": 80},
-    "英镑": {"p_arg": 100000, "cost": 80},
-    "欧元": {"p_arg": 100000, "cost": 70},
-    "恒指": {"p_arg": 10, "cost": 100},
-    "原油": {"p_arg": 1000, "cost": 100},
-    "白银": {"p_arg": 5000, "cost": 250},
-    "黄金": {"p_arg": 100, "cost": 100},
-    "测试": {"p_arg": 100, "cost": 100}
+    "加元": {"p_arg": 100000, "p_val": 1, "p_diff": 22, "comm": 50},
+    "澳元": {"p_arg": 10000, "p_val": 1, "p_diff": 21, "comm": 50},  # diff
+    "日元": {"p_arg": 1000, "p_val": 1, "p_diff": 19, "comm": 50},
+    "英镑": {"p_arg": 100000, "p_val": 1, "p_diff": 22, "comm": 50},
+    "欧元": {"p_arg": 100000, "p_val": 1, "p_diff": 22, "comm": 50},
+    "恒指": {"p_arg": 1, "p_val": 10, "p_diff": 20, "comm": 80},
+    "原油": {"p_arg": 1000, "p_val": 5, "p_diff": 70, "comm": 50},
+    "白银": {"p_arg": 1000, "p_val": 5, "p_diff": 41, "comm": 50},  # diff
+    "黄金": {"p_arg": 100, "p_val": 1, "p_diff": 45, "comm": 50},
+    "测试": {"p_arg": 100, "p_val": 1, "p_diff": 45, "comm": 50}
 }
 
 
-def _generator_signal(raw_signal: dict, change: dict) -> dict:
+def get_price(p_name: str, the_time: datetime.datetime = None) -> float:
     """
-    根据原始喊单信号和方向,生成新的(正向/反向/任意)(单个)信号字典
+    从数据查询一个产品的价格
+    :param p_name:
+    :param the_time:
+    :return:
+    目前，原油，恒指，白银没有报价
+    """
+    _name_map = {
+        "英镑": {"platform_name": "Xinze Group Limited", "code": "GBPUSD"},
+        "加元": {"platform_name": "Xinze Group Limited", "code": "USDCAD"},
+        "澳元": {"platform_name": "Xinze Group Limited", "code": "AUDUSD"},
+        "日元": {"platform_name": "Xinze Group Limited", "code": "USDJPY"},
+        "欧元": {"platform_name": "Xinze Group Limited", "code": "EURUSD"},
+        "恒指": {"platform_name": "Xinze Group Limited", "code": "HK50"},
+        "原油": {"platform_name": "Xinze Group Limited", "code": "XTIUSD"},
+        "白银": {"platform_name": "Xinze Group Limited", "code": "XAGUSD"},
+        "黄金": {"platform_name": "Xinze Group Limited", "code": "XAUUSD"},
+        "测试": {"platform_name": "Xinze Group Limited", "code": "XAGUSD"}
+    }
+    f = _name_map.get(p_name, dict())
+    the_time = the_time if isinstance(the_time, datetime.datetime) else datetime.datetime.now()
+    f['platform_time'] = {"$lte": the_time}
+    s = [("platform_time", -1)]
+    p = ['platform_time', "price", "product"]
+    ses = mongo_db.get_conn(table_name="quotation")
+    kw = {
+        "limit": 1,
+        "filter": f,
+        "projection": p,
+        "sort": s
+    }
+    r = ses.find_one(**kw)
+    if isinstance(r, dict):
+        return r['price']
+    else:
+        return 0.0
+
+
+def delay_virtual_trade(signal: dict) -> dict:
+    """
+    暴露给视图函数使用的,_generator_signal函数的引用
+    :param signal:
+    :return:
+    """
+    return _generator_signal(signal)
+
+
+def _generator_signal(raw_signal: dict) -> dict:
+    """
+    处理喊单信号.
+    1. 原始信号不做处理.
     :param raw_signal:
-    :param change: Teacher.direction
     :return:
     """
     now = datetime.datetime.now()
-    res = raw_signal.copy()
+    res = raw_signal
+    """
     op = res.get("op")
     record_id = res['record_id']
     record_id = ObjectId(record_id) if isinstance(record_id, str) and len(record_id) == 24 else record_id
@@ -61,47 +122,46 @@ def _generator_signal(raw_signal: dict, change: dict) -> dict:
     teacher_id = res.pop('updater_id') if teacher_id is None else teacher_id
     teacher_id = ObjectId(teacher_id) if isinstance(teacher_id, str) and len(teacher_id) == 24 else teacher_id
     res['teacher_id'] = teacher_id
-    # teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
     res['change'] = change
     res['enter_time'] = res.pop("create_time")
     res['exit_time'] = res.pop("update_time")
     enter_price = res['enter_price']
     exit_price = res.get('exit_price')
+    """
+    change = res['change']
+    teacher_id = res['teacher_id']
     product = res['product']
-
+    teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
     if change == "raw":
-        teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
-        res['native'] = True
-        res['direction'] = native_direction
+        """原始信号"""
+        pass
     else:
-        res["_id"] = ObjectId()
-        teacher = random.choice(Teacher.direction_map()[change])
-        teacher_id = teacher['_id']
-        res['teacher_id'] = teacher_id
-        res['teacher_name'] = teacher['name']
-        res['native'] = False
-        if change == "follow":
-            res['direction'] = native_direction
-        elif change == "reverse" and native_direction == "买入":
-            res['direction'] = "卖出"
-        elif change == "reverse" and native_direction == "卖出":
-            res['direction'] = "买入"
+        if res['case_type'] == "exit":
+            """离场信号,重建离场时间/价格"""
+            exit_price = get_price(p_name=product, the_time=now)
+            res['exit_time'] = now
+            res['exit_price'] = exit_price
         else:
-            res['direction'] = random.choice(["买入", "卖出"])
-        res['t_coefficient'] = 1 if res['direction'] == "买入" else -1
-        a_coefficient = random.randint(-4, 4)  # 开仓价随机系数
-        res['a_coefficient'] = a_coefficient
-        """当前没有点差"""
-        new_enter_price = enter_price + (1 / product_map[product]['p_arg']) * a_coefficient
-        res['enter_price'] = new_enter_price
+            """进场信号,重建进场时间/价格"""
+            enter_price = get_price(p_name=product, the_time=now)
+            res['enter_time'] = now
+            res['enter_price'] = enter_price
+
+    res['t_coefficient'] = 1 if res['direction'] == "买入" else -1
     """生成手数并计算是否需要加金"""
-    lots_range = teacher['lots_range']
-    lots = random.randint(lots_range[0], lots_range[1])
-    res['lots'] = lots
-    min_money = (lots * product_map[product]['cost']) / 400  # 400倍杠杆
+    lots = res.get('lots')
+    if lots is None:
+        lots_range = teacher['lots_range']
+        lots = random.randint(lots_range[0], lots_range[1])
+        res['lots'] = lots
+    else:
+        pass
+    info = product_map[product]
+    cost = info['p_val'] * info['p_diff'] + info['comm']  # 每手成本,单位美元
+    min_money = (lots * cost) / 400  # 400倍杠杆
     deposit = teacher.get("deposit", 0)
     deposit_amount = teacher.get("deposit_amount", 0)
-    if deposit < min_money:
+    if deposit < min_money and res['case_type'] == "enter":
         """触发加金"""
         money = Deposit.generator_deposit(min_money=min_money)
         deposit += money
@@ -124,31 +184,24 @@ def _generator_signal(raw_signal: dict, change: dict) -> dict:
         'mes_type': 'new_order_message2',
         'signature': 'template_message'
     }
-    if op == "data_update" and isinstance(enter_price, (int, float)) and isinstance(exit_price, (int, float)):
+    if res['case_type'] == "exit":
         """
-        平仓信号,现在生成
-        1. a/b系数。
-        2. 可能的方向重设
-        3. 进场/离场价格
-        剩下的：
-        1. 手数生成
-        2. 资金计算
-        3. 盈利率计算
-        4. 胜负计算（用于计算胜率）
-        则留到close_case环节处理。
+        平仓信号
         """
-        res['need_calculate'] = True
-        b_coefficient = random.randint(-4, 4)  # 平仓价随机系数
-        res['b_coefficient'] = b_coefficient
-        new_exit_price = exit_price + (1 / product_map[product]['p_arg']) * b_coefficient
-        res['exit_price'] = new_exit_price
         template_message['order_type'] = "平仓"  # 模板消息类型
     else:
         template_message['order_type'] = "开仓"  # 模板消息类型
         pass
+    """
+    1. 进场 保存数据
+    2. 离场 计算胜率,盈利率,保存等
+    """
+    calculate_trade(res)
+    """发送模板消息阶段"""
     u = "http://127.0.0.1:8080/template_message"
-    r = requests.post(u, data=template_message, timeout=2)
-    status = r.status_code
+    # r = requests.post(u, data=template_message, timeout=2)  # 调试请注销
+    # status = r.status_code  # 调试请注销
+    status = 200  # 调试专用，生产环境请注销
     if status != 200:
         ms = "申请模板消息出错:{}, {}".format(status, datetime.datetime.now())
         logger.exception(msg=ms)
@@ -159,19 +212,126 @@ def _generator_signal(raw_signal: dict, change: dict) -> dict:
     return res
 
 
+def calculate_trade(raw_signal: dict) -> None:
+    """
+    计算单子的盈利,盈利率,胜率
+    :param raw_signal: 原始信号字典.
+    :return:
+    """
+    need_calculate = True if raw_signal.get('case_type') == "exit" else False
+    if not need_calculate:
+        """
+        不需要计算,也就是进场记录,直接保存.
+        """
+        raw_signal.pop("_id")
+        f = {"record_id": raw_signal.pop("record_id"), "change": raw_signal.pop("change")}
+        u = {"$set": raw_signal}
+        r = Trade.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+        if r is None:
+            ms = "保存trade失败! f:{}, u: {}".format(f, u)
+            logger.exception(msg=ms)
+            print(ms)
+        else:
+            pass
+    else:
+        """
+        计算开始,需要计算的内容:
+        # 1. lots 随机一个交易手数,在下单的时候计算.
+        2. deposit   当前存款
+        3. deposit_amount 历史总存款.
+        # 4.  入金事件在下单的时候计算.
+        5. each_profit 本次交易的每手盈利
+        6. profit 本次交易的盈利 each_profit * lots
+        7. profit_amount 历史交易总盈利
+        8. profit_ratio 和 win_ratio 盈利率和胜率
+        """
+        """计算盈利总额,盈利率"""
+        x = raw_signal
+        change = x.get("change")
+        teacher_id = x['teacher_id']
+        teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
+        deposit = teacher.get('deposit', 0)
+        profit_amount = teacher.get('profit_amount', 0)
+        deposit_amount = teacher.get('deposit_amount', 0)
+        case_count = teacher.get('case_count', 0)
+        win_count = teacher.get('win_count', 0)
+        product = x['product']
+        """计算各种参数"""
+        exit_price = x['exit_price']  # 离场点位
+        enter_price = x['enter_price']  # 进场点位
+        info = product_map[product]
+        p_v = info['p_val']   # 点值
+        p_d = info['p_diff']  # 点差
+        comm = info['comm']   # 每手佣金
+        t_c = x['t_coefficient']                  # 空单/多单
+        each_profit_dollar = ((exit_price - enter_price) * t_c - p_d) * p_v  # 每手盈利美元毛利
+        each_profit = each_profit_dollar - comm
+        x['each_profit_dollar'] = each_profit_dollar
+        x['each_profit'] = each_profit
+        lots = 1  # 最少手数
+        try:
+            lots = x['lots']
+        except Exception as e:
+            print(e)
+            print(x)
+        the_profit = lots * each_profit  # 本次交易盈利
+        x['the_profit'] = the_profit
+        if the_profit >= 0:
+            win_count += 1
+        else:
+            pass
+        case_count += 1
+        win_ratio = round((win_count / case_count) * 100, 2)
+        deposit += the_profit
+        profit_amount += the_profit
+        print(x)
+        print(teacher)
+        profit_ratio = round((profit_amount / deposit_amount) * 100, 2)  # 盈利率
+        client = mongo_db.get_client()
+        t1 = client[mongo_db.db_name][Trade.get_table_name()]
+        t2 = client[mongo_db.db_name][Teacher.get_table_name()]
+        with client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction():
+                t1_f = {"_id": x.pop("_id")}
+                t1_u = {"$set": x}
+                r1 = t1.find_one_and_update(filter=t1_f, update=t1_u, upsert=True)
+                t2_f = {"_id": teacher_id}
+                t2_u = {"$set": {
+                    'deposit': deposit,
+                    'deposit_amount': deposit_amount,
+                    'profit_amount': profit_amount,
+                    'profit_ratio': profit_ratio,
+                    "case_count": case_count,
+                    "win_count": win_count,
+                    "win_ratio": win_ratio,
+                }}
+                r2 = t2.find_one_and_update(filter=t2_f, update=t2_u, upsert=True)
+                print(r2)
+
+
 def generator_signal_and_save(raw_signal: dict) -> list:
     """
-    根据原始喊单信号,生成新的(正向/反向/任意)信号字典(生成的同时如果是离场信号的话就要计算盈利).
-    最后返回这四个信号字典的数组
+    作为上一版本函数,此函数被废止 2018-8-21
+    1.
+    如果是原始喊单信号,生成新的(正向/反向/任意)信号字典(生成的同时如果是离场信号的话就要计算盈利).
+    这四个信号字典的分为2组。
+    原始信号作为一组，立即计算保存。
+    三个虚拟信号作为一组。发送给虚拟喊单接口做延时处理。
+    2.
+    所有喊单的盈利，都需要计算出来。
     注意raw_signal必须有record_id字段,过早的信号没有这个字段.
     :param raw_signal: 原始信号字典.
     :return:
     """
     t_map = Teacher.direction_map()
+    raw_signal = _generator_signal(raw_signal, "raw")
     t_list = [_generator_signal(raw_signal, x) for x in t_map.keys()]
-    need_calculate = t_list[0].get('need_calculate')
+    need_calculate = raw_signal.get('need_calculate')
     if not need_calculate:
-        """不需要计算,也就是进场记录,直接保存就好了"""
+        """
+        不需要计算,也就是进场记录,原生喊单信号直接保存.
+        虚拟喊单信号发送延迟喊单信息.
+        """
         for x in t_list:
             x.pop("_id")
             f = {"record_id": x.pop("record_id"), "change": x.pop("change")}
@@ -276,6 +436,111 @@ def generator_signal_and_save(raw_signal: dict) -> list:
                         "win_ratio": win_ratio,
                     }}
                     r2 = t2.find_one_and_update(filter=t2_f, update=t2_u, upsert=True)
+
+
+def process_case(doc_dict: dict, raw: bool = False) -> bool:
+    """
+    接受喊单信号并处理:
+    1. 区别是开单还是离场信号,分别送入不同的函数处理.
+    2. 发送模板消息
+    :param doc_dict: Signal的doc
+    :param raw: 是否是原生信号
+    :return:
+    """
+    if raw:
+        now = datetime.datetime.now()
+        op = doc_dict.get("op")
+        enter_price = doc_dict['enter_price']
+        exit_price = doc_dict.get('exit_price')
+        record_id = doc_dict['record_id']
+        record_id = ObjectId(record_id) if isinstance(record_id, str) and len(record_id) == 24 else record_id
+        doc_dict['record_id'] = record_id
+        native_direction = doc_dict.get('direction')  # 原始订单的方向
+        doc_dict['native_direction'] = native_direction
+        teacher_name = doc_dict.pop('creator_name', None)  # 老师名
+        teacher_name = doc_dict.pop('updater_name') if teacher_name is None else teacher_name
+        doc_dict['teacher_name'] = teacher_name
+        teacher_id = doc_dict.pop('creator_id', None)  # 老师id
+        teacher_id = doc_dict.pop('updater_id') if teacher_id is None else teacher_id
+        teacher_id = ObjectId(teacher_id) if isinstance(teacher_id, str) and len(teacher_id) == 24 else teacher_id
+        doc_dict['teacher_id'] = teacher_id
+        doc_dict['enter_time'] = doc_dict.pop("create_time")
+        if op == "data_update" and isinstance(enter_price, (int, float)) and isinstance(exit_price, (int, float)):
+            case_type = "exit"
+        else:
+            case_type = "enter"
+        doc_dict['case_type'] = case_type  # trade类型,根据doc识别订单类型
+        """是原生信号,立即处理,并生成3个延迟虚拟信号"""
+        doc_dict['native'] = True
+        doc_dict['change'] = "raw"
+        exit_reason = doc_dict['exit_reason']
+        if "enter_time" not in doc_dict:
+            doc_dict['enter_time'] = doc_dict.pop("create_time")
+        if "exit_time" not in doc_dict:
+            doc_dict['exit_time'] = doc_dict.pop("update_time")
+        f = {"record_id": doc_dict['record_id'], "change": "raw"}
+        if case_type == "exit":
+            """取以前的价格和入场时间"""
+            r = Trade.find_one_plus(filter_dict=f, instance=False)
+            if r is None:
+                ms = "trade查找失败,:{}".format(f)
+                logger.exception(ms)
+                send_mail(title="trade查找失败{}".format(now), content=ms)
+            else:
+
+                doc_dict['enter_price'] = r['enter_price']
+                doc_dict['enter_time'] = r['enter_time']
+                doc_dict['product'] = r['product']
+                doc_dict['_id'] = r['_id']
+        else:
+            pass
+        """生成虚拟信号"""
+        t_map = Teacher.direction_map(include_raw=False)
+        # t_map = dict()  # 生产环境请注销
+        for k, t in t_map.items():
+            if doc_dict['case_type'] == "enter":
+                """进场"""
+                temp = doc_dict.copy()
+                temp["_id"] = ObjectId()
+                temp['native'] = False
+                teacher = random.choice(t)
+                teacher_id = teacher['_id']
+                temp['teacher_id'] = teacher_id
+                temp['teacher_name'] = teacher['name']
+                change = k
+                temp['change'] = change
+                if change == "follow":
+                    temp['direction'] = native_direction
+                elif change == "reverse" and native_direction == "买入":
+                    temp['direction'] = "卖出"
+                elif change == "reverse" and native_direction == "卖出":
+                    temp['direction'] = "买入"
+                else:
+                    temp['direction'] = random.choice(["买入", "卖出"])
+            else:
+                f["change"] = k
+                r = Trade.find_one_plus(filter_dict=f, instance=False)
+                if r is None:
+                    ms = "trade查找失败,:{}".format(f)
+                    logger.exception(ms)
+                    send_mail(title="trade查找失败{}".format(now), content=ms)
+                    temp = None
+                else:
+                    r['case_type'] = case_type
+                    r['exit_reason'] = exit_reason
+                    temp = r
+            if temp is None:
+                pass
+            else:
+                count_down = random.randint(30, 1600)  # 延迟操作的秒数,表示在原始信号发出后多久进行操作?
+                json_obj = mongo_db.to_flat_dict(temp)
+                count_down = 1
+                send_virtual_trade.apply_async(countdown=count_down, kwargs={"trade_json": json_obj})
+            # break  # 生产环境请注销
+    else:
+        pass
+    """原始喊单就立即保存数据并发送模板信息"""
+    _generator_signal(raw_signal=doc_dict)
 
 
 class RawSignal(mongo_db.BaseDoc):
@@ -875,6 +1140,7 @@ class Trade(Signal):
     （老师的喊单）交易, 包括虚拟老师和真实老师的都会保存在这里.
     """
     _table_name = "trade"
+    _table_name = "trade2"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['native'] = bool  # 这个记录是原生的吗?
@@ -899,10 +1165,10 @@ class Trade(Signal):
     type_dict['lots'] = int  # 交易手数
     type_dict['the_profit'] = float  # 本次交易总盈利
     type_dict['t_coefficient'] = float  # （交易）系数 -1/1
-    type_dict['p_coefficient'] = float  # （点值）系数
-    type_dict['a_coefficient'] = float  # 开仓价随机系数
-    type_dict['b_coefficient'] = float  # 平仓价随机系数
-    type_dict['need_calculate'] = bool  # 平仓信号特有。提醒系统计算盈利
+    type_dict['p_coefficient'] = float  # （点值）系数 废止2018-8-21
+    type_dict['a_coefficient'] = float  # 开仓价随机系数 废止2018-8-21
+    type_dict['b_coefficient'] = float  # 平仓价随机系数 废止2018-8-21
+    type_dict['need_calculate'] = bool  # 平仓信号特有。提醒系统计算盈利 废止2018-8-21
 
     def __init__(self, **kwargs):
         super(Signal, self).__init__(**kwargs)
@@ -929,42 +1195,77 @@ class Trade(Signal):
         :return:
         """
         signal = signal.get_dict() if isinstance(signal, Signal) else signal
-        generator_signal_and_save(raw_signal=signal)
+        # generator_signal_and_save(raw_signal=signal)
+        process_case(doc_dict=signal, raw=True)
 
 
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
     a = {
-    "_id" : ObjectId("5b67a444c5aee8250b3e142b"),
-    "creator_name" : "语昂",
-    "datetime" : "2018-08-06T01:28:25.000Z",
-    "app_id" : "5a45b8436203d26b528c7881",
-    "app_name" : "分析师交易记录",
-    "create_time" : "2018-08-06T09:28:31.843Z",
-    "creator_id" : "5a1e680642f8c1bffc5dbd6f",
-    "direction" : "买入",
-    "each_cost" : 100.0,
-    "each_profit" : 700.0,
-    "each_profit_dollar" : 800.0,
-    "enter_price" : 27800.0,
-    "entry_id" : "5a45b90254ca00466b3c0cd1",
-    "op" : "data_update",
-    "p_coefficient" : 10.0,
-    "product" : "恒指",
-    "profit" : 800.0,
-    "receive_time" : "2018-08-06T09:44:48.707Z",
-    "record_id" : "5b67a43fed59cc4e636bf822",
-    "send_time_enter" : "2018-08-06T09:28:36.158Z",
-    "t_coefficient" : 1.0,
-    "the_type" : "普通",
-    "token_name" : "策略助手 小迅",
-    "update_time" : "2018-08-06T09:44:47.899Z",
-    "updater_id" : "5a1e680642f8c1bffc5dbd6f",
-    "updater_name" : "语昂",
-    "exit_price" : 27880.0,
-    "exit_reason" : "保护利润，提前离场",
-    "send_time_exit" : "2018-08-06T09:44:48.824Z"
-}
-    s = Signal(**a)
+        "_id" : ObjectId("5b67a444c5aee8250b3e142b"),
+        "creator_name" : "语昂",
+        "datetime" : "2018-08-06T01:28:25.000Z",
+        "app_id" : "5a45b8436203d26b528c7881",
+        "app_name" : "分析师交易记录",
+        "create_time" : "2018-08-21T12:28:31.843Z",
+        "creator_id" : "5a1e680642f8c1bffc5dbd6f",
+        "direction" : "买入",
+        "each_cost" : 100.0,
+        "each_profit" : 700.0,
+        "each_profit_dollar" : 800.0,
+        "enter_price" : 27800.0,
+        "entry_id" : "5a45b90254ca00466b3c0cd1",
+        "op" : "data_create",
+        "p_coefficient" : 10.0,
+        "product" : "恒指",
+        "profit" : 800.0,
+        "receive_time" : "2018-08-06T09:44:48.707Z",
+        "record_id" : "5b67a43fed59cc4e636bf822",
+        "send_time_enter" : "2018-08-06T09:28:36.158Z",
+        "t_coefficient" : 1.0,
+        "the_type" : "普通",
+        "token_name" : "策略助手 小迅",
+        "update_time" : "2018-08-21T12:44:47.899Z",
+        "updater_id" : "5a1e680642f8c1bffc5dbd6f",
+        "updater_name" : "语昂",
+        "exit_price" : 0,
+        "exit_reason" : "",
+        "send_time_exit" : "2018-08-06T09:44:48.824Z"
+    }
+    b = {
+        "_id": ObjectId("5b67a444c5aee8250b3e142b"),
+        "creator_name": "语昂",
+        "datetime": "2018-08-06T01:28:25.000Z",
+        "app_id": "5a45b8436203d26b528c7881",
+        "app_name": "分析师交易记录",
+        "create_time": "2018-08-21T12:28:31.843Z",
+        "creator_id": "5a1e680642f8c1bffc5dbd6f",
+        "direction": "买入",
+        "each_cost": 100.0,
+        "each_profit": 700.0,
+        "each_profit_dollar": 800.0,
+        "enter_price": 27800.0,
+        "entry_id": "5a45b90254ca00466b3c0cd1",
+        "op": "data_update",
+        "p_coefficient": 10.0,
+        "product": "恒指",
+        "profit": 800.0,
+        "receive_time": "2018-08-06T09:44:48.707Z",
+        "record_id": "5b67a43fed59cc4e636bf822",
+        "send_time_enter": "2018-08-06T09:28:36.158Z",
+        "t_coefficient": 1.0,
+        "the_type": "普通",
+        "token_name": "策略助手 小迅",
+        "update_time": "2018-08-21T12:44:47.899Z",
+        "updater_id": "5a1e680642f8c1bffc5dbd6f",
+        "updater_name": "语昂",
+        "exit_price": 27880.0,
+        "exit_reason": "保护利润，提前离场",
+        "send_time_exit": "2018-08-06T09:44:48.824Z"
+    }
+    s = Signal(**b)
     Trade.sync_from_signal(s)
+    """测试获取价格"""
+    # th_time = mongo_db.get_datetime_from_str("2018-8-12 16:00:00")
+    # get_price(p_name="黄金", the_time=th_time)
     pass

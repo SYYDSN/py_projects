@@ -100,6 +100,7 @@
     type_dict['status'] = int  # 任职/经营 状态. -1 个体经营/0 离职/ 1 在职
     """驾驶证信息 Driving License,简称dl"""
     type_dict['dl_image'] = str  # 驾驶证图片,.24位字符串
+    type_dict['dl_image_url'] = str  # 驾驶证图片的url
     type_dict['dl_license_class'] = str  # 驾驶证信息.驾驶证类型,准驾车型 英文字母一律大写
     type_dict['dl_first_date'] = datetime.datetime  # 驾驶证信息 首次领证日期
     type_dict['dl_valid_begin'] = datetime.datetime  # 驾驶证信息 驾照有效期的开始时间

@@ -8,6 +8,7 @@ import mongo_db
 from flask import request
 import json
 import datetime
+from tools_module import get_real_ip
 from flask_socketio import SocketIO
 from log_module import get_logger
 
@@ -17,6 +18,78 @@ logger = get_logger()
 
 
 """行情模块"""
+
+
+class RawRequestInfo(mongo_db.BaseDoc):
+    """
+    原始请求信号的记录,注意，没有记录请求中的files参数,可用来监听任意request,
+    目前的用途:
+    1. 监听交易平台发过来的消息  2018-6-29
+    """
+    _table_name = "raw_request_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['server'] = str
+    type_dict['ip'] = str
+    type_dict['url'] = str
+    type_dict['path'] = str
+    type_dict['args'] = dict
+    type_dict['form'] = dict
+    type_dict['json'] = dict
+    type_dict['headers'] = dict
+    type_dict['time'] = datetime.datetime
+
+    def __init__(self, **kwargs):
+        if "event_date" not in kwargs:
+            kwargs['event_date'] = datetime.datetime.now()
+        super(RawRequestInfo, self).__init__(**kwargs)
+
+    @classmethod
+    def get_init_dict(cls, req: request) -> dict:
+        """
+        从request中获取初始化字典.
+        :param req:
+        :return:
+        """
+        headers = {k: v for k, v in req.headers.items()}
+        args = {k: v for k, v in req.args.items()}
+        form = {k: v for k, v in req.form.items()}
+        json_data = None if req.json is None else (req.json if isinstance(req.json, dict) else json.loads(req.json))
+        ip = get_real_ip(req)
+        now = datetime.datetime.now()
+        args = {
+            "ip": ip,
+            "method": req.method.lower(),
+            "url": req.url,
+            "path": req.path,
+            "headers": headers,
+            "args": args,
+            "form": form,
+            "json": json_data,
+            "time": now
+        }
+        return args
+
+    @classmethod
+    def instance(cls, req: request):
+        """
+        生成一个实例
+        :param req: flask.request
+        :return: 实例
+        """
+        args = cls.get_init_dict(req=req)
+        instance = cls(**args)
+        return instance
+
+    @classmethod
+    def record(cls, req: request) -> ObjectId:
+        """
+        记录原始的请求
+        :param req:
+        :return:
+        """
+        instance = cls.instance(req)
+        return instance.save_plus()
 
 
 class Quotation(mongo_db.BaseDoc):
@@ -77,9 +150,32 @@ class Quotation(mongo_db.BaseDoc):
                     res2.append(temp2)
             if auto_save:
                 ses = cls.get_collection()
-                ses.insert_many(documents=res2)
+                res = ses.insert_many(documents=res2)
+                print(res)
             else:
                 pass
+        return res
+
+    @classmethod
+    def analysis(cls, data_str: str) -> list:
+        """
+        从一个flask的request的data中分析发送来的信息的list
+        这个函数是用来检查发送来的信息格式的。不用于生产环境
+        :param data_str:
+        :return:
+        """
+        res = list()
+        if isinstance(data_str, str) and len(data_str) > 10:
+            prices = data_str
+            t1 = [[y for y in x.split("*")] for x in prices.split("^")]
+            for x in t1:
+                if len(x) >= 3:
+                    temp = {"code": x[0], "product": x[1], "price": float(x[2])}
+                    res.append(temp)
+                else:
+                    print("不合格的报价字段：{}".format(x))
+        else:
+            pass
         return res
 
     @classmethod
@@ -107,3 +203,15 @@ class KLine(mongo_db.BaseDoc):
     """
     :k线数据，从5分钟开始。
     """
+
+
+if __name__ == "__main__":
+    d = "USDCHF*美元兑瑞郎*0.99120^GBPUSD*英镑兑美元*1.27945^EURUSD*欧元兑美元*1.14802^USDJPY*美元兑日元*110.071" \
+        "^USDCAD*美元兑加元*1.30425^AUDUSD*澳元兑美元*0.73370^EURGBP*欧元兑英镑*0.89714^EURAUD*欧元兑澳元*1.56436^" \
+        "EURJPY*欧元兑日元*126.368^CADJPY*加元兑日元*84.380^GBPJPY*英镑兑日元*140.834^AUDNZD*澳元兑纽元*1.10404^AUDCAD*" \
+        "澳元兑加元*0.95694^AUDCHF*澳元兑瑞郎*0.72719^AUDJPY*澳元兑日元*80.759^CHFJPY*瑞郎兑日元*111.025^" \
+        "XAUUSD*黄金*1190.24^XAGUSD*白银*14.735^"
+    prices = Quotation.analysis(d)
+    for x in prices:
+        print(x)
+    pass

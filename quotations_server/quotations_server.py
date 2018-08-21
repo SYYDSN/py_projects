@@ -1,13 +1,18 @@
 # -*-coding:utf-8-*-
 from flask import Flask
 from flask import request
+from flask import abort
 from flask import session
 from flask_session import Session
 import os
 from flask import render_template
 from flask_socketio import SocketIO
 import json
+import datetime
+from log_module import get_logger
+from mail_module import send_mail
 from module.quotations_module import Quotation
+from module.quotations_module import RawRequestInfo
 
 
 port = 8001
@@ -20,6 +25,7 @@ app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览�
 app.config.from_object(__name__)
 Session(app)
 socket_io = SocketIO(app)
+logger = get_logger()
 
 
 @app.route('/')
@@ -30,6 +36,7 @@ def hello_world():
 @app.route("/quotations/listen", methods=['post', 'get'])
 def quotations_func():
     """"
+    http://47.106.68.161:8001/quotations/listen
     监听发送来的报价,并使用socketio向所有客户端发送消息,注意:
     1. 平台有优先级.优先级可以人为排序.
     2. 同一时间,只允许根据一个报价服务器的报价发布.
@@ -92,6 +99,27 @@ def listen_func():
 @app.route("/test")
 def test_func():
     return render_template("test.html")
+
+
+@app.before_request
+def logger_request_info():
+    """
+    监控所有的请求信息
+    :return:
+    """
+    data = None
+    try:
+        data = RawRequestInfo.get_init_dict(req=request)
+        mes = RawRequestInfo(**data)
+        mes.set_attr("server", "quotations_server")
+        mes.save_plus()
+    except Exception as e:
+        ms = "Error: {}, data: {}".format(e, data)
+        logger.exception(msg=ms)
+        send_mail(title="{}Message_Server监听请求出错".format(datetime.datetime.now()), content=ms)
+    finally:
+        if request.url.startswith("http://www.baidu.com"):
+            return abort(404)
 
 
 if __name__ == '__main__':

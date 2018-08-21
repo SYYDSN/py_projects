@@ -276,21 +276,29 @@ class Teacher(mongo_db.BaseDoc):
                 t.insert_many(documents=res, session=ses)
 
     @classmethod
-    def direction_map(cls) -> dict:
+    def direction_map(cls, include_raw: bool = True) -> dict:
         """
         获取以方向为key,老师的doc的list为val的字典.
         用于在生成虚拟信号的时候提供随机特性
+        : param include_raw: 是否包含原生的方向.
         :return:
         """
         ts = Teacher.find_plus(filter_dict=dict(), to_dict=True)
         t_dict = dict()  # 方向和老师的字典
         for t in ts:
             d = t.get("direction")
-            if d is not None:
-                if d in t_dict:
-                    t_dict[d].append(t)
-                else:
-                    t_dict[d] = [t]
+            if include_raw:
+                if d is not None:
+                    if d in t_dict:
+                        t_dict[d].append(t)
+                    else:
+                        t_dict[d] = [t]
+            else:
+                if d is not None and d != "raw":
+                    if d in t_dict:
+                        t_dict[d].append(t)
+                    else:
+                        t_dict[d] = [t]
         return t_dict
 
 

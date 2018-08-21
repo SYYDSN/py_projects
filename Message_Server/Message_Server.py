@@ -55,13 +55,16 @@ def hello_world():
 
 @app.route("/listen_<key>", methods=['post'])
 def listen_func(key):
-    """监听简道云发送过来的消息"""
+    """监听
+    1. 简道云
+    2. 虚拟喊单延迟信号
+    发送过来的消息"""
     mes = {"message": "success"}
     headers = request.headers
     event_id = headers.get("X-JDY-DeliverId")
     signature = headers.get("X-JDY-Signature")
     data = request.json
-    data = data if isinstance(data, dict) else json.loads(data)
+    data = data if isinstance(data, dict) else get_args(request)
     print(event_id)
     print(signature)
     print(data)
@@ -89,6 +92,12 @@ def listen_func(key):
         print(ms)
         """虚拟老师管理方式暂时未定"""
         pass
+    elif key == "virtual_trade":
+        """虚拟喊单延迟信号"""
+        trade = get_args(req=request)
+        trade = Trade(**trade)
+        res = delay_virtual_trade(trade.get_dict())
+        print(res)
     else:
         mes['message'] = '错误的path'
     return json.dumps(mes)
