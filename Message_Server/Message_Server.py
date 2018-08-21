@@ -95,6 +95,8 @@ def listen_func(key):
     elif key == "virtual_trade":
         """虚拟喊单延迟信号"""
         trade = get_args(req=request)
+        if "native" in trade:
+            trade['native'] = True if trade['native'] == "True" else False
         trade = Trade(**trade)
         res = delay_virtual_trade(trade.get_dict())
         print(res)
