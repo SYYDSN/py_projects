@@ -126,13 +126,14 @@
                 </div>
             </div>
 
-        <script src="/static/js/jquery.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
         <script src="/static/js/LCalendar.min.js"></script>
         <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
         <script src="/static/js/jquery-weui.min.js"></script>
         <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
         <script src="/static/js/modal.js"></script>
+        <!--<script src="/static/js/add_info_jilu.js?v={{version}}"></script>-->
+        <!--
         <script>
 //             var calendar = new LCalendar();
 //             calendar.init({
@@ -163,10 +164,12 @@
                         success: function (res) {
                         var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
                          $obj.attr('src',localIds);
+                         $('.modal').modal({backdrop: 'static', keyboard: false});   
                          wx.uploadImage({
                             localId: localIds[0], // 需要上传的图片的本地ID，由chooseImage接口获得
                             isShowProgressTips: 1, // 默认为1，显示进度提示
                             success: function (res) {
+                               // $('.modal').modal({backdrop: 'static', keyboard: false});
                                 var serverId = res.serverId; // 返回图片的服务器端ID
                                 if($obj.attr('id') == 'image_id'){
                                     var table_name = "honor_image";
@@ -186,6 +189,9 @@
                                     if(status == 'success'){
                                         $obj.attr("data-id", json[field_name]);
                                         $obj.attr("data-url", json[field_name + "_url"]);
+                                        setTimeout(function(){
+                                            $('.modal').modal('hide');
+                                             },1000);
                                         console.log($obj)
                                     }else{
                                         $.alert(status);
@@ -293,7 +299,7 @@
             });
             
         </script>
-        <!-- 微信 提示 删除按钮-->
+
         <script>
             $("#delete").on("touchstart",function(){
                 $.confirm("您确定删除本条信息？",function(){
@@ -320,5 +326,6 @@
                 })
             })
         </script>
+    -->
 </body>
 </html>
