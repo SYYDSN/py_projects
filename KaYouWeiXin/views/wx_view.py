@@ -167,6 +167,11 @@ def resume_image_func(user: dict = None, action: str = 'get', table_name: str = 
                     file_format = "png"
                     file_name = "{}.{}".format(file_name.split(".")[0], file_format)
                 else:
+                    if img.mode != "GBA":
+                        """转换图像格式"""
+                        img = img.convert("RGB")
+                    else:
+                        pass
                     file_format = file_name.split(".")[-1]
                 img.save(fp=data, format=file_format)
                 data = BytesIO(initial_bytes=data.getvalue())  # initial_bytes的值必须是二进制本身,不能是ByteIO对象.

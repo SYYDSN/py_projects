@@ -199,9 +199,9 @@ def _generator_signal(raw_signal: dict) -> dict:
     calculate_trade(res)
     """发送模板消息阶段"""
     u = "http://127.0.0.1:8080/template_message"
-    # r = requests.post(u, data=template_message, timeout=2)  # 调试请注销
-    # status = r.status_code  # 调试请注销
-    status = 200  # 调试专用，生产环境请注销
+    r = requests.post(u, data=template_message, timeout=2)  # 调试请注销
+    status = r.status_code  # 调试请注销
+    # status = 200  # 调试专用，生产环境请注销
     if status != 200:
         ms = "申请模板消息出错:{}, {}".format(status, datetime.datetime.now())
         logger.exception(msg=ms)
@@ -247,7 +247,7 @@ def calculate_trade(raw_signal: dict) -> None:
         """
         """计算盈利总额,盈利率"""
         x = raw_signal
-        change = x.get("change")
+        # change = x.get("change")
         teacher_id = x['teacher_id']
         teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
         deposit = teacher.get('deposit', 0)
@@ -295,6 +295,7 @@ def calculate_trade(raw_signal: dict) -> None:
                 t1_f = {"_id": x.pop("_id")}
                 t1_u = {"$set": x}
                 r1 = t1.find_one_and_update(filter=t1_f, update=t1_u, upsert=True)
+                print(r1)
                 t2_f = {"_id": teacher_id}
                 t2_u = {"$set": {
                     'deposit': deposit,
@@ -534,7 +535,7 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
             else:
                 count_down = random.randint(30, 1600)  # 延迟操作的秒数,表示在原始信号发出后多久进行操作?
                 json_obj = mongo_db.to_flat_dict(temp)
-                count_down = 1
+                count_down = 10  # 测试专用
                 send_virtual_trade.apply_async(countdown=count_down, kwargs={"trade_json": json_obj})
             # break  # 生产环境请注销
     else:
@@ -949,7 +950,7 @@ class Signal(mongo_db.BaseDoc):
 
             """发送消息到钉钉群"""
             res = send_signal(out_put, token_name=self.get_attr("token_name"))
-            # res = 1
+            # res = 1  # 测试专用
             if res:
                 if the_type == "删除订单":
                     self.__dict__['send_time_delete'] = datetime.datetime.now()
@@ -978,7 +979,6 @@ class Signal(mongo_db.BaseDoc):
                     print(r)
                     """记录原始信号并生成虚拟信号"""
                     try:
-                        # Trade.sync_from_signal(signal=self)
                         Trade.sync_from_signal(signal=r)
                         pass
                     except Exception as e:
@@ -1140,7 +1140,7 @@ class Trade(Signal):
     （老师的喊单）交易, 包括虚拟老师和真实老师的都会保存在这里.
     """
     _table_name = "trade"
-    _table_name = "trade2"
+    # _table_name = "trade2"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['native'] = bool  # 这个记录是原生的吗?
@@ -1202,7 +1202,7 @@ class Trade(Signal):
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
     a = {
-        "_id" : ObjectId("5b67a444c5aee8250b3e142b"),
+        "_id" : ObjectId("6267a444c5aee8250b3e142b"),
         "creator_name" : "语昂",
         "datetime" : "2018-08-06T01:28:25.000Z",
         "app_id" : "5a45b8436203d26b528c7881",
@@ -1263,7 +1263,7 @@ if __name__ == "__main__":
         "exit_reason": "保护利润，提前离场",
         "send_time_exit": "2018-08-06T09:44:48.824Z"
     }
-    s = Signal(**b)
+    s = Signal(**a)
     Trade.sync_from_signal(s)
     """测试获取价格"""
     # th_time = mongo_db.get_datetime_from_str("2018-8-12 16:00:00")

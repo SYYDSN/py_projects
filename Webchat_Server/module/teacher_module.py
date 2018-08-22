@@ -186,5 +186,5 @@ class Teacher(mongo_db.BaseDoc):
 
 if __name__ == "__main__":
     # Teacher.index()
-    Teacher.single_info(t_id=ObjectId("5aab3ea4340c1749505a2819"))
+    Teacher.single_info(t_id=ObjectId("5a1e680642f8c1bffc5dbd6f"))
     pass

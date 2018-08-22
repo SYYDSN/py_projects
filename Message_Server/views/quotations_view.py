@@ -13,7 +13,7 @@ from tools_module import *
 from mail_module import send_mail
 
 
-"""接受行情服务器推送过来的信息2018-8-7"""
+"""接受行情服务器推送过来的信息2018-8-7,此视图仅做测试用，有正式的行情服务器"""
 
 
 """注册蓝图"""

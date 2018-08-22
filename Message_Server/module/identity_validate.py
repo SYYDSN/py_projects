@@ -10,6 +10,7 @@ from werkzeug.contrib.cache import SimpleCache
 from uuid import uuid4
 import mongo_db
 from log_module import get_logger
+from mail_module import send_mail
 from jwt.exceptions import InvalidSignatureError
 
 
@@ -181,7 +182,11 @@ class GlobalSignature(mongo_db.BaseDoc):
                 try:
                     res = jwt.decode(jwt=jwt_str, key=secret, algorithm=algorithm)
                 except InvalidSignatureError as e:
-                    logger.exception(e)
+                    title = "{}解密信息出现错误".format(datetime.datetime.now())
+                    content = "错误原因：{},参数：jwt:{}, key: {}, algorithm: {}".format(e, jwt_str, secret, algorithm)
+                    ms = "{}，{}".format(title, content)
+                    send_mail(title=title, content=content)
+                    logger.exception(ms)
                     print(e)
                     try:
                         old_secret = cls.get_signature_prev()
