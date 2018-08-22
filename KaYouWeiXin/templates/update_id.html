@@ -8,6 +8,7 @@
     <title>上传身份证</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/weui.min.css">
 </head>
 <style>
         *{
@@ -54,8 +55,7 @@
         }
        .jiantou{
          font-size: 1rem;
-           font-size: 16px;
-          margin-top: 8px;
+         font-size: 16px;
         }
         .div_info p img{
             width: 88%;
@@ -65,14 +65,17 @@
         .p_mag {
             margin-top: 1em;
         }
+        .row_padd{
+            padding: 1em 0;
+        }
     </style>
 <body>
         <div class="container-fluid">
                 <span style="display: none" id="resume_id">{{ user.resume_id }}</span>
-                <div class="row">
+                <div class="row row_padd">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
-                        <a href="/wx/html/resume.html">
-                            <i class="glyphicon glyphicon-menu-left pull-left jiantou">返回</i> 
+                        <a href="/wx/html/resume_detail.html">
+                                <button type="button" class="btn btn-primary btn-sm"> <i class="glyphicon glyphicon-menu-left  jiantou">返回</i> </button>
                         </a>
                     </div>    
                 </div>
@@ -91,14 +94,28 @@
                 </div>
                 </div>
             </div>
+            <!-- 操作提示 模态框 -->
+            <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  aria-hidden=”true” data-backdrop=”static”>
+                    <div class="modal-dialog modal-sm" role="document">
+                      <div class="modal-content">
+                            <div class="weui-loadmore">
+                                    <i class="weui-loading"></i>
+                                    <span class="weui-loadmore__tips">正在上传，请稍后</span>
+                            </div>
+                      </div>
+                    </div>
+            </div>
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
         <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-        <script src="/wx/js_sdk_init?debug=1&api=chooseImage uploadImage getLocalImgData"></script>
+        <script src="/static/js/jquery-weui.min.js"></script>
+        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage getLocalImgData"></script>
         <script src="/static/js/jquery-weui.min.js"></script>
         <!--<script src="/static/js/wx_custom.js"></script>-->
+
     <script>
     $(function(){
+        // $('.modal').modal({backdrop: 'static', keyboard: false});
         /*
         * 整体逻辑如下：
         * 1. 上传图片到然后，得到微信服务器返回的serverId                       chose_and_upload 函数
@@ -130,12 +147,10 @@
                             wx.getLocalImgData({
                                 localId: localIds[0], // 图片的localID
                                 success: function (res) {  
-                                alert(res);
                                 var img_data = res.localData; // localData是图片的base64数据，可以用img标签显示
-                                var src_data = "data:image/png;base64," + img_data;
-                                alert(src_data);
-                                $dom.attr('src', src_data);
-                                upload_img(localIds); // 上传图片
+                                // alert(img_data);
+                                $dom.attr('src', img_data);
+                                upload_img($dom, localIds); // 上传图片
                                 }
                             });
                         }
@@ -145,26 +160,26 @@
                     }
                     else{
                         $dom.attr('src',localIds);
-                        upload_img(localIds); // 上传图片
+                        upload_img($dom, localIds); // 上传图片
                     }
                 }
             });
         };
 
-        function upload_img(local_ids){
+        function upload_img($obj, local_ids){
             // 上传图片到微信服务器
             wx.uploadImage({
                 localId: local_ids[0],  // 微信官方文档有误，请照此填写
                 isShowProgressTips: 1,
                 success: function(res){
                     // alert("localIds: " + res.serverId);
-
+                    $('.modal').modal({backdrop: 'static', keyboard: false});
                     var id = res.serverId;
                     // alert("server_id: "+ id);
 
                     // 请求api接口去下载临时素材
                     var table_name = "id_image";  // 上传身份证对应的表名
-                    var field_name = $dom.attr("id");
+                    var field_name = $obj.attr("id");
                     var args = {
                         "server_id": id,    // server_id 下载素材用
                         "table_name": table_name,
@@ -172,21 +187,30 @@
                         "db": "mongo_db2"            // 库名，固定
                     }
                     var url = "/wx/auto_download/" + table_name;
+                    // alert(JSON.stringify(args));
                     $.post(url, args, function(resp){
+                        
                         var json = JSON.parse(resp);
                         var status = json['message'];
                         console.log(json);
+                        // alert(status);
                         if(status == "success"){
                             // 成功，保存返回值
-                            $dom.attr("data-id", json[field_name]);
-                            var key = field_name + "_url";
-                            var img_url =  json[key];
-                            $dom.attr("data-url", img_url);
-                            var args = {"src":$dom.attr("src")};
-                            $.post("/temp_message", args, function(resp){
-                                var r = JSON.parse(resp);
-                                alert(r['message']);
-                            });
+                            try{
+                                $obj.attr("data-id", json[field_name]);
+                                var key = field_name + "_url";
+                                var img_url =  json[key];
+                                $obj.attr("data-url", img_url);
+                                setTimeout(function(){
+                                $('.modal').modal('hide');
+                                 },3000);
+                                // alert(img_url);
+                            }
+                            catch(e){
+                                $.alert(e,function(){
+
+                                });
+                            }
                         }
                         else{
                             alert(status);
@@ -212,12 +236,14 @@
             var args = {};
             var need_submit = false;
             var id_image_face = $id_image_face.attr("data-id");
+            // alert(id_image_face);
             if(id_image_face){
                 need_submit = true;
                 args['id_image_face'] = id_image_face;
                 args['id_image_face_url'] = $id_image_face.attr("data-url");
             }
             var id_image_back = $id_image_back.attr("data-id");
+            // alert(id_image_back);
             if(id_image_back){
                 need_submit = true;
                 args['id_image_face'] = id_image_back;
@@ -230,18 +256,22 @@
                     var json = JSON.parse(resp);
                     var status = json['message'];
                     console.log(json);
+                    // alert(status);
                     if(status == "success"){
                         // 成功，下一步
-                        alert("操作成功");
-                        location.href = "/wx/html/resume.html";
+                        $.alert('保存成功！',function(){
+                            location.href = "/wx/html/resume_detail.html";
+                        });
                     }
                     else{
-                        alert(status);
+                        $.alert('保存失败！');
                     }
                 });
             }
             else{
-                location.href = "/wx/html/resume.html";
+                $.alert('未保存图片！',function(){
+                        location.href = "/wx/html/resume_detail.html";
+                    });
             }
         });
 

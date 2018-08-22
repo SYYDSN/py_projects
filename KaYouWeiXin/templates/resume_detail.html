@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>简历</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/weui.min.css">
+    <link rel="stylesheet" href="/static/css/zoomify.min.css">
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            font-size: 12px;
+        }
+        body{
+            background: #EBF0F1;
+        }
+        ul{
+            margin-bottom: 0;
+        }
+        ul li{
+            list-style: none;
+        }
+        .xian{
+            border-bottom: 1px solid #D3D3D3;
+        }
+        .head{
+            padding: 0.7em 0;
+        }
+        .head b{
+            font-size: 0.7rem;
+        }
+        .header_img{
+            display: flex;
+        }
+        .portrait{
+            width: 5em;
+            height: 3em;
+        }
+        .portrait_img{
+            width: 6em;
+            height: 8em;
+        }
+        .pa_dfn{
+            padding: 0.5em 0.5em;
+        }
+        dl{
+            margin-bottom: 0;
+
+        }
+        .row{
+            background: #fff;
+        }
+        .row_resume{
+            margin-top: 1em;
+        }
+        .color_one title_mag{
+            color: #464646;
+        }
+        .color_two{
+            color: #656565;
+        }
+        .color_three{
+            color: #989898;
+        }
+        .color_for{
+            color: #666666;
+        }
+        .title_mag{
+            position: relative;
+            left: 0.5em;
+        }
+        .article_padding{
+            /* padding-left: 0.5em;  */
+        }
+        .jiantou{
+            color: #666;
+            font-size: 1rem;
+        }
+        .list_size{
+            font-size: 1.2rem;
+            position: relative;
+            margin-top: 0.2em;
+        }
+        .list_border{
+            padding-left:0.8em; 
+            border-left: 1px solid #ccc;
+            margin-top: 0;
+        }
+        .list_border li{
+            padding-bottom: 0.2em;
+        }
+        .list_size li{
+            margin-left: 0.2em;
+        }
+        .li_mag{
+            margin: 0.2em 0;
+        }
+        .big{
+            /* padding-left:2em;  */
+            float: left;
+            /* height: 11em; */
+            /* width: 1px; */
+            /* background: #ccc; */
+            /* margin-top: 10px; */
+            position: absolute;
+            display: block;
+            top: 0.1em;
+            left: -0.1em;
+        }
+        .big i{
+            display: inline-block;
+            border-radius: 50%;
+        }
+        .i_one{
+            width: 1em;;
+            height: 1em;
+            border: 1px solid #ccc;
+            position: absolute;
+            top: -7px;
+            left: -5px;
+        }
+        .i_two{
+            width: 0.5em;
+            height: 0.5em;
+            background: linear-gradient(rgb(78, 78, 78),rgb(223, 197, 197));
+            position: absolute;
+            top: 2px;
+            left: 2px;
+        }
+        .btn{
+            padding: 3px 8px;
+        }
+        .btn-success {
+            color: #fff;
+            background-color: #9a9a9a;
+            border-color: #949494;
+        }
+        .btn-success:hover {
+            color: #fff;
+            background-color: #9a9a9a;
+            border-color: #949494;
+        }
+        .btn-success:active:hover {
+            color: #fff;
+            background-color: #696969;
+            border-color: #5e5e5e;
+        }
+        .title_btn{
+            margin: 0.6em 0;
+        }
+        .id_num img{
+            width: 3em;
+            height: 2em;
+        }
+        .zoomify.zoomed{
+            height: auto;
+        }
+      .img_widt img{
+            width: 100%;
+        } 
+        .close{
+            opacity: 1;
+        }
+        .close:hover{
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row ">
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 title_btn">
+                <a href="/wx/html/register_info.html">pop_img
+                    <i class="glyphicon glyphicon-menu-left pull-left jiantou"></i>
+                </a>
+<!--                 <a href="javascript:;">
+                    <i class="glyphicon glyphicon-menu-right pull-right jiantou"></i>
+                </a>    -->
+            </div>
+        </div>
+        <!-- 基本信息 -->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                <article>
+                    <div class="head"> 
+                         <i class="glyphicon glyphicon-list-alt"></i><b class="color_one title_mag title_mag">基本信息</b>
+                        <a href="/wx/html/driver_two.html">
+                            <button class="btn btn-primary pull-right">编辑</button>
+                        </a> 
+                    </div>
+                    <div class="xian"></div>
+                    <div class="header_img">
+                       <dfn class="pa_dfn"><img class="portrait_img pop_img" src="{{ resume.head_image if resume.head_image else "/static/images/head_img.png" }}" alt=""></dfn> 
+                        <article>
+                            <h4 class="color_one title_mag">{{ resume.real_name }}</h4>
+                            <h6>{{ resume.gender }}|{{ resume.age }} 
+                                <span class="color_two">驾照：</span >
+                                    <span class="color_one title_mag">{{ resume.dl_license_class }}</span>
+                                    <span style="margin-left: 0.5em" class="color_two">驾龄：</span>
+                                        <span class="color_one title_mag">{{ resume.driving_experience }}</span></h6>
+                            <h5>{{ resume.industry_experience }}年工作经验</h5>
+                        </article>
+                    </div>
+                        <ul class="list_size">
+                            <li><span class="color_two">手机号：</span><span class="color_one title_mag">{{ resume.phone if resume.phone else '未填写'}}</span></li>
+                            <li></li>
+                            <li></li>
+                            <li><span class="color_two">居住地：</span><span class="color_one title_mag">{{ resume.living_place if resume.living_place else "未填写"}}</span></li>
+                            <li class="id_num">
+                                <span>身份证：</span>
+                                <span>正面：<img class="id_num_one pop_img" src="{{ resume.id_image_face_url }}" alt=""></span>
+                                <span>反面：<img class="id_num_two pop_img" src="{{ resume.id_image_back_url }}" alt=""></span>
+                                <a href="/wx/html/update_id.html"><button class="btn btn-primary pull-right">{{ '编辑' if resume.id_image_face_url or resume.id_image_back_url else '上传' }}</button></a>
+                            </li>
+                         </ul>
+                    </article>
+            </div>
+        </div><!--基本信息 end！！！-->
+        <!-- 求职意愿 -->
+        <div class="row row_resume">
+                <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 ">
+                    <span style="display: none;"> {{ resume }} </span>
+                    <article>
+                        <div class="head"> <i class="glyphicon glyphicon-screenshot"></i>
+                            <b class="color_one title_mag">求职意愿</b> 
+                            <a href="/wx/html/additional.html"> <button class="btn btn-primary pull-right">编辑</button></a>
+                        </div>
+                        <div class="xian"></div>
+                        <article class="article_padding">
+                            <ul class="list_size list_border">
+                                <!-- <li class="color_three">2017/10-2018/4[6个月]</li>
+                                <li><b>清华大学</b></li>
+                                <li><span class="color_two">本科|</span><span>导演</span></li> -->
+                                <li>
+                                    <big class="big">
+                                        <i class="i_one"><i class="i_two"></i></i>
+                                    </big>
+                                </li>
+                                <li><span class="color_two">当前状态：</span><span>{{ resume.status if resume.status else '未填写'}}</span></li>
+                                <li><span class="color_two">期望城市：</span><span>{{resume.expected_regions if resume.expected_regions else '未填写'}}</span></li>
+                                <li><span class="color_two">期望薪资：</span><span>{{ resume.expected_salary if resume.expected_salary else '未填写'}} 元/月</span></li>
+                            </ul>
+                        </article>
+                    </article>
+                </div>
+            </div><!--求职意愿   end！-->
+        <!-- 工作履历 -->
+        <div class="row row_resume">
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 ">
+                <article>
+                    <div class="head"> <i class="glyphicon glyphicon-lock"></i>
+                        <b class="color_one title_mag">工作履历</b>
+                       <a href="/wx/html/resume_info.html"><button class="btn btn-primary pull-right">添加</button></a> 
+                     </div>
+                    <div class="xian"></div>
+                    <!-- <div class="">
+                       <dl>
+                           <dd，由于很多人会连续上传身份证图片，鉴于我我们微信服务器带宽只有1m，明显跟不上反映。你需要加上“正在上传，请稍后“之类的模态框阻碍用户进行连续的操作。
+                           <dd，由于很多人会连续上传身份证图片，鉴于我我们微信服务器带宽只有1m，明显跟不上反映。你需要加上“正在上传，请稍后“之类的模态框阻碍用户进行连续的操作。
+                       </dl>
+                    </div> -->
+                    {% for x in resume.work_list %} 
+                        <article class="article_padding">
+                            <ul class="list_size list_border">
+                                <li class="color_three">
+                                        <big class="big">
+                                            <i class="i_one"><i class="i_two"></i></i>
+                                        </big>
+                                    <span class="work_title">
+                                            {{ x.begin | str_time }}至{{ x.get('end') | str_time }}
+                                    </span>
+                                   <a href="/wx/html/resume_info.html?w_id={{ x._id }}"> <button class="btn btn-success pull-right">编辑</button></a>
+                                </li>
+                                <li class="li_mag"><b>{{ x.enterprise_name }}</b></li>
+                                <li><span class="color_two">车辆类型：</span><span>{{ x.vehicle_type if x.vehicle_type else '平板式货车'}}</span></li>
+                                <li><span class="color_two">吨位：</span><span>{{ x.vehicle_load if x.vehicle_load else "未填写" }}</span></li>
+                                <li><span class="color_two">工作描述：</span><span>{{ x.description if x.description else "未填写" }}</span></li>
+                            </ul>
+                        </article>
+                    {% endfor %}
+                </article>
+            </div>
+        </div><!--工作履历   end！-->
+        <!-- 教育经历 -->
+        <div class="row row_resume">
+                <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 ">
+                    <article>
+                        <div class="head"> <i class="glyphicon glyphicon-education"></i>
+                            <b class="color_one title_mag">教育经历</b>
+                           <a href="/wx/html/educational_experience.html"> <button class="btn btn-primary pull-right">添加</button></a>
+                         </div>
+                        <div class="xian"></div>
+                        <!-- <div class="">
+                           <dl>
+                               <dd>2017/10-2018/4[6个月]</dd>
+                               <dd><b>xxx专职速运</b></dd>
+                           </dl>
+                        </div> -->
+                        {% for x in resume.education_list %}
+                            <article class="article_padding">
+                                <ul class="list_size list_border">
+                                    <li class="color_three">
+                                        <big class="big">
+                                            <i class="i_one"><i class="i_two"></i></i>
+                                        </big>
+                                        <span>{{ x.begin | str_time }}至{{ x.get('end') | str_time }}</span>
+                                        <a href="/wx/html/educational_experience.html?e_id={{ x._id }}"> <button class="btn btn-success pull-right">编辑</button></a>
+                                    </li>
+                                    <li class="li_mag"><b>{{ x.school_name }}</b></li>
+                                    <li><span class="color_two">专业：</span><span>{{x.major if x.major else '未填写'}}</span></li>
+                                </ul>
+                            </article>
+                        {% endfor %}
+                    </article>
+                </div>
+            </div><!--教育经历   end！-->
+        <!-- 荣誉情况 -->
+        <div class="row row_resume">
+                <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 ">
+                    <article>
+                        <div class="head"> <i class="glyphicon glyphicon-ok-circle"></i>
+                            <b class="color_one title_mag">荣誉情况</b>
+                            <a href="/wx/html/add_info_jilu.html"><button class="btn btn-primary pull-right">添加</button></a> 
+                         </div>
+                        <span style="display: none"> {{ resume.honor_list }} </span>
+                        <div class="xian"></div>
+                        {% for x in resume.honor_list %}
+                        <article class="article_padding">
+                            <ul class="list_size list_border">
+                                <li>
+                                    <big class="big">
+                                        <i class="i_one"><i class="i_two"></i></i>
+                                    </big>
+                                    <span>获奖时间：</span>
+                                    <span>{{ x.time | str_time }}</span>
+                                    <a href="/wx/html/add_info_jilu.html?h_id={{ x._id }}"><button class="btn btn-success pull-right">编辑</button></a> 
+                                </li>
+                                <li class="li_mag"><b class="color_two">荣誉名称：</b><b>{{ x.title }}</b></li>
+                                <li><span class="color_two">荣誉信息：</span><span>{{ x.info if x.info else '未填写'}}</span></li>
+                                <li><span class="color_two">荣誉证件：</span><span class="id_num"><img class="honer_img pop_img" src="{{ x.imge_url if x.imge_url else "/static/images/honer_img.png" }}" alt=""></span></li>
+                            </ul>
+                        </article>
+                        {% endfor %}
+                    </article>
+                </div>
+            </div><!--荣誉情况   end！-->
+        <!-- 车辆信息 -->
+        <div class="row row_resume">
+                <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 ">
+                    <article>
+                        <div class="head"> <i class="glyphicon glyphicon-bed"></i>
+                            <b class="color_one title_mag">车辆信息</b> 
+                            <a href="/wx/html/driver_three.html"><button class="btn btn-primary pull-right">添加</button></a>
+                         </div>
+                        <div class="xian"></div>
+                        <span style="display: none"> {{ resume.vehicle_list }} </span>
+                        {% for x in resume.vehicle_list %}
+                            <article class="article_padding">
+                                <ul class="list_size list_border">
+                                    <li>
+                                        <big class="big">
+                                            <i class="i_one"><i class="i_two"></i></i>
+                                        </big>
+                                    </li>
+                                    <li>
+                                        <span class="color_two">车辆照片：</span>
+                                        <span><img class="portrait pop_img" src="{{ x.image_url if x.image_url else '/static/images/car_imgs.png'}}" alt=""></span>
+                                        <a href="/wx/html/driver_three.html?v_id={{ x._id }}">
+                                            <button class="btn btn-success pull-right">编辑</button>
+                                        </a>
+                                    </li>
+                                    <li><span class="color_two">车辆号牌：</span><span>{{ x.plate_number if x.plate_number else "未填写" }}</span></li>
+                                    <li><span class="color_two">车辆类型：</span><span>{{ x.vehicle_type if x.vehicle_type else "未填写" }}</span></li>
+                                    <li><span class="color_two">车主姓名：</span><span>{{x.owner_name if x.owner_name else "未填写" }}</span></li>
+                                    <li><span class="color_two">车辆型号：</span><span>{{ x.vehicle_model if x.vehicle_model else "未填写" }}</span></li>
+                                    <li><span class="color_two">车辆识别码/或后六位：</span><span>{{ x.vin_id if x.vin_id else "未填写" }}</span></li>
+                                    <li><span class="color_two">发动机号：</span><span>{{ x.engine_id if x.engine_id else "未填写" }}</span></li>
+                                    <li><span class="color_two">注册日期：</span><span>{{ (x.register_date | str_time) if x.register_date else "未填写" }}</span></li>
+                                    <li><span class="color_two">发证日期：</span><span>{{ (x.issued_date | str_time) if x.issued_date else "未填写" }}</span></li>
+                                </ul>
+                            </article>
+                        {% endfor %}
+                    </article>
+                </div>
+        </div><!--荣誉情况   end！-->
+    </div>
+    <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  aria-hidden=”true” data-backdrop=”static”>
+<div class="modal-dialog modal-sm" role="document">
+  <div class="modal-content close" data-dismiss="modal" aria-label="Close">
+        <div class="img_widt" >
+            <img id="show_pop_img" src="{{ resume.id_image_face_url }}">
+        </div>
+      <div style="position: absolute;
+    color: #fff;
+    text-align: center;
+    right: 0;
+    font-size: 1.2rem;" class="glyphicon glyphicon-remove"></div>
+  </div>
+</div>
+</div>
+</body>
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/jquery-weui.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/zoomify.min.js"></script>
+<script>
+    $('.pop_img').on("touchstart",function(){
+        $("#show_pop_img").attr("src", $(this).attr("src"));
+        $('.modal').modal();
+    });
+    // //正面身份证放大缩小效果 
+    // $('.id_num_one').zoomify();
+    // //反面身份证放大缩小效果 
+    // $('.id_num_two').zoomify();
+    // //卡车头像 点击放大缩小效果
+    // $('.portrait').zoomify();
+    // //荣誉证件
+    // $('.honer_img').zoomify();
+</script>
+</html>

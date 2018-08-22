@@ -2,7 +2,8 @@
 <html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>简历</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
@@ -28,12 +29,12 @@
         width: 70%;
         color: #333;
     }
-
+    .div_info p {
+    padding: 2em 0;
+    }
     .jiantou {
-        /*     display: none; */
         font-size: 2rem;
-        /*     line-height: 2em; */
-        /*     padding:1rem 0; */
+        color: #696969;
     }
 
     .jiantou_mag {
@@ -79,8 +80,8 @@
         width: 100% !important;
     }
     .div_info .img_succes {
-        width: 70px;
-        height: 50px;
+        width: 60px;
+        height: 45px;
         margin-right: 1em;
     }
 
@@ -108,16 +109,20 @@
     .pannel_clic {
         text-align: center;
         height: 2em;
-        /* background: #007ACC; */
+        position: relative;
+        bottom: -0.5em;
     }
 
     .pannel_clic i {
         line-height: 0em;
         height: 2em;
-        padding: 1em 4em;
+        padding: 1em 3em;
         color: #fff;
-        background: #007ACC;
-        border-radius: 6px;
+        background: #e0e0e0;
+        border-radius: 60px 60px 0 0;
+        border: 1px solid #d2d2d2;
+        position: relative;
+        top: -1px;
     }
 
     /* 荣誉证件 */
@@ -136,20 +141,31 @@
         height: 2em;
         text-align: center;
     }
+   .div_honor_divs  .flex_adiv span{
+        display: inline-block;
+        width: 50%;
+        text-align: auto;
+        text-align: -webkit-auto;
+    }
 
     .pannel_clic_honor {
         text-align: center;
         height: 2em;
         /* background: #007ACC; */
+        position: relative;
+        bottom: -0.5em;
     }
 
     .pannel_clic_honor i {
         line-height: 0em;
         height: 2em;
-        padding: 1em 4em;
+        padding: 1em 3em;
         color: #fff;
-        background: #007ACC;
-        border-radius: 6px;
+        background: #e0e0e0;
+        border-radius: 60px 60px 0 0;
+        border: 1px solid #d2d2d2;
+        position: relative;
+        top: -1px;
     }
 
     /* 教育经历 */
@@ -168,19 +184,29 @@
         height: 2em;
         text-align: center;
     }
-
+ .div_vehicle_divs .flex_adiv span{
+        display: inline-block;
+        width: 50%;
+        text-align: auto;
+        text-align: -webkit-auto;
+    }
     .pannel_educational, .pannel_vehicle {
         text-align: center;
         height: 2em;
+        position: relative;
+        bottom: -0.5em;
     }
 
     .pannel_educational > i, .pannel_vehicle > i {
         line-height: 0em;
         height: 2em;
-        padding: 1em 4em;
+        padding: 1em 3em;
         color: #fff;
-        background: #007ACC;
-        border-radius: 6px;
+        background: #e0e0e0;
+        border-radius: 60px 60px 0 0;
+        border: 1px solid #d2d2d2;
+        position: relative;
+        top: -1px;
     }
        /* 微信提示 */
     .weui-toast{
@@ -188,147 +214,7 @@
     }
     /* 车辆信息 */
 </style>
-<body>
-<!-- 简历完成度 -->
-
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 header">
-
-            <p>
-                <a href="/wx/html/register_info.html"><i
-                        class="glyphicon glyphicon-menu-left pull-left jiantou"></i></a>
-                简历完成度越高越容易找到合适的工作呦！
-                <a href="javascript:window.history.back(-1);"><i class="glyphicon glyphicon-menu-right pull-right jiantou jiantou_mag"></i></a>
-            </p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-            <p class="flex_outer">
-                <span>上传身份证</span>
-                <a href="./update_id.html" class="flex_inner">
-                    <img class="img_succes" src="{{ resume.id_image_face_url }}">
-                    <img class="img_succes" src="{{ resume.id_image_back_url }}">
-                    <span class="add"> {{ '编辑' if resume.id_image_face_url or resume.id_image_back_url else '添加' }} </span>
-                </a>
-            </p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-            <div class="p flex_outer">
-                <div>基本信息</div>
-                <a href="/wx/html/driver_two.html" class="flex_inner">
-                    <ul>
-                        <li>
-                            <span>姓名 {{ resume.real_name }}</span><span>性别 {{ resume.gender }}</span>
-                        </li>
-                        <li>
-                            <span>驾照 {{ resume.dl_license_class }}</span><span>驾龄 {{ resume.driving_experience }}</span>
-                        </li>
-                    </ul>
-                    <span class="add">编辑</span>
-
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_vehicle">
-
-            <p>车辆信息 <a href="./driver_three.html"> <span class="pull-right"> 添加 </span></a></p>
-            <div class="vehicle">
-                {% for x in resume.vehicle_list %}
-                    <div class="div_vehicle_divs">
-                        <a class="flex_adiv" href="./driver_three.html?w_id={{ x._id }}">
-                            <span>{{ x.plate_number}}11</span>
-                            <span>{{ x.vehicle_model}}11</span>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-            <div class="pannel_vehicle">
-                <i class="glyphicon glyphicon-chevron-down"></i>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-            <p>附加信息 <a href="./additional.html"> <span class="pull-right"> 添加 </span></a></p>
-        </div>
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_work">
-            <p>
-                履历信息
-                <a href="./resume_info.html"> <span class="pull-right"> 添加 </span></a>
-            </p>
-            <div class="work_dvs_for">
-
-                {% for x in resume.work_list %}
-                    <div class="work_dvs">
-                        <a class="flex_adiv" href="./resume_info.html?w_id={{ x._id }}">
-                            <span>{{ x.begin | str_time }}</span>
-                            <span>{{ x.get('end') | str_time }}</span>
-                            <span>{{ x.enterprise_name }}</span>
-                        </a>
-                </div>
-                {% endfor %}
-            </div>
-            <div class="pannel_clic">
-                <i class="glyphicon glyphicon-chevron-down"></i>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_honor">
-            <p>荣誉情况
-                <a href="./add_info_jilu.html">
-                    <span class="pull-right"> 添加 </span></a>
-            </p>
-            <div class="honor">
-                {% for x in resume.honor_list %}
-                    <div class="div_honor_divs">
-                        <a class="flex_adiv" href="./add_info_jilu.html?h_id={{ x._id }}">
-                            <span>{{ x.time | str_time }}</span>
-                            <span>{{ x.title }}</span>
-                        </a>
-                </div>
-                {% endfor %}
-            </div>
-            <div class="pannel_clic_honor">
-                <i class="glyphicon glyphicon-chevron-down"></i>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_educational">
-            <p>教育经历
-                <a href="./educational_experience.html"> <span class="pull-right"> 添加 </span></a>
-            </p>
-            <div class="educational">
-                {% for x in resume.education_list %}
-                    <div class="div_eduacational_divs">
-                        <a class="flex_adiv" href="./educational_experience.html?e_id={{ x._id }}">
-                            <span>{{ x.begin | str_time }}</span>
-                            <span>{{ x.school_name }}</span>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-            <div class="pannel_educational">
-                <i class="glyphicon glyphicon-chevron-down"></i>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
-            <!-- <p>预览简历</p> -->
-        </div>
-    </div>
-</div>
-</body>
 <script src="/static/js/jquery.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
 <script>
 
     // 车辆信息
@@ -439,6 +325,150 @@
             });
         }
     });
-
+   
 </script>
+<body>
+<!-- 简历完成度 -->
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 header">
+
+            <p>
+                <a href="/wx/html/register_info.html"><i
+                        class="glyphicon glyphicon-menu-left pull-left jiantou"></i></a>
+                简历完成度越高越容易找到合适的工作呦！
+                <a href="javascript:window.history.back(-1);"><i class="glyphicon glyphicon-menu-right pull-right jiantou jiantou_mag"></i></a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+            <p class="flex_outer">
+                <span>上传身份证</span>
+                <a href="./update_id.html" class="flex_inner">
+                    <img class="img_succes" src="{{ resume.id_image_face_url }}">
+                    <img class="img_succes" src="{{ resume.id_image_back_url }}">
+                    <span class="add"> {{ '编辑' if resume.id_image_face_url or resume.id_image_back_url else '添加' }} </span>
+                </a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+            <div class="p flex_outer">
+                <div>基本信息</div>
+                <a href="/wx/html/driver_two.html" class="flex_inner">
+                    <ul>
+                        <li>
+                            <span>姓名 {{ resume.real_name }}</span><span>性别 {{ resume.gender }}</span>
+                        </li>
+                        <li>
+                            <span>驾照 {{ resume.dl_license_class }}</span><span>驾龄 {{ resume.driving_experience }}</span>
+                        </li>
+                    </ul>
+                    <span class="add">编辑</span>
+
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+            <p>求职意愿 <a href="./additional.html"> <span class="pull-right"> 添加 </span></a></p>
+        </div>
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_work">
+            <p>
+                履历信息
+                <a href="./resume_info.html"> <span class="pull-right"> 添加 </span></a>
+            </p>
+            <div class="work_dvs_for">
+
+                {% for x in resume.work_list %}
+                    <div class="work_dvs">
+                        <a class="flex_adiv" href="./resume_info.html?w_id={{ x._id }}">
+                            <span>开始：{{ x.begin | str_time }}</span>
+                            <span>结束：{{ x.get('end') | str_time }}</span>
+                            <span>公司名称：{{ x.enterprise_name }}</span>
+                        </a>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="pannel_clic">
+                <i class="glyphicon glyphicon-chevron-down"></i>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_educational">
+            <p>教育经历
+                <a href="./educational_experience.html"> <span class="pull-right"> 添加 </span></a>
+            </p>
+            <div class="educational">
+                {% for x in resume.education_list %}
+                    <div class="div_eduacational_divs">
+                        <a class="flex_adiv" href="./educational_experience.html?e_id={{ x._id }}">
+                            <span>开始：{{ x.begin | str_time }}</span>
+                            <span>结束：{{ x.get('end') | str_time }}</span>
+                            <span>学校：{{ x.school_name }}</span>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="pannel_educational">
+                <i class="glyphicon glyphicon-chevron-down"></i>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_honor">
+            <p>荣誉情况
+                <a href="./add_info_jilu.html">
+                    <span class="pull-right"> 添加 </span></a>
+            </p>
+            <div class="honor">
+                {% for x in resume.honor_list %}
+                    <div class="div_honor_divs">
+                        <a class="flex_adiv" href="./add_info_jilu.html?h_id={{ x._id }}">
+                            <span>获奖时间：{{ x.time | str_time }}</span>
+                            <span>荣誉名称：{{ x.title }}</span>
+                        </a>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="pannel_clic_honor">
+                <i class="glyphicon glyphicon-chevron-down"></i>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_vehicle">
+            <span style="display: none;">{{ resume.vehicle_list }}</span>
+            <p>车辆信息 <a href="./driver_three.html"> <span class="pull-right"> 添加 </span></a></p>
+            <div class="vehicle">
+                
+                {% for x in resume.vehicle_list %}
+                    <div class="div_vehicle_divs">
+                        <a class="flex_adiv" href="./driver_three.html?v_id={{ x._id }}">
+                            <span>车辆号牌：{{ x.plate_number}}</span>
+                            <span>型号：{{ x.vehicle_model}}</span>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="pannel_vehicle">
+                <i class="glyphicon glyphicon-chevron-down"></i>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+            <!-- <p>预览简历</p> -->
+        </div>
+    </div>
+</div>
+</body>
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+
 </html>

@@ -53,6 +53,18 @@ def str_time(val: datetime.datetime, fmt: str = None) -> str:
     return res
 
 
+def is_list(val) -> bool:
+    """
+    自定义的jinja2的过滤器, 判断一个对象是否是数组
+    :param val:
+    :return:
+    """
+    if isinstance(val, list):
+        return True
+    else:
+        return False
+
+
 app.jinja_env.filters['str_time'] = str_time
 
 

@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>我是中介</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
@@ -37,7 +38,7 @@
             outline: none;
             border: none;
             height: 100%;
-            width: 100%;
+            width: 68%;
             /* background: #f5f5f5; */
         }
         .div_info a{
@@ -93,20 +94,24 @@
                         <p class="p_text">上传营业执照</p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg  div_marg">
-                        <p class="inp_one"><input id="contacts" class="inp_add" type="text" placeholder="联系人"></p>
+                        <p class="inp_one"><span> 联系人： </span><input id="contacts" class="inp_add" type="text"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                        <p class="inp_one"><input id="contacts_num" class="inp_add" type="text" placeholder="联系电话"></p>
+                        <p class="inp_one"><span> 联系电话： </span><input id="contacts_num" class="inp_add" type="number"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                        <p class="inp_one"><input id="name" class="imgs inp_add" type="text" placeholder="公司名称"></p>
+                        <p class="inp_one"><span> 公司名称： </span><input id="name" class="imgs inp_add" type="text"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                            <p class="inp_one"><input id="" class="inp_add" type="text" placeholder="邮箱"></p>
+                            <p class="inp_one"><span> 邮箱： </span><input id="" class="inp_add" type="emal"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                            <p><input id="identity_code" class="inp_add" type="text" placeholder="营业执照号"></p>
+                            <p class="inp_one"><span> 银行卡号： </span><input id="" class="inp_add" type="text"></p>
                     </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
+                            <p><span> 营业执照号： </span><input id="identity_code" class="inp_add" type="text"></p>
+                    </div>
+                    
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
                             <a id="submit" href="javascript:;"> <p>提交</p></a>
                     </div>
@@ -114,51 +119,99 @@
             </div>
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
-        <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
         <script src="/static/js/jquery-weui.min.js"></script>
-        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
+        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage getLocalImgData"></script>
+        <script src="/static/js/modal.js"></script>
         <script>
            function img_honor($obj){
-                wx.chooseImage({
-                        count: 1, // 默认9
-                        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-                        sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-                        success: function (res) {
+                   wx.chooseImage({
+                    count: 1, // 默认9
+                    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                    sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                    success: function (res) {
+                        var agent = navigator.userAgent;
+                        var is_iphone = agent.indexOf("iPhone OS") != -1?true: false;
                         var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-                         $obj.attr('src',localIds);
-                         wx.uploadImage({
-                            localId: localIds[0], // 需要上传的图片的本地ID，由chooseImage接口获得
-                            isShowProgressTips: 1, // 默认为1，显示进度提示
-                            success: function (res) {
-                                var serverId = res.serverId; // 返回图片的服务器端ID
-                                if($obj.attr('id') == 'business_license_image'){
-                                    var table_name = "business_license_image";
-                                };
-                               var field_name = $obj.attr("id");
-                                 //上传图片对应的  id信息
-                                var args = {
-                                    "server_id":serverId,
-                                    "table_name": table_name,
-                                    "field_name": field_name,
-                                    "db":"mongo_db" // 库名，固定
-                                };
-                                var url = "/wx/auto_download/" + table_name;
-                                $.post(url, args,function(resp){
-                                    let  json = JSON.parse(resp);
-                                    let status = json['message'];
-                                    if(status == 'success'){
-                                        $obj.attr("data-id", json[field_name]);
-                                        $obj.attr("data-url", json[field_name + "_url"]);
-                                        console.log($obj)
-                                    }else{
-                                        alert(status);
+                        if(is_iphone){
+                            try{
+                                wx.getLocalImgData({
+                                    localId: localIds[0], // 图片的localID
+                                    success: function (res) {  
+                                    var img_data = res.localData; // localData是图片的base64数据，可以用img标签显示
+                                    // alert(img_data);
+                                    $obj.attr('src', img_data);
+                                    upload_img($obj, localIds); // 上传图片
                                     }
-                                })
+                                });
                             }
-                            });
+                            catch(error){
+                                alert(error);
+                            }
+                        }
+                        else{
+                            $obj.attr('src',localIds);
+                            upload_img($obj, localIds); // 上传图片
+                        }
+                    }
+                });
+            };
+            
+            function upload_img($obj, local_ids){
+            // 上传图片到微信服务器
+            wx.uploadImage({
+                localId: local_ids[0],  // 微信官方文档有误，请照此填写
+                isShowProgressTips: 1,
+                success: function(res){
+                    // alert("localIds: " + res.serverId);
+                    $('.modal').modal({backdrop: 'static', keyboard: false});
+                    var id = res.serverId;
+                    // alert("server_id: "+ id);
+
+                    // 请求api接口去下载临时素材
+                    var table_name = "id_image";  // 上传身份证对应的表名
+                    var field_name = $obj.attr("id");
+                    var args = {
+                        "server_id": id,    // server_id 下载素材用
+                        "table_name": table_name,
+                        "field_name": field_name,  // 字段名
+                        "db": "mongo_db2"            // 库名，固定
+                    }
+                    var url = "/wx/auto_download/" + table_name;
+                    // alert(JSON.stringify(args));
+                    $.post(url, args, function(resp){
+                        
+                        var json = JSON.parse(resp);
+                        var status = json['message'];
+                        console.log(json);
+                        // alert(status);
+                        if(status == "success"){
+                            // 成功，保存返回值
+                            try{
+                                $obj.attr("data-id", json[field_name]);
+                                var key = field_name + "_url";
+                                var img_url =  json[key];
+                                $obj.attr("data-url", img_url);
+                                setTimeout(function(){
+                                $('.modal').modal('hide');
+                                 },3000);
+                                // alert(img_url);
+                            }
+                            catch(e){
+                                $.alert(e,function(){
+
+                                });
+                            }
+                        }
+                        else{
+                            alert(status);
                         }
                     });
-            };
+
+                }
+            });
+        }
+            
             $('.iimg').each(function(){
                 let $this = $(this);
                 $this.click(function(){

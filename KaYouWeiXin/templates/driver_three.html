@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>车辆信息填写</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
@@ -16,10 +17,12 @@
     .div_spn{
         padding: 0 60px;
     }
-
     .div_spn p span{
         display: inline-block;
         width: 49%;
+    }
+    .div_info  i{
+        padding: 2em 0;
     }
     #city_one , #city_two{
         text-align:center;
@@ -37,6 +40,8 @@
         width: 60px;
         height: 6em;
         overflow: hidden;
+        position: relative;
+        top: -2.3em;
     }
     .imgs{
         width: 100%;
@@ -48,15 +53,16 @@
     }
     .pk-input{
         line-height: 6em;
-        margin-top: 1.7em;
     }
     .pk-arrow {
         margin: 0 auto;
         line-height: 195%;
     }
+    .pk-arrow{
+        bottom: 2.2em;
+    }
     .inp_widh{
         width: 30% !important;
-        margin-top: 2.1em;
     }
     .dele{
         text-align: center;
@@ -70,8 +76,27 @@
         width: 3em;
         height: 3em;
         color: red;
-        line-height: 3em;
         font-size: 1rem;
+    }
+    .div_info_btn p {
+        line-height: 0;
+        border-radius: 6px;
+    }
+    .div_info p input {
+        width: 78%;
+    }
+    .div_info p .inp_widt{
+        width: 52%;
+    }
+    .div_info p .inp_leng{
+        width: 72%;
+    }
+    .pk-input.-clean {
+        width: 100%;
+    }
+        /* 微信提示 */
+    .weui-toast{
+        margin-left: 0 !important;
     }
 </style>
 <script>user = {{ user | safe }};</script>
@@ -88,24 +113,33 @@
                            display:"none"
                        })
                    }
-            })
+            });
 </script>
 <body>
         <div class="container-fluid">
+            <div class="row row_padd">
+                        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                             <a href="/wx/html/resume_detail.html">
+                                <button type="button" class="btn btn-primary btn-sm"> <i class="glyphicon glyphicon-menu-left  jiantou">返回</i> </button>
+                            </a>
+                        </div>    
+                </div>
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <span  style="display:none">{{ resume }}</span>
+                        <span style="display: none;">{{ vehicle }}</span>
                             <p>车辆照片 <i class="pull-right iimg">
-                                    <img class="imgs" id="imgs_car"  src="{{ resume.image_url if resume.image_url else '/static/images/poto.png'}}" alt="">
+                                    <img id="image_id" class="inps imgs"   src="{{ vehicle.image_url if vehicle.image_url else '/static/images/poto.png'}}" alt="">
                             </i></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p>  <input id="plate_number" class="inps" value="" type="text" placeholder="车辆号牌"></p>
+                        <p> <span>车辆号牌:</span> <input id="plate_number" class="inps" value="{{ vehicle.plate_number if vehicle.plate_number }}" type="text"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
                             <p class="p_alert"> 
-                                <select name="state" id="state" class="state pickout inps" placeholder="选择车辆类型">
+                                <select name="state" id="state" class="state pickout inps" placeholder="{{ vehicle.vehicle_type  if vehicle.vehicle_type else  '选择车辆类型'}}">
                                         <option value="pe">小型轿车</option>
-                                        <option value="pb">小型客车</option>
+                                        <option value="pb">小型客车</option>77%
                                         <option value="ba">中型客车</option>
                                         <option value="sp">大型客车</option>
                                         <option value="qd">平板式货车</option>
@@ -119,41 +153,31 @@
                             </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p><input id="vehicle_load" class="inps" type="text" placeholder="车辆载重量/吨"></p>
+                            <p><span>车辆载重量Kg/吨:</span><input id="vehicle_load" class="inps inp_widt" type="text" value="{{ vehicle.vehicle_load if vehicle.vehicle_load }}"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p><input id="vehicle_length" class="inps" type="text" placeholder="车辆长度/米"></p>
+                            <p><span>车辆长度/米:</span><input id="vehicle_length" class="inps inp_leng" type="number" value="{{ vehicle.vehicle_length if vehicle.vehicle_length}}"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p><input id="owner_name" class="inps" type="text" placeholder="车主姓名"></p>
+                            <p><span>车主姓名:</span><input id="owner_name" class="inps" type="text" value="{{ vehicle.owner_name if vehicle.owner_name }}"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p><input id="vehicle_model" class="inps" type="text" placeholder="车辆型号"></p>
+                            <p><span>车辆型号:</span><input id="vehicle_model" class="inps" type="text" value="{{ vehicle.vehicle_model if vehicle.vehicle_model }}"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p><input id="vin_id" class="inps" type="text" placeholder="车辆识别码/或后六位"></p>
+                            <p><span>车辆识别码/或后六位:</span><input id="vin_id" class="inps inp_widt" type="text" value="{{ vehicle.vin_id if vehicle.vin_id }}"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p><input id="engine_id" class="inps" type="text" placeholder="发动机号"></p>
+                            <p><span>发动机号:</span><input id="engine_id" class="inps " type="text" value="{{ vehicle.engine_id if vehicle.engine_id }}"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p>注册日期<input id="register_date" class="inps pull-right inp_widh" type="text" readonly="" placeholder="选择时间" data-lcalendar="2016-05-11,2016-05-11" /></p>
+                            <i class="glyphicon glyphicon-menu-right pull-right"></i>
+                            <p>注册日期<input id="register_date" class="inps pull-right inp_widh" type="text" readonly="" value="{{ (vehicle.register_date | str_time) if vehicle.register_date }}" placeholder="选择时间" data-lcalendar="2016-05-11,2016-05-11" /></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                            <p>发证日期<input id="issued_date" class="inps pull-right inp_widh" type="text" readonly="" placeholder="选择时间" data-lcalendar="2016-05-11,2016-05-11" /></p>
+                            <i class="glyphicon glyphicon-menu-right pull-right"></i>
+                            <p>发证日期<input id="issued_date" class="inps pull-right inp_widh" type="text" value="{{ (vehicle.issued_date | str_time) if vehicle.issued_date else ''}}" readonly="" placeholder="选择时间" data-lcalendar="2016-05-11,2016-05-11" /></p>
                     </div>
-                    <!-- <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian div_spn div_spn_inp">
-                        <p><span class="inp_mag">
-                            <input id="city_one" type="text" readonly="" name="input_area" placeholder="景德">
-                            <input id="value1" type="hidden"/>
-                            </span> 
-                            <i></i> 
-                            <span class="pull-right">
-                            <input id="city_two" type="text" readonly="" name="input_two" placeholder="南昌">
-                            <input id="value2" type="hidden"/>
-                            </span>
-                        </p>
-                    </div> -->
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
                         <a id="complete" href="javascript:;" class="complete"> <p>完成</p></a>
                         <a href="javascript:;" id="modify" class="modify"> <p>修改</p></a>
@@ -162,24 +186,6 @@
                 </div>
             </div>
             <!-- 模态框 -->
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">有无车辆</h4>
-                    </div>
-                    <div class="modal-body" >
-                        <div style="display: inline-block;width: 50%"><input type="radio" name="rad">有</div>
-                        <div style="display: inline-block;width: 48%"><input type="radio" name="rad">无</div>
-                    </div>
-                    <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary">确认</button>
-                    </div>
-                </div>
-                </div>
-            </div>
 
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
@@ -188,8 +194,9 @@
         <script src="/static/js/jquery-weui.min.js"></script>
         <!-- <script src="/static/js/LAreaData1.js"></script>
         <script src="/static/js/LArea.js"></script>  -->
-        <script src="/static/js/wexin.js"></script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
         <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
+        <script src="/static/js/modal.js"></script>
         <script>
            pickout.to({
 			el:'.state',
@@ -198,22 +205,37 @@
             $('.pk-input').attr('id','vehicle_type');
             $('.pk-input').addClass('inps');
             $('.txt').append('<input type="text">');
+            // 选择时间
+            $("#register_date").calendar({
+                maxDate:new Date().getFullYear()+"-"+(new Date().getMonth() + 1) + "-" + new Date().getDate()
+            });
+            $("#issued_date").calendar({
+                maxDate:new Date().getFullYear()+"-"+(new Date().getMonth() + 1) + "-" + new Date().getDate()
+            });
+//             var lcalendar = new LCalendar();
+//             lcalendar.init({
+//                 'trigger': '#register_date', //标签id
+//                 'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
+//                 'minDate': '1900-1-1', //最小日期
+//                 'maxDate': new Date().getFullYear()+"-"+(new Date().getMonth() + 1) + "-" + new Date().getDate() //最大日期
+//             });
+//             var lcalendar2 = new LCalendar();
+//             lcalendar2.init({
+//                 'trigger': '#issued_date', //标签id
+//                 'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
+//                 'minDate': '1900-1-1', //最小日期
+//                 'maxDate': new Date().getFullYear()+"-"+(new Date().getMonth() + 1) + "-" + new Date().getDate() //最大日期
+//             });
         </script>
         <script>
-            var lcalendar = new LCalendar();
-            lcalendar.init({
-                'trigger': '#register_date', //标签id
-                'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
-                'minDate': '1900-1-1', //最小日期
-                'maxDate': '2022-1-1'
-            })
-            var localendar2 = new LCalendar();
-            localendar2.init({
-                'trigger': '#issued_date', //标签id
-                'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
-                'minDate': '1900-1-1', //最小日期
-                'maxDate': '2022-1-1'
-            });
+            //删除按钮 显示隐藏 判断
+            let url_head = location.search; //获取url中含"?"符后的字串
+            let work_id = url_head.substring(6);
+            if( work_id == "" ){
+                $(".dele").hide();
+             }else{
+                $(".submit").hide();
+             };
         </script>
         <script>
                function img_car($obj){
@@ -229,10 +251,10 @@
                             isShowProgressTips: 1, // 默认为1，显示进度提示
                             success: function (res) {
                                 var serverId = res.serverId; // 返回图片的服务器端ID
-                                if($obj.attr('id') == 'imgs_car'){
-                                    var table_name = "driving_license_image"
+                                if($obj.attr('id') == 'image_id'){
+                                    var table_name = "vehicle_image"
                                 }
-                               var  field_name =  "dl_image" 
+                               var  field_name =  "image_id" 
                                  //上传图片对应的  id信息
                                 var args = {
                                     "server_id":serverId,
@@ -246,7 +268,7 @@
                                     let status = json['message'];
                                     if(status == 'success'){
                                         $obj.attr("data-id", json[field_name]);
-                                        $obj.attr("data-url", json[field_name+"url"]);
+                                        $obj.attr("data-url", json[field_name+"_url"]);
                                     }else{
                                         alert(status);
                                     }
@@ -277,17 +299,21 @@
                             if(val){
                                 args[arg_name] = val;
                                 is_null = true;
+                                 //  微信时间格式转换
+                                if( arg_name == 'register_date'|| arg_name == 'issued_date' ){
+                                    var arg_name_time = val.replace(/\//g ,"-");
+                                    args[arg_name] = arg_name_time; //存入数组替换之前的
+                                }
                             }
                         }
                         else {
-                            if(arg_name == 'imgs_car'){
+                            if(arg_name == 'image_id'){
                                 let img_id = obj.attr("data-id");
                                 if(img_id){
                                     is_null = true;
                                     args['image_id'] = img_id;
                                     args['image_url'] = obj.attr('data-url');
                                 }
-                                
                             }
                         }
                    }
@@ -299,45 +325,59 @@
                 //    var  car = $("input[name='rad']:checked").val();
                 //    console.log(Boolean(args));
                    if(args){
+                    $('.modal').modal({backdrop: 'static', keyboard: false});
                       let url =  '/wx/resume/extend';
                       args['resume_id'] = user.resume_id;
                       args['opt'] = "add_vehicle";
                        $.post(url,args,function(resp){
                            let json = JSON.parse(resp);
                             if(json['message'] == 'success'){
-                                alert('保存成功！');
-                                location.href = '/wx/html/resume.html';
+                                setTimeout(function(){
+                                    $('.modal').modal('hide');
+                                 },3000);
+                                $.toast("保存成功！");
+                                $.confirm("本条信息添加完成，是否继续添加？",function(){
+                                // 继续添加操作
+                                 setTimeout(function(){location.href = '/wx/html/driver_three.html';},1000);
+                            },function(){ 
+                                //取消c操作
+                                location.href = '/wx/html/resume_detail.html'
+                            }); 
                             }else{
-                                alert('保存失败！');
+                                $.alert('保存失败！');
                             }
                        })
                    } 
                    else{
-                       alert('未保存信息！');
+                    $.alert('未保存信息！');
                    }
                 //    var 
                });
                
             //修改信息
             $('#modify').on('touchstart', function(){
-                let args = submit("inp_add");
+                let args = sumit("inps");
                 if(args){
+                    $('.modal').modal({backdrop: 'static', keyboard: false});
                     let url_head = location.search; //获取url中含"?"符后的字串
                     let v_id = url_head.substring(6); //履历id
                     args['v_id'] = v_id;
                     args['resume_id'] = user.resume_id;
                     args['opt'] = "update_vehicle";
                     $.post("/wx/resume/extend", args, function(resp){
+                        setTimeout(function(){
+                            $('.modal').modal('hide');
+                            },3000);
                         let json = JSON.parse(resp);
                         if(json['message'] == 'success'){
-                            alert('修改成功！');
-                            location.href = '/wx/html/resume.html';
+                            $.toast("修改成功！");
+                            setTimeout(function(){location.href = '/wx/html/resume_detail.html';},1000);
                         }else{
-                            alert('修改失败');
+                            $.alert('修改失败');
                         }
                     }) 
                 }else{
-                    alert('未修改信息');
+                    $.alert('未修改信息');
                 }
             });
         </script>
@@ -347,19 +387,19 @@
                 $.confirm("您确定删除本条信息？",function(){
                     // 删除操作
                     let url_head = location.search; //获取url中含"?"符后的字串
-                    let h_id = url_head.substring(6);
+                    let v_id = url_head.substring(6);
                     let args = {};
                     // let work_id = $("#work_id").text();
                     args['resume_id'] = user.resume_id;
-                    args['h_id'] = h_id;
+                    args['v_id'] = v_id;
                     args["opt"] = "delete_vehicle";
                     $.post("/wx/resume/extend", args, function(resp){
                         let json = JSON.parse(resp);
                         if(json['message'] == 'success'){
                             $.toast("删除成功！");
-                            setTimeout(function(){location.href = '/wx/html/resume.html';},1000);
+                            setTimeout(function(){location.href = '/wx/html/resume_detail.html';},1000);
                         }else{
-                            alert('删除失败！');
+                            $.alert('删除失败！');
                         }
                     });
                 },function(){ 

@@ -9,6 +9,7 @@ import datetime
 from log_module import get_logger
 from module.server_api import generator_relate_img
 from module.driver_module import *
+from pdb import set_trace
 
 
 ObjectId = mongo_db.ObjectId
@@ -225,6 +226,8 @@ class WXUser(mongo_db.BaseDoc):
         :return:
         """
         mes = {"message": "success"}
+        print("u_id: {}".format(u_id))
+        print("resume_args: {}".format(resume_args))
         user = cls.find_by_id(o_id=u_id, to_dict=True)
         resume_id = user.get("resume_id", "")
         _id = resume_args.pop("_id", "")

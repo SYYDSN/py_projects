@@ -25,6 +25,7 @@ from pdb import set_trace
 from uuid import uuid4
 from pdb import set_trace
 import requests
+from PIL import Image
 from mongo_db import get_datetime_from_str
 
 
@@ -131,8 +132,44 @@ def resume_image_func(user: dict = None, action: str = 'get', table_name: str = 
                 file_name = "1.jpeg" if r.get('file_name') is None else r['file_name']
                 """把文件名的中文从utf-8转成latin-1,这是防止中文的文件名造成的混乱"""
                 file_name = file_name.encode().decode('latin-1')
-                data = r['data']
-                data = BytesIO(initial_bytes=data)
+                img = Image.open(BytesIO(initial_bytes=r['data']))
+                """这2个参数暂时用不上"""
+                img_width = img.width
+                img_height = img.height
+                """重设图片大小"""
+                size = get_arg(req=request, arg="size", default_value="")  # 参数size用于重设尺寸 size=width*height
+                if size != "":
+                    temp = size.split("*")
+                    if len(temp) > 1 and temp[0].isdigit() and temp[1].isdigit():
+                        width = int(temp[0])
+                        height = int(temp[1])
+                    else:
+                        width = 80
+                        height = 60
+                    img = img.resize(size=(width, height))
+                else:
+                    pass
+                """旋转图片,虽然理论上可以进行任何角度的旋转,但是出于效果,最好只进行90度的整数倍旋转"""
+                rotate = get_arg(req=request, arg="rotate", default_value="0")  # 参数rotate用于旋转图片 rotate=90
+                if isinstance(rotate, str) and rotate.isdigit():
+                    rotate = int(rotate)
+                    img = img.rotate(rotate)
+                else:
+                    pass
+                data = BytesIO()
+                if img.mode == "RGBA":
+                    """
+                    png图片是4通道.而JPEG是RGB三个通道，所以PNG转BMP时候程序不知道A通道怎么办,
+                    会报 cannot write mode RGBA as JPEG  的错误.
+                    解决方法是检查img的mode,进行针对性的处理.
+                    文件的后缀名也要做针对性的修改
+                    """
+                    file_format = "png"
+                    file_name = "{}.{}".format(file_name.split(".")[0], file_format)
+                else:
+                    file_format = file_name.split(".")[-1]
+                img.save(fp=data, format=file_format)
+                data = BytesIO(initial_bytes=data.getvalue())  # initial_bytes的值必须是二进制本身,不能是ByteIO对象.
                 resp = make_response(send_file(data, attachment_filename=file_name, as_attachment=True,
                                                mimetype=mime_type))
                 return resp
@@ -458,9 +495,36 @@ def resume_opt_func(user: dict = None):
     param user:  用户字典
     :return:
     """
+    user2 = {
+        "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
+        "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
+        "access_token": "12_ypF7a9ujmbnNYnbtZF8eyLyy23H9YmST6pMPYAuYefQizi4CrFOupAlLXKMe2dfRGa2Ezt0ApdHHTz-LdX8qtYVS8qTq2OQtnW5ZXtvUCGQ",
+        "city": "闵行",
+        "country": "中国",
+        "expires_in": 7200,
+        "groupid": 0,
+        "head_img_url": "http://thirdwx.qlogo.cn/mmopen/dUtvxcibjGMKAzSRePkx3ZGZnRMsDyzU6f8fNjxtrS2nXCcwMPQUbZM4YYfS1vhWoObUHQaErCDEjNrStKszkiaA/132",
+        "language": "zh_CN",
+        "nick_name": "徐立杰",
+        "province": "上海",
+        "qr_scene": 0,
+        "qr_scene_str": "",
+        "refresh_token": "12_7h-zJ5RYfKWjYp7AQOiIe7VdFaZxw7gPFe3xxVVx4eEGdtuaYYK4st9HgSADdvJo_QpSLkF2JLP4Royzd_NfLde291LetISRV32TjtRweMQ",
+        "remark": "",
+        "scope": "snsapi_userinfo",
+        "sex": 1,
+        "subscribe": 1,
+        "subscribe_scene": "ADD_SCENE_SEARCH",
+        "tagid_list": [],
+        "relate_img": "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQF78DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyQm9HVjAxNG5jaGwxMDAwME0wN2QAAgQmRFhbAwQAAAAA",
+        "phone": "15618317376",
+        "resume_id": ObjectId("5b5a96d9bede684e68049f01")
+    }
+    user = user2 if user is None else user
     mes = {"success": "error"}
     u_id = user['_id']
     resume_args = get_args(request)
+    print("resume_opt_func args: {}".format(resume_args))
     if "time" in resume_args:
         resume_args['time'] = get_datetime_from_str(resume_args['time'])
     if "relate_time" in resume_args:
@@ -478,6 +542,18 @@ def resume_opt_func(user: dict = None):
     if "authenticity" in resume_args:
         authenticity = resume_args['authenticity']
         resume_args['authenticity'] = authenticity if isinstance(authenticity, bool) else bool(authenticity)
+    if "expected_salary" in resume_args:
+        try:
+            raw_expected_salary = resume_args['expected_salary']
+            print("raw_expected_salary: {}".format(raw_expected_salary))
+            expected_salary = json.loads(raw_expected_salary)
+            print("expected_salary: {}".format(expected_salary))
+            resume_args['expected_salary'] = expected_salary
+        except Exception as e:
+            logger.exception(msg=e)
+            raise e
+        finally:
+            pass
     try:
         mes = WXUser.opt_resume(u_id=u_id, resume_args=resume_args)
     except Exception as e:
@@ -552,7 +628,7 @@ def common_view_func(user: dict = None, html_name: str = ''):
         "phone": "15618317376",
         "resume_id": ObjectId("5b5a96d9bede684e68049f01")
     }
-    user = user2 if len(user) == 0 else user
+    user = user2 if user is None else user
     template_dir = os.path.join(__project_dir__, 'templates')
     file_names = os.listdir(template_dir)
     ver = uuid4().hex

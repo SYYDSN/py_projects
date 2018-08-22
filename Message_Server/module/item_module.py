@@ -38,16 +38,16 @@ DBRef = mongo_db.DBRef
 
 
 product_map = {
-    "加元": {"p_arg": 100000, "p_val": 1, "p_diff": 22, "comm": 50},
-    "澳元": {"p_arg": 10000, "p_val": 1, "p_diff": 21, "comm": 50},  # diff
-    "日元": {"p_arg": 1000, "p_val": 1, "p_diff": 19, "comm": 50},
-    "英镑": {"p_arg": 100000, "p_val": 1, "p_diff": 22, "comm": 50},
-    "欧元": {"p_arg": 100000, "p_val": 1, "p_diff": 22, "comm": 50},
-    "恒指": {"p_arg": 1, "p_val": 10, "p_diff": 20, "comm": 80},
-    "原油": {"p_arg": 1000, "p_val": 5, "p_diff": 70, "comm": 50},
-    "白银": {"p_arg": 1000, "p_val": 5, "p_diff": 41, "comm": 50},  # diff
-    "黄金": {"p_arg": 100, "p_val": 1, "p_diff": 45, "comm": 50},
-    "测试": {"p_arg": 100, "p_val": 1, "p_diff": 45, "comm": 50}
+    "加元": {"p_arg": 100000, "p_val": 1, "p_diff": 22, "comm": 50, "cost": 72},
+    "澳元": {"p_arg": 10000, "p_val": 1, "p_diff": 21, "comm": 50, "cost": 71},  # diff
+    "日元": {"p_arg": 1000, "p_val": 1, "p_diff": 19, "comm": 50, "cost": 69},
+    "英镑": {"p_arg": 100000, "p_val": 1, "p_diff": 22, "comm": 50, "cost": 72},
+    "欧元": {"p_arg": 100000, "p_val": 1, "p_diff": 20, "comm": 50, "cost": 70},
+    "恒指": {"p_arg": 1, "p_val": 10, "p_diff": 2, "comm": 80, "cost": 100},
+    "原油": {"p_arg": 1000, "p_val": 1, "p_diff": 50, "comm": 50, "cost": 100},
+    "白银": {"p_arg": 1000, "p_val": 5, "p_diff": 41, "comm": 50, "cost": 255},  # diff
+    "黄金": {"p_arg": 100, "p_val": 1, "p_diff": 45, "comm": 50, "cost": 95},
+    "测试": {"p_arg": 100, "p_val": 1, "p_diff": 45, "comm": 50, "cost": 95}
 }
 
 

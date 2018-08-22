@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
     <title>我要兼职</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/weui.min.css">
 </head>
 <style>
         *{
@@ -59,6 +63,10 @@
         .div_info .p_marg{
             margin-top: 1em;
         }
+         /* 微信提示 */
+        .weui-toast{
+            margin-left: 0 !important;
+        }
     </style>
 <body>
         <div class="container-fluid">
@@ -83,9 +91,11 @@
             </div>
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
-        <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
         <script src="/static/js/wexin.js"></script>
-        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
+        <script src="/static/js/jquery-weui.min.js"></script>
+        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage getLocalImgData"></script>
+        <script src="/static/js/modal.js"></script>
         <script>
             $(function(){
         /*
@@ -111,49 +121,86 @@
                 sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
                 sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
                 success: function (res) {
+                    var agent = navigator.userAgent;
+                    var is_iphone = agent.indexOf("iPhone OS") != -1?true: false;
                     var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-                    $dom.attr('src',localIds);
-                    // 上传图片到微信服务器
-                    wx.uploadImage({
-                        localId: localIds[0],  // 微信官方文档有误，请照此填写
-                        isShowProgressTips: 1,
-                        success: function(res){
-                            // alert("localIds: " + res.serverId);
-
-                            var id = res.serverId;
-                            // alert("server_id: "+ id);
-
-                            // 请求api接口去下载临时素材
-                            var table_name = "id_image";  // 上传身份证对应的表名
-                            var field_name = $dom.attr("id");
-                            var args = {
-                                "server_id": id,    // server_id 下载素材用
-                                "table_name": table_name,
-                                "field_name": field_name,  // 字段名
-                                "db": "mongo_db2"            // 库名，固定
-                            }
-                            var url = "/wx/auto_download/" + table_name;
-                            $.post(url, args, function(resp){
-                                var json = JSON.parse(resp);
-                                var status = json['message'];
-                                console.log(json);
-                                if(status == "success"){
-                                    // 成功，保存返回值
-                                    $dom.attr("data-id", json[field_name]);
-                                    $dom.attr("data-url", json[field_name + "_url"]);
-                                }
-                                else{
-                                    alert(status);
+                    if(is_iphone){
+                        try{
+                            wx.getLocalImgData({
+                                localId: localIds[0], // 图片的localID
+                                success: function (res) {  
+                                var img_data = res.localData; // localData是图片的base64数据，可以用img标签显示
+                                // alert(img_data);
+                                $dom.attr('src', img_data);
+                                upload_img($dom, localIds); // 上传图片
                                 }
                             });
+                        }
+                        catch(error){
+                            alert(error);
+                        }
+                    }
+                    else{
+                        $dom.attr('src',localIds);
+                        upload_img($dom, localIds); // 上传图片
+                    }
+                }
+            });
+        };
+        function upload_img($obj, local_ids){
+            // 上传图片到微信服务器
+            wx.uploadImage({
+                localId: local_ids[0],  // 微信官方文档有误，请照此填写
+                isShowProgressTips: 1,
+                success: function(res){
+                    // alert("localIds: " + res.serverId);
+                    $('.modal').modal({backdrop: 'static', keyboard: false});
+                    var id = res.serverId;
+                    // alert("server_id: "+ id);
 
+                    // 请求api接口去下载临时素材
+                    var table_name = "id_image";  // 上传身份证对应的表名
+                    var field_name = $obj.attr("id");
+                    var args = {
+                        "server_id": id,    // server_id 下载素材用
+                        "table_name": table_name,
+                        "field_name": field_name,  // 字段名
+                        "db": "mongo_db2"            // 库名，固定
+                    }
+                    var url = "/wx/auto_download/" + table_name;
+                    // alert(JSON.stringify(args));
+                    $.post(url, args, function(resp){
+                        
+                        var json = JSON.parse(resp);
+                        var status = json['message'];
+                        console.log(json);
+                        // alert(status);
+                        if(status == "success"){
+                            // 成功，保存返回值
+                            try{
+                                $obj.attr("data-id", json[field_name]);
+                                var key = field_name + "_url";
+                                var img_url =  json[key];
+                                $obj.attr("data-url", img_url);
+                                setTimeout(function(){
+                                $('.modal').modal('hide');
+                                 },3000);
+                                // alert(img_url);
+                            }
+                            catch(e){
+                                alert(e,function(){
+
+                                });
+                            }
+                        }
+                        else{
+                            alert(status);
                         }
                     });
 
                 }
             });
-        };
-
+        }
         // 给上传按钮加上事件
         $(".p_marg").each(function(){
             var $this = $(this);
@@ -194,12 +241,12 @@
                         console.log(json);
                         if(status == "success"){
                             // 成功，下一步
-                            alert("操作成功");
+                           $.toast("操作成功");
                             // location.href = "/wx/html/resume.html";
                         }
                         else{
                             need_submit = false;
-                            alert(status);
+                            $.alert(status);
                         }
                     });
                 }
@@ -213,11 +260,11 @@
                     console.log(json);
                     if(status == "success"){
                         // 成功，下一步
-                        alert("操作成功");
+                        $.toast("操作成功");
                         // location.href = "/wx/html/resume.html";
                     }
                     else{
-                        alert(status);
+                        $.alert(status);
                     }
                 });
             }

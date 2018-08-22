@@ -7,9 +7,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>注册</title>
-    <script src="/static/js/common.js"></script>
+<!--     <script src="/static/js/common.js"></script> -->
     <!-- <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/mui.min.css"> -->
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/weui.min.css">
 </head>
 <style>
     *{
@@ -120,7 +122,27 @@
         /*         display:none; */
     }
 </style>
-<script> user = {{ user | safe }}; </script>
+        <script src="/static/js/jquery.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <script src="/static/js/LCalendar.min.js"></script>
+        <script src="/static/js/pickout.min.js"></script>
+        <script src="/static/js/jquery-weui.min.js"></script>
+        <!-- <script src="/static/js/LAreaData1.js"></script>
+        <script src="/static/js/LArea.js"></script>  -->
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
+<script> 
+    user = {{ user | safe }}; 
+</script>
+<script>
+        //判断是否已经注册如过注册返回窗口
+        (function(){
+            if(user['phone'] !== undefined && user['phone'].length == 11){
+                top.location = "/wx/html/resume_detail.html";
+                return false;
+            }
+        })();
+</script>
 <body>
 <div class="register">
 
@@ -147,20 +169,11 @@
 </div>
 <div class="tishi2"></div>
 <script src="/static/js/jquery.js"></script>
-
+<!-- <script src="/static/js/common.js"></script> -->
 <script>
     $(function(){
         // 关闭手机号码不正确的模态框提示
         $(".tishi .show1 .tips_bottom button").click(function(){$(".tishi").hide();});
-
-        //判断是否已经注册如过注册返回窗口
-        (function(){
-            if(user['phone'] !== undefined && user['phone'].length == 11){
-                top.location = "/wx/html/register_info.html";
-                alert('您已注册！');
-                return;
-            }
-        })();
 
         var $phone_number = $('#phone_number');
         //点击获取验证码按钮
@@ -200,6 +213,16 @@
                 }
             });
         });
+        // 验证手机号码的函数,不合法的手机号码会返回false
+        validate_phone = function (phone) {
+            var myreg = /^(((1[3-9][0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+            if (myreg.test(phone)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
         //点击注册验证
         $("#ahref").click(function(){
             var phone = $.trim($("#phone_number").val());// 手机号
