@@ -124,6 +124,22 @@ class GlobalSignature(mongo_db.BaseDoc):
         return obj
 
     @classmethod
+    def get_history_signature(cls, prev: int = 1) -> (dict, None):
+        """
+        从数据库查询已经失效的旧的签名,此方法暂时没有使用.处于备用状态.
+        :param prev: 上溯第几个签名?默认是上溯一个,也就是刚刚失效的那个签名.
+        :return: 签名对象的字典
+        """
+        f = dict()
+        s = {"time": -1}
+        skip = prev
+        r = cls.find_plus(filter_dict=f, sort_dict=s, skip=skip, limit=1, to_dict=True)
+        if len(r) == 0:
+            return None
+        else:
+            return r[0]
+
+    @classmethod
     def encode(cls, payload: dict, secret: str = None, algorithm: str = "HS256") -> (bytes, None):
         """
         加密.注意返回的类型是bytes.
@@ -182,28 +198,36 @@ class GlobalSignature(mongo_db.BaseDoc):
                 try:
                     res = jwt.decode(jwt=jwt_str, key=secret, algorithm=algorithm)
                 except InvalidSignatureError as e:
-                    title = "{}解密信息出现错误".format(datetime.datetime.now())
-                    content = "错误原因：{},参数：jwt:{}, key: {}, algorithm: {}".format(e, jwt_str, secret, algorithm)
-                    ms = "{}，{}".format(title, content)
-                    send_mail(title=title, content=content)
-                    logger.exception(ms)
+                    logger.exception(e)
                     print(e)
                     try:
                         old_secret = cls.get_signature_prev()
                         if old_secret is None:
                             ms = "signature验证失败"
                             print(ms)
+                            title = "{}解密信息出现错误,签名过期并且没找到旧的签名.".format(datetime.datetime.now())
+                            content = "错误原因：{},参数：jwt:{}, key: {}, algorithm: {}".format(e, jwt_str, secret, algorithm)
+                            ms = "{}，{}".format(title, content)
+                            send_mail(title=title, content=content)
                             logger.exception(ms)
                             raise ValueError(ms)
                         else:
                             res = jwt.decode(jwt=jwt_str, key=old_secret, algorithm=algorithm)
                     except Exception as e:
                         print(e)
-                        logger.exception(e)
+                        title = "{}解密信息出现错误,新旧签名皆无效".format(datetime.datetime.now())
+                        content = "错误原因：{},参数：jwt:{}, key: {}, algorithm: {}".format(e, jwt_str, secret, algorithm)
+                        ms = "{}，{}".format(title, content)
+                        send_mail(title=title, content=content)
+                        logger.exception(ms)
                         raise e
                 except Exception as e:
-                    print(e)
-                    logger.exception(e)
+                    title = "{}解密信息出现未预料错误".format(datetime.datetime.now())
+                    content = "错误原因：{},参数：jwt:{}, key: {}, algorithm: {}".format(e, jwt_str, secret, algorithm)
+                    ms = "{}，{}".format(title, content)
+                    send_mail(title=title, content=content)
+                    print(ms)
+                    logger.exception(ms)
                     raise e
                 finally:
                     if isinstance(res, bytes) and to_str:
@@ -219,9 +243,14 @@ if __name__ == "__main__":
     # s = GlobalSignature.encode({"user_name": "jack", "user_password": "e10adc3949ba59abbe56e057f20f883e"})
     # print(s)
     """解码"""
-    s = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJqYWNrIiwidXNlcl9wYXNzd29yZCI6ImUxMGFkYzM5NDliYTU5YWJ' \
-        'iZTU2ZTA1N2YyMGY4ODNlIn0.acyXoVLENBCSqLbSxXFhMHbyzgwxHXlI_0T9micZO8o'
+    s = 'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoie1widXNlcl9uYW1lXCI6XCLlvKDnkZ5cIixcIk1UNF9hY2NvdW50XCI6ODMwMDM1MCxcImRlcG' \
+        '9zaXRfb3JkZXJcIjpcIjAwMDAwMDAwMDAwMDAwMDAxOTMyXCIsXCJkZXBvc2l0X21vbmV5XCI6MTAwLjAsXCJ0aXRsZVwiOlwi5YWl6YeR5o' \
+        'iQ5YqfXCIsXCJ1c2VyX3BhcmVudF9uYW1lXCI6XCIwMDQwMDBcIixcInN0YXR1c1wiOlwi5bey5pSv5LuYXCIsXCJvcGVyYXRlX3RpbWVcI' \
+        'jpcIjIwMTgtMDgtMjMgMTY6MzU6NTVcIn0iLCJpc3MiOiJhdXRoMCIsImV4cCI6MTUzNTAyMDU1NX0.3smM2Xf5HlaCUVX9SsvdptURRsi' \
+        'zdiRGShAp-GfhpS4'
     print(s)
-    s = GlobalSignature.decode(s)
+    key = "4c5232f5d1784a94a2d486cf55d30aca"
+    key_old = "d94f22d89abd40ff82b2c736d8df9a88"
+    s = GlobalSignature.decode(jwt_str=s, secret=key_old, algorithm="HS256")
     print(s)
     pass

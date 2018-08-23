@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>我是中介</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+</head>
+<style>
+        *{
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        p{
+            margin: 0;
+        }
+        .div_info{
+            /* background: #F4F2F3; */
+            height: 4em;
+        }
+        .div_info p{
+            line-height: 4em;
+        }
+        .xian{
+            border-bottom:1px solid #ccc; 
+        }
+        .text_cen p{
+            text-align: center;
+        }
+        .div_info p input{
+            outline: none;
+            border: none;
+            height: 100%;
+            width: 100%;
+        }
+        .div_info a{
+            width: 45px;
+        }
+        .div_info_btn{
+            position: absolute;
+            bottom: 0;
+            margin-bottom: 2em;
+        }
+        .div_info_btn p{
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #ccc;
+            line-height: 2.5em;
+            border-radius: 6px;
+            background: #417FFF;
+            color: #Fff;
+        }
+        .div_info_p{
+            text-align: center;
+        }
+    </style>
+<body>
+        <a class="weui_btn weui_btn_primary" href="javascript:;" onclick="take_a_photo()">22222</a>
+
+        <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_p">
+                        <p><img src="#" alt=""></p>
+                        <p>身份证正面照</p>
+                    </div>
+                <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_p">
+                        <p><img src="#" alt=""></p>
+                        <p>身份证反面照</p>
+                </div>
+                <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
+                        <a href="#"><p>提交</p></a>
+                </div>
+                </div>
+            </div>
+        <script src="../js/jquery.js"></script>
+        <script src="../js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script src="../js/wexin.js"></script>
+        <script>
+            $(function(){
+                debugger;
+            })
+
+        function take_a_photo(){
+            wx.chooseImage({
+                count: 1, // 默认9
+
+                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+
+                sourceType: ['album', 'camera'], // 
+                
+                success: function (res) {
+
+                var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+
+                console.log('123')
+                    
+                }
+                });
+                console.log('123');
+
+        }
+        </script>
+</body>
+</html>

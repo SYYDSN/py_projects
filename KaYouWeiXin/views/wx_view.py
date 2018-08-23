@@ -330,12 +330,22 @@ def self_info_func(user: dict = None, key: str = "view"):
             mes['data'] = mongo_db.to_flat_dict(user, ignore_columns=ignore_fields)
         elif key == "update":
             """更新/修改用户信息"""
-            ignore_fields = [
-                'openid', 'unionid', 'subscribe', 'subscribe_scene', 'subscribe_time',
-                'access_token', 'expires_in', 'time', 'refresh_token', 'role',
-                'resume_id', 'relate_time', 'relate_id', 'relate_image', 'authenticity',
-                'relate_image', 'name', 'identity_code'
-            ]
+            check_pass = user.get("checked", 0)  # 中介/兼职审核状态
+            if check_pass == 1 or check_pass == 2:
+                ignore_fields = [
+                    'openid', 'unionid', 'subscribe', 'subscribe_scene', 'subscribe_time',
+                    'access_token', 'expires_in', 'time', 'refresh_token', 'role',
+                    'resume_id', 'relate_time', 'relate_id', 'relate_image', 'authenticity',
+                    'relate_image', 'name', 'identity_code', 'blank_name', 'blank_account'
+
+                ]
+            else:
+                ignore_fields = [
+                    'openid', 'unionid', 'subscribe', 'subscribe_scene', 'subscribe_time',
+                    'access_token', 'expires_in', 'time', 'refresh_token', 'role',
+                    'resume_id', 'relate_time', 'relate_id', 'relate_image', 'authenticity',
+                    'relate_image'
+                ]
             args = get_args(request)
             s = dict()
             names = WXUser.type_dict.keys()
@@ -600,7 +610,7 @@ def resume_extend_info_func(user: dict = None):
     return json.dumps(mes)
 
 
-@check_platform_session
+# @check_platform_session
 def common_view_func(user: dict = None, html_name: str = ''):
     """
     通用页面视图

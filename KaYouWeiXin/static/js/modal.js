@@ -1,4 +1,4 @@
-var modal = `<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  aria-hidden=”true” data-backdrop=”static”>
+var my_modal = `<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  aria-hidden=”true” data-backdrop=”static”>
 <div class="modal-dialog modal-sm" role="document">
   <div class="modal-content">
         <div class="weui-loadmore">

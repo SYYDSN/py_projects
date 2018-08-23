@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>我是中介</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/weui.min.css">
+</head>
+<style>
+        *{
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+        }
+        body{
+            background: #f5f5f5;
+        }
+        p{
+            margin: 0;
+        }
+        .div_info{
+            background: #fff;
+        }
+        .div_info p{
+            line-height: 4em;
+        }
+        .xian{
+            border-bottom:1px solid #ccc; 
+        }
+        .text_cen p{
+            text-align: center;
+        }
+        .div_info p input{
+            outline: none;
+            border: none;
+            height: 100%;
+            width: 68%;
+            /* background: #f5f5f5; */
+        }
+        .div_info a{
+            width: 45px;
+        }
+        .div_info_btn{
+            margin-top: 2em;
+            margin-bottom: 2em;
+            background: #f5f5f5;
+        }
+        .div_info_btn p{
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #ccc;
+            line-height: 2.5em;
+            border-radius: 6px;
+            background: #417FFF;
+            color: #fff;
+        }
+        .p_text{
+            text-align: center;
+        }
+        .p_text img{
+            margin-top: 1em;
+            width: 96%;
+            height:12em;
+            pointer-events: none;
+        }
+        .div_bg{
+            /* background: #f5f5f5; */
+        }
+        .div_bg input{
+            /* background: #f5f5f5; */
+        }
+        .container-fluid{
+           
+        }
+        .div_marg{
+            margin-top: 2rem;
+        }
+        .inp_one{
+            border-bottom: 1px solid #ccc;
+        }
+        .weui-toast{
+            margin-left: 0;
+        }
+    </style>
+<body>
+        <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p class="p_text iimg"><img id="business_license_image" class="imgs inp_add"  src="/static/images/poto.png" alt=""></p>
+                        <p class="p_text">上传营业执照</p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg  div_marg">
+                        <p class="inp_one"><span> 联系人： </span><input id="contacts" class="inp_add" type="text"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
+                        <p class="inp_one"><span> 联系电话： </span><input id="contacts_num" class="inp_add" type="number"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
+                        <p class="inp_one"><span> 公司名称： </span><input id="name" class="imgs inp_add" type="text"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
+                            <p class="inp_one"><span> 邮箱： </span><input id="" class="inp_add" type="emal"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
+                            <p class="inp_one"><span> 银行卡号： </span><input id="" class="inp_add" type="text"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
+                            <p><span> 营业执照号： </span><input id="identity_code" class="inp_add" type="text"></p>
+                    </div>
+                    
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
+                            <a id="submit" href="javascript:;"> <p>提交</p></a>
+                    </div>
+                </div>
+            </div>
+        <script src="/static/js/jquery.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+        <script src="/static/js/jquery-weui.min.js"></script>
+        <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage getLocalImgData"></script>
+        <script src="/static/js/modal.js"></script>
+        <script>
+           function img_honor($obj){
+                   wx.chooseImage({
+                    count: 1, // 默认9
+                    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                    sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                    success: function (res) {
+                        var agent = navigator.userAgent;
+                        var is_iphone = agent.indexOf("iPhone OS") != -1?true: false;
+                        var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                        if(is_iphone){
+                            try{
+                                wx.getLocalImgData({
+                                    localId: localIds[0], // 图片的localID
+                                    success: function (res) {  
+                                    var img_data = res.localData; // localData是图片的base64数据，可以用img标签显示
+                                    // alert(img_data);
+                                    $obj.attr('src', img_data);
+                                    upload_img($obj, localIds); // 上传图片
+                                    }
+                                });
+                            }
+                            catch(error){
+                                alert(error);
+                            }
+                        }
+                        else{
+                            $obj.attr('src',localIds);
+                            upload_img($obj, localIds); // 上传图片
+                        }
+                    }
+                });
+            };
+            
+            function upload_img($obj, local_ids){
+            // 上传图片到微信服务器
+            wx.uploadImage({
+                localId: local_ids[0],  // 微信官方文档有误，请照此填写
+                isShowProgressTips: 1,
+                success: function(res){
+                    // alert("localIds: " + res.serverId);
+                    $('.modal').modal({backdrop: 'static', keyboard: false});
+                    var id = res.serverId;
+                    // alert("server_id: "+ id);
+
+                    // 请求api接口去下载临时素材
+                    var table_name = "id_image";  // 上传身份证对应的表名
+                    var field_name = $obj.attr("id");
+                    var args = {
+                        "server_id": id,    // server_id 下载素材用
+                        "table_name": table_name,
+                        "field_name": field_name,  // 字段名
+                        "db": "mongo_db2"            // 库名，固定
+                    }
+                    var url = "/wx/auto_download/" + table_name;
+                    // alert(JSON.stringify(args));
+                    $.post(url, args, function(resp){
+                        
+                        var json = JSON.parse(resp);
+                        var status = json['message'];
+                        console.log(json);
+                        // alert(status);
+                        if(status == "success"){
+                            // 成功，保存返回值
+                            try{
+                                $obj.attr("data-id", json[field_name]);
+                                var key = field_name + "_url";
+                                var img_url =  json[key];
+                                $obj.attr("data-url", img_url);
+                                setTimeout(function(){
+                                $('.modal').modal('hide');
+                                 },3000);
+                                // alert(img_url);
+                            }
+                            catch(e){
+                                $.alert(e,function(){
+
+                                });
+                            }
+                        }
+                        else{
+                            alert(status);
+                        }
+                    });
+
+                }
+            });
+        }
+            
+            $('.iimg').each(function(){
+                let $this = $(this);
+                $this.click(function(){
+                    let img = $this.find('.imgs');
+                    img_honor(img);
+                });
+            });
+            function submit(class_name){
+                let doms = $(`.${class_name}`);
+                let args = {};
+                let is_null = false;
+                for(let dom of doms){
+                    let obj = $(dom);
+                    let tag_name = obj[0].tagName.toLowerCase();
+                    let arg_name = obj.attr('id');
+                    if(tag_name == 'input'){
+                        let val = $.trim(obj.val());
+                        if(val){
+                            args[arg_name] = val;
+                            is_null = true;
+                        };
+                    }else {
+                        if(arg_name == 'business_license_image'){
+                            let business_license_image = obj.attr("data-id");
+                            if(business_license_image){
+                                is_null = true;
+                                args["business_license_image"] = business_license_image;
+                                args["business_license_image_url"] = obj.attr("data-url");
+                            }
+                        }
+                    }
+                };
+                return is_null? args:null;
+            };
+          // 添加信息            
+            $('#submit').on('touchstart', function(){
+                let args = submit("inp_add");
+                if(args){
+                    $.post("/wx/self_info/update", args, function(resp){
+                        let json = JSON.parse(resp);
+                        if(json['message'] == 'success'){
+                            $.toast("保存成功！");
+                            // setTimeout(function(){location.href = '/wx/html/resume.html';},1000);
+                        }else{
+                            alert('保存失败');
+                        }
+                    }) 
+                }else{
+                    alert('未保存信息！');
+                }
+            });
+            //修改信息
+            $('#modify').on('touchstart', function(){
+                let args = submit("inp_add");
+                if(args){
+                    let url_head = location.search; //获取url中含"?"符后的字串
+                    let h_id = url_head.substring(6); //履历id
+                    args['h_id'] = h_id;
+                    args['resume_id'] = user.resume_id;
+                    args['opt'] = "update_honor";
+                    $.post("/wx/resume/opt", args, function(resp){
+                        let json = JSON.parse(resp);
+                        if(json['message'] == 'success'){
+                            alert('修改成功！');
+                            location.href = '/wx/html/resume.html';
+                        }else{
+                            alert('修改失败');
+                        }
+                    }) 
+                }else{
+                    alert('未修改信息');
+                }
+            });
+            
+        </script>
+</body>
+</html>

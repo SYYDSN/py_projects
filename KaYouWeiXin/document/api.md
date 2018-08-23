@@ -46,6 +46,8 @@
     type_dict['relate_image'] = str  # 中介商名字/销售二维码图片地址,这个图片保存在微信服务器上.
     type_dict['name'] = str  # 中介商名字/销售真实姓名.用于展示在二维码上
     type_dict['contacts'] = str  # 中介公司联系人,如果是黄牛/销售,那么这里可以和注册用户的real_name是同一人
+    type_dict['blank_name'] = str  # 开户行名称.
+    type_dict['blank_account'] = str  # 银行账户卡号.
     type_dict['contacts_num'] = str  # 中介公司联系电话,如果是黄牛/销售,那么这里可以和注册用户的phone一致
     type_dict['contacts_email'] = str  # 中介公司/黄牛/销售联系邮箱,这个是专门用来发送结算信息的
     type_dict['identity_code'] = str  # 中介商执照号码/销售真实身份证id.用于部分展示在二维码上

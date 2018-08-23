@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>基本信息填写</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/weui.min.css">
+</head>
+
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+    }
+body,html{
+    height: 100%;
+}
+.pull_img img{
+    display: inline-block;
+    width: 6rem;
+    height: 6rem;
+}
+.pull_img{
+    text-align: center;
+    width: 50%;
+}
+.pull_img p{
+    text-align: center;
+    width: 100%;
+}
+/*<!-- 第二row -->*/
+.inp input{
+    width: 100%;
+    outline: none;
+    border: none;
+    background: #F4F2F3;
+    border-bottom:1px solid #BABABA;
+    height: 4rem;
+}
+
+.inp p{
+    margin: 0;
+    line-height: 2rem;
+}
+.inp .year{
+    border: none;
+}
+.row_two{
+    background: #F4F2F3;
+    margin-top: 2rem;
+}
+.row_three{
+    margin-top: 10em;
+}
+.row_three p{
+    text-align: center;
+    line-height: 2rem;
+    border-radius: 4px;
+    width: 100%;
+    border: 1px solid #ccc;
+    background: #427DFF;
+    color: #fff;
+    /* position: absolute; */
+    /* bottom: 0; */
+}
+.pbtn{
+    border: none;
+    }
+.pbtn #submit_form{
+    margin-top: 1em;
+    padding: 10px 12px;
+    background-color: #f5f5f5;
+}
+.pbtn .from input{
+    border: none;
+    background-color: #f5f5f5;
+    outline: none;
+    width: 70%;
+    text-indent: 3px;
+    line-height: 2rem;
+}
+.pbtn .from p{
+    border-bottom: 1px solid #ccc  
+}
+.pheg{
+    padding: 4px 0;
+    /* border-bottom: 1px solid; */
+    border-bottom: 1px solid #ccc;
+}
+.jiantou{
+    display: none;
+    font-size: 1rem;
+    line-height: 1em;
+    padding:1rem 0;
+    color: #696969;
+}
+.ubmit_modify{
+    display: none;
+}
+.imgs{
+    height:2.5em;
+}
+.jiantou_right{
+    width: 1em;
+    height: 1em;
+    position: relative;
+    top: 0.5em;
+}
+.toolbar .title{
+    line-height: 0;
+}
+.inpt{
+     width: 70% !important;
+}
+.submit_modify{
+    display: none;
+}
+       /* 微信提示 */
+.weui-toast{
+     margin-left: 0 !important;
+}
+</style>
+<script> user = {{ user | safe }}; </script>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <span id="userid" style="display:none">{{ user }}</span>
+                <span id="resume_id" style="display:none">{{ user.resume_id }}</span>
+                <a href="/wx/html/resume_detail.html"><i class="glyphicon glyphicon-menu-right pull-right jiantou"></i></a> 
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pbtn">
+                <div class="from" id="submit_form">
+                    <div class="pheg"> <span>资格证：</span>
+                        <input class="submit_arg inpt" value="{{ resume.rtqc_license_class if resume.rtqc_license_class else  "点击选择" }}" id="rtqc_license_class" type="text">
+                        <!-- <i class="pull-right glyphicon glyphicon-menu-right  jiantou_right"></i> -->
+                        <!-- <input class="submit_arg" value="{{ resume.rtqc_license_class }}" id="rtqc_license_class" type="text" placeholder="从业资格证">-->
+                    </div> 
+                        <p><span>驾照:</span>
+                            <input class="submit_arg  dl_license_class"  value="{{ resume.dl_license_class }}" id="dl_license_class" type="text" placeholder="驾照"></p>
+                        <p><span>姓名:</span>
+                            <input class="submit_arg" value="{{ resume.real_name }}" id="real_name" type="text" placeholder="姓名"></p>
+<!--                         <p><input class="submit_arg" value="{{ resume.work_experience }}" id="work_experience" type="text" placeholder="工作经验"></p> -->
+                        <p><span>驾龄:</span>
+                            <input class="submit_arg" value="{{ resume.driving_experience }}" id="driving_experience" type="number" placeholder="驾龄"></p>
+                        <p><span>从业年限:</span>
+                            <input class="submit_arg" value="{{ resume.industry_experience }}" id="industry_experience" type="number" placeholder="从业年限"></p>
+                </div>
+            </div>
+        </div>
+        <div class="row row_three">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <a id="submit_btn" href="javascript:;"> <p class="anniu">提交</p> </a>
+                <a id="submit_modify" class="submit_modify" href="javascript:;"> <p class="anniu">修改</p> </a>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script src="/static/js/jquery-weui.min.js"></script>
+    <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage"></script>
+    <script>
+        if( $('#resume_id').text()){
+                $('.jiantou').css({
+                    'display':'block'
+                });
+                $('.from').css({
+                    'marginTop':'0',
+                    'padding': '10px'+ '12px',
+                    'backgroundColor': '#f5f5f5',
+                });
+                    $('#submit_btn').css('display','none');
+                    $('.submit_modify').css('display','block');
+            }
+          function img_honor($obj){
+                wx.chooseImage({
+                        count: 1, // 默认9
+                        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                        sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                        success: function (res) {
+                        var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                         $obj.attr('src',localIds);
+                         wx.uploadImage({
+                            localId: localIds[0], // 需要上传的图片的本地ID，由chooseImage接口获得
+                            isShowProgressTips: 1, // 默认为1，显示进度提示
+                            success: function (res) {
+                                var serverId = res.serverId; // 返回图片的服务器端ID
+                                if($obj.attr('id') == 'rtqc_image'){
+                                    var table_name = "honor_image";
+                                }
+                               var  field_name =  "rtqc_image";
+                                 //上传图片对应的  id信息
+                                var args = {
+                                    "server_id":serverId,
+                                    "table_name": table_name,
+                                    "field_name": field_name,
+                                    "db":"mongo_db2" // 库名，固定
+                                };
+                                var url = "/wx/auto_download/" + table_name;
+                                $.post(url, args,function(resp){
+                                    let  json = JSON.parse(resp);
+                                    let status = json['message'];
+                                    if(status == 'success'){
+                                        $obj.attr("data-id", json[field_name]);
+                                        $obj.attr("data-url", json[field_name + "_url"]);
+                                        console.log($obj)
+                                    }else{
+                                        alert(status);
+                                    }
+                                })
+                            }
+                            });
+                        }
+                    });
+            };
+            $('.iimg').each(function(){
+                let $this = $(this);
+                $this.click(function(){
+                    let img = $this.find('.imgs');
+                    img_honor(img)
+                })
+            });
+
+        function submit(class_name){
+                let doms = $(`.${class_name}`);
+                let args = {};
+                let is_null = false;
+                for(let dom of doms){
+                    let obj = $(dom);
+                    let tag_name = obj[0].tagName.toLowerCase();
+                    let arg_name = obj.attr('id');
+                    if(tag_name == 'input'){
+                        let val = $.trim(obj.val());
+                        if(val){
+                            args[arg_name] =val;
+                            is_null = true;
+                        };
+                    }else {
+                        if(arg_name == 'rtqc_image'){
+                            let rtqc_image = obj.attr("data-id");
+                            if(rtqc_image){
+                                is_null = true;
+                                args["rtqc_image"] = rtqc_image;
+                                args["rtqc_image_url"] = obj.attr("data-url");
+                            }
+                        }
+                    }
+                };
+                return is_null? args:null;
+            };
+        
+    $(function(){
+        // 提交按钮事件
+        $("#submit_btn").click(function(){
+            let args = submit("submit_arg");
+            if(args){
+                    $.post("/wx/resume/opt", args, function(resp){
+                    var json = JSON.parse(resp);
+                    var status = json['message'];
+                    if(status == "success"){
+                        location.href = "/wx/html/resume_detail.html";
+                    }
+                    else{
+                        alert(status);
+                        return false;
+                    }
+                });
+            }
+            
+            
+        });
+        // 修改按钮
+        $("#submit_modify").click(function(){
+            let args = submit("submit_arg");
+            if(args){
+                    args['_id'] = $('#resume_id').text();
+                    $.post("/wx/resume/opt", args, function(resp){
+                    var json = JSON.parse(resp);
+                    var status = json['message'];
+                    if(status == "success"){
+                        location.href = "/wx/html/resume_detail.html";
+                    }
+                    else{
+                        alert(status);
+                        return false;
+                    }
+                });
+            }
+            
+        });
+    // end!
+    });
+    
+    </script>
+</body>
+<script>
+    $(".inpt").select({
+  title: "选择资格证类型",
+  items: [
+    {
+      title: "经营性道路旅客运输",
+      value: "001",
+    },
+    {
+      title: "经营性道路货物运输",
+      value: "002",
+    },
+    {
+      title: "道路危险货物运输",
+      value: "003",
+    },
+    {
+      title: "道路危险货物运输装卸管理人员和押运人员资格证书",
+      value: "004",
+    },
+    {
+      title: "机动车维修技术人员 ",
+      value: "004",
+    },
+    {
+      title: "机动车驾驶培训教练员 ",
+      value: "004",
+    }
+  ]
+});
+$(".dl_license_class").select({
+  title: "驾照类型",
+  items: [
+    {
+      title: "A1",
+      value: "001",
+    },
+    {
+      title: "A2",
+      value: "002",
+    },
+    {
+      title: "A3",
+      value: "003",
+    },
+    {
+      title: "B1",
+      value: "004",
+    },
+    {
+      title: "B2",
+      value: "005",
+    },
+    {
+      title: "C1",
+      value: "006",  
+    },
+    {
+      title: "C2",
+      value: "007",  
+    },
+    {
+      title: "C3",
+      value: "008",  
+    },
+    {
+      title: "C4",
+      value: "009",  
+    }
+  ]
+});
+</script>
+</html>

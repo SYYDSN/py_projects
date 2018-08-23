@@ -474,7 +474,7 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
         """是原生信号,立即处理,并生成3个延迟虚拟信号"""
         doc_dict['native'] = True
         doc_dict['change'] = "raw"
-        exit_reason = doc_dict['exit_reason']
+        exit_reason = doc_dict.get('exit_reason')
         if "enter_time" not in doc_dict:
             doc_dict['enter_time'] = doc_dict.pop("create_time")
         if "exit_time" not in doc_dict:
@@ -528,7 +528,8 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
                     temp = None
                 else:
                     r['case_type'] = case_type
-                    r['exit_reason'] = exit_reason
+                    if isinstance(exit_reason, str) and len(exit_reason) > 1:
+                        r['exit_reason'] = exit_reason
                     temp = r
             if temp is None:
                 pass
@@ -1263,7 +1264,7 @@ if __name__ == "__main__":
         "exit_reason": "保护利润，提前离场",
         "send_time_exit": "2018-08-06T09:44:48.824Z"
     }
-    s = Signal(**a)
+    s = Signal(**b)
     Trade.sync_from_signal(s)
     """测试获取价格"""
     # th_time = mongo_db.get_datetime_from_str("2018-8-12 16:00:00")

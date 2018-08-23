@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>我是中介</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        font-size: 14px
+    }
+    h3{
+        text-align: center;
+    }
+</style>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+            <h3 class="p1">某某某的二维码</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+            <img class="img-responsive" src="{{ user.relate_img if user.relate_img  else '/static/images/poto.png' }}" alt="">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+            <div class="line">{{ user.name if user.name else (user.real_name if user.real_name else user.nick_name ) }}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+            {% if user.role == 2 %}
+             <div class="line">工商许可证号码: {{ user.identity_code }}</div>
+            {% else  %}
+            {% endif  %}
+             <div class="line">联系人: {{ user.contacts }}</div>
+             <div class="line">联系电话: {{ user.contacts_num }}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
+            <p><a href="./register.html"> 帮我找工作</a></p>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    role = {{ user.role if user.role else 0 }};
+    if(role >= 1 && role <= 3){
+        // 这是中介/销售/黄牛 ,nothing
+    }
+    else{
+        var referrer = location.referrer;
+        if(referrer == undefined || referrer == ""){
+            referrer = "/wx/html/resume.html";
+        }else{}
+        alert("权限不足");
+        location.href = referrer;
+    }
+</script>
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script>
+</script>
+</html>
