@@ -15,9 +15,45 @@ from log_module import get_logger
 
 ObjectId = mongo_db.ObjectId
 logger = get_logger()
+"""
+"英镑": {"platform_name": "Xinze Group Limited", "code": "GBPUSD"},
+        "加元": {"platform_name": "Xinze Group Limited", "code": "USDCAD"},
+        "澳元": {"platform_name": "Xinze Group Limited", "code": "AUDUSD"},
+        "日元": {"platform_name": "Xinze Group Limited", "code": "USDJPY"},
+        "欧元": {"platform_name": "Xinze Group Limited", "code": "EURUSD"},
+        "恒指": {"platform_name": "Xinze Group Limited", "code": "HK50"},
+        "原油": {"platform_name": "Xinze Group Limited", "code": "XTIUSD"},
+        "白银": {"platform_name": "Xinze Group Limited", "code": "XAGUSD"},
+        "黄金": {"platform_name": "Xinze Group Limited", "code": "XAUUSD"},
+        "测试": {"platform_name": "Xinze Group Limited", "code": "XAGUSD"}
+"""
+p_map = {
+    "Xinze Group Limited": {
+        "USDCAD": "加元",
+        "AUDUSD": "澳元",
+        "USDJPY": "日元",
+        "EURUSD": "欧元",
+        "HK50": "恒指",
+        "XTIUSD": "原油",
+        "XAGUSD": "白银",
+        "XAUUSD": "黄金"
+    }
+}
 
 
 """行情模块"""
+
+
+def transform_product(raw_dict: dict, ignores: list = None) -> (dict, None):
+    """
+    根据报价的代码批量将产品的商品名称，转换成自由的产品名称。
+    :param raw_dict: 产品报价的dict的
+    :param ignores: 忽略的列名
+    :return: 转换后的list
+    """
+    ignores = ignores if isinstance(ignores, list) and len(ignores) > 0 else ['_id']
+    p = raw_dict.get("platform_name")
+    c = raw_dict.get("code")
 
 
 class RawRequestInfo(mongo_db.BaseDoc):

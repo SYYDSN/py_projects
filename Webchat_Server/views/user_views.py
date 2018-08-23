@@ -367,6 +367,10 @@ def common_view_func(html_name: str):
             """行情页面"""
             page_title = "行情"
             kwargs['page_title'] = page_title
+        elif html_name == "process_case.html":
+            """分析师管理交易的页面"""
+            page_title = "交易管理"
+            kwargs['page_title'] = page_title
         else:
             pass
         html_name = "wx/{}".format(html_name)

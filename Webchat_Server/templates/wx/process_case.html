@@ -1,0 +1,40 @@
+{% extends "wx/template.html" %}
+{% block css %}
+    <link rel="stylesheet" href="/static/css/process_case.css?v={{ version }}">
+{% endblock %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 top_block">
+
+                <i class="fa fa-chevron-left"></i>
+
+                <span class="title">
+                    {{ page_title }}
+                </span>
+                <a href="/user/html/news.html">
+                    系统消息
+                </a>
+            </div>
+        </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mid_block">
+            <div class="mid_line price_zone">
+                <span class="product_name">
+                    ----
+                </span>
+                <span class="product_code">
+                    ----
+                </span>
+                <span class="product_price">
+                    ----
+                </span>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/process_case.js?v={{ version }}"></script>
+{% endblock %}
