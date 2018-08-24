@@ -302,10 +302,42 @@ def draw_user_info():
             """成功"""
             obj = WXUser.wx_login(**data)
             session["user_id"] = obj['_id']
+            session["update_date"] = datetime.datetime.now()
             return redirect(ref)
             # return render_template("page_auth.html", ref=ref, data=data)
         else:
             return abort(403)
+
+
+@check_platform_session
+def back_apply(user: dict = None):
+    """
+    撤回(中介/兼职)的认证申请.
+    :param user:
+    :return:
+    """
+    if not isinstance(user, dict):
+        return abort(404)
+    else:
+        mes = {"message": "unknown error"}
+        u_id = get_arg(request, "u_id", "")
+        if isinstance(u_id, str) and len(u_id) == 24:
+            if u_id == str(user['_id']):
+                """参数正确"""
+                if user.get('checked', 0) == 1 and user.get("authenticity", 0) == 1:
+                    """可以撤回"""
+                    f = {"_id": user['_id']}
+                    u = {"checked": 0}
+                    r = WXUser.find_one_and_update_plus(filter_dict=f, upsert=False, update_dict=u)
+                    if r is None:
+                        mes['message'] = "撤回失败"
+                    else:
+                        mes['message'] = "success"
+            else:
+                mes['message'] = "请求无法满足"
+        else:
+            mes['message'] = "参数错误"
+        return json.dumps(mes)
 
 
 @check_platform_session
@@ -362,6 +394,7 @@ def self_info_func(user: dict = None, key: str = "view"):
                 mes['message'] = "缺少必要的参数"
             else:
                 f = {"_id": user['_id']}
+                s['checked'] = 1  # 提交审核状态
                 u = {"$set": s}
                 r = WXUser.find_one_and_update_plus(filter_dict=f, upsert=False, update_dict=u)
                 if r is None:
@@ -610,7 +643,45 @@ def resume_extend_info_func(user: dict = None):
     return json.dumps(mes)
 
 
-# @check_platform_session
+@check_platform_session
+def build_relate(user: dict = None):
+    """
+    用户手动建立和中介/兼职/销售的关联关系
+    :param user:
+    :return:
+    """
+    # user = WXUser.find_by_id("5b56be217b3128ec21daa50a", to_dict=True)
+    mes = {"message": "error"}
+    if user is None:
+        mes['message'] = "用户不能为空"
+    else:
+        role = user.get("role", 0)
+        if role > 0:
+            ms = "用户:{}的角色不能委托他人求职".format(user)
+            logger.exception(msg=ms)
+            mes['message'] = "当前用户角色无法委托求助"
+        else:
+            s_id = get_arg(request, 's_id', "")
+            if isinstance(s_id, str) and len(s_id) == 24:
+                sales = WXUser.find_by_id(o_id=s_id, to_dict=True)
+                if sales is None:
+                    mes['message'] = "sid非法"
+                else:
+                    s_role = sales.get("role", 0)
+                    if s_role < 1:
+                        mes['message'] = "被委托人身份校验失败"
+                    else:
+                        r = WXUser.relate(u_id=user['_id'], s_id=sales['_id'])
+                        if r:
+                            mes['message'] = "success"
+                        else:
+                            mes['message'] = "委托失败"
+            else:
+                mes['message'] = "sid错误"
+    return json.dumps(mes)
+
+
+@check_platform_session
 def common_view_func(user: dict = None, html_name: str = ''):
     """
     通用页面视图
@@ -618,6 +689,7 @@ def common_view_func(user: dict = None, html_name: str = ''):
     param html_name:  html文件名,包含目录路径
     :return:
     """
+    # user = WXUser.find_by_id("5b56be217b3128ec21daa50a", to_dict=True)
     user2 = {
         "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
         "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
@@ -671,6 +743,8 @@ def common_view_func(user: dict = None, html_name: str = ''):
             # kwargs['work'] = dict()
             if html_name in ["resume.html", "resume_detail.html"]:
                 """这个页面是显示简历全部信息的地方,需要额外详细的简历信息"""
+                page_title = "我的简历"
+                kwargs['page_title'] = page_title
                 info = DriverResume.get_full_info(resume_id=resume_id)
                 message = info['message']
                 if message == "success":
@@ -683,6 +757,8 @@ def common_view_func(user: dict = None, html_name: str = ''):
             # set_trace()
             kwargs['resume'] = resume
         elif html_name == "driver_three.html":  # 车辆信息
+            page_title = "自有车辆"
+            kwargs['page_title'] = page_title
             v_id = get_arg(request, "v_id", "")
             if isinstance(v_id, str) and len(v_id) == 24:
                 vehicle = Vehicle.find_by_id(o_id=v_id, to_dict=True)
@@ -690,6 +766,8 @@ def common_view_func(user: dict = None, html_name: str = ''):
                 vehicle = dict()
             kwargs['vehicle'] = vehicle
         elif html_name == "add_info_jilu.html":  # 添加荣誉
+            page_title = "曾获荣誉"
+            kwargs['page_title'] = page_title
             if resume_id == "":
                 return abort(403)
             else:
@@ -700,6 +778,8 @@ def common_view_func(user: dict = None, html_name: str = ''):
                     honor = dict()
                 kwargs['honor'] = honor
         elif html_name == "resume_info.html":  # 添加工作经验
+            page_title = "工作履历"
+            kwargs['page_title'] = page_title
             if resume_id == "":
                 return abort(403)
             else:
@@ -710,6 +790,8 @@ def common_view_func(user: dict = None, html_name: str = ''):
                     work = dict()
                 kwargs['work'] = work
         elif html_name == "educational_experience.html":  # 添加教育经历
+            page_title = "教育经历"
+            kwargs['page_title'] = page_title
             if resume_id == "":
                 return abort(403)
             else:
@@ -719,38 +801,91 @@ def common_view_func(user: dict = None, html_name: str = ''):
                 else:
                     education = dict()
                 kwargs['education'] = education
-        elif html_name == "my_resource.html":  # 中介/销售/黄牛 查看自己的推荐的资源
-            # 测试时为了获取资源,生产环境请注销
-            # kwargs['user'] = WXUser.find_by_id(o_id=ObjectId("5b56c0f87b3128ec21daa693"), to_dict=True)
-            now = datetime.datetime.now()
-            y = get_arg(request, "y", now.year)
-            m = get_arg(request, "m", now.month)
-            b = mongo_db.get_datetime_from_str("{}-{}-1 0:0:0".format(y, m))
-            f = {"relate_time": {"$gte": b, "$lte": now}}
-            page_index = get_arg(request, "index", 1)
-            res = WXUser.page_resource(u_id=kwargs['user']['_id'], filter_dict=f, page_index=page_index)
-            total_record = res.get("total_record", 0)
-            total_page = res.get("total_page", 0)
-            data = res.get("data", list())
-            current_page = res.get("current_page", 1)
-            pages = res.get("pages", list())
-            page_title = "我的资源"
-            # pages = [1, 2, 3, 4]  # 生产环境注销
-            # total_record = 50  # 生产环境注销
-            # total_page = 5  # 生产环境注销
-            # page_index = 2  # 生产环境注销
-            kwargs['data'] = data
-            kwargs['current_page'] = current_page
-            kwargs['pages'] = pages
-            kwargs['page_index'] = page_index
+        elif html_name == "intermediary.html":
+            """
+            上传营业执照等申请中介审核的页面
+            1. 如果审核尚未通过.允许访问本页面.
+                1. 未申请的,允许发起申请.
+                2. 申请中的,锁定输入.不允许编辑.但是可以撤回.
+                3. 申请驳回的,允许编辑再次申请
+            2. 审核通过,跳转到help_job.html页面
+            """
+            page_title = "申请认证"
             kwargs['page_title'] = page_title
-            kwargs['total_record'] = total_record
-            kwargs['total_page'] = total_page
-            kwargs['y'] = y
-            kwargs['m'] = m
-        elif html_name == "help_job.html":  # 我的二维码页面, 中介/销售/黄牛专用页面
+            if user.get("authenticity") == 1:
+                return redirect("/wx/html/help_job.html?u_id={}".format(user['_id']))
+        elif html_name == "my_resource.html":  # 中介/销售/黄牛 查看自己的推荐的资源
+            u_id = get_arg(request, "u_id", "")
+            user = None
+            if isinstance(u_id, str) and len(u_id) == 24:
+                user = WXUser.find_by_id(o_id=u_id, to_dict=True, can_json=True)
+            else:
+                pass
             # 测试时为了获取资源,生产环境请注销
-            kwargs['user'] = WXUser.find_by_id(o_id=ObjectId("5b56c0f87b3128ec21daa693"), to_dict=True)
+            # if user is None:
+            #     user = WXUser.find_by_id(o_id=ObjectId("5b56c0f87b3128ec21daa693"), to_dict=True, can_json=False)
+            if user is None:
+                """没有合法的u_id参数就重定向"""
+                referrer = request.referrer
+                if referrer is None or referrer == "":
+                    return abort(404)
+                else:
+                    return redirect(referrer)
+            else:
+                kwargs['user'] = user
+                now = datetime.datetime.now()
+                y = get_arg(request, "y", now.year)
+                m = get_arg(request, "m", now.month)
+                b = mongo_db.get_datetime_from_str("{}-{}-1 0:0:0".format(y, m))
+                f = {"relate_time": {"$gte": b, "$lte": now}}
+                page_index = get_arg(request, "index", 1)
+                res = WXUser.page_resource(u_id=kwargs['user']['_id'], filter_dict=f, page_index=page_index)
+                total_record = res.get("total_record", 0)
+                total_page = res.get("total_page", 0)
+                data = res.get("data", list())
+                current_page = res.get("current_page", 1)
+                pages = res.get("pages", list())
+                page_title = "我的资源"
+                # pages = [1, 2, 3, 4]  # 生产环境注销
+                # total_record = 50  # 生产环境注销
+                # total_page = 5  # 生产环境注销
+                # page_index = 2  # 生产环境注销
+                kwargs['data'] = data
+                kwargs['current_page'] = current_page
+                kwargs['pages'] = pages
+                kwargs['page_index'] = page_index
+                kwargs['page_title'] = page_title
+                kwargs['total_record'] = total_record
+                kwargs['total_page'] = total_page
+                kwargs['y'] = y
+                kwargs['m'] = m
+        elif html_name == "help_job.html":
+            """
+            u_id = "5b56c0f87b3128ec21daa693"
+            展示关联二维码二维码页面, 中介/销售/黄牛专属页面,任何人访问这个页面的时候,必须带上u_id参数.
+            否则原路导向回去或者403
+            用户访问此页面时,检测用户是否已绑定
+            """
+            page_title = "委托求职"
+            kwargs['page_title'] = page_title
+            s_id = get_arg(request, "s_id", "")
+            s_id = s_id if s_id != "" else get_arg(request, "u_id", "")
+            if isinstance(s_id, str) and len(s_id) == 24:
+                sales = WXUser.find_by_id(o_id=s_id, to_dict=True, can_json=True)
+                if isinstance(sales, dict):
+                    """
+                    带s_id参数
+                    1. 验证过,允许访问
+                    2. 尚未通过审核,允许跳转到页面,但提示未审核,立即跳转. 
+                    """
+                    kwargs['sales'] = sales
+                else:
+                    """不合法的u_id参数"""
+                    return abort(403)
+            else:
+                """无u_id参数"""
+                return abort(403)
+            """访问页面之前,可能需要加载一些参数"""
         else:
             pass
         print(kwargs)  # 打印参数
@@ -794,9 +929,13 @@ wx_blueprint.add_url_rule(rule="/js_sdk_init_demo", view_func=wx_js_api_demo, me
 wx_blueprint.add_url_rule(rule="/sms/<key>", view_func=sms_func, methods=['post', 'get'])
 """用户自己操作(查看/修改)自己的(微信)用户信息"""
 wx_blueprint.add_url_rule(rule="/self_info/<key>", view_func=self_info_func, methods=['post', 'get'])
+"""用户撤回申请中介/兼职的申请"""
+wx_blueprint.add_url_rule(rule="/back_apply", view_func=back_apply, methods=['post', 'get'])
 """操作(查看/添加/修改,但是不能删除)简历基本信息"""
 wx_blueprint.add_url_rule(rule="/resume/opt", view_func=resume_opt_func, methods=['post', 'get'])
 """操作(查看/添加/修改/删除)简历扩展信息"""
 wx_blueprint.add_url_rule(rule="/resume/extend", view_func=resume_extend_info_func, methods=['post', 'get'])
+"""手动建立用户和中介/兼职/销售的委托关系"""
+wx_blueprint.add_url_rule(rule="/build_relate", view_func=build_relate, methods=['post', 'get'])
 """通用页面视图"""
 wx_blueprint.add_url_rule(rule="/html/<html_name>", view_func=common_view_func, methods=['post', 'get'])

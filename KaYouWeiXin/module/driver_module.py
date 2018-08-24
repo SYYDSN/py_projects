@@ -422,8 +422,8 @@ class DriverResume(mongo_db2.BaseDoc):
     """某些司机自己有车辆"""
     type_dict['vehicle'] = list  # 车辆信息, Vehicle.的ObjectId对象
     """求职意愿"""
-    type_dict['want_job'] = bool  # 是否有求职意向?有求职意向的才会推荐工作,可以认为这是个开关.
-    type_dict['remote'] = bool  # 是否原因在外地工作?
+    type_dict['want_job'] = int  # 是否有求职意向?有求职意向的才会推荐工作,可以认为这是个开关. 1/0
+    type_dict['remote'] = int  # 是否原因在外地工作? 1/0
     type_dict['target_city'] = str  # 期望工作城市,这是一个临时性的字段,地区编码库完善后,此阻断将由 expected_regions替代.
     """留下,暂时不用,只有愿意不愿意取外地工作这个选项"""
     type_dict['expected_regions'] = list    # 期望工作地区,list是区域代码的list,

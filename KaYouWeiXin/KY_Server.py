@@ -175,22 +175,31 @@ def message_func():
             xml = xml['xml']
             print(xml)
             event = xml.get("Event")
-            client_id = xml.get("FromUserName")
-            if event.lower() == "scan":
-                """扫码事件"""
-                event_key = xml.get("EventKey", "")
-                if event_key.startswith("relate_"):
-                    sale_id = event_key.split("_")[-1]
-                    print("client_id: {}, client_id: {}".format(client_id, sale_id))
-                    WXUser.relate(open_id=client_id, s_id=sale_id)
-            elif event.lower() == "subscribe":
-                """
-                订阅事件,用户未关注的时候的扫带参数二维码就会生成这个事件.
-                """
-            elif event.lower() == "view":
-                """浏览页面事件"""
+            if event is None:
+                msg_type = xml.get("event")
+                if msg_type == "text":
+                    """
+                    这是用户在公众号发消息
+                    """
+                    content = xml.get("Content")
+                    print("room mes is {}".format(content))
             else:
-                pass
+                client_id = xml.get("FromUserName")
+                if event.lower() == "scan":
+                    """扫码事件"""
+                    event_key = xml.get("EventKey", "")
+                    if event_key.startswith("relate_"):
+                        sale_id = event_key.split("_")[-1]
+                        print("client_id: {}, client_id: {}".format(client_id, sale_id))
+                        WXUser.relate(open_id=client_id, s_id=sale_id)
+                elif event.lower() == "subscribe":
+                    """
+                    订阅事件,用户未关注的时候的扫带参数二维码就会生成这个事件.
+                    """
+                elif event.lower() == "view":
+                    """浏览页面事件"""
+                else:
+                    pass
         else:
             pass
 

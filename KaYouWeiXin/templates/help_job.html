@@ -6,8 +6,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>我是中介</title>
+    <title>{{ page_title }}</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/weui.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/jquery-weui.min.js"></script>
 </head>
 <style>
     * {
@@ -15,60 +20,121 @@
         padding: 0;
         font-size: 14px
     }
+    .p1{
+        text-align: center;
+    }
     h3{
         text-align: center;
     }
+    .line{
+        padding: 0.5em 0;
+        border: 1px solid #ccc;
+        border-bottom: none;
+        text-indent: 1.2rem;
+    }
+    .bag_info{
+        /* border: 1px solid #ccc; */
+        background-color: #efefef;
+    }
+    .padd_in{
+        margin-top: 1em;
+        padding: 0.5em 0;
+        background-color: #efefef;
+    }
+    .line_bord{
+        text-align: center;
+        border-bottom:1px solid #ccc;;
+    }
+      /*   bootstrap 模态框   */
+        .modal-content{
+            opacity: 1;
+        }
+        .close:focus, .close:hover{
+            opacity: 1;
+        }
+        .close img{
+            width: 100%;
+        }
+        .anniu {
+            margin-top: 1.2em;
+        }
+        .pop_img{
+            margin:0 auto;
+        }
 </style>
+<script>
+    authenticity = {{ sales.authenticity }};
+</script>
 <body>
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-            <h3 class="p1">某某某的二维码</h3>
+            <h4 class="p1">{{ sales.name if sales.name else (sales.name if sales.name else sales.nick_name ) }}</h4>
+            <h5 class="p1">二维码</h5>
         </div>
     </div>
     <div class="row">
         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-            <img class="img-responsive" src="{{ user.relate_img if user.relate_img  else '/static/images/poto.png' }}" alt="">
+            <img class="img-responsive pop_img" src="{{ sales.relate_img if sales.relate_img and sales.authenticity == 1 else '/static/images/poto.png' }}" alt="">
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-            <div class="line">{{ user.name if user.name else (user.real_name if user.real_name else user.nick_name ) }}</div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+    <div class="row padd_in">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info bag_info">
+                <span style="display: none;"></span>
+            <div class="line">公司名称：{{ sales.name if sales.name else (sales.name if sales.name else sales.nick_name ) }}</div>
             {% if user.role == 2 %}
-             <div class="line">工商许可证号码: {{ user.identity_code }}</div>
+             <div class="line"> 营业执照号: {{ sales.identity_code }}</div>
             {% else  %}
             {% endif  %}
-             <div class="line">联系人: {{ user.contacts }}</div>
-             <div class="line">联系电话: {{ user.contacts_num }}</div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
-            <p><a href="./register.html"> 帮我找工作</a></p>
+             <div class="line">联系人: {{ sales.contacts }}</div>
+             <div class="line">联系电话: {{ sales.contacts_num }}</div>
+            <div class="line line_bord">
+                {% if sales._id == user._id %}
+                <a href="/wx/html/my_resource.html?u_id={{ user._id }}">
+                    <button class=" btn btn-success">我的客户列表</button>
+                </a>
+                {% elif user.relate_id == sales._id %}
+                    <button class="btn btn-success">委托进行中</button>
+                {% else %}
+                    <button id="submit_relate" data-id="{{ sales._id }}" data-name="{{ sales.name }}" class="btn btn-success">点此委托求职</button>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 </body>
 <script>
-    role = {{ user.role if user.role else 0 }};
-    if(role >= 1 && role <= 3){
-        // 这是中介/销售/黄牛 ,nothing
-    }
-    else{
-        var referrer = location.referrer;
-        if(referrer == undefined || referrer == ""){
-            referrer = "/wx/html/resume.html";
-        }else{}
-        alert("权限不足");
-        location.href = referrer;
-    }
-</script>
-<script src="/static/js/jquery.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
-<script>
+    $(function(){
+        // 检测sales是否通过审查?
+        if(authenticity != 1){
+            $.alert("当前页面尚未通过审核!", function(){
+                var referrer = location.referrer;
+                if(referrer == undefined){
+                    referrer = "/wx/html/resume_detail.html";
+                }
+                location.href = referrer;
+            })
+        }
+
+        // 手动建立委托关系
+        $("#submit_relate").click(function () {
+            var $this = $("#submit_relate");
+            $.confirm("你正在委托" + $this.attr("data-name") + "进行求职,确认吗?",
+                function(){
+                    var args = {"s_id": $this.attr("data-id")};
+                    $.post("/wx/build_relate", args, function(resp){
+                        var resp = JSON.parse(resp);
+                        var status = resp['message'];
+                        if(status == "success"){
+                            $.alert("恭喜,委托成功!");
+                        }
+                        else{
+                            $.alert(status);
+                        }
+                    });
+                }, function(){});
+        });
+    // end !!!
+    });
 </script>
 </html>

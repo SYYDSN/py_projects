@@ -98,13 +98,20 @@ def check_platform_session(f):
         else:
             user = None
         print("user_id: {}".format(user_id))
+        ref = request.full_path
+        ref = base64.urlsafe_b64encode(ref.encode())
         if user is None:
-            ref = request.full_path
-            ref = base64.urlsafe_b64encode(ref.encode())
             return redirect(url_for("wx_blueprint.get_code_and_redirect", ref=ref))
         else:
-            kwargs['user'] = user
-            return f(*args, **kwargs)
+            """
+            用户id有效,需要检查一下用户的上一次的抓取用户的时间,如果超过24小时,也需要更新一下用户的信息.
+            """
+            prev_update = session.get("update_date")
+            if prev_update is None or (datetime.datetime.now() - prev_update).total_seconds() > 86400:
+                return redirect(url_for("wx_blueprint.get_code_and_redirect", ref=ref))
+            else:
+                kwargs['user'] = user
+                return f(*args, **kwargs)
     return decorated_function
 
 

@@ -61,9 +61,9 @@ class WXUser(mongo_db.BaseDoc):
     type_dict['relate_time'] = datetime.datetime  # 和人力资源中介的关联时间
     type_dict['relate_id'] = ObjectId  # 人力资源中介_id,也就是Sales._id,用于判断归属.
     """以下Sales类专有属性"""
-    type_dict['checked'] = int  # 是否已通过兼职/销售/中介的审核? 0/不存在忽略, 1是申请中未通过. 2是申请通过, -1是驳回.
+    type_dict['checked'] = int  # 是否已通过兼职/销售/中介的审核? 0/不存在忽略, 1是申请中. 2是申请通过, -1是驳回.
     type_dict['reject_reason'] = str  # 申请驳回原因,只有在checked字段是-1状态,本字段才有效
-    type_dict['authenticity'] = bool  # 中介商/黄牛/销售 的真实性确认. 在审核通过后这个字段为真
+    type_dict['authenticity'] = int  # 中介商/黄牛/销售 的真实性确认. 在审核通过后这个字段为1,否则为0或者不存在
     type_dict['relate_image'] = str  # 中介商名字/销售二维码图片地址,这个图片保存在微信服务器上.
     type_dict['name'] = str  # 中介商名字/销售真实姓名.用于展示在二维码上
     type_dict['contacts'] = str  # 中介公司联系人,如果是黄牛/销售,那么这里可以和注册用户的real_name是同一人
@@ -180,7 +180,7 @@ class WXUser(mongo_db.BaseDoc):
             logger.exception(ms)
             raise ValueError(ms)
         else:
-            if isinstance(u_id, str) and len(u_id) == 24:
+            if (isinstance(u_id, str) and len(u_id) == 24) or isinstance(u_id, ObjectId):
                 user = cls.find_by_id(o_id=u_id, to_dict=True)
             else:
                 user = cls.find_one_plus(filter_dict={"openid": open_id}, instance=False)
