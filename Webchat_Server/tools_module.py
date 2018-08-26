@@ -20,6 +20,7 @@ from uuid import uuid4
 import urllib.request
 import os
 from uuid import uuid4
+from module.teacher_module import Teacher
 from werkzeug.contrib.cache import RedisCache
 from log_module import get_logger
 from log_module import recode
@@ -98,6 +99,28 @@ def check_platform_session(f):
             return redirect(url_for("user_blueprint.get_code_and_redirect", ref=ref))
         else:
             return f(*args, **kwargs)
+    return decorated_function
+
+
+def check_teacher_session(f):
+    """检测老师是否登录的装饰器"""
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        t_id = session.get("t_id")  # 检测session中的老师id
+        print("t_id: {}".format(t_id))
+        ref = request.full_path
+        ref = base64.urlsafe_b64encode(ref.encode())
+        if t_id is None:
+            """老师id不存在"""
+            return redirect(url_for("teacher_blueprint.login", ref=ref))
+        else:
+            """检查老师id真实性"""
+            teacher = Teacher.find_by_id(o_id=t_id, to_dict=True)
+            if isinstance(teacher, dict):
+                kwargs['teacher'] = teacher
+                return f(*args, **kwargs)
+            else:
+                return redirect(url_for("teacher_blueprint.login", ref=ref))
     return decorated_function
 
 

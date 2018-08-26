@@ -32,6 +32,8 @@ class Teacher(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
     """真实老师的name可能取自简道云(也可再修改)"""
     type_dict['name'] = str   # 展示的名字，比如青云老师等
+    type_dict['phone'] = str   # 手机号码，用来登录
+    type_dict['password'] = str   # 密码.md5加密
     type_dict['real_name'] = str  # 真实姓名，非必须
     type_dict['head_img'] = str  # 头像文件相当与项目根目录的路径
     type_dict['img'] = str  # 半身像文件相当与项目根目录的路径

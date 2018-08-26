@@ -3,6 +3,7 @@ from flask import abort
 from flask import send_from_directory
 from flask import render_template
 from views.user_views import user_blueprint
+from views.teacher_views import teacher_blueprint
 from flask import request
 from flask import session
 from flask_session import Session
@@ -28,6 +29,7 @@ app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览�
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持久化的会话的生存时间
 SESSION_TYPE = "redis"
 app.register_blueprint(user_blueprint)
+app.register_blueprint(teacher_blueprint)
 Session(app)
 port = 8080
 app_id = "wx0caf19ad3fd15e71"                       # 盛汇app_id

@@ -26,6 +26,11 @@ html {
   padding: 5px 20px 5px 10px;
   border-radius: 0 4px 4px 0;
 }
+.top2_block {
+  text-align: center;
+  font-size: 12px;
+  color: #8c8c8c;
+}
 .middle_block {
   font-size: 16px;
 }

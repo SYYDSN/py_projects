@@ -293,7 +293,10 @@ def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     :param ignore_columns: 不需要返回的列
     :return:
     """
-    return {other_can_json(k): other_can_json(v) for k, v in a_dict.items() if k not in ignore_columns}
+    if isinstance(a_dict, dict):
+        return {other_can_json(k): other_can_json(v) for k, v in a_dict.items() if k not in ignore_columns}
+    else:
+        return a_dict
 
 
 def last_day_of_month(the_date: datetime.datetime) -> int:

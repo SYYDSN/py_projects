@@ -16,7 +16,7 @@ from log_module import get_logger
 ObjectId = mongo_db.ObjectId
 logger = get_logger()
 """
-"英镑": {"platform_name": "Xinze Group Limited", "code": "GBPUSD"},
+        "英镑": {"platform_name": "Xinze Group Limited", "code": "GBPUSD"},
         "加元": {"platform_name": "Xinze Group Limited", "code": "USDCAD"},
         "澳元": {"platform_name": "Xinze Group Limited", "code": "AUDUSD"},
         "日元": {"platform_name": "Xinze Group Limited", "code": "USDJPY"},
@@ -29,14 +29,15 @@ logger = get_logger()
 """
 p_map = {
     "Xinze Group Limited": {
-        "USDCAD": "加元",
-        "AUDUSD": "澳元",
-        "USDJPY": "日元",
-        "EURUSD": "欧元",
-        "HK50": "恒指",
-        "XTIUSD": "原油",
-        "XAGUSD": "白银",
-        "XAUUSD": "黄金"
+        "GBPUSD": {"product": "英镑", "code": "GBPUSD"},
+        "USDCAD": {"product": "加元", "code": "USDCAD"},
+        "AUDUSD": {"product": "澳元", "code": "AUDUSD"},
+        "USDJPY": {"product": "日元", "code": "USDJPY"},
+        "EURUSD": {"product": "欧元", "code": "EURUSD"},
+        "HK50": {"product": "恒指", "code": "HK50"},
+        "XTIUSD": {"product": "原油", "code": "XTIUSD"},
+        "XAGUSD": {"product": "白银", "code": "XAGUSD"},
+        "XAUUSD": {"product": "黄金", "code": "XAUUSD"}
     }
 }
 
@@ -44,16 +45,25 @@ p_map = {
 """行情模块"""
 
 
-def transform_product(raw_dict: dict, ignores: list = None) -> (dict, None):
+def transform_product(raw_dict: dict) -> (dict, None):
     """
-    根据报价的代码批量将产品的商品名称，转换成自由的产品名称。
-    :param raw_dict: 产品报价的dict的
-    :param ignores: 忽略的列名
+    根据报价的代码批量将产品的商品名称，转换成自有的产品名称。
+    :param raw_dict: 产品报价的dict
     :return: 转换后的list
     """
-    ignores = ignores if isinstance(ignores, list) and len(ignores) > 0 else ['_id']
     p = raw_dict.get("platform_name")
     c = raw_dict.get("code")
+    map1 = p_map.get(p)
+    if map1 is None:
+        pass
+    else:
+        temp = map1.get(c)
+        if temp is None:
+            pass
+        else:
+            raw_dict['product'] = temp['product']
+            raw_dict['code'] = temp['code']
+            return raw_dict
 
 
 class RawRequestInfo(mongo_db.BaseDoc):
@@ -186,8 +196,8 @@ class Quotation(mongo_db.BaseDoc):
                     res2.append(temp2)
             if auto_save:
                 ses = cls.get_collection()
-                res = ses.insert_many(documents=res2)
-                print(res)
+                insert_res = ses.insert_many(documents=res2)
+                print(insert_res)
             else:
                 pass
         return res
@@ -224,7 +234,7 @@ class Quotation(mongo_db.BaseDoc):
 
         :return:
         """
-        mes = [mongo_db.to_flat_dict(x) for x in init_list]
+        mes = [mongo_db.to_flat_dict(transform_product(x)) for x in init_list if transform_product(x) is not None]
         data = json.dumps(mes)
         io.emit(event=event, data=data)
 
@@ -247,7 +257,16 @@ if __name__ == "__main__":
         "EURJPY*欧元兑日元*126.368^CADJPY*加元兑日元*84.380^GBPJPY*英镑兑日元*140.834^AUDNZD*澳元兑纽元*1.10404^AUDCAD*" \
         "澳元兑加元*0.95694^AUDCHF*澳元兑瑞郎*0.72719^AUDJPY*澳元兑日元*80.759^CHFJPY*瑞郎兑日元*111.025^" \
         "XAUUSD*黄金*1190.24^XAGUSD*白银*14.735^"
-    prices = Quotation.analysis(d)
-    for x in prices:
-        print(x)
+    q1 = {
+    "_id" : ObjectId("5b80427e6a090e5fb296b963"),
+    "platform_time" : "2018-08-25T01:38:05.000Z",
+    "price" : 68.74,
+    "product" : "原油",
+    "platform_account" : "8300140",
+    "platform_name" : "Xinze Group Limited",
+    "code" : "XTIUSD",
+    "receive_time" : "2018-08-25T01:38:06.381Z"
+    }
+    r = Quotation.send_io_message([q1], "aaa", "a")
+    print(r)
     pass

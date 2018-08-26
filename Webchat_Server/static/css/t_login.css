@@ -1,0 +1,51 @@
+.top_block .form {
+  margin-top: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.top_block .form .line {
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  font-size: 14px;
+}
+.top_block .form .line >i {
+  width: 45px;
+  font-size: 1.2em;
+  display: block;
+  color: #337ab7;
+}
+.top_block .form .line >.fa-mobile-phone {
+  font-size: 1.5em;
+}
+.top_block .form .line >input {
+  border: 1px solid #dedede;
+  border-radius: 5px;
+  width: calc(100% - 3.5em);
+  padding: 0.6em;
+}
+.top_block .form .line >input ::-webkit-input-placeholder {
+  color: #dedede;
+}
+.top_block .form .line >input :-moz-placeholder {
+  color: #dedede;
+}
+.top_block .form .line >input ::-moz-placeholder {
+  coloront_color: #dedede;
+}
+.top_block .form .line >input :-ms-input-placeholder {
+  color: #dedede;
+}
+.top_block .form .line button {
+  width: 80%;
+  min-width: 300px;
+}
+.top_block .form .line .warning {
+  border: 1px solid #f00;
+}

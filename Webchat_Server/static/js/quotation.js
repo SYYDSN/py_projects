@@ -10,11 +10,12 @@ $(function(){
     // 接收报价的事件.
     io_client.on("price", function(resp){
         var prices = JSON.parse(resp);
-        // console.log(prices);
+        console.log(prices);
         show_price(prices);
     });
 
     function show_price (price_list){
+        $(".now").text(price_list[0]['platform_time']);
         // 显示报价
         for(var price of price_list){
             var code = price['code'];

@@ -18,8 +18,8 @@
             </div>
         </div>
     <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mid_block">
-            <div class="mid_line price_zone">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 price_block">
+            <div class="price_zone">
                 <span class="product_name">
                     ----
                 </span>
@@ -32,6 +32,26 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 process_block">
+            <div class="user_info">
+                <span class="col_name">
+                    当前交易帐号:
+                </span>
+                <span class="account">
+                    {{ teacher.name }}
+                </span>
+            </div>
+            <div class="select_zone">
+                <label class="product_name" for="select_product">
+                    当前交易帐号:
+                </label>
+                <input id="select_product">
+            </div>
+        </div>
+    </div>
+
     </div>
 {% endblock %}
 
