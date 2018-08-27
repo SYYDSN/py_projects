@@ -145,6 +145,18 @@
     type_dict['self_evaluation'] = str  # 自我评价
     """获奖/荣誉证书 Honor._id的list对象"""
     type_dict['honor'] = list
+    type_dict['crime'] = int  # 犯罪记录,默认0/None, 1表示有.
+    type_dict['accident'] = int  # 重大事故,默认0/None, 1表示有.
+    """
+    重大疾病,str的list,提供一个多选菜单,
+    1. 血压/血脂异常
+    2. 心脏功能异常
+    3. 肢体功能缺失
+    4. 听觉/视力缺陷
+    5. 烈性传染病
+    6. 其他
+    """
+    type_dict['diseases'] = list
     type_dict['update_date'] = datetime.datetime  # 简历的刷新时间
     type_dict['create_date'] = datetime.datetime  # 简历的创建时间
 ```

@@ -1,6 +1,6 @@
 {% extends "wx/template.html" %}
 {% block css %}
-    <link rel="stylesheet" href="/static/css/process_case.css?v={{ version }}">
+    <link rel="stylesheet" href="/static/css/process_case.css?v={{ v }}">
 {% endblock %}
 {% block body %}
     <div class="container-fluid">
@@ -20,15 +20,18 @@
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 price_block">
             <div class="price_zone">
-                <span class="product_name">
-                    ----
+                <span data-id="" class="product_name">
+
                 </span>
-                <span class="product_code">
-                    ----
+                <span class="buy_price">
+
                 </span>
-                <span class="product_price">
-                    ----
+                <span class="sell_price">
+
                 </span>
+            </div>
+            <div class="now_zone">
+                <span class="now"></span>
             </div>
         </div>
     </div>
@@ -45,9 +48,13 @@
             </div>
             <div class="select_zone">
                 <label class="product_name" for="select_product">
-                    当前交易帐号:
+                    当前交易产品:
                 </label>
-                <input id="select_product">
+                <input type="text" id="select_product" placeholder="点击选择产品">
+            </div>
+            <div class="process_case">
+                    <button id="buy_it">买&emsp;&emsp;入</button>
+                    <button id="sell_it">卖&emsp;&emsp;出</button>
             </div>
         </div>
     </div>
@@ -56,5 +63,6 @@
 {% endblock %}
 
 {% block js %}
-    <script src="/static/js/process_case.js?v={{ version }}"></script>
+    <script src="/static/js/socket.io.js"></script>
+    <script src="/static/js/process_case.js?v={{ v }}"></script>
 {% endblock %}

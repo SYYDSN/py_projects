@@ -185,8 +185,28 @@ class Teacher(mongo_db.BaseDoc):
         data.update(t)
         return data
 
+    @classmethod
+    def get_hold(cls, t_id: (str, ObjectId), h_id: (str, ObjectId) = None) -> (None, dict, list):
+        """
+        获取老师的持仓记录
+        :param t_id: Teacher._id
+        :param h_id: Trade._id
+        :return:
+        """
+        begin = mongo_db.get_datetime_from_str("2018-08-27 17:00:00")
+        end = datetime.datetime.now()
+        res = hold_info_from_db(t_id=t_id, begin=begin, end=end, h_id=h_id)
+        if h_id is None:
+            return res
+        else:
+            if len(res) == 0:
+                return None
+            else:
+                return res[0]
+
 
 if __name__ == "__main__":
-    # Teacher.index()
-    Teacher.single_info(t_id=ObjectId("5a1e680642f8c1bffc5dbd6f"))
+    """查询单个老师的持仓记录"""
+    cc = Teacher.get_hold(t_id="5b65f2d9dbea625d78469f23")
+    print(cc)
     pass

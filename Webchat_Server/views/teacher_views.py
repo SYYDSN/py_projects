@@ -23,6 +23,10 @@ teacher_blueprint = Blueprint("teacher_blueprint", __name__, url_prefix="/teache
 """分析师登录，喊单操作的视图函数"""
 
 
+def version():
+    return uuid4().hex
+
+
 def login() -> str:
     """teacher login page"""
     method = request.method.lower()
@@ -66,14 +70,14 @@ def login_out():
 def quotation_page():
     """报价页面"""
     page_title = "行情"
-    return render_template("quotation.html", page_title=page_title)
+    return render_template("quotation.html", page_title=page_title, v=version())
 
 
 @check_teacher_session
 def process_case_page(teacher: dict = None):
     """交易管理"""
     page_title = "交易管理"
-    return render_template("process_case.html", page_title=page_title, teacher=teacher)
+    return render_template("process_case.html", page_title=page_title, teacher=teacher, v=version())
 
 
 

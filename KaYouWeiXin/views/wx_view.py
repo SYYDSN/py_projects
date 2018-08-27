@@ -731,6 +731,7 @@ def common_view_func(user: dict = None, html_name: str = ''):
             "additional.html",
             "driver_two.html",
             "part_time.html",
+            'safety_health.html',
             "update_id.html",
         ]
         resume_id = user.get("resume_id", "")

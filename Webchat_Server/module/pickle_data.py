@@ -290,7 +290,7 @@ def draw_data_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
 
 def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetime = None, end: datetime.datetime = None) -> list:
     """
-    从数据库获取分析师的持仓。返回数据的list对象
+    从数据库获取分析师的持仓。返回数据的list对象 ,不再建议使用,请使用hold_info_from_db
     :param t_id: 老师id
     :param begin: 开始时间
     :param end:  截至时间
@@ -396,6 +396,84 @@ def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
         pass
     print("共计{}条记录".format(len(records)))
     return records
+
+
+def hold_info_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetime = None,
+                      end: datetime.datetime = None, h_id: (str, ObjectId) = None) -> list:
+    """
+    从数据库获取分析师的持仓。,替代draw_hold_list_from_db函数.
+    如果h_id是None,返回全部数据的list对象,否则返回对应的记录的list(单个元素的list)
+    :param t_id: 老师id
+    :param begin: 开始时间
+    :param end:  截至时间
+    :param h_id:  持仓Trade的_id
+    :return:
+    """
+    table_name = "trade"
+    records = list()
+    now = datetime.datetime.now()
+    if isinstance(t_id, ObjectId) or (isinstance(t_id, str) and len(t_id) == 24):
+        f = {
+            "teacher_id": ObjectId(t_id) if isinstance(t_id, str) else t_id,
+            "exit_price": {"$exists": False}
+        }
+    else:
+        f = {
+            "exit_price": {"$exists": False}
+        }
+    if isinstance(begin, datetime.datetime) and isinstance(end, datetime.datetime):
+        if end <= begin:
+            pass
+        else:
+            f['enter_time'] = {
+                "$exists": True, "$type": 9,
+                "$lte": end, "$gte": begin
+            }
+    elif isinstance(begin, datetime.datetime) and end is None:
+        f['enter_time'] = {
+            "$exists": True, "$type": 9,
+            "$lte": now, "$gte": begin
+        }
+    elif isinstance(end, datetime.datetime) and begin is None:
+        f['enter_time'] = {"$exists": True, "$type": 9, "$lte": end}
+    else:
+        pass
+    if isinstance(h_id, str) and len(h_id) == 24:
+        f['_id'] = ObjectId(h_id)
+    ses = mongo_db.get_conn(table_name=table_name)
+    if table_name == "signal_info":
+        s = [("create_time", -1)]
+    else:
+        s = [("enter_time", -1)]
+    signals = ses.find(filter=f, sort=s)
+    if signals.count() > 0:
+        signals = [x for x in signals if x.get("product") in p_list]
+        for signal in signals:
+            teacher = signal.get('teacher_id')
+            product = signal['product']
+            each_profit = signal['each_profit']
+            enter_time = signal['enter_time']
+            exit_time = signal['exit_time']
+            win = 1 if each_profit >= 0 else 0
+            temp = dict()
+            temp['teacher'] = teacher
+            temp['product'] = product
+            temp['direction'] = signal['direction']
+            temp['each_profit'] = each_profit  # 每手实际盈利
+            temp['enter_time'] = enter_time.strftime("%F")  # 进场日
+            temp['hold_hour'] = round((now - enter_time).total_seconds() / 3600, 0)  # 持仓时间
+            temp['enter_price'] = signal['enter_price']
+            temp['exit_date'] = exit_time.strftime("%F")  # 出场日
+            temp['timestamp'] = exit_time.timestamp()  # 出场日的timestamp对象，用于排序
+            week_list = exit_time.isocalendar()
+            temp['week'] = "{}年{}周".format(week_list[0], week_list[1])
+            temp['win'] = win
+            records.append(temp)
+    else:
+        pass
+    print("共计{}条记录".format(len(records)))
+    return records
+
 
 
 def calculate_win_per_by_teacher(begin: str = None, end: str = None) -> dict:
