@@ -76,9 +76,25 @@ def quotation_page():
 @check_teacher_session
 def process_case_page(teacher: dict = None):
     """交易管理"""
-    page_title = "交易管理"
-    return render_template("process_case.html", page_title=page_title, teacher=teacher, v=version())
+    method = request.method.lower()
+    if method == "get":
+        page_title = "交易管理"
+        return render_template("process_case.html", page_title=page_title, teacher=teacher, v=version())
+    elif method == "post":
+        """
+        分析师微信喊单信号。在未整合之前，此类信号一律转交
+        Message_Server项目处理 2018-8-28
+        """
+        args = get_args(request)
+        _id = args.get("_id", "")
+        if isinstance(_id, str) and len(_id) == 24:
+            """这是离场"""
+            pass
+        else:
+            """这是进场"""
 
+    else:
+        return abort(405)
 
 
 """集中注册函数"""

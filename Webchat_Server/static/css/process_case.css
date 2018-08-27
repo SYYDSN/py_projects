@@ -30,6 +30,12 @@ html {
   text-align: center;
   display: inline-block;
 }
+.price_block .price_zone .buy_price {
+  color: #e35e57;
+}
+.price_block .price_zone .sell_price {
+  color: #5ec679;
+}
 .price_block .now_zone {
   width: 100%;
   display: flex;

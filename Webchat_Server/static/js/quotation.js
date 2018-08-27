@@ -20,8 +20,8 @@ $(function(){
         for(var price of price_list){
             var code = price['code'];
             var name = price['product'];
-            var buy = price['price'];  // 买价
-            var sell = price['price']; // 卖价
+            var buy = price['buy'];  // 买价
+            var sell = price['sell']; // 卖价
             var id_str =  code.toLowerCase();
             var obj = $("#" + id_str);
             if(obj.length == 0){

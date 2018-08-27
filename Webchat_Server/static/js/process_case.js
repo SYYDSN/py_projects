@@ -47,8 +47,8 @@ $(function(){
         if(set_code.length >= 4){
             for(var price of price_list){
                 var temp_code = price['code'];
-                var buy_price = price['price'];  // 买价
-                var sell_price = price['price']; // 卖价
+                var buy_price = price['buy'];  // 买价
+                var sell_price = price['sell']; // 卖价
                 var temp_code =  temp_code.toLowerCase();
                 if(set_code == temp_code)
                 {
@@ -66,6 +66,23 @@ $(function(){
         * args action: 方向, 买入/卖出
         * */
         var product = $.trim($(".product_name").text());
+        var enter_price = direction == "买入"? parseFloat($.trim($(".buy_price").text())):
+            parseFloat($.trim($(".sell_price").text()));
+        var enter_time = $.trim($(".now").text());
+        $.confirm(`${enter_price}价位, ${direction}${product}, 你确定吗?`, "建仓操作", function(){
+            var args = {
+                "product": product, "direction": direction,
+                "enter_price": enter_price, "enter_time": enter_time
+            };
+            $.post("/teacher/process_case.html", args, function(resp){
+                var resp = JSON.parse(resp);
+                var status = resp['message'];
+                if(status == "success"){
+                    $.alert("建仓成功！");
+                    location.href = "/teacher/process_case.html?product=" + product;
+                }
+            });
+        });
     };
 
 // end !

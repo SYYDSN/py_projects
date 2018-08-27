@@ -1145,7 +1145,7 @@ class Trade(Signal):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['native'] = bool  # 这个记录是原生的吗?
-    type_dict['record_id'] = ObjectId # 原记录的id,指向Signal的record_id属性
+    type_dict['record_id'] = ObjectId  # 原记录的id,指向Signal的record_id属性
     type_dict['native_direction'] = str  # 原始订单的方向
     type_dict['change'] = str  # 改变方式  raw/follow/reverse/random
     type_dict['direction'] = str  # 方向（实际方向）

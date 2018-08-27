@@ -52,3 +52,7 @@ html {
   width: 25%;
   text-align: center;
 }
+.middle_block .price_list .title_line {
+  color: #3085b5;
+  font-weight: 600;
+}

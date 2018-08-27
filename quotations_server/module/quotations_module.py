@@ -29,15 +29,15 @@ logger = get_logger()
 """
 p_map = {
     "Xinze Group Limited": {
-        "GBPUSD": {"product": "英镑", "code": "GBPUSD"},
-        "USDCAD": {"product": "加元", "code": "USDCAD"},
-        "AUDUSD": {"product": "澳元", "code": "AUDUSD"},
-        "USDJPY": {"product": "日元", "code": "USDJPY"},
-        "EURUSD": {"product": "欧元", "code": "EURUSD"},
-        "HK50": {"product": "恒指", "code": "HK50"},
-        "XTIUSD": {"product": "原油", "code": "XTIUSD"},
-        "XAGUSD": {"product": "白银", "code": "XAGUSD"},
-        "XAUUSD": {"product": "黄金", "code": "XAUUSD"}
+        "GBPUSD": {"product": "英镑", "code": "GBPUSD", "p_arg": 100000, "p_val": 1, "p_diff": 22},
+        "USDCAD": {"product": "加元", "code": "USDCAD", "p_arg": 100000, "p_val": 1, "p_diff": 22},
+        "AUDUSD": {"product": "澳元", "code": "AUDUSD", "p_arg": 10000, "p_val": 1, "p_diff": 21},
+        "USDJPY": {"product": "日元", "code": "USDJPY", "p_arg": 1000, "p_val": 1, "p_diff": 19},
+        "EURUSD": {"product": "欧元", "code": "EURUSD", "p_arg": 100000, "p_val": 1, "p_diff": 20},
+        "HK50": {"product": "恒指", "code": "HK50", "p_arg": 1, "p_val": 10, "p_diff": 2},
+        "XTIUSD": {"product": "原油", "code": "XTIUSD", "p_arg": 1000, "p_val": 1, "p_diff": 50},
+        "XAGUSD": {"product": "白银", "code": "XAGUSD", "p_arg": 1000, "p_val": 5, "p_diff": 41},
+        "XAUUSD": {"product": "黄金", "code": "XAUUSD", "p_arg": 100, "p_val": 1, "p_diff": 45}
     }
 }
 
@@ -47,7 +47,7 @@ p_map = {
 
 def transform_product(raw_dict: dict) -> (dict, None):
     """
-    根据报价的代码批量将产品的商品名称，转换成自有的产品名称。
+    根据报价的代码批量将产品的商品名称，转换成自有的产品名称。同时根据点差计算买入价
     :param raw_dict: 产品报价的dict
     :return: 转换后的list
     """
@@ -61,9 +61,17 @@ def transform_product(raw_dict: dict) -> (dict, None):
         if temp is None:
             pass
         else:
-            raw_dict['product'] = temp['product']
-            raw_dict['code'] = temp['code']
-            return raw_dict
+            res = raw_dict.copy()
+            res['product'] = temp['product']
+            res['code'] = temp['code']
+            price = res.pop("price")
+            sell = price
+            buy = sell + temp['p_diff'] * temp['p_val'] / temp['p_arg']
+            price = str(price)
+            index = len(price) - (price.index(".") + 1)
+            res['sell'] = round(sell, index)
+            res['buy'] = round(buy, index)
+            return res
 
 
 class RawRequestInfo(mongo_db.BaseDoc):
