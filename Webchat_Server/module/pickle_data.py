@@ -383,10 +383,12 @@ def draw_hold_list_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetim
             temp['product'] = product
             temp['direction'] = signal['direction']
             temp['each_profit'] = each_profit  # 每手实际盈利
-            temp['enter_time'] = enter_time.strftime("%F")  # 进场日
+            temp['enter_time'] = enter_time
+            temp['enter_time_str'] = enter_time.strftime("%F")  # 进场日
             temp['hold_hour'] = round((now - enter_time).total_seconds() / 3600, 0)  # 持仓时间
             temp['enter_price'] = signal['enter_price']
-            temp['exit_date'] = exit_time.strftime("%F")  # 出场日
+            temp['exit_date'] = exit_time
+            temp['exit_date_str'] = exit_time.strftime("%F")  # 出场日
             temp['timestamp'] = exit_time.timestamp()  # 出场日的timestamp对象，用于排序
             week_list = exit_time.isocalendar()
             temp['week'] = "{}年{}周".format(week_list[0], week_list[1])
@@ -451,21 +453,25 @@ def hold_info_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetime = N
         for signal in signals:
             teacher = signal.get('teacher_id')
             product = signal['product']
+            code = signal.get("code", "")
+            lots = signal.get("lots", 1)
             each_profit = signal['each_profit']
             enter_time = signal['enter_time']
-            exit_time = signal['exit_time']
             win = 1 if each_profit >= 0 else 0
             temp = dict()
+            temp['_id'] = signal['_id']
             temp['teacher'] = teacher
             temp['product'] = product
+            temp['lots'] = lots
+            temp['code'] = code
             temp['direction'] = signal['direction']
             temp['each_profit'] = each_profit  # 每手实际盈利
-            temp['enter_time'] = enter_time.strftime("%F")  # 进场日
+            temp['enter_time'] = enter_time
+            temp['enter_time_str'] = enter_time.strftime("%F")  # 进场日
             temp['hold_hour'] = round((now - enter_time).total_seconds() / 3600, 0)  # 持仓时间
             temp['enter_price'] = signal['enter_price']
-            temp['exit_date'] = exit_time.strftime("%F")  # 出场日
-            temp['timestamp'] = exit_time.timestamp()  # 出场日的timestamp对象，用于排序
-            week_list = exit_time.isocalendar()
+            temp['timestamp'] = enter_time.timestamp()  # 出场日的timestamp对象，用于排序
+            week_list = enter_time.isocalendar()
             temp['week'] = "{}年{}周".format(week_list[0], week_list[1])
             temp['win'] = win
             records.append(temp)
@@ -698,7 +704,7 @@ def calculate_win_per_by_week_single(t_id: (str, ObjectId) = None, begin: str = 
     begin = mongo_db.get_datetime_from_str(begin)
     end = mongo_db.get_datetime_from_str(end)
     raw = draw_data_list_from_db(t_id, begin, end)
-    hold = draw_hold_list_from_db(t_id, begin, end)
+    hold = hold_info_from_db(t_id, begin, end)
     res = dict()
     for record in raw:
         p_name = record['product']

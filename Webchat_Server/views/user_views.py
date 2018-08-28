@@ -30,20 +30,18 @@ user_blueprint = Blueprint("user_blueprint", __name__, url_prefix="/user", templ
 
 
 @check_platform_session
-def hello() -> str:
+def hello(user: dict = None) -> str:
     """hello world"""
-    wx_user = get_platform_session_arg("wx_user")
-    return "hello baby <a href='/wx/auth/info'>去授权</a><br><h2>{}</h2>".format(str(wx_user))
+    return "hello baby <a href='/wx/auth/info'>去授权</a><br><h2>{}</h2>".format(str(user))
 
 
 @check_platform_session  # 调试注销
-def sms_func(key):
+def sms_func(user: dict = None, key: str = ""):
     """
     发送/校验短信
     :return:
     """
     mes = {"message": "success"}
-    user = get_platform_session_arg("wx_user", None)
     print("user: {}".format(user))
     # user = {"_id": ObjectId("5b56bdba7b3128ec21daa4c7")}  # 调试打开,正式注销
     if user is None:
@@ -68,7 +66,8 @@ def sms_func(key):
                 r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
                 if isinstance(r, dict):
                     """成功"""
-                    session['wx_user'] = r
+                    session['user_id'] = r['_id']
+                    session.pop('wx_user', None)
                 else:
                     mes['message'] = "绑定手机失败"
             else:
@@ -82,7 +81,7 @@ def sms_func(key):
 
 
 @check_platform_session
-def file_func(action, table_name):
+def file_func(user: dict = None, action: str = "", table_name: str = ""):
     """
     保存/获取文件,
     :param action: 动作, save/get(保存/获取)
@@ -99,7 +98,7 @@ def file_func(action, table_name):
     table_name = table_name if table_name in tables else 'base_file'
     if action == "save":
         """保存文件"""
-        r = BaseFile.save_flask_file(req=request, collection=table_name)
+        r = BaseFile.save_flask_file(req=request, collection=table_name, owner=user['_id'])
         if isinstance(r, ObjectId):
             mes['_id'] = str(r)
         else:
@@ -189,7 +188,8 @@ def draw_user_info():
         if "openid" in data:
             """成功"""
             obj = WXUser.wx_login(**data)  # 保存用户信息
-            session["wx_user"] = obj  # 写入会话
+            session["user_id"] = obj['_id']
+            session["update_date"] = datetime.datetime.now()
             return redirect(ref)
             # return render_template("page_auth.html", ref=ref, data=data)
         else:
@@ -264,7 +264,7 @@ def wx_js_func():
 
 
 @check_platform_session
-def wx_js_api_demo():
+def wx_js_api_demo(user: dict = None):
     """
     一个演示页面,用于测试wx的js-sdk接口的初始化工作(测试wx_js_func函数)
     :return:
@@ -273,39 +273,13 @@ def wx_js_api_demo():
 
 
 # @check_platform_session
-def common_view_func(html_name: str):
+def common_view_func(user: dict = None, html_name: str = ""):
     """
     通用页面视图
     param html_name:  html文件名,包含目录路径
     :return:
     """
-    user = get_platform_session_arg("wx_user", None)
-    user2 = {
-        "_id": ObjectId("5b56bdba7b3128ec21daa4c7"),
-        "openid": "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
-        "access_token": "12_ypF7a9ujmbnNYnbtZF8eyLyy23H9YmST6pMPYAuYefQizi4CrFOupAlLXKMe2dfRGa2Ezt0ApdHHTz-LdX8qtYVS8qTq2OQtnW5ZXtvUCGQ",
-        "city": "闵行",
-        "country": "中国",
-        "expires_in": 7200,
-        "groupid": 0,
-        "head_img_url": "http://thirdwx.qlogo.cn/mmopen/dUtvxcibjGMKAzSRePkx3ZGZnRMsDyzU6f8fNjxtrS2nXCcwMPQUbZM4YYfS1vhWoObUHQaErCDEjNrStKszkiaA/132",
-        "language": "zh_CN",
-        "nick_name": "徐立杰",
-        "province": "上海",
-        "qr_scene": 0,
-        "qr_scene_str": "",
-        "refresh_token": "12_7h-zJ5RYfKWjYp7AQOiIe7VdFaZxw7gPFe3xxVVx4eEGdtuaYYK4st9HgSADdvJo_QpSLkF2JLP4Royzd_NfLde291LetISRV32TjtRweMQ",
-        "remark": "",
-        "scope": "snsapi_userinfo",
-        "sex": 1,
-        "subscribe": 1,
-        "subscribe_scene": "ADD_SCENE_SEARCH",
-        "tagid_list": [],
-        "relate_img": "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQF78DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyQm9HVjAxNG5jaGwxMDAwME0wN2QAAgQmRFhbAwQAAAAA",
-        "phone": "15618317376",
-        "resume_id": ObjectId("5b5a96d9bede684e68049f01")
-    }
-    user = user2 if user is None else user
+    user = WXUser.find_by_id(o_id=ObjectId("5b57a770f313841fc0effef7"), to_dict=True) if user is None else user
     print("user: {}".format(user))
     template_dir = os.path.join(__project_dir__, 'templates', 'wx')
     file_names = os.listdir(template_dir)
@@ -372,13 +346,14 @@ def common_view_func(html_name: str):
 
 
 @check_platform_session
-def follow_teacher():
+def follow_teacher(user: dict = None):
     """
     跟随和反跟随老师
     :return:
     """
-    user = get_platform_session_arg("wx_user", dict())
+
     mes = {"message": "未知的错误"}
+    user = WXUser.find_by_id(o_id=ObjectId("5b57a770f313841fc0effef7"), to_dict=True) if user is None else user
     phone = user.get("phone")
     if phone is None:
         mes['message'] = "请先绑定手机号码"
@@ -400,11 +375,6 @@ def follow_teacher():
             ms = "未知的操作：{}".format(the_type)
             logger.exception(msg=ms)
             mes['message'] = ms
-        if mes['message'] == "success":
-            user = WXUser.find_by_id(o_id=user['_id'], to_dict=True)
-            session["wx_user"] = user  # 写入会话
-        else:
-            pass
     return json.dumps(mes)
 
 

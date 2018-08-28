@@ -108,26 +108,6 @@ def _generator_signal(raw_signal: dict) -> dict:
     """
     now = datetime.datetime.now()
     res = raw_signal
-    """
-    op = res.get("op")
-    record_id = res['record_id']
-    record_id = ObjectId(record_id) if isinstance(record_id, str) and len(record_id) == 24 else record_id
-    res['record_id'] = record_id
-    native_direction = res.pop('direction')  # 原始订单的方向
-    res['native_direction'] = native_direction
-    teacher_name = res.pop('creator_name', None)  # 老师名
-    teacher_name = res.pop('updater_name') if teacher_name is None else teacher_name
-    res['teacher_name'] = teacher_name
-    teacher_id = res.pop('creator_id', None)  # 老师id
-    teacher_id = res.pop('updater_id') if teacher_id is None else teacher_id
-    teacher_id = ObjectId(teacher_id) if isinstance(teacher_id, str) and len(teacher_id) == 24 else teacher_id
-    res['teacher_id'] = teacher_id
-    res['change'] = change
-    res['enter_time'] = res.pop("create_time")
-    res['exit_time'] = res.pop("update_time")
-    enter_price = res['enter_price']
-    exit_price = res.get('exit_price')
-    """
     change = res['change']
     teacher_id = res['teacher_id']
     product = res['product']
@@ -1157,6 +1137,7 @@ class Trade(Signal):
     type_dict['teacher_name'] = str  #
     type_dict['teacher_id'] = ObjectId  #
     type_dict['product'] = str  # 产品名称
+    type_dict['code'] = str  # 产品代码
     type_dict['exit_reason'] = str  # 离场理由
     type_dict['enter_price'] = float  # 建仓价
     type_dict['exit_price'] = float  # 平仓价

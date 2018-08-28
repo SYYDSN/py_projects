@@ -2,6 +2,10 @@ html
     font-size 14px
     color #4e4e4e
 
+.buy
+    color #e35e57
+.sell
+    color #5ec679
 .top_block
     display flex
     flex-direction row
@@ -15,7 +19,7 @@ html
 
 .price_block
     font-size 16px
-    padding 20px 10px
+    padding 10px 10px
     .price_zone
         width 100%
         display flex
@@ -34,21 +38,23 @@ html
         width 100%
         display flex
         flex-direction row
-        justify-content flex-end
+        justify-content center
         .now
             display block
             font-size 14px
+            color #d9d9d9
             width 20em
             height 1em
-            text-align right
+            text-align center
 
 .process_block
     font-size 16px
-    padding 20px 10px
+    padding 10px 10px
+    text-align center
     .user_info
         margin-bottom 10px
     .user_info,.select_zone, .process_case
-        padding 10px 10px
+        padding 5px 10px
         width 100%
         display flex
         flex-direction row
@@ -57,9 +63,10 @@ html
         >span,label,input
             width 50%
             border none
+            text-align center
         #buy_it,#sell_it
             width calc((100% - 20px)/2)
-            margin-top 20px
+            margin-top 10px
             height 3em
             border-radius 4px
             margin-bottom 20px
@@ -71,6 +78,54 @@ html
             margin-left 10px
             background-color #5ec679
             border 1px solid #5ec679
+
+.case_block
+    font-size 18px
+    padding 15px 10px 10px
+    .title_line
+        color #bfbfbf
+        font-size 18px
+        font-weight 600
+    .case_line
+        width 100%
+        display flex
+        flex-direction row
+        justify-content center
+        align-items center
+        text-align center
+        >div
+            width 33%
+            min-height 1em
+            display block
+            text-align center
+            overflow hidden
+            word-break break-all
+            padding 5px
+            .close_case
+                width 100%
+                background-color #f3c065
+                border 1px solid #d6a859
+                padding 5px auto
+                border-radius 5px
+        .case
+            .cell_line
+                width 100%
+                display flex
+                font-size 16px
+                flex-direction row
+                justify-content space-around
+                align-items center
+                align-content center
+                .enter_time,.p_direction
+                    font-size 14px
+                .p_direction,.p_lots
+                    width 28px
+                .enter_time,.p_name
+                    width calc(100% - 32px)
+                .p_name
+                    font-weight 700
+    .top_line
+        border-top 1px solid lightgrey
 
 
 

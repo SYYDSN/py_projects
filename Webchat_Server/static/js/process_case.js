@@ -12,6 +12,26 @@ $(function(){
 
     ];  // 产品名称的列表
 
+    // 自动根据url参数选择产品
+    (function(){
+        var product = get_url_arg("p");
+        console.log(product);
+        if(product == undefined || product == ""){
+            // nothing...
+        }
+        else{
+            for(var p of p_names){
+                var code = p['title'].split(" ")[0].toLowerCase();
+                var name = p['value'];
+                console.log(`${code}==${product}`);
+                if(code == product){
+                    $("#select_product").val(p['title']);
+                    $(".price_zone > .product_name").attr("data-id", code).text(name);
+                }
+            }
+        }
+    })();
+
     // 初始化产品选择输入框
     var init_select = function(){
         $("#select_product").select({
@@ -44,46 +64,103 @@ $(function(){
         $(".now").text(price_list[0]['platform_time']);  // 当前时间
         // 显示报价
         var set_code = $(".price_zone > .product_name").attr("data-id").toLowerCase();
-        if(set_code.length >= 4){
-            for(var price of price_list){
-                var temp_code = price['code'];
-                var buy_price = price['buy'];  // 买价
-                var sell_price = price['sell']; // 卖价
-                var temp_code =  temp_code.toLowerCase();
-                if(set_code == temp_code)
-                {
-                    $(".price_zone > .buy_price").text(buy_price);
-                    $(".price_zone > .sell_price").text(sell_price);
-                }
-                else{}
+        for(var price of price_list){
+            var temp_code = price['code'];
+            var buy_price = price['buy'];  // 买价
+            var sell_price = price['sell']; // 卖价
+            var temp_code =  temp_code.toLowerCase();
+            if(set_code == temp_code)
+            {
+                $(".price_zone > .buy_price").text(buy_price);
+                $(".price_zone > .sell_price").text(sell_price);
+            }
+            else{}
+            var obj = $(`.now_price[data-id='${temp_code.toLowerCase()}']`);
+            var obj_d = obj['data-d'];
+            if(obj_d == "买入"){
+                obj.text(sell_price);
+            }
+            else{
+                obj.text(buy_price);
             }
         }
     }
 
-    // 进场函数函数
+    // 进场函数
     var enter = function(direction){
         /*
         * args action: 方向, 买入/卖出
         * */
         var product = $.trim($(".product_name").text());
+        var code = $.trim($(".product_name").attr("data-id")).toLowerCase();
         var enter_price = direction == "买入"? parseFloat($.trim($(".buy_price").text())):
             parseFloat($.trim($(".sell_price").text()));
         var enter_time = $.trim($(".now").text());
-        $.confirm(`${enter_price}价位, ${direction}${product}, 你确定吗?`, "建仓操作", function(){
+        if(product == "" || isNaN(enter_price)){
+            $.alert("请先选择产品", function(){return false;});
+        }
+        else if($(".case_block .case_line").length > 5){
+            $.alert("持仓过多,无法继续开单", function(){return false;});
+        }
+        else{
+            $.confirm(`${enter_price}价位, ${direction}${product}, 你确定吗?`, "建仓操作", function(){
+                var args = {
+                    "product": product, "direction": direction, "code": code,
+                    "enter_price": enter_price, "enter_time": enter_time
+                };
+                $.post("/teacher/process_case.html", args, function(resp){
+                    var resp = JSON.parse(resp);
+                    var status = resp['message'];
+                    if(status == "success"){
+                        $.alert("建仓成功！", function(){
+                            location.href = "/teacher/process_case.html?p=" + code;
+                        });
+                    }
+                });
+            });
+        }
+    };
+
+    // 多单
+    $("#buy_it").click(function () {
+        enter("买入");
+    });
+
+    // 空单
+    $("#sell_it").click(function () {
+        enter("卖出");
+    });
+
+    // 离场函数
+    var exit = function($obj){
+        var _id = $.trim($obj.attr("data-id"));
+        var direction = $.trim($obj.attr("data-d"));
+        var type = direction=="买入"? "多单": "空单";
+        var product = $.trim($obj.attr("data-n"));
+
+        $.confirm(`对此${product}${type}进行平仓操作, 你确定吗?`, "平仓操作", function(){
             var args = {
-                "product": product, "direction": direction,
-                "enter_price": enter_price, "enter_time": enter_time
+                "_id": _id,
+                "direction": direction,
+                "product": product
             };
             $.post("/teacher/process_case.html", args, function(resp){
                 var resp = JSON.parse(resp);
                 var status = resp['message'];
                 if(status == "success"){
-                    $.alert("建仓成功！");
-                    location.href = "/teacher/process_case.html?product=" + product;
+                    $.alert("平仓成功！", function(){
+                        location.href = "/teacher/process_case.html";
+                    });
                 }
             });
         });
     };
+
+    // 平仓按钮事件
+    $(".close_case").each(function(){
+        var $this = $(this);
+        $this.click(function(){exit($this);});
+    });
 
 // end !
 });

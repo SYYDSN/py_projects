@@ -38,6 +38,26 @@ app_id = "wx66711dbfd84a50c4"                       # 汇赢app_id
 app_secret = "d9186b6cef15534427c02f6ee7085a9f"     # 汇赢app_secret
 
 
+"""自定义过滤器"""
+
+
+def short_date(d: datetime.datetime) -> str:
+    """
+    日期格式化,返回'x月x日'这样的格式
+    :param d:
+    :return:
+    """
+    return "{}月{}日".format(d.month, d.day)
+
+
+"""注册jinja2过滤器"""
+
+app.jinja_env.filters['short_date'] = short_date
+
+
+"""工具函数"""
+
+
 def get_all_args(req) -> dict:
     """
     获取一次请求的所有参数.
@@ -93,6 +113,12 @@ def hello_world():
     data = get_all_args(req=request)
     mes['data'] = data
     return json.dumps(mes)
+
+
+@app.route("/<file_name>")
+def validate_func(file_name):
+    """申诉"""
+    return send_from_directory(directory="static/file/", filename=file_name)
 
 
 @app.route("/MP_verify_sMgcu97iNJMwM7WI.txt")

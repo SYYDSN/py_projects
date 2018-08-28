@@ -88,7 +88,7 @@ def clear_platform_session():
 
 
 def check_platform_session(f):
-    """检测管操作员是否登录的装饰器"""
+    """检测用户是否登录的装饰器"""
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
         session.pop("wx_user", None)  # 去除以前的会话内容

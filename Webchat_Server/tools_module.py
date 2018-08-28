@@ -24,6 +24,7 @@ from module.teacher_module import Teacher
 from werkzeug.contrib.cache import RedisCache
 from log_module import get_logger
 from log_module import recode
+from module.item_module import WXUser
 
 
 """公用的函数和装饰器"""
@@ -88,17 +89,30 @@ def clear_platform_session():
 
 
 def check_platform_session(f):
-    """检测管操作员是否登录的装饰器"""
+    """检测微信用户是否登录的装饰器"""
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
-        wx_user = session.get("wx_user")  # 检测session中的wx_user
-        print("wx_user: {}".format(wx_user))
-        if wx_user is None:
-            ref = request.full_path
-            ref = base64.urlsafe_b64encode(ref.encode())
+        session.pop("wx_user", None)  # 去除以前的会话内容
+        user_id = session.get("user_id")  # 检测session中的user_id
+        if isinstance(user_id, ObjectId):
+            user = WXUser.find_by_id(o_id=user_id, to_dict=True)
+        else:
+            user = None
+        print("user_id: {}".format(user_id))
+        ref = request.full_path
+        ref = base64.urlsafe_b64encode(ref.encode())
+        if user is None:
             return redirect(url_for("user_blueprint.get_code_and_redirect", ref=ref))
         else:
-            return f(*args, **kwargs)
+            """
+            用户id有效,需要检查一下用户的上一次的抓取用户的时间,如果超过24小时,也需要更新一下用户的信息.
+            """
+            prev_update = session.get("update_date")
+            if prev_update is None or (datetime.datetime.now() - prev_update).total_seconds() > 86400:
+                return redirect(url_for("wx_blueprint.get_code_and_redirect", ref=ref))
+            else:
+                kwargs['user'] = user
+                return f(*args, **kwargs)
     return decorated_function
 
 
@@ -108,11 +122,9 @@ def check_teacher_session(f):
     def decorated_function(*args, **kwargs):
         t_id = session.get("t_id")  # 检测session中的老师id
         print("t_id: {}".format(t_id))
-        ref = request.full_path
-        ref = base64.urlsafe_b64encode(ref.encode())
         if t_id is None:
             """老师id不存在"""
-            return redirect(url_for("teacher_blueprint.login", ref=ref))
+            return redirect(url_for("teacher_blueprint.login"))
         else:
             """检查老师id真实性"""
             teacher = Teacher.find_by_id(o_id=t_id, to_dict=True)
@@ -120,7 +132,7 @@ def check_teacher_session(f):
                 kwargs['teacher'] = teacher
                 return f(*args, **kwargs)
             else:
-                return redirect(url_for("teacher_blueprint.login", ref=ref))
+                return redirect(url_for("teacher_blueprint.login"))
     return decorated_function
 
 
