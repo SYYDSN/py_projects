@@ -15,7 +15,9 @@ from module.item_module import WXUser
 from views.wx_view import wx_blueprint
 import requests
 from module.item_module import RawWebChatMessage
+from module.item_module import WebChatMessage
 from module.item_module import WXUser
+from module.item_module import EventHandler
 from tools_module import *
 from mongo_db import cache
 import xmltodict
@@ -202,9 +204,16 @@ def message_func():
                     pass
         else:
             pass
-
-        return "success"  # 规定的返回字符串
-
+        """对微信服务器推送的消息进行处理"""
+        info = WebChatMessage.instance_from_request(request)
+        resp = EventHandler.listen(info=info)
+        if resp == b'':
+            return "success"  # 规定的返回字符串
+        else:
+            resp = make_response(resp)
+            resp.headers["Content-Type"] = "text/xml; charset=utf-8"
+            print(resp)
+            return resp
     else:
         return abort(405)
 
@@ -225,7 +234,13 @@ def logger_request_info():
     args = {k: v for k, v in request.args.items()}
     form = {k: v for k, v in request.form.items()}
     json_data = None if request.json is None else {k: v for k, v in request.headers.items()}
-    xml_data = request.data.decode(encoding="utf-8")
+    try:
+        xml_data = request.data.decode(encoding="utf-8")
+    except Exception as e:
+        logger.exception(msg=e)
+        xml_data = ''
+    finally:
+        pass
     ip = get_real_ip(request)
     now = datetime.datetime.now()
     data = {
@@ -241,6 +256,8 @@ def logger_request_info():
     }
     mes = RawWebChatMessage(**data)
     mes.save_plus()
+    one = WebChatMessage.doc_from_raw(mes.get_dict())
+    WebChatMessage(**one).save_plus()
 
 
 if __name__ == '__main__':

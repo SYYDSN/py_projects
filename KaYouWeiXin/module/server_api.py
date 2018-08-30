@@ -451,9 +451,9 @@ def download_image(u_id: (str, ObjectId), table_name: str, media_id: str) -> dic
     return mes
 
 
-def get_templates() -> list:
+def get_message_templates() -> list:
     """
-    获取全部的模板信息
+    获取全部的消息模板信息
     :return:
     """
     u = "https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token={}".\
@@ -473,13 +473,37 @@ def send_template_message():
     pass
 
 
+def get_materials(m_type: str = 'image', offset: int = 0, count: int = 20) -> dict:
+    """
+    :param m_type:   素材类型 图片（image）、视频（video）、语音 （voice）、图文（news）
+    :param offset:   从全部素材的该偏移位置开始返回，0表示从第一个素材 返回
+    :param count:   返回素材的数量，取值在1到20之间
+    获取素材列表
+    :return:
+    """
+    tk = AccessToken.get_token()
+    u = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token={}".format(tk)
+    args = {"type": m_type, "offset": offset, "count": count}
+    r = requests.post(u, data=json.dumps(args))
+    status = r.status_code
+    if status != 200:
+        ms = "获取模板信息时,服务器返回了错误的状态码:{}, time:{}".format(status, datetime.datetime.now())
+        send_mail(title=ms)
+        raise ValueError(ms)
+    else:
+        data = r.json()
+        return data
+
+
 if __name__ == "__main__":
     """获取jsapi_ticket"""
     # ticket = JSAPITicket.get_ticket()
     # JSAPITicket.get_signature("http://temp.safego.org/wx/")
     """测试获取关联二维码"""
     # print(generator_relate_img("5b56bdba7b3128ec21daa4c7"))
-    u2 = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token={}".format(AccessToken.get_token())
-    r = requests.get(u2)
-    print(r.json())
+    # u2 = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token={}".format(AccessToken.get_token())
+    # r = requests.get(u2)
+    # print(r.json())
+    """获取素材列表"""
+    get_materials()
     pass

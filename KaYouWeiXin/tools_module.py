@@ -108,6 +108,7 @@ def check_platform_session(f):
             """
             prev_update = session.get("update_date")
             if prev_update is None or (datetime.datetime.now() - prev_update).total_seconds() > 86400:
+                """超过24小时,再次获取信息"""
                 return redirect(url_for("wx_blueprint.get_code_and_redirect", ref=ref))
             else:
                 kwargs['user'] = user
