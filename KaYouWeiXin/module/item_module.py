@@ -155,10 +155,59 @@ class EventHandler:
                 event = xml['Event'].lower()
                 if event == "subscribe":
                     """关注公众号"""
+                    f = {"openid": openid}
+                    u = {"$set": {"subscribe": 1}}
+                    WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
                 elif event == "unsubscribe":
                     """取消关注"""
+                    ms = "用户: {} 取消关注".format(openid)
+                    logger.info(ms)
+                    print(ms)
+                    f = {"openid": openid}
+                    u = {"$set": {"subscribe": 0}}
+                    WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                elif event == "scan":
+                    """扫码"""
+                    event_key = xml['EventKey']
+                    print("event_key is {}".format(event_key))
+                    if event_key.startswith("relate_"):
+                        """扫描委托求职二维码"""
+                        f = {"openid": openid}
+                        user = WXUser.find_one_plus(filter_dict=f, instance=False)
+                        data = ''
+                        if user is None:
+                            data = "尊敬的用户,请先关注卡佑公众号再进行操作"
+                        else:
+                            phone = user.get("phone", "")
+                            resume_id = user.get("resume_id", "")
+                            print("phone is {}".format(phone))
+                            print("resume_id is {}".format(resume_id))
+                            if not isinstance(resume_id, ObjectId):
+                                data = "卡佑助手提醒: 你还没填写自己的简历,请点击<a href='http://temp.safego.org/wx/html/register_info." \
+                                       "html'>这里填写简历</a>"
+                            elif len(phone) != 11:
+                                data = "卡佑助手提醒: 你还没绑定手机,请点击<a href='http://temp.safego.org/wx/html/register." \
+                                       "html'>这里填写进行绑定</a>"
+                            else:
+                                s_id = event_key.split("relate_")[-1]
+                                sales = WXUser.find_by_id(o_id=s_id, to_dict=True)
+                                if sales is None:
+                                    pass
+                                else:
+                                    s_name = sales['name'] if sales.get("name") else sales.get("nick_name", "")
+                                    data = "卡佑助手提醒: {}已接受你的求职委托.".format(s_name)
+                        if data == "":
+                            pass
+                        else:
+                            res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
+                    else:
+                        title = "{} 未意料的扫码事件消息:{}.{}".format(now, msg_type, event_key)
+                        content = "{}".format(str(info))
+                        send_mail(title=title, content=content)
+                elif event == "view":
+                    """点击菜单"""
                 else:
-                    title = "{} 未意料的消息:{}.{}".format(now, msg_type, event)
+                    title = "{} 未意料的事件消息:{}.{}".format(now, msg_type, event)
                     content = "{}".format(str(info))
                     send_mail(title=title, content=content)
             elif msg_type == "text":
@@ -168,8 +217,6 @@ class EventHandler:
                 res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
             elif msg_type == "image":
                 """图片消息"""
-            elif msg_type == "scan":
-                """扫码"""
             else:
                 title = "{} 未意料的类型:{}".format(now, msg_type)
                 content = "{}".format(str(info))
@@ -536,7 +583,10 @@ class WXUser(mongo_db.BaseDoc):
             if isinstance(user, dict) and isinstance(sale, dict):
                 role = sale.get("role", 0)
                 print("sale's role is {}".format(role))
-                if isinstance(role, int) and role > 0:
+                if len(user.get("phone", "")) != 11 or not isinstance(user.get("resume_id"), ObjectId):
+                    print("用户没有绑定手机或没有简历信息: {}".format(user))
+                    return False
+                elif isinstance(role, int) and role > 0:
                     relate_time = datetime.datetime.now()
                     relate_id = sale['_id']
                     f = {"_id": user['_id']}

@@ -14,6 +14,7 @@ from modules.item_module import RawWebChatMessage
 from modules.item_module import WXUserInfo
 from views.flash_view import flash_blueprint
 from views.vegetable_view import vegetable_blueprint
+from views.normal_view import normal_blueprint
 
 
 """训练服务器"""
@@ -30,6 +31,7 @@ SESSION_TYPE = "redis"
 app.config.from_object(__name__)
 app.register_blueprint(flash_blueprint)  # 注册闪卡训练蓝图
 app.register_blueprint(vegetable_blueprint)  # 注册蔬菜蓝图
+app.register_blueprint(normal_blueprint)  # 注册暂时没有归类的视图函数的蓝图
 Session(app)
 app_id = "wxd89f1f72776053ad"                       # app_id
 app_secret = "66a4200979bf09dd565180f1bd9c38d4"     # app_secret

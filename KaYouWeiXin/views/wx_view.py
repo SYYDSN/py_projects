@@ -681,6 +681,11 @@ def build_relate(user: dict = None):
     return json.dumps(mes)
 
 
+def follow_me_func():
+    """引导用户关注公众号页面"""
+    return render_template("page_code.html")
+
+
 @check_platform_session
 def common_view_func(user: dict = None, html_name: str = ''):
     """
@@ -938,5 +943,7 @@ wx_blueprint.add_url_rule(rule="/resume/opt", view_func=resume_opt_func, methods
 wx_blueprint.add_url_rule(rule="/resume/extend", view_func=resume_extend_info_func, methods=['post', 'get'])
 """手动建立用户和中介/兼职/销售的委托关系"""
 wx_blueprint.add_url_rule(rule="/build_relate", view_func=build_relate, methods=['post', 'get'])
+"""引导用户关注页面,不能放在通用页面视图里,会被循环重定向"""
+wx_blueprint.add_url_rule(rule="/follow_me", view_func=follow_me_func, methods=['post', 'get'])
 """通用页面视图"""
 wx_blueprint.add_url_rule(rule="/html/<html_name>", view_func=common_view_func, methods=['post', 'get'])

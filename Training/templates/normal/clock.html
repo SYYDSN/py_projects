@@ -1,0 +1,28 @@
+{% extends "standard_template.html" %}
+{% block extend_css %}
+    <link rel="stylesheet" href="/static/css/flipclock.css">
+    <link rel="stylesheet" href="/static/css/normal/clock.css">
+    <script src="/static/js/flipclock.min.js"></script>
+    <script src="/static/js/d3.min.js"></script>
+{% endblock %}
+
+{% block container %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clock_outer">
+            <div class="clock_inner" id="clock_01">
+
+            </div>
+            <div class="clock_inner" id="clock_02">
+                <p></p>
+                <p></p>
+                <p></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extend_js %}
+    <script src="/static/js/normal/clock.js"></script>
+{% endblock %}
