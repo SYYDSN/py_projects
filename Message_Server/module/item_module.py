@@ -429,6 +429,9 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
     :return:
     """
     if raw:
+        """
+        如果当前信号是原始信号,就生产一批虚拟信号并延迟发送.
+        """
         now = datetime.datetime.now()
         op = doc_dict.get("op")
         enter_price = doc_dict['enter_price']
@@ -439,13 +442,16 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
         native_direction = doc_dict.get('direction')  # 原始订单的方向
         doc_dict['native_direction'] = native_direction
         teacher_name = doc_dict.pop('creator_name', None)  # 老师名
+        teacher_name = doc_dict.get("teacher_name") if teacher_name is None else teacher_name
         teacher_name = doc_dict.pop('updater_name') if teacher_name is None else teacher_name
         doc_dict['teacher_name'] = teacher_name
         teacher_id = doc_dict.pop('creator_id', None)  # 老师id
+        teacher_id = doc_dict.get("teacher_id") if teacher_id is None else teacher_id
         teacher_id = doc_dict.pop('updater_id') if teacher_id is None else teacher_id
         teacher_id = ObjectId(teacher_id) if isinstance(teacher_id, str) and len(teacher_id) == 24 else teacher_id
         doc_dict['teacher_id'] = teacher_id
-        doc_dict['enter_time'] = doc_dict.pop("create_time")
+        if 'enter_time' not in doc_dict:
+            doc_dict['enter_time'] = doc_dict.pop("create_time")
         if op == "data_update" and isinstance(enter_price, (int, float)) and isinstance(exit_price, (int, float)):
             case_type = "exit"
         else:
@@ -456,9 +462,9 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
         doc_dict['change'] = "raw"
         exit_reason = doc_dict.get('exit_reason')
         if "enter_time" not in doc_dict:
-            doc_dict['enter_time'] = doc_dict.pop("create_time")
+            doc_dict['enter_time'] = doc_dict.pop("create_time", None)
         if "exit_time" not in doc_dict:
-            doc_dict['exit_time'] = doc_dict.pop("update_time")
+            doc_dict['exit_time'] = doc_dict.pop("update_time", None)
         f = {"record_id": doc_dict['record_id'], "change": "raw"}
         if case_type == "exit":
             """取以前的价格和入场时间"""
@@ -516,12 +522,13 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
             else:
                 count_down = random.randint(30, 1600)  # 延迟操作的秒数,表示在原始信号发出后多久进行操作?
                 json_obj = mongo_db.to_flat_dict(temp)
-                count_down = 10  # 测试专用
+                # count_down = 10  # 测试专用
                 send_virtual_trade.apply_async(countdown=count_down, kwargs={"trade_json": json_obj})
+                print("{}秒后发送数据. info={}".format(count_down, json_obj))
             # break  # 生产环境请注销
     else:
         pass
-    """原始喊单就立即保存数据并发送模板信息"""
+    """接受原始喊单和虚拟立即保存数据并发送模板信息"""
     _generator_signal(raw_signal=doc_dict)
 
 

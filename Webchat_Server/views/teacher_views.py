@@ -37,7 +37,9 @@ def post_trade(info: dict) -> True:
     :param info:
     :return:
     """
-    r = requests.post("http://127.0.0.1:8000/listen_virtual_trade", data=info)
+    u = "http://127.0.0.1:8000/listen_virtual_trade"
+    u = "http://wx.yataitouzigl.com/listen_virtual_trade"
+    r = requests.post(u, data=info)
     status = r.status_code
     res = True
     if status == 200:
@@ -64,7 +66,7 @@ def login() -> str:
     method = request.method.lower()
     if method == "get":
         page_title = "大师登录"
-        return render_template("t_login.html", page_title=page_title)
+        return render_template("t_login.html", page_title=page_title,v=version())
     elif method == "post":
         phone = get_arg(request, "phone", '')
         pw = get_arg(request, "password", '')
@@ -80,8 +82,11 @@ def login() -> str:
             else:
                 pw = md5(pw.encode(encoding='utf-8')).hexdigest().lower()
                 if pw == t.get("password", "").lower():
-                    """登录成功"""
-                    session['t_id'] = t["_id"]
+                    if t.get("native"):
+                        """登录成功"""
+                        session['t_id'] = t["_id"]
+                    else:
+                        mes['message'] = "此账户无法登录"
                 else:
                     mes['message'] = "密码错误"
         return json.dumps(mes)
@@ -99,6 +104,15 @@ def quotation_page():
     """报价页面"""
     page_title = "行情"
     return render_template("quotation.html", page_title=page_title, v=version())
+
+
+def news_func():
+    """
+    新闻页面/系统信息
+    :return:
+    """
+    page_title = "实时新闻"
+    return render_template("news.html", page_title=page_title, v=version())
 
 
 @check_teacher_session
@@ -163,6 +177,8 @@ teacher_blueprint.add_url_rule(rule="/login.html", view_func=login, methods=['ge
 teacher_blueprint.add_url_rule(rule="/login_out", view_func=login_out, methods=['get', 'post'])
 """报价页面"""
 teacher_blueprint.add_url_rule(rule="/quotation.html", view_func=quotation_page, methods=['get', 'post'])
+"""新闻页面"""
+teacher_blueprint.add_url_rule(rule="/news.html", view_func=news_func, methods=['get', 'post'])
 """交易管理"""
 teacher_blueprint.add_url_rule(rule="/process_case.html", view_func=process_case_page, methods=['get', 'post'])
 

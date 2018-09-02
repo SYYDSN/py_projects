@@ -6,10 +6,14 @@ if __project_path not in sys.path:
     sys.path.append(__project_path)
 import mongo_db
 import datetime
+import random
+import hashlib
 from module.pickle_data import *
+from werkzeug.contrib.cache import SimpleCache
 
 
 ObjectId = mongo_db.ObjectId
+simple_cache = SimpleCache()
 
 
 """
@@ -25,6 +29,9 @@ class Teacher(mongo_db.BaseDoc):
     两个类属性的字段相同即可.
     Webchat_Server项目项目下的teacher_module函数更丰富一些。
     你会在2个项目下分别看到这两个模块。
+    2018-9-2 新增老师
+    为了便于统计成绩和管理,原来的老师会慢慢的停止使用,使用新的一批老师账户来操作.中间会有过度期.2套账户都可以使用
+    新的账户体系.
     """
     _table_name = "teacher"
     type_dict = dict()
@@ -63,7 +70,68 @@ class Teacher(mongo_db.BaseDoc):
         if "native" not in kwargs:
             ms = "native必须"
             raise ValueError(ms)
+        if "head_img" not in kwargs:
+            kwargs['head_img'] = cls.pop_head_image()
+        if "win_ratio" not in kwargs:
+            kwargs['win_ratio'] = 0
+        if "win_count" not in kwargs:
+            kwargs['win_count'] = 0
+        if "case_count" not in kwargs:
+            kwargs['case_count'] = 0
+        if "profit_ratio" not in kwargs:
+            kwargs['profit_ratio'] = 0
+        if "profit_amount" not in kwargs:
+            kwargs['profit_amount'] = 0
+        if "deposit" not in kwargs:
+            kwargs['deposit'] = 0
+        if "deposit_amount" not in kwargs:
+            kwargs['deposit_amount'] = 0
+        if "lots_range" not in kwargs:
+            kwargs['lots_range'] = cls.generator_lots_range()
         return cls(**kwargs)
+
+    @classmethod
+    def init_head_image_list(cls) -> list:
+        """
+        初始化头像列表
+        :return:
+        """
+        d = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        p = os.path.join(d, "static", 'images', 'head_image')
+        ns = os.listdir(p)
+        res = list()
+        for name in ns:
+            u = os.path.join("/static/images/head_image", name)
+            res.append(u)
+        key = "t_head_img"
+        simple_cache.set(key=key, value=res, timeout=900)
+        return res
+
+    @classmethod
+    def pop_head_image(cls) -> str:
+        """
+        尽量不重复的生成老师的头像,如果头像资源用尽,那就重头来.
+        :return:
+        """
+        key = "t_head_img"
+        m = simple_cache.get(key)
+        if m is None or len(m) == 0:
+            m = cls.init_head_image_list()
+        else:
+            pass
+        url = m.pop(random.randint(0, len(m) - 1))
+        simple_cache.set(key=key, value=m, timeout=900)
+        return url
+
+    @classmethod
+    def generator_lots_range(cls) -> list:
+        """
+        虚拟一个手数范围
+        :return:
+        """
+        begin = random.choice([1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3])
+        step = random.choice([2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 7, 7])
+        return [begin, begin + step]
 
     @classmethod
     def rebuild(cls) -> None:
@@ -204,9 +272,62 @@ class Teacher(mongo_db.BaseDoc):
             else:
                 return res[0]
 
+    @classmethod
+    def import_info(cls):
+        """
+        导入老师信息,这是个很少使用的函数,每次使用前,请仔细阅读代码.进行
+        相应的修改之后再运行.
+        1. 导入的老师都是真实老师,
+        2. 虚拟虚拟老师.以1:4的比例自动生成,
+        3. 真实老师和虚拟老师都可以修改资料. 但虚拟老师不能登录.
+        :return:
+        """
+        r_t = ['北仑', '乐天', '秦观', '宗晨', '宇向']  # 真实老师
+        v_t = [                               # 虚拟老师
+            '豪何', '誉杰', '东晖', '铭远',
+            '俊彦', '扬波', '宜修', '凯风',
+            '孟林', '子中', '一鸣', '连彬',
+            '越林', '自宾', '成其'
+        ]
+        n = 0
+        s = 'xd123457'  # 密码
+        pw = hashlib.md5(s.encode()).hexdigest()
+        for name in r_t:
+            _id = ObjectId()
+            from_id = _id
+            n += 1
+            t = {
+                "_id": _id, "name": name, "native": True, "from_id": from_id,
+                "phone": str(n).zfill(4), "password": pw
+            }
+            n += 1
+            t1 = {
+                "name": "{}".format(v_t.pop()), "native": False,
+                "from_id": from_id, "direction": "follow",
+                "phone": str(n).zfill(4), "password": pw
+            }
+            n += 1
+            t2 = {
+                "name": "{}".format(v_t.pop()), "native": False,
+                "from_id": from_id, "direction": "reverse",
+                "phone": str(n).zfill(4), "password": pw
+            }
+            n += 1
+            t3 = {
+                "name": "{}".format(v_t.pop()), "native": False,
+                "from_id": from_id, "direction": "random",
+                "phone": str(n).zfill(4), "password": pw
+            }
+            cls.instance(**t1).save_plus()
+            cls.instance(**t2).save_plus()
+            cls.instance(**t3).save_plus()
+            cls.instance(**t).save_plus()
+
+
 
 if __name__ == "__main__":
     """查询单个老师的持仓记录"""
-    cc = Teacher.get_hold(t_id="5b65f2d9dbea625d78469f23")
-    print(cc)
+    # cc = Teacher.get_hold(t_id="5b65f2d9dbea625d78469f23")
+    # print(cc)
+    Teacher.import_info()
     pass

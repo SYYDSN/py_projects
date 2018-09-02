@@ -13,8 +13,8 @@ $(function(){
     $("#btn_login").click(function(){
         var phone = $.trim($("#phone").val());
         var password = $.trim($("#password").val());
-        if(!validate_phone(phone)){
-            $.alert("手机号码错误", function(){$("#phone").addClass("warning")});
+        if(phone.length < 4){
+            $.alert("账户错误", function(){$("#phone").addClass("warning")});
         }
         else if(password == ""){
             $.alert("密码不能为空", function(){$("#password").addClass("warning")});

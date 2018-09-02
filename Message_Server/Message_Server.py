@@ -95,10 +95,15 @@ def listen_func(key):
     elif key == "virtual_trade":
         """虚拟喊单延迟信号"""
         trade = get_args(req=request)
+        print("原始trade: {}".format(trade))
+        native = False
         if "native" in trade:
-            trade['native'] = True if trade['native'] == "True" else False
+            native = True if trade['native'] == "True" else False
+        trade['native'] = native
         trade = Trade(**trade)
-        res = delay_virtual_trade(trade.get_dict())
+        trade = trade.get_dict()
+        # res = delay_virtual_trade(trade)
+        res = process_case(trade, native)
         print(res)
     else:
         mes['message'] = '错误的path'
