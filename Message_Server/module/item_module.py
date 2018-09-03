@@ -983,7 +983,7 @@ class Signal(mongo_db.BaseDoc):
                     print(r)
                     """记录原始信号并生成虚拟信号"""
                     try:
-                        Trade.sync_from_signal(signal=r)
+                        # Trade.sync_from_signal(signal=r)  # 2018-9-4 停止同步
                         pass
                     except Exception as e:
                         print(e)

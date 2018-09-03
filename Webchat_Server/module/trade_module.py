@@ -178,6 +178,9 @@ def _generator_signal(raw_signal: dict) -> dict:
     2. 离场 计算胜率,盈利率,保存等
     """
     calculate_trade(res)
+    """发送钉订消息"""
+    d_res = send_tips_to_dingding(mes_dict)
+    print("钉订消息发送结果:{}".format(d_res))
     """发送模板消息阶段"""
     send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
     return res
@@ -517,14 +520,16 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
         else:
             """离场"""
             f["change"] = {"$ne": "raw"}
-            f['exit_price'] = {"$in": [None, 0.0, 0]}
+            f['exit_price'] = {"$in": [None, 0.0, 0]}  # 经常不明原因的找不到信号.暂时无法判定是不是问题?
             r = Trade.find_plus(filter_dict=f, to_dict=True)
             if len(r) == 0:
                 ms = "虚拟信号离场时,,trade查找失败,:{}".format(f)
                 logger.exception(ms)
-                send_mail(title="trade查找失败{}".format(now), content=ms)
+                # send_mail(title="trade查找失败{}".format(now), content=ms)
                 temp = None
             else:
+                ms = "虚拟信号离场时,,trade查找成功,数量{}个,:{}".format(f, len(r))
+                logger.exception(ms)
                 for temp in r:
                     temp['case_type'] = case_type
                     if isinstance(exit_reason, str) and len(exit_reason) > 1:
@@ -540,6 +545,49 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
     """接受原始喊单和虚拟立即保存数据并发送模板信息"""
     _generator_signal(raw_signal=doc_dict)
     return True
+
+
+def send_tips_to_dingding(info: dict) -> bool:
+    """
+    使用钉订机器人发送消息
+    :param info:
+    :return:
+    """
+    if info.get("native"):
+        """只发送真实的喊单信号"""
+        auth = info.get("teacher_name")
+        direction = info.get("direction")
+        product = info.get("product")
+        the_type = "建仓提醒" if info.get("case_type") == "enter" else "平仓提醒"
+        if the_type == "建仓提醒":
+            enter_price = info.get("enter_price")
+            enter_time = info.get("enter_time").strftime("%m月%d日 %H:%M:%S")
+            text = "#### {}\n > {}老师{}{} \n\r >建仓价格：{} \n\r > {}".format(the_type, auth, direction, product,
+                                                                         enter_price, enter_time)
+        else:
+            # the_type == "平仓提醒"
+            each_profit = info.get("each_profit")
+            enter_price = info.get("enter_price")
+            exit_price = info.get("exit_price")
+            exit_time = info.get("exit_time").strftime("%m月%d日 %H:%M:%S")
+            text = "#### {}\n > {}老师平仓{}方向{}订单 \n\r > 建仓：{} <br> \n\r > 平仓：{} <br> \n\r > 每手实际盈利 {} \n\r > <br> {}".format(
+                the_type, auth, direction,
+                info.get("product", ""), enter_price, exit_price,
+                each_profit,
+                exit_time)
+
+        out_put = dict()
+        markdown = dict()
+        markdown['title'] = the_type
+        markdown['text'] = text
+        out_put['markdown'] = markdown
+        out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+
+        """发送消息到钉钉群"""
+        res = send_signal(out_put, token_name="策略助手 小迅")
+        return res
+    else:
+        pass
 
 
 class RawSignal(mongo_db.BaseDoc):
