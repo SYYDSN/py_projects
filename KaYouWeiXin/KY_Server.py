@@ -210,9 +210,9 @@ def message_func():
         if resp == b'':
             return "success"  # 规定的返回字符串
         else:
+            print(resp)
             resp = make_response(resp)
             resp.headers["Content-Type"] = "text/xml; charset=utf-8"
-            print(resp)
             return resp
     else:
         return abort(405)

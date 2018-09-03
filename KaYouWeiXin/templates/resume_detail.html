@@ -213,8 +213,8 @@
                             <li><span class="color_two">居住地：</span><span class="color_one title_mag">{{ resume.living_place if resume.living_place else "未填写"}}</span></li>
                             <li class="id_num">
                                 <span>身份证：</span>
-                                <span>正面：<img class="id_num_one pop_img" src="{{ resume.id_image_face_url + '&size=80*60' }}" alt=""></span>
-                                <span>反面：<img class="id_num_two pop_img" src="{{ resume.id_image_back_url + '&size=80*60' }}" alt=""></span>
+                                <span>正面：<img class="id_num_one pop_img" src="{{ (resume.id_image_face_url + '&size=80*60') if resume.id_image_face_url else '/static/images/zhengmian.png' }}" alt=""></span>
+                                <span>反面：<img class="id_num_two pop_img" src="{{ (resume.id_image_back_url + '&size=80*60') if resume.id_image_back_url else '/static/images/fanmian.png' }}" alt=""></span>
                                 <a href="/wx/html/update_id.html"><button class="btn btn-primary pull-right">{{ '编辑' if resume.id_image_face_url or resume.id_image_back_url else '上传' }}</button></a>
                             </li>
                          </ul>

@@ -7,6 +7,7 @@ from views.teacher_views import teacher_blueprint
 from flask import request
 from flask import session
 from flask_session import Session
+from flask import make_response
 from flask import redirect
 import json
 import datetime
@@ -16,7 +17,11 @@ import requests
 import xmltodict
 from celery_module import send_template_message
 from module.item_module import RawWebChatMessage
+from module.item_module import WebChatMessage
 from module.item_module import WXUser
+from module.item_module import EventHandler
+from module.trade_module import Trade
+from module.trade_module import process_case
 from tools_module import *
 from mongo_db import cache
 
@@ -146,31 +151,48 @@ def message_func():
         else:
             return abort(403)
     elif request.method.lower() == "post":
-        """微信服务器推送的消息"""
-        """
-        微信服务器推送的消息的放在xml,同时args里面也有参数
-        xml的内容取出后是一个有序字典:
-        OrderedDict([('xml',
-          OrderedDict([('ToUserName', 'gh_134657758ddf'),
-                       ('FromUserName', 'oBBcR1T5r6FCqOo2WNxMqPUqvK_I'),
-                       ('CreateTime', '1532479965'),
-                       ('MsgType', 'event'),
-                       ('Event', 'SCAN'),
-                       ('EventKey', '123'),
-                       ('Ticket',
-                        'gQHB8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAybmhTSjBKNG5jaGwxMDAwMHcwM0wAAgQYwlZbAwQAAAAA')]))])
-
-        """
-        xml_data = request.data.decode(encoding="utf-8")
-        return "success"  # 规定的返回字符串
+        """微信服务器推送的消息,为新服务器推送来的都是xml消息"""
+        info = WebChatMessage.instance_from_request(request)
+        resp = EventHandler.listen(info=info)
+        if resp == b'':
+            return "success"  # 规定的返回字符串
+        else:
+            resp = make_response(resp)
+            resp.headers["Content-Type"] = "text/xml; charset=utf-8"
+            print(resp)
+            return resp
     else:
         return abort(405)
+
+
+@app.route("/listen_<key>", methods=['post'])
+def listen_func(key):
+    """监听
+    1. 虚拟喊单延迟信号
+    发送过来的消息"""
+    mes = {"message": "success"}
+    if key == "virtual_trade":
+        """虚拟喊单延迟信号"""
+        trade = get_args(req=request)
+        print("原始trade: {}".format(trade))
+        native = False
+        if "native" in trade:
+            native = True if trade['native'] == "True" else False
+        trade['native'] = native
+        trade = Trade(**trade)
+        trade = trade.get_dict()
+        res = process_case(trade, native)
+        print(res)
+    else:
+        mes['message'] = '错误的path'
+    return json.dumps(mes)
 
 
 @app.route("/template_message", methods=['post', 'get'])
 def template_message_func():
     """
     向微信用户发送模板消息.
+    2018-9-3 弃用,使用内部函数替代.原有的Message_Server中的模块已合并到本模块
     :return:
     """
     mes = {"message": "success"}
@@ -182,6 +204,7 @@ def template_message_func():
     else:
         mes_type = args.pop("mes_type", "")
         send_template_message.delay(mes_type=mes_type, mes_dict=args)
+        print("template_message's return is {}".format(mes))
         return json.dumps(mes)
 
 

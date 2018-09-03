@@ -21,6 +21,35 @@ simple_cache = SimpleCache()
 """
 
 
+class Deposit(mongo_db.BaseDoc):
+    """
+    入金/存款(记录),当老师做单的时候,如果资金不足,就会激发入金行为
+    """
+    _table_name = "deposit"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['t_id'] = ObjectId  # 老师id
+    type_dict['num'] = float  # 入金金额.
+    type_dict['time'] = datetime.datetime
+
+    @classmethod
+    def generator_deposit(cls, min_money: float) -> float:
+        """
+        生成一个加金的数字
+        :param min_money: 最低额度.加金金额必须大于此额度.
+        :return: 实际的加金额度.
+        """
+        l = [10000,  15000, 20000, 30000, 50000, 100000]
+        r = 0
+        for x in l:
+            if min_money * 2 <= x:
+                r = x
+                break
+            else:
+                pass
+        return r
+
+
 class Teacher(mongo_db.BaseDoc):
     """
     老师,微信项目（Webchat_Server）有一个同名的类，不同的是：
@@ -219,7 +248,8 @@ class Teacher(mongo_db.BaseDoc):
         :return:
         """
         """默认查询近30天的胜率数据"""
-        data = cls.find_plus(filter_dict=dict(), to_dict=True)
+        f = {"create_date": {"$gt": mongo_db.get_datetime_from_str("2018-9-3 0:0:0")}}
+        data = cls.find_plus(filter_dict=f, to_dict=True)
         data = {x["_id"]: x for x in data}
         """查询老师的跟随人数"""
         d = cls.follow_count()
@@ -273,10 +303,39 @@ class Teacher(mongo_db.BaseDoc):
                 return res[0]
 
     @classmethod
+    def direction_map(cls, include_raw: bool = True) -> dict:
+        """
+        获取以方向为key,老师的doc的list为val的字典.
+        用于在生成虚拟信号的时候提供随机特性
+        : param include_raw: 是否包含原生的方向.
+        :return:
+        """
+        f = {"create_date": {"$gt": mongo_db.get_datetime_from_str("2018-9-3 0:0:0")}}
+        ts = Teacher.find_plus(filter_dict=f, to_dict=True)
+        t_dict = dict()  # 方向和老师的字典
+        for t in ts:
+            d = t.get("direction")
+            if include_raw:
+                if d is not None:
+                    if d in t_dict:
+                        t_dict[d].append(t)
+                    else:
+                        t_dict[d] = [t]
+            else:
+                if d is not None and d != "raw":
+                    if d in t_dict:
+                        t_dict[d].append(t)
+                    else:
+                        t_dict[d] = [t]
+        return t_dict
+
+    @classmethod
     def import_info(cls):
         """
         导入老师信息,这是个很少使用的函数,每次使用前,请仔细阅读代码.进行
         相应的修改之后再运行.
+        0001/北仑, 0005/乐天, 0009/秦观, 0013/宗晨, 0017/宇向
+        密码:xd123457
         1. 导入的老师都是真实老师,
         2. 虚拟虚拟老师.以1:4的比例自动生成,
         3. 真实老师和虚拟老师都可以修改资料. 但虚拟老师不能登录.
@@ -322,7 +381,6 @@ class Teacher(mongo_db.BaseDoc):
             cls.instance(**t2).save_plus()
             cls.instance(**t3).save_plus()
             cls.instance(**t).save_plus()
-
 
 
 if __name__ == "__main__":

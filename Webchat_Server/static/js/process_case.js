@@ -60,15 +60,19 @@ $(function(){
         show_price(prices);
     });
 
+    var price_dict = {};   // 价格容器
     function show_price (price_list){
         $(".now").text(price_list[0]['platform_time']);  // 当前时间
         // 显示报价
         var set_code = $(".price_zone > .product_name").attr("data-id").toLowerCase();
         for(var price of price_list){
             var temp_code = price['code'];
+            var product = price['product'];
             var buy_price = price['buy'];  // 买价
             var sell_price = price['sell']; // 卖价
-            var temp_code =  temp_code.toLowerCase();
+            var time = price['platform_time'];
+            price_dict[product] = {"buy": buy_price, "sell": sell_price, "time": time};  // 价格容器更新
+            temp_code =  temp_code.toLowerCase();
             if(set_code == temp_code)
             {
                 $(".price_zone > .buy_price").text(buy_price);
@@ -137,23 +141,28 @@ $(function(){
         var direction = $.trim($obj.attr("data-d"));
         var type = direction=="买入"? "多单": "空单";
         var product = $.trim($obj.attr("data-n"));
-
-        $.confirm(`对此${product}${type}进行平仓操作, 你确定吗?`, "平仓操作", function(){
-            var args = {
-                "_id": _id,
-                "direction": direction,
-                "product": product
-            };
-            $.post("/teacher/process_case.html", args, function(resp){
-                var resp = JSON.parse(resp);
-                var status = resp['message'];
-                if(status == "success"){
-                    $.alert("平仓成功！", function(){
-                        location.href = "/teacher/process_case.html";
-                    });
-                }
+        var obj = price_dict[product];
+        if(obj){
+            var price = direction=='买入'?obj['sell']: obj['buy'];
+            $.confirm(`对此${product}${type}进行平仓操作, 你确定吗?`, "平仓操作", function(){
+                var args = {
+                    "_id": _id,
+                    "direction": direction,
+                    "exit_time": obj['time'],
+                    "exit_price": price,
+                    "product": product
+                };
+                $.post("/teacher/process_case.html", args, function(resp){
+                    var resp = JSON.parse(resp);
+                    var status = resp['message'];
+                    if(status == "success"){
+                        $.alert("平仓成功！", function(){
+                            location.href = "/teacher/process_case.html";
+                        });
+                    }
+                });
             });
-        });
+        }else{}
     };
 
     // 平仓按钮事件

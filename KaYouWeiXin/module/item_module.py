@@ -48,11 +48,40 @@ class XMLMessage:
         self.xml = xml
 
     def add_text(self, content: str = ""):
+        """添加文本消息"""
         xml = self.xml
         xml['MsgType'] = 'text'
         xml['Content'] = content
         return xml
 
+    def add_news(self, item_list: list = None):
+        """
+        添加图文消息
+        :param item_list: 图文对象的字典的数组.第一个图文对象是大图.图文对象的格式如下:
+        item = {
+                    "Title": "标题",
+                    "Description": "文本描述",
+                    "PicUrl": "图片素材的地址,支持JPG、PNG格式，较好的效果为大图360*200，小图200*200",
+                    "Url": "点击图文消息跳转链接"
+                }
+        :return:
+        """
+        xml = self.xml
+        xml['MsgType'] = 'news'
+        xml['ArticleCount'] = len(item_list)
+        r = list()
+        if item_list is None:
+            xml['ArticleCount'] = 0
+        else:
+            for x in item_list:
+                temp = OrderedDict()
+                temp['Title'] = x['title']
+                temp['Description'] = x['desc']
+                temp['PicUrl'] = x['img_url']
+                temp['Url'] = x['url']
+                r.append(temp)
+        xml['Articles'] = r
+        return xml
 
     @classmethod
     def produce(cls, to_user: str, msg_type: str, data: object, to_xml: bool = True) -> (str, dict):
@@ -70,8 +99,10 @@ class XMLMessage:
             res = obj.__getattribute__(func_name)(data)
             r = OrderedDict()
             r['xml'] = res
+
             if to_xml:
-                return dicttoxml.dicttoxml(obj=r, root=False, attr_type=False, cdata=True)
+                r = dicttoxml.dicttoxml(obj=r, root=False, attr_type=False, cdata=True)
+                return r
             else:
                 return r
         else:
@@ -158,6 +189,30 @@ class EventHandler:
                     f = {"openid": openid}
                     u = {"$set": {"subscribe": 1}}
                     WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+                    data = [
+                        {
+                            "title": "卡佑欢迎你",
+                            "img_url": "http://mmbiz.qpic.cn/mmbiz_jpg/KCRpHfdSvS4f5tNDutYeOQGm727dzQyWps0zM6WuRHm"
+                                       "LrvwsxibtvxcZEAtToiaUEibHgRaj28o8PAp7edhUcKMNw/0?wx_fmt=jpeg",
+                            "desc": "大企业，工作有保障，专业平台 合法营运 收入稳定 合作共赢 福利保障 五险一金 安全保障 专人服务",
+                            "url": "http://temp.safego.org/wx/html/about.html"
+                        },
+                        {
+                            "title": "欢迎老司机加入, 点此填写简历",
+                            "img_url": "http://mmbiz.qpic.cn/mmbiz_jpg/KCRpHfdSvS4f5tNDutYeOQGm727dzQyWS62gcmK44lRRoJ"
+                                       "dv9SkicUl2HZJKictiaV7tdWCUZYMkDcr9pFJAC02vA/0?wx_fmt=jpeg",
+                            "desc": "收入稳定, 福利齐全, 欢迎老司机加入, 点此填写简历",
+                            "url": "http://temp.safego.org/wx/html/register.html"
+                        }
+                    ]
+                    data = [{
+                            "title": "卡佑欢迎你",
+                            "img_url": "http://mmbiz.qpic.cn/mmbiz_jpg/KCRpHfdSvS4f5tNDutYeOQGm727dzQyWps0zM6WuRHm"
+                                       "LrvwsxibtvxcZEAtToiaUEibHgRaj28o8PAp7edhUcKMNw/0?wx_fmt=jpeg",
+                            "desc": "大企业，工作有保障，专业平台 合法营运 收入稳定 合作共赢 福利保障 五险一金 安全保障 专人服务",
+                            "url": "http://temp.safego.org/wx/html/register.html"
+                        }]
+                    res = XMLMessage.produce(to_user=openid, msg_type="news", data=data)
                 elif event == "unsubscribe":
                     """取消关注"""
                     ms = "用户: {} 取消关注".format(openid)
@@ -253,8 +308,6 @@ class EventHandler:
         :param openid:
         :return:
         """
-
-
 
 
 class RawWebChatMessage(mongo_db.BaseDoc):
@@ -872,24 +925,42 @@ if __name__ == "__main__":
     """按月查询,分页显示中介下面的关联的用户资源"""
     # WXUser.page_resource(u_id=ObjectId("5b56c0f87b3128ec21daa693"))
     """测试监听"""
-    d = {
-        'url': 'http://temp.safego.org/message?signature=7adcd3a3f9073c4b0eca36a4d36a4eb342418198&times'
-                'tamp=1535621448&nonce=873970012&openid=oBBcR1T5r6FCqOo2WNxMqPUqvK_I',
-        'json': None,
-        'xml': OrderedDict([('ToUserName', 'gh_134657758ddf'), ('FromUserName', 'oBBcR1T5r6FCqOo2WNxMqPUqvK_I'),
-                            ('CreateTime', '1535621447'), ('MsgType', 'text'), ('Content', '感觉'),
-                            ('MsgId', '6595443894336331761'),
-                            ('create_time', datetime.datetime(2018, 8, 30, 17, 30, 47))]),
-        'args': {'timestamp': '1535621448', 'signature': '7adcd3a3f9073c4b0eca36a4d36a4eb342418198',
-                 'nonce': '873970012', 'openid': 'oBBcR1T5r6FCqOo2WNxMqPUqvK_I'},
-        'method': 'post',
-        'headers': {'X-Forwarded-For': '140.207.54.80', 'Content-Length': '279',
-                    'Content-Type': 'text/xml', 'Host': 'temp.safego.org',
-                    'Accept': '*/*', 'Pragma': 'no-cache', 'Connection': 'close',
-                    'X-Real-Ip': '140.207.54.80', 'User-Agent': 'Mozilla/4.0'},
-        'ip': '140.207.54.80',
-        'time': datetime.datetime(2018, 8, 30, 17, 30, 53, 335271),
-        'form': {}
-    }
-    print(EventHandler.listen(info=d))
+    # d = {
+    #     'url': 'http://temp.safego.org/message?signature=7adcd3a3f9073c4b0eca36a4d36a4eb342418198&times'
+    #             'tamp=1535621448&nonce=873970012&openid=oBBcR1T5r6FCqOo2WNxMqPUqvK_I',
+    #     'json': None,
+    #     'xml': OrderedDict([('ToUserName', 'gh_134657758ddf'), ('FromUserName', 'oBBcR1T5r6FCqOo2WNxMqPUqvK_I'),
+    #                         ('CreateTime', '1535621447'), ('MsgType', 'text'), ('Content', '感觉'),
+    #                         ('MsgId', '6595443894336331761'),
+    #                         ('create_time', datetime.datetime(2018, 8, 30, 17, 30, 47))]),
+    #     'args': {'timestamp': '1535621448', 'signature': '7adcd3a3f9073c4b0eca36a4d36a4eb342418198',
+    #              'nonce': '873970012', 'openid': 'oBBcR1T5r6FCqOo2WNxMqPUqvK_I'},
+    #     'method': 'post',
+    #     'headers': {'X-Forwarded-For': '140.207.54.80', 'Content-Length': '279',
+    #                 'Content-Type': 'text/xml', 'Host': 'temp.safego.org',
+    #                 'Accept': '*/*', 'Pragma': 'no-cache', 'Connection': 'close',
+    #                 'X-Real-Ip': '140.207.54.80', 'User-Agent': 'Mozilla/4.0'},
+    #     'ip': '140.207.54.80',
+    #     'time': datetime.datetime(2018, 8, 30, 17, 30, 53, 335271),
+    #     'form': {}
+    # }
+    # print(EventHandler.listen(info=d))
+    """测试图文消息"""
+    dd = [
+        {
+            "title": "卡佑欢迎你",
+            "img_url": "http://mmbiz.qpic.cn/mmbiz_jpg/KCRpHfdSvS4f5tNDutYeOQGm727dzQyWps0zM6WuRHm"
+                       "LrvwsxibtvxcZEAtToiaUEibHgRaj28o8PAp7edhUcKMNw/0?wx_fmt=jpeg",
+            "desc": "大企业，工作有保障，专业平台 合法营运 收入稳定 合作共赢 福利保障 五险一金 安全保障 专人服务",
+            "url": "http://temp.safego.org/wx/html/about.html"
+        },
+        {
+            "title": "欢迎老司机加入, 点此填写简历",
+            "img_url": "http://mmbiz.qpic.cn/mmbiz_jpg/KCRpHfdSvS4f5tNDutYeOQGm727dzQyWS62gcmK44lRRoJ"
+                       "dv9SkicUl2HZJKictiaV7tdWCUZYMkDcr9pFJAC02vA/0?wx_fmt=jpeg",
+            "desc": "收入稳定, 福利齐全, 欢迎老司机加入, 点此填写简历",
+            "url": "http://temp.safego.org/wx/html/register.html"
+        }
+    ]
+    XMLMessage.produce(to_user="aaa", msg_type="news", data=dd)
     pass

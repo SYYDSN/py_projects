@@ -14,6 +14,7 @@ import requests
 from hashlib import md5
 from uuid import uuid4
 from tools_module import *
+from module.trade_module import process_case
 from module.teacher_module import *
 import mongo_db
 
@@ -28,37 +29,6 @@ teacher_blueprint = Blueprint("teacher_blueprint", __name__, url_prefix="/teache
 def version():
     """生成一个随机的版本号"""
     return uuid4().hex
-
-
-def post_trade(info: dict) -> True:
-    """
-    发送微信喊单信号给Message_Server,这是一个临时的解决方案.
-    将来可能要把处理喊单信号的模块整合进本项目  2018-8-28
-    :param info:
-    :return:
-    """
-    u = "http://127.0.0.1:8000/listen_virtual_trade"
-    u = "http://wx.yataitouzigl.com/listen_virtual_trade"
-    r = requests.post(u, data=info)
-    status = r.status_code
-    res = True
-    if status == 200:
-        resp = r.json()
-        mes = resp['message']
-        if mes == "success":
-            print("ok")
-        else:
-            ms = "Message_Server的listen_virtual_trade接口返回了错误的信息:{}".format(resp)
-            logger.exception(ms)
-            print(ms)
-            res = False
-    else:
-
-        ms = "Message_Server的listen_virtual_trade接口返回了错误的响应码:{}".format(status)
-        logger.exception(ms)
-        print(ms)
-        res = False
-    return res
 
 
 def login() -> str:
@@ -132,6 +102,31 @@ def process_case_page(teacher: dict = None):
         args = get_args(request)
         args['teacher_id'] = teacher['_id']
         args['teacher_name'] = teacher['name']
+        args['version'] = "1.0"
+        if "enter_time" in args:
+            args['enter_time'] = mongo_db.get_datetime_from_str(args['enter_time'])
+        if "exit_time" in args:
+            args['exit_time'] = mongo_db.get_datetime_from_str(args['exit_time'])
+        enter_price = args.pop("enter_price", None)
+        try:
+            enter_price = float(enter_price)
+        except Exception as e:
+            print(e)
+        finally:
+            if isinstance(enter_price, float):
+                args['enter_price'] = float(enter_price)
+            else:
+                pass
+        exit_price = args.pop("exit_price", None)
+        try:
+            exit_price = float(exit_price)
+        except Exception as e:
+            print(e)
+        finally:
+            if isinstance(exit_price, float):
+                args['exit_price'] = float(exit_price)
+            else:
+                pass
         if teacher['native']:
             """真实老师"""
             args['change'] = "raw"
@@ -148,8 +143,9 @@ def process_case_page(teacher: dict = None):
             if obj is None:
                 return json.dumps({"message": "订单不存在"})
             else:
-                args.update(obj)
                 args['case_type'] = "exit"
+                obj.update(args)
+                args = obj
         else:
             """这是进场"""
             args['_id'] = ObjectId()
@@ -158,7 +154,7 @@ def process_case_page(teacher: dict = None):
             args['lots'] = 1
             args['native_direction'] = args['direction']
             args['record_id'] = args['_id']
-        if post_trade(args):
+        if process_case(doc_dict=args, raw=True):
             mes = {"message": "success"}
         else:
             mes = {"message": "操作失败"}

@@ -6,15 +6,224 @@ if __project_path not in sys.path:
     sys.path.append(__project_path)
 import mongo_db
 import datetime
+import json
 from log_module import get_logger
 from uuid import uuid4
+from mail_module import send_mail
+from collections import OrderedDict
 from werkzeug.contrib.cache import SimpleCache
 from module.pickle_data import calculate_win_per_by_teacher_mix
+import dicttoxml
+import xmltodict
+from xml.parsers.expat import ExpatError
 
 
 ObjectId = mongo_db.ObjectId
 logger = get_logger()
 simple_cache = SimpleCache()
+
+
+my_id = "huiyingZN"  # 汇赢智能公众号id
+
+
+class XMLMessage:
+    """
+    一个生消息xml的类
+    """
+    type_map = {
+        "news": "Articles",    # 图文消息
+        "music": "Music",      # 音乐消息
+        "video": "Video",      # 视频消息
+        "voice": "Voice",      # 语音消息
+        "image": "Image",      # 图片消息
+        "text": "Content"      # 文本消息
+    }
+
+    def __init__(self, to_user: str):
+        """
+        :param to_user: 目标用户的openid
+        :param mes_type: 消息类型
+        """
+        xml = OrderedDict()
+        xml['ToUserName'] = to_user
+        xml['FromUserName'] = my_id
+        xml['CreateTime'] = int(datetime.datetime.now().timestamp())
+        self.xml = xml
+
+    def add_text(self, content: str = ""):
+        xml = self.xml
+        xml['MsgType'] = 'text'
+        xml['Content'] = content
+        return xml
+
+    @classmethod
+    def produce(cls, to_user: str, msg_type: str, data: object, to_xml: bool = True) -> (str, dict):
+        """
+        生成一个用于回复的xml消息
+        :param to_user: 用户的openid
+        :param msg_type: 消息类型,仅限于type_map.keys()中的类型.
+        :param data:  数据,不同类型的消息,格式要求不同.详见具体的底层函数
+        :param to_xml: 是否转换为xml格式?, 否则返回的是以xml为根节点的OrderedDict
+        :return:
+        """
+        func_name = "add_{}".format(msg_type)
+        obj = cls(to_user=to_user)
+        if hasattr(obj, func_name):
+            res = obj.__getattribute__(func_name)(data)
+            r = OrderedDict()
+            r['xml'] = res
+            if to_xml:
+                return dicttoxml.dicttoxml(obj=r, root=False, attr_type=False, cdata=True)
+            else:
+                return r
+        else:
+            ms = "错误的消息类型: {}".format(msg_type)
+            raise ValueError(ms)
+
+
+class EventHandler:
+    """
+    当微信服务器推送(事件/文本/图片/扫码)信息到服务器,请调用此函数进行回复
+    """
+    @classmethod
+    def listen(cls, info: dict) -> bytes:
+        """
+        监听微信推送的事件消息(比如关注公众号, 扫码等).
+        检查info字典中的消息类型,如果有对应的处理函数就进行相应的处理
+        下面是一些xml信息的示范
+        1. 取消关注
+        {
+            "ToUserName" : "gh_134657758ddf",
+            "FromUserName" : "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
+            "CreateTime" : "1535603763",
+            "MsgType" : "event",
+            "Event" : "unsubscribe",
+            "EventKey" : null,
+            "create_time" : ISODate("2018-08-30T12:36:03.000Z")
+        }
+        2. 关注公众号
+        {
+            "ToUserName" : "gh_134657758ddf",
+            "FromUserName" : "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
+            "CreateTime" : "1535603863",
+            "MsgType" : "event",
+            "Event" : "subscribe",
+            "EventKey" : null,
+            "create_time" : ISODate("2018-08-30T12:37:43.000Z")
+        }
+        3. 扫描委托求职二维码
+        {
+            "ToUserName" : "gh_134657758ddf",
+            "FromUserName" : "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
+            "CreateTime" : "1535603967",
+            "MsgType" : "event",
+            "Event" : "SCAN",
+            "EventKey" : "relate_5b56c0f87b3128ec21daa693",
+            "Ticket" : "gQEd8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyZWhPaDBTNG5jaGwxMDAwMGcwN2IAAgRq22tbAwQAAAAA",
+            "create_time" : ISODate("2018-08-30T12:39:27.000Z")
+        }
+        4. 用户公众号发文本消息
+        {
+            "ToUserName" : "gh_134657758ddf",
+            "FromUserName" : "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
+            "CreateTime" : "1535604037",
+            "MsgType" : "text",
+            "Content" : "你好",
+            "MsgId" : "6595369118955706758",
+            "create_time" : ISODate("2018-08-30T12:40:37.000Z")
+        }
+        5. 用户公众号发图片
+        {
+            "ToUserName" : "gh_134657758ddf",
+            "FromUserName" : "oBBcR1T5r6FCqOo2WNxMqPUqvK_I",
+            "CreateTime" : "1535604081",
+            "MsgType" : "image",
+            "PicUrl" : "http://mmbiz.qpic.cn/mmbiz_jpg/tsJ9TEnc4GLT0fthC4Irho1XpSQiaiauVKLvS3V5tmdiaQJGmibYUFN8UMiaJF6m7r7MFYqHUK8iaqBynUL2TuvAaicLg/0",
+            "MsgId" : "6595369307934267784",
+            "MediaId" : "rcnvWQheiwfu3de7ThXV7ksvV_KK5FGKuiO1kNJ1_c4Zh3vQ59Qc4ottyvH1ozYM",
+            "create_time" : ISODate("2018-08-30T12:41:21.000Z")
+        }
+        :param info: 消息字典,就是WebChatMessage的实例的doc
+        :return:
+        """
+        res = b''
+        if "xml" in info:
+            now = datetime.datetime.now()
+            xml = info['xml']
+            msg_type = xml['MsgType'].lower()
+            openid = xml['FromUserName']
+            if msg_type == "event":
+                """事件"""
+                event = xml['Event'].lower()
+                if event == "subscribe":
+                    """关注公众号"""
+                    f = {"openid": openid}
+                    u = {"$set": {"subscribe": 1}}
+                    WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+                elif event == "unsubscribe":
+                    """取消关注"""
+                    ms = "用户: {} 取消关注".format(openid)
+                    logger.info(ms)
+                    print(ms)
+                    f = {"openid": openid}
+                    u = {"$set": {"subscribe": 0}}
+                    WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                elif event == "scan":
+                    """扫码"""
+                    event_key = xml['EventKey']  # 场景id
+                    print("event_key is {}".format(event_key))
+                elif event == "view":
+                    """点击菜单"""
+                else:
+                    title = "{} 未意料的事件消息:{}.{}".format(now, msg_type, event)
+                    content = "{}".format(str(info))
+                    send_mail(title=title, content=content)
+            elif msg_type == "text":
+                """文本消息"""
+                s = xml['Content']
+                print(" 你输入的内容是: '{}'".format(s))
+                if s == "喊单":
+                    """回复老师喊单登录的链接"""
+                    data = "芝麻开门. 分析师登录入口请戳<a href='http://wx.yataitouzigl.com/teacher/login.html'>此处</a>"
+                    res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
+            elif msg_type == "image":
+                """图片消息"""
+            else:
+                title = "{} 未意料的类型:{}".format(now, msg_type)
+                content = "{}".format(str(info))
+                send_mail(title=title, content=content)
+        else:
+            pass
+        return res
+
+    @classmethod
+    def welcome(cls, openid: str):
+        """
+        回复消息之欢迎信息,图文消息的示范:
+        <xml>
+            <ToUserName>< ![CDATA[toUser] ]></ToUserName>
+            <FromUserName>< ![CDATA[fromUser] ]></FromUserName>
+            <CreateTime>12345678</CreateTime>
+            <MsgType>< ![CDATA[news] ]></MsgType>
+            <ArticleCount>2</ArticleCount>
+            <Articles>                                                      # 文章列表
+                <item>
+                    <Title>< ![CDATA[title1] ]></Title>
+                    <Description>< ![CDATA[description1] ]></Description>
+                    <PicUrl>< ![CDATA[picurl] ]></PicUrl>
+                    <Url>< ![CDATA[url] ]></Url>
+                </item>
+                <item>
+                    <Title>< ![CDATA[title] ]></Title>
+                    <Description>< ![CDATA[description] ]></Description>
+                    <PicUrl>< ![CDATA[picurl] ]></PicUrl>
+                    <Url>< ![CDATA[url] ]></Url>
+                </item>
+            </Articles><
+        </xml>
+        :param openid:
+        :return:
+        """
 
 
 class RawWebChatMessage(mongo_db.BaseDoc):
@@ -24,6 +233,160 @@ class RawWebChatMessage(mongo_db.BaseDoc):
     _table_name = "raw_webchat_message"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+
+
+class WebChatMessage(mongo_db.BaseDoc):
+    """
+    微信的记录,和RawWebChatMessage不同,这个定义了字段类型
+    """
+    _table_name = "webchat_message"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['ip'] = str
+    type_dict['url'] = str
+    type_dict['method'] = str
+    type_dict['headers'] = dict
+    type_dict['args'] = dict
+    type_dict['form'] = dict
+    type_dict['xml'] = OrderedDict
+    type_dict['time'] = datetime.datetime
+
+    @classmethod
+    def instance_from_request(cls, request) -> dict:
+        """
+        从flask的request获取实例
+        :param request:
+        :return:
+        """
+        headers = {k: v for k, v in request.headers.items()}
+        args = {k: v for k, v in request.args.items()}
+        form = {k: v for k, v in request.form.items()}
+        json_data = None if request.json is None else {k: v for k, v in request.headers.items()}
+        try:
+            xml_data = request.data.decode(encoding="utf-8")
+        except Exception as e:
+            logger.exception(msg=e)
+            xml_data = ''
+        finally:
+            pass
+        try:
+            ip = request.headers["X-Forwarded-For"].split(":")[0]
+        except KeyError as e:
+            print(e)
+            ip = request.remote_addr  # 注意：tornado是 request.remote_ip   flask是 req.remote_addr
+        if ip.find(",") != -1:
+            """处理微信登录时转发的双ip"""
+            ip = ip.split(",")[0]
+        else:
+            pass
+        now = datetime.datetime.now()
+        data = {
+            "ip": ip,
+            "url": request.url,
+            "method": request.method.lower(),
+            "headers": headers,
+            "args": args,
+            "form": form,
+            "json": json_data,
+            "xml": xml_data,
+            "time": now
+        }
+        return cls.doc_from_raw(raw=data)
+
+    @classmethod
+    def docs_from_raw(cls, filter_dict: dict = None, multi: bool = False) ->(dict, list):
+        """
+        从RawWebChatMessage的表中,按照条件获取记录,并转换成WebChatMessage的doc,
+        主要的工作就是把xml字段从str转换为OrderedDict
+        :param filter_dict:
+        :param multi: 返回一个还是多个文档?
+        :return:
+        """
+        f = dict() if filter_dict is None else filter_dict
+        ses = mongo_db.get_conn(table_name="raw_webchat_message")
+        res = ses.find(filter=f, limit=(0 if multi else 1))
+        result = list()
+        for one in res:
+            xml_str = one.get("xml", "")
+            if xml_str == "":
+                pass
+            else:
+                error = None
+                try:
+                    xml = xmltodict.parse(xml_input=xml_str, encoding="utf-8")
+                except ExpatError as e:
+                    logger.exception(e)
+                    print(e)
+                    try:
+                        xml = json.loads(xml_str)
+                    except Exception as e2:
+                        logger.exception(e2)
+                        print(e2)
+                        error = e2
+                    finally:
+                        pass
+                finally:
+                    if error is None:
+                        print(xml)
+                        data = xml.get('xml')
+                        if data is None:
+                            pass
+                        else:
+                            if 'CreateTime' in data:
+                                create_time = datetime.datetime.fromtimestamp(float(data['CreateTime']))
+                                data['create_time'] = create_time
+                            else:
+                                pass
+                            xml = data
+                        one['xml'] = xml
+                    else:
+                        pass
+            result.append(one)
+        return result
+
+    @classmethod
+    def doc_from_raw(cls, raw: dict) -> dict:
+        """
+        从RawWebChatMessage的doc从转换对象
+        :param raw:
+        :return:
+        """
+        one = raw.copy()
+        xml_str = one.get("xml", "")
+        if xml_str == "":
+            pass
+        else:
+            error = None
+            xml = OrderedDict()
+            try:
+                xml = xmltodict.parse(xml_input=xml_str, encoding="utf-8")
+            except ExpatError as e:
+                logger.exception(e)
+                print(e)
+                try:
+                    xml = json.loads(xml_str)
+                except Exception as e2:
+                    logger.exception(e2)
+                    print(e2)
+                    error = e2
+                finally:
+                    pass
+            finally:
+                if error is None:
+                    data = xml.get('xml')
+                    if data is None:
+                        pass
+                    else:
+                        if 'CreateTime' in data:
+                            create_time = datetime.datetime.fromtimestamp(float(data['CreateTime']))
+                            data['create_time'] = create_time
+                        else:
+                            pass
+                        xml = data
+                    one['xml'] = xml
+                else:
+                    pass
+        return one
 
 
 class TeacherRank(mongo_db.BaseDoc):

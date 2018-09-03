@@ -283,7 +283,8 @@ class Teacher(mongo_db.BaseDoc):
         : param include_raw: 是否包含原生的方向.
         :return:
         """
-        ts = Teacher.find_plus(filter_dict=dict(), to_dict=True)
+        f = {"create_date": {"$gt": mongo_db.get_datetime_from_str("2018-9-3 0:0:0")}}
+        ts = Teacher.find_plus(filter_dict=f, to_dict=True)
         t_dict = dict()  # 方向和老师的字典
         for t in ts:
             d = t.get("direction")

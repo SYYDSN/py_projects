@@ -475,6 +475,7 @@ def send_template_message():
 
 def get_materials(m_type: str = 'image', offset: int = 0, count: int = 20) -> dict:
     """
+    获取永久素材的列表，也包含公众号在公众平台官网素材管理模块中新建的图文消息、语音、视频等素材
     :param m_type:   素材类型 图片（image）、视频（video）、语音 （voice）、图文（news）
     :param offset:   从全部素材的该偏移位置开始返回，0表示从第一个素材 返回
     :param count:   返回素材的数量，取值在1到20之间

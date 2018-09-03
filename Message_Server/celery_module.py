@@ -80,6 +80,8 @@ def test(self, *args, **kwargs):
 def send_virtual_trade(trade_json: dict) -> None:
     """
     发送虚拟喊单信号
+    2018-9-3 Trade相关模块合并到WebChat_Server后,此函数转移到后者的celery_module中
+    本模块暂时没有用途,停止运行.
     :param trade_json: 消息字典
     :return:
     """

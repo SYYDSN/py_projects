@@ -4,6 +4,7 @@ from kombu import Exchange, Queue
 from mail_module import send_mail
 import datetime
 import asyncio
+import requests
 from module.item_module import Score
 from module.server_api import new_order_message2
 
@@ -75,6 +76,29 @@ def test(self, *args, **kwargs):
     print(self)
     print(args)
     print(kwargs)
+
+
+@app.task(bind=False)
+def send_virtual_trade(trade_json: dict) -> None:
+    """
+    发送虚拟喊单信号
+    2018-9-3 由Message_Server项目中的Trade相关功能合并到本项目后,
+    此函数替代Message_Server.celery_module中的同名函数的功能,后者废止
+    :param trade_json: 消息字典
+    :return:
+    """
+    r = requests.post("http://127.0.0.1:8080/listen_virtual_trade", data=trade_json)
+    status = r.status_code
+    if status == 200:
+        resp = r.json()
+        mes = resp['message']
+        if mes == "success":
+            print("ok")
+        else:
+            print("error")
+    else:
+        print(status)
+    print(trade_json)
 
 
 @app.task(bind=False)

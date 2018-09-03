@@ -5,24 +5,27 @@ __project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
 from log_module import get_logger
-from module.teacher_module import *
-from send_moudle import *
-import mongo_db
-from flask import request
-from tools_module import get_real_ip
+from module.teacher_module import Teacher
+from module.teacher_module import Deposit
 import datetime
-import calendar
-import requests
-from pymongo import ReturnDocument
 import random
+import mongo_db
+import calendar
+from flask import request
+import requests
+from tools_module import get_real_ip
+from send_moudle import *
 from mail_module import send_mail
+from pymongo import ReturnDocument
+from celery_module import send_template_message
 from celery_module import send_virtual_trade
-import xmltodict
 
 
 logger = get_logger()
 ObjectId = mongo_db.ObjectId
-DBRef = mongo_db.DBRef
+
+
+"""喊单信号操作模块"""
 
 
 """
@@ -159,18 +162,16 @@ def _generator_signal(raw_signal: dict) -> dict:
     else:
         pass
     """待发送的模板消息字典"""
-    template_message = {
+    mes_dict = {
         "t_id": str(teacher_id),
-        'mes_type': 'new_order_message2',
-        'signature': 'template_message'
     }
     if res['case_type'] == "exit":
         """
         平仓信号
         """
-        template_message['order_type'] = "平仓"  # 模板消息类型
+        mes_dict['order_type'] = "平仓"  # 模板消息类型
     else:
-        template_message['order_type'] = "开仓"  # 模板消息类型
+        mes_dict['order_type'] = "开仓"  # 模板消息类型
         pass
     """
     1. 进场 保存数据
@@ -178,17 +179,7 @@ def _generator_signal(raw_signal: dict) -> dict:
     """
     calculate_trade(res)
     """发送模板消息阶段"""
-    u = "http://wx.yataitouzigl.com/template_message"
-    u = "http://127.0.0.1:8080/template_message"
-    r = requests.post(u, data=template_message, timeout=2)
-    status = r.status_code
-    if status != 200:
-        ms = "申请模板消息出错:{}, {}".format(status, datetime.datetime.now())
-        logger.exception(msg=ms)
-        print(ms)
-        send_mail(title=ms)
-    else:
-        pass
+    send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
     return res
 
 
@@ -247,7 +238,7 @@ def calculate_trade(raw_signal: dict) -> None:
         else:
             exit_price = x['exit_price']  # 离场点位
         """计算各种参数"""
-        enter_price = x['enter_price']  # 进场点位
+        enter_price = float(x['enter_price']) if isinstance(x['enter_price'], str) else x['enter_price']  # 进场点位
         info = product_map[product]
         p_v = info['p_val']   # 点值
         p_d = info['p_diff']  # 点差
@@ -389,6 +380,7 @@ def generator_signal_and_save(raw_signal: dict) -> list:
                 each_profit = each_profit_dollar - each_cost
                 x['each_profit_dollar'] = each_profit_dollar
                 x['each_profit'] = each_profit
+            lots = 1 # 默认值
             try:
                 lots = x['lots']
             except Exception as e:
@@ -525,6 +517,7 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
         else:
             """离场"""
             f["change"] = {"$ne": "raw"}
+            f['exit_price'] = {"$in": [None, 0.0, 0]}
             r = Trade.find_plus(filter_dict=f, to_dict=True)
             if len(r) == 0:
                 ms = "虚拟信号离场时,,trade查找失败,:{}".format(f)
@@ -535,7 +528,7 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
                 for temp in r:
                     temp['case_type'] = case_type
                     if isinstance(exit_reason, str) and len(exit_reason) > 1:
-                        temp['exit_reason'] = exit_reason
+                        r['exit_reason'] = exit_reason
                     """延时操作"""
                     count_down = random.randint(30, 1600)  # 延迟操作的秒数,表示在原始信号发出后多久进行操作?
                     json_obj = mongo_db.to_flat_dict(temp)
@@ -546,6 +539,7 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
         pass
     """接受原始喊单和虚拟立即保存数据并发送模板信息"""
     _generator_signal(raw_signal=doc_dict)
+    return True
 
 
 class RawSignal(mongo_db.BaseDoc):
@@ -1274,3 +1268,6 @@ if __name__ == "__main__":
     # th_time = mongo_db.get_datetime_from_str("2018-8-12 16:00:00")
     # get_price(p_name="黄金", the_time=th_time)
     pass
+
+
+
