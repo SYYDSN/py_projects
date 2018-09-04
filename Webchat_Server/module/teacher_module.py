@@ -384,8 +384,5 @@ class Teacher(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    """查询单个老师的持仓记录"""
-    # cc = Teacher.get_hold(t_id="5b65f2d9dbea625d78469f23")
-    # print(cc)
-    Teacher.import_info()
+    Teacher.index()
     pass

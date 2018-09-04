@@ -102,6 +102,12 @@ class XMLMessage:
 
             if to_xml:
                 r = dicttoxml.dicttoxml(obj=r, root=False, attr_type=False, cdata=True)
+                if msg_type == "news" and len(data) > 1:
+                    """满足图文消息恢复格式不对int类型包裹cdata的要求"""
+                    l = len(data)
+                    b1 = "<ArticleCount><![CDATA[{}]]></ArticleCount>".format(l)
+                    b2 = "<ArticleCount>{}</ArticleCount>".format(l)
+                    r.replace(b1.encode(), b2.encode())
                 return r
             else:
                 return r
@@ -189,7 +195,7 @@ class EventHandler:
                     f = {"openid": openid}
                     u = {"$set": {"subscribe": 1}}
                     WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
-                    data = [
+                    data1 = [
                         {
                             "title": "卡佑欢迎你",
                             "img_url": "http://mmbiz.qpic.cn/mmbiz_jpg/KCRpHfdSvS4f5tNDutYeOQGm727dzQyWps0zM6WuRHm"
@@ -198,7 +204,7 @@ class EventHandler:
                             "url": "http://temp.safego.org/wx/html/about.html"
                         },
                         {
-                            "title": "欢迎老司机加入, 点此填写简历",
+                            "title": "找工作,用卡佑!欢迎新老司机加入, 好工作不等人.现在就去填写简历.",
                             "img_url": "http://mmbiz.qpic.cn/mmbiz_jpg/KCRpHfdSvS4f5tNDutYeOQGm727dzQyWS62gcmK44lRRoJ"
                                        "dv9SkicUl2HZJKictiaV7tdWCUZYMkDcr9pFJAC02vA/0?wx_fmt=jpeg",
                             "desc": "收入稳定, 福利齐全, 欢迎老司机加入, 点此填写简历",
@@ -212,7 +218,8 @@ class EventHandler:
                             "desc": "大企业，工作有保障，专业平台 合法营运 收入稳定 合作共赢 福利保障 五险一金 安全保障 专人服务",
                             "url": "http://temp.safego.org/wx/html/register.html"
                         }]
-                    res = XMLMessage.produce(to_user=openid, msg_type="news", data=data)
+
+                    res = XMLMessage.produce(to_user=openid, msg_type="news", data=data1)
                 elif event == "unsubscribe":
                     """取消关注"""
                     ms = "用户: {} 取消关注".format(openid)

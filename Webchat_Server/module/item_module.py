@@ -174,6 +174,9 @@ class EventHandler:
                     print("event_key is {}".format(event_key))
                 elif event == "view":
                     """点击菜单"""
+                elif event == "templatesendjobfinish":
+                    """模板消息发送结果"""
+                    pass
                 else:
                     title = "{} 未意料的事件消息:{}.{}".format(now, msg_type, event)
                     content = "{}".format(str(info))
@@ -184,7 +187,7 @@ class EventHandler:
                 print(" 你输入的内容是: '{}'".format(s))
                 if s == "喊单":
                     """回复老师喊单登录的链接"""
-                    data = "芝麻开门. 分析师登录入口请戳<a href='http://wx.yataitouzigl.com/teacher/login.html'>此处</a>"
+                    data = "芝麻开门. <a href='http://wx.yataitouzigl.com/teacher/login.html'>分析师登录入口</a>"
                     res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
             elif msg_type == "image":
                 """图片消息"""

@@ -174,13 +174,12 @@ def _generator_signal(raw_signal: dict) -> dict:
         mes_dict['order_type'] = "开仓"  # 模板消息类型
         pass
     """
+    calculate_trade函数负责
     1. 进场 保存数据
     2. 离场 计算胜率,盈利率,保存等
+    3. 如果是原生信号,发送钉钉消息
     """
     calculate_trade(res)
-    """发送钉订消息"""
-    d_res = send_tips_to_dingding(mes_dict)
-    print("钉订消息发送结果:{}".format(d_res))
     """发送模板消息阶段"""
     send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
     return res
@@ -291,6 +290,9 @@ def calculate_trade(raw_signal: dict) -> None:
                 }}
                 r2 = t2.find_one_and_update(filter=t2_f, update=t2_u, upsert=True)
                 print(r2)
+    """发送钉订消息"""
+    d_res = send_tips_to_dingding(raw_signal)
+    print("钉订消息发送结果:{}".format(d_res))
 
 
 def generator_signal_and_save(raw_signal: dict) -> list:
@@ -578,6 +580,7 @@ def send_tips_to_dingding(info: dict) -> bool:
 
         out_put = dict()
         markdown = dict()
+        out_put['msgtype'] = 'markdown'
         markdown['title'] = the_type
         markdown['text'] = text
         out_put['markdown'] = markdown

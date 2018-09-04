@@ -324,15 +324,17 @@ def back_apply(user: dict = None):
         if isinstance(u_id, str) and len(u_id) == 24:
             if u_id == str(user['_id']):
                 """参数正确"""
-                if user.get('checked', 0) == 1 and user.get("authenticity", 0) == 1:
+                if user.get('checked', 0) == 1 and user.get("authenticity", 0) == 0:
                     """可以撤回"""
                     f = {"_id": user['_id']}
-                    u = {"checked": 0}
+                    u = {"$set": {"checked": 0}}
                     r = WXUser.find_one_and_update_plus(filter_dict=f, upsert=False, update_dict=u)
                     if r is None:
                         mes['message'] = "撤回失败"
                     else:
                         mes['message'] = "success"
+                else:
+                    mes['message'] = "不满足撤回条件"
             else:
                 mes['message'] = "请求无法满足"
         else:
