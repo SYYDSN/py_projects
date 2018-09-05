@@ -487,6 +487,13 @@ class BusinessLicenseImage(mongo_db.BaseFile):
     _table_name = "business_license_image"
 
 
+class PersonLicenseImage(mongo_db.BaseFile):
+    """
+    手持身份证的图片
+    """
+    _table_name = "person_license_image"
+
+
 class WXUser(mongo_db.BaseDoc):
     """从微信接口获取的用户身份信息,目前的用户是测试"""
     _table_name = "wx_user"
@@ -527,6 +534,9 @@ class WXUser(mongo_db.BaseDoc):
     type_dict['identity_code'] = str  # 中介商执照号码/销售真实身份证id.用于部分展示在二维码上
     type_dict['blank_name'] = str  # 开户行名称.
     type_dict['blank_account'] = str  # 银行账户卡号.
+    type_dict['person_id_code'] = str  # 身份证号码, 兼职专用属性
+    type_dict['person_license_image_url'] = str  # 手持身份证照片的地址, 兼职专用属性
+    type_dict['person_license_image'] = ObjectId  # 手持身份证照片的id, 指向PersonLicenseImage._id,兼职专用属性
     type_dict['business_license_image_url'] = str  # 营业执照照片的地址,
     type_dict['business_license_image'] = ObjectId  # 营业执照照片的id, 指向BusinessLicenseImage._id
 

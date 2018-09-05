@@ -51,6 +51,9 @@
     type_dict['contacts_num'] = str  # 中介公司联系电话,如果是黄牛/销售,那么这里可以和注册用户的phone一致
     type_dict['contacts_email'] = str  # 中介公司/黄牛/销售联系邮箱,这个是专门用来发送结算信息的
     type_dict['identity_code'] = str  # 中介商执照号码/销售真实身份证id.用于部分展示在二维码上
+    type_dict['person_id_code'] = str  # 身份证号码, 兼职专用属性
+    type_dict['person_license_image_url'] = str  # 手持身份证照片的地址, 兼职专用属性
+    type_dict['person_license_image'] = ObjectId  # 手持身份证照片的id, 指向PersonLicenseImage._id,兼职专用属性
     type_dict['business_license_image_url'] = str  # 营业执照照片的地址,
     type_dict['business_license_image'] = ObjectId  # 营业执照照片的id, 指向BusinessLicenseImage._id
 ```
@@ -633,12 +636,14 @@ image_url： 荣誉证书图片的url，由自身服务器传回
 
 1. 通知下载图片地址: /wx/auto_download/vehicle_image
 参数：
+db: mongo_db2   固定值 **特有参数** 
 table_name : vehicle_image 固定值
 field_name： image_id 固定值
 server_id: 微信服务器回传的图片id
 
 2. 修改车辆照片信息地址：/wx/resume/extend
 参数：
+db: mongo_db2   固定值 **特有参数** 
 resume_id： 简历id ，
 v_id: 车辆对象的_id,
 opt: add_vehicle/update_vehicle  操作类型，添加/修改
@@ -650,6 +655,7 @@ image_url： 车辆照片的url，由自身服务器传回
 
 1. 通知下载图片地址: /wx/auto_download/driving_license_image
 参数：
+db: mongo_db2   固定值 **特有参数** 
 table_name : driving_license_image 固定值
 field_name： dl_image 固定值
 server_id: 微信服务器回传的图片id
@@ -664,6 +670,7 @@ dl_image_url： 驾照图片的url，由自身服务器传回
 
 1. 通知下载图片地址: /wx/auto_download/rtqc_image
 参数：
+db: mongo_db2   固定值 **特有参数** 
 table_name : rtqc_image 固定值
 field_name： rtqc_image 固定值
 server_id: 微信服务器回传的图片id
@@ -674,6 +681,21 @@ _id： 简历id ，会由后端传值到页面
 rtqc_image 从业许可证图片的id，由自身服务器传回，24位字符串
 rtqc_image_url： 从业许可证片的url，由自身服务器传回
 
+**手持身份证照片的图片** person_license_image
+
+1. 通知下载图片地址: /wx/auto_download/person_license_image
+参数：
+db: mongo_db   固定值 **特有参数** 
+table_name : person_license_image 固定值
+field_name： person_license_image 固定值
+server_id: 微信服务器回传的图片id
+
+2. 修改营业执照图片信息地址：/wx/self_info/update
+参数：
+_id： 简历id ，会由后端传值到页面
+person_license_image 手持身份证照片的id，由自身服务器传回，24位字符串
+person_license_image_url： 手持身份证照片url，由自身服务器传回
+
 **营业执照图片** business_license_image
 
 1. 通知下载图片地址: /wx/auto_download/business_license_image
@@ -683,7 +705,7 @@ table_name : business_license_image 固定值
 field_name： business_license_image 固定值
 server_id: 微信服务器回传的图片id
 
-1. 修改营业执照图片信息地址：/wx/self_info/update
+2. 修改营业执照图片信息地址：/wx/self_info/update
 参数：
 _id： 简历id ，会由后端传值到页面
 business_license_image 营业执照图片的id，由自身服务器传回，24位字符串

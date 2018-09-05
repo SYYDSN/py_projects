@@ -1,0 +1,175 @@
+html {
+  font-size: 14px;
+  color: #4e4e4e;
+}
+.buy {
+  color: #e35e57;
+}
+.sell {
+  color: #5ec679;
+}
+.top_block {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  color: #7e7e7e;
+  padding: 15px 10px;
+}
+.top_block >a {
+  font-size: 14px;
+}
+.price_block {
+  font-size: 16px;
+  padding: 10px 10px;
+}
+.price_block .price_zone {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.price_block .price_zone >span {
+  width: 30%;
+  text-align: center;
+  display: inline-block;
+}
+.price_block .price_zone .buy_price {
+  color: #e35e57;
+}
+.price_block .price_zone .sell_price {
+  color: #5ec679;
+}
+.price_block .now_zone {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.price_block .now_zone .now {
+  display: block;
+  font-size: 14px;
+  color: #d9d9d9;
+  width: 20em;
+  height: 1em;
+  text-align: center;
+}
+.process_block {
+  font-size: 16px;
+  padding: 10px 10px;
+  text-align: center;
+}
+.process_block .user_info {
+  margin-bottom: 10px;
+}
+.process_block .user_info,
+.process_block .select_zone,
+.process_block .process_case {
+  padding: 5px 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.process_block .user_info >span,
+.process_block .select_zone >span,
+.process_block .process_case >span,
+.process_block .user_info label,
+.process_block .select_zone label,
+.process_block .process_case label,
+.process_block .user_info input,
+.process_block .select_zone input,
+.process_block .process_case input {
+  width: 50%;
+  border: none;
+  text-align: center;
+}
+.process_block .user_info #buy_it,
+.process_block .select_zone #buy_it,
+.process_block .process_case #buy_it,
+.process_block .user_info #sell_it,
+.process_block .select_zone #sell_it,
+.process_block .process_case #sell_it {
+  width: calc((100% - 20px) / 2);
+  margin-top: 10px;
+  height: 3em;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+.process_block .user_info #buy_it,
+.process_block .select_zone #buy_it,
+.process_block .process_case #buy_it {
+  margin-right: 10px;
+  background-color: #e35e57;
+  border: 1px solid #e35e57;
+}
+.process_block .user_info #sell_it,
+.process_block .select_zone #sell_it,
+.process_block .process_case #sell_it {
+  margin-left: 10px;
+  background-color: #5ec679;
+  border: 1px solid #5ec679;
+}
+.case_block {
+  font-size: 18px;
+  padding: 15px 10px 10px;
+}
+.case_block .title_line {
+  color: #bfbfbf;
+  font-size: 18px;
+  font-weight: 600;
+}
+.case_block .case_line {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.case_block .case_line >div {
+  width: 33%;
+  min-height: 1em;
+  display: block;
+  text-align: center;
+  overflow: hidden;
+  word-break: break-all;
+  padding: 5px;
+}
+.case_block .case_line >div .close_case {
+  width: 100%;
+  background-color: #f3c065;
+  border: 1px solid #d6a859;
+  padding: 5px auto;
+  border-radius: 5px;
+}
+.case_block .case_line .case .cell_line {
+  width: 100%;
+  display: flex;
+  font-size: 16px;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  align-content: center;
+}
+.case_block .case_line .case .cell_line .enter_time,
+.case_block .case_line .case .cell_line .p_direction {
+  font-size: 14px;
+}
+.case_block .case_line .case .cell_line .p_direction,
+.case_block .case_line .case .cell_line .p_lots {
+  width: 28px;
+}
+.case_block .case_line .case .cell_line .enter_time,
+.case_block .case_line .case .cell_line .p_name {
+  width: calc(100% - 32px);
+}
+.case_block .case_line .case .cell_line .p_name {
+  font-weight: 700;
+}
+.case_block .top_line {
+  border-top: 1px solid #d3d3d3;
+}

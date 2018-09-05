@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>获取用户信息的演示页面</title>
+    <style>
+        img{
+            width:100px;
+            height: auto;
+            margin: auto;
+        }
+        table{
+            width:100%;
+            font-size:28px;
+        }
+        .key{
+            width:40%;
+        }
+        .value{
+            width: 60%;
+            white-space: normal;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+<h1>用户信息</h1>
+<img src="{{ data.headimgurl }}">
+<table>
+{% for k, v in data.items() %}
+    <tr>
+    <td class="key">{{ k }}</td>
+    <td class="value">{{ v }}</td>
+    </tr>
+{% endfor %}
+</table>
+</body>
+</html>

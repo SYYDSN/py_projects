@@ -44,7 +44,7 @@ def hello(user: dict = None) -> str:
     return "hello baby <a href='/wx/auth/info'>{}去授权</a><br><h2>{}</h2>".format(user.get("nick_name"), str(user['_id']))
 
 
-@check_platform_session
+# @check_platform_session
 def file_func(user: dict = None, action: str = "get", table_name: str = "base_info"):
     """
     保存/获取文件, 此函数目前不常用,是对微信用户数据库的操作.
@@ -58,7 +58,7 @@ def file_func(user: dict = None, action: str = "get", table_name: str = "base_in
     tables表名,分别存储不同的类的实例.
     1. base_info                  文件存储基础表,BaseFile
     """
-    tables = ['base_file', 'flash_image']
+    tables = ['base_file', 'flash_image', 'person_license_image']
     table_name = table_name if table_name in tables else 'base_file'
     if action == "save":
         """保存文件"""
@@ -199,11 +199,12 @@ def download_image_func(user: dict = None, table_name: str = "base_file"):
     1. base_info                  文件存储基础表,BaseFile
     """
     tables = ['base_file', 'head_image', 'id_image', 'honor_image', 'vehicle_image', 'driving_license_image',
-              'rtqc_image', 'business_license_image']
+              'rtqc_image', 'business_license_image', 'person_license_image']
     table_name = table_name if table_name in tables else 'base_file'
 
     """保存文件"""
     db_str = get_arg(request, "db", "mongo_db2")
+    print("db_str is {}".format(db_str))
     handler_map = {"mongo_db": BaseFile, "mongo_db2": BaseFile2}
     handler = handler_map.get(db_str) if handler_map.get(db_str) else BaseFile2
 
@@ -589,6 +590,10 @@ def resume_opt_func(user: dict = None):
         business_license_image = resume_args['business_license_image']
         resume_args['business_license_image'] = business_license_image if isinstance(business_license_image, ObjectId) \
             else ObjectId(business_license_image)
+    if "person_license_image" in resume_args:
+        person_license_image = resume_args['person_license_image']
+        resume_args['person_license_image'] = person_license_image if isinstance(person_license_image, ObjectId) \
+            else ObjectId(person_license_image)
     if "authenticity" in resume_args:
         authenticity = resume_args['authenticity']
         resume_args['authenticity'] = authenticity if isinstance(authenticity, bool) else bool(authenticity)

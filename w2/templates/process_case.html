@@ -1,0 +1,124 @@
+{% extends "wx/template.html" %}
+{% block css %}
+    <link rel="stylesheet" href="/static/css/process_case.css?v={{ v }}">
+{% endblock %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 top_block">
+
+                <i class="fa fa-chevron-left"></i>
+
+                <span class="title">
+                    {{ page_title }}
+                </span>
+                <a href="/user/html/news.html">
+                    系统消息
+                </a>
+            </div>
+        </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 price_block">
+            <div class="price_zone">
+                <span data-id="" class="product_name">
+
+                </span>
+                <span class="buy_price">
+
+                </span>
+                <span class="sell_price">
+
+                </span>
+            </div>
+            <div class="now_zone">
+                <span class="now"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 process_block">
+            <div class="user_info">
+                <span class="col_name">
+                    当前交易帐号:
+                </span>
+                <span class="account">
+                    {{ teacher.name }}
+                </span>
+            </div>
+            <div class="select_zone">
+                <label for="select_product">
+                    当前交易产品:
+                </label>
+                <input type="text" id="select_product" placeholder="点击选择产品">
+            </div>
+            <div class="process_case">
+                    <button id="buy_it">买&emsp;&emsp;入</button>
+                    <button id="sell_it">卖&emsp;&emsp;出</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 case_block">
+            <div class="case_line title_line">
+                <div class="case_info first">
+                    订单
+                </div>
+                <div class="enter_p">
+                    进场
+                </div>
+                <!--
+                <div class="now_p">
+                    现价
+                </div>
+                -->
+                <div class="do_it last">
+                    操作
+                </div>
+            </div>
+            {% for hold in hold_list %}
+                <div class="case_line top_line">
+                    <div class="case first">
+                        <div class="cell_line">
+                            <span class="p_name">
+                                {{ hold.code | upper }}
+                            </span>
+                            <span class="p_lots  {{ 'buy' if hold.direction == '买入' else 'sell' }}">
+                                {{ hold.lots }}手
+                            </span>
+                        </div>
+                        <div class="cell_line">
+                            <span class="enter_time">
+                                {{ hold.enter_time | short_date }}
+                            </span>
+                            <span class="p_direction  {{ 'buy' if hold.direction == '买入' else 'sell' }}">
+                                {{ hold.direction }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="enter_price  {{ 'buy' if hold.direction == '买入' else 'sell' }}">
+                        {{ hold.enter_price }}
+                    </div>
+                    <!--
+                    <div data-direction="{{ hold.code }}" data-id="{{ hold.code }}" class="now_price {{ 'buy' if hold.direction == '买入' else 'sell' }}">
+                        ---
+                    </div>
+                    -->
+                    <div class="do_it last">
+                        <button data-p="{{ hold.code }}" data-d="{{ hold.direction }}" data-n="{{ hold.product }}" data-id="{{ hold._id }}" class="close_case">
+                            平仓
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/socket.io.js"></script>
+    <script src="/static/js/process_case.js?v={{ v }}"></script>
+{% endblock %}
