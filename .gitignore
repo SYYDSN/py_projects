@@ -1,5 +1,6 @@
 recode/*.txt
 webui/*
+/WebChat_Server/document/.~lock.*
 *.pyc
 *.pkl
 *.log
