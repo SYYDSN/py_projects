@@ -664,7 +664,8 @@ async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
                     args = {
                         "touser": openid,
                         "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
-                        "url": "http://wx.91master.cn/user/html/index.html",
+                        "url": "http://wx.91master.cn/user/html/currentCrunchy.html?t_id={}".format(
+                            str(t_id) if isinstance(t_id, ObjectId) else t_id),
                         "data": {
                             "first": {
                                 "value": "你关注的{}老师有新的操作".format(t_name),
