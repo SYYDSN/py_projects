@@ -383,7 +383,7 @@ class DriverResume(mongo_db2.BaseDoc):
     type_dict['phone'] = str  # 手机号码
     type_dict['email'] = str  # 邮箱
     type_dict['birth_date'] = datetime.datetime  # 出生日期,以身份证号码为准
-    type_dict['id_num'] = str  # 身份证号码
+    type_dict['id_num'] = str  # 身份证号码 和身份证照片的ocr结果进行比对核实身份,确认后不准修改
     type_dict['id_image_face'] = ObjectId  # 身份证正面图片
     type_dict['id_image_face_url'] = str  # 身份证正面图片
     type_dict['id_image_back'] = ObjectId  # 身份证背面图片
