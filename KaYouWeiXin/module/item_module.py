@@ -702,6 +702,15 @@ class WXUser(mongo_db.BaseDoc):
         resume_id = user.get("resume_id", "")
         _id = resume_args.pop("_id", "")
         _id = ObjectId(_id) if isinstance(_id, str) and len(_id) == 24 else _id
+
+        """处理身份证正面和背面的id"""
+        id_image_face = resume_args.get("id_image_face", None)
+        id_image_back = resume_args.get("id_image_back", None)
+        if isinstance(id_image_face, str) and len(id_image_face) == 24:
+            resume_args['id_image_face'] = ObjectId(id_image_face)
+        if isinstance(id_image_back, str) and len(id_image_back) == 24:
+            resume_args['id_image_back'] = ObjectId(id_image_back)
+
         if len(resume_args) == 1 and "_id" in resume_args:
             """字典中只有_id字段表示查看简历"""
             if isinstance(_id, ObjectId) and _id == resume_id:

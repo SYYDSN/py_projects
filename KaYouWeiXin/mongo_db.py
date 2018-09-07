@@ -2250,10 +2250,10 @@ class BaseDoc:
     def find_one_and_update_plus(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
                               return_document: str="after"):
         """
-        find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
-        find_one_and_update和find_alone_and_update替更简单医易用.
+        本方法是find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
+        和本方法相比find_one_and_update和find_alone_and_update更简单易用.
         本方法更灵活,只是在设置参数时要求更高.
-        找到一个文档然后更新它，如果找不到就插入
+        找到一个文档然后更新它，(如果找不到就插入)
         :param filter_dict: 查找时匹配参数 字典
         :param update_dict: 更新的数据，字典,注意例子中参数的写法,有$set和$inc两种更新方式.
         :param projection: 输出限制列  projection={'seq': True, '_id': False} 只输出seq，不输出_id

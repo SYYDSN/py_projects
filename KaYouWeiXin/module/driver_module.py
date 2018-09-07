@@ -9,6 +9,7 @@ import requests
 import datetime
 import re
 from log_module import get_logger
+from module.ocr_module import OcrResult
 from pymongo.results import InsertOneResult
 from pymongo.results import UpdateResult
 from pymongo.results import DeleteResult
@@ -462,7 +463,13 @@ class DriverResume(mongo_db2.BaseDoc):
     5. 烈性传染病
     6. 其他
     """
-    type_dict['diseases'] = list
+    type_dict['diseases'] = list   # 重大疾病
+    """
+    身份证号码和图片是否被锁定? 为1表示被锁定,这时无法修改身份证号码和图片.
+    只有在身份证号码和身份证号码图片正面的名字和号码都一致,并且背面识别有效期有效时才锁定.
+    """
+    type_dict['locked_id_card'] = int  # 身份证号码和图片是否被锁定?
+    type_dict['id_card_end'] = datetime.datetime  # 身份证有效期的截至日期
     type_dict['update_date'] = datetime.datetime  # 简历的刷新时间
     type_dict['create_date'] = datetime.datetime  # 简历的创建时间
 
@@ -742,7 +749,6 @@ class DriverResume(mongo_db2.BaseDoc):
             resume.pop("vehicle", None)
             mes['data'] = resume
         return mes
-
 
     @classmethod
     def add_work_history(cls, resume_id: (str, ObjectId), history_args: dict) -> ObjectId:
@@ -1516,6 +1522,25 @@ class DriverResume(mongo_db2.BaseDoc):
             raise ValueError(ms)
         return res
 
+    @classmethod
+    def check_and_lock(cls, doc: dict) -> bool:
+        """
+        检查并锁定信息,
+        1. 身份证正面图片的号码,名字与简历基本信息一致,并且身份证在有效期内
+        2. 上传的驾照的级别和简历基本信息中一致.
+        由于进行图像识别是一个耗时的操作.因此应该定期执行而不是直接由celery加入工作队列,
+        以避免用户频频修改信息的时候,造成额外的重复作业.
+        :param doc:
+        :return:
+        """
+        """检查身份证号码"""
+        id_image_face = doc['id_image_face']
+        id_image_back = doc['id_image_back']
+        face_info = OcrResult.id_card(img_id=id_image_face, ab='a')
+        back_info = OcrResult.id_card(img_id=id_image_back, ab='b')
+        """从识别结果里取出来身份证号码,姓名和有效期的截止日期"""
+        print()
+
 
 if __name__ == "__main__":
     """查询省和直辖市"""
@@ -1532,7 +1557,10 @@ if __name__ == "__main__":
     # }
     # DriverResume.delete_work_history(resume_id="5b3da7d84660d33df4a40a81", work_id=work_id)
     """查询简历的全部信息"""
-    DriverResume.get_full_info('5b5a96d9bede684e68049f01')
+    # DriverResume.get_full_info('5b5a96d9bede684e68049f01')
+    """检查并锁定简历信息"""
+    info = DriverResume.find_by_id(o_id="5b5fcfa0bede686fc61f969f", to_dict=True)
+    DriverResume.check_and_lock(doc=info)
     pass
 
 
