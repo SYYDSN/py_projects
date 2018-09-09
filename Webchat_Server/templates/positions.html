@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"/>
+    <meta name="screen-orientation" content="portrait"/>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <title>交易管理</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/teacher_index.css"/>
+    <script type="text/javascript" src="/static/js/teacher_common.js"></script>
+
+</head>
+
+<body>
+<div class="wrapIn">
+    <div class="redLogBundle-navList">
+        <p class="goListLink">
+            <a href="javascript:history.go(-1)"><img src="/static/images/titleIcon-2.png"/></a>
+        </p>
+        <ul class="redLogBundle-nav">
+
+            <li class="on">
+                <a href="/user/html/remind.html">交易管理</a>
+            </li>
+        </ul>
+    </div>
+    <div class="wrap pt02">
+        <div class="plr04">
+            <div class="fz28 dealManageText">
+                当前交易账号：{{ teacher.name }} <span>2018-09-15 10:41:52</span>
+            </div>
+            <div class="fz28 pt02 dealManageChoose">
+                当前产品报价：<span class="red pr02" id="buy_price"></span><span id="sell_price" class="green"></span>
+                <div class="selectText">
+                    <select id="select_product">
+                        <option value="XTIUSD">XTIUSD</option>
+                        <option value="XAUUSD">XAUUSD</option>
+                        <option value="XAGUSD">XAGUSD</option>
+                        <option value="EURUSD">EURUSD</option>
+                        <option value="USDJPY">USDJPY</option>
+                        <option value="USDCAD">USDCAD</option>
+                        <option value="GBPUSD">GBPUSD</option>
+                        <option value="HK50">HK50</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+            <div class="dealChoose fz28 pt02">
+                <p class="text">交易类型 ：</p>
+                <div class="selectText">
+                    <button type="button" class="buyButton">买入</button>
+                    <span class="pl04"><button type="button" class="sellButton5ec679">卖出</button></span>
+                </div>
+            </div>
+        </div>
+        <div class="plr01">
+            <ul class="crunchy-tabList">
+                <li class="on">
+                    <a href="javascript:;" data-div="positions_div">目前持仓</a>
+                </li>
+                <li>
+                    <a href="javascript:;" data-div="history_div">历史交易</a>
+                </li>
+                <li>
+                    <a href="javascript:;" data-div="chart_div">我的报表</a>
+                </li>
+                <li>
+                    <a href="javascript:;" data-div="person_div">个人中心</a>
+                </li>
+            </ul>
+
+            <div class="show_zone" id="positions_div">
+                <table border="0" cellspacing="0" cellpadding="0" class="priceTableList">
+                    <tr>
+                        <th>产品</th>
+                        <th>价位</th>
+                        <th>操作</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
+                            2018.09.05 10:45:05
+                        </td>
+                        <td class="textCenter">1.17100-1.13217</td>
+                        <td class="textRight">
+                            <button type="button" class="closeButton">平仓</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="textTitle"> EURUSD,<span class="colore35e57">sell</span></p>
+                            2018.09.05 10:45:05
+                        </td>
+                        <td class="textCenter">1.17100-1.13217</td>
+                        <td class="textRight">
+                            <button type="button" class="closeButton">平仓</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
+                            2018.09.05 10:45:05
+                        </td>
+                        <td class="textCenter">1.17100-1.13217</td>
+                        <td class="textRight">
+                            <button type="button" class="closeButton">平仓</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
+                            2018.09.05 10:45:05
+                        </td>
+                        <td class="textCenter">1.17100-1.13217</td>
+                        <td class="textRight">
+                            <button type="button" class="closeButton">平仓</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
+                            2018.09.05 10:45:05
+                        </td>
+                        <td class="textCenter">1.17100-1.13217</td>
+                        <td class="textRight">
+                            <button type="button" class="closeButton">平仓</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
+                            2018.09.05 10:45:05
+                        </td>
+                        <td class="textCenter">1.17100-1.13217</td>
+                        <td class="textRight">
+                            <button type="button" class="closeButton">平仓</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
+                            2018.09.05 10:45:05
+                        </td>
+                        <td class="textCenter">1.17100-1.13217</td>
+                        <td class="textRight">
+                            <button type="button" class="closeButton">平仓</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="crunchy-InfoText show_zone" id="history_div">
+                <div class="currentCrunchyinput">
+                    <input type="" placeholder="输入交易品种进行搜索"/>
+                    <button type="button">搜索</button>
+                </div>
+
+                <div class="crunchy-wrap">
+                    <ul class="currentCrunchy">
+                        <li>
+                            <div class="textList">
+                                <p class="textTitle"> EURUSD<span class="colore35e57 pl01">buy</span></p>
+                                2018.09.05 10:45:05
+                            </div>
+                            <div class="priceText">
+                                1.17100-1.13217
+                            </div>
+
+                            <div class="earnings">
+                                $600.00/手
+                            </div>
+                        </li>
+
+                        <li>
+                            <div class="textList">
+                                <p class="textTitle"> EURUSD<span class="color17b640 pl01">sell</span></p>
+                                2018.09.05 10:45:05
+                            </div>
+                            <div class="priceText">
+                                1.17100-1.13217
+                            </div>
+
+                            <div class="earnings color17b640">
+                                $600.00/手
+                            </div>
+                        </li>
+
+                        <li>
+                            <div class="textList">
+                                <p class="textTitle"> EURUSD<span class="colore35e57 pl01">buy</span></p>
+                                2018.09.05 10:45:05
+                            </div>
+                            <div class="priceText">
+                                1.17100-1.13217
+                            </div>
+
+                            <div class="earnings">
+                                $600.00/手
+                            </div>
+                        </li>
+
+                        <li>
+                            <div class="textList">
+                                <p class="textTitle"> EURUSD<span class="color17b640 pl01">sell</span></p>
+                                2018.09.05 10:45:05
+                            </div>
+                            <div class="priceText">
+                                1.17100-1.13217
+                            </div>
+
+                            <div class="earnings color17b640">
+                                $600.00/手
+                            </div>
+                        </li>
+                        <li>
+                            <div class="textList">
+                                <p class="textTitle"> EURUSD<span class="colore35e57 pl01">buy</span></p>
+                                2018.09.05 10:45:05
+                            </div>
+                            <div class="priceText">
+                                1.17100-1.13217
+                            </div>
+
+                            <div class="earnings">
+                                $600.00/手
+                            </div>
+                        </li>
+
+                        <li>
+                            <div class="textList">
+                                <p class="textTitle"> EURUSD<span class="color17b640 pl01">sell</span></p>
+                                2018.09.05 10:45:05
+                            </div>
+                            <div class="priceText">
+                                1.17100-1.13217
+                            </div>
+
+                            <div class="earnings color17b640">
+                                $600.00/手
+                            </div>
+                        </li>
+
+                    </ul>
+                    <p class="upmorelist">往上拉加载更多</p>
+                </div>
+            </div>
+
+            <div class="crunchy-InfoText show_zone" id="chart_div">
+                <div class="crunchy-wrap">
+                    <div class="textTop">
+                        <p>表现 <span>(单位：累计美金/每手)</span></p>数据将于每天北京时间00:00更新
+                    </div>
+                    <div id="main" style="width: 100%; height:5.6rem;">
+
+                    </div>
+                    <p class="textHint">*历史表现并不代表未来交易的成功率，您需要理智的做出判断</p>
+                    <p class="tongjiTitle">数据统计</p>
+                    <ul class="tongji">
+                        <li>
+                            <p>87.10%</p>胜率
+                        </li>
+                        <li>
+                            <p>484笔</p>盈利订单
+                        </li>
+                        <li>
+                            <p>71笔</p>亏损订单
+                        </li>
+                        <li>
+                            <p>558笔</p>总交易
+                        </li>
+
+
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="show_zone" id="person_div">
+                <div class="userTextimg">
+                    <p class="leftimg"><img src="/static/images/img1.png"/></p>
+                    <div class="userInfo">
+                        <h3>北仑</h3>
+                        <p># 机会准 持单短</p>
+                    </div>
+                </div>
+                <div class="individualResume">
+                    <p class="title"><span>分析师简介：</span></p>
+
+                    <p style="text-indent: 2em;">
+                        资深金融行业人士，黄金外汇交易培训师，身兼股票外汇行业高管与投资者的双重身份。拥有十二年交易经验，擅长分析研究国际投资市场规律。2006年进入金融领域并十年一直坚持在金融领域发展。2011年创立“经典趋势节奏”交易系统，帮助交易者把握想要的趋势行情，形成年收益率目标100%的系统化规则化交易方法。“经典趋势节奏”体系的准确率高、盈亏比高、风险控制极强；注重多级别顺势、止损有效性、科学资金管理等方面综合判定下的交易方式。</p>
+                    <p>运用技术分析，深谙股市、利率、股指及大宗商品联动性 金融机构大客户等中短线交易。2016年创建语昂交易俱乐部，自俱乐部开设以来，各项课程受业内投资人一致好评。
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="/static/js/jquery-1.8.3.min.js"></script>
+<script src="/static/js/jquery-weui.min.js"></script>
+<script src="/static/js/tools.js"></script>
+<script src="/static/js/echarts.min.js"></script>
+<script src="/static/js/socket.io.js"></script>
+<script src="/static/js/positions.js?v={{ v }}"></script>
+</html>

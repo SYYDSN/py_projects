@@ -87,7 +87,10 @@ def news_func():
 
 @check_teacher_session
 def process_case_page(teacher: dict = None):
-    """交易管理"""
+    """
+    交易管理
+    旧版本,暂停使用,仅作参考 2018-9-9
+    """
     method = request.method.lower()
     if method == "get":
         page_title = "交易管理"
@@ -164,6 +167,89 @@ def process_case_page(teacher: dict = None):
         return abort(405)
 
 
+@check_teacher_session
+def teacher_page(teacher: dict = None, page_name: str = ""):
+    """老师"""
+    method = request.method.lower()
+    if method == "get":
+        if page_name == "positions.html":
+            page_title = "交易管理"
+            hold_list = Teacher.get_hold(t_id=teacher['_id'])  # 持仓信息
+            return render_template("positions.html", page_title=page_title, teacher=teacher, hold_list=hold_list,
+                                   v=version())
+        else:
+            return abort(404)
+    elif method == "post":
+        """
+        分析师微信喊单信号。在未整合之前，此类信号一律转交
+        Message_Server项目处理 2018-8-28
+        """
+        args = get_args(request)
+        args['teacher_id'] = teacher['_id']
+        args['teacher_name'] = teacher['name']
+        args['version'] = "1.0"
+        if "enter_time" in args:
+            args['enter_time'] = mongo_db.get_datetime_from_str(args['enter_time'])
+        if "exit_time" in args:
+            args['exit_time'] = mongo_db.get_datetime_from_str(args['exit_time'])
+        enter_price = args.pop("enter_price", None)
+        try:
+            enter_price = float(enter_price)
+        except Exception as e:
+            print(e)
+        finally:
+            if isinstance(enter_price, float):
+                args['enter_price'] = float(enter_price)
+            else:
+                pass
+        exit_price = args.pop("exit_price", None)
+        try:
+            exit_price = float(exit_price)
+        except Exception as e:
+            print(e)
+        finally:
+            if isinstance(exit_price, float):
+                args['exit_price'] = float(exit_price)
+            else:
+                pass
+        if teacher['native']:
+            """真实老师"""
+            args['change'] = "raw"
+            args['native'] = True
+        else:
+            args['change'] = 'follow'
+            args['native'] = False
+        _id = args.get("_id", "")
+        if isinstance(_id, str) and len(_id) == 24:
+            """这是离场"""
+            ses = mongo_db.get_conn(table_name="trade")
+            f = {"_id": ObjectId(_id)}
+            obj = ses.find_one(filter=f)
+            if obj is None:
+                return json.dumps({"message": "订单不存在"})
+            else:
+                args['case_type'] = "exit"
+                obj.update(args)
+                args = obj
+        else:
+            """这是进场"""
+            args['_id'] = ObjectId()
+            args['case_type'] = "enter"
+            args['each_profit'] = 0.0
+            args['lots'] = 1
+            args['native_direction'] = args['direction']
+            args['record_id'] = args['_id']
+        if process_case(doc_dict=args, raw=True):
+            mes = {"message": "success"}
+        else:
+            mes = {"message": "操作失败"}
+        return json.dumps(mes)
+
+    else:
+        return abort(405)
+
+
+
 """集中注册函数"""
 
 
@@ -177,4 +263,6 @@ teacher_blueprint.add_url_rule(rule="/quotation.html", view_func=quotation_page,
 teacher_blueprint.add_url_rule(rule="/news.html", view_func=news_func, methods=['get', 'post'])
 """交易管理"""
 teacher_blueprint.add_url_rule(rule="/process_case.html", view_func=process_case_page, methods=['get', 'post'])
+"""老师"""
+teacher_blueprint.add_url_rule(rule="/html/<page_name>", view_func=teacher_page, methods=['get', 'post'])
 

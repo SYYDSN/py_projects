@@ -1,0 +1,635 @@
+a,
+body,
+button,
+dd,
+div,
+dl,
+dt,
+figure,
+form,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+html,
+iframe,
+img,
+input,
+li,
+ol,
+p,
+select,
+table,
+td,
+textarea,
+th,
+ul {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+}
+ul {
+  list-style: none;
+}
+img {
+  border: 0 none;
+  vertical-align: middle;
+}
+a {
+  text-decoration: none;
+}
+h3 {
+  font-weight: 600;
+}
+a {
+  color: #4e4e4e;
+}
+body {
+  -webkit-backface-visibility: hidden;
+  -webkit-touch-callout: none;
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  text-size-adjust: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-overflow-scrolling: touch;
+  -webkit-user-drag: none;
+  background: #fff;
+  color: #4e4e4e;
+  word-wrap: break-word;
+  margin: 0 auto;
+  padding: 0;
+  font-size: 0.24rem;
+  font-family: "Microsoft YaHei", PingFangSC-Regular, sans-serif, "Microsoft JhengHei", STHeiti, MingLiu;
+  line-height: 1.42857;
+}
+body,
+html {
+  height: 100%;
+}
+img {
+  max-width: 100%;
+}
+.wrapIn {
+  display: -webkit-flex;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  width: 7.5rem;
+  margin: 0 auto;
+}
+.wrap {
+  margin: 0 auto;
+  width: 7.5rem;
+  position: relative;
+  -webkit-flex: 1;
+  flex: 1;
+  overflow-y: auto;
+}
+.redLogBundle-navList {
+  display: -webkit-flex;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.goListLink {
+  width: 0.8rem;
+  text-align: center;
+}
+.goListLink a {
+  display: block;
+}
+.goListLink img {
+  display: inline-block;
+  width: 0.26rem;
+}
+.redLogBundle-nav {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex: 1;
+  flex: 1;
+  padding: 0 20% 4%;
+}
+.redLogBundle-nav li {
+  -webkit-flex: 1;
+  flex: 1;
+  width: 1%;
+  font-size: 0.28rem;
+  text-align: center;
+}
+.redLogBundle-nav li a {
+  padding: 0.25rem 0.15rem;
+  display: block;
+  margin: 0 0.1rem;
+  color: #8b8b8b;
+  position: relative;
+}
+.redLogBundle-nav .on a {
+  color: #222;
+}
+.redLogBundle-nav .on a:after {
+  content: '';
+  height: 0.05rem;
+  background: #FFD700;
+  width: 0.56rem;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-left: -0.28rem;
+}
+.plr04 {
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+}
+.fz28 {
+  font-size: 0.28rem;
+}
+.pt02 {
+  padding-top: 0.2rem;
+}
+.textCenter {
+  text-align: center;
+}
+.dealManageText {
+  overflow: hidden;
+}
+.dealManageText span {
+  font-size: 0.22rem;
+  color: #999;
+  float: right;
+}
+.dealManageChoose {
+  display: -webkit-flex;
+  display: flex;
+}
+.dealManageChoose .selectText {
+  -webkit-flex: 1;
+  padding-left: 0.2rem;
+  flex: 1;
+}
+.dealManageChoose .selectText select {
+  width: 100%;
+}
+.green {
+  color: #17b640;
+}
+.red {
+  color: #e35e57;
+}
+.pr02 {
+  padding-right: 0.2rem;
+}
+.dealChoose {
+  margin: 0.16rem auto 0.4rem;
+  display: flex;
+  display: -webkit-flex;
+}
+.dealChoose .text {
+  width: 7em;
+}
+.dealChoose .selectText {
+  -webkit-flex: 1;
+  flex: 1;
+}
+.dealChoose select {
+  width: 100%;
+  border: 1px solid #797979;
+  height: 0.6rem;
+  text-align: center;
+}
+.buyButton,
+.sellButton,
+.closeButton,
+.sellButton5ec679 {
+  background: #e35e57;
+  border: 1px solid #e35e57;
+  color: #fff;
+  cursor: pointer;
+  padding: 0.15rem 0.66rem;
+  border-radius: 3px;
+  font-size: 0.26rem;
+}
+.pl04 {
+  padding-left: 0.4rem;
+}
+.sellButton {
+  background: #fff;
+  border: 1px solid #d4d4d4;
+  color: #cacaca;
+}
+.sellButton5ec679 {
+  background: #17b640;
+  border: 1px solid #5ec679;
+}
+.closeButton {
+  background: #f3c065;
+  padding: 0.1rem 0.5rem;
+  border: 0;
+  color: #333;
+}
+.plr01 {
+  padding-left: 0.1rem;
+  padding-right: 0.1rem;
+}
+.crunchy-tabList {
+  margin: 0 0 0.3rem;
+  display: -webkit-flex;
+  -webkit-flex: flex;
+}
+.crunchy-tabList li {
+  -webkit-flex: 1;
+  flex: 1;
+  color: #cccccc;
+  text-align: center;
+}
+.crunchy-tabList li a {
+  display: block;
+  padding: 0.15rem 0;
+  background: #f2f2f2;
+  border: 1px solid #F2F2F2;
+  color: #cccccc;
+}
+.crunchy-tabList .on {
+  background: #fff;
+  color: #333;
+}
+.crunchy-tabList .on a {
+  background: #fff;
+  color: #333;
+}
+.userTextimg {
+  padding: 0.25rem 0.3rem;
+  display: -webkit-flex;
+  -webkit-flex: flex;
+  align-items: center;
+}
+.userTextimg .leftimg {
+  width: 1.36rem;
+  height: 1.36rem;
+  border: 1px solid #f1f1f1;
+  border-radius: 1.5rem;
+}
+.userTextimg .leftimg img {
+  width: 1.36rem;
+  height: 1.36rem;
+}
+.userTextimg .userInfo {
+  -webkit-flex: 1;
+  flex: 1;
+  padding-left: 0.4rem;
+  color: #999;
+}
+.userTextimg .userInfo h3 {
+  font-size: 0.44rem;
+  color: #333;
+}
+.individualResume {
+  background: #f7f7f7;
+  padding: 0.3rem;
+  border-radius: 0.1rem;
+  color: #999;
+}
+.individualResume .title {
+  padding-bottom: 0.2rem;
+  font-size: 0.28rem;
+}
+.individualResume .title span {
+  display: inline-block;
+  border-left: 0.1rem solid #999;
+  padding-left: 0.15rem;
+  line-height: 1;
+}
+.crunchy-InfoText {
+  display: -webkit-flex;
+  -webkit-flex: flex;
+  height: 100%;
+  flex-direction: column;
+}
+.crunchy-InfoText .crunchy-wrap {
+  -webkit-flex: 1;
+  flex: 1;
+  overflow-y: auto;
+}
+.crunchy-InfoText .crunchy-wrap .textTop {
+  padding: 0.15rem 0.1rem 0;
+  text-align: center;
+  color: #ccc;
+  display: -webkit-flex;
+  -webkit-flex: flex;
+}
+.crunchy-InfoText .crunchy-wrap .textTop p {
+  -webkit-flex: 1;
+  flex: 1;
+  color: #333;
+  text-align: left;
+  font-size: 0.26rem;
+}
+.crunchy-InfoText .crunchy-wrap .textTop p span {
+  font-size: 0.24rem;
+  color: #ccc;
+}
+.crunchy-InfoText .crunchy-wrap .textHint {
+  text-align: center;
+  color: #ccc;
+  padding: 0.2rem 0;
+}
+.crunchy-InfoText .crunchy-wrap .tongjiTitle {
+  font-size: 0.3rem;
+  color: #333;
+  padding-left: 0.3rem;
+}
+.crunchy-InfoText .crunchy-wrap .tongji {
+  overflow: hidden;
+  font-size: 0;
+}
+.crunchy-InfoText .crunchy-wrap .tongji li {
+  display: inline-block;
+  width: 25%;
+  color: #ccc;
+  text-align: center;
+  margin-top: 0.3rem;
+  font-size: 0.24rem;
+}
+.crunchy-InfoText .crunchy-wrap .tongji li p {
+  font-size: 0.3rem;
+  color: #333;
+}
+.crunchy-InfoText .crunchy-btn {
+  padding: 0.3rem;
+}
+.currentCrunchyinput {
+  background: #f2f2f2;
+  display: -webkit-flex;
+  -webkit-flex: flex;
+}
+.currentCrunchyinput input {
+  width: 6.2rem;
+  border: 0;
+  height: 0.62rem;
+  line-height: 0.62rem;
+  text-align: center;
+  background: none;
+}
+.currentCrunchyinput button {
+  -webkit-flex: 1;
+  flex: 1;
+  border: 0;
+  cursor: pointer;
+  height: 0.62rem;
+  overflow: hidden;
+  text-indent: -9999rem;
+  background: url(../images/search-icon.png) no-repeat center center;
+  background-size: 0.4rem auto;
+}
+.currentCrunchy {
+  padding: 0.15rem 0.3rem 0;
+}
+.currentCrunchy li {
+  display: -webkit-flex;
+  -webkit-flex: flex;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0.3rem 0;
+  color: #999;
+  text-align: center;
+  align-items: center;
+}
+.currentCrunchy li p {
+  color: #8b8b8b;
+  font-size: 0.3rem;
+}
+.currentCrunchy li .textList {
+  -webkit-flex: 1;
+  flex: 1;
+  text-align: left;
+  font-size: 0.18rem;
+  color: #999;
+}
+.currentCrunchy li .textList .textTitle {
+  font-size: 0.26rem;
+  color: #333;
+}
+.currentCrunchy li .color0066cc {
+  color: #0066cc;
+}
+.currentCrunchy li .colorc00 {
+  color: #c00;
+}
+.currentCrunchy li .colord44739 {
+  color: #d44739;
+}
+.currentCrunchy li .color17b640 {
+  color: #17b640;
+}
+.currentCrunchy li .colore35e57 {
+  color: #e35e57;
+}
+.currentCrunchy li .priceText {
+  width: 2.3rem;
+  text-align: center;
+}
+.currentCrunchy li .earnings {
+  width: 2.1rem;
+  text-align: right;
+  font-size: 0.26rem;
+  color: #e35e57;
+}
+.currentCrunchy li .color17b640 {
+  color: #17b640;
+}
+.pl01 {
+  padding-left: 0.1rem;
+}
+.upmorelist {
+  text-align: center;
+  padding: 0.2rem;
+  color: #999;
+}
+.priceTableList {
+  width: 100%;
+  border-collapse: collapse;
+}
+.priceTableList td,
+.priceTableList th {
+  padding: 0.2rem 0 0.1rem;
+  border-bottom: 1px solid #eee;
+  color: #999;
+  vertical-align: middle;
+  font-size: 0.24rem;
+}
+.priceTableList td:last-child,
+.priceTableList th:last-child {
+  padding-right: 0.1rem;
+}
+.priceTableList td:first-child,
+.priceTableList th:first-child {
+  padding-left: 0.1rem;
+}
+.priceTableList th {
+  color: #333;
+  padding-top: 0;
+  font-weight: 100;
+}
+.priceTableList th:first-child {
+  text-align: left;
+  padding-left: 0.2rem;
+}
+.priceTableList th:last-child {
+  padding-left: 0.41rem;
+}
+.priceTableList .textTitle {
+  font-size: 0.26rem;
+  color: #333;
+}
+.priceTableList .color0066cc {
+  color: #0066cc;
+}
+.priceTableList .colore35e57 {
+  color: #e35e57;
+}
+.priceTableList .colord44739 {
+  color: #d44739;
+}
+.priceTableList .color17b640 {
+  color: #17b640;
+}
+.priceTableList .fz03 {
+  font-size: 0.3rem;
+}
+.textRight {
+  text-align: right;
+}
+.fixedWin {
+  position: fixed;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.7);
+  width: 100%;
+  z-index: 1000;
+}
+.fixedWin .wrapWin {
+  width: 5.66rem;
+  background: #fff;
+  color: #404040;
+  font-size: 0.23rem;
+  margin: 0 auto;
+  border-radius: 0.15rem;
+  position: relative;
+  top: 20%;
+  padding: 0.2rem 0.4rem 0.4rem;
+}
+.fixedWin .wrapWin .textTitle {
+  font-size: 0.33rem;
+  position: relative;
+}
+.fixedWin .wrapWin .textTitle .close {
+  position: absolute;
+  right: 0;
+  width: 0.8rem;
+  height: 0.8rem;
+  background: url(../images/close.png) no-repeat right 0;
+  background-size: 0.27rem auto;
+}
+.fixedWin .wrapWin .corlor9f9f9f {
+  color: #9f9f9f;
+}
+.fixedWin .wrapWin .btnLinks,
+.fixedWin .wrapWin .button-text {
+  background: none;
+  text-align: center;
+  border: 0;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  font-size: 0.3rem;
+  padding: 0.15rem 0;
+}
+.fixedWin .wrapWin .button-text {
+  background: #f5bf5b;
+  display: inline-block;
+  width: 3.1rem;
+  margin: 0 auto;
+  border-radius: 0.1rem;
+}
+.fixedWin .wrapWin .succeedText,
+.fixedWin .wrapWin .buyTextTitle {
+  text-align: center;
+  font-size: 0.48rem;
+  padding: 0.76rem 0;
+  border-bottom: 1px solid #404040;
+}
+.fixedWin .wrapWin .buyTextTitle {
+  font-size: 0.32rem;
+  padding: 1.1rem 0;
+}
+.fixedWin .wrapWin .lineHeight {
+  border-bottom: 1px solid #404040;
+}
+.fixedWin fieldset {
+  border: 1px solid #bdbdbd;
+  color: #9f9f9f;
+  border-radius: 0.1rem;
+}
+.fixedWin fieldset legend {
+  border: 0;
+}
+.fixedWin fieldset .text {
+  font-size: 0.36rem;
+  padding: 0 0.25rem;
+}
+.fixedWin .textlist {
+  border-bottom: 1px solid #404040;
+  padding: 0.25rem 0 0.25rem;
+}
+.fixedWin .textlist dl {
+  display: flex;
+  display: -webkit-flex;
+  padding: 0.05rem 0;
+}
+.fixedWin .textlist dl dt {
+  -webkit-flex: 1;
+  flex: 1;
+}
+.fixedWin .textlist dl dd {
+  text-align: right;
+  width: 2.3rem;
+}
+.fixedWin .borderNone {
+  border: 0;
+}
+.fixedWin .btnNoneColor {
+  background: none;
+  padding: 0.15rem 0.7rem;
+  color: #404040;
+  font-size: 0.3rem;
+}
+.ptb03 {
+  padding-bottom: 0.3rem;
+  padding-top: 0.3rem;
+}
+.ptb06 {
+  padding-bottom: 0.6rem;
+  padding-top: 0.6rem;
+}
+.pr03 {
+  padding-right: 0.3rem;
+}
+.fz32 {
+  font-size: 0.32rem;
+}
+.pl04 {
+  padding-left: 0.4rem;
+}
+.pb02 {
+  padding-bottom: 0.2rem;
+}
+.pt03 {
+  padding-top: 0.3rem;
+}
+.pb03 {
+  padding-bottom: 0.3rem;
+}

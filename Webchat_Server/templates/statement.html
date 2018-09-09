@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="format-detection" content="email=no">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+		<meta name="screen-orientation" content="portrait" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<title>交易管理</title>
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		<script type="text/javascript" src="js/common.js"></script>
+
+	</head>
+
+	<body>
+		<div class="wrapIn">
+			<div class="redLogBundle-navList">
+				<p class="goListLink">
+					<a href="javascript:history.go(-1)"><img src="images/titleIcon-2.png" /></a>
+				</p>
+				<ul class="redLogBundle-nav">
+
+					<li class="on">
+						<a href="remind.html">交易管理</a>
+					</li>
+				</ul>
+			</div>
+			<div class="wrap pt02">
+				<div class="plr04">
+					<div class="fz28 dealManageText">
+						当前交易账号：北仑 <span>2018-09-15 10:41:52</span>
+					</div>
+					<div class="fz28 pt02 dealManageChoose">
+						当前产品报价：<span class="red pr02">27924</span><span class="green">27904</span>
+						<div class="selectText">
+							<select>
+								<option>XTIUSD</option>
+								<option>XAUUSD</option>
+								<option>XAGUSD</option>
+								<option>EURUSD</option>
+								<option>GBPUSD</option>
+								<option>USDJPY</option>
+								<option>USDCAD</option>
+								<option>USDCHF</option>
+								<option>HK</option>
+
+							</select>
+						</div>
+
+					</div>
+					<div class="dealChoose fz28 pt02">
+						<p class="text">交易类型 ：</p>
+						<div class="selectText">
+							<button type="button" class="buyButton">买入</button>
+							<span class="pl04"><button type="button" class="sellButton5ec679">卖出</button></span>
+						</div>
+					</div>
+				</div>
+				<div class="plr01">
+					<ul class="crunchy-tabList">
+						<li>
+							<a href="positions.html">目前持仓</a>
+						</li>
+						<li>
+							<a href="historicalTransaction.html">历史交易</a>
+						</li>
+						<li class="on">
+							<a href="statement.html">我的报表</a>
+						</li>
+						<li>
+							<a href="index.html">个人中心</a>
+						</li>
+					</ul>
+					<div class="crunchy-InfoText">
+					<div class="crunchy-wrap">
+						<div class="textTop">
+							<p>表现 <span>(单位：累计美金/每手)</span></p>数据将于每天北京时间00:00更新
+						</div>
+					<div id="main" style="width: 100%; height:5.6rem;">
+						
+					</div>
+						<p class="textHint">*历史表现并不代表未来交易的成功率，您需要理智的做出判断</p>
+						<p class="tongjiTitle">数据统计</p>
+						<ul class="tongji">
+							<li>
+								<p>87.10%</p>胜率
+							</li>
+							<li>
+								<p>484笔</p>盈利订单
+							</li>
+							<li>
+								<p>71笔</p>亏损订单
+							</li>	<li>
+								<p>558笔</p>总交易
+							</li>
+							
+
+						</ul>
+					</div>
+				
+				</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" src="js/jquery-1.8.3.min.js" ></script>
+	<script type="text/javascript" src="js/echarts.simple.min.js" ></script>
+<script>
+ var myChart = echarts.init(document.getElementById('main'));
+option = {
+
+    xAxis: [
+    {
+        type: 'category',
+         data: ['1月', '2月', '3月', '4月', '5月']
+          }, 
+
+         
+    ],
+     yAxis: {
+        min: 0,      
+        type: 'value',
+        axisLine: {onZero: false}
+    },
+    series: [{
+        data: [220, 932, 901, 934, 1290,1900],
+        type: 'line',
+         symbolSize:10
+    }]
+};
+ myChart.setOption(option);
+</script>
+</html>
