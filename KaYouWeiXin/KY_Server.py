@@ -67,8 +67,43 @@ def is_list(val) -> bool:
         return False
 
 
+def get_birth(birth: datetime.datetime) -> str:
+    """
+    根据出生年月计算年龄
+    :param birth:
+    :return:
+    """
+    if isinstance(birth, datetime.datetime):
+        now = datetime.datetime.now().year
+        y = birth.year
+        m = birth.month
+        return "{} 岁({}年{}月)".format(now - y, y, m)
+    else:
+        return ''
+
+
+def transform_education(education: (str, int)) -> int:
+    """
+    转换学历,忽视旧的字符串格式的学历.None转为-1
+    :param education:
+    :return:
+    """
+    if isinstance(education, str):
+        try:
+            education = int(education)
+        except Exception as e:
+            education = -1
+    elif isinstance(education, int):
+        pass
+    else:
+        education = -1
+    return education
+
+
 app.jinja_env.filters['str_time'] = str_time
 app.jinja_env.filters['is_list'] = is_list
+app.jinja_env.filters['get_birth'] = get_birth
+app.jinja_env.filters['transform_education'] = transform_education
 
 
 """辅助函数"""

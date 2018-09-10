@@ -200,7 +200,7 @@ class IdCardOcrRequest(mongo_db2.BaseDoc):
     @classmethod
     def process(cls) -> None:
         """
-        处理简历相关的OCR识别请求
+        处理简历中身份证的OCR识别请求,此函数未完成.2018-9-10
         :return:
         """
         f = {"resp_time": {"$exists": False}}
@@ -262,6 +262,8 @@ class IdCardOcrRequest(mongo_db2.BaseDoc):
                 logger.exception(msg=ms)
                 print(ms)
                 pass
+
+
 
 
 

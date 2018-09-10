@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ real_name }}</title>
+    <link rel="stylesheet" href="/static/css/inside/resume_template.css?v={{ v }}">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/es6-promise.auto.min.js"></script>
+    <script src="/static/js/jspdf.min.js"></script>
+    <script src="/static/js/html2canvas.min.js"></script>
+    <script src="/static/js/html2pdf.min.js"></script>
+</head>
+<body>
+<div id="main">
+    <div class="container-fluid">
+        <!--顶部工具栏-->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 top_tools">
+                <div class="tool_item" id="print_btn"><i class="fa fa-print"></i><span>打印</span></div>
+                <div class="tool_item"  id="export_btn"><i class="fa fa-file-pdf-o"></i><span>PDF</span></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 title_div">
+                简历
+            </div>
+        </div>
+        <!--基本信息-->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="base_info">
+                    <div class="left">
+                        <img class="head_img" src="{{ head_img_url if head_img_url else '/static/images/head_img.png' }}">
+                    </div>
+                    <div class="right">
+                        <div class="right_line first">{{ real_name }}</div>
+                        <div class="right_line">
+                            <div class="info_item">
+                                <i class="fa fa-home"></i>
+                                <span class="info_value">
+                                    {{ address }}
+                                </span>
+                            </div>
+                            <div class="info_item">
+                                <i class="fa fa-mobile"></i>
+                                <span class="info_value">
+                                    {{ phone }}
+                                </span>
+                            </div>
+                            <div class="info_item">
+                                <i class="fa fa-user"></i>
+                                <span class="info_value">
+                                    {{ gender + " | " }}
+                                    {% if married == 0 %}
+                                        {{ "未婚" + " | " }}
+                                    {% elif married == 1 %}
+                                        {{ "已婚" + " | " }}
+                                    {% elif married == -1 %}
+                                         {{ "离异" + " | " }}
+                                    {% else %}
+                                    {% endif %}
+                                    {{ birth_date | get_birth }}
+                                </span>
+                            </div>
+                            <div class="info_item">
+                                <i class="fa fa-mortar-board"></i>
+                                <span class="info_value">
+                                    {% if education | transform_education >= 4 %}
+                                        本科
+                                    {% elif education | transform_education == 3 %}
+                                        大专
+                                    {% elif education | transform_education == 2 %}
+                                        中学
+                                    {% elif education | transform_education == 1 %}
+                                        小学
+                                    {% else %}
+                                        无
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="right_line">
+                            <div class="info_item">
+                                <i class="fa fa-bar-chart"></i>
+                                <span class="info_value">
+                                    {{ work_experience | string + "年工作经验" }}
+                                </span>
+                            </div>
+                            <div class="info_item">
+                                <i class="fa fa-drivers-license-o"></i>
+                                <span class="info_value">
+                                    {{ dl_license_class | upper }}驾照
+                                </span>
+                            </div>
+                            <div class="info_item">
+                                <i class="fa fa-dashboard"></i>
+                                <span class="info_value">
+                                        {{ driving_experience + "年驾龄" if driving_experience else "" }}
+                                    </span>
+                            </div>
+                            <div class="info_item">
+                                <i class="fa fa-drivers-license"></i>
+                                <span class="info_value">
+                                        {{ rtqc_license_class if rtqc_license_class else "无行业许可证" }}
+                                    </span>
+                            </div>
+                            <div class="info_item">
+                                <i class="fa fa-street-view"></i>
+                                <span class="info_value">
+                                        {{ industry_experience + "年行业经验" if industry_experience else "" }}
+                                    </span>
+                            </div>
+                        </div>
+
+                        <div class="right_line">
+                            <div class="info_item">
+                                <i class="fa fa-truck"></i>
+                                <span class="info_value">
+                                    {{ ('在职' if status == 1 else '自营') if status else '离职' }}
+                                </span>
+                            </div>
+                            <div class="info_item">
+                                <i class="fa fa-flag-o"></i>
+                                <span class="info_value">
+                                    {{ '需要一份工作' if want_job else '暂时不想找工作' }}
+                                </span>
+                            </div>
+                            <div class="info_item">
+                                <i class="fa fa-map-marker"></i>
+                                <span class="info_value">
+                                    {{ '接受外地工作' if remote else '不接受外地工作' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--主要显示区域开始-->
+        <!--个人信息-->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="show_zone person_block">
+                    <ul class="my_table">
+                        <li class="col_1">
+                                <span class="title first">基本信息</span>
+                        </li>
+                        <li class="col_2">
+                            <span class="name first">家庭住址</span><span class="value">{{ address if address else ' ' }}</span>
+                            <span class="name">现住址</span><span class="value">{{ living_place }}</span>
+                        </li>
+                        <li class="col_2">
+                            <span class="name  first">籍贯</span><span class="value">{{ birth_place }}</span>
+                            <span class="name">身份证号码</span><span class="value">{{ id_num }}</span>
+                        </li>
+                        <li class="col_2 last">
+                            <span class="name first">紧急联系人</span><span class="value">{{ ice_contact }}</span>
+                            <span class="name">紧急联系人号码</span><span class="value">{{ ice_phone }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--求职意愿-->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="show_zone salary_block">
+                    <ul class="my_table">
+                        <li class="col_1">
+                                <span class="title first">求职意愿</span>
+                        </li>
+                        <li class="col_3 last">
+                            <span class="name first">有求职意愿</span><span class="value">{{ '是' if want_job else '否' }}</span>
+                            <span class="name">接受异地工作</span><span class="value">{{ '是' if remote == 1 else '否' }}</span>
+                            <span class="name">期望待遇</span><span class="value">
+                            {{ expected_salary[0] | string + ('+' if expected_salary[1] else '')if expected_salary else '面议' }}
+                        </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--工作经验-->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="show_zone work_block">
+                    <ul class="my_table">
+                        <li class="col_1 {{'last' if work_list | length == 0 else '' }}">
+                                <span class="title first">工作经历</span>
+                        </li>
+                        {% for work in work_list %}
+                            <li class="col_2 first">
+                                <span class="title2 name first">企业名称</span>
+                                <span class="value">{{ work.enterprise_name }}</span>
+                                <span class="name">工作时间</span>
+                                <span class="value">{{ work.begin | str_time }} 至 {{ work.end | str_time }}</span>
+                            </li>
+                            <li class="col_3">
+                            <span class="name first">所属部门</span>
+                                <span class="value">{{ work.dept_name }}</span>
+                                <span class="name">企业性质</span>
+                                <span class="value">{{ work.enterprise_class }}</span>
+                                <span class="name">企业规模</span>
+                                <span class="value">{{ work.enterprise_scale }}</span>
+                            </li>
+                            <li class="col_3">
+                                <span class="name first">任职岗位</span>
+                                <span class="value">{{ work.post_name }}</span>
+                                <span class="name">团队人数</span>
+                                <span class="value">{{ work.team_size }}</span>
+                                <span class="name">驾驶车型</span>
+                                <span class="value">{{ work.vehicle_type }}</span>
+                            </li>
+                            <li class="col_1">
+                                <span class="name first">工作描述</span>
+                                <span class="value">{{ work.description }}</span>
+                            </li>
+                            <li class="col_1 last">
+                                <span class="name first">工作业绩</span>
+                                <span class="value">{{ work.achievement }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--教育经历-->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="show_zone education_block">
+                    <ul class="my_table">
+                        <li class="col_1 {{'last' if education_list | length == 0 else '' }}">
+                                <span class="title first">教育经历</span>
+                        </li>
+                        {% for education in education_list %}
+                            <li class="col_2 first">
+                                <span class="title2 name first">教育机构</span>
+                                <span class="value">{{ education.school_name }}</span>
+                                <span class="name">学习时间</span>
+                                <span class="value">{{ education.begin | str_time }} 至 {{ education.end | str_time }}</span>
+                            </li>
+                            <li class="col_2 last">
+                                <span class="name first">机构类型</span>
+                                <span class="value">{{ education.level }}</span>
+                            <span class="name first">学习专业</span>
+                                <span class="value">{{ education.major }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--荣誉信息-->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="show_zone honor_block">
+                    <ul class="my_table">
+                        <li class="col_1 {{'last' if honor_list | length == 0 else '' }}">
+                                <span class="title first">所获荣誉</span>
+                        </li>
+                        {% for honor in honor_list %}
+                            <li class="col_2 first">
+                                <span class="title2 name first">荣誉称号</span>
+                                <span class="value">{{ honor.title }}</span>
+                                <span class="name">获奖时间</span>
+                                <span class="value">{{ honor.time | str_time }}</span>
+                            </li>
+                            <li class="col_1 {{ 'last' if loop.last else '' }}">
+                                <span class="name first">相关信息</span>
+                                <span class="value">{{ honor.info }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--自有车辆-->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="show_zone vehicle_block">
+                    <ul class="my_table">
+                        <li class="col_1 {{'last' if vehicle_list | length == 0 else '' }}">
+                                <span class="title first">自有车辆</span>
+                        </li>
+                        {% for vehicle in vehicle_list %}
+                            <li class="col_2 {{ 'last' if loop.last else '' }}">
+                                <span class="name first last">车型</span>
+                                <span class="value">{{ vehicle.vehicle_model }}</span>
+                                <span class="name">车长</span>
+                                <span class="value">{{ vehicle.vehicle_length }}</span>
+                                <span class="name">牌照</span>
+                                <span class="value">{{ vehicle.plate_number }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--主要显示区域结束-->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="page_bottom">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/static/js/inside/resume_template.js?v={{ v }}"></script>
+</html>

@@ -8,6 +8,7 @@ import mongo_db2
 import requests
 import datetime
 import re
+from flask import render_template
 from log_module import get_logger
 from module.ocr_module import OcrResult
 from pymongo.results import InsertOneResult
@@ -302,7 +303,7 @@ class WorkHistory(mongo_db2.BaseDoc):
     车长,只有货车有这个选项.
     6/9.6/17.5 三档 None代表没有此项数据,-1代表大于17.5
     """
-    type_dict['vehicle_length'] = float  # 车辆载重量,单位米.
+    type_dict['vehicle_length'] = float  # 车辆载长度,单位米.
     type_dict['description'] = str  # 工作描述.带换行符和空格的字符串格式.
     type_dict['achievement'] = str  # 工作业绩.带换行符和空格的字符串格式.
     type_dict["create_date"] = datetime.datetime  # 创建日期
@@ -376,6 +377,7 @@ class DriverResume(mongo_db2.BaseDoc):
     type_dict['user_name'] = str  # 用户名,唯一判定,默认和手机相同,可以登录司机招聘网(功能未实现)
     type_dict['real_name'] = str  # 真实姓名 ,可以从驾驶证取
     type_dict['head_image'] = ObjectId  # 头像
+    type_dict['head_image_url'] = str  # 头像,url
     type_dict['gender'] = str   # 以驾驶证信息为准. 男/女
     type_dict['married'] = int  # 婚否? 0/1/-1 未婚/已婚/离异  None 空白
     type_dict['birth_place'] = str   # 籍贯/出生地
@@ -390,6 +392,8 @@ class DriverResume(mongo_db2.BaseDoc):
     type_dict['id_image_back'] = ObjectId  # 身份证背面图片
     type_dict['id_image_back_url'] = str  # 身份证背面图片
     type_dict['age'] = int  # 年龄 以身份证号码为准
+    type_dict['ice_contact'] = str  # 紧急联系人,ICE是 in case of emergency (紧急状况)的意思
+    type_dict['ice_phone'] = str  # 紧急电话
     """以下3个字段因为是动态的,需要在每次查询doc的时候进行计算,以保证准确性"""
     type_dict['driving_experience'] = int  # 驾龄 单位 年 用驾驶证信息中的首次领证日期计算
     type_dict['industry_experience'] = int  # 从业年限 单位 年 用道路运输从业资格证信息中的首次领证日期计算
@@ -702,7 +706,8 @@ class DriverResume(mongo_db2.BaseDoc):
                 "from": "honor_info",
                 "let": {"honor_ids": {"$ifNull": ["$honor", []]}},  # 注意这里的$ifNull的用法,这相当于三元表达式
                 "pipeline": [
-                    {"$match": {"$expr": {"$in": ["$_id", "$$honor_ids"]}}}  # 注意这里的$in的用法
+                    {"$match": {"$expr": {"$in": ["$_id", "$$honor_ids"]}}},  # 注意这里的$in的用法
+                    {"$sort": {"time": 1}}
                 ],
                 "as": "honor_list"
             }},
@@ -710,8 +715,10 @@ class DriverResume(mongo_db2.BaseDoc):
                 "from": "work_history",
                 "let": {"work_ids": {"$ifNull": ["$work_history", []]}},  # 注意这里的$ifNull的用法,这相当于三元表达式
                 "pipeline": [
-                    {"$match": {"$expr": {"$in": ["$_id", "$$work_ids"]}}}  # 注意这里的$in的用法
+                    {"$match": {"$expr": {"$in": ["$_id", "$$work_ids"]}}},  # 注意这里的$in的用法
+                    {"$sort": {"end": -1}}
                 ],
+
                 "as": "work_list"
             }},
             {"$lookup": {
@@ -720,7 +727,8 @@ class DriverResume(mongo_db2.BaseDoc):
                     "education_ids": {"$ifNull": ["$education_history", []]}  # 注意这里的$ifNull的用法,这相当于三元表达式
                 },
                 "pipeline": [
-                    {"$match": {"$expr": {"$in": ["$_id", "$$education_ids"]}}}  # 注意这里的$in的用法
+                    {"$match": {"$expr": {"$in": ["$_id", "$$education_ids"]}}},  # 注意这里的$in的用法
+                    {"$sort": {"end": -1}}
                 ],
                 "as": "education_list"
             }},
@@ -1525,7 +1533,7 @@ class DriverResume(mongo_db2.BaseDoc):
     @classmethod
     def check_and_lock(cls, doc: dict) -> bool:
         """
-        检查并锁定信息,
+        检查并锁定信息,防止身份信息通过审核后被随意修改.  未完成,需要ocr_module配合,  2018-9-10
         1. 身份证正面图片的号码,名字与简历基本信息一致,并且身份证在有效期内
         2. 上传的驾照的级别和简历基本信息中一致.
         由于进行图像识别是一个耗时的操作.因此应该定期执行而不是直接由celery加入工作队列,
@@ -1540,6 +1548,35 @@ class DriverResume(mongo_db2.BaseDoc):
         back_info = OcrResult.id_card(img_id=id_image_back, ab='b')
         """从识别结果里取出来身份证号码,姓名和有效期的截止日期"""
         print()
+
+    @classmethod
+    def get_html(cls, r_id: (str, ObjectId)) -> str:
+        """
+        根据简历id,按照预订的样式,生成一个html的简历文件.
+        :param r_id:
+        :return:
+        """
+        if isinstance(r_id, str) and len(r_id) == 24:
+            r_id = ObjectId(r_id)
+        elif isinstance(r_id, ObjectId):
+            pass
+        else:
+            ms = "r_id 错误: {}".format(r_id)
+            logger.exception(msg=ms)
+            raise ValueError(ms)
+        doc = cls.get_full_info(r_id)
+        if doc['message'] == 'success':
+            doc = doc['data']
+            """
+            文档转为html
+            """
+            args = doc
+            for k, v in args.items():
+                print(k, v)
+        else:
+            ms = doc['message']
+            logger.exception(msg=ms)
+            raise ValueError(ms)
 
 
 if __name__ == "__main__":
@@ -1558,9 +1595,12 @@ if __name__ == "__main__":
     # DriverResume.delete_work_history(resume_id="5b3da7d84660d33df4a40a81", work_id=work_id)
     """查询简历的全部信息"""
     # DriverResume.get_full_info('5b5a96d9bede684e68049f01')
+    """获取简历的html格式"""
+    rh = DriverResume.get_html('5b5fcfa0bede686fc61f969f')
+    print(rh)
     """检查并锁定简历信息"""
-    info = DriverResume.find_by_id(o_id="5b5fcfa0bede686fc61f969f", to_dict=True)
-    DriverResume.check_and_lock(doc=info)
+    # info = DriverResume.find_by_id(o_id="5b5fcfa0bede686fc61f969f", to_dict=True)
+    # DriverResume.check_and_lock(doc=info)
     pass
 
 

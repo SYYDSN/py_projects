@@ -36,12 +36,34 @@ wx_blueprint = Blueprint("wx_blueprint", __name__, url_prefix="/wx", template_fo
 """用于公众号页面的视图函数"""
 
 
+def get_version():
+    """
+    返回一个随机的版本号
+    :return:
+    """
+    return uuid4().hex
+
+
 @check_platform_session
 def hello(user: dict = None) -> str:
     """hello world
     :param user:  用户字典
     """
     return "hello baby <a href='/wx/auth/info'>{}去授权</a><br><h2>{}</h2>".format(user.get("nick_name"), str(user['_id']))
+
+
+def debug_resume_html_func():
+    """
+    测试查看用户id,这是个临时函数.最终这个函数要安排到微信公众号的CRM后台中完成.2018-9-10
+    :return:
+    """
+    r_id = get_arg(request, "r_id", "")
+    if isinstance(r_id, str) and len(r_id) == 24:
+        doc = DriverResume.get_full_info(resume_id=r_id)['data']
+
+        return render_template("inside/resume_template.html", **doc)
+    else:
+        return abort(403, "bad parameters!")
 
 
 # @check_platform_session
@@ -730,7 +752,7 @@ def common_view_func(user: dict = None, html_name: str = ''):
     user = user2 if user is None else user
     template_dir = os.path.join(__project_dir__, 'templates')
     file_names = os.listdir(template_dir)
-    ver = uuid4().hex
+    ver = get_version()
     kwargs = dict()  # 页面传参数
     kwargs['version'] = ver
     kwargs['user'] = to_flat_dict(user)
@@ -918,6 +940,8 @@ def share_wx_func():
 
 """hello"""
 wx_blueprint.add_url_rule(rule="/hello", view_func=hello, methods=['get', 'post'])
+"""查看html格式的简历,此函数用来测试和调试 2018-9-10"""
+wx_blueprint.add_url_rule(rule="/debug_resume_html", view_func=debug_resume_html_func, methods=['get', 'post'])
 """分享微信的单独页面,用于外链"""
 wx_blueprint.add_url_rule(rule="/share_wx", view_func=share_wx_func, methods=['get'])
 """保存或者获取文件(mongodb存储)"""

@@ -26,6 +26,7 @@
     type_dict['country'] = str  # 国家
     type_dict['province'] = str  # 省份
     type_dict['city'] = str
+    type_dict['head_img'] = ObjectId  # 头像图片
     type_dict['head_img_url'] = str  # 头像图片地址
     type_dict['subscribe'] = int   # 是否已关注本微信号
     type_dict['subscribe_scene'] = str   # 用户关注的渠道来源
@@ -88,6 +89,8 @@
     type_dict['id_image_back'] = ObjectId  # 身份证背面图片
     type_dict['id_image_back_url'] = str  # 身份证背面图片
     type_dict['age'] = int  # 年龄 以身份证号码为准
+    type_dict['ice_contact'] = str  # 紧急联系人,ICE是 in case of emergency (紧急状况)的意思
+    type_dict['ice_phone'] = str  # 紧急电话
     type_dict['driving_experience'] = int  # 驾龄 单位 年 用驾驶证信息中的首次领证日期计算
     type_dict['industry_experience'] = int  # 从业年限 单位 年 用道路运输从业资格证信息中的首次领证日期计算
     type_dict['work_experience'] = int  # 工作年限 单位 年 依赖first_work_date属性
