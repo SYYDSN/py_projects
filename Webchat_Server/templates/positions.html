@@ -12,6 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
     <title>交易管理</title>
     <link rel="stylesheet" type="text/css" href="/static/css/teacher_index.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/dropload.css"/>
     <script type="text/javascript" src="/static/js/teacher_common.js"></script>
 
 </head>
@@ -32,10 +33,14 @@
     <div class="wrap pt02">
         <div class="plr04">
             <div class="fz28 dealManageText">
-                当前交易账号：{{ teacher.name }} <span>2018-09-15 10:41:52</span>
+                当前交易账号：{{ teacher.name }} <span class="now">2018-09-15 10:41:52</span>
             </div>
-            <div class="fz28 pt02 dealManageChoose">
-                当前产品报价：<span class="red pr02" id="buy_price"></span><span id="sell_price" class="green"></span>
+            <div id="price_div"  data-code="" class="fz28 pt02 dealManageChoose">
+                当前产品报价：
+                <span class="red pr02" id="buy_price"></span>
+                <span id="sell_price" class="green"></span>
+                <span style="display: none" id="cur_product_name"></span>
+                <span style="display: none" id="cur_product_code"></span>
                 <div class="selectText">
                     <select id="select_product">
                         <option value="XTIUSD">XTIUSD</option>
@@ -55,8 +60,8 @@
             <div class="dealChoose fz28 pt02">
                 <p class="text">交易类型 ：</p>
                 <div class="selectText">
-                    <button type="button" class="buyButton">买入</button>
-                    <span class="pl04"><button type="button" class="sellButton5ec679">卖出</button></span>
+                    <button type="button" id="buy_it" class="buyButton">买入</button>
+                    <span class="pl04"><button type="button" id="sell_it" class="sellButton5ec679">卖出</button></span>
                 </div>
             </div>
         </div>
@@ -77,178 +82,63 @@
             </ul>
 
             <div class="show_zone" id="positions_div">
-                <table border="0" cellspacing="0" cellpadding="0" class="priceTableList">
+                <table border="0" cellspacing="0" cellpadding="0" class="priceTableList case_block">
                     <tr>
                         <th>产品</th>
                         <th>价位</th>
                         <th>操作</th>
                     </tr>
-                    <tr>
-                        <td>
-                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
-                            2018.09.05 10:45:05
-                        </td>
-                        <td class="textCenter">1.17100-1.13217</td>
-                        <td class="textRight">
-                            <button type="button" class="closeButton">平仓</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="textTitle"> EURUSD,<span class="colore35e57">sell</span></p>
-                            2018.09.05 10:45:05
-                        </td>
-                        <td class="textCenter">1.17100-1.13217</td>
-                        <td class="textRight">
-                            <button type="button" class="closeButton">平仓</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
-                            2018.09.05 10:45:05
-                        </td>
-                        <td class="textCenter">1.17100-1.13217</td>
-                        <td class="textRight">
-                            <button type="button" class="closeButton">平仓</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
-                            2018.09.05 10:45:05
-                        </td>
-                        <td class="textCenter">1.17100-1.13217</td>
-                        <td class="textRight">
-                            <button type="button" class="closeButton">平仓</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
-                            2018.09.05 10:45:05
-                        </td>
-                        <td class="textCenter">1.17100-1.13217</td>
-                        <td class="textRight">
-                            <button type="button" class="closeButton">平仓</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
-                            2018.09.05 10:45:05
-                        </td>
-                        <td class="textCenter">1.17100-1.13217</td>
-                        <td class="textRight">
-                            <button type="button" class="closeButton">平仓</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="textTitle"> EURUSD,<span class="color17b640">buy</span></p>
-                            2018.09.05 10:45:05
-                        </td>
-                        <td class="textCenter">1.17100-1.13217</td>
-                        <td class="textRight">
-                            <button type="button" class="closeButton">平仓</button>
-                        </td>
-                    </tr>
+                    {% for hold in hold_list %}
+                        <tr id="{{ hold._id }}" class="case_line">
+                            <td>
+                                <p class="textTitle"> {{ hold.code | upper }},<span class="{{ 'colord44739' if hold.direction == '买入' else 'color17b640' }}">{{ 'buy' if hold.direction == '买入' else 'sell' }} {{ hold.lots }}手</span></p>
+                                {{ hold.enter_time | short_date2 }}
+                            </td>
+                            <td class="textCenter">
+                                <span class="enter_p">{{ hold.enter_price }}</span>
+                                -
+                                <span data-p_direction="{{ hold.direction }}" data-p_name="{{ hold.code }}" class="now_p"></span>
+                            </td>
+                            <td class="textRight">
+                                <button  data-p="{{ hold.code | upper }}" data-d="{{ hold.direction }}" data-n="{{ hold.product }}" data-id="{{ hold._id }}" type="button" class="closeButton close_case">平仓</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </table>
             </div>
 
             <div class="crunchy-InfoText show_zone" id="history_div">
                 <div class="currentCrunchyinput">
-                    <input type="" placeholder="输入交易品种进行搜索"/>
-                    <button type="button">搜索</button>
+                    <input id="search_kw" type="text" placeholder="输入交易品种进行搜索"/>
+                    <button id="search_history" type="button">搜索</button>
                 </div>
 
                 <div class="crunchy-wrap">
-                    <ul class="currentCrunchy">
-                        <li>
-                            <div class="textList">
-                                <p class="textTitle"> EURUSD<span class="colore35e57 pl01">buy</span></p>
-                                2018.09.05 10:45:05
-                            </div>
-                            <div class="priceText">
-                                1.17100-1.13217
-                            </div>
+                    <ul id="default_history" class="currentCrunchy">
+                        {% for trade in trade_list %}
+                            <li id="{{ trade._id }}">
+                                <div class="textList">
+                                    <p class="textTitle">
+                                        {{ trade.product }}
+                                        <span class="{{ 'colore35e57' if trade.direction == '买入' else 'color17b640' }} pl01">
+                                            {{ 'buy' if trade.direction == '买入' else 'sell' }}
+                                        </span>
+                                    </p>
+                                    {{ trade.exit_time | short_date2 }}
+                                </div>
+                                <div class="priceText">
+                                    {{ trade.enter_price }} - {{ trade.exit_price }}
+                                </div>
 
-                            <div class="earnings">
-                                $600.00/手
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="textList">
-                                <p class="textTitle"> EURUSD<span class="color17b640 pl01">sell</span></p>
-                                2018.09.05 10:45:05
-                            </div>
-                            <div class="priceText">
-                                1.17100-1.13217
-                            </div>
-
-                            <div class="earnings color17b640">
-                                $600.00/手
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="textList">
-                                <p class="textTitle"> EURUSD<span class="colore35e57 pl01">buy</span></p>
-                                2018.09.05 10:45:05
-                            </div>
-                            <div class="priceText">
-                                1.17100-1.13217
-                            </div>
-
-                            <div class="earnings">
-                                $600.00/手
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="textList">
-                                <p class="textTitle"> EURUSD<span class="color17b640 pl01">sell</span></p>
-                                2018.09.05 10:45:05
-                            </div>
-                            <div class="priceText">
-                                1.17100-1.13217
-                            </div>
-
-                            <div class="earnings color17b640">
-                                $600.00/手
-                            </div>
-                        </li>
-                        <li>
-                            <div class="textList">
-                                <p class="textTitle"> EURUSD<span class="colore35e57 pl01">buy</span></p>
-                                2018.09.05 10:45:05
-                            </div>
-                            <div class="priceText">
-                                1.17100-1.13217
-                            </div>
-
-                            <div class="earnings">
-                                $600.00/手
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="textList">
-                                <p class="textTitle"> EURUSD<span class="color17b640 pl01">sell</span></p>
-                                2018.09.05 10:45:05
-                            </div>
-                            <div class="priceText">
-                                1.17100-1.13217
-                            </div>
-
-                            <div class="earnings color17b640">
-                                $600.00/手
-                            </div>
-                        </li>
-
+                                <div class="earnings">
+                                    ${{ trade.each_profit | short_num1 }}/手
+                                </div>
+                            </li>
+                        {% endfor %}
                     </ul>
-                    <p class="upmorelist">往上拉加载更多</p>
+                    <ul id="searched_history" class="currentCrunchy">
+                    </ul>
+                    <p class="upmorelist">往上拉加载更多</p><div id="test"></div>
                 </div>
             </div>
 
@@ -286,18 +176,19 @@
                 <div class="userTextimg">
                     <p class="leftimg"><img src="/static/images/img1.png"/></p>
                     <div class="userInfo">
-                        <h3>北仑</h3>
-                        <p># 机会准 持单短</p>
+                        <h3>{{ teacher.name }}</h3>
+                        <p>{{ teacher.feature if teacher.feature else '机会准 持单短'}}</p>
                     </div>
                 </div>
                 <div class="individualResume">
                     <p class="title"><span>分析师简介：</span></p>
-
+                    {% if teacher.resume %}
+                        {% else %}
                     <p style="text-indent: 2em;">
                         资深金融行业人士，黄金外汇交易培训师，身兼股票外汇行业高管与投资者的双重身份。拥有十二年交易经验，擅长分析研究国际投资市场规律。2006年进入金融领域并十年一直坚持在金融领域发展。2011年创立“经典趋势节奏”交易系统，帮助交易者把握想要的趋势行情，形成年收益率目标100%的系统化规则化交易方法。“经典趋势节奏”体系的准确率高、盈亏比高、风险控制极强；注重多级别顺势、止损有效性、科学资金管理等方面综合判定下的交易方式。</p>
                     <p>运用技术分析，深谙股市、利率、股指及大宗商品联动性 金融机构大客户等中短线交易。2016年创建语昂交易俱乐部，自俱乐部开设以来，各项课程受业内投资人一致好评。
                     </p>
-
+                    {% endif %}
                 </div>
             </div>
 
@@ -306,9 +197,9 @@
 </div>
 </body>
 <script src="/static/js/jquery-1.8.3.min.js"></script>
-<script src="/static/js/jquery-weui.min.js"></script>
 <script src="/static/js/tools.js"></script>
 <script src="/static/js/echarts.min.js"></script>
+<script src="/static/js/dropload.min.js"></script>
 <script src="/static/js/socket.io.js"></script>
 <script src="/static/js/positions.js?v={{ v }}"></script>
 </html>

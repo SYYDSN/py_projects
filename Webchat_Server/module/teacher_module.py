@@ -278,6 +278,9 @@ class Teacher(mongo_db.BaseDoc):
             end = now
         if begin is None:
             begin = now - datetime.timedelta(days=60)
+        """
+        calculate_win_per_by_week_single和cls.get_hold方法一样,本质上都是调用了hold_info_from_db函数
+        """
         data = calculate_win_per_by_week_single(t_id=t_id, begin=begin, end=end)
         t = Teacher.find_by_id(o_id=t_id, can_json=True)
         data.update(t)
@@ -381,6 +384,42 @@ class Teacher(mongo_db.BaseDoc):
             cls.instance(**t2).save_plus()
             cls.instance(**t3).save_plus()
             cls.instance(**t).save_plus()
+
+    @classmethod
+    def trade_history(cls, t_id: ObjectId, filter_dict: dict, page_size: int = 50, can_json: bool = False) -> list:
+        """
+        分页查询喊单历史(已离场的)
+        :param t_id:  老师id
+        :param filter_dict:  查询条件字典,
+        :param page_size:  一页有多少条记录?
+        :return:
+        """
+        filter_dict["teacher_id"] = t_id
+        filter_dict["case_type"] = "exit"
+        sort_list = [("_id", -1)]
+        projection = ['_id', 'exit_time', 'product', 'direction', 'enter_price', 'exit_price', 'lots', 'each_profit']
+        ses = mongo_db.get_conn(table_name="trade")
+        args = {
+            "filter": filter_dict,
+            "sort": sort_list,   # 可能是None,但是没问题.
+            "projection": projection,
+            "limit": page_size
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        """开始查询页面"""
+        res = list()
+        r = ses.find(**args)
+        if r is None:
+            pass
+        else:
+            if r.count() > 0:
+                if can_json:
+                    res = [mongo_db.to_flat_dict(x) for x in r]
+                else:
+                    res = [x for x in r]
+            else:
+                pass
+        return res
 
 
 if __name__ == "__main__":

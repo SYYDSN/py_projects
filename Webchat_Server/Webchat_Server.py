@@ -46,6 +46,21 @@ app_secret = "d9186b6cef15534427c02f6ee7085a9f"     # 汇赢app_secret
 """自定义过滤器"""
 
 
+def short_num(num: float) -> float:
+    """不保留小数"""
+    return int(num)
+
+
+def short_num1(num: float) -> float:
+    """保留1位小数"""
+    return round(num, 1)
+
+
+def short_num2(num: float) -> float:
+    """保留2位小数"""
+    return round(num, 2)
+
+
 def short_date(d: datetime.datetime) -> str:
     """
     日期格式化,返回'x月x日'这样的格式
@@ -55,9 +70,22 @@ def short_date(d: datetime.datetime) -> str:
     return "{}月{}日".format(d.month, d.day)
 
 
+def short_date2(d: datetime.datetime) -> str:
+    """
+    日期格式化,返回'x月x日 12时xx分'这样的格式
+    :param d:
+    :return:
+    """
+    return "{}月{}日 {}时{}分".format(d.month, d.day, d.hour, d.minute)
+
+
 """注册jinja2过滤器"""
 
+app.jinja_env.filters['short_num'] = short_num
+app.jinja_env.filters['short_num1'] = short_num1
+app.jinja_env.filters['short_num2'] = short_num2
 app.jinja_env.filters['short_date'] = short_date
+app.jinja_env.filters['short_date2'] = short_date2
 
 
 """工具函数"""

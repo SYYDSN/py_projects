@@ -34,8 +34,8 @@ $(function(){
                 else{
                     var ref = resp['ref'];
 
-                    // location.href = ref == undefined? "/teacher/process_case.html": ref;
-                    location.href = ref == undefined? "/teacher/html/positions.html": ref;
+                    location.href = ref == undefined? "/teacher/process_case.html": ref;
+                    // location.href = ref == undefined? "/teacher/html/positions.html": ref;
                 }
             });
         }

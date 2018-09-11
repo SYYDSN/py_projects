@@ -880,7 +880,7 @@ class BaseFile:
     """
     保存文件到mongodb数据库的GridFS操作基础类,
     这一类函数都不推荐使用init创建实例.而是使用
-    cls.save_cls以及其眼神的方法cls.save_flask_file来保存文件.
+    cls.save_cls以及其延伸的方法cls.save_flask_file来保存文件.
     """
     _table_name = "base_file"
     type_dict = dict()
@@ -1110,7 +1110,7 @@ class BaseFile:
         :param filter_dict:  查询条件字典
         :param sort_dict:  排序条件字典
         :param projection:  投影数组,决定输出哪些字段?
-        :param page_size:
+        :param page_size:  一页有多少条记录?
         :param ruler: 翻页器最多显示几个页码？
         :param page_index: 页码(当前页码)
         :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
@@ -1855,7 +1855,6 @@ class BaseDoc:
     def insert_one(cls, **kwargs):
         """
         把参数转换为对象并插入
-        :param obj: 字典参数
         :return: ObjectId
         """
         instance = None
@@ -2251,10 +2250,10 @@ class BaseDoc:
     def find_one_and_update_plus(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
                               return_document: str="after"):
         """
-        find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
-        find_one_and_update和find_alone_and_update替更简单医易用.
+        本方法是find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
+        和本方法相比find_one_and_update和find_alone_and_update更简单易用.
         本方法更灵活,只是在设置参数时要求更高.
-        找到一个文档然后更新它，如果找不到就插入
+        找到一个文档然后更新它，(如果找不到就插入)
         :param filter_dict: 查找时匹配参数 字典
         :param update_dict: 更新的数据，字典,注意例子中参数的写法,有$set和$inc两种更新方式.
         :param projection: 输出限制列  projection={'seq': True, '_id': False} 只输出seq，不输出_id

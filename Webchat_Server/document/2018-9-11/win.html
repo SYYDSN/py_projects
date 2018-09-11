@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="format-detection" content="email=no">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+		<meta name="screen-orientation" content="portrait" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<title>交易管理</title>
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		<script type="text/javascript" src="js/common.js"></script>
+
+	</head>
+
+	<body>
+		
+				<!--弹层-->
+		<div class="fixedWin" >
+			<!--买入（确认买入）-->
+			<div class="wrapWin buyWrapWin">
+				<h3 class="textTitle"> <span class="close"></span></h3>
+
+				<p class="buyTextTitle">您确定要买入1.0手吗？ </p>
+				<p class="textCenter pt03 pb03">
+					<button type="button" class="btnNoneColor">取消</button>
+					<span class="pl04"><button type="button" class="btnNoneColor">确定</button></span>
+				</p>
+			</div>
+
+			<!--卖出（确认卖出）-->
+			<div class="wrapWin SellWrapWin" style="display: none;">
+				<h3 class="textTitle"> <span class="close"></span></h3>
+
+				<p class="buyTextTitle">您确定要卖出1.0手吗？ </p>
+				<p class="textCenter pt03 pb03">
+					<button type="button" class="btnNoneColor">取消</button>
+					<span class="pl04"><button type="button" class="btnNoneColor">确定</button></span>
+				</p>
+			</div>
+			<!--卖出（确认卖出）-->
+			<div class="wrapWin closeWrapWin" style="display: none;">
+				<h3 class="textTitle"> <span class="close"></span></h3>
+
+				<div class="ptb06 fz32 pl04 lineHeight">
+					<p class="pb02">平仓：XTIUSD,buy 1.00</p>
+					<p>获利：3 000.00</p>
+				</div>
+				<p class="textCenter pt03 pb03">
+					<button type="button" class="btnNoneColor">取消</button>
+					<span class="pl04"><button type="button" class="btnNoneColor">确定</button></span>
+				</p>
+			</div>
+
+		</div>
+	</body>
+</html>

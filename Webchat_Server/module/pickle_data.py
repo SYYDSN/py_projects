@@ -834,6 +834,14 @@ def query_chart_data(chart_type: str = "teacher", begin: str = None, end: str = 
     return res
 
 
+def win_and_chart(t_id: (str, ObjectId)) -> dict:
+    """
+    查询老师的胜率,图表数据等.
+    :param t_id:
+    :return:
+    """
+
+
 if __name__ == "__main__":
     # calculate_win_per_by_product()
     # calculate_win_per_by_teacher()
