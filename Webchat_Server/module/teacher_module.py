@@ -396,7 +396,7 @@ class Teacher(mongo_db.BaseDoc):
         """
         filter_dict["teacher_id"] = t_id
         filter_dict["case_type"] = "exit"
-        sort_list = [("_id", -1)]
+        sort_list = [("exit_time", -1)]
         projection = ['_id', 'exit_time', 'product', 'direction', 'enter_price', 'exit_price', 'lots', 'each_profit']
         ses = mongo_db.get_conn(table_name="trade")
         args = {

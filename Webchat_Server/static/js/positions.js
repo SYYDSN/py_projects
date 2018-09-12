@@ -145,7 +145,9 @@ $(function(){
                     "product": product, "direction": direction, "code": code,
                     "enter_price": enter_price, "enter_time": enter_time
                 };
+                $.pop_alert();
                 $.post(post_url, args, function (resp) {
+                    $.close_alert();
                     var resp = JSON.parse(resp);
                     var status = resp['message'];
                     if (status == "success") {
@@ -191,7 +193,9 @@ $(function(){
                     "exit_price": price,
                     "product": product
                 };
+                $.pop_alert();
                 $.post(post_url, args, function (resp) {
+                    $.close_alert();
                     var resp = JSON.parse(resp);
                     var status = resp['message'];
                     if (status == "success") {
@@ -213,57 +217,93 @@ $(function(){
         $this.click(function(){exit($this);});
     });
 
-    // 搜索喊单历史按钮.
-    $("#search_history").click(function(){
+    // 获取搜索的关键字
+    var get_keyword = function(){
         var kw = $.trim($("#search_kw").val()).toUpperCase();
-        var product = '';
-        for(var p of p_names){
-            var code = p['code'];
-            var name = p['name'];
-            if(kw == code || kw == name){
-                product = name;
-                break;
-            }
-            else{}
-        }
-        if(product != ""){
-            var args = {
-                "the_type": "trade_history",
-                "product": product
-            };
-            $.post(post_url, args, function(resp){
-                var resp = JSON.parse(resp);
-                var status = resp['message'];
-                if(status != "success"){
-                    alert(status);
-                }
-                else{
-                    var trade_list = resp['data'];
-                    $("#default_history").hide();
-                    fill_history(trade_list);
-                }
-            });
+        var product = null;
+        if(kw == ""){
+            return kw;
         }
         else{
-            // 重置
-            $("#searched_history").empty();
+            for(var p of p_names){
+                var code = p['code'];
+                var name = p['name'];
+                if(kw == code || kw == name){
+                    product = name;
+                    break;
+                }
+                else{}
+            }
+            return product;
+        }
+    };
+
+    // 搜索喊单历史按钮. 使用搜索按钮总是清空原有的喊单历史
+    $("#search_history").click(function(){
+        var product = get_keyword();
+        if(product == null){
+            // 输入了错误的关键字
+        }
+        else{
+            if(product != ""){
+                var args = {
+                    "the_type": "trade_history",
+                    "product": product
+                };
+                $.pop_alert();
+                $.post(post_url, args, function(resp){
+                    $.close_alert();
+                    var resp = JSON.parse(resp);
+                    var status = resp['message'];
+                    if(status != "success"){
+                        alert(status);
+                    }
+                    else{
+                        $("#search_kw").attr("data-search", product); // post后更新字段
+                        var trade_list = resp['data'];
+                        fill_history(trade_list, product, true);  // 填充历史列表
+                    }
+                });
+            }
+            else{
+                // 无关键字的搜索
+                $("#search_kw").attr("data-search", product); // 更新字段
+                $("#searched_history").hide();
+                $("#default_history").show();
+            }
+        }
+    });
+
+    $("#search_kw").keyup(function(){
+        // 监视关键字输入框
+        if($.trim($(this).val()) == ""){
+            $("#searched_history").hide();
             $("#default_history").show();
         }
-
     });
 
     // 填充喊单历史的函数.
-    var fill_history = function(a_list){
-        var c = $("#searched_history");
+    var fill_history = function(a_list, p_name, empty){
+        /*
+        * params a_list:      list      喊单历史的数组
+        * params p_name:      字符串     搜索的产品名字
+        * params empty:       Boolean   是否清除以前的数据?
+        * */
+        var is_default = p_name==""?true: false;  // 是不是默认的喊单历史?(没有指明产品的)
+        var c =  is_default?$("#default_history") : $("#searched_history");
+        if(empty){
+            c.empty();
+        }
         for(var i of a_list){
-            var time = i['exit_time'].split(" ");
+            var exit_time = i['exit_time'];
+            var time = exit_time.split(" ");
             var md = time[0].split("-");
             var hh = time[1].split(":");
             var m = md[1];
             var d = md[2];
             var h = hh[0];
             var m2 = hh[1];
-            var t = `<li id="${i._id}">
+            var t = `<li id="${i._id}" data-time="${exit_time}">
                         <div class="textList">
                             <p class="textTitle">
                                 ${i.product}
@@ -282,25 +322,57 @@ $(function(){
                      </li>`;
             c.append(t);
         }
+        if(p_name==""){
+            $("#searched_history").hide();
+            $("#default_history").show();
+        }
+        else{
+            $("#default_history").hide();
+            $("#searched_history").show()
+        }
     };
 
-    $
-//滚动条到页面底部加载更多案例 
-$(window).scroll(function(){
-	alert(1);
- var scrollTop = $(this).scrollTop();    //滚动条距离顶部的高度
- var scrollHeight = $(document).height();   //当前页面的总高度
- var clientHeight = $(this).height();    //当前可视的页面高度
- // console.log("top:"+scrollTop+",doc:"+scrollHeight+",client:"+clientHeight);
- if(scrollTop + clientHeight >= scrollHeight){   //距离顶部+当前高度 >=文档总高度 即代表滑动到底部 
-     //滚动条到达底部
-     alert(3)
- }else if(scrollTop<=0){
-	//滚动条到达顶部
-	 alert(4)
- //滚动条距离顶部的高度小于等于0 TODO
- 
- }});
+    // 懒加载更多喊单历史的函数
+    var more_history = function(){
+        // 获取最早一条记录.就是历史列表中最下面一条(列表是倒序排列的)
+        var p = $("#search_kw").attr("data-search");
+        var first_exit_time = null;  // 最早的一个历史的离场时间
+        if(p == ""){
+            // 默认历史
+            first_exit_time = $("#default_history > li:last").attr("data-time");
+        }
+        else{
+            // 带参数过滤器的
+        }
+        // alert(`最后的历史id=${first_exit_time}`);
+        var args = {
+            "the_type": "trade_history",
+            "product": p
+        };
+        if(first_exit_time != null){
+            args['first_exit_time'] = first_exit_time;
+        }
+        $.pop_alert();
+        $.post(post_url, args, function(resp){
+            $.close_alert();
+            var resp = JSON.parse(resp);
+            console.log(resp);
+            var status = resp['message'];
+            if(status != "success"){
+                alert(status);
+            }
+            else{
+                $("#search_kw").attr("data-search", p); // post后更新字段
+                var trade_list = resp['data'];
+                $("#default_history").hide();
+                fill_history(trade_list, p, false);
+            }
+        });
+    };
+
+
+    // 下滑到页面底部的事件.
+    $("#history_outer").pull_down(more_history);
 
 
 

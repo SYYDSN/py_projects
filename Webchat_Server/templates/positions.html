@@ -11,8 +11,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
     <title>交易管理</title>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="/static/css/teacher_index.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/dropload.css"/>
+    <link rel="stylesheet" href="/static/css/positions.css">
     <script type="text/javascript" src="/static/js/teacher_common.js"></script>
 
 </head>
@@ -109,14 +110,15 @@
 
             <div class="crunchy-InfoText show_zone" id="history_div">
                 <div class="currentCrunchyinput">
-                    <input id="search_kw" type="text" placeholder="输入交易品种进行搜索"/>
+                    <!--data-search属性给懒加载提供搜索关键字-->
+                    <input data-search="" id="search_kw" type="text" placeholder="输入交易品种进行搜索,比如 原油 或 XTIUSD"/>
                     <button id="search_history" type="button">搜索</button>
                 </div>
 
-                <div class="crunchy-wrap">
+                <div id="history_outer" class="crunchy-wrap">
                     <ul id="default_history" class="currentCrunchy">
                         {% for trade in trade_list %}
-                            <li id="{{ trade._id }}">
+                            <li id="{{ trade._id }}" data-time="{{ trade.exit_time }}">
                                 <div class="textList">
                                     <p class="textTitle">
                                         {{ trade.product }}
@@ -138,7 +140,8 @@
                     </ul>
                     <ul id="searched_history" class="currentCrunchy">
                     </ul>
-                    <p class="upmorelist">往上拉加载更多</p><div id="test"></div>
+                    <!--<p class="upmorelist">往上拉加载更多</p>-->
+                    <p class="upmorelist"><i class="fa fa-angle-double-down"></i></p>
                 </div>
             </div>
 
@@ -195,11 +198,13 @@
         </div>
     </div>
 </div>
+
+
 </body>
 <script src="/static/js/jquery-1.8.3.min.js"></script>
 <script src="/static/js/tools.js"></script>
 <script src="/static/js/echarts.min.js"></script>
-<script src="/static/js/dropload.min.js"></script>
+<script src="/static/js/jquery_extends.js?v={{ v }}"></script>
 <script src="/static/js/socket.io.js"></script>
 <script src="/static/js/positions.js?v={{ v }}"></script>
 </html>

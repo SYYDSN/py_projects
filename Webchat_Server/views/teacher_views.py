@@ -178,7 +178,6 @@ def process_case_page2(teacher: dict = None):
         """喊单历史"""
         f = dict()
         trade_list = Teacher.trade_history(t_id=teacher['_id'], filter_dict=f)
-        trade_list = trade_list * 3
         return render_template("positions.html", page_title=page_title, teacher=teacher, hold_list=hold_list,
                                v=version(), trade_list=trade_list)
     elif method == "post":
@@ -247,14 +246,20 @@ def process_case_page2(teacher: dict = None):
                 mes = {"message": "操作失败"}
         elif the_type == "trade_history":
             """历史喊单"""
-            p = get_arg(request, "product", "")
+            p = get_arg(request, "product", "")  # 是否对产品种类进行了筛选?
             if p == "":
                 f = dict()
             else:
                 f = {"product": p}
-                data = Teacher.trade_history(t_id=teacher['_id'], filter_dict=f, can_json=True)
-                mes['data'] = data
-                mes['message'] = 'success'
+            first_exit_time = get_arg(request, "first_exit_time", "")  # 是否对产品离场时间进行过滤?
+            if isinstance(first_exit_time, str) and len(first_exit_time) > 12:
+                first_exit_time = mongo_db.get_datetime_from_str(first_exit_time)
+                if isinstance(first_exit_time, datetime.datetime):
+                    f['exit_time'] = {"$lt": first_exit_time}
+
+            data = Teacher.trade_history(t_id=teacher['_id'], filter_dict=f, can_json=True)
+            mes['data'] = data
+            mes['message'] = 'success'
         else:
             mes = {"message": "未知的操作:{}".format(the_type)}
         return json.dumps(mes)

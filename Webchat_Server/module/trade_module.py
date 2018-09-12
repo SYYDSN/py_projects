@@ -389,7 +389,7 @@ def generator_signal_and_save(raw_signal: dict) -> list:
                 each_profit = each_profit_dollar - each_cost
                 x['each_profit_dollar'] = each_profit_dollar
                 x['each_profit'] = each_profit
-            lots = 1 # 默认值
+            lots = 1  # 默认值
             try:
                 lots = x['lots']
             except Exception as e:
