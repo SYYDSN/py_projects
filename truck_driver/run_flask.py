@@ -1,12 +1,16 @@
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
-from flask_server import app, port
+from truck_server import app, port
 import bjoern
 import cherrypy
 from cherrypy import _cpwsgi_server
 from meinheld import server
-from gevent.wsgi import WSGIServer
+try:
+    from gevent.wsgi import WSGIServer
+except ImportError as e:
+    print(e)
+    from gevent.pywsgi import WSGIServer
 
 
 # tornado方式部署,异步模式.
@@ -19,9 +23,9 @@ from gevent.wsgi import WSGIServer
 
 
 # bjoern部署方式,c语言,异步模式.注意,这种方式不支持ssl,也不能自定义headers
-# print("bjoern running on {} port ..".format(port))
-# bjoern.listen(app, "0.0.0.0", port)
-# bjoern.run()
+print("bjoern running on {} port ..".format(port))
+bjoern.listen(app, "0.0.0.0", port)
+bjoern.run()
 
 
 # cherrypy部署方式,py语言,线程池模式.生产环境使用较多
@@ -35,8 +39,8 @@ from gevent.wsgi import WSGIServer
 
 
 # meinheld 方式,部分c的py.
-server.listen(("0.0.0.0", port))
-server.run(app)
+# server.listen(("0.0.0.0", port))
+# server.run(app)
 
 
 # gevent 部署方式

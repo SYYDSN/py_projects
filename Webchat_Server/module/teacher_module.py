@@ -21,6 +21,34 @@ simple_cache = SimpleCache()
 """
 
 
+class TeacherLog(mongo_db.BaseDoc):
+    """
+    老师客户端操作的错误日志
+    """
+    _table_name = "teacher_log"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['url'] = str
+    type_dict['error'] = str
+    type_dict['args'] = str
+    type_dict['error_time'] = datetime.datetime
+    type_dict['save_time'] = datetime.datetime
+
+    @classmethod
+    def log(cls, t_id: ObjectId, url: str, error_time: datetime.datetime, error: str, content: str) -> None:
+        """记录"""
+        d = dict()
+        d['_id'] = ObjectId()
+        d['t_id'] = t_id
+        d['error'] = error
+        d['url'] = url
+        d['args'] = content
+        d['error_time'] = error_time
+        d['save_time'] = datetime.datetime.now()
+        ses = mongo_db.get_conn(table_name=cls.get_table_name())
+        ses.insert_one(d)
+
+
 class Deposit(mongo_db.BaseDoc):
     """
     入金/存款(记录),当老师做单的时候,如果资金不足,就会激发入金行为

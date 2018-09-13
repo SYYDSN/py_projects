@@ -6,7 +6,11 @@ import bjoern
 import cherrypy
 from cherrypy import _cpwsgi_server
 from meinheld import server
-from gevent.wsgi import WSGIServer
+try:
+    from gevent.wsgi import WSGIServer
+except ImportError as e:
+    print(e)
+    from gevent.pywsgi import WSGIServer
 
 
 # tornado方式部署,异步模式.

@@ -133,7 +133,65 @@ var close_alert = function(){
     $obj.hide();
 };
 
+var ajax_error = function(req, status, error, req_args, u){
+    /*
+     ajax请求错误回调
+     error = NOT FOUND                404
+     error = FORBIDDEN                403
+     error = FORBIDDEN                401
+     error = INTERNAL SERVER ERROR    500
+     ...
+     每次ajax出错的时候,会记录下出错的信息.发送到日志接口.
+     如果发送到日志接口出错.那就保存在本地的会话里,不再由本函数发送.
+     (将由其他的函数进行批量处理,暂时不实现 2018-9-13)
+      */
+    console.log("Ajax_Error start");
+    // console.log(req);
+    // console.log(status);
+    console.log(u);
+    console.log(error);
+    console.log(req_args);
+    console.log("Ajax_Error end");
+    var now = new Date();
+    var error_time = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`
+    console.log(`error time is ${error_time}`);
+    // 这是其他函数post失败的情况
+    var args = {
+        "args": JSON.stringify(req_args),
+        "url": u,
+        "ajax_error_count": 1,
+        "error": error,
+        "error_time": error_time
+    }
+    $.post("/teacher/log", args, function(r){
+        close_alert();
+        alert("操作失败");
+        try{
+            var a = JSON.parse(r);
+            console.log(a);
+        }
+        catch(e){
+            console.log(r);
+        }
+    });
+
+};
+
+var post_plus = function (url, args, callback){
+    var setting = {
+        url: url,
+        type: "POST",
+        error:function(arg1, arg2, arg3){ajax_error(arg1, arg2,arg3, args, url)}, // 请求完成时的回调.
+        data: args,                                 // 参数
+        success: callback                           // 成功时的回调
+    };
+    $.ajax(setting);
+};
+
+/*扩展函数注册区域*/
+
 $.extend({
+    "post": post_plus,                                      //重定义post
     pop_alert: function(arg){pop_alert(arg);},                  // 弹出事件
     close_alert: function(){close_alert();}                  // 强制关闭弹出事件
 });

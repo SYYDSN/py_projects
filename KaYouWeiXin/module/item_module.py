@@ -262,6 +262,10 @@ class EventHandler:
                             pass
                         else:
                             res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
+                    elif event_key == "456":
+                        """扫码关注公众号"""
+                        ms = "{}扫码关注公众号".format(openid)
+                        logger.info(msg=ms)
                     else:
                         title = "{} 未意料的扫码事件消息:{}.{}".format(now, msg_type, event_key)
                         content = "{}".format(str(info))

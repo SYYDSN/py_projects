@@ -85,11 +85,25 @@ def news_func():
     return render_template("news.html", page_title=page_title, v=version())
 
 
+def log_func():
+    """记录老师操作日志"""
+    t_id = session.get("t_id", '')
+    content = get_arg(request, "args", "")
+    url = get_arg(request, "url", "")
+    error = get_arg(request, "error", "")
+    error_time = get_arg(request, "error_time", "")
+    error_time_t = mongo_db.get_datetime_from_str(error_time)
+    error_time = error_time_t if isinstance(error_time_t, datetime.datetime) else error_time
+    TeacherLog.log(t_id=t_id, url=url, error_time=error_time, error=error, content=content)
+    return json.dumps("ok")
+
+
 @check_teacher_session
 def process_case_page(teacher: dict = None):
     """
+    暂停使用,仅作参考 2018-9-9
     交易管理
-    旧版本,暂停使用,仅作参考 2018-9-9
+    旧版本,
     """
     method = request.method.lower()
     if method == "get":
@@ -268,10 +282,11 @@ def process_case_page2(teacher: dict = None):
         return abort(405)
 
 
-
 """集中注册函数"""
 
 
+"""日志接口"""
+teacher_blueprint.add_url_rule(rule="/log", view_func=log_func, methods=['get', 'post'])
 """老师登录"""
 teacher_blueprint.add_url_rule(rule="/login.html", view_func=login, methods=['get', 'post'])
 """老师注销"""

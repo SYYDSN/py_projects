@@ -294,7 +294,7 @@ def calculate_trade(raw_signal: dict) -> None:
                 }}
                 r2 = t2.find_one_and_update(filter=t2_f, update=t2_u, upsert=True)
                 print(r2)
-    """发送钉订消息"""
+    """发送钉钉消息"""
     d_res = send_tips_to_dingding(raw_signal)
     print("钉订消息发送结果:{}".format(d_res))
 
@@ -567,6 +567,7 @@ def send_tips_to_dingding(info: dict) -> bool:
         the_type = "建仓提醒" if info.get("case_type") == "enter" else "平仓提醒"
         if the_type == "建仓提醒":
             enter_price = info.get("enter_price")
+            enter_price = round(enter_price, 2) if isinstance(enter_price, float) else enter_price
             enter_time = info.get("enter_time").strftime("%m月%d日 %H:%M:%S")
             text = "#### {}\n > {}老师{}{} \n\r >建仓价格：{} \n\r > {}".format(the_type, auth, direction, product,
                                                                          enter_price, enter_time)
@@ -574,7 +575,9 @@ def send_tips_to_dingding(info: dict) -> bool:
             # the_type == "平仓提醒"
             each_profit = info.get("each_profit")
             enter_price = info.get("enter_price")
+            enter_price = round(enter_price, 2) if isinstance(enter_price, float) else enter_price
             exit_price = info.get("exit_price")
+            exit_price = round(exit_price, 2) if isinstance(exit_price, float) else exit_price
             exit_time = info.get("exit_time").strftime("%m月%d日 %H:%M:%S")
             text = "#### {}\n > {}老师平仓{}方向{}订单 \n\r > 建仓：{} <br> \n\r > 平仓：{} <br> \n\r > 每手实际盈利 {} \n\r > <br> {}".format(
                 the_type, auth, direction,

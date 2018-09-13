@@ -10,6 +10,11 @@ from log_module import get_logger
 from aip import AipOcr
 
 
+"""
+百度ocr模块安装方式
+"""
+
+
 ObjectId = mongo_db2.ObjectId
 logger = get_logger()
 

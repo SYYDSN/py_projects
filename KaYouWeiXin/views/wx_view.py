@@ -59,9 +59,12 @@ def debug_resume_html_func():
     """
     r_id = get_arg(request, "r_id", "")
     if isinstance(r_id, str) and len(r_id) == 24:
-        doc = DriverResume.get_full_info(resume_id=r_id)['data']
-
-        return render_template("inside/resume_template.html", **doc)
+        res = DriverResume.get_full_info(resume_id=r_id)
+        doc = res.get("data")
+        if doc is None:
+            return abort(404, "resume's id {} is invalid!".format(r_id))
+        else:
+            return render_template("inside/resume_template.html", **doc)
     else:
         return abort(403, "bad parameters!")
 

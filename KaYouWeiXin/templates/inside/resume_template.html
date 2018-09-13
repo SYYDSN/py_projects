@@ -23,11 +23,13 @@
                 <div class="tool_item"  id="export_btn"><i class="fa fa-file-pdf-o"></i><span>PDF</span></div>
             </div>
         </div>
+        <!--
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 title_div">
                 简历
             </div>
         </div>
+        -->
         <!--基本信息-->
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -98,7 +100,7 @@
                             <div class="info_item">
                                 <i class="fa fa-dashboard"></i>
                                 <span class="info_value">
-                                        {{ driving_experience + "年驾龄" if driving_experience else "" }}
+                                        {{ driving_experience | string + "年驾龄" if driving_experience else "" }}
                                     </span>
                             </div>
                             <div class="info_item">
@@ -110,7 +112,7 @@
                             <div class="info_item">
                                 <i class="fa fa-street-view"></i>
                                 <span class="info_value">
-                                        {{ industry_experience + "年行业经验" if industry_experience else "" }}
+                                        {{ industry_experience | string + "年行业经验" if industry_experience else "" }}
                                     </span>
                             </div>
                         </div>
