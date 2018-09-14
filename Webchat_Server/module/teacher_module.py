@@ -78,6 +78,11 @@ class Deposit(mongo_db.BaseDoc):
         return r
 
 
+class TeacherImage(mongo_db.BaseFile):
+    """老师相关图片"""
+    _table_name = "teacher_image"
+    
+
 class Teacher(mongo_db.BaseDoc):
     """
     老师,微信项目（Webchat_Server）有一个同名的类，不同的是：

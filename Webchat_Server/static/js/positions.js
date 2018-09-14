@@ -126,7 +126,7 @@ $(function(){
             parseFloat($.trim($("#sell_price").text()));
         var enter_time = $.trim($(".now").text());
         if(product == "" || isNaN(enter_price)){
-            $.alert("请先选择产品");
+            alert("请先选择产品");
             return false;
         }
         else if(code != $.trim($("#price_div").attr("data-id"))){
@@ -374,7 +374,37 @@ $(function(){
     // 下滑到页面底部的事件.
     $("#history_outer").pull_down(more_history);
 
+    // 图片的裁剪插件
 
+    var jcrop_api = $.Jcrop('#view_image',{
+        onChange: showPreview,
+        onSelect: showPreview,
+        aspectRatio: 1
+    });
+
+
+    // 点击头像弹出修改头像的页面.
+    $("#my_head_img").click(function(){
+        $("#select_image").click();
+
+    });
+
+    // 上传图片的input的change事件.
+    $("#select_image").change(function(){
+        var $this = $("#select_image");
+        var file = $this[0].files[0];
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        var set_img = function(data){
+            $("#view_image").attr("src",data);
+            $(".modal_outer").show();
+        };
+        reader.onload = function(event){
+            console.log(event);
+            var img = event.target.result;
+            set_img(img);
+        };
+    });
 
 // end !
 });

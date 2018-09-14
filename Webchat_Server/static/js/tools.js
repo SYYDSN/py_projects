@@ -209,3 +209,99 @@ function build_url(base_path, arg_dict){
     }
     return base_path;
 }
+
+function upload_progress(event){
+    /*
+    上传进度处理函数,这里只是一个示范函数,实际中要重写此函数.
+    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
+    :return: nothing
+    */
+    if (event.lengthComputable) {
+        var complete_percent = Math.round(event.loaded * 100 / event.total);
+        console.log(`完成度:${complete_percent}`);
+    }else{}
+}
+
+function upload_complete(event){
+    /*
+    上传文件success时的事件,根据实际需要可以覆盖.
+    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
+    :return: nothing
+    */
+    let json = {"message": "未知的错误"};
+    let status = event.target.status;
+    if(status !== 200){
+        json = {"message": `服务器没有作出正确的回应,返回码:${status}`};
+    }
+    else{
+        let str = event.target.responseText;
+        if(str === undefined){
+            json['message'] = "上传成功,但服务器没有回应任何消息";
+        }
+        else{
+            json = JSON.parse(str);
+        }
+    }
+    console.log(json);
+    if(json['message'] === "success"){
+        alert("上传成功!");
+        // 以下为定制脚本
+        $("#return_url").attr("src", json['data']['url']);
+    }
+    else{
+        alert(json['message']);
+    }
+}
+
+function upload_error(event){
+    /*
+    上传文件失败时的事件,根据实际需要可以覆盖.
+    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
+    :return: nothing
+    */
+    let json = {"message": "error"};
+    console.log(json);
+}
+
+function upload_abort(event){
+    /*
+    上传文件被中止时的事件,根据实际需要可以覆盖.
+    :params event: 文件上传事的事件,一般由XMLHttpRequest的upload的事件监听器来传递事件.
+    :return: nothing
+    */
+    let json = {"message": "abort"};
+    console.log(json);
+}
+
+function upload(file_name, $obj, action_url, header_dict){
+    /*
+    上传文件.
+    :params file_name:   文件名.
+    :params $obj:        input的jquery对象.
+    :params action_url:  上传的服务器url
+    :params header_dict: 放入header的参数,是键值对形式的字典,键名不要用下划线,因为那是个禁忌
+    :return:             dict类型. 一个字典对象,一般是{"message": "success"}
+    */
+    let data = new FormData();
+    data.append(file_name, $obj[0].files[0]);
+    /*
+    有关XMLHttpRequest对象的详细信息,请参考.
+    https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest
+    */
+    let req = new XMLHttpRequest();
+    req.upload.addEventListener("progress", upload_progress, false);
+    req.addEventListener("load", upload_complete, false);
+    req.addEventListener("error", upload_error, false);
+    req.addEventListener("abort", upload_abort, false);
+    req.open("post", action_url);
+    // 必须在open之后才能给请求头赋值
+    if(header_dict){
+        /*
+        * 传送请求头信息,目前服务端还未做对应的处理.这只是与被给后来使用的.
+        * */
+        for(let k in header_dict){
+            req.setRequestHeader(k, header_dict[k]);
+        }
+    }
+    req.send(data);
+}

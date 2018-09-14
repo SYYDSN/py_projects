@@ -278,8 +278,8 @@ def calculate_trade(raw_signal: dict) -> None:
         t2 = client[mongo_db.db_name][Teacher.get_table_name()]
         with client.start_session(causal_consistency=True) as ses:
             with ses.start_transaction():
-                t1_f = {"_id": x.pop("_id")}
-                t1_u = {"$set": x}
+                t1_f = {"_id": x["_id"]}
+                t1_u = {"$set": {k: v for k, v in x.items() if k != "_id"}}
                 r1 = t1.find_one_and_update(filter=t1_f, update=t1_u, upsert=True)
                 print(r1)
                 t2_f = {"_id": teacher_id}
@@ -295,8 +295,17 @@ def calculate_trade(raw_signal: dict) -> None:
                 r2 = t2.find_one_and_update(filter=t2_f, update=t2_u, upsert=True)
                 print(r2)
     """发送钉钉消息"""
-    d_res = send_tips_to_dingding(raw_signal)
-    print("钉订消息发送结果:{}".format(d_res))
+    d_res = None
+    try:
+        d_res = send_tips_to_dingding(raw_signal)
+    except Exception as e:
+        title = "{}往直播群发送钉钉机器人消息失败".format(datetime.datetime.now())
+        content = "错误原因:{}, trade = {}".format(e, raw_signal)
+        send_mail(title=title, content=content)
+        d_res = "往直播群发送钉钉机器人消息失败! {}".format(content)
+        logger.exception(msg=d_res)
+    finally:
+        print("钉订消息发送结果:{}".format(d_res))
 
 
 def generator_signal_and_save(raw_signal: dict) -> list:

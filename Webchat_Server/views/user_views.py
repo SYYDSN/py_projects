@@ -98,7 +98,8 @@ def file_func(user: dict = None, action: str = "", table_name: str = ""):
     table_name = table_name if table_name in tables else 'base_file'
     if action == "save":
         """保存文件"""
-        r = BaseFile.save_flask_file(req=request, collection=table_name, owner=user['_id'])
+        owner = user.get('_id')
+        r = BaseFile.save_flask_file(req=request, collection=table_name, owner=owner)
         if isinstance(r, ObjectId):
             mes['_id'] = str(r)
         else:
