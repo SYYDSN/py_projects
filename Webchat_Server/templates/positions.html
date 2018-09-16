@@ -218,10 +218,16 @@
         -->
         <input id="select_image" type="file" accept="image/*" capture="camera" multiple>
         <div class="modal_stage">
+            <div class="top">
+                <i class="fa fa-close" id="close_modal"></i>
+            </div>
             <div class="up">
                 <img id="view_image" src="">
             </div>
-            <div class="down"></div>
+            <div class="down">
+                <button id="submit_select" class="btn_submit submit_btn">保存</button>
+                <button id="reselect" class="submit_btn">重选</button>
+            </div>
 
         </div>
     </div>

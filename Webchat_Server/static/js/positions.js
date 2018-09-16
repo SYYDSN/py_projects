@@ -374,19 +374,38 @@ $(function(){
     // 下滑到页面底部的事件.
     $("#history_outer").pull_down(more_history);
 
-    // 图片的裁剪插件
-
-    var jcrop_api = $.Jcrop('#view_image',{
-        onChange: showPreview,
-        onSelect: showPreview,
-        aspectRatio: 1
+    // 图片的裁剪插件 未实现
+    /*
+    jcrop_api = $.Jcrop('#',{
+        allowSelect: true,  // 允许新选框
+        allowMove: true,  // 允许移动选框
+        allowResize: true,  // 允许缩放选框
+        baseClass: 'jcrop',
+        // addClass: "my_style_class",  // 添加样式类
+        bgColor: "red",                // 背景色
+        bgOpacity: 0.6,                // 背景透明度
+        bgFade: false,                 // 使用背景过渡效果
+        borderOpacity: 0.4,            // 边框透明度
+        handlerOpacity: 0.5,           // 缩放按钮透明度
+        handlerSize: 9,                // 缩放按钮尺寸
+        handlerOffset: 5,              // 缩放按钮和边框的距离
+        aspectRatio: 1,                // 选框高宽比
+        onChange: change_rect,  // 选框改变时的事件
+        onSelect: function(e){console.log(e);},  // 选框选定时的事件
+        onRelease: function(e){console.log(e);}, // 选框取消时的事件
     });
+    */
+
+    // 裁剪图片时,改变选框时的事件 未实现
+    var change_rect = function(event){
+        var file = event.target.files;
+        console.log(file);
+    };
 
 
-    // 点击头像弹出修改头像的页面.
+    // 点击头像弹出修改头像的事件
     $("#my_head_img").click(function(){
         $("#select_image").click();
-
     });
 
     // 上传图片的input的change事件.
@@ -396,7 +415,8 @@ $(function(){
         var reader = new FileReader();
         reader.readAsDataURL(file);
         var set_img = function(data){
-            $("#view_image").attr("src",data);
+            var img_obj = $("#view_image");
+            img_obj.attr("src",data);
             $(".modal_outer").show();
         };
         reader.onload = function(event){
@@ -404,6 +424,31 @@ $(function(){
             var img = event.target.result;
             set_img(img);
         };
+    });
+
+    // 上传图片模态框,关闭按钮事件
+    $("#close_modal").click(function(){
+        $(".modal_outer").hide();
+    });
+
+    // 上传图片模态框,重选按钮事件
+    $("#reselect").click(function(){
+        $(".modal_outer").hide();
+        $("#my_head_img").click();
+    });
+
+    // 上传图片模态框,提交按钮事件
+    $("#submit_select").click(function(){
+        var url = "/teacher/file/save/teacher_image";
+        $("#select_image").upload(url, function(resp){
+            var resp = JSON.parse(resp);
+            var status = resp['message'];
+            if(status != "success"){
+                alert()
+            }
+        })
+    }, function(error){
+        console.log(error);
     });
 
 // end !

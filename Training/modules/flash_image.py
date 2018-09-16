@@ -34,7 +34,6 @@ class FlashImage(BaseFile):
                 cls.save_cls(f, name=the_name, file_name=name, series=series)
 
 
-
 class FlashItem(BaseDoc):
     """一个闪动的操作元素"""
     _table_name = "flash_item"
