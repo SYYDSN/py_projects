@@ -297,7 +297,8 @@ class Teacher(mongo_db.BaseDoc):
     @classmethod
     def single_info(cls, t_id: (str, ObjectId), begin: (str, datetime.datetime) = None, end: (str, datetime.datetime) = None) -> dict:
         """
-        老师的个人页面，有图标，持仓和历史数据
+        老师的个人页面，有图表，持仓和历史数据
+        图表数据改为柱装图 2019-9-17
         :param t_id:
         :param begin:
         :param end:

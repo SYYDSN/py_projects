@@ -13,7 +13,7 @@
     <title>交易管理</title>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="/static/css/teacher_index.css"/>
-    <link rel="stylesheet" href="/static/css/positions.css">
+    <link rel="stylesheet" href="/static/css/positions.css?v={{ v }}">
     <script type="text/javascript" src="/static/js/teacher_common.js"></script>
     <!--图像上传裁剪,共2个脚本,一个css目录下的Jcrop.gif文件,jquery必须-->
     <link rel="stylesheet" href="/static/css/jquery.Jcrop.min.css">
@@ -178,21 +178,40 @@
 
             <div class="show_zone" id="person_div">
                 <div class="userTextimg">
-                    <p class="leftimg"><img id="my_head_img" src="/static/images/img1.png"/></p>
+                    <p class="leftimg"><img id="my_head_img" src="{{ teacher.head_img + '&size=120*90' if teacher.head_img else '/static/images/img1.png' }}"/></p>
                     <div class="userInfo">
-                        <h3>{{ teacher.name }}</h3>
-                        <p>{{ teacher.feature if teacher.feature else '机会准 持单短'}}</p>
+                        <div class="flex_row_left">
+                            <h3 id="teacher_name">{{ teacher.name }}</h3>
+                            <!--老师名字轻易不能改
+                            <i id="edit_teacher_name" class="fa fa-edit"></i>
+                            -->
+                        </div>
+                        <div class="flex_row_left">
+                            <p id="teacher_feature">{{ teacher.feature if teacher.feature else '机会准 持单短'}}</p>
+                            <i id="edit_teacher_feature" class="fa fa-edit"></i>
+                            <i id="save_teacher_feature" class="fa fa-save"></i>
+                        </div>
                     </div>
                 </div>
                 <div class="individualResume">
-                    <p class="title"><span>分析师简介：</span></p>
-                    {% if teacher.resume %}
-                        {% else %}
-                    <p style="text-indent: 2em;">
-                        资深金融行业人士，黄金外汇交易培训师，身兼股票外汇行业高管与投资者的双重身份。拥有十二年交易经验，擅长分析研究国际投资市场规律。2006年进入金融领域并十年一直坚持在金融领域发展。2011年创立“经典趋势节奏”交易系统，帮助交易者把握想要的趋势行情，形成年收益率目标100%的系统化规则化交易方法。“经典趋势节奏”体系的准确率高、盈亏比高、风险控制极强；注重多级别顺势、止损有效性、科学资金管理等方面综合判定下的交易方式。</p>
-                    <p>运用技术分析，深谙股市、利率、股指及大宗商品联动性 金融机构大客户等中短线交易。2016年创建语昂交易俱乐部，自俱乐部开设以来，各项课程受业内投资人一致好评。
+                    <p class="title">
+                        <span>分析师简介：</span>
+                        <i id="edit_teacher_resume" class="fa fa-edit"></i>
+                        <i id="save_teacher_resume" class="fa fa-save"></i>
                     </p>
-                    {% endif %}
+                    <p id="teacher_resume" style="text-indent: 2em;">
+                        {% if teacher.resume %}
+                            {{ teacher.resume }}
+                        {% else %}
+                        资深金融行业人士，黄金外汇交易培训师，身兼股票外汇行业高管与投资者的双重身份。拥有十二年交易经验，
+                        擅长分析研究国际投资市场规律。2006年进入金融领域并十年一直坚持在金融领域发展。
+                        2011年创立“经典趋势节奏”交易系统，帮助交易者把握想要的趋势行情，形成年收益率目标100%的系统化规则化交易方法
+                        。“经典趋势节奏”体系的准确率高、盈亏比高、风险控制极强；注重多级别顺势、
+                        止损有效性、科学资金管理等方面综合判定下的交易方式。
+                        运用技术分析，深谙股市、利率、股指及大宗商品联动性 金融机构大客户等中短线交易。
+                        2016年创建语昂交易俱乐部，自俱乐部开设以来，各项课程受业内投资人一致好评。
+                        {% endif %}
+                    </p>
                 </div>
             </div>
 
@@ -201,9 +220,10 @@
 </div>
 
 <!--修改图片模态框-->
-<div class="modal_outer">
+<div id="head_img_modal" class="modal_outer">
     <div class="modal_inner">
         <!--
+            <input id="select_image" type="file" accept="image/*" capture="camera" multiple>
             accept表示打开系统文件目录
             accept="image/*"  打开相册
             accept="video/*"  打开视频
@@ -215,8 +235,10 @@
             IOS中, multiple  属性无效. 必须写2个input来自行实现选择.
             判断是否是苹果手机的方法:
             navigator.userAgent.toLowerCase() == "iphone os"
+            由于目前拍摄的照片尺寸过大,所以暂时关闭拍照的功能(没有capture="camera" 和 multiple属性)
         -->
-        <input id="select_image" type="file" accept="image/*" capture="camera" multiple>
+
+        <input id="select_image" type="file" accept="image/*">
         <div class="modal_stage">
             <div class="top">
                 <i class="fa fa-close" id="close_modal"></i>

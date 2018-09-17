@@ -834,11 +834,27 @@ def query_chart_data(chart_type: str = "teacher", begin: str = None, end: str = 
     return res
 
 
-def win_and_chart(t_id: (str, ObjectId)) -> dict:
+def win_and_bar(t_id: (str, ObjectId)) -> dict:
     """
-    查询老师的胜率,图表数据等.
+    查询老师的,状图表数据并计算胜率. 2018-9-17
     :param t_id:
     :return:
+    db.trade.aggregate([
+    {"$match":{"change": "raw", "enter_time":{$exists:true, $ne:null, "$gte":ISODate("2018-08-31T23:00:00.000Z")},"each_profit":{$exists: true}}},
+    {
+        "$project":
+            {
+                "teacher_id": "$teacher_id",
+                "teacher_name": "$teacher_name",
+                "enter_time": "$enter_time",
+                "str":{$dateToString: {date:"$enter_time", format:"%G-%m-%d %H:%M:%S"}},
+                "win":{$gte:["$each_profit", 0]}
+            },
+    },
+    {$addFields:{"case":1, "w":{$cond:{if:{"$eq":["$win", true]},then:1,else:0}}}},
+    {"$sort":{"enter_time":1}},
+    {"$match": {"w": 0}}
+    ])
     """
 
 

@@ -410,45 +410,114 @@ $(function(){
 
     // 上传图片的input的change事件.
     $("#select_image").change(function(){
-        var $this = $("#select_image");
-        var file = $this[0].files[0];
-        var reader = new FileReader();
-        reader.readAsDataURL(file);
-        var set_img = function(data){
-            var img_obj = $("#view_image");
-            img_obj.attr("src",data);
-            $(".modal_outer").show();
-        };
-        reader.onload = function(event){
-            console.log(event);
-            var img = event.target.result;
-            set_img(img);
-        };
+        try{
+            var $this = $("#select_image");
+            var file = $this[0].files[0];
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            var set_img = function(data){
+                var img_obj = $("#view_image");
+                img_obj.attr("src",data);
+                $("#head_img_modal").show();
+            };
+            reader.onload = function(event){
+                console.log(event);
+                var img = event.target.result;
+                set_img(img);
+            };
+        }
+        catch(e){
+            alert(e);
+        }
+
     });
 
     // 上传图片模态框,关闭按钮事件
     $("#close_modal").click(function(){
-        $(".modal_outer").hide();
+        $("#head_img_modal").hide();
     });
 
     // 上传图片模态框,重选按钮事件
     $("#reselect").click(function(){
-        $(".modal_outer").hide();
+        $("#head_img_modal").hide();
         $("#my_head_img").click();
     });
 
     // 上传图片模态框,提交按钮事件
     $("#submit_select").click(function(){
         var url = "/teacher/file/save/teacher_image";
+        $.pop_alert("上传图片中...");
         $("#select_image").upload(url, function(resp){
+            $.close_alert();
             var resp = JSON.parse(resp);
             var status = resp['message'];
-            if(status != "success"){
-                alert()
+            if(status !== "success"){
+                alert(status);
+                return false;
+            }
+            else{
+                console.log(resp);
+                location.href = "/teacher/process_case.html?div=person_div";
+            }
+        }, function(e){
+            alert(e);
+            close_alert();
+            return false;
+        });
+    });
+
+    // 编辑个人信息按钮
+    $("#edit_teacher_feature,#edit_teacher_resume").click(function(){
+        var $this = $(this);
+        var str = "#" + $.trim($this.attr("id").replace("edit_", ""));
+        $(str).addClass("edit_dom").attr("contenteditable", true);
+        $this.hide();
+        $this.next(".fa-save").show();
+    });
+
+    var raw_teacher_feature = '';
+    var raw_teacher_resume = '';
+    var init_info = function(){
+        // 预加载个人信息,用于比对是否需要更新
+        raw_teacher_feature = $("#teacher_feature").text();
+        raw_teacher_resume = $("#teacher_resume").text();
+    };
+    init_info();
+
+    // 保存个人信息按钮
+    $("#save_teacher_feature,#save_teacher_resume").each(function(){
+        var $this = $(this);
+        console.log($this);
+        $this.click(function(){
+            var id_name = $.trim($this.attr("id").replace("save_", ""));
+            var field_name = id_name.split("teacher_")[1];
+            var $obj = $("#" + id_name);
+            var s = $.trim($obj.html());
+            var old = id_name == "teacher_feature"? raw_teacher_feature: raw_teacher_resume;
+            if($.trim(old) == s){
+                $this.hide();
+                $obj.removeClass("edit_dom").attr("contenteditable", false);
+                $this.prev(".fa-edit").show();
+            }
+            else{
+                var args = {'the_type': "update_person"};
+                args[field_name] = $obj.html();
+                var url = "/teacher/process_case.html";
+                $.post(url, args, function(resp){
+                    var resp = JSON.parse(resp);
+                    var status = resp['message'];
+                    if(status == "success"){
+                        $this.hide();
+                        $obj.removeClass("edit_dom").attr("contenteditable", false);
+                        $this.prev(".fa-edit").show();
+                        init_info();
+                    }
+                    else{
+                        alert(status);
+                    }
+                });
             }
         })
-    }, function(error){
-        console.log(error);
     });
 
 // end !

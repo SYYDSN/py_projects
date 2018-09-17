@@ -297,7 +297,7 @@ function my_upload(options){
         else{
             file_size = file_size / 1000;
             if(file_size > max_size){
-                let ms = `文件尺寸过大: 限制:${max_size}, 当前大小:${file_size} kb`;
+                let ms = `文件尺寸过大: 限制:${max_size}kb, 当前大小:${file_size} kb`;
                 erro_func(ms);
                 can_exe = false;
             }
@@ -370,7 +370,7 @@ function my_upload2($obj, url, success_cb, error_cb){
     let opts = {
         file_name: file_name,
         file_data: file_data,
-        max_size: 2000,
+        max_size: 4000,
         url: url,
         success_cb: success_cb,
         error_cb: error_cb,
