@@ -182,9 +182,9 @@
                     <div class="userInfo">
                         <div class="flex_row_left">
                             <h3 id="teacher_name">{{ teacher.name }}</h3>
-                            <!--老师名字轻易不能改
-                            <i id="edit_teacher_name" class="fa fa-edit"></i>
-                            -->
+                            <!--老师修改密码-->
+                            <i id="edit_teacher_pw" class="fa fa-key"></i>
+
                         </div>
                         <div class="flex_row_left">
                             <p id="teacher_feature">{{ teacher.feature if teacher.feature else '机会准 持单短'}}</p>
@@ -249,6 +249,37 @@
             <div class="down">
                 <button id="submit_select" class="btn_submit submit_btn">保存</button>
                 <button id="reselect" class="submit_btn">重选</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!--修改密码模态框-->
+<div id="edit_pw_modal" class="modal_outer">
+    <div class="modal_inner">
+        <div class="modal_stage">
+            <div class="top">
+               <h3>修改密码</h3>
+            </div>
+            <div class="up">
+               <div class="modal_line">
+                   <label for="old_pw">输入旧密码</label>
+                   <input type="password" id="old_pw">
+               </div>
+               <div class="modal_line">
+                   <label for="pw_1">输入新密码</label>
+                   <input type="password" id="pw_1">
+               </div>
+               <div class="modal_line">
+                   <label for="pw_2">重复新密码</label>
+                   <input type="password" id="pw_2">
+               </div>
+            </div>
+            <div class="down">
+                <button id="change_pw" class="btn_submit submit_btn">确认</button>
+                <button id="cancel_change" class="submit_btn">关闭</button>
             </div>
 
         </div>

@@ -834,10 +834,11 @@ def query_chart_data(chart_type: str = "teacher", begin: str = None, end: str = 
     return res
 
 
-def win_and_bar(t_id: (str, ObjectId)) -> dict:
+def win_and_bar(t_id: (str, ObjectId) = None) -> list:
     """
     查询老师的,状图表数据并计算胜率. 2018-9-17
-    :param t_id:
+
+    :param t_id: None表示全部老师
     :return:
     db.trade.aggregate([
     {"$match":{"change": "raw", "enter_time":{$exists:true, $ne:null, "$gte":ISODate("2018-08-31T23:00:00.000Z")},"each_profit":{$exists: true}}},
@@ -856,12 +857,57 @@ def win_and_bar(t_id: (str, ObjectId)) -> dict:
     {"$match": {"w": 0}}
     ])
     """
+    t_id = t_id if isinstance(t_id, ObjectId) or t_id is None else ObjectId(t_id)
+    if isinstance(t_id, ObjectId):
+        match_dict = {
+                    "exit_time": {"$exists": True, "$ne": None},
+                    "teacher_id": t_id,
+                    "case_type": "exit"
+                }
+    else:
+        match_dict = {
+            "exit_time": {"$exists": True, "$ne": None},
+            "case_type": "exit"
+        }
+    pipeline = [
+        {
+            "$match": match_dict
+        },
+        {
+            "$project":
+                {
+                    "teacher_id": "$teacher_id",
+                    "ym": {'$dateToString': {'date': "$enter_time", 'format': "%G-%m"}},
+                    "win": {'$gte': ["$each_profit", 0]}
+                }
+        },
+        {
+            "$group":
+                {
+                    "_id": "$teacher_id", "count": {"$sum": 1},
+                    "win":
+                        {
+                            "$sum": {"$cond":
+                                         {
+                                             "if": "$win",
+                                             "then": 1,
+                                             "else": 0
+                                          }}
+                        }
+                }
+        }
+    ]
+    ses = mongo_db.get_conn(table_name="trade")
+    res = ses.aggregate(pipeline=pipeline)
+    data = [x for x in res]
+    return data
 
 
 if __name__ == "__main__":
     # calculate_win_per_by_product()
     # calculate_win_per_by_teacher()
     # calculate_win_per_by_teacher_mix()
-    calculate_win_per_by_week_single(ObjectId("5a1e680642f8c1bffc5dbd69"))
+    # calculate_win_per_by_week_single(ObjectId(ObjectId("5b8c5451dbea62189b5c28ea"))
+    win_and_bar()
     pass
 

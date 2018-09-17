@@ -520,5 +520,10 @@ $(function(){
         })
     });
 
+    // 弹出修改密码模态框
+    $("#edit_teacher_pw").click(function(){
+        $("#edit_pw_modal").show();
+    });
+
 // end !
 });

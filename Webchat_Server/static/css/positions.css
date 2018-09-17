@@ -20,9 +20,10 @@
   display: none;
   margin-left: 10px;
 }
-.flex_row_left >#edit_teacher_name {
+.flex_row_left >#edit_teacher_pw {
   font-size: 24px;
-  margin-left: 15px;
+  display: block;
+  margin-left: 25px;
 }
 .flex_row_left >#edit_teacher_feature,
 .flex_row_left #edit_teacher_resume {
@@ -104,4 +105,56 @@
 }
 .modal_outer .modal_inner >.modal_stage >.down >#reselect {
   color: #808080;
+}
+#edit_pw_modal .modal_inner {
+  margin-top: 26%;
+  background-color: #fff;
+  width: 400px;
+}
+#edit_pw_modal .modal_inner .modal_stage {
+  margin: 0 50px;
+  width: 100%;
+}
+#edit_pw_modal .modal_inner .modal_stage .top {
+  justify-content: center;
+  color: #a3a3a3;
+}
+#edit_pw_modal .modal_inner .modal_stage .top >h3 {
+  margin-top: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #d3d3d3;
+  width: 100%;
+  text-align: center;
+}
+#edit_pw_modal .modal_inner .modal_stage .up {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 0;
+}
+#edit_pw_modal .modal_inner .modal_stage .up >.modal_line {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+#edit_pw_modal .modal_inner .modal_stage .up >.modal_line >label {
+  font-size: 18px;
+  color: #a3a3a3;
+  width: 6em;
+  text-align: left;
+}
+#edit_pw_modal .modal_inner .modal_stage .up >.modal_line >input {
+  border-color: #d3d3d3;
+  border-radius: 2px;
+  font-size: 18px;
+  background-color: #ececec;
+  width: calc(100% - 6em);
+}
+#edit_pw_modal .modal_inner .modal_stage .down {
+  padding: 0 0 30px;
 }

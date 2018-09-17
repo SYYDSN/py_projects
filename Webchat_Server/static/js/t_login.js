@@ -4,7 +4,7 @@ $(function(){
 
     $("#password").keyup(function(event){
         console.log(event);
-        if(event.keyCode == 13 && validate_phone($.trim($("#phone").val())) && $.trim($("#password").val()) != ""){
+        if(event.keyCode === 13){
              $("#btn_login").click();
         }
     });
