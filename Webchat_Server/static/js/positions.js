@@ -525,5 +525,171 @@ $(function(){
         $("#edit_pw_modal").show();
     });
 
+    // 关闭修改密码模态框
+    $("#cancel_change").click(function(){
+        $("#edit_pw_modal").hide();
+    });
+
+    // 提交修改密码的请求.
+    $("#change_pw").click(function(){
+        var old_pw = $.trim($("#old_pw").val());
+        var pw_1 = $.trim($("#pw_1").val());
+        var pw_2 = $.trim($("#pw_2").val());
+        if(old_pw === ""){
+            alert("旧密码不能为空");
+            return false;
+        }
+        else if(pw_1 === ""){
+            alert("新密码不能为空");
+            return false;
+        }
+        else if(pw_2 === ""){
+            alert("请重复输入新密码");
+            return false;
+        }
+        else if(pw_2 !== pw_1){
+            alert("两次输入的新密码必须一致");
+            return false;
+        }
+        else if(old_pw === pw_1){
+            alert("新旧密码相同,无需修改");
+            return false;
+        }
+        else{
+            var args = {
+                "the_type": "update_person",
+                "old_password": $.md5(old_pw),
+                "password": $.md5(pw_1)
+            };
+            $.pop_alert("提交中...");
+            $.post(post_url, args, function(resp){
+                $.close_alert();
+                var resp = JSON.parse(resp);
+                var status = resp['message'];
+                if(status !== "success"){
+                    alert(status);
+                    return false;
+                }
+                else{
+                    alert("密码已更改,请重新登录");
+                    location.href = "/teacher/login.html";
+                }
+            });
+        }
+    });
+
+    // 加载老师的图表数据
+    var init_chart = function(){
+        var t_id = $.trim($("#teacher_id").attr("data-id"));
+        // t_id = '5a1e680642f8c1bffc5dbd6f';
+        var url = "/teacher/chart/bar";
+        var args = {"t_id": t_id};
+        $.post(url, args,function(resp){
+            var resp = JSON.parse(resp);
+            console.log(resp);
+            var status = resp['message'];
+            if(status !== "success"){
+                alert(status);
+                return false;
+            }
+            else{
+                var all_count = 0;
+                var win_count = 0;
+                var data = resp['data'];
+                var x_list = [], y_list = [], z_list = [];
+                for(var i = 0; i< 6; i++){
+                    console.log(i);
+                    var x = data[i];
+                    if(x === undefined){
+                        x_list.push('');
+                    }
+                    else{
+                        var temp = x['date'];
+                        if(temp === undefined){
+                            x_list.push('');
+                        }
+                        else{
+                            x_list.push(temp);
+                            y_list.push(x['per']);
+                            var t_win = x['win'];
+                            var t_count = x['count'];
+                            all_count += t_count;
+                            win_count += t_win;
+                            z_list.push([t_win, t_count]);
+                        }
+                    }
+
+                }
+                var lost_count = all_count - win_count;
+                $("#win_count").text(`${win_count}笔`);
+                $("#lost_count").text(`${lost_count}笔`);
+                $("#all_count").text(`${all_count}笔`);
+                $("#win_per").text(`${((win_count/all_count)*100).toFixed(1)}%`);
+                console.log(x_list);
+                bar_chart($("#main")[0], x_list, y_list, z_list);
+            }
+        });
+    };
+    $("#my_chart_a").click(function(){init_chart();});
+
+    // 初始化柱装图
+    var bar_flag = false;
+    var bar_chart = function(dom, x_data, y_data, z_data){
+        var opts =  {
+            title: {
+        text: '胜率统计',
+        subtext: '单位: %  数据实时更新'
+        },
+            color: ['#3398DB'],
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis : [
+                {
+                    type : 'category',
+                    data : x_data,
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value',
+                    max: 100,
+                    min: 0
+                }
+            ],
+            series : [
+                {
+                    name:'胜率',
+                    type:'bar',
+                    barWidth: '60%',
+                    label: {
+                normal: {
+                    show: true,
+                    position: 'inside'
+                }
+            },
+                    data:y_data
+                }
+            ]
+        };
+        if(!bar_flag){
+            echarts.init(dom).setOption(opts);
+            bar_flag = true;
+        }
+
+    };
+
 // end !
 });

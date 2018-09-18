@@ -455,6 +455,25 @@ class Teacher(mongo_db.BaseDoc):
                 pass
         return res
 
+    @classmethod
+    def win_and_bar(cls, t_id: (str, ObjectId) = None) -> list:
+        """
+        查询老师的,状图表数据并统计获胜场次. 2018-9-17
+        分组标志: 月份+老师id
+        排序 老师Id正序, 月份正序
+        :param t_id:
+        :return:
+        """
+        a_list = win_and_bar(t_id)
+        a_list = [{
+            't_id': str(x['_id']['t_id']),
+            'date': x['_id']['date'].strftime("%y/%m"),
+            "win": x['win'],
+            "count": x['count'],
+            'per': round((x['win'] / x['count']) * 100, 1) if x['count'] else 0
+        } for x in a_list]  # 添加每月胜率
+        return a_list
+
 
 if __name__ == "__main__":
     """查询单个老师的持仓记录"""

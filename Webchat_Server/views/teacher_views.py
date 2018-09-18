@@ -73,7 +73,7 @@ def login() -> str:
 
 def login_out():
     """注销"""
-    session.pop("t_id")
+    session.pop("t_id", None)
     return json.dumps({"message": "success"})
 
 
@@ -107,7 +107,7 @@ def log_func():
 
 def file_func(action: str = "", table_name: str = ""):
     """
-    保存/获取文件,
+    保存/获取文件,此函数仅允许老师上传图片.但允许所有人查看图片.
     :param action: 动作, save/get(保存/获取)
     :param table_name: 文件类对应的表名.
     :return:
@@ -220,126 +220,31 @@ def file_func(action: str = "", table_name: str = ""):
     return json.dumps(mes)
 
 
-# @check_teacher_session
-# def process_case_page(teacher: dict = None):
-#     """
-#     暂停使用,仅作参考 2018-9-9
-#     交易管理
-#     旧版本,
-#     """
-#     method = request.method.lower()
-#     if method == "get":
-#         page_title = "交易管理"
-#         hold_list = Teacher.get_hold(t_id=teacher['_id'])  # 持仓信息
-#         return render_template("process_case.html", page_title=page_title, teacher=teacher, hold_list=hold_list,
-#                                v=version())
-#     elif method == "post":
-#         """
-#         分析师微信喊单信号。在未整合之前，此类信号一律转交
-#         Message_Server项目处理 2018-8-28
-#         """
-#         args = get_args(request)
-#         now = datetime.datetime.now()
-#         mes = {"message": "success"}
-#         t_id = teacher['_id']
-#         args['teacher_id'] = t_id
-#         args['teacher_name'] = teacher['name']
-#         args['version'] = "1.0"
-#         if teacher['native']:
-#             """真实老师"""
-#             args['change'] = "raw"
-#             args['native'] = True
-#         else:
-#             args['change'] = 'follow'
-#             args['native'] = False
-#         _id = args.get("_id", "")
-#         if isinstance(_id, str) and len(_id) == 24:
-#             """1 这是离场"""
-#             """1.1 处理离场时间"""
-#             ets = args.get('exit_time', '')
-#             et = mongo_db.get_datetime_from_str(ets)
-#             if isinstance(et, datetime.datetime):
-#                 args['exit_time'] = et
-#             else:
-#                 title = "{}离场时没有传递离场时间".format(now)
-#                 content = "老师id: {}, trade_id:{}, exit_time:{}".format(t_id, _id, ets)
-#                 logger.exception(msg=title + content)
-#                 send_mail(title=title, content=content)
-#                 args['exit_time'] = now
-#             """1.2 处理离场价格"""
-#             exit_price = None
-#             exit_price_s = args.pop("exit_price", None)
-#             try:
-#                 exit_price = float(exit_price_s)
-#             except Exception as e:
-#                 print(e)
-#             finally:
-#                 if isinstance(exit_price, float):
-#                     args['exit_price'] = float(exit_price)
-#                     ses = mongo_db.get_conn(table_name="trade")
-#                     f = {"_id": ObjectId(_id)}
-#                     obj = ses.find_one(filter=f)
-#                     if obj is None:
-#                         mes["message":] = "订单不存在"
-#                     else:
-#                         args['case_type'] = "exit"
-#                         obj.update(args)
-#                         args = obj
-#                         if process_case(doc_dict=args, raw=True):
-#                             """成功"""
-#                             pass
-#                         else:
-#                             mes = {"message": "操作失败"}
-#                 else:
-#                     title = "{}离场时没有传递离场价格".format(now)
-#                     content = "老师id: {}, trade_id:{},exit_price:{} ".format(t_id, _id, exit_price_s)
-#                     logger.exception(msg=title + content)
-#                     send_mail(title=title, content=content)
-#                     mes = {"message": "缺少离场价格"}
-#         else:
-#             """2 这是进场"""
-#             """2.1 先处理进场时间"""
-#             enter_time_s = args.get("enter_time", '')
-#             enter_time = mongo_db.get_datetime_from_str(enter_time_s)
-#             if isinstance(enter_time, datetime.datetime):
-#                 args['enter_time'] = enter_time
-#             else:
-#                 title = "{}进场时没有传递进场时间".format(now)
-#                 content = "老师id: {}, trade_id:{}, enter_time:{}".format(t_id, _id, enter_time_s)
-#                 logger.exception(msg=title + content)
-#                 send_mail(title=title, content=content)
-#                 args['enter_time'] = now
-#             """2.2 处理进场价格"""
-#             enter_price = None
-#             enter_price_s = args.pop("enter_price", None)
-#             try:
-#                 enter_price = float(enter_price_s)
-#             except Exception as e:
-#                 print(e)
-#             finally:
-#                 if isinstance(enter_price, float):
-#                     args['enter_price'] = float(enter_price)
-#                     args['_id'] = ObjectId()
-#                     args['case_type'] = "enter"
-#                     args['each_profit'] = 0.0
-#                     args['lots'] = 1
-#                     args['native_direction'] = args['direction']
-#                     args['record_id'] = args['_id']
-#                     if process_case(doc_dict=args, raw=True):
-#                         """成功"""
-#                         pass
-#                     else:
-#                         mes = {"message": "操作失败"}
-#                 else:
-#                     title = "{}进场时没有传递进场价格".format(now)
-#                     content = "老师id: {}, trade_id:{},enter_price:{} ".format(t_id, _id, enter_price_s)
-#                     logger.exception(msg=title + content)
-#                     send_mail(title=title, content=content)
-#                     mes = {"message": "缺少进场价格"}
-#
-#         return json.dumps(mes)
-#     else:
-#         return abort(405)
+def teacher_chart_func(the_type: str):
+    """
+    查看老师的各种图标数据, 允许任何人查看
+    : params the_type: 图标类型
+    :return:
+    """
+    t_id = get_arg(request, 't_id', "")
+    if isinstance(t_id, str) and len(t_id) == 24:
+        t_id = ObjectId(t_id)
+    else:
+        t_id = None
+    mes = {"message": "success"}
+    if the_type.lower() == 'bar':
+        """柱装图数据"""
+        data_list = Teacher.win_and_bar(t_id)
+        if len(data_list) < 6:
+            delta = 6 - len(data_list)
+            for i in range(delta):
+                data_list.append(dict())
+        else:
+            data_list = data_list[(len(data_list) - 6):]
+        mes['data'] = data_list
+    else:
+        mes['message'] = "{} 类型未实现".format(the_type)
+    return json.dumps(mes)
 
 
 @check_teacher_session
@@ -475,12 +380,28 @@ def process_case_page2(teacher: dict = None):
         elif the_type == "update_person":
             """老师编辑自己的资料"""
             f = {"_id": teacher['_id']}
-            u = {"$set": args}
-            r = Teacher.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
-            if r is None:
-                mes['message'] = "更新个人资料失败"
+            old_pw = args.pop("old_password", None)
+            if old_pw is None:
+                """修改除密码之外的资料"""
+                u = {"$set": args}
+                r = Teacher.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                if r is None:
+                    mes['message'] = "更新个人资料失败"
+                else:
+                    mes['message'] = 'success'
             else:
-                mes['message'] = 'success'
+                """这是修改密码,需要先验证原始密码是否正确?"""
+                if old_pw == teacher['password']:
+                    """旧密码正确"""
+                    u = {"$set": args}
+                    r = Teacher.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+                    if r is None:
+                        mes['message'] = "修改密码失败"
+                    else:
+                        mes['message'] = 'success'
+                        session.pop("t_id", None)  # 清除会话信息
+                else:
+                    mes['message'] = "旧密码不正确"
         else:
             mes = {"message": "未知的操作:{}".format(the_type)}
         return json.dumps(mes)
@@ -498,6 +419,8 @@ teacher_blueprint.add_url_rule(rule="/log", view_func=log_func, methods=['get', 
 teacher_blueprint.add_url_rule(rule="/login.html", view_func=login, methods=['get', 'post'])
 """老师图片的相关操作"""
 teacher_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['get', 'post'])
+"""查看老师的图表数据"""
+teacher_blueprint.add_url_rule(rule="/chart/<the_type>", view_func=teacher_chart_func, methods=['get', 'post'])
 """老师注销"""
 teacher_blueprint.add_url_rule(rule="/login_out", view_func=login_out, methods=['get', 'post'])
 """报价页面"""

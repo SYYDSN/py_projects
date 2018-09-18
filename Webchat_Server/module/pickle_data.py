@@ -836,9 +836,10 @@ def query_chart_data(chart_type: str = "teacher", begin: str = None, end: str = 
 
 def win_and_bar(t_id: (str, ObjectId) = None) -> list:
     """
-    查询老师的,状图表数据并计算胜率. 2018-9-17
-
-    :param t_id: None表示全部老师
+    查询老师的,状图表数据并统计获胜场次. 2018-9-17
+    分组标志: 月份+老师id
+    排序 老师Id正序, 月份正序
+    :param t_id:
     :return:
     db.trade.aggregate([
     {"$match":{"change": "raw", "enter_time":{$exists:true, $ne:null, "$gte":ISODate("2018-08-31T23:00:00.000Z")},"each_profit":{$exists: true}}},
@@ -860,10 +861,10 @@ def win_and_bar(t_id: (str, ObjectId) = None) -> list:
     t_id = t_id if isinstance(t_id, ObjectId) or t_id is None else ObjectId(t_id)
     if isinstance(t_id, ObjectId):
         match_dict = {
-                    "exit_time": {"$exists": True, "$ne": None},
-                    "teacher_id": t_id,
-                    "case_type": "exit"
-                }
+            "exit_time": {"$exists": True, "$ne": None},
+            "teacher_id": t_id,
+            "case_type": "exit"
+        }
     else:
         match_dict = {
             "exit_time": {"$exists": True, "$ne": None},
@@ -877,14 +878,24 @@ def win_and_bar(t_id: (str, ObjectId) = None) -> list:
             "$project":
                 {
                     "teacher_id": "$teacher_id",
-                    "ym": {'$dateToString': {'date': "$enter_time", 'format': "%G-%m"}},
+                    "exit_time": "$exit_time",
+                    "ym":
+                        {
+                            "$dateFromParts":
+                                {
+                                    "year": {"$year": "$exit_time"},
+                                    "month": {"$month": "$exit_time"},
+                                    "day": 1
+                                 }
+                        },
                     "win": {'$gte': ["$each_profit", 0]}
                 }
         },
         {
             "$group":
                 {
-                    "_id": "$teacher_id", "count": {"$sum": 1},
+                    "_id": {"t_id": "$teacher_id", "date": "$ym"},
+                    "count": {"$sum": 1},
                     "win":
                         {
                             "$sum": {"$cond":
@@ -894,6 +905,12 @@ def win_and_bar(t_id: (str, ObjectId) = None) -> list:
                                              "else": 0
                                           }}
                         }
+                }
+        },
+        {
+            "$sort":
+                {
+                    "_id.t_id": 1, "_id.date": 1
                 }
         }
     ]
