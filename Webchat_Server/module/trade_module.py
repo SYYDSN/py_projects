@@ -254,6 +254,10 @@ def calculate_trade(raw_signal: dict) -> None:
         each_profit = each_profit_dollar - comm
         x['each_profit_dollar'] = each_profit_dollar
         x['each_profit'] = each_profit
+        x['p_val'] = p_v
+        x['p_diff'] = p_d
+        x['p_arg'] = p_a
+        x['comm'] = comm
         lots = 1  # 最少手数
         try:
             lots = x['lots']
@@ -305,7 +309,10 @@ def calculate_trade(raw_signal: dict) -> None:
         d_res = "往直播群发送钉钉机器人消息失败! {}".format(content)
         logger.exception(msg=d_res)
     finally:
-        print("钉订消息发送结果:{}".format(d_res))
+        if d_res is None:
+            pass
+        else:
+            print("钉订消息发送结果:{}".format(d_res))
 
 
 def generator_signal_and_save(raw_signal: dict) -> list:
@@ -583,7 +590,7 @@ def send_tips_to_dingding(info: dict) -> bool:
                                                                          enter_price, enter_time)
         else:
             # the_type == "平仓提醒"
-            each_profit = info.get("each_profit")
+            each_profit = round(info.get("each_profit", 0.0), 0)
             enter_price = info.get("enter_price")
             enter_price = round(enter_price, 2) if isinstance(enter_price, float) and len(str(enter_price)) > 8 \
                 else enter_price
@@ -1307,18 +1314,20 @@ if __name__ == "__main__":
         "datetime": "2018-08-06T01:28:25.000Z",
         "app_id": "5a45b8436203d26b528c7881",
         "app_name": "分析师交易记录",
+        "change": "raw",
+        "case_type": "exit",
         "create_time": "2018-08-21T12:28:31.843Z",
-        "creator_id": "5a1e680642f8c1bffc5dbd6f",
+        "teacher_id": "5a1e680642f8c1bffc5dbd6f",
         "direction": "买入",
         "each_cost": 100.0,
         "each_profit": 700.0,
         "each_profit_dollar": 800.0,
-        "enter_price": 27800.0,
+        "enter_price": 27364.0,
         "entry_id": "5a45b90254ca00466b3c0cd1",
         "op": "data_update",
         "p_coefficient": 10.0,
         "product": "恒指",
-        "profit": 800.0,
+        "profit": 0.0,
         "receive_time": "2018-08-06T09:44:48.707Z",
         "record_id": "5b67a43fed59cc4e636bf822",
         "send_time_enter": "2018-08-06T09:28:36.158Z",
@@ -1328,15 +1337,17 @@ if __name__ == "__main__":
         "update_time": "2018-08-21T12:44:47.899Z",
         "updater_id": "5a1e680642f8c1bffc5dbd6f",
         "updater_name": "语昂",
-        "exit_price": 27880.0,
+        "exit_price": 27389,
         "exit_reason": "保护利润，提前离场",
         "send_time_exit": "2018-08-06T09:44:48.824Z"
     }
-    s = Signal(**b)
-    Trade.sync_from_signal(s)
+    # s = Signal(**b)
+    # Trade.sync_from_signal(s)
     """测试获取价格"""
     # th_time = mongo_db.get_datetime_from_str("2018-8-12 16:00:00")
     # get_price(p_name="黄金", the_time=th_time)
+    """测试计算单子盈利"""
+    # calculate_trade(b)
     pass
 
 

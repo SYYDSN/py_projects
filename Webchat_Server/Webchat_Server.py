@@ -79,6 +79,26 @@ def short_date2(d: datetime.datetime) -> str:
     return "{}月{}日 {}时{}分".format(d.month, d.day, d.hour, d.minute)
 
 
+def startswith(string: str, pre: str) -> bool:
+    """
+    检查一个字符串是否以特定的字符串序列开头?
+    :param string: 待检测字符串
+    :param pre:
+    :return:
+    """
+    return string.startswith(pre)
+
+
+def endswith(string: str, end: str) -> bool:
+    """
+    检查一个字符串是否以特定的字符串序列结尾?
+    :param string: 待检测字符串
+    :param end:
+    :return:
+    """
+    return string.endswith(end)
+
+
 """注册jinja2过滤器"""
 
 app.jinja_env.filters['short_num'] = short_num
@@ -86,6 +106,8 @@ app.jinja_env.filters['short_num1'] = short_num1
 app.jinja_env.filters['short_num2'] = short_num2
 app.jinja_env.filters['short_date'] = short_date
 app.jinja_env.filters['short_date2'] = short_date2
+app.jinja_env.tests['startswith'] = startswith
+app.jinja_env.tests['endswith'] = endswith
 
 
 """工具函数"""

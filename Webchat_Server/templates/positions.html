@@ -28,7 +28,7 @@
         <ul class="redLogBundle-nav">
 
             <li class="on">
-                <a href="/user/html/remind.html">交易管理</a>
+               <a href="/user/html/remind.html">交易管理</a>
             </li>
         </ul>
     </div>
@@ -178,7 +178,7 @@
 
             <div class="show_zone" id="person_div">
                 <div class="userTextimg">
-                    <p class="leftimg"><img id="my_head_img" src="{{ teacher.head_img + '&size=120*90' if teacher.head_img else '/static/images/img1.png' }}"/></p>
+                    <p class="leftimg"><img id="my_head_img" src="{{ (teacher.head_img if teacher.head_img is startswith('/static/images') else teacher.head_img + '&size=120*90') if teacher.head_img else '/static/images/img1.png' }}"/></p>
                     <div class="userInfo">
                         <div class="flex_row_left">
                             <h3 id="teacher_name">{{ teacher.name }}</h3>

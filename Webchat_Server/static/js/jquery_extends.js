@@ -156,7 +156,7 @@ var ajax_error = function(req, status, error, req_args, u){
     console.log(req_args);
     console.log("Ajax_Error end");
     var now = new Date();
-    var error_time = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`
+    var error_time = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
     console.log(`error time is ${error_time}`);
     // 这是其他函数post失败的情况
     var args = {
@@ -165,7 +165,7 @@ var ajax_error = function(req, status, error, req_args, u){
         "ajax_error_count": 1,
         "error": error,
         "error_time": error_time
-    }
+    };
     $.post("/teacher/log", args, function(r){
         close_alert();
         alert("操作失败");

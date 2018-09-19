@@ -429,15 +429,28 @@ def login_func():
         phone = get_arg(request, "phone", None)
         password = get_arg(request, "password", None)
         if phone and password:
+            agent = request.user_agent.string
+            ip = get_real_ip(request)
+            d = {
+                "phone": phone,
+                "password": password,
+                "ip": ip,
+                "agent": agent,
+                "time": datetime.datetime.now()
+            }
             res = user_module.User.login(phone, password)
             mes = {"message": "success"}
             if isinstance(res, dict):
                 if res['message'] == "success":
+                    d['success'] = True
                     save_platform_session(**res['data'])
                 else:
+                    d['success'] = False
                     mes = res
             else:
+                d['success'] = False
                 mes = {"message": "登录错误"}
+            user_module.LoginLog.log(d)
             return json.dumps(mes)
         else:
             return abort(404)
