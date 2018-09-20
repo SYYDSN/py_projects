@@ -250,7 +250,9 @@ def calculate_trade(raw_signal: dict) -> None:
         p_a = info['p_arg']  # 系数
         comm = info['comm']   # 每手佣金
         t_c = x['t_coefficient']                  # 空单/多单
-        each_profit_dollar = ((exit_price - enter_price) * t_c - p_d/p_a) * p_v * p_a  # 每手盈利美元毛利(尚未扣除佣金)
+        """"""
+        # each_profit_dollar = ((exit_price - enter_price) * t_c - p_d/p_a) * p_v * p_a  # 2018-9-20废止, 每手盈利美元毛利(尚未扣除佣金)
+        each_profit_dollar = (exit_price - enter_price) * t_c * p_v * p_a  # 每手盈利美元毛利(尚未扣除佣金)
         each_profit = each_profit_dollar - comm
         x['each_profit_dollar'] = each_profit_dollar
         x['each_profit'] = each_profit
