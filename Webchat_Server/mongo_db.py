@@ -968,8 +968,12 @@ class BaseFile:
         """
         fs = cls.fs_cls(collection)
         r = fs.put(data=file_obj, **kwargs)
-        file_obj.close()
-        return r
+        try:
+            file_obj.close()
+        except Exception as e:
+            print(e)
+        finally:
+            return r
 
     @classmethod
     def save_flask_file(cls, req: request, collection: str = None, arg_name: str = None, **kwargs) -> (str, ObjectId, None):

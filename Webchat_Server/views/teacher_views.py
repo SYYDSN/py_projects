@@ -77,6 +77,18 @@ def login_out():
     return json.dumps({"message": "success"})
 
 
+def praise_func():
+    """
+    战绩页面,
+    :return:
+    """
+    fid = get_arg(request, "fid", "")
+    if fid == "":
+        return abort(404)
+    else:
+        return render_template("praise_page.html", fid=fid)
+
+
 def quotation_page():
     """报价页面"""
     page_title = "行情"
@@ -123,7 +135,7 @@ def file_func(action: str = "", table_name: str = ""):
     1. base_info                  文件存储基础表,对应mongo_db.BaseFile
     2. teacher_image                老师相关图片
     """
-    tables = ['base_file', 'teacher_image']
+    tables = ['base_file', 'teacher_image', 'praise_image']
     table_name = table_name if table_name in tables else 'base_file'
     if action == "save":
         """保存文件"""
@@ -152,7 +164,7 @@ def file_func(action: str = "", table_name: str = ""):
             else:
                 mes['message'] = "保存失败"
     elif action == "view":
-        """获取文件"""
+        """获取文件/图片"""
         fid = get_arg(request, "fid", "")
         if isinstance(fid, str) and len(fid) == 24:
             fid = ObjectId(fid)
@@ -417,6 +429,8 @@ def process_case_page2(teacher: dict = None):
 teacher_blueprint.add_url_rule(rule="/log", view_func=log_func, methods=['get', 'post'])
 """老师登录"""
 teacher_blueprint.add_url_rule(rule="/login.html", view_func=login, methods=['get', 'post'])
+"""战绩页面"""
+teacher_blueprint.add_url_rule(rule="/praise.html", view_func=praise_func, methods=['get', 'post'])
 """老师图片的相关操作"""
 teacher_blueprint.add_url_rule(rule="/file/<action>/<table_name>", view_func=file_func, methods=['get', 'post'])
 """查看老师的图表数据"""

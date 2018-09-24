@@ -105,7 +105,9 @@ def file_func(user: dict = None, action: str = "", table_name: str = ""):
         else:
             mes['message'] = "保存失败"
     elif action == "view":
-        """获取文件"""
+        """
+        获取图片,注意这个方法比较原始,teacher_view下的文件有缩略图参数
+        """
         fid = get_arg(request, "fid", "")
         if isinstance(fid, str) and len(fid) == 24:
             fid = ObjectId(fid)
