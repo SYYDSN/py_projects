@@ -1,0 +1,43 @@
+{% extends "template.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/upload_demo.css">
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 col-lg-offset-3 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 my_div">
+                <img id="view_image" src="">
+                <div class="json_div">
+                    <div class="json_div_inner"></div>
+                </div>
+                <div class="my_bottom">
+                    <!--
+                        <input id="select_image" type="file" accept="image/*" capture="camera" multiple>
+                        accept表示打开系统文件目录
+                        accept="image/*"  打开相册
+                        accept="video/*"  打开视频
+                        capture  指调用哪些设备
+                        capture='microphone'   调用录音机
+                        capture='camera'       调用相机
+                        capture='camcorder'    调用摄像机
+                        file类型的input还有一个 multiple 的单值属性.表示同时提供打开文件和设备的选项.
+                        IOS中, multiple  属性无效. 必须写2个input来自行实现选择.
+                        判断是否是苹果手机的方法:
+                        navigator.userAgent.toLowerCase() == "iphone os"
+                        由于目前拍摄的照片尺寸过大,所以暂时关闭拍照的功能(没有capture="camera" 和 multiple属性)
+                    -->
+                    <input id="select_image" type="file" accept="image/*">
+                    <button id="select_btn" class="btn btn-default btn-primary">选择</button>
+                    <button id="upload_btn" class="btn btn-default btn-primary">上传</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/upload_demo.js"></script>
+{% endblock %}
