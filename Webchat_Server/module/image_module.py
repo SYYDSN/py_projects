@@ -24,6 +24,7 @@ deposit_path = os.path.join(__project_path, 'static', 'images', 'praise', 'depos
 """
 图像操作模块
 此模块应该放置在Message_server下面,在接收交易平台的入金成功信息的时候操作此模块
+在此存在的目的仅仅是验证技术
 """
 
 

@@ -9,6 +9,7 @@ from tools_module import *
 from module.item_module import *
 from views.mt4_view import mt4_blueprint
 from views.quotations_view import quotations_blueprint
+from views.normal_view import normal_blueprint
 import os
 
 
@@ -21,6 +22,7 @@ app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览�
 app.config.from_object(__name__)
 app.register_blueprint(mt4_blueprint)  # 注册监听mt4后台发送过来的消息的蓝图
 app.register_blueprint(quotations_blueprint)  # 注册监听报价行情推送的消息的蓝图
+app.register_blueprint(normal_blueprint)  # 注册一般视图的蓝图
 Session(app)
 
 
