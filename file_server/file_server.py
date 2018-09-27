@@ -25,7 +25,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持
 app.register_blueprint(image_blueprint)  # 注册图片视图
 SESSION_TYPE = "redis"
 Session(app)
-port = 70001
+port = 7001
 
 
 @app.route("/")

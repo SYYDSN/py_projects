@@ -1,8 +1,17 @@
 # 文件服务器接口文档
 
+#### Domain: file.bhxxjs.cn
 #### Protocol: http 1.0/2.0
-#### Host: 47.99.105.196
+#### Ip: 47.99.105.196
 #### Port: 7001
+
+**主机地址**
+
+主机地址为 协议+ip+端口或者 协议+域名
+主机地址使用以下2种表示方式皆可：
+
+1. http://47.99.105.196:7001
+2. http://file.bhxxjs.cn
 
 ### 一般约定
 
@@ -26,10 +35,37 @@
 
 * Url: /images/obj/save/image_file
 * Method: post/get
-* Headers:  auth = "647a5253c1de4812baf1c64406e91396"
+* Headers:  auth = "647a5253c1de4812baf1c64406e91396"   请求头中的身份验证信息，固定的字符串
 * Args: 
 
 >* file 字节类型  必须   待上传的图片的数据
+
+* Request Example:
+
+```html
+.....
+<!--一个上传图片的例子，html代码部分-->
+<input id="select_image" type="file" accept="image/*">
+<button id="upload_btn" class="btn btn-default btn-primary">上传</button>
+.....
+<script>
+....
+/*j一个上传图片的例子，avascript代码部分*/
+$("#upload_btn").click(function(){
+        var headers = {"auth": "647a5253c1de4812baf1c64406e91396"};               // 请求头，用于验证身份
+        var url = "http://47.99.105.196:7001/images/obj/save/image_file";         // 提交地址,
+        // 上传图片
+        $("#select_image").upload(url, function(json){
+            // 处理成功的返回
+            ...
+        }, function(e){
+            // 处理错误的返回
+            ...
+        }, headers);
+    });
+....
+</script>
+```
 
 * Return:
 1. success:
@@ -67,14 +103,14 @@ var resp = {
 * Request Example:
 
 ```javascript
-var host = "http://47.99.105.196";             // 主机地址
+var host = "http://47.99.105.196:7001";             // 主机地址
 var api = '/images/obj/view/image_file';       // api的url
 var img_id = "5bab505d17397c118bdfac9d";       // 图片的id
 var size = "120*90";                           // 尺寸，表示120像素宽，90像素高
 
 var url = host + api + "?fid=" + img_id + "&size=" + size;
 /*
-* 最后拼接的图片地址是 http://47.99.105.196/images/obj/view/image_file?fid=5bab505d17397c118bdfac9d&size=120*90
+* 最后拼接的图片地址是 http://47.99.105.196:7001/images/obj/view/image_file?fid=5bab505d17397c118bdfac9d&size=120*90
 * */
 
 ```
