@@ -118,7 +118,7 @@ class Praise(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['the_type'] = int  # 类型 0激活,1加金
-    type_dict['order'] = str  # 平台事件序列号,唯一
+    type_dict['order'] = str  # 平台事件序列号,也就是_id,唯一
     type_dict['dept'] = str  # 部门
     type_dict['group'] = str  # 组
     type_dict['sales'] = str  # 销售

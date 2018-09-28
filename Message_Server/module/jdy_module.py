@@ -7,47 +7,73 @@ if __project_path not in sys.path:
 from log_module import get_logger
 import mongo_db
 from send_moudle import *
+from pymongo import ReturnDocument
+import requests
 import datetime
 
 
 ObjectId = mongo_db.ObjectId
+app_key = 'gavQrjmjxekfyK4qeZAI0usSZmZq0oww'
+headers = {'Authorization': 'Bearer {}'.format(app_key)}
 
 
 """简道云相关的模块"""
 
 
-class CustomerRelation(mongo_db.BaseFile):
+class RefreshInfo(mongo_db.BaseDoc):
     """
-    客户和销售人员之间的对应关系
+    记录刷新时间
     """
-    _table_name = "customer_relation"
+    _table_name = "refresh_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['raw_id'] = ObjectId
-    type_dict['mt4_account'] = str  # mt4账户,唯一
-    type_dict['customer'] = str  # 客户名
-    type_dict['sales'] = str  # 销售名
-    type_dict['manager'] = str  # 经理名
-    type_dict['director'] = str  # 总监名
-    type_dict['platform'] = str  # 平台名
-    type_dict['create_time'] = datetime.datetime  # 创建时间
+    type_dict['table_name'] = str
+    type_dict['time'] = datetime.datetime  # 刷新时间
 
     @classmethod
-    def get_init(cls, **kwargs):
+    def get_prev(cls, table_name: str) -> (datetime.datetime, None):
         """
-        从简道云返回的数据中,生产初始化对象的参数集合
-        :param kwargs:
+        获取上一次的刷新信息
+        :param table_name: 表名
         :return:
         """
-        init = dict()
-        init['raw_id'] = ObjectId(kwargs.get('_id', None))
-        init['mt4_account'] = kwargs.get('_widget_1515400344933', '')
-        init['customer'] = kwargs.get('_widget_1515400344920', '')
-        init['sales'] = kwargs.get('_widget_1520476984707', '')
-        init['manager'] = kwargs.get('_widget_1520476984720', '')
-        init['director'] = kwargs.get('_widget_1520476984733', '')
-        init['platform'] = kwargs.get('_widget_1517984569439', '')
-        create_time = kwargs.get('createTime', '')
-        a_time = mongo_db.get_datetime_from_str(create_time)
-        init['create_time'] = a_time if isinstance(a_time, datetime.datetime) else create_time
-        return init
+        f = {"table_name": table_name}
+        r = cls.find_one_plus(filter_dict=f, instance=False)
+        if r is None:
+            pass
+        else:
+            return r['time']
+
+    @classmethod
+    def update_time(cls,  table_name: str) -> None:
+        """
+        更新刷新时间
+        :param table_name:
+        :return:
+        """
+        f = {"table_name": table_name}
+        u = {"$set": {"time": datetime.datetime.now()}}
+        cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+
+
+def listen_api(**kwargs):
+    """
+    监听简道云通过.api推送过来的消息
+    :param kwargs:
+    :return:
+    """
+
+
+def process_praise(**kwargs) -> None:
+    """
+    处理简道云发送过来的战报海报消息
+    :param kwargs:
+    :return:
+    """
+
+
+if __name__ == "__main__":
+    pass
+
+
+
