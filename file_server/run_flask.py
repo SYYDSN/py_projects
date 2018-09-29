@@ -14,12 +14,12 @@ except ImportError as e:
 
 
 # tornado方式部署,异步模式.
-# http_server = HTTPServer(WSGIContainer(app))
-# http_server.bind(port)
+http_server = HTTPServer(WSGIContainer(app))
+http_server.bind(port)
 # http_server.start(0)
-# # http_server.start(1)
-# print("server running on {} port ...".format(port))
-# IOLoop.current().start()
+http_server.start(1)
+print("server running on {} port ...".format(port))
+IOLoop.current().start()
 
 
 # bjoern部署方式,c语言,异步模式.注意,这种方式不支持ssl,也不能自定义headers
@@ -39,8 +39,8 @@ except ImportError as e:
 
 
 # meinheld 方式,部分c的py.
-server.listen(("0.0.0.0", port))
-server.run(app)
+# server.listen(("0.0.0.0", port))
+# server.run(app)
 
 
 # gevent 部署方式

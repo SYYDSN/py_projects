@@ -18,6 +18,7 @@ from mongo_db import ObjectId
 from PIL import Image
 from io import BytesIO
 import json
+from module.captcha_module import MyImageCaptcha
 
 
 """注册蓝图"""

@@ -1,0 +1,39 @@
+{% extends "template.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/captcha_demo.css">
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 col-lg-offset-3 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 my_div">
+
+                <div class="div_outer">
+                    <div class="div_inner">
+                        <div class="div_line">
+                            <label for="phone">
+                                手机
+                            </label>
+                            <input id="phone" type="text">
+                        </div>
+                        <div class="div_line">
+                            <label for="password">密码</label>
+                            <input id="password" type="password">
+                        </div>
+                        <div class="div_line">
+                            <label for="re_password">重复密码</label>
+                            <input id="re_password" type="password">
+                        </div>
+                        <div class="div_line"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/captcha_demo.js"></script>
+{% endblock %}
