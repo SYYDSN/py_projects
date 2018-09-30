@@ -18,7 +18,9 @@ from mongo_db import ObjectId
 from PIL import Image
 from io import BytesIO
 import json
+from tools_module import AUTH
 from module.captcha_module import MyImageCaptcha
+from module.captcha_module import MySmsCaptcha
 
 
 """通用蓝图"""
@@ -125,7 +127,33 @@ def captcha_demo():
         return render_template("captcha_demo.html")
 
 
+def validate_code_func():
+    """
+    检查短信验证码
+    :return:
+    """
+    auth = request.headers.get("auth")
+    if auth == AUTH:
+        phone = get_arg(request, "phone", "")
+        code = get_arg(request, "code", "")
+        resp = MySmsCaptcha.validate_code(phone=phone, code=code)
+    else:
+        resp = {"message": "auth error!"}
+    return json.dumps(resp)
 
+
+def send_sms_func():
+    """
+    发送短信接口
+    :return:
+    """
+    auth = request.headers.get("auth")
+    if auth == AUTH:
+        phone = get_arg(request, "phone", "")
+        resp = MySmsCaptcha.send_sms(phone=phone)
+    else:
+        resp = {"message": "auth error!"}
+    return json.dumps(resp)
 
 
 """集中注册函数"""
@@ -139,3 +167,7 @@ api_blueprint.add_url_rule(rule="/captcha/<c_id>", view_func=captcha_func, metho
 api_blueprint.add_url_rule(rule="/get_captcha_url", view_func=get_captcha_url, methods=['get', 'post'])
 """图片验证码示范页"""
 api_blueprint.add_url_rule(rule="/captcha_demo", view_func=captcha_demo, methods=['post', 'get'])
+"""发送短信验证码"""
+api_blueprint.add_url_rule(rule="/get_sms", view_func=send_sms_func, methods=['post', 'get'])
+"""验证短信验证码是否正确?"""
+api_blueprint.add_url_rule(rule="/validate_code", view_func=validate_code_func, methods=['post', 'get'])

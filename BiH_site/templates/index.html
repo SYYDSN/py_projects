@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+    <link href="css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.css" />
+</head>
+<body>
+<!--导航-->
+{{ form.hidden_tag() }}
+<!--滚动条下拉导航-->
+<div class="fixed" id="hidden">
+    <div class=" container fixed-pd">
+        <div class="colors" id="colors2">
+            <div>
+                <a href="javascript:;" class="f1"><img src="img/logo_news.png"></a>
+                <a href="javascript:;" class=" hov f2 " name="color2">产 品</a>
+                <!--product.html -->
+                <a href="javascript:;" class=" hov f3 f3s" name="color2">解 决 方 案</a>
+                <!--scheme.html-->
+                <!--<a href="javascript:;" class=" hov f3" name="color2">合 作 企 业</a>-->
+                <!--cooperation.html -->
+                <a href="javascript:;" class=" hov f4" name="color2">案 例 介 绍</a>
+                <!-- -->
+                <a href="javascript:;" class=" hov f5" name="color2">外 包 平 台</a>
+                <!-- -->
+                <a href="javascript:;" class=" hov f6" name="color2">关 于 我 们</a>
+                <!--about.html -->
+                <a href="javascript:;" class=" hov f8" name="color2" id="login2">登录</a>
+                <a href="javascript:;" class=" hov f9" name="color2" id="res2">注册</a>
+            </div>
+        </div>
+        <div class="f7">
+            <input type="text" placeholder="搜点什么呢" id="text2">
+            <span class="search"><img src="img/incon.png"></span>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+<!--banner-->
+<!--<div class="banner" id="br">-->
+    <!--<div class="banner-img" id="banner">-->
+        <!--<a href="" class="first"><img src="img/banner.jpg"></a>-->
+        <!--<a href=""><img src="img/banner2.jpg"></a>-->
+        <!--&lt;!&ndash;<a href=""><img src="img/banner3.jpg"></a>&ndash;&gt;-->
+    <!--</div>-->
+    <!--<div class="btn" id="btn">-->
+        <!--<span onclick="set(0)"></span>-->
+        <!--<span onclick="set(1)"></span>-->
+        <!--&lt;!&ndash;<span onclick="set(2)"></span>&ndash;&gt;-->
+    <!--</div>-->
+<!--</div>-->
+<div class="carousel slide carousel-fade" id="carousel" data-interval="4000" data-pause="hover" data-wrap="true" data-ride="carousel">
+    <ul class="carousel-indicators">
+        <li class="active" data-slide-to="0" data-target="#carousel"></li>
+        <li data-slide-to="1" data-target="#carousel"></li>
+        <!--<li data-slide-to="2" data-target="#carousel"></li>-->
+        <!--<li data-slide-to="3" data-target="#carousel"></li>-->
+    </ul>
+    <div class="carousel-inner">
+        <div class="item active">
+            <img src="img/banner.jpg" width="100%">
+        </div>
+        <div class="item">
+            <img src="img/banner2.jpg" width="100%">
+        </div>
+        <!--<div class="item">-->
+            <!--<img src="img/Banner1.jpg" width="100%">-->
+        <!--</div>-->
+        <!--<div class="item">-->
+            <!--<img src="img/Banner2222.jpg" width="100%">-->
+        <!--</div>-->
+    </div>
+    <!--<a href="#carousel" data-slide="prev" class="carousel-control left">-->
+        <!--<span class="glyphicon glyphicon-chevron-left"></span>-->
+
+    <!--</a>-->
+    <!--<a href="#carousel" data-slide="next" class="carousel-control right">-->
+        <!--<span class="glyphicon glyphicon-chevron-right"></span>-->
+    <!--</a>-->
+</div>
+<!--<div class="banner" id="banner">
+    <div class="banner-content">
+        <div class="banner-img" id="banner-img">
+            <a href="" class="first"><img src="img/Banner1.jpg"> </a>
+            <a href=""><img src="img/Banner2222.jpg"> </a>
+        </div>
+        <div class="banner-btn" id="banner-btn">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>-->
+<div class="fixed" id="nav">
+    <div class="fixed-pd">
+        <div class=" colors" id="colors">
+            <!-- container-->
+            <div>
+                <a href="javascript:;" class=" f1"><img src="img/logo_news.png"></a>
+                <a href="javascript:;" class=" hov f2 " name="color">产 品</a>
+                <!--product.html -->
+                <a href="javascript:;" class=" hov f3 f3s" name="color">解 决 方 案</a>
+                <!--scheme.html-->
+                <!--<a href="javascript:;" class=" hov f3" name="color">合 作 企 业</a>-->
+                <!--cooperation.html -->
+                <a href="javascript:;" class=" hov f4" name="color">案 例 介 绍</a>
+                <!-- -->
+                <a href="javascript:;" class=" hov f5" name="color">外 包 平 台</a>
+                <!-- -->
+                <a href="javascript:;" class=" hov f6" name="color">关 于 我 们</a>
+                <!--about.html -->
+
+                <a href="javascript:;" class=" hov f8" name="color" id="login">登录</a>
+                <a href="javascript:;" class=" hov f9" name="color" id="res">注册</a>
+            </div>
+            <div class="f7">
+                <input type="text" placeholder="搜点什么呢"  id="text">
+                <a href="" class="search"><img src="img/incon.png"></a>
+            </div>
+        </div>
+        <!--<nav class="navbar navbar-default" role="navigation" id="kk">-->
+            <!--<div class="navbar-header">-->
+                <!--<button type="button" class="navbar-toggle" data-toggle="collapse"-->
+                        <!--data-target="#example-navbar-collapse" id="gg">-->
+                    <!--<span></span>-->
+                    <!--<span></span>-->
+                    <!--<span></span>-->
+                <!--</button>-->
+                <!--<a id="hh" class="navbar-brand" href=""></a>-->
+            <!--</div>-->
+            <!--<div class="collapse navbar-collapse" id="example-navbar-collapse">-->
+                <!--<ul class="nav navbar-nav" id="ul">-->
+                    <!--<li><a href="">Bootstrap2中文文档</a></li>-->
+                    <!--<li><a href=""> Bootstrap3中文文档</a></li>-->
+                    <!--<li><a href="">Bootstrap 4.0 预览</a></li>-->
+                    <!--<li><a href="">Less 教程</a></li>-->
+                    <!--<li><a href="">jQuery API</a></li>-->
+                    <!--<li><a href=""> 网站实例</a></li>-->
+                    <!--<li><a href="">关于</a></li>-->
+                <!--</ul>-->
+            <!--</div>-->
+        <!--</nav>-->
+
+        <div class="clear"></div>
+    </div>
+</div>
+<!--登录注册-->
+<div class="reg" id="reg">
+    <div class="registerBox">
+        <form>
+            <div class="register-top" style="height: 70px;border-bottom: 1px solid #ccc">
+                <div id="resgi"><span></span>用户注册</div>
+                <div id="logi"><span></span>用户登录</div>
+                <div id="guanbi">x</div>
+            </div>
+            <div class="reg-b">
+                <div class="reg-box" id="reg-box1">
+                    <div class="regInputBox">
+                        <div class="reginputImg"></div>
+                        <input class="regInput  " maxlength="11" id="iphone" placeholder="请输入11位正确号码">
+                        <!--<div class="regInputTips" id="regInputTips">手机号码不能为空</div>-->
+                        <!-- 手机号输入框没有内容且失去焦点时显示这个ID的内容 regInputTips-->
+                    </div>
+                    <div class="regInputBox">
+                        <div class="reginputImg reginputImgPsw"></div>
+                        <input type="password" class="regInput " placeholder="请设置登录密码" id="password" maxlength="16">
+                        <!--<div class="regInputTips" id="regInputTips2">密码必须在6-16个字符之间,由数字、大小写字母、特殊字符组成</div>-->
+                        <!-- 密码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips-->
+                    </div>
+                    <div class="regInputBox">
+                        <div class="reginputImg reginputImgPsw"></div>
+                        <input type="password" class="regInput " placeholder="请确认登录密码" id="password2" maxlength="16">
+                        <!--<div class="regInputTips" id="regInputTips2">密码必须在6-16个字符之间,由数字、大小写字母、特殊字符组成</div>-->
+                        <!-- 密码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips2-->
+                    </div>
+                    <div class="regInputBox">
+                        <div class="regYZMbox" id="regYZMbox">
+                            <input class="regInputYZM" type="text" id="code_input" value="" placeholder="请输入短信验证码" maxlength="4">
+                            <!--<a href="javascript:;" class="sx_btn" id="my_button"></a>-->
+                            <input class="ver_mid"  type="button" id="v_container" value="获取短信验证码" >
+                            <!---->
+                        </div>
+                        <!--<div class="regInputTips" id="regInputTips3">请输入验证码</div>-->
+                        <!-- 验证码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips3-->
+                    </div>
+                    <div>
+                        <input class="regBtnOrg" value="立即注册" type="button" id="su_mit">
+                        <div class="regInputTips">
+                            当前系统繁忙，请稍后再试
+                        </div>
+                    </div>
+                    <div class="fontcLBlack fonts12 account">
+                        已有账号？<a  href="javascript:;" class="regBule" id="su-login">快速登陆</a>
+                    </div>
+                </div>
+                <div class="reg-box" id="reg-box2">
+                    <div class="regInputBox">
+                        <div class="reginputImg"></div>
+                        <input class="regInput  " maxlength="11" id="iphone2" placeholder="请输入11位正确号码">
+                        <!--<div class="regInputTips" id="regInputTips">手机号码不能为空</div>-->
+                        <!-- 手机号输入框没有内容且失去焦点时显示这个ID的内容 regInputTips-->
+                    </div>
+                    <div class="regInputBox">
+                        <div class="reginputImg reginputImgPsw"></div>
+                        <input type="password" class="regInput " placeholder="请输入登录密码" id="password3" maxlength="16">
+                        <!--<div class="regInputTips" id="regInputTips2">密码必须在6-16个字符之间,由数字、大小写字母、特殊字符组成</div>-->
+                        <!-- 密码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips-->
+                    </div>
+
+                    <div class="regInputBox">
+                        <div class="regYZMbox" id="regYZMbox2">
+                            <input class="regInputYZM" type="text" id="code_input2" value="" placeholder="请输入验证码" maxlength="4">
+                            <a href="javascript:;" class="sx_btn" id="my_button2"></a>
+                            <div class="ver_mid2"   id="v_container2"></div>
+                            <!---->
+                        </div>
+                        <!--<div class="regInputTips" id="regInputTips3">请输入验证码</div>-->
+                        <!-- 验证码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips3-->
+                    </div>
+                    <div>
+                        <input class="regBtnOrg" value="登录" type="button" id="su_mit2">
+                        <!--<div class="regInputTips">-->
+                            <!--当前系统繁忙，请稍后再试-->
+                        <!--</div>-->
+
+                    </div>
+                    <div class="fontcLBlack fonts12 account">
+                        没有账号？<a href="javascript:;" class="regBule" id="su-login2">快速注册</a>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<!--产品介绍标题-->
+<div class="product">
+    <div class="product-c">
+        <span class="cp"></span>
+        <div class="product-L"></div>
+        推荐产品
+        <div class="product-R"></div>
+    </div>
+</div>
+<!--产品介绍内容-->
+<div class="by">
+    <div class="tabs">
+        <div class="margin">
+            <div class="tabs-center" id="tab-center">
+                <div id="tabs-center">
+                    <div class="tabs-center1">
+                        <a href="javascript:;"><img src="" data-imgurl="img/OA2.png"> </a>
+                    </div>
+                    <div class="tabs-center2">
+                        <a href="javascript:;"><img src="" data-imgurl="img/erp.png"> </a>
+                    </div>
+                    <div class="tabs-center3">
+                        <a href="javascript:;"><img src="" data-imgurl="img/crm.png"></a>
+                    </div>
+                </div>
+                <!--<div class="tabs-btn-left" >-->
+                    <!--<img src="img/shang.png" id="btn-left">-->
+                <!--</div>-->
+                <!--<div class="tabs-btn-right">-->
+                    <!--<img src="img/xia.png" id="btn-right">-->
+                <!--</div>-->
+            </div>
+            <div class="tabs-right">
+                <div class="tabs-top" id="tabs-top">
+                    <div class="tabs-right-top">
+                        <div class="ttt">
+                            <a href="javascript:;">OA语音助手</a>
+                        </div>
+                        <span></span>
+                    </div>
+                    <div class="tabs-right-top">
+                        <div class="ttt">
+                            <a href="javascript:;">门户空间</a>
+                        </div>
+                        <span></span>
+                    </div>
+                    <div class="tabs-right-top">
+                        <div class="ttt">
+                            <a href="javascript:;">协同工作</a>
+                        </div>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="tabs-right-center">
+                    <p>必<span>•</span>弘<span>•</span>信<span>•</span>息</p>
+                    <span class="tabs-right-center-orange"></span>
+                </div>
+                <div class="tabs-right-content" id="title-content">
+                    <div class="tabs-right-bottom1">
+                        <ul>
+                            <li>语音识别、语音合成、语音唤醒、声纹登录</li>
+                            <li>基于智能语音的人机对话方式协同办公</li>
+                            <li>基于智能语义分析的消息提醒与播报</li>
+                            <li>基于智能语义分析的公共服务导航与集成展示</li>
+                            <li>深度自我学习，根据应用大数据智能分析与预警</li>
+                        </ul>
+                    </div>
+                    <div class="tabs-right-bottom2">
+                        <p>
+                            <span>个性化的定制，多维空间展示</span><br>
+                             <span>门户全息呈现：</span>多门户多空间多业务模式架构；
+                            按角色/应用/职能的不同门户设置；同时体现协同工作价值和数据价值；
+                            预置多风格的门户模板，拿来即用；自适应适配布局：PC/移动/大屏
+                        </p>
+                        <p>
+                            <span>门户随需定制：</span>统一门户引擎，让门户具备灵活配置、扩展、复用能力；
+                            多端统一门户引擎：PC 和 移动；支持空间布局个性化设置；
+                            实现门户主题打包导入导出复用；模板库与资源库，个性化配置
+                        </p>
+                    </div>
+                    <div class="tabs-right-bottom3">
+                        <p><span>二元化工作流：</span>实现刚性的制度与柔性的流程 相结合，
+                            实现快速审批。并且支持加签、减签、会签、知会、修改、
+                            回退、撤销、终止、移交、转发、督办、关联、收藏、流程自动分 支、
+                            多条件分支策略，满足企业各种复杂流程处理状况。</p>
+
+                        <p><span>流程仿真技术：</span>实现完整流程仿真，模拟组织运营情况，
+                            流程表单自动流转，一键监测节点和分支异常，人员离职、
+                            部门调整时快速实现流程准确自动调整</p>
+                    </div>
+                </div>
+                <a href="javascript:;" class="more Logins" >了解更多</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--企业OA-->
+<div class="by2">
+    <div class="abbr">
+        <div class="abbr2">
+            <div class="abbr-content">
+                <div class="abbr-1">
+                    <h2>OA</h2>
+                    <p>企业OA也称为办公自动化(Office Automation)，是一门将计算机技术、通信技术、系统科学与行为科学应用于用传统的数据处理技术难以处理的量非常大而结构又不明确的那些业务上的一项综合技术。
+                    </p>
+                    <a href="javascript:;" class="Logins">了解更多</a>
+                </div>
+                <div class="abbr-2">
+                    <h2>CRM</h2>
+
+                    <p>集中管控客户资源，严谨管控以客户为中心的售前、售中、售后过程，形成规范严谨的业务流程，让管理更轻松、工作效率更高。
+                    </p>
+                        <a href="javascript:;" class="Logins">了解更多</a>
+                </div>
+                <div class="abbr-3">
+                    <h2>ERP</h2>
+
+                    <p>通过应用德米萨ERP软件标准版，是以客户为中心、以产品创新为核心、实现从产品设计到生产制造、从销售管理到售后服务的整个产供销全生命周期的一体化管理。
+                    </p>
+                    <a href="javascript:;" class="Logins">了解更多</a>
+                </div>
+            </div>
+            <div class="abbr-content2 ">
+                <div class=" abbr-1">
+                    <h2>商超商业管理</h2>
+
+                    <p>针对大型商场、超市、连锁店、批发店等的行业特点，专业开发的一套集计算机技术、信息技术、网络通讯技术、数字化技术和全面综合管理为一体的商业管理系统
+                    </p>
+                    <a href="javascript:;"  class="Logins">了解更多</a>
+
+                </div>
+                <div class=" abbr-2">
+                    <h2>供应链</h2>
+
+                    <p>供应链管理系统是一款基于供应链管理及金融服务的创新型大型系统。供应链管理信息化将帮助企业建立高效、分销商和终端客户甚至在整个行业之间建立了一条畅通的高速公路一样。
+                    </p>
+
+                    <a href="javascript:;" class="Logins">了解更多</a>
+
+                </div>
+                <div class=" abbr-3">
+                    <h2>人事管理系统</h2>
+
+                    <p>人力资源信息化系统建设的经验，以信息技术实现对企业人力资源信息的高度集成化管理，为中国企业使用的人力资源管理解决方案。
+                    </p>
+                    <a href="javascript:;"  class="Logins">了解更多</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--解决方案-->
+<div class="scheme" id="scheme">
+    <div class="row padding">
+        <div class="product product2">
+            <div class="product-c">
+                <span class="cp"></span>
+                <div class="product-L"></div>
+                经典解决方案
+                <div class="product-R"></div>
+            </div>
+        </div>
+        <div class="scheme-left" id="img">
+            <a href="">
+                <img src=""  data-imgurl="img/scheme1.png">
+            </a>
+        </div>
+        <div class="scheme-right">
+            <div class="scheme-right-top">
+                <a href="">
+                    单点登录，一键解决
+                </a>
+            </div>
+            <div class="scheme-right-center">
+                <p>能够配置多个系统的登录，实现统一平台操作</p>
+                <p>能够在菜单上显示为菜单项，并通过权限组控制使用权</p>
+                <p>每个用户在登录时能够保存用户名、密码，并可自行维护</p>
+                <p>华天动力OA也向其他系统开放自己的单点登录接口</p>
+                <div>域整合</div>
+                <p>当前PC如果已经成功登录AD域，访问OA可通过域用户<br>
+                    直接登录，实现企业内部网的统一认证
+                </p>
+                <a href="javascript:;" class="Logins">了解更多</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--管理-->
+<div class="manage">
+    <div class="manage-left">
+        <a href="" class="yinyin">
+        </a>
+        <div class="manage-left-top">
+            <i></i>
+            <h1>管理自如，得心应手</h1>
+            <p>You can manage with ease </p>
+        </div>
+        <div class="manage-left-center">
+            <div class="bei">管理自如，得心应手</div>
+            <p>考勤机、短信、报表、邮件服务器.....</p>
+            <p>数据统一维护</p>
+            <p>企业除各种的软件系统外，辅助的的硬件设备也必不可少，</p>
+            <p>比如考勤机、短信通道、邮件服务器等。这些设备的的数</p>
+            <p>据信息也要采集到OA系统中，数据统一维护，报表查看。</p>
+            <p>只有这样，才能够真正把企业内部的系统完全集成起来，真<br>正实现信息高速路。</p>
+        </div>
+        <a href="javascript:;" class="lj Logins">了解更多</a>
+    </div>
+    <div class="manage-right"></div>
+</div>
+<!--成功案例-->
+<div class="succeed">
+    <div class="product product3">
+        <div class="product-c">
+            <span class="cp"></span>
+            <div class="product-L"></div>
+            案例介绍
+            <div class="product-R"></div>
+        </div>
+    </div>
+    <div class="succeed-left" id="img2">
+        <div class="succeed-left-content">
+            <div class="fd1"><a href="javascript:;"><img src=""  data-imgurl="img/succeed1.jpg"></a></div>
+            <div class="fd"><a href="javascript:;" ><img src=""  data-imgurl="img/succeed2.jpg"></a></div>
+            <div class="f43"><a  href="javascript:;"><img src="" data-imgurl="img/succeed3.jpg"></a></div>
+            <div class="pd"><a  href="javascript:;"><img src=""  data-imgurl="img/succeed4.jpg"></a></div>
+        </div>
+        <div class="succeed-left-content2">
+            <div class="p1" id="visible1"><a href="javascript:;"><img src="" data-imgurl="img/succeed1.jpg"></a></div>
+            <div class="p2" id="visible2"><a href="javascript:;"><img src="" data-imgurl="img/succeed2.jpg"></a></div>
+            <div class="p3" id="visible3"><a href="javascript:;"><img src="" data-imgurl="img/succeed3.jpg"></a></div>
+            <div class="p4" id="visible4"><a href="javascript:;"><img src="" data-imgurl="img/succeed4.jpg"></a></div>
+        </div>
+        <div class="visible1" id="v_hidden">
+            <div class="visible1-box">
+                <div class="ps">
+                    <img src="" data-imgurl="img/succeed1.jpg"><a href="javascript:;" id="hide"></a>
+                </div>
+            </div>
+        </div>
+        <div class="visible1" id="v_hidden2">
+            <div class="visible1-box">
+                <div class="ps">
+                    <img src="" data-imgurl="img/succeed2.jpg"><a href="javascript:;" id="hide2"></a>
+                </div>
+            </div>
+        </div>
+        <div class="visible1" id="v_hidden3">
+            <div class="visible1-box">
+                <div class="ps">
+                    <img src="" data-imgurl="img/succeed3.jpg"><a href="javascript:;" id="hide3"></a>
+                </div>
+            </div>
+        </div>
+        <div class="visible1" id="v_hidden4">
+            <div class="visible1-box">
+                <div class="ps">
+                    <img src="" data-imgurl="img/succeed4.jpg"><a href="javascript:;" id="hide4"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="succeed-by"></div>
+    <div class="succeed-right-hidden">
+        <div class="succeed-right">
+            <div class="succeed-right-top">
+                <div class="yinyin2"></div>
+                <h1>宏瑞投资</h1>
+                <p class="oa">OA系统<span></span></p>
+                <P>具备常用的，增删改查的以及信息的归类</P>
+                <p>基本上可以实现业务的管理以及客户的基本信息等标准，给公司的领导提供了管理公司的捷径</p>
+            </div>
+<!--
+            <a  href="http://101.37.149.151:8024/index.aspx" target="_blank" class="lj">了解更多</a>
+-->
+        </div>
+        <div class="succeed-right">
+            <div class="succeed-right-top">
+                <div class="yinyin2"></div>
+                <h1>泽稷科技</h1>
+                <p class="oa">OA系统<span></span></p>
+                <P>实现了具体业务的精细化管理，</P>
+                <p>流程标准的规范化，数据归类成库，给集团的领导<br>提供了决策支撑的作用。</p>
+            </div>
+            <!--<a  href="http://cloud.10oa.com/trial/view/catalogue.aspx?sid=100000&name=%u6211%u7684%u684C%u9762 " target="_blank" class="lj">了解更多</a>-->
+        </div>
+        <div class="succeed-right">
+            <div class="succeed-right-top">
+                <div class="yinyin2"></div>
+                <h1>驰骋科技</h1>
+                <p class="oa">OA系统<span></span></p>
+                <P>具备常用的一些后台功能，发布信息等</P>
+                <p>非常规范的流程，以及数据库的分类，可以很好的给公司领导提供信息的管理。</p>
+            </div>
+<!--
+            <a target="_blank" href="http://ccoa.ccflow.org/Main/Default.aspx#" class="lj">了解更多</a>
+-->
+        </div>
+        <div class="succeed-right">
+            <div class="succeed-right-top">
+                <div class="yinyin2"></div>
+                <h1>希捷科技</h1>
+                <p class="oa">OA系统<span></span></p>
+                <P>集合各类后台管理功能，以及对业务的精细化管理</P>
+                <p>可以很好的为用户提供想要的一些功能，增删改查等等</p>
+            </div>
+<!--
+            <a  target="_blank" href="https://www.erdangjiade.com/modals/7/775/demo/index.html" class="lj">了解更多</a>
+-->
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+<!--成功案例-->
+<div class="footer-tab">
+    <div class="tab-left" id="img3">
+        <div class="tab-btn" >
+            <div class="btn1"><a href="javascript:;"><img src="" data-imgurl="img/OA.jpg"></a> </div>
+            <div class="btn2"><a href="javascript:;"><img src="" data-imgurl="img/CRM1.jpg"></a> </div>
+            <div class="btn3"><a href="javascript:;"><img src="" data-imgurl="img/ERP2.jpg"></a> </div>
+            <div class="btn4"><a href="javascript:;"><img src="" data-imgurl="img/renshiguanli.png"></a> </div>
+        </div>
+        <div class="tab-box">
+            <div class="box1" id="visible5"><a href="javascript:;"><img src="" data-imgurl="img/OA.jpg"></a></div>
+            <div class="box2" id="visible6"><a href="javascript:;"><img src="" data-imgurl="img/CRM1.jpg"></a></div>
+            <div class="box3" id="visible7"><a href="javascript:;"><img src="" data-imgurl="img/ERP2.jpg"></a></div>
+            <div class="box4" id="visible8"><a href="javascript:;"><img src="" data-imgurl="img/renshiguanli.png"></a></div>
+        </div>
+        <div class="visible1" id="v_hidden5">
+            <div class="visible1-box">
+                <div class="ps">
+                    <img src="" data-imgurl="img/OA.jpg"><a href="javascript:;" id="hide5"></a>
+                </div>
+            </div>
+        </div>
+        <div class="visible1" id="v_hidden6">
+            <div class="visible1-box">
+                <div class="ps">
+                    <img src="" data-imgurl="img/CRM1.jpg"><a href="javascript:;" id="hide6"></a>
+                </div>
+            </div>
+        </div>
+        <div class="visible1" id="v_hidden7">
+            <div class="visible1-box">
+                <div class="ps">
+                    <img src="" data-imgurl="img/ERP2.jpg"><a href="javascript:;" id="hide7"></a>
+                </div>
+            </div>
+        </div>
+        <div class="visible1" id="v_hidden8">
+            <div class="visible1-box">
+                <div class="ps">
+                    <img src="" data-imgurl="img/renshiguanli.png"><a href="javascript:;" id="hide8"></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="cjanli">
+        案例介绍
+    </div>
+    <div class="tab-right">
+    </div>
+
+    <ul class="tab-right-ct">
+        <li><span></span><a href="">上海捷艺信息科技有限公司 2018-04-25</a></li>
+        <li> <span></span><a href="">武汉瀚宇电子管理有限公司 2018-06-16</a></li>
+        <li><span></span><a href="">上海永澜投资管理有限公司 2018-02-13</a></li>
+        <li><span></span><a href="">苏州瑾邦投资管理有限公司 2018-07-12</a></li>
+        <li><span></span><a href="">宁波寓邦信息有限公司 2018-05-28</a></li>
+    </ul>
+</div>
+<!--合作伙伴-->
+<!--<div class="product product4">-->
+    <!--<div class="product-c">-->
+        <!--<span class="cp"></span>-->
+        <!--<div class="product-L"></div>-->
+        <!--合作伙伴-->
+        <!--<div class="product-R"></div>-->
+    <!--</div>-->
+<!--</div>-->
+<!--<div class="cooperation" id="demo">-->
+    <!--<div class="index">-->
+        <!--<ul id="demo1">-->
+            <!--<li><a href="" class="img1"></a></li>-->
+            <!--<li><a href="" class="img2"></a></li>-->
+            <!--<li><a href="" class="img3"></a></li>-->
+            <!--<li class="f4"><a href="" class="img4"></a></li>-->
+            <!--<li><a href="" class="img5"></a></li>-->
+            <!--<li><a href=""  class="img66"></a></li>-->
+            <!--<li><a href="" class="img7"></a></li>-->
+            <!--<li class="f8" ><a href="" class="img8"></a></li>-->
+        <!--</ul>-->
+        <!--<ul id="demo2"></ul>-->
+    <!--</div>-->
+<!--</div>-->
+<!--底部-->
+<div class="footer">
+    <div class="footer-content">
+        <div class="footer-l-top">
+            <ul>
+                <li>
+                    <a href="">必弘信息</a>
+                </li>
+                <li>
+                    <a href="">企业合作</a>
+                </li>
+                <li>
+                    <a href="">解决方案</a>
+                </li>
+                <li>
+                    <a href="">诚聘英才</a>
+                </li>
+                <li style="border-right: none">
+                    <a href="">企业动态</a>
+                </li>
+            </ul>
+        </div>
+        <div class="footer-r-top">
+            <div class="wx">
+                <a href="javascript:;"><img src="img/weixin.jpg"></a>
+                <span>企业微信</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer-b-c">
+    <div class="footer-bottom">
+        <a href="" class="bh">上海必弘信息技术有限公司</a>
+        <a href="https://www.amap.com/place/B00155NMJ4" target="_blank">上海市嘉定区安亭镇新源路155弄v6时代新源商务楼1612室</a>
+        <div>©2018 BIHO<span id="lx"> 联系我们</span><span>隐私条款 </span>沪ICP备18034805号-1</div>
+    </div>
+</div>
+<!--滚动导航开始-->
+<div class="gd-nav">
+    <a href="javascript:;" class="gd-nav-kf"></a>
+    <a href="javascript:;" class="gd-nav-sj" id="gd-nav-sj"></a>
+    <a href="javascript:;" class="gd-nav-wx" id="gd-nav-wx"></a>
+    <a href="javascript:;" class="gd-nav-jd" id="gd-nav-jd"></a>
+    <a href="javascript:;" class="gd-nav-top-hide" id="gd-nav-top-hide"></a>
+    <div id="sj-hide"></div>
+    <div id="wx-hide"></div>
+    <div id="jd-hide"></div>
+</div>
+<script src="js/jquery.js"></script>
+<script src="js/jquery.md5.js"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+<script type="text/javascript">
+
+    $(".Logins").click(function(){
+        reg.style.display="block";
+    })
+
+
+
+
+
+
+    /*$('.carousel').carousel();*/
+    /*轮播图*/
+//    $(function(){
+//        $('#carousel').carousel({interval:4000});
+//    })
+
+//    setInterval(function () {
+//        var n = ["red","blue"];
+//        $('.hov').css({
+//            color : n[Math.floor(Math.random() * n.length)]
+//        });
+//    }, 3000);
+//    $(".colors .hov").eq(0).css({background:"red"});
+//    $(".colors .hov ").click(function(){
+//        $(".colors  .hov ").eq($(this).index()).css({background:"red"}).siblings().css({background:""})
+//
+//    })
+//    var con=document.getElementsByName("color");
+//    console.log(con)
+//    for(var a=0;a<con.length;a++){
+//        con[a].onclick=function(){
+//            for(var s=0;s<con.length;s++){
+//                con[s].style.background=""
+//            }
+//            this.style.background="red";
+//        }
+//    }
+
+    $(document).ready(function() {
+        $(".f2").click(function() {
+            $("html, body").animate({
+                scrollTop: $(".by").offset().top }, {duration: 500,easing: "swing"})
+            return false;
+        });
+
+        $(".f3s").click(function() {
+            $("html, body").animate({
+                scrollTop: $("#scheme").offset().top }, {duration: 500,easing: "swing"});
+            return false;
+        });
+        $(".f4").click(function() {
+            $("html, body").animate({
+                scrollTop: $(".succeed").offset().top }, {duration: 500,easing: "swing"});
+            return false;
+        });
+
+    })
+
+
+    function A(){
+        /*成功案例选项卡1*/
+        $(".succeed-left-content2 div").eq(1).siblings().hide();
+        $(".succeed-right-hidden .succeed-right").eq(1).siblings().hide();
+        $(".succeed-left-content div").eq(1).css({height:"86px",width:"160px",marginTop:"-10px"});
+        $(".succeed-left-content div").click(function(){
+            $(".succeed-right-hidden  .succeed-right").eq($(this).index()).show().siblings().hide();
+            $(".succeed-left-content2 div").eq($(this).index()).show().siblings().hide();
+            $(".succeed-left-content div").eq($(this).index()).css({height:"86px",width:"160px",marginTop:"-10px",transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"66",width:"130px",marginTop:""})
+            x=$(this).index()
+        });
+        var x=0;
+        function ti(){
+            x++;
+            if(x==$(".succeed-left-content2 div").length){
+                x=0;
+            }
+            $(".succeed-right-hidden  .succeed-right").eq(x).show().siblings().hide();
+            $(".succeed-left-content2 div").eq(x).show().siblings().hide();
+            $(".succeed-left-content div").eq(x).css({height:"86px",width:"160px",marginTop:"-10px",transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"66",width:"130px",marginTop:""})
+        }
+        T=setInterval(ti,3000);
+        $(".succeed-left-content2 div").mouseover(function(){
+            clearInterval(T)
+        });
+        $(".succeed-right-hidden  .succeed-right").mouseover(function(){
+            clearInterval(T)
+        });
+        $(".succeed-left-content2 div").mouseout(function(){
+            T=setInterval(ti,3000);
+        });
+        $(".succeed-right-hidden  .succeed-right").mouseout(function(){
+            T=setInterval(ti,3000);
+        });
+    }
+    A()
+    function B(){
+        /*成功案例选项卡2*/
+        $(".tab-box div").eq(1).siblings().hide();
+        $(".tab-btn div").eq(1).css({background:"blue",color:"white",height:"60px",width:"121px",marginLeft:"-12px",boxShadow:"0 0 7px #000"});
+        $(".tab-btn div").click(function(){
+            $(".tab-box div").eq($(this).index()).show().siblings().hide();
+            $(".tab-btn div").eq($(this).index()).css({background:"blue",color:"white",height:"60px",width:"121px",marginLeft:"-12px",
+                boxShadow:"0 0 7px #000",transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"48px",width:"97px",marginLeft:"",transition:"",boxShadow:""})
+            a=$(this).index()
+        });
+        var a=0;
+        function ti2(){
+            a++;
+            if(a==$(".tab-btn div").length){
+                a=0;
+            }
+            $(".tab-box div").eq(a).show().siblings().hide();
+            $(".tab-btn div").eq(a).css({background:"blue",color:"white",height:"60px",width:"121px",marginLeft:"-12px",
+                boxShadow:"0 0 7px #000",transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"48px",width:"97px",marginLeft:"",transition:"",boxShadow:""})
+        }
+        T2=setInterval(ti2,3000);
+        $(".tab-btn div").mouseover(function(){
+            clearInterval(T2)
+        });
+        $(".tab-box div").mouseover(function(){
+            clearInterval(T2)
+        });
+        $(".tab-btn div").mouseout(function(){
+            T2=setInterval(ti2,3000);
+        });
+        $(".tab-box div").mouseout(function(){
+            T2=setInterval(ti2,3000);
+        });
+    }
+    B()
+</script>
+</body>
+<script src="js/index.js"></script>
+</html>
+

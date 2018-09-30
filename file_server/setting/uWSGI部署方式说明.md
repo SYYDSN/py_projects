@@ -25,7 +25,7 @@ invalid request block size: 21573 (max 4096)...skip
 ```
 [program: uwsgi-7001-alone]
 
-command = uwsgi --http 127.0.0.1:7001 --wsgi-file main.py --callable app --process 4 --threads 2 --buffer-size 8192 --stats 127.0.0.1:9191 ;
+command = uwsgi --http 127.0.0.1:7001 --wsgi-file main.py --callable app --process 4 --threads 2 --buffer-size 8192;
 
 directory = /home/web/aaa       ; 运行的脚本的目录
 
@@ -44,7 +44,7 @@ startretries = 3                      ; 程序失败的重试次数web
 ```
 [program: uwsgi-7001-back]
 
-command = uwsgi --http-socket 127.0.0.1:7001 --wsgi-file main.py --callable app --process 4 --threads 2 --buffer-size 8192 --stats 127.0.0.1:9191 ;
+command = uwsgi --http-socket 127.0.0.1:7001 --wsgi-file main.py --callable app --process 4 --threads 2 --buffer-size 8192;
 
 directory = /home/web/aaa       ; 运行的脚本的目录
 
@@ -66,9 +66,13 @@ startretries = 3                      ; 程序失败的重试次数web
 * **--callable**: 就是入口文件中run的那个app
 * **--process**: 启动几个进程? 官方建议为计算机核心数目*2
 * **--threads**: 每个进程开几个线程?
-* **--stats**: 运行状态转发到那个地址和端口?
+* **--stats**: 运行状态转发到那个地址和端口? 一般配合--stats-http命令使用.可以使用 nc ip port  的命令查看,注意,这个是snmp协议的(不能在网页上直接查看).
+* **--stats-http**: 配合--stats参数,把信息以http的方式输出到--stats参数指定的端口(你可以在网页上直接查看这个地址)
 * **--buffer-size**: 缓冲区尺寸,最大65535,uwsgi的默认缓冲区很小.如果您在日志中开始收到“invalid request block size”，则可能意味着您需要更大的缓冲区。
-* **--post-buffering**
+* **--post-buffering**  post文件在磁盘上的缓冲区大小,一般这个文件都缓存在内存中,所以这个选项并不常用.
+
+
+使用配置文件可以得到更好的效果具体的配置相对复杂.官方文档在[这里](https://uwsgi-docs.readthedocs.io/en/latest/Configuration.html)
 
 
 uwsgi的官方文档[https://uwsgi-docs.readthedocs.io/en/latest/WSGIquickstart.html](https://uwsgi-docs.readthedocs.io/en/latest/WSGIquickstart.html)

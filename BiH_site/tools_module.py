@@ -29,8 +29,8 @@ from log_module import recode
 ALLOWED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'gif', 'tif')  # 允许上传的图片后缀
 cache = RedisCache()
 cors_session_timeout = 600  # 跨域用户的会话信息的最大生命间隔
-logger = get_logger()
 AUTH = '647a5253c1de4812baf1c64406e91396'  # 全局验证的请求头
+logger = get_logger()
 
 
 def allowed_file(filename):

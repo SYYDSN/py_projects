@@ -17,7 +17,9 @@ from mongo_db import BaseFile
 from mongo_db import ObjectId
 from PIL import Image
 from io import BytesIO
+from tools_module import AUTH
 import json
+
 from module.captcha_module import MyImageCaptcha
 
 
@@ -57,7 +59,7 @@ def image_func(action: str = "", table_name: str = ""):
     auth = request.headers.get("auth", "") if auth == "" else auth  # 参数和headers中，只要有一个带有词参数即可
     if action == "save":
         """保存文件"""
-        if auth != "647a5253c1de4812baf1c64406e91396":
+        if auth != AUTH:
             mes['message'] = '未登录'
         else:
             from_ip = get_real_ip(request)

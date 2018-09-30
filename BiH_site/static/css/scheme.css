@@ -1,0 +1,437 @@
+html, body, div, p, span, a, ul, li, ol, h1, h2, h3, h4, h5, h6, dd, dt, input, img, select, form, table, td, tr, hr, br, video, audio, textarea {
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    outline: none;
+    vertical-align: top;
+    text-decoration: none;
+}
+p{
+    margin: 0;
+}
+body{
+    min-width: 1170px;
+    font-family: "Microsoft YaHei";
+}
+ul li {
+    list-style: none;
+}
+/*a{
+    text-decoration: none;
+    color: #999999;
+}*/
+/*������ʽ*/
+.fixed{
+    min-width: 1170px;
+    height: 50px;
+    line-height: 50px;
+    font-family:"Microsoft YaHei bold";
+    z-index: 3;
+    width: 100%;
+    position: absolute;
+    top: 0;
+}
+.fixed a{
+    color: #b0aaaa;
+    font-size: 16px;
+}
+.fixed a:hover{
+    color: white;
+    text-decoration: none;
+}
+.fixed .fixed-pd{
+    min-width: 1170px;
+    width: 1170px;
+    margin: auto;
+    height: inherit;
+}
+.f1 img{
+    width: 40px;
+    height: 40px;
+    /* margin-top: 5px;*/
+    margin-bottom: 3px;
+}
+
+.f1,.f2,.f3,.f4,.f5,.f6{
+    margin-right: 40px;
+    float: left;
+}
+.f7{
+    float: left;
+    position: relative;
+}
+.f7 input{
+    width: 154px;
+    margin-top: 11px;
+    height: 28px;
+    background: #fff;
+    border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -o-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    margin-left: 10px;
+    padding-left: 15px;
+}
+.f7 .search{
+    font-size: 0;
+}
+.f7 .search img{
+    display: inline-block;
+    width: 19px;
+    height: 19px;
+    position: absolute;
+    right: 10px;
+    top: 16px;
+}
+.f8{
+    float: right;
+    margin-right: 15px;
+}
+.f9{
+    float: right;
+    margin-right: 40px;
+}
+#hidden{
+    width: 100%;
+    position: fixed;
+    top: -80px;
+    z-index: 100;
+    min-width: 1170px;
+    background-color: #1c2226;
+}
+/*
+.banner{
+    min-width: 1170px;
+    position: relative;
+}
+.banner-content{
+    width: 100%;
+    height: 580px;
+}
+.banner-img{
+    width: inherit;
+    height: auto;
+}
+.banner-img a{
+    position: absolute;
+    transition:  opacity 1s linear;
+}
+.banner-img .first{
+    z-index: 1;
+    opacity: 1;
+}
+.banner-img a img{
+    max-width: 100%;
+    height: auto;
+}
+.banner-btn{
+    width: 120px;
+    height: 35px;
+    font-size: 0;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    margin-left: -60px;
+    z-index: 2;
+}
+.banner-btn span{
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-right: 15px;
+    margin-top: 12px;
+    cursor: pointer;
+}
+*/
+
+/*banner*/
+
+.container{
+    font-family: 微软雅黑;
+    background: #fff;
+    margin:50px auto;
+    overflow: hidden;
+    width: 1170px;
+}
+.container .menu{
+    width: 240px;
+    float: left;
+}
+.container .jf{
+    width: 240px;
+    height: 32px;
+    margin-bottom: 39px;
+}
+.container .jf h3{
+    width: 240px;
+    font-size: 30px;
+    color: #373434;
+}
+.menu{
+    float: left;
+}
+.menu h3{
+    margin-bottom: 23px;
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+/*position 菜单背景图标*/
+.positionIicon{
+    display: inline-block;
+    margin: 0 4px;
+    width: 10px;
+    height: 7px;
+    margin-left: 8px;
+    vertical-align: middle;
+    transition: all 0.3s;
+}
+/*menu图标*/
+.q-menu-img{
+    background: url("../img/sanjiaos.png")  no-repeat;
+    background-size: 100%  100%;
+}
+.q-menu-doit{
+    background: url("../img/sanjiaos.png")  no-repeat;
+    background-size: 100%  100%;
+}
+.q-menu-three{
+    background: url("../img/sanjiaos.png")  no-repeat;
+    background-size: 100%  100%;
+}
+.container .menu h3{
+    font-size: 20px;
+    cursor: pointer;
+}
+.container .menu ul{
+    display: none;
+}
+.container .menu ul li{
+    height: 28px;
+    line-height: 28px;
+}
+/*.container .menu ul li a:hover{
+    background: #9FB6CD;
+    border-radius: 14px;
+    -webkit-border-radius: 14px;
+    -moz-border-radius: 14px;
+    -moz-border-radius:14px;
+    color:#fff;
+}*/
+
+/*.container .menu .selected{
+    background: #ccc;
+    border-radius: 14px;
+}
+*/
+.container .menu li a{
+    display: block;
+    color: #000;
+    width: 180px;
+    height: 26px;
+}
+.container .menu li a .red{
+    background: black;
+}
+.menu .ulmenu1 li{
+    position: relative;
+    vertical-align: middle;
+    font-size: 18px;
+    color: #373434;
+    margin-bottom: 28px;
+}
+.menu  .ulmenu1 li span{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: transparent;
+    border: 1px solid black;
+    vertical-align: middle;
+    margin-right: 17px;
+}
+.menu  .ulmenu1 li i{
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: transparent;
+    position: absolute;
+    left: 4px;
+    top: 12px;
+    vertical-align: middle;
+}
+.menu .ulmenu2 li{
+    position: relative;
+    vertical-align: middle;
+    font-size: 18px;
+    color: #373434;
+    margin-bottom: 28px;
+}
+.menu  .ulmenu2 li span{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: transparent;
+    border: 1px solid black;
+    vertical-align: middle;
+    margin-right: 17px;
+}
+.menu  .ulmenu2 li i{
+    display: inline-block;
+    width: 8px;
+    height: 9px;
+    background:transparent;
+    position: absolute;
+    left: 4px;
+    top: 11px;
+    vertical-align: middle;
+}
+.menu .ulmenu3 li{
+    position: relative;
+    vertical-align: middle;
+    font-size: 18px;
+    color: #373434;
+    margin-bottom: 28px;
+}
+.menu  .ulmenu3 li span{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: transparent;
+    border: 1px solid black;
+    vertical-align: middle;
+    margin-right: 17px;
+}
+.menu  .ulmenu3 li i{
+    display: inline-block;
+    width: 8px;
+    height: 9px;
+    background: transparent;
+    position: absolute;
+    left: 4px;
+    top: 11px;
+    vertical-align: middle;
+}
+.container .content{
+    margin-top: -80px;
+    width: 888px;
+    float: right;
+}
+.tab ul{
+    width: inherit;
+}
+.tab ul li{
+    width: 276px;
+    height: 291px;
+    float: left;
+    margin-right: 30px;
+    margin-bottom: 46px;
+    cursor: pointer;
+}
+.tab ul li img:hover{
+    box-shadow: 0 0 7px #999;
+    -webkit-box-shadow: 0 0 7px #999;
+    -o-box-shadow: 0 0 7px #999;
+    -moz-box-shadow: 0 0 7px #999;
+    -ms-box-shadow: 0 0 7px #999;
+}
+.tab ul li img{
+    width: 276px;
+    height: 197px;
+    background: silver;
+    transition: all 0.5s;
+}
+.tab ul .no-right{
+    margin-right: 0;
+}
+.tab ul .box-r h5{
+    font-size: 18px;
+    color: #000000;
+    margin-top: 20px;
+    margin-bottom: 17px;
+}
+.tab ul .box-r p{
+    font-size: 13px;
+    color: #999999;
+}
+.container .content .menu1 .tab {
+    display: none;
+}
+.container .content .menu1 .active{
+    display: block;
+}
+/*第二个菜单下的文档内容*/
+.container .content .menu2 .tab {
+    display: none;
+}
+.container .content .menu2 .active{
+    display: block;
+}
+/*第三个菜单下的文档内容*/
+.container .content .menu3 .tab {
+    display: none;
+}
+.container .content .menu3 .active {
+    display: block;
+}
+/*
+.tab-content-bottom{
+    text-align: center;
+    font-size: 0;
+}
+.tab-content-bottom a{
+    display: inline-block;
+    width: 120px;
+    height: 35px;
+    line-height: 35px;
+    background: #1d0d51;
+    border-radius: 3px;
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 30px;
+}
+
+.tab-content-bottom a:hover{
+    opacity: 0.8;
+}
+.tab-content-bottom ul{
+    text-align: left;
+    display: none;
+}
+*/
+
+.footer{
+    min-width: 1170px;
+    height: 232px;
+    background: #222;
+}
+.footer-top{
+    width: inherit;
+    height: 100px;
+}
+.footer-bottom{
+    text-align: center;
+    width: inherit;
+    height: 50px;
+    line-height: 50px;
+    margin: auto;
+    margin-top: 75px;
+}
+.footer-bottom a{
+    font-size: 17px;
+    color: #999999;
+    float: left;
+    margin-right: 60px;
+}
+.footer-bottom a:hover{
+    color: #fff;
+}
+.footer-bottom .bh{
+    margin-left: 200px;
+}
+/*底部*/

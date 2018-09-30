@@ -1,9 +1,10 @@
 # 文件服务器接口文档
 
-#### Domain: file.bhxxjs.cn
-#### Protocol: http 1.0/2.0
-#### Ip: 47.99.105.196
-#### Port: 7001
+#### Domain: file.bhxxjs.cn / resource.bhxxjs.cn  *域名*
+#### Protocol: http 1.0/2.0  *访问协议*
+#### Ip: 47.99.105.196 *ip地址*
+#### Port: 7001 *端口*
+#### Auth:  647a5253c1de4812baf1c64406e91396  *用于身份验证的字符串*
 
 **主机地址**
 
@@ -26,6 +27,7 @@
 
 * [上传图片](#1)
 * [查看图片](#2)
+* [短信验证码](#3)
 
 ### 接口详细说明
 
@@ -35,7 +37,7 @@
 
 * Url: /images/obj/save/image_file
 * Method: post/get
-* Headers:  auth = "647a5253c1de4812baf1c64406e91396"   请求头中的身份验证信息，固定的字符串
+* Headers:  auth =Auth   请求头中的身份验证信息，固定的字符串,Auth就是文档顶部的定义的Auth字符串
 * Args: 
 
 >* file 字节类型  必须   待上传的图片的数据
@@ -114,6 +116,32 @@ var url = host + api + "?fid=" + img_id + "&size=" + size;
 * */
 
 ```
+* Return:  文件
 
+#### <span id="3" style="color: #398dee">短信验证码</span>
 
+上传图片文件到数据库中
+
+* Url: /normal/obj/view/image_file
+* Method: get
+* Headers:  
+* Args: 
+
+>* fid 字符串类型  必须   图片的id
+>* size 字符串类型  非必须  图片的尺寸，格式如同： width*height 
+
+* Request Example:
+
+```javascript
+var host = "http://47.99.105.196:7001";             // 主机地址
+var api = '/images/obj/view/image_file';       // api的url
+var img_id = "5bab505d17397c118bdfac9d";       // 图片的id
+var size = "120*90";                           // 尺寸，表示120像素宽，90像素高
+
+var url = host + api + "?fid=" + img_id + "&size=" + size;
+/*
+* 最后拼接的图片地址是 http://47.99.105.196:7001/images/obj/view/image_file?fid=5bab505d17397c118bdfac9d&size=120*90
+* */
+
+```
 * Return:  文件

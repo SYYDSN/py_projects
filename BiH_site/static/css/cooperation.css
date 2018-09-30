@@ -1,0 +1,553 @@
+html, body, div, p, span, a, ul, li, ol, h1, h2, h3, h4, h5, h6, dd, dt, input, img, select, form, table, td, tr, hr, br, video, audio, textarea {
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    outline: none;
+    vertical-align: top;
+    text-decoration: none;
+}
+p{
+    margin: 0;
+}
+.body{
+    background: #f7f7f8;
+    font-family: "Microsoft YaHei";
+}
+body{
+    min-width: 1170px;
+
+
+}
+ul li {
+    list-style: none;
+}
+
+/*a{
+    text-decoration: none;
+    color: #999999;
+}*/
+/*������ʽ*/
+
+.fixed{
+    min-width: 1170px;
+    height: 50px;
+    line-height: 50px;
+    font-family:"Microsoft YaHei bold";
+    z-index: 3;
+    width: 100%;
+    position: absolute;
+    top: 0;
+}
+.fixed a{
+    color: #b0aaaa;
+    font-size: 16px;
+}
+.fixed a:hover{
+    color: white;
+    text-decoration: none;
+}
+
+.fixed .fixed-pd{
+    min-width: 1170px;
+    width: 1170px;
+    margin: auto;
+    height: inherit;
+}
+
+.f1 img{
+    width: 40px;
+    height: 40px;
+    /* margin-top: 5px;*/
+    margin-bottom: 3px;
+}
+
+.f1,.f2,.f3,.f4,.f5,.f6{
+    margin-right: 40px;
+    float: left;
+}
+.f7{
+    float: left;
+    position: relative;
+}
+.f7 input{
+    width: 154px;
+    margin-top: 11px;
+    height: 28px;
+    background: #fff;
+    border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -o-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    margin-left: 10px;
+    padding-left: 15px;
+}
+.f7 .search{
+    font-size: 0;
+}
+.f7 .search img{
+    display: inline-block;
+    width: 19px;
+    height: 19px;
+    position: absolute;
+    right: 10px;
+    top: 16px;
+}
+
+.f8{
+    float: right;
+    margin-right: 15px;
+}
+.f9{
+    float: right;
+    margin-right: 40px;
+}
+
+#hidden{
+    width: 100%;
+    position: fixed;
+    top: -80px;
+    z-index: 100;
+    min-width: 1170px;
+    background-color: #1c2226;
+
+}
+
+/*
+.banner{
+    min-width: 1170px;
+    position: relative;
+}
+.banner-content{
+    width: 100%;
+    height: 580px;
+}
+
+.banner-img{
+    width: inherit;
+    height: auto;
+
+}
+.banner-img a{
+    position: absolute;
+    transition:  opacity 1s linear;
+}
+.banner-img .first{
+    z-index: 1;
+    opacity: 1;
+}
+.banner-img a img{
+    max-width: 100%;
+    height: auto;
+}
+.banner-btn{
+    width: 120px;
+    height: 35px;
+    font-size: 0;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    margin-left: -60px;
+    z-index: 2;
+}
+.banner-btn span{
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-right: 15px;
+    margin-top: 12px;
+    cursor: pointer;
+}
+*/
+
+/*banner*/
+
+.product{
+    min-width: 117px;
+    width: 1170px;
+    height: 35px;
+    line-height: 35px;
+    background: #f7f7f8;
+    text-align: center;
+    margin: auto;
+    margin-top: 45px;
+    margin-bottom: 45px;
+    color: #000000;
+    font-family: "Microsoft YaHei";
+    font-size: 0;
+}
+
+.product .product-c{
+    position: relative;
+    color: #000000;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+/*中间文字标题*/
+
+
+
+
+.content{
+    margin: auto;
+    width: 1200px;
+    height: 326px;
+}
+
+.content .content-img{
+    width: inherit;
+    height: 188px;
+}
+.content-img ul{
+    overflow: hidden;
+    height: inherit;
+}
+.content-img ul li{
+    width: 300px;
+    height: inherit;
+    float: left;
+}
+
+.content-img ul .img1{
+    background: #bfbfbf;
+}
+.content-img ul .img2{
+    background: #a29c9c;
+}
+.content-img ul .img3{
+    background: #d2d2d2;
+}
+.content-img ul .img4{
+    background: #bfbfbf;
+}
+
+
+
+.content-center{
+    width: inherit;
+    height: 110px;
+    margin-top: 28px;
+
+}
+.content-center ul{
+    overflow: hidden;
+    height: inherit;
+    text-align: center;
+    margin-bottom: 0;
+}
+.content-center ul li{
+    width: 300px;
+    border-right: 2px solid #ececee;
+    padding: 0 42px;
+    float: left;
+    height: 110px;
+}
+.content-center ul li h3{
+    margin: 0 0 18px 0;
+    font-size: 16px;
+    color: #000000;
+    font-weight: 600;
+}
+
+.content-center ul li p{
+    font-size: 14px;
+    color: #979797;
+}
+
+/*图片*/
+
+
+.join{
+    width: 1200px;
+    height: 145px;
+    margin: auto;
+    position: relative;
+}
+.join-content{
+    padding: 0 138px;
+}
+
+.join-content ul {
+    width: inherit;
+    height: 101px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+.join-content ul li{
+    float: left;
+    width: 67px;
+    height: inherit;
+    font-size: 0;
+    text-align: center;
+    margin-right: 147px;
+}
+.join-content ul li a{
+    display: inline-block;
+    width: 67px;
+    height: 67px;
+    line-height: 67px;
+    background: #eeeef1;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -o-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    margin-bottom: 18px;
+}
+.join-content ul li a img{
+    width: 31px;
+    height: 32px;
+}
+.join-content ul li .f1 img{
+    width: 33px;
+    height: 32px;
+    margin-bottom: 2px;
+}
+.join-content ul li .p1 img{
+    width: 30px;
+    height: 32px;
+}
+.join-content ul li .p1 img{
+    width: 27px;
+    height: 32px;
+}
+.join-content ul li .d1 img{
+    width: 47px;
+    height: 32px;
+}
+.join-content ul li span{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border: 4px solid #a19d9c;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -o-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+}
+.join-line{
+    width: 1200px;
+    height: 42px;
+    border-top: 1px dashed #000000;
+    margin-top: -7px;
+    padding: 0 120px;
+}
+.join-line ul{
+    overflow: hidden;
+    margin-bottom: 0;
+}
+.join-line ul li{
+    width: 192px;
+    float: left;
+    margin-top: 23px;
+}
+.join-line ul li a{
+    font-size: 13px;
+    color: #000000;
+}
+.join-line ul .f1 {
+    padding-left: 18px;
+    margin-right: 0;
+}
+.join-line ul .f2 {
+    text-align: center;
+    margin-right: 0;
+}
+.join-line ul .f3 {
+    text-align: right;
+    margin-right: 0;
+    padding-right: 15px;
+}
+.join-line ul .f4 {
+    text-align: right;
+    margin-right: 0;
+    padding-right: 5px;
+}
+/*加入合作伙伴*/
+.product-b{
+    background: #fff;
+}
+.partner{
+    min-width: 1170px;
+    background: #fff;
+    height: 425px;
+    margin-top: 45px;
+    padding-top: 1px;
+}
+.partner-content{
+    min-width: 1130px;
+    width: 1130px;
+    height: 255px;
+    margin: auto;
+    padding: 0 20px;
+    overflow: hidden;
+    margin-bottom: 45px;
+}
+.partner #demo1 li{
+    width: 240px;
+    height: 112px;
+    line-height: 112px;
+    text-align: center;
+    box-shadow: 0 0 3px #999;
+    -webkit-box-shadow: 0 0 3px #999;
+    -o-box-shadow: 0 0 3px #999;
+    -moz-box-shadow: 0 0 3px #999;
+    -ms-box-shadow: 0 0 3px #999;
+    background: #ffffff;
+    float: left;
+    margin-right: 43px;
+    margin-top: 10px;
+}
+.partner #demo1 .img1{
+    display: inline-block;
+    width: 131px;
+    height: 44px;
+    margin-top: 34px;
+    background: url("../img/coop1.png") no-repeat;
+}
+.partner #demo1 .img1:hover{
+    display: inline-block;
+    width: 131px;
+    height: 44px;
+    background: url("../img/coop1_1.png") no-repeat;
+}
+
+.partner #demo1 .img2{
+    display: inline-block;
+    width: 94px;
+    height: 41px;
+    margin-top: 36px;
+    background: url("../img/coop2.png") no-repeat;
+}
+.partner #demo1 .img2:hover{
+    background: url("../img/coop2_2.png");
+}
+.partner #demo1 .img3{
+    display: inline-block;
+    background: url("../img/coop3.png") no-repeat;
+    width: 192px;
+    height: 56px;
+    margin-top: 28px;
+}
+.partner #demo1 .img3:hover{
+    background: url("../img/coop3_3.png") no-repeat;
+}
+.partner #demo1 .img4{
+    display: inline-block;
+    width: 125px;
+    height: 49px;
+    margin-top: 32px;
+    background: url("../img/coop4.png")no-repeat;
+}
+.partner #demo1 .img4:hover{
+    background: url("../img/coop4_4.png")no-repeat;
+}
+.partner #demo1 .img5{
+    display: inline-block;
+    background: url("../img/coop5.png") no-repeat;
+    width: 168px;
+    height: 45px;
+    margin-top: 34px;
+}
+.partner #demo1 .img5:hover{
+    background: url("../img/coop5_5.png")no-repeat;
+}
+.partner #demo1 .img66{
+    display: inline-block;
+    background: url("../img/coop6.png") no-repeat;
+    background-size: 100% 100%;
+    width: 97px;
+    height: 37px;
+    margin-top: 38px;
+}
+.partner #demo1 .img66:hover{
+    background: url("../img/coop6_6.png")no-repeat;
+}
+.partner #demo1 .img7{
+    display: inline-block;
+    background: url("../img/coop7.png") no-repeat;
+    width: 179px;
+    height: 44px;
+    margin-top: 34px;
+}
+.partner #demo1 .img7:hover{
+    background: url("../img/coop7_7.png")no-repeat;
+}
+.partner #demo1 .img8{
+    display: inline-block;
+    background: url("../img/coop8.png") no-repeat;
+    width: 172px;
+    height: 29px;
+    margin-top: 42px;
+}
+.partner #demo1 .img8:hover{
+    background: url("../img/coop8_8.png")no-repeat;
+}
+.partner #demo1 .f4{
+    margin-right: 0;
+    padding: 0;
+}
+.partner #demo1 .f8{
+    margin-right: 0;
+}
+    /*
+    .tab-content-bottom{
+        text-align: center;
+        font-size: 0;
+    }
+    .tab-content-bottom a{
+        display: inline-block;
+        width: 120px;
+        height: 35px;
+        line-height: 35px;
+        background: #1d0d51;
+        border-radius: 3px;
+        font-size: 16px;
+        color: #ffffff;
+        margin-bottom: 30px;
+    }
+
+    .tab-content-bottom a:hover{
+        opacity: 0.8;
+    }
+    .tab-content-bottom ul{
+        text-align: left;
+        display: none;
+    }
+    */
+.footer{
+    min-width: 1170px;
+    height: 232px;
+    background: #222;
+}
+.footer-top{
+    width: inherit;
+    height: 100px;
+}
+.footer-bottom{
+    text-align: center;
+    width: inherit;
+    height: 50px;
+    line-height: 50px;
+    margin: auto;
+    margin-top: 75px;
+}
+.footer-bottom a{
+    font-size: 17px;
+    color: #999999;
+    float: left;
+    margin-right: 60px;
+}
+.footer-bottom a:hover{
+    color: #fff;
+}
+.footer-bottom .bh{
+    margin-left: 200px;
+}
+/*底部*/
