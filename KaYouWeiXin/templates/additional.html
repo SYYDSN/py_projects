@@ -31,14 +31,21 @@
            border: 1px solid #ccc;
         }
                /* 微信提示 */
-    .weui-toast{
-        margin-left: 0 !important;
-    }
-    .toolbar .title{
-        line-height: 0;
-    }
+        .weui-toast{
+            margin-left: 0 !important;
+        }
+        .toolbar .title{
+            line-height: 0;
+        }
+        .div_info p .recommend {
+            width: 60%;
+        }
+        .toolbar .toolbar-inner{
+            background: #e0e0e0;
+        }
     </style>
 <body>
+    
         <div class="container-fluid">
                 <div class="row row_padd">
                         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
@@ -50,19 +57,23 @@
                 <div class="row">
                         <span id="resume_id" style="display:none">{{ user.resume_id }}</span>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><span>当前状态:</span><input id="status" class="inp_add" type="text" value="{{ resume.status if resume.status else '' }}"></p>
+                        <span style="display: none;" class="status_id">{{ resume.status if resume.status else '' }}</span>
+                        <p><span>当前状态:</span><input id="status" class="inp_add" type="text" value=""></p>
                     </div>  
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
                         <p>
-<!--                             <input class="weui-input inp_add" id="expected_regions" type="text" > -->
-                            <span>期望城市:</span><input id="expected_regions" class="inp_add city_set" type="text" value="{{resume.expected_regions if resume.expected_regions else ''}}">
+<!--                        <input class="weui-input inp_add" id="expected_regions" type="text" > -->
+                            <span>期望城市:</span><input id="expected_regions" class="inp_add " type="text" value="{{resume.expected_regions if resume.expected_regions else ''}}">
                         </p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><span>期望薪资:</span>
-                            <input class="inp_add expected_salary" type="number" value="{{ resume.expected_salary[0] if (resume.expected_salary | length) > 0 else ''}}">-
+                        <p><span>期望薪资/月:</span>
+                            <input class="inp_add expected_salary" type="number" value="{{ resume.expected_salary[0] if (resume.expected_salary | length) > 0 else ''}}">——
                             <input  class="inp_add expected_salary expected_salary_two" type="number" value="{{ resume.expected_salary[1] if (resume.expected_salary | length) > 1 else ''}}"></p>
                     </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
+                        <p><span>是否愿意接受推荐:</span><input id="want_job" class="inp_add recommend" type="text" value="{{ resume.want_job if resume.want_job else '' }}"></p>
+                    </div> 
                     <!-- <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
                         <p><input id="" class="inp_add" type="text" placeholder="驾照信息"></p>
                     </div> -->
@@ -75,20 +86,51 @@
         <script src="/static/js/jquery-weui.min.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
         <script src="/static/js/city-picker.min.js"></script>
-<!--         <script src="/static/js/modal.js"></script> -->
+        <script src="/static/js/modal.js"></script>
         <script>
             //选择状态
             $("#status").select({
                 title: "选择状态",
-                items: ["离职","在职"]
+                items: [{
+                   title: "在职",
+                   value: "1"
+                },{
+                   title: "离职",
+                   value: "0"
+                },{
+                   title: "个体经营",
+                   value: "-1"
+                }]
                 });
-            //选择城市
-            $(".city_set").cityPicker({
-                title: "选择期望城市",
-                showDistrict: false,
-                onChange: function (picker, values, displayValues) {
-                console.log(values, displayValues);
-                }
+            
+            if( $('.status_id').text() !== ''  ){
+                  if( $('.status_id').text() == -1){
+                          $('#status').val("个体经营");
+                       }else if($('.status_id').text() == 0){
+                          $('#status').val("离职");
+                       }else if($('.status_id').text() == 1 ){
+                          $('#status').val("在职");
+                       }
+                   }
+//             //选择城市
+//             $(".city_set").cityPicker({
+//                 title: "选择期望城市",
+//                 showDistrict: false,
+//                 onChange: function (picker, values, displayValues) {
+//                 console.log(values, displayValues);
+//                 }
+//              });
+            //是否接受推荐
+            $(".recommend").select({
+                title: "选择是否接受",
+                items: ["是","否"]
+                });
+            //  较短长度的选择框  用户体验略差
+            //  通过改变样式  增加高度  更直快速吸引 客户 进行选择
+             $("#status").on('click',function(){
+                 $(".weui-select-modal").css({
+                     height: '18rem'
+                 })
              });
         </script>
         <script>
@@ -132,24 +174,31 @@
                                 args[arg_name] = JSON.stringify(val_list);
                                 is_null = true;
                                }
-                            
                         };
                     };
                 };
                 return is_null? args:null;
             };
+            
             $('#submit').on('touchstart', function(){
                 let args = submit("inp_add");
+                if( args["status"]){
+                    if( args["status"] == "个体经营"){
+                           args["status"] = -1;
+                       }else if( args["status"] == "离职" ){
+                           args["status"] = 0;
+                       }else if( args["status"] == "在职" ){
+                           args["status"] = 1;
+                       }
+                   }
                 if(args){
-                    $('.modal').modal({backdrop: 'static', keyboard: false});
+                   $('.modal_two').modal({backdrop: 'static', keyboard: false});
                     var resume_id = $("#resume_id").text();  
                     args['_id'] = resume_id;
                     $.post("/wx/resume/opt", args, function(resp){
                         let json = JSON.parse(resp);
                         if(json['message'] == 'success'){
-                           setTimeout(function(){
-                                $('.modal').modal('hide');
-                            },3000);
+                            $('.modal_two').modal('hide');
                             $.toast("保存成功！");
                             location.href = "/wx/html/resume_detail.html";
                         }else{

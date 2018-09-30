@@ -82,6 +82,9 @@
         .weui-picker-modal.weui-picker-modal-visible{
             z-index: 100;
         }
+        .toolbar .toolbar-inner{
+            background: #e0e0e0;
+        }
     </style>
     <script>user = {{ user | safe }};</script>
 <body>
@@ -152,6 +155,9 @@
                         <p id="myModal"><span> 性别: </span> <input class="class_agr gender_selt" id="gender" type="text" value="{{ resume.gender }}"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                        <p id=""><span> 学历: </span> <input class="class_agr education_selt" id="education" type="text" value="{{ resume.education }}"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
                         <p>
                             <span> 年龄: </span> <input class="class_agr" id="age" type="number" value="{{ resume.age }}">
                              <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
@@ -163,7 +169,7 @@
                            </p>
                     </div> 
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                            <p><span> 身份证号码: </span> <input class="class_agr class_wit" id="id_num" type="number" value="{{ resume.id_num }}">
+                            <p><span> 身份证号码: </span> <input class="class_wit class_agr" value="{{ resume.id_num }}" id="id_num" type="text">
                                 <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
                            </p>
                     </div>
@@ -181,6 +187,16 @@
                                 <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
                            </p>
                     </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                            <p><span> 紧急联系人: </span> <input class="class_agr class_wit" id="ice_contact" type="text" value="{{ resume.ice_contact }}">
+                                <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
+                           </p>
+                    </div>
+                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
+                            <p><span> 紧急电话: </span> <input class="class_agr class_wit" id="ice_phone" type="text" value="{{ resume.ice_phone }}">
+                                <!-- <i class="glyphicon glyphicon-menu-right pull-right"></i> -->
+                           </p>
+                    </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
                        <a id="submt" href="javascript:;"> <p>完成</p></a>
                     </div>                       
@@ -192,8 +208,18 @@
         <script src="/static/js/jquery-weui.min.js"></script>
         <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
         <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage getLocalImgData"></script>
-<!--         <script src="/static/js/modal.js"></script> -->
+        <script src="/static/js/modal.js"></script>
         <script>
+             //  身份证的截取替换****  判断身份证长度
+            var $num = $('#id_num').val();
+            if( $num.length > 15 ){
+                var $numstg =  $num.substring(4,12);
+                var values = $numstg.replace($numstg,"********");
+                var $numbegin =  $num.substring(0,4);
+                var lent = $num.length;
+                var $numend = $num.substring(12,lent);
+                $('#id_num').val($numbegin+values+$numend);
+               }
 //                console.log(document.body)[0]
             /*
                document.getElementsByClassName("weui-picker-modal")[0].addEventListener('touchmove', function (e) {
@@ -223,6 +249,7 @@
                 success: function (res) {
                 var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
                     $obj.attr('src',localIds);
+                    $('.modal_two').modal({backdrop: 'static', keyboard: false});
                     wx.uploadImage({
                         localId:localIds[0],
                         isShowProgressTips: 1,
@@ -259,6 +286,7 @@
                                 if(status == 'success'){
                                     $obj.attr("data-id", json[field_name]);
                                     $obj.attr("data-url",json[field_name + "_url"]);
+                                    $('.modal_two').modal('hide');
                                 }
                                 else{
                                     alert(status);
@@ -283,6 +311,11 @@
                 var doms = $(`.${class_name}`);
                 let args  = {};
                 let is_null = false;
+//                 if( $('#id_num').val() == '' ||  $('#id_num').val() == undefined){
+//                     is_null =false
+//                     $.alert("身份证号为必填！");
+//                     return;
+//                    }
                 for(let dom of doms){
                     let obj = $(dom);
                     let tag_name = obj[0].tagName.toLowerCase();
@@ -300,8 +333,7 @@
                             if(img_id){
                                 is_null = true;
                                 args['dl_image'] = img_id;
-                                args['dl_image_url'] = obj.attr('data-url');$("body").on("touchstart", function(event){console.log(event); return false;}).on("touchmove", function(event){console.log(event); return false;}).on("touchend", function(event){console.log(event); return false;})
-                                
+                                args['dl_image_url'] = obj.attr('data-url'); 
                             }
                         }
                         else if(arg_name == 'head_image'){
@@ -349,7 +381,7 @@
                         }
                     }); 
                 }else{
-                    $.alert('未保存信息',function(){});
+//                     $.alert('未保存信息',function(){});
                 }
             });
              //  修改
@@ -358,9 +390,9 @@
                 console.log(user);
              }));
              
-  wx.error(function(){
-            alert(error)
-        });
+             wx.error(function(){
+                alert(error)
+                });
         </script>
 </body>
 <script>
@@ -393,8 +425,6 @@
     }
   ]
 });
-
-
 $(".dl_license_class").select({
   title: "驾照类型",
   items: [
@@ -433,6 +463,31 @@ $(".dl_license_class").select({
     {
       title: "C4",
       value: "009",  
+    }
+  ]
+});
+  $(".education_selt").select({
+  title: "选择学历",
+  items: [
+    {
+      title: "本科及以上",
+      value: "001",
+    },
+    {
+      title: "大专",
+      value: "002",
+    },
+    {
+      title: "高中/中专",
+      value: "003",
+    },
+    {
+      title: "初中",
+      value: "004",
+    },
+    {
+      title: "小学 ",
+      value: "004",
     }
   ]
 });

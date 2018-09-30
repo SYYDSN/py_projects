@@ -198,8 +198,6 @@ def resume_image_func(user: dict = None, action: str = 'get', table_name: str = 
                     else:
                         pass
                     file_format = file_name.split(".")[-1]
-                if file_format.lower() == "jpg":
-                    file_format = 'jpeg'
                 img.save(fp=data, format=file_format)
                 data = BytesIO(initial_bytes=data.getvalue())  # initial_bytes的值必须是二进制本身,不能是ByteIO对象.
                 resp = make_response(send_file(data, attachment_filename=file_name, as_attachment=True,

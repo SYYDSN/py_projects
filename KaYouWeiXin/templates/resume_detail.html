@@ -175,9 +175,9 @@
     <div class="container-fluid">
         <div class="row ">
             <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 title_btn">
-                <a href="/wx/html/register_info.html">
+<!--                 <a href="/wx/html/register_info.html">
                     <i class="glyphicon glyphicon-menu-left pull-left jiantou"></i>
-                </a>
+                </a> -->
 <!--                 <a href="javascript:;">
                     <i class="glyphicon glyphicon-menu-right pull-right jiantou"></i>
                 </a>    -->
@@ -195,7 +195,7 @@
                     </div>
                     <div class="xian"></div>
                     <div class="header_img">
-                       <dfn class="pa_dfn"><img class="portrait_img pop_img" src="{{ resume.head_image + '&size=320*240' if resume.head_image else "/static/images/head_img.png" }}" alt=""></dfn> 
+                       <dfn class="pa_dfn"><img class="portrait_img pop_img" src="{{ resume.head_image + '&size=320*240' if resume.head_image  else "/static/images/head_img.png" }}" alt=""></dfn> 
                         <article>
                             <h4 class="color_one title_mag">{{ resume.real_name }}</h4>
                             <h6>{{ resume.gender }}|{{ resume.age }} 
@@ -213,8 +213,8 @@
                             <li><span class="color_two">居住地：</span><span class="color_one title_mag">{{ resume.living_place if resume.living_place else "未填写"}}</span></li>
                             <li class="id_num">
                                 <span>身份证：</span>
-                                <span>正面：<img class="id_num_one pop_img" src="{{ (resume.id_image_face_url + '&size=80*60') if resume.id_image_face_url else '/static/images/zhengmian.png' }}" alt=""></span>
-                                <span>反面：<img class="id_num_two pop_img" src="{{ (resume.id_image_back_url + '&size=80*60') if resume.id_image_back_url else '/static/images/fanmian.png' }}" alt=""></span>
+                                <span>正面：<img class="id_num_one pop_img" src="{{ (resume.id_image_face_url + '&size=80*60') if resume.id_image_face_url  else '/static/images/zhengmian.png' }}" alt=""></span>
+                                <span>反面：<img class="id_num_two pop_img" src="{{ (resume.id_image_back_url + '&size=80*60') if resume.id_image_back_url  else '/static/images/fanmian.png' }}" alt=""></span>
                                 <a href="/wx/html/update_id.html"><button class="btn btn-primary pull-right">{{ '编辑' if resume.id_image_face_url or resume.id_image_back_url else '上传' }}</button></a>
                             </li>
                          </ul>
@@ -241,7 +241,11 @@
                                         <i class="i_one"><i class="i_two"></i></i>
                                     </big>
                                 </li>
-                                <li><span class="color_two">当前状态：</span><span>{{ resume.status if resume.status else '未填写'}}</span></li>
+                                <li><span class="color_two">
+                                     <span style="display: none;" class="status_id">{{ resume.status if resume.status else '' }}</span>
+                                    当前状态：
+                                    </span><span class="status">{{ resume.status if (resume.status ==1  ) else '未填写'}}</span>
+                                </li>
                                 <li><span class="color_two">期望城市：</span><span>{{resume.expected_regions if resume.expected_regions else '未填写'}}</span></li>
                                 <li><span class="color_two">期望薪资：</span>
                                     <span>
@@ -256,6 +260,7 @@
                                         面议
                                         {%endif%}
                                     </span></li>
+                                 <li><span class="color_two">是否接受推荐：</span><span>{{ resume.want_job if resume.want_job else '' }}</span></li>
                             </ul>
                         </article>
                     </article>
@@ -356,6 +361,31 @@
                     </article>
                 </div>
             </div><!--荣誉情况   end！-->
+            <!-- 驾驶安全/犯罪记录 -->
+        <div class="row row_resume">
+                <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 ">
+                    <span style="display: none;"> {{ resume }} </span>
+                    <article>
+                        <div class="head"> <i class="glyphicon glyphicon-screenshot"></i>
+                            <b class="color_one title_mag">安全与健康</b> 
+                            <a href="/wx/html/safety_health.html"> <button class="btn btn-primary pull-right">编辑</button></a>
+                        </div>
+                        <div class="xian"></div>
+                        <article class="article_padding">
+                            <ul class="list_size list_border">
+                                <li>
+                                    <big class="big">
+                                        <i class="i_one"><i class="i_two"></i></i>
+                                    </big>
+                                </li>
+                                <li><span class="color_two">重大疾病：</span><span>{{ resume.diseases if resume.diseases else '未填写'}}</span></li>
+                                <li><span class="color_two">犯罪记录：</span><span>{{resume.crime if resume.crime else '未填写'}}</span></li>
+                                <li><span class="color_two">重大事故：</span><span>{{ resume.diseases if resume.diseases else '未填写' }}</span></li>
+                            </ul>
+                        </article>
+                    </article>
+                </div>
+            </div> <!--驾驶安全/犯罪记录   end！--> 
         <!-- 车辆信息 -->
         <div class="row row_resume">
                 <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 ">
@@ -416,6 +446,16 @@
 <script src="/static/js/bootstrap.min.js"></script>
 <script src="/static/js/zoomify.min.js"></script>
 <script>
+    //  在职状态的判断  
+    if( $('.status_id').text() !== '' ){
+        if( $('.status_id').text() == -1){
+           $('.status').text("个体经营");
+        }else if($('.status_id').text() == 0){
+           $('.status').text("离职");
+        }else if($('.status_id').text() == 1 ){
+           $('.status').text("在职");
+        }
+     }// end!!!!
     $('.pop_img').on("touchstart",function(){
         $("#show_pop_img").attr("src", $(this).attr("src").split("&size")[0]);
         $('.modal').modal();

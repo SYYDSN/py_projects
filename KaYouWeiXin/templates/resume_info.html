@@ -80,7 +80,7 @@
             font-size: 1rem;
         }
         .div_info p input {
-            width: 80%;
+            width: 78%;
         }
         .pk-input.-clean {
             width: 100%;
@@ -89,9 +89,15 @@
             margin-bottom: 0;
         }
            /* 微信提示 */
-    .weui-toast{
-        margin-left: 0 !important;
-    }
+        .weui-toast{
+            margin-left: 0 !important;
+        }
+            .toolbar .toolbar-inner{
+            background: #e0e0e0;
+        }
+        .toolbar .toolbar-inner{
+            background: #e0e0e0;
+        }
     </style>
 <body>
 
@@ -134,7 +140,7 @@
                                         <option value="qd">仓栅式货车</option>
                                         <option value="qd">罐式车</option>
                                         <option value="qd">自卸车</option>
-                                        <option value="qd"></option>
+                                        <option value="qd">挂车</option>
                                 </select>
                             </p>
                     </div>
@@ -175,11 +181,11 @@
             $pk_input.attr('id','vehicle_type');
             $pk_input.addClass('inp_add');
             $('.txt').append('<input type="text">');
-            
+            //微信时间插件
             $("#begin").calendar({
                 maxDate:new Date().getFullYear()+"-"+(new Date().getMonth() + 1) + "-" + new Date().getDate()
             });
-            
+            //结束时间
             $("#end").calendar({
                 maxDate:new Date().getFullYear()+"-"+(new Date().getMonth() + 1) + "-" + new Date().getDate()
             });
@@ -257,16 +263,14 @@
                 let args_nan = nans( b );
                 
                 if(args && args_nan){
-                    $('.modal').modal({backdrop: 'static', keyboard: false});
+                    $('.modal_two').modal({backdrop: 'static', keyboard: false});
                     var resume_id = $("#resume_id").text();
                     args['resume_id'] = resume_id;
                     args['opt'] = "add_work";
                     $.post("/wx/resume/extend", args, function(resp){
                         let json = JSON.parse(resp);
                         if(json['message'] == 'success'){
-                            setTimeout(function(){
-                                $('.modal').modal('hide');
-                            },3000);
+                            $('.modal_two').modal('hide');
                             $.toast("保存成功！");
                             $.confirm("本条信息添加完成，是否继续添加？",function(){
                                 // 继续添加操作
@@ -280,7 +284,7 @@
                         }
                     }) 
                 }else{
-                    $.alert('提交信息失败！');
+                    $.alert('未填写信息！');
                 }
             });
             //  修改
@@ -294,7 +298,7 @@
                 }
                 let args_nan = nans( b );
                 if(args && args_nan){
-                    $('.modal').modal({backdrop: 'static', keyboard: false});
+                    $('.modal_two').modal({backdrop: 'static', keyboard: false});
                     var resume_id = $("#resume_id").text();
                     let url_head = location.search; //获取url中含"?"符后的字串
                     let work_id = url_head.substring(6); //履历id
@@ -302,9 +306,7 @@
                     args['resume_id'] = resume_id;
                     args['opt'] = "update_work";
                     $.post("/wx/resume/extend", args, function(resp){
-                        setTimeout(function(){
-                                $('.modal').modal('hide');
-                            },3000);
+                        $('.modal_two').modal('hide');
                         let json = JSON.parse(resp);
                         if(json['message'] == 'success'){
                             $.toast("修改成功！");

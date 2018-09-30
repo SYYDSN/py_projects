@@ -74,6 +74,9 @@
     .weui-toast{
         margin-left: 0 !important;
     }
+    .toolbar .toolbar-inner{
+            background: #e0e0e0;
+        }
     </style>
     <script src="/static/js/jquery.js"></script>
     <script>
@@ -100,7 +103,7 @@
                 <div class="row">
                         <span id="resume_id" style="display:none">{{ user.resume_id }}</span>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
-                        <p><span>大学/教育机构名称:</span><input id="school_name" class="inp inp_add" value="{{ education.school_name }}" class="inp_add" type="text"></p>
+                        <p><span>培训教育机构名称:</span><input id="school_name" class="inp inp_add" value="{{ education.school_name }}" class="inp_add" type="text"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info xian">
                         <p>

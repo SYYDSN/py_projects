@@ -68,6 +68,9 @@
         .row_padd{
             padding: 1em 0;
         }
+        .toolbar .toolbar-inner{
+            background: #e0e0e0;
+        }
     </style>
 <body>
         <div class="container-fluid">
@@ -81,11 +84,11 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_p ">
-                        <p class="p_mag"><img class="imgs" id="id_image_face" src="{{ resume.id_image_face_url if resume.id_image_face_url else '/static/images/poto.png'}}" alt=""></p>
+                        <p class="p_mag"><img class="imgs" id="id_image_face" src="{{ (resume.id_image_face_url+ '&size=300*400') if resume.id_image_face_url else '/static/images/poto.png'}}" alt=""></p>
                         <p>{{ '点击上图重新上传身份证正面照片' if resume.id_image_face_url else '请上传身份证正面照' }}</p>
                     </div>
                 <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_p">
-                        <p class="p_mag"><img class="imgs" id="id_image_back" src="{{ resume.id_image_back_url if resume.id_image_back_url else '/static/images/poto.png'}}" alt=""></p>
+                        <p class="p_mag"><img class="imgs" id="id_image_back" src="{{ (resume.id_image_back_url+ '&size=300*400') if resume.id_image_back_url else '/static/images/poto.png'}}" alt=""></p>
                         <p>{{ '点击上图重新上传身份证反面照片' if resume.id_image_back_url else '请上传身份证反面照' }}</p>
                 </div>
                     <div id="res"></div>
@@ -167,13 +170,14 @@
         };
 
         function upload_img($obj, local_ids){
+            $('.modal').modal({backdrop: 'static', keyboard: false});
             // 上传图片到微信服务器
             wx.uploadImage({
                 localId: local_ids[0],  // 微信官方文档有误，请照此填写
                 isShowProgressTips: 1,
                 success: function(res){
                     // alert("localIds: " + res.serverId);
-                    $('.modal').modal({backdrop: 'static', keyboard: false});
+//                     $('.modal').modal({backdrop: 'static', keyboard: false});
                     var id = res.serverId;
                     // alert("server_id: "+ id);
 
@@ -201,9 +205,7 @@
                                 var key = field_name + "_url";
                                 var img_url =  json[key];
                                 $obj.attr("data-url", img_url);
-                                setTimeout(function(){
                                 $('.modal').modal('hide');
-                                 },3000);
                                 // alert(img_url);
                             }
                             catch(e){
@@ -246,7 +248,7 @@
             // alert(id_image_back);
             if(id_image_back){
                 need_submit = true;
-                args['id_image_face'] = id_image_back;
+                args['id_image_back'] = id_image_back;
                 args['id_image_back_url'] = $id_image_back.attr("data-url");
             }
             if(need_submit){

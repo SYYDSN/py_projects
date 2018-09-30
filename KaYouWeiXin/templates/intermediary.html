@@ -85,207 +85,290 @@
         .weui-toast{
             margin-left: 0;
         }
+        /*   bootstrap 模态框   */
+        .modal-content{
+            opacity: 1;
+        }
+        .close:focus, .close:hover{
+            opacity: 1;
+        }
+        .close img{
+            width: 100%;
+        }
+        .anniu {
+            margin-top: 1.2em;
+        }
     </style>
-<script>user = {{ user | safe }};</script>
+    <script src="/static/js/jquery.js"></script>
+     <script>user = {{ user | safe }};</script>
+    <script>
+        (function(){
+            if(user['authenticity'] == 1){
+                top.location = "/wx/html/help_job.html?s_id=" + user["_id"];
+                return false;
+             }else{
+                 
+             };  
+    })();
+    </script>
 <body>
         <div class="container-fluid">
                 <div class="row">
+                    <span style="display:none;">{{ user }}</span>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info">
-                        <p class="p_text iimg"><img id="business_license_image" class="imgs inp_add"  src="/static/images/poto.png" alt=""></p>
-                        <p class="p_text">上传营业执照</p>
+                        <p class="p_text iimg"><img id="business_license_image" class="imgs inp_add pop_img"  src="{{  user.business_license_image_url + '&size=320*240' if user.business_license_image_url  else '/static/images/poto.png' }}" alt=""></p>
+                        <p class="p_text">点击图片上传营业执照  <span class="anniu btn btn-primary btn-xs pull-right">查看原图</span></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg  div_marg">
-                        <p class="inp_one"><span> 联系人： </span><input id="contacts" class="inp_add" type="text"></p>
+                        <p class="inp_one"><span> 联系人： </span><input id="contacts" value = "{{ user.contacts }}" class="inp_add" type="text"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                        <p class="inp_one"><span> 联系电话： </span><input id="contacts_num" class="inp_add" type="number"></p>
+                        <p class="inp_one"><span> 联系电话： </span><input id="contacts_num" value="{{ user.contacts_num }}" class="inp_add" type="number"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                        <p class="inp_one"><span> 公司名称： </span><input id="name" class="imgs inp_add" type="text"></p>
+                        <p class="inp_one"><span> 公司名称： </span><input id="name" value="{{ user.name }}" class="imgs inp_add" type="text"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                            <p class="inp_one"><span> 邮箱： </span><input id="" class="inp_add" type="email"></p>
+                            <p class="inp_one"><span> 邮箱： </span><input id="contacts_email" value="{{ user.contacts_email }}" class="inp_add" type="emal"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                            <p class="inp_one"><span> 银行卡号： </span><input id="" class="inp_add" type="text"></p>
+                            <p class="inp_one"><span> 开户行名称： </span><input id="blank_name" value="{{ user.blank_name }}"  class="inp_add" type="text"></p>
                     </div>
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
-                            <p><span> 营业执照号： </span><input id="identity_code" class="inp_add" type="text"></p>
+                            <p class="inp_one"><span> 银行卡号： </span><input id="blank_account" value="{{ user.blank_account }}" class="inp_add" type="number"></p>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_bg">
+                            <p><span> 营业执照号： </span><input id="identity_code" value="{{ user.identity_code }}" class="inp_add" type="text"></p>
                     </div>
                     
                     <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_info div_info_btn">
                             <a id="submit" href="javascript:;"> <p>提交</p></a>
+                            <a id="chehui" href="javascript:;"> <p>撤回</p></a>
                     </div>
                 </div>
             </div>
-        <script src="/static/js/jquery.js"></script>
+<!--     <div class= "bohui"> 驳回理由</div> -->
+<!--   点击查看原图信息 放大   -->
+        <div class="modal_one modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  aria-hidden=”true” data-backdrop=”static”>
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content close" data-dismiss="modal" aria-label="Close">
+        <div class="img_widt" >
+            <img id="show_pop_img" src="">
+        </div>
+      <div style="position: absolute;color: #fff;text-align: center; right: 0;font-size: 1.2rem;" class="glyphicon glyphicon-remove"></div>
+     <!-- end-->
+  </div>
+</div>
+</div>
         <script src="/static/js/bootstrap.min.js"></script>
         <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
         <script src="/static/js/jquery-weui.min.js"></script>
         <script src="/wx/js_sdk_init?debug=0&api=chooseImage uploadImage getLocalImgData"></script>
         <script src="/static/js/modal.js"></script>
         <script>
-           function img_honor($obj){
-                   wx.chooseImage({
-                    count: 1, // 默认9
-                    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-                    sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-                    success: function (res) {
-                        var agent = navigator.userAgent;
-                        var is_iphone = agent.indexOf("iPhone OS") != -1?true: false;
-                        var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-                        if(is_iphone){
-                            try{
-                                wx.getLocalImgData({
-                                    localId: localIds[0], // 图片的localID
-                                    success: function (res) {  
-                                    var img_data = res.localData; // localData是图片的base64数据，可以用img标签显示
-                                    // alert(img_data);
-                                    $obj.attr('src', img_data);
-                                    upload_img($obj, localIds); // 上传图片
-                                    }
-                                });
+           $('#chehui').hide();
+           $('#bohui').hide();
+                 // 监听touch事件
+                 $('.anniu').on("click",function(){
+                        $("#show_pop_img").attr("src", $('.pop_img').attr("src").split("&size")[0]);
+                        $('.modal_one').modal();
+                  });
+            if(user['checked'] == 1 ){ //1是申请中未通过
+                //关闭图片点击 禁止输入框输入
+                    $('#chehui').show();
+                    $('#submit').hide();
+                    $('.inp_add').attr('readonly','readonly');
+                    $('.iimg, .imgs').prop("readonly", 'readonly');
+                   
+             }else if( user['checked'] == 2 ){ //2是申请通过
+                    
+             }else if( user['checked'] == -1){ // -1是驳回.
+                 
+                    $('#container-fluid').hide();
+                    $('.bohui').show();
+                 
+             }else if( user['checked'] == 0 ){// 忽略未存在
+                  
+             };
+             // 撤回
+             // 1 是否已通过兼职/销售/中介的审核? 0/不存在忽略, 1是申请中未通过. 2是申请通过, -1是驳回.
+             // 2 撤回的条件是  1是申请中未通过.
+             $('#chehui').on('click',function(){
+                    if(user['checked'] == 1 ){
+                       user['checked'] =  0;
+                        var id = user["_id"];
+                        var args = {
+                            "u_id": id
+                        };
+                        // 确认提交时先弹出模态框  禁止操作
+                        $('.modal_two').modal({backdrop: 'static', keyboard: false});
+                        //  提交信息   修改checked状态地址   back_apply
+                        $.post("/wx/back_apply", args, function(resp){
+                            //  将后台传回的 json字符串  转换为对象
+                            let json = JSON.parse(resp);
+                            if(json['message'] == 'success'){
+                                $('.modal_two').modal('hide');
+                                $.toast("撤销成功！");
+                                $("#submit").hide();
+                                $('.inp_add').attr('readonly','readonly');
+                                location.reload();//刷新页面
+    //                             setTimeout(function(){location.href = '/wx/html/help_job.html';},1000);
+                            }else{
+                                alert('保存失败');
                             }
-                            catch(error){
-                                alert(error);
+                        });
+                     }else{
+                         //  状态未通过
+                         
+                     }
+             });
+             function img_honor($obj){
+                       wx.chooseImage({
+                        count: 1, // 默认9
+                        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                        sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                        success: function (res) {
+                            var agent = navigator.userAgent;
+                            var is_iphone = agent.indexOf("iPhone OS") != -1?true: false;
+                            var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                            if(is_iphone){
+                                try{
+                                    wx.getLocalImgData({
+                                        localId: localIds[0], // 图片的localID
+                                        success: function (res) {  
+                                        var img_data = res.localData; // localData是图片的base64数据，可以用img标签显示
+                                        // alert(img_data);
+                                        $obj.attr('src', img_data);
+                                        upload_img($obj, localIds); // 上传图片
+                                        }
+                                    });
+                                }
+                                catch(error){
+                                    alert(error);
+                                }
                             }
-                        }
-                        else{
-                            $obj.attr('src',localIds);
-                            upload_img($obj, localIds); // 上传图片
-                        }
-                    }
-                });
-            };
-            
-            function upload_img($obj, local_ids){
-            // 上传图片到微信服务器
-            wx.uploadImage({
-                localId: local_ids[0],  // 微信官方文档有误，请照此填写
-                isShowProgressTips: 1,
-                success: function(res){
-                    // alert("localIds: " + res.serverId);
-                    $('.modal').modal({backdrop: 'static', keyboard: false});
-                    var id = res.serverId;
-                    // alert("server_id: "+ id);
-
-                    // 请求api接口去下载临时素材
-                    var table_name = "id_image";  // 上传身份证对应的表名
-                    var field_name = $obj.attr("id");
-                    var args = {
-                        "server_id": id,    // server_id 下载素材用
-                        "table_name": table_name,
-                        "field_name": field_name,  // 字段名
-                        "db": "mongo_db2"            // 库名，固定
-                    }
-                    var url = "/wx/auto_download/" + table_name;
-                    // alert(JSON.stringify(args));
-                    $.post(url, args, function(resp){
-                        
-                        var json = JSON.parse(resp);
-                        var status = json['message'];
-                        console.log(json);
-                        // alert(status);
-                        if(status == "success"){
-                            // 成功，保存返回值
-                            try{
-                                $obj.attr("data-id", json[field_name]);
-                                var key = field_name + "_url";
-                                var img_url =  json[key];
-                                $obj.attr("data-url", img_url);
-                                setTimeout(function(){
-                                $('.modal').modal('hide');
-                                 },3000);
-                                // alert(img_url);
+                            else{
+                                $obj.attr('src',localIds);
+                                upload_img($obj, localIds); // 上传图片
                             }
-                            catch(e){
-                                $.alert(e,function(){
-
-                                });
-                            }
-                        }
-                        else{
-                            alert(status);
                         }
                     });
+                };
 
-                }
-            });
-        }
-            
-            $('.iimg').each(function(){
-                let $this = $(this);
-                $this.click(function(){
-                    let img = $this.find('.imgs');
-                    img_honor(img);
+                function upload_img($obj, local_ids){
+                // 确认提交时先弹出模态框  禁止操作
+                $('.modal_two').modal({backdrop: 'static', keyboard: false});
+                // 上传图片到微信服务器
+                wx.uploadImage({
+                    localId: local_ids[0],  // 微信官方文档有误，请照此填写
+                    isShowProgressTips: 1,
+                    success: function(res){
+                        // alert("localIds: " + res.serverId);
+                        var id = res.serverId;
+                        // alert("server_id: "+ id);
+
+                        // 请求api接口去下载临时素材
+                        var table_name = "id_image";  // 上传身份证对应的表名
+                        var field_name = $obj.attr("id");
+                        var args = {
+                            "server_id": id,    // server_id 下载素材用
+                            "table_name": table_name,
+                            "field_name": field_name,  // 字段名
+                            "db": "mongo_db2"            // 库名，固定
+                        }
+                        var url = "/wx/auto_download/" + table_name;
+                        // alert(JSON.stringify(args));
+                         $('.modal_two').modal({backdrop: 'static', keyboard: false});
+                        $.post(url, args, function(resp){
+                            var json = JSON.parse(resp);
+                            var status = json['message'];
+                            console.log(json);
+                            // alert(status);
+                            if(status == "success"){
+                                //隐藏模态框
+                                $('.modal_two').modal('hide');
+                                // 成功，保存返回值
+                                try{
+                                    $obj.attr("data-id", json[field_name]);
+                                    var key = field_name + "_url";
+                                    var img_url =  json[key];
+                                    $obj.attr("data-url", img_url);
+                                    $('.modal_two').modal('hide');
+                                    // alert(img_url);
+                                }
+                                catch(e){
+                                    $.alert(e,function(){
+                                    });
+                                }
+                            }
+                            else{
+                                alert(status);
+                            }
+                        });
+
+                    }
                 });
-            });
-            function submit(class_name){
-                let doms = $(`.${class_name}`);
-                let args = {};
-                let is_null = false;
-                for(let dom of doms){
-                    let obj = $(dom);
-                    let tag_name = obj[0].tagName.toLowerCase();
-                    let arg_name = obj.attr('id');
-                    if(tag_name == 'input'){
-                        let val = $.trim(obj.val());
-                        if(val){
-                            args[arg_name] = val;
-                            is_null = true;
-                        };
-                    }else {
-                        if(arg_name == 'business_license_image'){
-                            let business_license_image = obj.attr("data-id");
-                            if(business_license_image){
+            }
+
+              $('.iimg').each(function(){
+                    let $this = $(this);
+                    $this.click(function(){
+                        let img = $this.find('.imgs');
+                        img_honor(img);
+                    });
+                });
+                function submit(class_name){
+                    let doms = $(`.${class_name}`);
+                    let args = {};
+                    let is_null = false;
+                    for(let dom of doms){
+                        let obj = $(dom);
+                        let tag_name = obj[0].tagName.toLowerCase();
+                        let arg_name = obj.attr('id');
+                        if(tag_name == 'input'){
+                            let val = $.trim(obj.val());
+                            if(val){
+                                args[arg_name] = val;
                                 is_null = true;
-                                args["business_license_image"] = business_license_image;
-                                args["business_license_image_url"] = obj.attr("data-url");
+                            };
+                        }else {
+                            if(arg_name == 'business_license_image'){
+                                let business_license_image = obj.attr("data-id");
+                                if(business_license_image){
+                                    is_null = true;
+                                    args["business_license_image"] = business_license_image;
+                                    args["business_license_image_url"] = obj.attr("data-url");
+                                }
                             }
                         }
-                    }
+                    };
+                    return is_null? args:null;
                 };
-                return is_null? args:null;
-            };
-          // 添加信息            
-            $('#submit').on('touchstart', function(){
-                let args = submit("inp_add");
-                if(args){
-                    $.post("/wx/self_info/update", args, function(resp){
-                        let json = JSON.parse(resp);
-                        if(json['message'] == 'success'){
-                            $.toast("保存成功！");
-                            // setTimeout(function(){location.href = '/wx/html/resume.html';},1000);
-                        }else{
-                            alert('保存失败');
-                        }
-                    }) 
-                }else{
-                    alert('未保存信息！');
-                }
-            });
-            //修改信息
-            $('#modify').on('touchstart', function(){
-                let args = submit("inp_add");
-                if(args){
-                    let url_head = location.search; //获取url中含"?"符后的字串
-                    let h_id = url_head.substring(6); //履历id
-                    args['h_id'] = h_id;
-                    args['resume_id'] = user.resume_id;
-                    args['opt'] = "update_honor";
-                    $.post("/wx/resume/opt", args, function(resp){
-                        let json = JSON.parse(resp);
-                        if(json['message'] == 'success'){
-                            alert('修改成功！');
-                            location.href = '/wx/html/resume.html';
-                        }else{
-                            alert('修改失败');
-                        }
-                    }) 
-                }else{
-                    alert('未修改信息');
-                }
-            });
+              // 添加信息            
+                $('#submit').on('touchstart', function(){
+                    let args = submit("inp_add");
+                    if(args){
+                        // 提交时先弹出模态框  禁止操作
+                        $('.modal_two').modal({backdrop: 'static', keyboard: false});
+                        //  提交信息  
+                        $.post("/wx/self_info/update", args, function(resp){
+                            let json = JSON.parse(resp);
+                            if(json['message'] == 'success'){
+                                $('.modal_two').modal('hide');
+                                $.toast("保存成功！");
+                                $("#submit").hide();
+                                $('.inp_add').attr('readonly','readonly');
+                                location.reload();//刷新页面
+    //                             setTimeout(function(){location.href = '/wx/html/help_job.html';},1000);
+                            }else{
+                                alert('保存失败');
+                            }
+                        });
+                    }else{
+                        alert('未保存信息！');
+                    }
+                });
+
             
         </script>
 </body>
