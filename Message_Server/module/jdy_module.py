@@ -9,6 +9,8 @@ import mongo_db
 from send_moudle import *
 from pymongo import ReturnDocument
 import requests
+from module.image_module import Praise
+from send_moudle import send_signal
 import datetime
 
 
@@ -56,12 +58,23 @@ class RefreshInfo(mongo_db.BaseDoc):
         cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
 
 
-def listen_api(**kwargs):
+def listen_jdy(**kwargs) -> dict:
     """
     监听简道云通过.api推送过来的消息
     :param kwargs:
     :return:
     """
+    req_type = kwargs.pop("req_type", None)
+    mes = {"message": "success"}
+    if req_type == 'deposit':
+        """入金宣传表"""
+        process_praise(**kwargs)
+    else:
+        ms = "错误的req_type:{}".format(req_type)
+        print(ms)
+        logger.exception(msg=ms)
+        mes['message'] = ms
+    return mes
 
 
 def process_praise(**kwargs) -> None:
@@ -70,6 +83,46 @@ def process_praise(**kwargs) -> None:
     :param kwargs:
     :return:
     """
+    args = dict()
+    args['order'] = kwargs['_id']
+    args['the_type'] = kwargs['the_type']
+    args['customer'] = kwargs['customer']
+    args['sales'] = kwargs['sales']
+    args['manager'] = kwargs['manager']
+    args['director'] = kwargs['director']
+    args['event_time'] = mongo_db.get_datetime_from_str(kwargs['time'])
+    money = kwargs['money']
+    try:
+        money = int(money)
+    except Exception as e:
+        ms = "转换入金宣传表中的金额时出错,money={}, error:{}".format(money, e)
+        logger.exception(msg=ms)
+        print(ms)
+    finally:
+        args['money'] = money
+        """创建并保存入金宣传信息"""
+        r = Praise.create(**args)
+        if isinstance(r, ObjectId):
+            """发送钉订消息"""
+            data = dict()
+            data['msgtype'] = 'markdown'
+            markdown_doc = dict()
+            markdown_doc['title'] = "入金喜报"
+            i = str(r)
+            text = "![screenshot](http://47.106.68.161:8000/normal/praise_image/view?fid={})".format(r)
+            print("text = {}".format(text))
+            markdown_doc['text'] = text
+            data['markdown'] = markdown_doc
+            token_name = '努力拼搏 入金宣传表'
+            send_signal(send_data=data, token_name=token_name)
+        else:
+            """发送钉订失败"""
+            title = "使用钉钉机器人发送入金宣传失败{}".format(datetime.datetime.now())
+            content = "args: {}".format(args)
+            send_mail(title=title, content=content)
+            ms = "{}, {}".format(title, content)
+            logger.exception(msg=ms)
+
 
 
 if __name__ == "__main__":

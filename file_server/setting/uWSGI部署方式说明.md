@@ -61,6 +61,7 @@ startretries = 3                      ; 程序失败的重试次数web
 
 参数说明
 
+* **--py-autoreload**: 1或者0, 自动重载,开发时使用这个参数
 * **--http或者--http-socket**: 绑定主机和端口,比如127.0.0.1:7001
 * **--wsgi-file**: 配置文件,对于flask来说,就是入口的那个py文件
 * **--callable**: 就是入口文件中run的那个app

@@ -56,13 +56,13 @@ def add_comma(num: (int, float)) -> str:
     return data
 
 
-def create_image(the_type: int = 0, dept: str = '', group: str = '', sales: str = '', customer: str = '',
+def create_image(the_type: int = 0, director: str = '', manager: str = '', sales: str = '', customer: str = '',
                  money: (int, float) = 0) -> Image:
     """
     生成一个图像文件
     :param the_type: 类型,0为激活,1为加金
-    :param dept: 部门 最长三个汉字
-    :param group: 组 最长三个汉字
+    :param director: 总监 最长三个汉字
+    :param manager: 经历 最长三个汉字
     :param sales: 销售 最长三个汉字
     :param customer: 客户 最长三个汉字
     :param money: 美金
@@ -79,7 +79,7 @@ def create_image(the_type: int = 0, dept: str = '', group: str = '', sales: str 
     width, height = im.size
     draw = ImageDraw.Draw(im)
     font_path = os.path.join(__project_path, 'resource', 'fonts', 'YaHei.ttf')
-    title = "恭喜{} ({})".format(dept, group)
+    title = "恭喜{} ({})".format(director, manager)
     if len(title) < 10:
         size1 = 55
         title_position = (180, 552)
@@ -119,23 +119,23 @@ class Praise(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['the_type'] = int  # 类型 0激活,1加金
     type_dict['order'] = str  # 平台事件序列号,也就是_id,唯一
-    type_dict['dept'] = str  # 部门
-    type_dict['group'] = str  # 组
+    type_dict['director'] = str  # 总监
+    type_dict['manager'] = str  # 经理
     type_dict['sales'] = str  # 销售
     type_dict['customer'] = str  # 客户
-    type_dict['money'] = float  #
+    type_dict['money'] = int  #
     type_dict['time'] = datetime.datetime  # 事件事件
     type_dict['description'] = str
 
     @classmethod
-    def create(cls, order: str, the_type: int = 0, dept: str = '', group: str = '', sales: str = '',
+    def create(cls, order: str, the_type: int = 0, director: str = '', manager: str = '', sales: str = '',
                   customer: str = '', money: (int, float) = 0, event_time: datetime.datetime = None) -> ObjectId:
         """
         根据条件获取加金,如果信息不存在就创建它.
         :param order: 平台事件序列号
         :param the_type: 类型,0为激活,1为加金
-        :param dept: 部门 最长三个汉字
-        :param group: 组 最长三个汉字
+        :param director: 总监 最长三个汉字
+        :param manager: 经理 最长三个汉字
         :param sales: 销售 最长三个汉字
         :param customer: 客户 最长三个汉字
         :param money: 美金
@@ -144,8 +144,8 @@ class Praise(mongo_db.BaseDoc):
         """
         args = {
             "the_type": the_type,
-            "dept": dept,
-            "group": group,
+            "director": director,
+            "manager": manager,
             "sales": sales,
             "customer": customer,
             "money": money,
@@ -154,7 +154,7 @@ class Praise(mongo_db.BaseDoc):
         f = {"order": order}
         one = cls.find_one_plus(filter_dict=f)
         if one is None:
-            """没有查到,需要创建一个"""
+            """没有查到记录,需要创建一个"""
             args.update(f)
             _id = cls.insert_one(**args)
         else:
@@ -178,12 +178,14 @@ class Praise(mongo_db.BaseDoc):
                 else:
                     args = {
                         "the_type": one['the_type'],
-                        "dept": one['dept'],
-                        "group": one['group'],
+                        "order": one['order'],
+                        "director": one['director'],
+                        "manager": one['manager'],
                         "sales": one['sales'],
                         "customer": one['customer'],
                         "money": one['money']
                     }
+                    args.pop("order", None)
                     img = create_image(**args)
                     if img is not None:
                         s_cache.set(key=key, value=img, timeout=86400)
@@ -195,7 +197,7 @@ class Praise(mongo_db.BaseDoc):
 
 
 if __name__ == "__main__":
-    # image_id = Praise.create(order="12",the_type=1, dept="一部", group="雄鹰队", sales="张三", customer="李四", money=1200)
+    # image_id = Praise.create(order="12",the_type=1, director="李总监", manager="张经理", sales="张三", customer="李四", money=1200)
     # print(image_id)
     i_id = "5bad2affdbea624788968109"
     img = Praise.get_image(i_id)

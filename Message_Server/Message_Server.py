@@ -10,6 +10,7 @@ from module.item_module import *
 from views.mt4_view import mt4_blueprint
 from views.quotations_view import quotations_blueprint
 from views.normal_view import normal_blueprint
+from module.jdy_module import listen_jdy
 import os
 
 
@@ -109,6 +110,41 @@ def listen_func(key):
         print(res)
     else:
         mes['message'] = '错误的path'
+    return json.dumps(mes)
+
+
+@app.route("/listen2_<key>", methods=['post'])
+def listen_func2(key):
+    """
+    监听简道云发送过来的消息,2018-10-8之后新建的简道云应用都用此接口.
+    每次更新服务器应用后,需要检查简道云对应的接口状态
+    1. 企划部.入金宣传表
+    """
+    mes = {"message": "success"}
+    headers = request.headers
+    event_id = headers.get("X-JDY-DeliverId")
+    signature = headers.get("X-JDY-Signature")
+    data = request.json
+    data = data if isinstance(data, dict) else get_args(request)
+    print(event_id)
+    print(signature)
+    print(data)
+    raw = RawSignal(**data)
+    raw.save_plus()  # 保存原始喊单数据格式
+    if key == "deposit":
+        """企划部.入金宣传表"""
+        secret_str = "tYfHgynb10QJkoPTPFoEJaI8"  # 不同的消息定义的secret不同，用来验证消息的合法性
+        validate_result = validate_signature(request, secret_str, signature)
+        print("deposit request validate result is {}".format(validate_result))
+        if validate_result:
+            kw = data['data']
+            kw['req_type'] = key
+            mes = listen_jdy(**kw)
+        else:
+            mes['message'] = "validate error"
+    else:
+        mes['message'] = '错误的path'
+    # print(mes)
     return json.dumps(mes)
 
 
