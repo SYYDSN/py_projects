@@ -14,18 +14,18 @@ except ImportError as e:
 
 
 # tornado方式部署,异步模式.
-http_server = HTTPServer(WSGIContainer(app))
-http_server.bind(port)
-http_server.start(0)
-# http_server.start(1)
-print("server running on {} port ...".format(port))
-IOLoop.current().start()
+# http_server = HTTPServer(WSGIContainer(app))
+# http_server.bind(port)
+# http_server.start(0)
+# # http_server.start(1)
+# print("server running on {} port ...".format(port))
+# IOLoop.current().start()
 
 
 # bjoern部署方式,c语言,异步模式.注意,这种方式不支持ssl,也不能自定义headers
-# print("bjoern running on {} port ..".format(port))
-# bjoern.listen(app, "0.0.0.0", port)
-# bjoern.run()
+print("bjoern running on {} port ..".format(port))
+bjoern.listen(app, "0.0.0.0", port)
+bjoern.run()
 
 
 # cherrypy部署方式,py语言,线程池模式.生产环境使用较多

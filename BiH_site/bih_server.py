@@ -137,7 +137,7 @@ def reg_func():
         """向后台提交注册信息"""
         r = None
         u = "http://192.168.1.102:8080/bhxx/register"
-        u = "http://127.0.0.1:8080/bhxx/register"
+        u = "http://www.bhxxjs.cn:8080/bhxx/register"
         try:
             r = requests.post(u, params=args, headers=hs, timeout=3)
         except Exception as e:
@@ -183,7 +183,7 @@ def login_func():
         """向后台提交登录信息"""
         r = None
         u = "http://192.168.1.102:8080/bhxx/login"
-        u = "http://1127.0.0.1:8080/bhxx/login"
+        u = "http://www.bhxxjs.cn:8080/bhxx/login"
         try:
             r = requests.post(u, params=args, headers=hs, timeout=3)
         except Exception as e:
