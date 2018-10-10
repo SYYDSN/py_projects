@@ -692,9 +692,8 @@ async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
                         }
                     }
                     print(args)
-                    send_mail(title="hello", content="{}".format(args))
+                    # send_mail(title="hello", content="{}".format(args))
                     async with session.post(url=u, data=json.dumps(args), timeout=5) as response:
-
                         resp = await response.json()
                         if isinstance(resp, dict):
                             info['return'] = "success"
