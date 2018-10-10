@@ -563,7 +563,7 @@ def new_order_message(open_id: str, nick_name: str, order_type: str, t_name: str
         "url": "http://wx.91master.cn/user/html/index.html",
         "data": {
             "first": {
-                "value": "你关注的{}老师有新的操作".format(t_name),
+                "value": "你关注的{}老师有新的操作...".format(t_name),
                 "color": "grey",
             },
             "tradeDateTime": {
@@ -584,6 +584,7 @@ def new_order_message(open_id: str, nick_name: str, order_type: str, t_name: str
             }
         }
     }
+
     r = requests.post(u, data=json.dumps(args))
     status = r.status_code
     if status != 200:
@@ -619,7 +620,7 @@ class TemplateMessageResponse(mongo_db.BaseDoc):
 
 async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
     """
-    新订单模板消息,使用grequests,批量发送.
+    新订单模板消息,使用批量发送.
     :param t_id:  老师id
     :param order_type: 订单类型  进场/离场
     :return:
@@ -655,6 +656,7 @@ async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
                 "t_name": t_name,
                 "time": now
             }
+            print("async begin ...")
             async with aiohttp.ClientSession() as session:
                 for x in us:
                     openid = x['openid']
@@ -689,7 +691,10 @@ async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
                             }
                         }
                     }
+                    print(args)
+                    send_mail(title="hello", content="{}".format(args))
                     async with session.post(url=u, data=json.dumps(args), timeout=5) as response:
+
                         resp = await response.json()
                         if isinstance(resp, dict):
                             info['return'] = "success"
@@ -697,6 +702,8 @@ async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
                         else:
                             info['return'] = "error"
                         info['_id'] = ObjectId()
+                        info['args'] = args
+                        info['time'] = now
                         ses = TemplateMessageResponse.get_collection()
                         ses.insert_one(document=info)
 

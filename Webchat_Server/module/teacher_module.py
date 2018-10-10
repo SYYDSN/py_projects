@@ -118,7 +118,7 @@ class Teacher(mongo_db.BaseDoc):
     type_dict['profit_amount'] = float  # 总额.每次close时候计算
     type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
     type_dict['lots_range'] = list  # 手数范围.
-    # type_dict['show'] = bool  # 是否显示?默认显示
+    type_dict['hide'] = bool  # 是否隐藏?
 
     @classmethod
     def instance(cls, **kwargs):
@@ -281,9 +281,11 @@ class Teacher(mongo_db.BaseDoc):
         :return:
         """
         """默认查询近30天的胜率数据"""
-        f = {"create_date": {"$gt": mongo_db.get_datetime_from_str("2018-9-3 0:0:0")}}
+        f = {
+            "create_date": {"$gt": mongo_db.get_datetime_from_str("2018-9-3 0:0:0")}
+        }
         data = cls.find_plus(filter_dict=f, to_dict=True)
-        data = {x["_id"]: x for x in data}
+        data = {x["_id"]: x for x in data if not x.get("hide")}
         """查询老师的跟随人数"""
         d = cls.follow_count()
         res = list()

@@ -79,7 +79,7 @@ def login_out():
 
 def praise_func():
     """
-    战绩页面,
+    战绩图片页面,废止2018-10-10
     :return:
     """
     fid = get_arg(request, "fid", "")

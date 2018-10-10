@@ -163,7 +163,7 @@ def _generator_signal(raw_signal: dict) -> dict:
         pass
     """待发送的模板消息字典"""
     mes_dict = {
-        "t_id": str(teacher_id),
+        "t_id": str(teacher_id)
     }
     if res['case_type'] == "exit":
         """
@@ -181,6 +181,7 @@ def _generator_signal(raw_signal: dict) -> dict:
     """
     calculate_trade(res)
     """发送模板消息阶段"""
+    print("_generator_signal 模板消息: {}".format(mes_dict))
     send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
     return res
 
