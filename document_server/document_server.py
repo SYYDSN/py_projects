@@ -3,6 +3,7 @@ from flask import request
 from flask import render_template
 from flask import url_for
 from flask import redirect
+from flask import send_from_directory
 from model.document_tools import list_dir
 from model.document_tools import get_project
 from model.document_tools import get_md
@@ -61,6 +62,15 @@ def md_view():
             data = ""
         mes['data'] = data
         return json.dumps(mes)
+
+
+@app.route("/image/<img>")
+def image_func(img):
+    """
+    图片重定向函数
+    :return:
+    """
+    return send_from_directory(directory="document/image/", filename=img)
 
 
 if __name__ == '__main__':

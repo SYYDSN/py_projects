@@ -3,31 +3,34 @@ from flask import session, request
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms import PasswordField
-from functools import wraps
+import functools
 from flask import redirect, url_for
 from wtforms import SubmitField
 from wtforms.validators import DataRequired
 from bson.objectid import ObjectId
 from flask_wtf.file import FileRequired, FileAllowed
 import datetime
-from error_module import pack_message
 import json
 import re
+import numpy as np
+import base64
 import random
 import hashlib
 from uuid import uuid4
-import base64
 import urllib.request
 import os
 from uuid import uuid4
-from api.data.item_module import AppLoginToken, User
 from werkzeug.contrib.cache import RedisCache
+from log_module import get_logger
+from log_module import recode
 
 
 """公用的函数和装饰器"""
 ALLOWED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'gif', 'tif')  # 允许上传的图片后缀
 cache = RedisCache()
 cors_session_timeout = 600  # 跨域用户的会话信息的最大生命间隔
+logger = get_logger()
+AUTH = '647a5253c1de4812baf1c64406e91396'  # 全局验证的请求头
 
 
 def allowed_file(filename):
@@ -65,9 +68,6 @@ def save_platform_session(**kwargs) -> bool:
     user_name = kwargs.get('user_name')
     user_password = kwargs.get('user_password')
     if not (user_id and user_name and user_password):
-        """去掉session中的内容"""
-        keys = list(session.keys())
-        [session.pop(x) for x in keys]
         return False
     else:
         """验证信息写入session"""
@@ -77,95 +77,45 @@ def save_platform_session(**kwargs) -> bool:
         return True
 
 
-def save_platform_cors_session(**kwargs) -> (str, None):
-    """保存平台操作者跨域会话信息
-    :kwargs 必须包含 user_id user_name user_password,sid四个参数
-    return 会话id
-    """
-    user_id = kwargs.get('user_id')
-    user_name = kwargs.get('user_name')
-    user_password = kwargs.get('user_password')
-    sid = kwargs.get('sid')  # 会话id
-    create_date = kwargs.get('create_date')  # 会话创建时间
-    result = False
-    if user_id is None or None or user_name is None or user_password is None:
-        pass
-    else:
-        """验证信息写入session"""
-        now = datetime.datetime.now()
-        kwargs['create_date'] = create_date if create_date else now
-        kwargs['last_update_date'] = now
-        sid = sid if sid else uuid4().hex
-        key = "session_key_{}".format(sid)
-        """
-        timeout是会话刷新间隔,用来确认用户是否还在线?如果在timeout的时间内,
-        没有收到用户页面发来的心跳信号,就认为用户已经离线,会删除用户的会话信息.
-        默认的心跳信号(会话刷新)间隔为10分钟
-        """
-        result = sid if cache.set(key, kwargs, timeout=cors_session_timeout) else result
-    return result
-
-
 def clear_platform_session():
     """清除平台操作者会话信息，注销使用。
     return None
     """
     """去掉session中的内容"""
     keys = list(session.keys())
-    [session.pop(x) for x in keys]
+    [session.pop(x, None) for x in keys]
     return False
 
 
-def clear_platform_cors_session(sid: str) -> bool:
-    """
-    清除平台操作者跨域会话信息，注销使用。
-    :param sid: 用户会话id
-    :return: True / False
-    """
-    key = "session_key_{}".format(sid)
-    return bool(cache.delete(key=key))
-
-
 def check_platform_session(f):
-    """检测管操作员是否登录的装饰器,本域和跨域用户共用"""
-    @wraps(f)
+    """检测用户是否登录的装饰器"""
+    @functools.wraps(f)
     def decorated_function(*args, **kwargs):
-        cors = get_arg(request, "cors", default_value=None)  # 跨域标志
-        if cors == 'cors':
-            """跨域用户"""
-            sid = get_arg(request, "sid", default_value=None)  # 跨域会话id
-            user_info = get_platform_cors_session_dict(sid)
-            if user_info is None:
-                return json.dumps({"message": "invalid session"})
-            else:
-                now = datetime.datetime.now()
-                last_upate_date = user_info['last_update_date']
-                delta = (now - last_upate_date).total_seconds()
-                if delta > cors_session_timeout:
-                    """会话超时"""
-                    clear_platform_cors_session(sid)
-                    return json.dumps({"message": "session timeout"})
-                else:
-                    """放行"""
-                    save_platform_cors_session(**user_info)  # 保存/更新跨域的会话
-                    return f(*args, **kwargs)
+        session.pop("wx_user", None)  # 去除以前的会话内容
+        user_id = session.get("user_id")  # 检测session中的user_id
+        if isinstance(user_id, ObjectId):
+            user = WXUser.find_by_id(o_id=user_id, to_dict=True)
         else:
-            """本域用户"""
-            user_name = session.get("user_name")  # 检测session中的user_name
-            user_password = session.get("user_password")  # user_password
-            user_id = session.get("user_id")  # 检测session中的user_id
-            if not (user_password and user_name and user_id):
-                return redirect(url_for("manage_blueprint.login_func"))
+            user = None
+        print("user_id: {}".format(user_id))
+        ref = request.full_path
+        ref = base64.urlsafe_b64encode(ref.encode())
+        if user is None:
+            return redirect(url_for("wx_blueprint.get_code_and_redirect", ref=ref))
+        else:
+            """
+            用户id有效,需要检查一下用户的上一次的抓取用户的时间,如果超过24小时,也需要更新一下用户的信息.
+            """
+            prev_update = session.get("update_date")
+            if user.get("subscribe", 0) != 1:
+                """没有关注公众号的用户,引导关注"""
+                return redirect("http://temp.safego.org/wx/follow_me")
+            elif prev_update is None or (datetime.datetime.now() - prev_update).total_seconds() > 86400:
+                """超过24小时,再次获取信息"""
+                return redirect(url_for("wx_blueprint.get_code_and_redirect", ref=ref))
             else:
-                checked_user_obj = User.find_one(user_name=user_name, user_password=user_password)
-                if checked_user_obj is None:
-                    """用户名和密码不正确"""
-                    return redirect(url_for("manage_blueprint.login_func"))
-                else:
-                    if str(checked_user_obj.get_id()) == user_id:
-                        return f(*args, **kwargs)
-                    else:
-                        return redirect(url_for("manage_blueprint.login_func"))
+                kwargs['user'] = user
+                return f(*args, **kwargs)
     return decorated_function
 
 
@@ -187,45 +137,13 @@ def get_platform_session_arg(arg_name: str, default_val: str = None) -> (str, No
         return arg_value
 
 
-def get_platform_cors_session_dict(session_id: str) -> (dict, None):
-    """
-    获取跨域用户的信息字典.
-    :param session_id:
-    :return: 信息字典
-    """
-    key = "session_key_{}".format(session_id)
-    return cache.get(key)
-
-
-def login_required_app(f):
-    """检测管app用户是否登录的装饰器"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        token = request.headers.get("auth_token", None)
-        if token is None:
-            token = get_arg(request, "token")
-        if token == "":  # 会话检测失败
-            message = pack_message({"message": "success"}, 3009, token=token)
-            return json.dumps(message)
-        else:
-            obj = AppLoginToken.get_id_by_token(token=token)
-            if obj['message'] == "success":
-                kwargs['user_id'] = obj['user_id']  # 把user_id作为地一个参数传递给视图函数
-            else:
-                message = pack_message({"message": "success"}, 3008, token=token)
-                return json.dumps(message)
-        return f(*args, **kwargs)
-
-    return decorated_function
-
-
 def check_phone(phone):
     """检查手机号码的合法性，合法的手机返回True"""
     if phone is None:
         return False
     elif isinstance(phone, str) or isinstance(phone, int):
         phone = str(phone).strip()
-        if len(phone) == 11 and phone.startswith("1"):
+        if len(phone) == 11 and phone.isdigit() and phone.startswith("1"):
             try:
                 int(phone)
                 return True
@@ -296,6 +214,7 @@ def get_args(req):
         arg_dict = {k: v for k, v in req.args.items()}
     if len(arg_dict) == 0:
         arg_dict = req.json
+    arg_dict = dict() if arg_dict is None else arg_dict
     return arg_dict
 
 
@@ -309,32 +228,6 @@ def get_datetime(number=0, to_str=True):
         return now.strftime("%Y-%m-%d %H:%M:%S")
     else:
         return now
-
-
-def get_datetime_from_str(date_str: str) -> datetime.datetime:
-    """
-    根据字符串返回datetime对象
-    :param date_str: 表示时间的字符串."%Y-%m-%d %H:%M:%S  "%Y-%m-%d %H:%M:%S.%f 或者 "%Y-%m-%d
-    :return: datetime.datetime对象
-    """
-    if isinstance(date_str, (datetime.datetime, datetime.date)):
-        return date_str
-    elif isinstance(date_str, str):
-        pattern_0 = re.compile(r'^2\d{3}-[01]?\d-[0-3]?\d$')  # 时间匹配2017-01-01
-        pattern_1 = re.compile(r'^2\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
-        pattern_2 = re.compile(r'^2\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
-        if pattern_2.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
-        elif pattern_1.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-        elif pattern_0.match(date_str):
-            return datetime.datetime.strptime(date_str, "%Y-%m-%d")
-        else:
-            print("get_datetime_from_str() 参数 {} 时间字符串格式不符合要求 2017-01-01或者2917-01-01 12:00:00".format(date_str))
-            return None
-    else:
-        print("get_datetime_from_str() 参数 {} 格式错误，期待str，得到一个 {}".format(date_str, type(date_str)))
-        return None
 
 
 def get_real_ip(req):
@@ -473,5 +366,10 @@ def expand_list(set_list: (list, tuple)) -> list:
         else:
             res.append(arg)
     return res
+
+
+if __name__ == "__main__":
+        pass
+
 
 

@@ -5,7 +5,9 @@ import pymongo
 from pymongo import monitoring
 import warnings
 import datetime
+import calendar
 import hashlib
+from flask import request
 from uuid import uuid4
 from bson.objectid import ObjectId
 from bson.code import Code
@@ -19,6 +21,8 @@ import math
 from pymongo import errors
 from pymongo.client_session import ClientSession
 from werkzeug.contrib.cache import RedisCache
+from pymongo import WriteConcern
+from pymongo.collection import Collection
 from log_module import get_logger
 from pymongo import ReturnDocument
 import gridfs
@@ -29,9 +33,9 @@ from pymongo.errors import DuplicateKeyError
 
 cache = RedisCache()
 logger = get_logger()
-user = "eroot"              # 数据库用户名
-password = "Try@Ex68769"       # 数据库密码
-db_name = "platform_db"        # 库名称
+user = "test_root"              # 数据库用户名
+password = "Test@1314"       # 数据库密码
+db_name = "test_db"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 
 """mongodb配置信息"""
@@ -40,30 +44,18 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
 """
 mongodb_setting = {
-    # "host": "127.0.0.1:27017",   # 数据库服务器地址            mongos 1
-    "host": "safego.org:20000",   # 数据库服务器地址            mongos 1
-    # "host": "pltf.safego.org:7171",   # 数据库服务器地址          mongos 2
-    # "host": "pltf.safego.org:8181",   # 数据库服务器地址        mongos 3
+    "host": "47.99.105.196:27017",   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
-    "maxPoolSize": 800,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
+    "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
-    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,可以做读写分离,本例从盘不稳定.改为主盘优先
+    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
     "username": user,       # 用户名
     "password": password    # 密码
 }
-
-
-"""副本集机器,留给异步队列监控健康状况的"""
-replica_hosts = [
-    {"host": "safego.org", "port": 27017},
-    {"host": "safego.org", "port": 20000},
-    {"host": "pltf.safego.org", "port": 7174},
-    {"host": "pltf.safego.org", "port": 8184}
-    ]
 
 
 class DBCommandListener(monitoring.CommandListener):
@@ -85,12 +77,13 @@ class DBCommandListener(monitoring.CommandListener):
         pass
 
     def failed(self, event):
-        command_name = event.command_name
-        command_dict = event.command
-        database_name = event.database_name
-        ms = "Error: {} 数据库的 {} 命令执行失败,参数:{}".format(database_name, command_name, command_dict)
-        print(ms)
-        logger.exception(ms)
+        # command_name = event.command_name
+        # command_dict = event.command
+        # database_name = event.database_name
+        # ms = "Error: {} 数据库的 {} 命令执行失败,参数:{}".format(database_name, command_name, command_dict)
+        # print(ms)
+        # logger.exception(ms)
+        pass
 
 
 class DBServerListener(monitoring.ServerListener):
@@ -195,32 +188,58 @@ class DB:
         return cls.instance
 
 
+def get_client() -> pymongo.MongoClient:
+    """
+    获取一个MongoClient(一般用于生成客户端session执行事物操作)
+    :return:
+    """
+    mongo_client = DB()
+    return mongo_client
+
+
 def get_db(database: str = None):
     """
     获取一个针对db_name对应的数据库的的连接，一般用于ORM方面。比如构建一个类。
     :param database: 数据库名
     :return: 一个Database对象。
     """
-    mongodb_conn = DB()
+    mongodb_conn = get_client()
     if database is None:
-        conn = mongodb_conn[db_name]
+        data_base = mongodb_conn[db_name]
     else:
-        conn = mongodb_conn[database]
-    return conn
+        data_base = mongodb_conn[database]
+    return data_base
 
 
-def get_conn(table_name: str, database: str = None):
+def get_conn(table_name: str, database: str = None, w: (int, str) = 1, j: bool = None) -> Collection:
     """
-    获取一个针对table_name对应的表的的连接，一般用户对数据库进行增删查改等操作。
+    获取一个针对table_name对应的表的的连接，一般用户直接对数据库进行增删查改等操作。
     :param table_name: collection的名称，对应sql的表名。必须。
     :param database: 数据库名
-    :return: 一个Collection对象，用于操作数据库。
+    :param w: 写关注级别选项.w mongodb的默认w的值是1.
+    :param j: 写关注日志选项.w mongodb的j的选项没有默认值.由其他地方的设置决定. False是关闭日志,True是打开日志.
+
+    w: 0 int,     不关注写
+    w: 1  int,    关注写,确保写动作执行完毕就算写成功.也是默认值
+    w: >1 int,    关注写,大于1的数值是值,在副本集中,写入了几个节点才算写成功?  比如设置为3,那就是至少副本集种有3个节点写入了此数据才算有效.
+    w: majority   字符串.当字符集取这个值的时候,标识只有副本集的绝大多数机器都写入了才算写成功.
+    w: (tag_name, ...) 集合类型,内部的元素都是mongodb实例的标签名,只有拥有这些标签名的所有结点都写入后才算写入成功.
+    j: None      不设置, 是否开启日志由其他地方的设置决定.
+    j: False      关闭日志,哪怕已经在其他地方的设置中开启了日志.这里也可以关闭.
+    j: True      开启日志,哪怕已经在其他地方的设置中关闭了日志.这里也可以开启.
+
+    return: pymongo.collection.Collection
     """
     if table_name is None or table_name == '':
         raise TypeError("表名不能为空")
     else:
         mongodb_conn = get_db(database)
         conn = mongodb_conn[table_name]
+        if j is None and w == 1:
+            pass
+        else:
+            write_concern = WriteConcern(j=None, w=w)
+            conn = conn.with_options(write_concern=write_concern)
         return conn
 
 
@@ -232,6 +251,22 @@ def get_fs(table_name: str, database: str = None) -> gridfs.GridFS:
     :return:
     """
     return gridfs.GridFS(database=get_db(database), collection=table_name)
+
+
+def expand_list(set_list: (list, tuple)) -> list:
+    """
+    展开嵌套的数组或者元组
+    :param set_list: 嵌套的元组或者数组
+    :return: 数组
+    调用方式 result = expand_list([1,2,[3,4],[5,6,7]])
+    """
+    res = list()
+    for arg in set_list:
+        if isinstance(arg, (list, tuple)):
+            res.extend(expand_list(arg))
+        else:
+            res.append(arg)
+    return res
 
 
 def other_can_json(obj):
@@ -280,6 +315,17 @@ def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     return {other_can_json(k): other_can_json(v) for k, v in a_dict.items() if k not in ignore_columns}
 
 
+def last_day_of_month(the_date: datetime.datetime) -> int:
+    """
+    求这个月的最后一天
+    :param the_date:
+    :return:
+    """
+    y = the_date.year
+    m = the_date.month
+    return calendar.monthrange(y, m)[-1]
+
+
 def prev_month(the_date: datetime.datetime = None) -> tuple:
     """
     给定一个时间,返回上个月的年和月的信息
@@ -290,7 +336,9 @@ def prev_month(the_date: datetime.datetime = None) -> tuple:
         ms = "the_date类型错误,使用当前日期替代,错误原因:期待一个datetime.datetime对象,获得了一个{}对象".format(type(the_date))
         warnings.warn(ms)
         the_date = datetime.datetime.now()
-    the_date = the_date - datetime.timedelta(days=1)
+    y = the_date.year
+    m = the_date.month
+    the_date = datetime.datetime.strptime("{}-{}-1".format(y, m), "%Y-%m-%d") - datetime.timedelta(days=1)
     res = (the_date.year, the_date.month)
     return res
 
@@ -348,28 +396,31 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
         if search:
             date_str = search.group()
             pattern_0 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d$')  # 时间匹配2017-01-01
-            pattern_1 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
-            pattern_2 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
-            pattern_3 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$') # 时间匹配2017-01-01 12:00:00 000
-            pattern_4 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
-            pattern_5 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01T12:00:00.000
-            pattern_6 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
-            pattern_7 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
+            pattern_1 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00
+            pattern_2 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
+            pattern_3 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
+            pattern_4 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$') # 时间匹配2017-01-01 12:00:00 000
+            pattern_5 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
+            pattern_6 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01T12:00:00.000
+            pattern_7 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
+            pattern_8 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
 
-            if pattern_7.match(date_str):
+            if pattern_8.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S %f")
-            elif pattern_6.match(date_str):
+            elif pattern_7.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-            elif pattern_5.match(date_str):
+            elif pattern_6.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
-            elif pattern_4.match(date_str):
+            elif pattern_5.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
-            elif pattern_3.match(date_str):
+            elif pattern_4.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S %f")
-            elif pattern_2.match(date_str):
+            elif pattern_3.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
-            elif pattern_1.match(date_str):
+            elif pattern_2.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+            elif pattern_1.match(date_str):
+                return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M")
             elif pattern_0.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%d")
             else:
@@ -487,7 +538,7 @@ def generator_password(raw: str)->str:
 
 def merge_dict(dict1: dict, dict2: dict) -> dict:
     """
-    把两个字典合并成一个字典。目的是保留尽可能多的信息
+    把两个字典合并成一个字典。和update方法不同,键相同的值不进行替换而是进行合并, 目的是保留尽可能多的信息
     一些合并时候的规则如下
     1. 有数据>''>None
     2. 数据长度大保留
@@ -845,10 +896,15 @@ class MyCache:
 
 
 class BaseFile:
-    """GridFS操作基础类"""
+    """
+    保存文件到mongodb数据库的GridFS操作基础类,
+    这一类函数都不推荐使用init创建实例.而是使用
+    cls.save_cls以及其延伸的方法cls.save_flask_file来保存文件.
+    """
     _table_name = "base_file"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['owner'] = ObjectId   # 拥有者id,一般是指向user_info的_id
     type_dict['file_name'] = str
     type_dict['file_type'] = str  # 文件类型
     type_dict['description'] = str
@@ -859,6 +915,22 @@ class BaseFile:
     type_dict['data'] = bytes
 
     def __init__(self, **kwargs):
+        _id = kwargs.pop("_id", None)
+        if _id is None:
+            pass
+        elif isinstance(_id, ObjectId):
+            kwargs['_id'] = _id
+        elif isinstance(_id, str) and len(_id) == 24:
+            kwargs['_id'] = ObjectId(_id)
+        else:
+            ms = "_id参数不合法:{}".format(_id)
+            raise ValueError(ms)
+        owner = kwargs.get("owner", None)
+        if not isinstance(owner, ObjectId):
+            ms = "owner只能是ObjectId类型,期待ObjectId得到:{}".format(type(owner))
+            raise ValueError(ms)
+        else:
+            pass
         if "file_name" not in kwargs:
             ms = "file_name arg is require!"
             raise ValueError(ms)
@@ -884,6 +956,11 @@ class BaseFile:
     def table_name(self):
         return self._table_name
 
+    def get_dbref(self):
+        """获取一个实例的DBRef对象"""
+        obj = DBRef(self._table_name, self._id, db_name)
+        return obj
+
     @classmethod
     def get_table_name(cls):
         return cls._table_name
@@ -892,34 +969,93 @@ class BaseFile:
     def fs_cls(cls, collection: str = None) -> gridfs.GridFS:
         """
         返回一个GridFS对象.
-        :param collection: 表名,
+        :param collection:
         :return:
         """
-        collection = cls.get_table_name() if collection is None else collection
+        collection = collection if collection else cls.get_table_name()
         return get_fs(collection)
 
     @classmethod
-    def save_cls(cls, file_obj, collection: str = None,  **kwargs) -> (str, ObjectId, None):
+    def save_cls(cls, file_obj, collection: str = None, **kwargs) -> (str, ObjectId, None):
         """
-        保存文件.
+        保存文件.类中最底层的保存文件的方法.
         :param file_obj: 一个有read方法的对象,比如一个就绪状态的BufferedReader对象.
-        :param collection: 表名,
+        :param collection:
         :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
         :return: 失败返回None,成功返回_id/str
         """
         fs = cls.fs_cls(collection)
         r = fs.put(data=file_obj, **kwargs)
-        file_obj.close()
+        try:
+            file_obj.close()
+        except Exception as e:
+            print(e)
+        finally:
+            return r
+
+    @classmethod
+    def save_flask_file(cls, req: request, collection: str = None, arg_name: str = None, **kwargs) -> (str, ObjectId, None):
+        """
+        保存文件. cls.save_cls的包装方法,专门针对flask.request进行了封装.
+        :param req: 一个有flask.request对象.
+        :param collection:
+        :param arg_name: 保存在flask.request.files里面的文件的参数名,如果不指明这个参数名,将只会取出其中的第一个对象进行保存.
+        :param kwargs:  metadata参数,会和文件一起保存,也可以利用这些参数进行查询.
+        :return: 失败返回None,成功返回_id/str
+        """
+        res = None
+        if arg_name is None:
+            for key_name, file_storage in req.files.items():
+                if file_storage is not None:
+                    file_name = file_storage.filename
+                    file_suffix = file_name.split(".")[-1]
+                    content_type = file_storage.content_type
+                    mime_type = file_storage.mimetype
+                    kwargs['file_name'] = file_name
+                    kwargs['file_suffix'] = file_suffix
+                    kwargs['content_type'] = content_type
+                    kwargs['mime_type'] = mime_type
+                    res = cls.save_cls(file_obj=file_storage, collection=collection, arg_name=key_name, **kwargs)
+                    if res is None:
+                        pass
+                    else:
+                        break
+        else:
+            file_storage = req.files.items.get(arg_name, None)
+            if file_storage is None:
+                pass
+            else:
+                file_name = file_storage.filename
+                file_suffix = file_name.split(".")[-1]
+                content_type = file_storage.content_type
+                mime_type = file_storage.mimetype
+                kwargs['file_name'] = file_name
+                kwargs['file_suffix'] = file_suffix
+                kwargs['content_type'] = content_type
+                kwargs['mime_type'] = mime_type
+                res = cls.save_cls(file_obj=file_storage, collection=collection, arg_name=arg_name, **kwargs)
+        return res
+
+    @staticmethod
+    def get_dict_from_fs(return_obj: gridfs.GridFS) -> dict:
+        """
+        从一个gridfs.GridFS对象中取回完整的字典。
+        :param return_obj:
+        :return:
+        """
+        r = return_obj._file
+        r['data'] = return_obj.read()
         return r
 
     @classmethod
-    def find_one_cls(cls, filter_dict: dict, collection: str = None, sort_dict: dict = None, instance: bool = False) -> (dict, None):
+    def find_one_cls(cls, filter_dict: dict, sort_dict: dict = None, instance: bool = False, collection: str = None)\
+            -> (dict, None):
         """
-        查找一个文件.
+        查找一个文件.cls.get_one_data的底层方法,
         :param filter_dict: 查找条件
-        :param filter_dict:
         :param sort_dict: 排序条件
         :param instance: 是否返回实例?
+        :param collection:
         :return: object/doc
         """
         fs = cls.fs_cls(collection)
@@ -931,8 +1067,7 @@ class BaseFile:
         if one is None:
             pass
         else:
-            r = one._file
-            r['data'] = one.read()
+            r = cls.get_dict_from_fs(one)
             one.close()
             return cls(**r) if instance else r
 
@@ -941,14 +1076,16 @@ class BaseFile:
         return self.__dict__['data']
 
     @classmethod
-    def get_one_data(cls, filter_dict: dict, sort_dict: dict = None) -> bytes:
+    def get_one_data(cls, filter_dict: dict, sort_dict: dict = None, collection: str = None) -> bytes:
         """
-        根据条件,查询一个文件,
+        根据条件,查询一个文件,cls.find_one_cls的包装函数,和cls.find_one_cls不同,前者返回的是文档或者实例.本
+        函数只返回文件的内容(bytes).
         :param filter_dict: 查找条件
         :param sort_dict: 排序条件
+        :param collection: 排序条件
         :return:
         """
-        r = cls.find_one_cls(filter_dict=filter_dict, sort_dict=sort_dict)
+        r = cls.find_one_cls(filter_dict=filter_dict, sort_dict=sort_dict, collection=collection)
         if r is None:
             pass
         else:
@@ -966,37 +1103,111 @@ class BaseFile:
         """
         file_id = file_id if isinstance(file_id, str) else str(file_id)
         collection = collection if collection else cls.get_table_name()
-        return 'manage/fs/{}/{}/{}'.format(collection, file_id, file_name)
+        return '/manage/fs/{}/{}/{}'.format(collection, file_id, file_name)
 
     @classmethod
-    def transform(cls, doc: dict, include_data: bool = False) -> dict:
+    def transform(cls, doc: dict, include_data: bool = False, collection: str = None) -> dict:
         """
         转换字典成为:
         1. files部分的BDRef转为url
         2. 除data外,都转为适合json的类型.
         :param doc:
         :param include_data: 是否包含data?
+        :param collection:
         :return:
         """
-        temp = dict()
-        f_id = doc['_id']
-        temp['_id'] = f_id
-        f_name = doc.get('file_name', '')
-        temp['file_name'] = f_name
-        f_type = doc.get('file_type', '')
-        temp['file_type'] = f_type
-        f_desc = doc.get('description', '')
-        temp['desc'] = f_desc
-        f_md5 = doc.get('md5', '')
-        temp['md5'] = f_md5
-        f_time = doc.get('uploadDate').strftime("%Y-%m-%d %H:%M:%S")
-        temp['time'] = f_time
-        if include_data:
-            f_data = doc.get('data')
+        f_data = doc.pop("data", None)
+        temp = to_flat_dict(doc)
+        if include_data and f_data is not None:
             temp['data'] = f_data
-        f_url = cls.format_url(file_id=f_id, file_name=f_name)
+        f_url = cls.format_url(file_id=temp['_id'], file_name=temp['file_name'], collection=collection)
         temp['url'] = f_url
         return temp
+
+    @classmethod
+    def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
+                      ruler: int = 5, page_index: int = 1, func: object = None) -> dict:
+        """
+        分页查询,注意这个方法和BaseDoc.query_by_page方法不同，本方法没有to_dict和can_json参数，
+        但默认传入这两个参数，目的是因为处理分页查询图片主要是为了前端呈现，这样是简化操作。
+        :param filter_dict:  查询条件字典
+        :param sort_dict:  排序条件字典
+        :param projection:  投影数组,决定输出哪些字段?
+        :param page_size:  一页有多少条记录?
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
+        :return: 字典对象.
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        """
+        if isinstance(page_size, int):
+            pass
+        elif isinstance(page_size, float):
+            page_size = int(page_size)
+        elif isinstance(page_size, str) and page_size.isdigit():
+            page_size = int(page_size)
+        else:
+            page_size = 10
+        page_size = 1 if page_size < 1 else page_size
+
+        if isinstance(page_index, int):
+            pass
+        elif isinstance(page_index, float):
+            page_index = int(page_index)
+        elif isinstance(page_index, str) and page_index.isdigit():
+            page_index = int(page_index)
+        else:
+            page_size = 1
+        page_index = 1 if page_index < 1 else page_index
+
+        skip = (page_index - 1) * page_size
+        if sort_dict is not None:
+            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        else:
+            sort_list = None
+        table_name = cls._table_name
+        ses = get_conn(table_name="{}.files".format(table_name))
+        args = {
+            "filter": filter_dict,
+            "sort": sort_list,  # 可能是None,但是没问题.
+            "projection": projection,
+            "skip": skip,
+            "limit": page_size
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        """开始计算分页数据"""
+        record_count = ses.count(filter=filter_dict)
+        page_count = math.ceil(record_count / page_size)  # 共计多少页?
+        delta = int(ruler / 2)
+        range_left = 1 if (page_index - delta) <= 1 else page_index - delta
+        range_right = page_count if (range_left + ruler - 1) >= page_count else range_left + ruler - 1
+        pages = [x for x in range(range_left, int(range_right) + 1)]
+        """开始查询页面"""
+        res = list()
+        ses = cls.fs_cls()
+        r = ses.find(**args)
+        if r is None:
+            pass
+        else:
+            if func:
+                res = [func(cls.transform(doc=cls.get_dict_from_fs(x))) for x in r]
+            else:
+                res = [cls.transform(doc=cls.get_dict_from_fs(x)) for x in r]
+        resp = {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        return resp
 
 
 class BaseDoc:
@@ -1149,7 +1360,8 @@ class BaseDoc:
                                 self.__dict__[k] = temp
                             except Exception as e:
                                 print(e)
-                                raise TypeError("{} 不是一个DBRef的实例".format(v))
+                                ms = "{} 不是一个DBRef的实例".format(v)
+                                raise TypeError(ms)
                         elif type_name.__name__ == "ObjectId" and v is None:
                             pass
                         elif type_name.__name__ == "GeoJSON" and isinstance(v, dict):
@@ -1666,14 +1878,13 @@ class BaseDoc:
     def insert_one(cls, **kwargs):
         """
         把参数转换为对象并插入
-        :param obj: 字典参数
         :return: ObjectId
         """
         instance = None
         try:
             instance = cls(**kwargs)
-        except TypeError:
-            logger.exception("Error! args: {}".format(str(kwargs)))
+        except TypeError as e:
+            logger.exception("Error! args:rease:{},kwargs: {}".format(e, str(kwargs)))
         finally:
             if instance is None:
                 return instance
@@ -1827,16 +2038,22 @@ class BaseDoc:
         return result
 
     @classmethod
-    def find_by_id(cls, o_id: (str, ObjectId), to_dict: bool = False, can_json: bool = False):
+    def find_by_id(cls, o_id: (str, ObjectId), to_dict: bool = False, can_json: bool = False, debug: bool = False):
         """查找并返回一个对象，这个对象是o_id对应的类的实例
         :param o_id: _id可以是字符串或者ObjectId
         :param to_dict: 是否转换结果为字典?
         :param can_json: 是否转换结果为可json化的字典?注意如果can_json为真,to_dict参数自动为真
+        :param debug: debug模式,开启后会记录所有的参数和返回结果.
         return cls.instance
         """
+        raw_args = {"_id": o_id}
         o_id = get_obj_id(o_id)
         ses = get_conn(cls._table_name)
-        result = ses.find_one({"_id": o_id})
+        result = ses.find_one({"_id": o_id})  # 返回的是文档
+        if debug:
+            record = {"doc": result}
+            record.update(raw_args)
+            logger.exception(msg=str(record))
         if result is None:
             return result
         else:
@@ -2056,10 +2273,10 @@ class BaseDoc:
     def find_one_and_update_plus(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
                               return_document: str="after"):
         """
-        find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
-        find_one_and_update和find_alone_and_update替更简单医易用.
+        本方法是find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
+        和本方法相比find_one_and_update和find_alone_and_update更简单易用.
         本方法更灵活,只是在设置参数时要求更高.
-        找到一个文档然后更新它，如果找不到就插入
+        找到一个文档然后更新它，(如果找不到就插入)
         :param filter_dict: 查找时匹配参数 字典
         :param update_dict: 更新的数据，字典,注意例子中参数的写法,有$set和$inc两种更新方式.
         :param projection: 输出限制列  projection={'seq': True, '_id': False} 只输出seq，不输出_id
@@ -2192,6 +2409,110 @@ class BaseDoc:
             else:
                 return [x for x in res]
 
+    @classmethod
+    def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
+                      ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False,
+                      func: object = None, target: str = "dict") -> dict:
+        """
+        分页查询
+        :param filter_dict:  查询条件字典
+        :param sort_dict:  排序条件字典
+        :param projection:  投影数组,决定输出哪些字段?
+        :param page_size:
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
+        :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
+        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
+        :param target: 和func参数配合使用,指明func是对实例本身操作还是对doc进行操作(instance/dict)
+        :return: 字典对象.
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        """
+        if isinstance(page_size, int):
+            pass
+        elif isinstance(page_size, float):
+            page_size = int(page_size)
+        elif isinstance(page_size, str) and page_size.isdigit():
+            page_size = int(page_size)
+        else:
+            page_size = 10
+        page_size = 1 if page_size < 1 else page_size
+
+        if isinstance(page_index, int):
+            pass
+        elif isinstance(page_index, float):
+            page_index = int(page_index)
+        elif isinstance(page_index, str) and page_index.isdigit():
+            page_index = int(page_index)
+        else:
+            page_size = 1
+        page_index = 1 if page_index < 1 else page_index
+
+        skip = (page_index - 1) * page_size
+        if can_json:
+            to_dict = True
+        if sort_dict is not None:
+            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        else:
+            sort_list = None
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        args = {
+            "filter": filter_dict,
+            "sort": sort_list,   # 可能是None,但是没问题.
+            "projection": projection,
+            "skip": skip,
+            "limit": page_size
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        """开始计算分页数据"""
+        record_count = ses.count(filter=filter_dict)
+        page_count = math.ceil(record_count / page_size)  # 共计多少页?
+        delta = int(ruler / 2)
+        range_left = 1 if (page_index - delta) <= 1 else page_index - delta
+        range_right = page_count if (range_left + ruler - 1) >= page_count else range_left + ruler - 1
+        pages = [x for x in range(range_left, int(range_right) + 1)]
+        """开始查询页面"""
+        res = list()
+        r = ses.find(**args)
+        if r is None:
+            pass
+        else:
+            if r.count() > 0:
+                if to_dict:
+                    if func and target == "dict":
+                        if can_json:
+                            res = [to_flat_dict(func(x)) for x in r]
+                        else:
+                            res = [func(x) for x in r]
+                    else:
+                        if can_json:
+                            res = [to_flat_dict(x) for x in r]
+                        else:
+                            res = [x for x in r]
+                else:
+                    if func and target == "instance":
+                        res = [func(cls(**x)) for x in r]
+                    else:
+                        res = [cls(**x) for x in r]
+            else:
+                pass
+        resp = {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        return resp
+
 
 """
     一些辅助的函数,2017-11-01之后添加,很多函数在tools_module里面也有一套,这里重复的原因是有时候引用tools_module模块
@@ -2294,9 +2615,31 @@ def normal_distribution_range(bottom_value: (float, int), top_value: (float, int
 
 
 if __name__ == "__main__":
-    f = "/home/walle/intel.txt"
-    c = open(f, 'rb')
-    e = BaseFile.find_one_cls(filter_dict={"file_name":"hello"}, instance=True)
-    print(e)
+    """
+    多文档事务演示
+    t1和t2请提前创建,事务不会自己创建collection,不然会报
+    Cannot create namespace mq_db.t1 in multi-document transaction
+    的错误
+    """
+    # class T1(BaseDoc):
+    #     _table_name = "t1"
+    #
+    #
+    # class T2(BaseDoc):
+    #     _table_name = "t2"
+    #
+    #     def __init__(self, **kwargs):
+    #         a = {}['name']
+    #         super(T2, self).__init__(**kwargs)
+    # client = get_client()
+    # t1 = client[db_name]['t1']  # 操作t1表的collection,db_name是你的数据库名,你可以这么写client.db_name.collection_name
+    # t2 = client[db_name]['t2']  # # 操作t2表的collection
+    # with client.start_session(causal_consistency=True) as session:
+    #     """事物必须在session下执行,with保证了session的正常关闭"""
+    #     with session.start_transaction():
+    #         """一旦出现异常会自动调用session.abort_transaction()"""
+    #         t1.insert_one(document={"name": "jack"}, session=session)  # 注意多了session这个参数
+    #         k = dict()['name']  # 制造一个错误,你会发现t1和t2的插入都不会成功.
+    #         t2.insert_one(document={"name": "jack2"}, session=session)
     pass
 

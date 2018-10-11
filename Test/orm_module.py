@@ -31,11 +31,16 @@ import warnings
 from pymongo.errors import DuplicateKeyError
 
 
+"""
+MongoDB4+ 的持久化类   2018-10-11
+"""
+
+
 cache = RedisCache()
 logger = get_logger()
-user = "mq_root"              # 数据库用户名
-password = "MessageQueue@156"       # 数据库密码
-db_name = "mq_db"           # 库名称
+user = "test_root"              # 数据库用户名
+password = "Test@1314"       # 数据库密码
+db_name = "test_db"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 
 """mongodb配置信息"""
@@ -44,7 +49,7 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
 """
 mongodb_setting = {
-    "host": "47.97.174.221:27017",   # 数据库服务器地址  注意这个数据库是3.6版本的
+    "host": "47.99.105.196:27017",   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
@@ -56,126 +61,6 @@ mongodb_setting = {
     "username": user,       # 用户名
     "password": password    # 密码
 }
-
-
-class DBCommandListener(monitoring.CommandListener):
-    """
-    监听数据库执行的命令,注意所有监听器都是同步执行的!!!
-    1.没必要不要使用,因为多少对性能有影响.
-    2.必须要使用的情况下,注意不要对性能造成影响.
-    """
-    def started(self, event):
-        # command_name = event.command_name
-        # command_dict = event.command
-        # database_name = event.database_name
-        # ms = "{} 数据库的 {} 命令开始,参数:{}".format(database_name, command_name, command_dict)
-        # print(ms)
-        # logger.info(ms)
-        pass
-
-    def succeeded(self, event):
-        pass
-
-    def failed(self, event):
-        # command_name = event.command_name
-        # command_dict = event.command
-        # database_name = event.database_name
-        # ms = "Error: {} 数据库的 {} 命令执行失败,参数:{}".format(database_name, command_name, command_dict)
-        # print(ms)
-        # logger.exception(ms)
-        pass
-
-
-class DBServerListener(monitoring.ServerListener):
-    """
-    数据库服务器状态改变监听器
-    注意所有监听器都是同步执行的!!!
-    1.没必要不要使用,因为多少对性能有影响.
-    2.必须要使用的情况下,注意不要对性能造成影响.
-    """
-    def opened(self, event):
-        # ms = "Warning: server {} is opened!".format(":".join([str(x) for x in event.server_address]))
-        # logger.info(ms)
-        # print(ms)
-        pass
-
-    def description_changed(self, event):
-        previous_server_type = event.previous_description.server_type
-        new_server_type = event.new_description.server_type
-        # if new_server_type != previous_server_type:
-        #     ms = "Warning: server description changed: from {} to {}".format(previous_server_type, new_server_type)
-        #     logger.info(ms)
-        # else:
-        #     pass
-
-    def closed(self, event):
-        ms = "Warning: Server {0.server_address} removed from topology {0.topology_id}".format(event)
-        logger.info(ms)
-
-
-class DBHeartBeatListener(monitoring.ServerHeartbeatListener):
-    """
-    数据库心跳监听器.
-    注意所有监听器都是同步执行的!!!
-    1.没必要不要使用,因为多少对性能有影响.
-    2.必须要使用的情况下,注意不要对性能造成影响.
-    """
-    def started(self, event):
-        # ms = "Heartbeat sent to server {0.connection_id}".format(event)
-        # logger.info(ms)
-        pass
-
-    def succeeded(self, event):
-        # ms = "Heartbeat to server {0.connection_id} succeeded with reply {0.reply.document}".format(event)
-        # logger.info(ms)
-        pass
-
-    def failed(self, event):
-        ms = "Warning: Heartbeat to server {0.connection_id} failed with error {0.reply}".format(event)
-        logger.info(ms)
-
-
-class DBTopologyListener(monitoring.TopologyListener):
-    """
-    数据库拓扑变化监听器.
-    注意所有监听器都是同步执行的!!!
-    1.没必要不要使用,因为多少对性能有影响.
-    2.必须要使用的情况下,注意不要对性能造成影响.
-    """
-    def opened(self, event):
-        # ms = "Topology with id {0.topology_id} opened".format(event)
-        # logger.info(ms)
-        pass
-
-    def description_changed(self, event):
-        # ms = "Topology description updated for topology id {0.topology_id}".format(event)
-        # logger.info(ms)
-        previous_topology_type = event.previous_description.topology_type
-        new_topology_type = event.new_description.topology_type
-        # if new_topology_type != previous_topology_type:
-        #     ms = "Topology {0.topology_id} changed type from {0.previous_description.topology_type_name} " \
-        #          "to {0.new_description.topology_type_name}".format(event)
-        #     logger.info(ms)
-        #
-        # if not event.new_description.has_writable_serv/er():
-        #     ms = "Warning: No writable servers available."
-        #     logger.warning(ms)
-        #
-        # if not event.new_description.has_readable_server():
-        #     ms = "Warning: No readable servers available."
-        #     logger.warning(ms)
-
-    def closed(self, event):
-        # ms = "Warning: Topology with id {0.topology_id} closed".format(event)
-        # logger.info(ms)
-        pass
-
-
-"""注册全局监听器"""
-monitoring.register(DBCommandListener())
-monitoring.register(DBServerListener())
-monitoring.register(DBHeartBeatListener())
-monitoring.register(DBTopologyListener())
 
 
 class DB:
@@ -278,7 +163,7 @@ def other_can_json(obj):
     """
     if isinstance(obj, ObjectId):
         return str(obj)
-    elif isinstance(obj, (DBRef, MyDBRef)):
+    elif isinstance(obj, DBRef):
         return str(obj.id)
     elif isinstance(obj, datetime.datetime):
         if obj.hour == 0 and obj.minute == 0 and obj.second == 0 and obj.microsecond == 0:
@@ -303,11 +188,6 @@ def other_can_json(obj):
 def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     """
     转换成可以json的字典,这是一个独立的方法
-    to_flat_dict 实例方法.
-    to_flat_dict 独立方法
-    doc_to_dict  独立方法
-    三个方法将在最后的评估后进行统一 2018-3-16
-    推荐to_flat_dict独立方法
     :param a_dict: 待处理的doc.
     :param ignore_columns: 不需要返回的列
     :return:
@@ -358,7 +238,7 @@ def get_datetime(number=0, to_str=True) -> (str, datetime.datetime):
 
 def get_date_from_str(date_str: str) -> datetime.date:
     """
-    根据字符串返回datet对象
+    根据字符串返回date对象
     :param date_str: 表示时间的字符串."%Y-%m-%d  "%Y/%m/%d或者 "%Y_%m_%d
     :return: datetime.date对象
     """
@@ -591,61 +471,22 @@ def get_datetime_from_timestamp(timestamp_str: str)->datetime.datetime:
         return get_datetime_from_str(timestamp_str)
 
 
-def doc_to_dict(doc_obj: dict, ignore_columns: list = list())->dict:
-    """
-    此方法和to_flat_dict独立方法的不同是本方法不能处理嵌套的对象,
-    所以推荐to_flat_dict独立方法.此函数保留只是为了兼容性.
-    调用时会警告
-    把一个mongodb的doc对象转换为纯的，可以被json转换的dict对象,
-    注意，这个方法不能转换嵌套对象，嵌套对象请自行处理。
-    to_flat_dict 实例方法.
-    to_flat_dict 独立方法
-    doc_to_dict  独立方法
-    三个方法将在最后的评估后进行统一 2018-3-16
-    :param doc_obj: mongodb的doc对象
-    :param ignore_columns: 不需要返回的列
-    :return: 可以被json转换的dict对象
-    """
-    ms = "已不推荐使用此方法,请用独立的to_flat_dict函数替代, 2018-3-16"
-    warnings.warn(message=ms)
-    res = dict()
-    for k, v in doc_obj.items():
-        if k in ignore_columns:
-            pass
-        else:
-            if isinstance(v, datetime.datetime):
-                v = v.strftime("%F %H:%M:%S.%f")
-                """
-                v = v.strftime("%F %H:%M:%S.%f")是v = v.strftime("%Y-%m-%d %H:%M:%S")的
-                简化写法，其中%f是指毫秒， %F等价于%Y-%m-%d.
-                注意，这个%F只可以用在strftime方法中，而不能用在strptime方法中
-                """
-            elif isinstance(v, datetime.date):
-                v = v.strftime("%F")
-            elif isinstance(v, ObjectId):
-                v = str(v)
-            elif isinstance(v, (MyDBRef, DBRef)):
-                v = str(v.id)
-            elif isinstance(v, dict):
-                keys = list(v.keys())
-                if len(keys) == 2 and "coordinates" in keys and "type" in keys:
-                    """这是一个GeoJSON对象"""
-                    v = v['coordinates']  # 前经度后纬度
-                else:
-                    pass
-            else:
-                pass
-            res[k] = v
-    return res
-
-
 class Field:
-    def __init__(self, col_name, col_type, sub_item_type=''):
-        self.col_name = col_name
-        self.col_type = col_type
-        self.col_value = None
-        if col_type == list or col_type == dict:
-            self.sub_item_type = sub_item_type
+    """
+    字段对象,用来定义类的属性
+    """
+    def __init__(self, field_name: str, field_type: type, field_value: object, show_name: str = None):
+        """
+        构造器
+        :param field_name:
+        :param field_type:
+        :param field_value:
+        :param show_name:
+        """
+        self.field_name = field_name   # 字段名
+        self.show_name = show_name   # 显示在权限管理中的字段名
+        self.field_type = field_type
+        self.field_value = field_value
 
 
 def get_obj_id(object_id):
@@ -670,67 +511,6 @@ def get_obj_id(object_id):
         ms = "object_id的类型错误，允许的是ObjectId和str,得到一个{}".format(type(object_id))
         logger.exception(ms)
         raise TypeError(ms)
-
-
-class MyDBRef(DBRef):
-    """自定义一个DBRef类，主要原本的初始化方法过于生僻，特进行简化"""
-    def __init__(self, collection, id=None, database=None, _extra={}, obj=None, doc=None, **kwargs):
-        """
-
-        :param collection: 继承父类参数，表名,作为简化写法，你也可以在这里传入一个DBRef，MyDBRef或者mongodb的doc实例。
-        :param id: 继承父类参数 object_id
-        :param database: 继承父类参数 数据库名 这前三个参数和obj，(collection,database,id)不可共存。会优先覆盖后者
-        :param _extra: 继承父类参数
-        :param obj: 一个DBRef对象。这个参数和doc，(collection,database,id)不可共存。
-        :param doc: 这个是从mongodb查询出来的DBRef的doc。这个参数和obj，(collection,database,id)不可共存。
-        :param kwargs: 继承父类参数
-        简化构造器
-        example：
-        dbref = MyDBRef(obj)
-        isinstance(obj,(DBRef,MyDBRef,dict))
-        """
-        db = database
-        if isinstance(collection, (DBRef, MyDBRef)) and id is None and obj is None:
-            """只有一个参数，并且是DBRef实例的情况，这是为了兼容BaseDoc的构造器"""
-            ref = None
-            oid = None
-            obj = collection
-        elif isinstance(collection, dict) and id is None and doc is None:
-            """只有一个参数，并且是dict实例的情况，这是为了兼容BaseDoc的构造器"""
-            ref = None
-            oid = None
-            doc = collection
-        else:
-            ref = collection
-            oid = id
-        if not (ref and oid):
-            """oid或者ref为空"""
-            if isinstance(obj, (MyDBRef, DBRef)):
-                ref = obj.collection
-                oid = obj.id
-                db = obj.database
-            else:
-                try:
-                    ref = doc['$ref']
-                    oid = doc['$id']
-                    db = doc['$db']
-                except KeyError as e:
-                    print(e)
-                    ref = doc['collection']
-                    oid = doc['id']
-                    db = doc['database']
-                finally:
-                    pass
-
-        super(MyDBRef, self).__init__(collection=ref, id=oid, database=db)
-
-    def to_dict(self) -> dict:
-        """
-        直接将self转换为dict的格式，和as_doc方法不同，本方法保留value原来的数据类型，而不是像as_doc全部转换为字符串格式。
-        :return: dict
-        """
-        res = {"$id": self.id, "$ref": self.collection, "$db": self.database}
-        return res
 
 
 class GeoJSON(dict):
@@ -1354,14 +1134,6 @@ class BaseDoc:
                         elif type_name.__name__ == "DBRef" and v is None:
                             """允许初始化时为空"""
                             pass
-                        elif (type_name.__name__ in ["DBRef", "MyDBRef"]) and not isinstance(v, (DBRef, MyDBRef)):
-                            try:
-                                temp = MyDBRef(v)
-                                self.__dict__[k] = temp
-                            except Exception as e:
-                                print(e)
-                                ms = "{} 不是一个DBRef的实例".format(v)
-                                raise TypeError(ms)
                         elif type_name.__name__ == "ObjectId" and v is None:
                             pass
                         elif type_name.__name__ == "GeoJSON" and isinstance(v, dict):
@@ -1598,56 +1370,13 @@ class BaseDoc:
             pass
         self.__dict__[attr_name] = old_dbref_list
 
-    def to_flat_dict(self, obj=None):
-        """转换成可以json的字典,此方法和同名的独立方法仍在评估中
-            to_flat_dict 实例方法.
-            to_flat_dict 独立方法
-            doc_to_dict  独立方法  废弃
-            三个方法将在最后的评估后进行统一 2018-3-16
-            推荐to_flat_dict独立方法
+    def to_flat_dict(self, ignore_columns: list = None):
         """
-        obj = self if obj is None else obj
-        raw_type = obj.type_dict
-        data_dict = {k: v for k, v in obj.__dict__.items() if v is not None}
-        result_dict = dict()
-        for k, v in data_dict.items():
-            type_name = '' if raw_type.get(k) is None else raw_type[k].__name__
-            if isinstance(v, (DBRef, MyDBRef)):
-                temp = {"$id": str(v.id), "$db": v.database, "$ref": v.collection}
-                result_dict[k] = temp
-            elif isinstance(v, dict):
-                temp = dict()
-                for k2, v2 in v.items():
-                    if isinstance(v2, BaseDoc):
-                        temp[k2] = self.to_flat_dict(v2)
-                    else:
-                        temp[k2] = v2
-                result_dict[k] = temp
-            elif isinstance(v, list):
-                temp = list()
-                for x in v:
-                    if isinstance(x, BaseDoc):
-                        temp.append(self.to_flat_dict(x))
-                    elif isinstance(x, DBRef):
-                        temp.append(str(x.id))
-                    else:
-                        temp.append(x)
-                result_dict[k] = temp
-            elif isinstance(v, BaseDoc):
-                result_dict[k] = self.to_flat_dict(v)
-            else:
-                if isinstance(v, ObjectId):
-                    result_dict[k] = str(v)
-                elif isinstance(v, DBRef):
-                    result_dict[k] = v.as_doc().to_dict()
-                elif isinstance(v, datetime.datetime) and type_name == "datetime":
-                    result_dict[k] = v.strftime("%Y-%m-%d %H:%M:%S")
-                elif isinstance(v, datetime.datetime) and type_name == "date":
-                    result_dict[k] = v.strftime("%Y-%m-%d")
-                elif isinstance(v, datetime.date):
-                    result_dict[k] = v.strftime("%Y-%m-%d")
-                else:
-                    result_dict[k] = v
+        进行把对象都转换成数字或者字符串这种可以进行json序列化的类型
+        :param ignore_columns: 被忽略的列名的数组
+        :return:
+        """
+        result_dict = to_flat_dict(self.get_dict(), ignore_columns=ignore_columns)
 
         return result_dict
 
@@ -1878,7 +1607,6 @@ class BaseDoc:
     def insert_one(cls, **kwargs):
         """
         把参数转换为对象并插入
-        :param obj: 字典参数
         :return: ObjectId
         """
         instance = None
@@ -2274,10 +2002,10 @@ class BaseDoc:
     def find_one_and_update_plus(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
                               return_document: str="after"):
         """
-        find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
-        find_one_and_update和find_alone_and_update替更简单医易用.
+        本方法是find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
+        和本方法相比find_one_and_update和find_alone_and_update更简单易用.
         本方法更灵活,只是在设置参数时要求更高.
-        找到一个文档然后更新它，如果找不到就插入
+        找到一个文档然后更新它，(如果找不到就插入)
         :param filter_dict: 查找时匹配参数 字典
         :param update_dict: 更新的数据，字典,注意例子中参数的写法,有$set和$inc两种更新方式.
         :param projection: 输出限制列  projection={'seq': True, '_id': False} 只输出seq，不输出_id

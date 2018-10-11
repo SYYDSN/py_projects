@@ -1782,19 +1782,114 @@ ul li {
 
 }
 
-.gd-nav .gd-nav-top-hide{
+
+
+
+.gd-nav{
+    width: 44px;
+    height: 176px;
+    position: fixed;
+    top: 72%;
+    z-index: 99;
+    right: 3%;
+}
+.gd-nav .gd-nav-kf{
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 2px;
+    background: url("../img/gudingdaohang.png") no-repeat -50px 0;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.gd-nav .gd-nav-kf:hover{
+    background-position: -1px 0;
+}
+.gd-nav .gd-nav-sj{
     display: block;
     width: 44px;
     height: 40px;
     margin-bottom: 2px;
-    background: url("../img/shangjiantou.png") no-repeat;
+    background: url("../img/gudingdaohang.png") no-repeat -50px -42px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.gd-nav .gd-nav-sj:hover{
+    background-position: -1px -42px;
+
+}
+.gd-nav .gd-nav-wx{
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 2px;
+    /*rgb(153,153,153)*/
+    background: url("../img/gudingdaohang.png")-50px  -126px no-repeat ;
+    transition: all 0.3s;
+    cursor: pointer;
+    border-radius: 3px;
+
+}
+.gd-nav .gd-nav-wx:hover{
+    background-position: -1px -126px;
+}
+
+.gd-nav .gd-nav-jd{
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 2px;
+    background: url("../img/gudingdaohang.png") no-repeat -50px -126px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.gd-nav .gd-nav-jd:hover{
+    background-position: -1px -126px;
+}
+.gd-nav .gd-nav-top-hide{
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 2px;
+    background: url("../img/gudingdaohang.png") no-repeat -50px -168px;
     transition: all 0.3s;
     cursor: pointer;
     visibility: hidden;
 }
-/*.gd-nav .gd-nav-top-hide:hover{*/
-    /*background-position: 0 -168px;*/
-/*}*/
+.gd-nav .gd-nav-top-hide:hover{
+    background-position: -1px -168px;
+}
+.gd-nav #sj-hide{
+
+    display: none;
+    position: absolute;
+    width: 150px;
+    height: 159px;
+    left: -150px;
+    top: 12px;
+    background: url(../img/cberweima1.png) left top no-repeat;
+}
+.gd-nav #wx-hide{
+
+    display: none;
+    position: absolute;
+    width: 290px;
+    height: 170px;
+    left: -295px;
+    top: 12px;
+    background: url(../img/cberweima2.png) left top no-repeat;
+}
+
+.gd-nav #jd-hide{
+
+    display: none;
+    position: absolute;
+    width: 150px;
+    height: 159px;
+    left: -150px;
+    top: 12px;
+    background: url(../img/cberweima3.png) left top no-repeat;
+}
 
 /*侧边栏导航*/
 

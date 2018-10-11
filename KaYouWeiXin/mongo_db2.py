@@ -21,6 +21,8 @@ import math
 from pymongo import errors
 from pymongo.client_session import ClientSession
 from werkzeug.contrib.cache import RedisCache
+from pymongo import WriteConcern
+from pymongo.collection import Collection
 from log_module import get_logger
 from pymongo import ReturnDocument
 import gridfs
@@ -201,26 +203,43 @@ def get_db(database: str = None):
     :param database: 数据库名
     :return: 一个Database对象。
     """
-    mongodb_conn = DB()
+    mongodb_conn = get_client()
     if database is None:
-        conn = mongodb_conn[db_name]
+        data_base = mongodb_conn[db_name]
     else:
-        conn = mongodb_conn[database]
-    return conn
+        data_base = mongodb_conn[database]
+    return data_base
 
 
-def get_conn(table_name: str, database: str = None):
+def get_conn(table_name: str, database: str = None, w: (int, str) = 1, j: bool = None) -> Collection:
     """
     获取一个针对table_name对应的表的的连接，一般用户直接对数据库进行增删查改等操作。
     :param table_name: collection的名称，对应sql的表名。必须。
     :param database: 数据库名
-    :return: 一个Collection对象，用于操作数据库。
+    :param w: 写关注级别选项.w mongodb的默认w的值是1.
+    :param j: 写关注日志选项.w mongodb的j的选项没有默认值.由其他地方的设置决定. False是关闭日志,True是打开日志.
+
+    w: 0 int,     不关注写
+    w: 1  int,    关注写,确保写动作执行完毕就算写成功.也是默认值
+    w: >1 int,    关注写,大于1的数值是值,在副本集中,写入了几个节点才算写成功?  比如设置为3,那就是至少副本集种有3个节点写入了此数据才算有效.
+    w: majority   字符串.当字符集取这个值的时候,标识只有副本集的绝大多数机器都写入了才算写成功.
+    w: (tag_name, ...) 集合类型,内部的元素都是mongodb实例的标签名,只有拥有这些标签名的所有结点都写入后才算写入成功.
+    j: None      不设置, 是否开启日志由其他地方的设置决定.
+    j: False      关闭日志,哪怕已经在其他地方的设置中开启了日志.这里也可以关闭.
+    j: True      开启日志,哪怕已经在其他地方的设置中关闭了日志.这里也可以开启.
+
+    return: pymongo.collection.Collection
     """
     if table_name is None or table_name == '':
         raise TypeError("表名不能为空")
     else:
         mongodb_conn = get_db(database)
         conn = mongodb_conn[table_name]
+        if j is None and w == 1:
+            pass
+        else:
+            write_concern = WriteConcern(j=None, w=w)
+            conn = conn.with_options(write_concern=write_concern)
         return conn
 
 
@@ -967,8 +986,12 @@ class BaseFile:
         """
         fs = cls.fs_cls(collection)
         r = fs.put(data=file_obj, **kwargs)
-        file_obj.close()
-        return r
+        try:
+            file_obj.close()
+        except Exception as e:
+            print(e)
+        finally:
+            return r
 
     @classmethod
     def save_flask_file(cls, req: request, collection: str = None, arg_name: str = None, **kwargs) -> (str, ObjectId, None):

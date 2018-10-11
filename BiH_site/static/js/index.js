@@ -275,6 +275,46 @@ function D(em){
 }
 D(document.getElementById("gd-nav-top-hide"));
 
+
+/*固定导航*/
+
+//下载app
+//var gd_nav_sj=document.getElementById("gd-nav-sj");
+//var sj_hide=document.getElementById("sj-hide");
+//
+//gd_nav_sj.onmouseover=function(){
+//    sj_hide.style.display="block"
+//};
+//
+//gd_nav_sj.onmouseout=function(){
+//    sj_hide.style.display="none"
+//};
+
+
+////小程序
+//var gd_nav_wx=document.getElementById("gd-nav-wx");
+//var wx_hide=document.getElementById("wx-hide");
+//gd_nav_wx.onmouseover=function(){
+//    wx_hide.style.display="block"
+//};
+//
+//gd_nav_wx.onmouseout=function(){
+//    wx_hide.style.display="none"
+//};
+
+
+//var gd_nav_jd=document.getElementById("gd-nav-jd");
+//var jd_hide=document.getElementById("jd-hide");
+//
+//gd_nav_jd.onmouseover=function(){
+//    jd_hide.style.display="block"
+//};
+//
+//gd_nav_jd.onmouseout=function(){
+//    jd_hide.style.display="none"
+//};
+
+
 //滚到指定位置出现返回向上按钮
 function X(){
     var hd_top=document.getElementById("gd-nav-top-hide");
@@ -653,11 +693,13 @@ var validate_phone = function (phone) {
     }
 };
 
+
+
 $("#v_container").click(function(){
     // 注册框点击发送短信按钮事件.
     var phone = $.trim($("#iphone").val());
     if(validate_phone(phone)){
-        var url = "/sms/get";
+        var url = "http://www.bhxxjs.cn/sms/get";
         var args = {"phone": phone, "csrf_token": $("#csrf_token").val()};
         $.post(url, args, function(resp){
             var resp = JSON.parse(resp);
@@ -665,12 +707,44 @@ $("#v_container").click(function(){
             if(status === "success"){
                 alert("短信已发送,请注意查收.");
                 return  true;
+
             }
             else{
                 alert(status);
                 return false;
             }
         });
+
+        var clock = '';
+        var nums = 60;
+        var col="#bbb";
+        var v_container=document.getElementById("v_container");
+
+        function sendCode()
+        {
+           v_container.disabled = true; //将按钮置为不可点击
+           v_container.style.background= col; //将按钮置为不可点击
+           v_container.value = nums+'秒后可重新获取';
+            clock = setInterval(doLoop, 1000); //一秒执行一次
+        }
+        function doLoop()
+        {
+            nums--;
+            if(nums > 0){
+                v_container.value = nums+'秒后可重新获取';
+            }else{
+                clearInterval(clock); //清除js定时器
+                v_container.disabled = false;
+                v_container.style.background=""
+                v_container.value = '点击发送验证码';
+                nums = 60; //重置时间
+            }
+        }
+        sendCode()
+
+
+
+
     }
     else{
         var str = `手机号码不正确!`;
@@ -728,6 +802,7 @@ $("#su_mit").click(function(){
         });
     }
 });
+
 
 $("#su_mit2").click(function(){
     var phone = $.trim($("#iphone2").val());
