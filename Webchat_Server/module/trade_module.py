@@ -254,9 +254,15 @@ def calculate_trade(raw_signal: dict) -> None:
         """"""
         # each_profit_dollar = ((exit_price - enter_price) * t_c - p_d/p_a) * p_v * p_a  # 2018-9-20废止, 每手盈利美元毛利(尚未扣除佣金)
         each_profit_dollar = (exit_price - enter_price) * t_c * p_v * p_a  # 每手盈利美元毛利(尚未扣除佣金)
+        """计算公式(尚未扣除佣金)"""
+        formula = "(exit_price - enter_price) * t_c * p_v * p_a=({} - {}) * {} * {} * {}".format(exit_price,
+                                                                                                 enter_price, t_c, p_v,
+                                                                                                 p_a)
+        x['formula'] = formula
         each_profit = each_profit_dollar - comm
         x['each_profit_dollar'] = each_profit_dollar
         x['each_profit'] = each_profit
+
         x['p_val'] = p_v
         x['p_diff'] = p_d
         x['p_arg'] = p_a
@@ -1244,6 +1250,7 @@ class Trade(Signal):
     type_dict['lots'] = int  # 交易手数
     type_dict['the_profit'] = float  # 本次交易总盈利
     type_dict['t_coefficient'] = float  # （交易）系数 -1/1
+    type_dict['formula'] = str  # 计算公式
     type_dict['p_coefficient'] = float  # （点值）系数 废止2018-8-21
     type_dict['a_coefficient'] = float  # 开仓价随机系数 废止2018-8-21
     type_dict['b_coefficient'] = float  # 平仓价随机系数 废止2018-8-21
