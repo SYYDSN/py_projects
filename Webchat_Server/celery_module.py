@@ -118,7 +118,7 @@ def send_template_message(mes_type: str, mes_dict: dict) -> None:
         send_mail(title=ms)
     else:
         handler = type_map[mes_type]
-        print(handler)
+        # send_mail(title=handler.__name__, content='{}'.format(datetime.datetime.now()))
         print(mes_dict)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(handler(**mes_dict))

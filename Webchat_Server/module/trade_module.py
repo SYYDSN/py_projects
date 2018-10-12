@@ -308,20 +308,25 @@ def calculate_trade(raw_signal: dict) -> None:
                 r2 = t2.find_one_and_update(filter=t2_f, update=t2_u, upsert=True)
                 print(r2)
     """发送钉钉消息"""
-    d_res = None
-    try:
-        d_res = send_tips_to_dingding(raw_signal)
-    except Exception as e:
-        title = "{}往直播群发送钉钉机器人消息失败".format(datetime.datetime.now())
-        content = "错误原因:{}, trade = {}".format(e, raw_signal)
-        send_mail(title=title, content=content)
-        d_res = "往直播群发送钉钉机器人消息失败! {}".format(content)
-        logger.exception(msg=d_res)
-    finally:
-        if d_res is None:
-            pass
-        else:
-            print("钉订消息发送结果:{}".format(d_res))
+
+    if raw_signal['teacher_id'] == ObjectId("5bbd3279c5aee8250bbe17d0"):
+        """非功老师是测试账户"""
+        pass
+    else:
+        d_res = None
+        try:
+            d_res = send_tips_to_dingding(raw_signal)
+        except Exception as e:
+            title = "{}往直播群发送钉钉机器人消息失败".format(datetime.datetime.now())
+            content = "错误原因:{}, trade = {}".format(e, raw_signal)
+            send_mail(title=title, content=content)
+            d_res = "往直播群发送钉钉机器人消息失败! {}".format(content)
+            logger.exception(msg=d_res)
+        finally:
+            if d_res is None:
+                pass
+            else:
+                print("钉订消息发送结果:{}".format(d_res))
 
 
 def generator_signal_and_save(raw_signal: dict) -> list:

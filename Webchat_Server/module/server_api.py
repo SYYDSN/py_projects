@@ -545,63 +545,63 @@ def score_change_message(open_id: str, nick_name: str, change_num: int, score_am
             return True
 
 
-def new_order_message(open_id: str, nick_name: str, order_type: str, t_name: str) -> bool:
-    """
-    新订单模板消息,使用requests,一般是单次发送.
-    :param open_id:
-    :param nick_name:
-    :param order_type: 订单类型  进场/离场
-    :param t_name:  老师名字
-    :return:
-    """
-    now = datetime.datetime.now()
-    now = now.strftime("%Y-%m-%d %H:%M:%S")
-    u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
-    args = {
-        "touser": open_id,
-        "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
-        "url": "http://wx.91master.cn/user/html/index.html",
-        "data": {
-            "first": {
-                "value": "你关注的{}老师有新的操作...".format(t_name),
-                "color": "grey",
-            },
-            "tradeDateTime": {
-                "value": now,
-                "color": "#82B6F4",
-            },
-            "orderType": {
-                "value": order_type,
-                "color": "#82B6F4",
-            },
-            "customerInfo": {
-                "value": nick_name,
-                "color": "#82B6F4",
-            },
-            "remark": {
-                "value": "点击“详情”查看完整信息",
-                "color": "#173177"
-            }
-        }
-    }
-
-    r = requests.post(u, data=json.dumps(args))
-    status = r.status_code
-    if status != 200:
-        ms = "服务器返回了错误的状态码：{}".format(status)
-        logger.exception(msg=ms)
-        print(ms)
-        return False
-    else:
-        resp = r.json()
-        error_code = resp['errcode']
-        if error_code != 0:
-            ms = "服务器返回了错误的消息：{}, code: {}".format(resp['errmsg'], error_code)
-            logger.exception(msg=ms)
-            print(ms)
-            return False
-        else:
-            return True
+# def new_order_message(open_id: str, nick_name: str, order_type: str, t_name: str) -> bool:
+#     """
+#     新订单模板消息,使用requests,一般是单次发送.
+#     :param open_id:
+#     :param nick_name:
+#     :param order_type: 订单类型  进场/离场
+#     :param t_name:  老师名字
+#     :return:
+#     """
+#     now = datetime.datetime.now()
+#     now = now.strftime("%Y-%m-%d %H:%M:%S")
+#     u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
+#     args = {
+#         "touser": open_id,
+#         "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
+#         "url": "http://wx.91master.cn/user/html/index.html",
+#         "data": {
+#             "first": {
+#                 "value": "你关注的{}老师有新的操作...".format(t_name),
+#                 "color": "grey",
+#             },
+#             "tradeDateTime": {
+#                 "value": now,
+#                 "color": "#82B6F4",
+#             },
+#             "orderType": {
+#                 "value": order_type,
+#                 "color": "#82B6F4",
+#             },
+#             "customerInfo": {
+#                 "value": nick_name,
+#                 "color": "#82B6F4",
+#             },
+#             "remark": {
+#                 "value": "点击“详情”查看完整信息",
+#                 "color": "#173177"
+#             }
+#         }
+#     }
+#
+#     r = requests.post(u, data=json.dumps(args))
+#     status = r.status_code
+#     if status != 200:
+#         ms = "服务器返回了错误的状态码：{}".format(status)
+#         logger.exception(msg=ms)
+#         print(ms)
+#         return False
+#     else:
+#         resp = r.json()
+#         error_code = resp['errcode']
+#         if error_code != 0:
+#             ms = "服务器返回了错误的消息：{}, code: {}".format(resp['errmsg'], error_code)
+#             logger.exception(msg=ms)
+#             print(ms)
+#             return False
+#         else:
+#             return True
 
 
 class TemplateMessageResponse(mongo_db.BaseDoc):
@@ -621,6 +621,102 @@ class TemplateMessageResponse(mongo_db.BaseDoc):
 async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
     """
     新订单模板消息,使用批量发送.
+    :param t_id:  老师id
+    :param order_type: 订单类型  进场/离场
+    :return:
+    """
+    # send_mail(title="func begin...", content='{}'.format(datetime.datetime.now()))
+    ses = mongo_db.get_conn("teacher")
+    t_id = ObjectId(t_id) if isinstance(t_id, str) else t_id
+    f = {"_id": t_id}
+    p = {"_id", "name"}
+    t = ses.find_one(filter=f, projection=p)
+    if t is None:
+        ms = "发送模板消息出错,无效的t_id:{}".format(t_id)
+        logger.exception(msg=ms)
+        send_mail(title=ms)
+        return False
+    else:
+        t_id = t['_id']
+        t_name = t['name']
+        f = {"follow": {"$elemMatch": {"$in": [t_id]}}}
+        p = ['_id', "openid", "nick_name"]
+        now = datetime.datetime.now()
+        ses = mongo_db.get_conn(table_name="wx_user")
+        us = ses.find(filter=f, projection=p)
+        us = [x for x in us]
+        us_l = len(us)
+        # send_mail(title="if begin ...", content='us_l={}, {}'.format(us_l, datetime.datetime.now()))
+        if us_l > 0:
+            ms = "准备发送{}条模板消息,老师id={}".format(us_l, t_id)
+            logger.info(msg=ms)
+
+            now = now.strftime("%Y-%m-%d %H:%M:%S")
+            u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
+            info = {
+                "t_id": t_id,
+                "t_name": t_name,
+                "time": now
+            }
+            # send_mail(title="async begin ...", content='{}'.format(datetime.datetime.now()))
+            async with aiohttp.ClientSession() as session:
+                for x in us:
+                    openid = x['openid']
+                    nick_name = x['nick_name']
+                    info['openid'] = openid
+                    info['nick_name'] = nick_name
+                    # send_mail(title="for begin ...", content='{}'.format(datetime.datetime.now()))
+                    args = {
+                        "touser": openid,
+                        "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
+                        "url": "http://wx.91master.cn/user/html/currentCrunchy.html?t_id={}".format(
+                            str(t_id) if isinstance(t_id, ObjectId) else t_id),
+                        "data": {
+                            "first": {
+                                "value": "你关注的{}老师有新的操作..".format(t_name),
+                                "color": "grey",
+                            },
+                            "tradeDateTime": {
+                                "value": now,
+                                "color": "#82B6F4",
+                            },
+                            "orderType": {
+                                "value": order_type,
+                                "color": "#82B6F4",
+                            },
+                            "customerInfo": {
+                                "value": nick_name,
+                                "color": "#82B6F4",
+                            },
+                            "remark": {
+                                "value": "点击“详情”查看完整信息",
+                                "color": "#173177"
+                            }
+                        }
+                    }
+                    # print(args)
+                    # send_mail(title="arg init...", content='{}'.format(datetime.datetime.now()))
+                    async with session.post(url=u, data=json.dumps(args), timeout=5) as response:
+                        resp = await response.json()
+                        if isinstance(resp, dict):
+                            info['return'] = "success"
+                            info.update(resp)
+                        else:
+                            info['return'] = "error"
+                        info['_id'] = ObjectId()
+                        info['args'] = args
+                        info['time'] = now
+                        ses = TemplateMessageResponse.get_collection()
+                        ses.insert_one(document=info)
+
+            return True
+        else:
+            return False
+
+
+def new_order_message3(t_id: (str, ObjectId), order_type: str) -> bool:
+    """
+    新订单模板消息,使用批量发送.和new_order_message3代码逻辑一样,不过是同步的.用来验证逻辑
     :param t_id:  老师id
     :param order_type: 订单类型  进场/离场
     :return:
@@ -656,56 +752,52 @@ async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
                 "t_name": t_name,
                 "time": now
             }
-            print("async begin ...")
-            async with aiohttp.ClientSession() as session:
-                for x in us:
-                    openid = x['openid']
-                    nick_name = x['nick_name']
-                    info['openid'] = openid
-                    info['nick_name'] = nick_name
-                    args = {
-                        "touser": openid,
-                        "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
-                        "url": "http://wx.91master.cn/user/html/currentCrunchy.html?t_id={}".format(
-                            str(t_id) if isinstance(t_id, ObjectId) else t_id),
-                        "data": {
-                            "first": {
-                                "value": "你关注的{}老师有新的操作".format(t_name),
-                                "color": "grey",
-                            },
-                            "tradeDateTime": {
-                                "value": now,
-                                "color": "#82B6F4",
-                            },
-                            "orderType": {
-                                "value": order_type,
-                                "color": "#82B6F4",
-                            },
-                            "customerInfo": {
-                                "value": nick_name,
-                                "color": "#82B6F4",
-                            },
-                            "remark": {
-                                "value": "点击“详情”查看完整信息",
-                                "color": "#173177"
-                            }
+            for x in us:
+                openid = x['openid']
+                nick_name = x['nick_name']
+                info['openid'] = openid
+                info['nick_name'] = nick_name
+                send_mail(title="for begin ...", content='{}'.format(datetime.datetime.now()))
+                args = {
+                    "touser": openid,
+                    "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
+                    "url": "http://wx.91master.cn/user/html/currentCrunchy.html?t_id={}".format(
+                        str(t_id) if isinstance(t_id, ObjectId) else t_id),
+                    "data": {
+                        "first": {
+                            "value": "你关注的{}老师有新的操作..".format(t_name),
+                            "color": "grey",
+                        },
+                        "tradeDateTime": {
+                            "value": now,
+                            "color": "#82B6F4",
+                        },
+                        "orderType": {
+                            "value": order_type,
+                            "color": "#82B6F4",
+                        },
+                        "customerInfo": {
+                            "value": nick_name,
+                            "color": "#82B6F4",
+                        },
+                        "remark": {
+                            "value": "点击“详情”查看完整信息",
+                            "color": "#173177"
                         }
                     }
-                    print(args)
-                    # send_mail(title="hello", content="{}".format(args))
-                    async with session.post(url=u, data=json.dumps(args), timeout=5) as response:
-                        resp = await response.json()
-                        if isinstance(resp, dict):
-                            info['return'] = "success"
-                            info.update(resp)
-                        else:
-                            info['return'] = "error"
-                        info['_id'] = ObjectId()
-                        info['args'] = args
-                        info['time'] = now
-                        ses = TemplateMessageResponse.get_collection()
-                        ses.insert_one(document=info)
-
+                }
+                print(args)
+                resp = requests.post(url=u, data=json.dumps(args), timeout=5)
+                if isinstance(resp, dict):
+                    info['return'] = "success"
+                    info.update(resp)
+                else:
+                    info['return'] = "error"
+                info['_id'] = ObjectId()
+                info['args'] = args
+                info['time'] = now
+                ses = TemplateMessageResponse.get_collection()
+                ses.insert_one(document=info)
             return True
         else:
             return False
