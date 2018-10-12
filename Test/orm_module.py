@@ -96,13 +96,18 @@ def get_db(database: str = None):
     return data_base
 
 
-def get_conn(table_name: str, database: str = None, w: (int, str) = 1, j: bool = None) -> Collection:
+def get_conn(table_name: str, database: str = None, db_client: pymongo.MongoClient = None,
+             write_concern: (WriteConcern, dict) = None) -> Collection:
     """
     获取一个针对table_name对应的表的的连接，一般用户直接对数据库进行增删查改等操作。
+    如果你要进行事务操作,请传入db_client参数以保证事务种所有的操作都在一个pymongo.MongoClient的session之下.
     :param table_name: collection的名称，对应sql的表名。必须。
     :param database: 数据库名
-    :param w: 写关注级别选项.w mongodb的默认w的值是1.
-    :param j: 写关注日志选项.w mongodb的j的选项没有默认值.由其他地方的设置决定. False是关闭日志,True是打开日志.
+    :param db_client: 数据库的pymongo的客户端 transaction专用选项,用于保持数据库会话的一致性
+    :param write_concern: 写关注级别. example: write_concern = {"w": 1, j: True}
+    写关注有 w和j 两个选项.
+    w: 写关注级别选项.w mongodb的默认w的值是1.
+    j: 写关注日志选项.w mongodb的j的选项没有默认值.由其他地方的设置决定. False是关闭日志,True是打开日志.
 
     w: 0 int,     不关注写
     w: 1  int,    关注写,确保写动作执行完毕就算写成功.也是默认值
@@ -118,13 +123,26 @@ def get_conn(table_name: str, database: str = None, w: (int, str) = 1, j: bool =
     if table_name is None or table_name == '':
         raise TypeError("表名不能为空")
     else:
-        mongodb_conn = get_db(database)
-        conn = mongodb_conn[table_name]
-        if j is None and w == 1:
-            pass
+        cur_db_name = database if database else db_name
+        if db_client is None:
+            cur_db = get_db(cur_db_name)
         else:
-            write_concern = WriteConcern(j=None, w=w)
+            cur_db = db_client[cur_db_name]
+        conn = cur_db[table_name]
+        if isinstance(write_concern, WriteConcern):
             conn = conn.with_options(write_concern=write_concern)
+        elif isinstance(write_concern, dict):
+            cur = dict()
+            cur['w'] = write_concern.get("w")
+            cur['j'] = write_concern.get("j")
+            cur = {k: v for k, v in cur.items()}
+            if len(cur) == 0:
+                pass
+            else:
+                write_concern = WriteConcern(**cur)
+                conn = conn.with_options(write_concern=write_concern)
+        else:
+            pass
         return conn
 
 
@@ -469,24 +487,6 @@ def get_datetime_from_timestamp(timestamp_str: str)->datetime.datetime:
     except ValueError as e:
         print(e)
         return get_datetime_from_str(timestamp_str)
-
-
-class Field:
-    """
-    字段对象,用来定义类的属性
-    """
-    def __init__(self, field_name: str, field_type: type, field_value: object, show_name: str = None):
-        """
-        构造器
-        :param field_name:
-        :param field_type:
-        :param field_value:
-        :param show_name:
-        """
-        self.field_name = field_name   # 字段名
-        self.show_name = show_name   # 显示在权限管理中的字段名
-        self.field_type = field_type
-        self.field_value = field_value
 
 
 def get_obj_id(object_id):
@@ -1006,96 +1006,16 @@ class BaseDoc:
     _table_name = "table_name"  
     """
 
-    def table_name(self):
+    __authentication = False  # 是否需要检查访问者权限?
+
+    def table_name(self) -> str:
+        """获取表名"""
         return self._table_name
 
-    def get_id(self):
-        """返回id对象"""
-        return self._id
-
-    def __eq__(self, other) -> bool:
-        """
-        重构的比较的方法．
-        :param other: 另一个对象
-        :return: 比较的结果．布尔值
-        """
-        if isinstance(other, self.__class__):
-            if self.get_id() == other.get_id():
-                return True
-            else:
-                d1 = self.__dict__
-                d2 = other.__dict__
-                d1.pop("_id")
-                d2.pop("_id")
-                return d1 == d2
-        else:
-            return False
-
     @classmethod
-    def get_table_name(cls):
+    def get_table_name(cls) -> str:
+        """获取表名"""
         return cls._table_name
-
-    @classmethod
-    def get_attr_from_cache(cls, o_id: (ObjectId, str), attr_name: str, default=None)-> (object, None):
-        """
-        从缓存中获取属性. 方法没写完
-        :param o_id:　ObjectId
-        :param attr_name:　属性名称
-        :param default:　　默认值
-        :return:
-        """
-        cache = MyCache(cls.get_table_name())
-        o_id = o_id if isinstance(o_id, str) else str(o_id)
-        r = default
-        if attr_name not in cls.type_dict:
-            pass
-        else:
-            r = cache.get_value("{}.{}".format(o_id, attr_name))
-        return r
-
-    @classmethod
-    def save_attr_to_cache(cls, o_id: (ObjectId, str), attr_name: str, attr_val: object)-> (object, None):
-        """
-        保存属性值到缓存
-        :param o_id:
-        :param attr_name:
-        :param attr_val:
-        :return:
-        """
-
-    @classmethod
-    def get_attr_cls(cls, o_id: ObjectId, attr_name: str, default=None) -> object:
-        """
-        ｇｅｔ_attr的类方法，带缓存．
-        :param o_id:
-        :param attr_name:
-        :param default:
-        :return:
-        """
-        r = cls.get_attr_from_cache(o_id, attr_name, default)
-
-    @classmethod
-    def get_unique_index_info(cls) -> dict:
-        """
-        获取所有唯一索引信息,这个方法还不完善.暂未使用
-        :param ses: 一个ｐｙｍｏｎｇｏ的连接对象
-        :return: dict,索引名,索引列名的list组成的字典．
-        """
-        ses = get_conn(cls.get_table_name())
-        index_list = ses.list_indexes()
-        result = dict()
-        for x in index_list:
-            unique = x.get('unique')  # 是否是唯一索引
-            index_name = x['name']
-            keys = x['key'].keys()  # 索引涉及的列的名称列表
-            if unique or index_name == "_id_":
-                if keys not in result.values():
-                    result[index_name] = keys
-                else:
-                    pass
-            else:
-                pass
-        return result
 
     def __init__(self, **kwargs):
         """构造器"""
@@ -1192,20 +1112,6 @@ class BaseDoc:
         finally:
             return res
 
-    def check_type(self):
-        """检查类的属性是否符合原始设定"""
-        if len(self.type_dict) == 0:
-            warnings.warn("没有设置字段类型检查")
-        else:
-            types = self.type_dict.keys()
-            for k, v in self.__dict__.items():
-                if k in types:
-                    if isinstance(v, self.type_dict[k]):
-                        pass
-                    else:
-                        warnings.warn("{}的值{}的类型与设定不符，原始的设定为{}，实际类型为{}".format(k, v, self.type_dict[k], type(v)),
-                                      RuntimeWarning)
-
     def get_dict(self, ignore: list = None) -> dict:
         """
         获取self.__dict__
@@ -1217,23 +1123,22 @@ class BaseDoc:
         else:
             return {k: v for k, v in self.__dict__.items() if k not in ignore}
 
-    def insert(self, obj=None):
+    def insert(self) -> ObjectId:
         """插入数据库,单个对象,返回ObjectId的实例"""
-        obj = self if obj is None else obj
-        table_name = obj.table_name()
+        table_name = self.table_name()
         ses = get_conn(table_name=table_name)
-        insert_dict = {k: v for k, v in obj.__dict__.items() if v is not None}
+        insert_dict = {k: v for k, v in self.__dict__.items() if v is not None}
         try:
             inserted_id = ses.insert_one(insert_dict).inserted_id
             if self._id is None and isinstance(inserted_id, ObjectId):
                 self._id = inserted_id
         except errors.DuplicateKeyError as e:
             error_key = ""
-            for x in obj.type_dict.keys():
+            for x in self.type_dict.keys():
                 if x in e.details['errmsg']:
                     error_key = x
                     break
-            error_val = obj.__dict__[error_key]
+            error_val = self.__dict__[error_key]
             mes = "重复的 {}:{}".format(error_key, error_val)
             raise ValueError(mes)
         return inserted_id
@@ -1301,36 +1206,6 @@ class BaseDoc:
             """
             return _id if res.upserted_id is None else res.upserted_id
 
-    def save(self, obj=None)->ObjectId:
-        """更新
-        1.如果原始对象不存在，那就插入，返回objectid
-        2.如果原始对象存在，那就update。返回objectid
-        3.如果遭遇唯一性验证失败，查询重复的对象的，返回0
-        4.其他问题会抛出/记录错误,返回None
-        return ObjectId
-        """
-        ms = "此方法已不建议使用,请使用实例方法save_plus和类方法replace_one替代, 2018-3-22"
-        warnings.warn(ms)
-        obj = self if obj is None else obj
-        table_name = obj.table_name()
-        ses = get_conn(table_name=table_name)
-        save_dict = {k: v for k, v in obj.__dict__.items() if v is not None}
-        save_id = None
-        try:
-            save_id = ses.save(save_dict)
-            if self._id is None and isinstance(save_id, ObjectId):
-                self._id = save_id
-        except pymongo.errors.DuplicateKeyError as e:
-            save_id = 0
-            ms = "mongo_db.save func Error,原因:重复的对象,detail: {}".format(e)
-            logger.info(ms)
-        except Exception as e:
-            ms = "mongo_db.save func Error,原因:{}".format(e)
-            logger.exception(ms)
-            raise e
-        finally:
-            return save_id
-
     def delete_self(self, obj=None):
         """删除自己"""
         obj = self if obj is None else obj
@@ -1342,11 +1217,6 @@ class BaseDoc:
             return True
         else:
             return False
-
-    def get_dbref(self):
-        """获取一个实例的DBRef对象"""
-        obj = DBRef(self._table_name, self._id, db_name)
-        return obj
 
     def in_list(self, attr_name, current_obj):
         """
@@ -1381,6 +1251,24 @@ class BaseDoc:
         return result_dict
 
     @classmethod
+    def exec(cls, exe_name: str, write_concern: (dict, WriteConcern) = None, *args, **kwargs) -> ObjectId:
+        """
+        执行Collection的原生命令
+        :param exe_name:
+        :param write_concern: 写关注
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        conn = cls.get_collection(write_concern=write_concern)
+        if hasattr(conn, exe_name):
+            handler = getattr(conn, name=exe_name)
+            handler(*args, **kwargs)
+        else:
+            ms = "pymongo.Collection没有{}这个方法".format(exe_name)
+            raise RuntimeError(ms)
+
+    @classmethod
     def replace_one(cls, filter_dict: dict, replace_dict: dict, upsert: bool = False) -> bool:
         """
         替换一个文档.
@@ -1396,6 +1284,7 @@ class BaseDoc:
     @staticmethod
     def simple_doc(doc_dict: dict, ignore_columns: list = None) -> dict:
         """
+        把doc转换成可被json序列化的格式
         :param doc_dict: 等待被精简的doc,一般是to_flat_dict方法处理过的实例
         :param ignore_columns: 不需要的列名
         :return: 精简过的doc
@@ -1519,74 +1408,17 @@ class BaseDoc:
         else:
             return False
 
-    def insert_self_and_return_dbref(self):
-        """
-        把参数转成obj对象插入数据库并返回dbref对象
-        return: DBRef
-        """
-        _id = self.insert()
-        if _id is None:
-            raise InvalidId("对象插入失败， {}".format(str(self.__dict__)))
-        else:
-            self._id = _id
-            return self.get_dbref()
-
-    def save_self_and_return_dbref(self):
-        """
-        把参数转成obj对象插入数据库并返回dbref对象,这个是save，对象不存在就插入，对象存在就update
-        return: DBRef
-        """
-        _id = self.save()
-        if _id is None:
-            raise InvalidId("对象保存失败， {}".format(str(self.__dict__)))
-        else:
-            self._id = _id
-            return self.get_dbref()
-
     @classmethod
-    def get_collection(cls):
+    def get_collection(cls, write_concern: (WriteConcern, dict) = None):
         """
         获取一个collection对象,这个对象可以执行绝大多数对数据库的操作.
         可以看作这是一个万能的数据库操作handler.只是略微复杂点而已.
+        :param write_concern: 写关注
+        :return:
         """
         table_name = cls.get_table_name()
-        conn = get_conn(table_name)
+        conn = get_conn(table_name=table_name, write_concern=write_concern)
         return conn
-
-    @classmethod
-    def get_instance_from_dbref(cls, dbref):
-        """
-        根据dbref返回一个实例对象
-        :param dbref: 一个dbref对象
-        :return: dbref对象的collection对应的class的一个实例
-        """
-        if dbref is None:
-            return None
-        else:
-            object_id = dbref.id
-            obj = cls.find_by_id(object_id)
-            return obj
-
-    @classmethod
-    def insert_and_return_dbref(cls, **kwargs):
-        """
-        把参数转成obj对象插入数据库并返回dbref对象，如果对象已存在，则返回原始对象的DBRef，
-        注意如果建议类构造器不是__init__方法时，你需要在子类中重构此方法。
-        :param kwargs: 创建对象的参数
-        :return: DBRef
-        """
-        obj = cls.find_one(**kwargs)
-        if isinstance(obj, cls):
-            """如果找到一个相同的对象"""
-            return obj.get_dbref()
-        else:
-            obj = cls(**kwargs)
-            _id = obj.insert()
-            if _id is None:
-                raise InvalidId("对象插入失败， {}".format(str(kwargs)))
-            else:
-                obj._id = _id
-                return obj.get_dbref()
 
     @classmethod
     def insert_and_return_instance(cls, **kwargs):
@@ -1604,7 +1436,7 @@ class BaseDoc:
             return obj
 
     @classmethod
-    def insert_one(cls, **kwargs):
+    def insert_one(cls, **kwargs) -> ObjectId:
         """
         把参数转换为对象并插入
         :return: ObjectId
@@ -1614,9 +1446,10 @@ class BaseDoc:
             instance = cls(**kwargs)
         except TypeError as e:
             logger.exception("Error! args:rease:{},kwargs: {}".format(e, str(kwargs)))
+            raise e
         finally:
             if instance is None:
-                return instance
+                return None
             else:
                 obj_id = instance.insert()
                 return obj_id
@@ -2244,8 +2077,8 @@ class BaseDoc:
 
 
 """
-    一些辅助的函数,2017-11-01之后添加,很多函数在tools_module里面也有一套,这里重复的原因是有时候引用tools_module模块
-    不是很方便,容易导致循环引用.
+ 一些辅助的函数,2017-11-01之后添加,很多函数在tools_module里面也有一套,这里重复的原因是有时候引用tools_module模块
+不是很方便,容易导致循环引用.
 """
 
 

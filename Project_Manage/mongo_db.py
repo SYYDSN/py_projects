@@ -211,11 +211,14 @@ def get_db(database: str = None):
     return data_base
 
 
-def get_conn(table_name: str, database: str = None, w: (int, str) = 1, j: bool = None) -> Collection:
+def get_conn(table_name: str, database: str = None, db_client: pymongo.MongoClient = None, w: (int, str) = 1,
+             j: bool = None) -> Collection:
     """
     获取一个针对table_name对应的表的的连接，一般用户直接对数据库进行增删查改等操作。
+    如果你要进行事务操作,请传入db_client参数以保证事务种所有的操作都在一个pymongo.MongoClient的session之下.
     :param table_name: collection的名称，对应sql的表名。必须。
     :param database: 数据库名
+    :param db_client: 数据库的pymongo的客户端 transaction专用选项,用于保持数据库会话的一致性
     :param w: 写关注级别选项.w mongodb的默认w的值是1.
     :param j: 写关注日志选项.w mongodb的j的选项没有默认值.由其他地方的设置决定. False是关闭日志,True是打开日志.
 
@@ -233,8 +236,12 @@ def get_conn(table_name: str, database: str = None, w: (int, str) = 1, j: bool =
     if table_name is None or table_name == '':
         raise TypeError("表名不能为空")
     else:
-        mongodb_conn = get_db(database)
-        conn = mongodb_conn[table_name]
+        cur_db_name = database if database else db_name
+        if db_client is None:
+            cur_db = get_db(cur_db_name)
+        else:
+            cur_db = db_client[cur_db_name]
+        conn = cur_db[table_name]
         if j is None and w == 1:
             pass
         else:
