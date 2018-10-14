@@ -2,14 +2,19 @@
 
 ## 安装 
 
-pip3/pip install uwsgi
+sudo apt install uwsgi
 
+python的插件也是要安装的
+
+sudo apt install uwsgi-plugin-python
+
+你可以用 --version查看版本我当前的版本是2.015
 
 uwsgi有独立部署和作为web容器的后端部署两种方式.这两种方式最主要的差别是前者可以直接访问,而后者需要部署在类似nginx这样的服务器的后面.
 这2种部署方式最主要的差别在于参数
 
-1. 独立部署 使用 --http host:port 方式绑定主机和端口
-2. 后端部署 使用 --http-socket  host:port 方式绑定主机和端口
+1. 独立部署 使用 --http-socket host:port 方式绑定主机和端口
+2. 后端部署 使用 --socket  host:port 方式绑定主机和端口
 
 * 当你使用 --http参数把uwsgi部署在web服务器后面时, 会导致uwsgi不停的反复重新加载对站,直至服务器宕机.
 * 当你使用  --http-socket或者--socket参数独立部署uwsgi的时候,你在访问服务器的时uwsgi会报错
@@ -62,7 +67,7 @@ startretries = 3                      ; 程序失败的重试次数web
 参数说明
 
 * **--py-autoreload**: 1或者0, 自动重载,开发时使用这个参数
-* **--http或者--http-socket**: 绑定主机和端口,比如127.0.0.1:7001
+* **----http-socket或者--socket**: 绑定主机和端口,比如127.0.0.1:7001
 * **--wsgi-file**: 配置文件,对于flask来说,就是入口的那个py文件
 * **--callable**: 就是入口文件中run的那个app
 * **--process**: 启动几个进程? 官方建议为计算机核心数目*2

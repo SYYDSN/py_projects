@@ -38,28 +38,37 @@ MongoDB4+ 的持久化类   2018-10-11
 
 cache = RedisCache()
 logger = get_logger()
-user = "test_root"              # 数据库用户名
-password = "Test@1314"       # 数据库密码
-db_name = "test_db"        # 库名称
-mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
-
-"""mongodb配置信息"""
-"""
-注意,使用连接池就不能使用mongos load balancer
-mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
-"""
+# user = "test_root"              # 数据库用户名
+# password = "Test@1314"       # 数据库密码
+# db_name = "test_db"        # 库名称
+# mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
+#
+# """mongodb配置信息"""
+# """
+# 注意,使用连接池就不能使用mongos load balancer
+# mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
+# """
+# mongodb_setting = {
+#     "host": "47.99.105.196:27017",   # 数据库服务器地址
+#     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
+#     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
+#     "minPoolSize": 0,  # 最小连接池,默认是0.
+#     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
+#     "authSource": db_name,  # 验证数据库
+#     'authMechanism': mechanism,  # 加密
+#     "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
+#     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
+#     "username": user,       # 用户名
+#     "password": password    # 密码
+# }
+db_name = "test_db"
 mongodb_setting = {
-    "host": "47.99.105.196:27017",   # 数据库服务器地址
+    "host": "127.0.0.1:27017",   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
-    "minPoolSize": 0,  # 最小连接池,默认是0.
+    "minPoolSize": 2,  # 最小连接池,默认是0.
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
-    'authMechanism': mechanism,  # 加密
-    "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
-    # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
-    "username": user,       # 用户名
-    "password": password    # 密码
 }
 
 
@@ -1072,8 +1081,6 @@ class BaseDoc:
                     pass
                 else:
                     self.__dict__[k] = v
-        if "_id" not in self.__dict__:
-            self._id = ObjectId()
 
     def __str__(self):
         return str(self.__dict__)
@@ -1262,7 +1269,7 @@ class BaseDoc:
         """
         conn = cls.get_collection(write_concern=write_concern)
         if hasattr(conn, exe_name):
-            handler = getattr(conn, name=exe_name)
+            handler = getattr(conn, exe_name)
             handler(*args, **kwargs)
         else:
             ms = "pymongo.Collection没有{}这个方法".format(exe_name)
@@ -1459,7 +1466,7 @@ class BaseDoc:
         """
         retry_insert_many_after_error  的辅助函数,批量插入,并返回成功和失败的结果.
         :param input_list: 待处理的数据ｌｉｓｔ．是ｄｏｃ(有_id的,)．不能是dict或者cls的实例.
-        :return: 插入成功的doc的list
+        :return: 插入成功的Object的list
         """
         if len(input_list) == 0:
             return []
@@ -1481,22 +1488,22 @@ class BaseDoc:
             else:
                 raw = [input_list]
             for sub in raw:
+                success_ids = []
                 try:
                     inserted_results = ses.insert_many(sub, ordered=False)  # 无序写,希望能返回所有出错信息.默认有序
                     success_ids = inserted_results.inserted_ids
                 except pymongo.errors.BulkWriteError as e:
                     ms = "insert_many_and_return_doc func Error:{}, args={}".format(e, input_list)
                     logger.info(ms)
-                    print(e)
-                    duplicate_doc_ids = [x['op']['_id'] for x in e.details['writeErrors']]
-                    success_ids = [x["_id"] for x in input_list if x["_id"] not in duplicate_doc_ids]
+                    raise e
                 except Exception as e1:
                     success_ids = []
                     ms = "retry_insert_many_after_error Error: {}".format(e1)
                     logger.exception(ms)
+                    raise e1
                 finally:
-                    res = [x for x in input_list if x['_id'] in success_ids]
-                    return_doc.extend(res)
+                    if len(success_ids) > 0:
+                        return_doc.extend(success_ids)
             return return_doc
 
     @classmethod
