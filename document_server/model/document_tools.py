@@ -103,8 +103,24 @@ def markdown_to_html(raw: str) -> str:
     :param raw:
     :return:
     """
-    exts = ['markdown.extensions.extra', 'markdown.extensions.codehilite', 'markdown.extensions.tables',
-            'markdown.extensions.toc']
+    exts = [
+        'markdown.extensions.extra',
+        'markdown.extensions.abbr',
+        'markdown.extensions.attr_list',
+        'markdown.extensions.def_list',
+        'markdown.extensions.fenced_code',
+        'markdown.extensions.footnotes',
+        'markdown.extensions.tables',
+        'markdown.extensions.admonition',
+        'markdown.extensions.codehilite',
+        'markdown.extensions.meta',
+        'markdown.extensions.nl2br',
+        'markdown.extensions.sane_lists',
+        'markdown.extensions.smarty',
+        'markdown.extensions.toc',
+        'markdown.extensions.wikilinks'
+
+    ]
     r = markdown.markdown(raw,  output_format='html5', extensions=exts)
     return r
 

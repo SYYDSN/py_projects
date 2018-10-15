@@ -1647,6 +1647,866 @@ ul li {
     padding: 0;
 }
 /*合作伙伴内容修饰*/
+
+
+
+/*伙伴分布内容*/
+.map{
+    height: 883px;
+    background: url("../img/beijingyu.png") no-repeat;
+}
+
+.map .map-content{
+    height: 813px;
+    width: 1000px;
+    margin:  auto;
+    position: relative;
+
+}
+
+.map .map-content img{
+    width: 100%;
+    height: 100%;
+    margin-top: 30px;
+}
+
+
+
+
+.maps{
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: url("../img/zuobiao.png")no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+/*西藏拉萨*/
+.map .map-content .position1{
+    position: absolute;
+    left: 264px;
+    bottom: 263px;
+}
+
+.map .map-content .position1:hover{
+    width: 14px;
+    height: 14px;
+    left: 262px;
+    bottom: 261px;
+    background-size: 100% 100%;
+}
+.map .map-content .position1:hover .position1-box{
+    display: block;
+
+}
+/*西藏拉萨*/
+/*显示的盒子*/
+.map .map-content .position1-box{
+
+    position: absolute;
+
+    width: 240px;
+    height: 140px;
+    /*background: rgba(255,255,255,0.4);*/
+    background: white;
+    display: none;
+    padding-top: 10px;
+    margin-left: 15px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    box-shadow: 0 0 7px #999;
+    -webkit-box-shadow: 0 0 7px #999;;
+    -o-box-shadow: 0 0 7px #999;;
+    -moz-box-shadow: 0 0 7px #999;;
+    -ms-box-shadow: 0 0 7px #999;;
+    z-index: 999;
+
+
+}
+
+.position1-box .pos-box-sj{
+    width: 180px;
+    height: 80px;
+
+    margin-left: 60px;
+    border-left: 1px solid #00a0e9;
+
+    overflow: hidden;
+}
+.position1-box .pos-box-sj div{
+    float: left;
+    margin-left: 15px;
+    font-size: 0;
+    text-align: center;
+    margin-top: 4px;
+}
+.position1-box .pos-box-sj div p{
+    font-size: 12px;
+}
+.position1-box .pos-box-sj div span{
+    display: inline-block;
+    width: 20px;
+    height: 58px;
+    background: #00a0e9;
+}
+.position1-box  .pos-box-sj .shuju2{
+    margin-top: 14px;
+}
+.position1-box  .pos-box-sj .shuju2 span{
+    height: 48px;
+}
+.position1-box .pos-box-xx{
+    width: 230px;
+    height: 1px;
+    background: #00a0e9;
+    margin-left: 5px;
+}
+.position1-box .pos-box-xx ul{
+    overflow: hidden;
+    padding-left: 70px;
+    padding-top: 5px;
+}
+
+.position1-box .pos-box-xx ul li{
+    float: left;
+    font-size: 12px;
+    margin-right: 7px;
+}
+.position1-box .pos-box-xx  p{
+    text-align: center;
+
+
+}
+/*显示的盒子*/
+
+/*乌鲁木齐*/
+.map .map-content .position2{
+    position: absolute;
+    left: 260px;
+    top: 219px;
+
+}
+
+.map .map-content .position2:hover{
+    width: 14px;
+    height: 14px;
+    left: 259px;
+    top: 217px;
+    background-size: 100% 100%;
+}
+.map .map-content .position2:hover .position1-box{
+    display: block;
+}
+/*乌鲁木齐*/
+
+/*青海西宁*/
+.map .map-content .position3{
+    position: absolute;
+    left: 474px;
+    top: 418px;
+
+}
+
+.map .map-content .position3:hover{
+    width: 14px;
+    height: 14px;
+    left: 472px;
+    top: 416px;
+    background-size: 100% 100%;
+}
+.map .map-content .position3:hover .position1-box{
+    display: block;
+}
+/*青海西宁*/
+
+/*甘肃兰州*/
+.map .map-content .position4{
+    position: absolute;
+    left: 513px;
+    top: 435px;
+
+}
+
+.map .map-content .position4:hover{
+    width: 14px;
+    height: 14px;
+    left: 512px;
+    top: 434px;
+    background-size: 100% 100%;
+}
+.map .map-content .position4:hover .position1-box{
+    display: block;
+}
+/*甘肃兰州*/
+
+
+/*四川成都*/
+.map .map-content .position5{
+    position: absolute;
+    left: 512px;
+    bottom: 251px;
+
+}
+
+.map .map-content .position5:hover{
+    width: 14px;
+    height: 14px;
+    left: 511px;
+    bottom: 250px;
+    background-size: 100% 100%;
+}
+.map .map-content .position5:hover .position1-box{
+    display: block;
+}
+/*四川成都*/
+
+
+/*云南昆明*/
+.map .map-content .position6{
+    position: absolute;
+    left: 476px;
+    bottom: 123px;
+
+}
+
+.map .map-content .position6:hover{
+    width: 14px;
+    height: 14px;
+    left: 474px;
+    bottom: 122px;
+    background-size: 100% 100%;
+}
+.map .map-content .position6:hover .position1-box{
+    display: block;
+}
+/*云南昆明*/
+
+
+
+/*贵州贵阳*/
+.map .map-content .position7{
+    position: absolute;
+    left: 562px;
+    bottom: 155px;
+
+}
+
+.map .map-content .position7:hover{
+    width: 14px;
+    height: 14px;
+    left: 560px;
+    bottom: 153px;
+    background-size: 100% 100%;
+}
+.map .map-content .position7:hover .position1-box{
+    display: block;
+}
+/*贵州贵阳*/
+
+
+/*广西南宁*/
+.map .map-content .position8{
+    position: absolute;
+    left: 593px;
+    bottom: 68px;
+
+}
+
+.map .map-content .position8:hover{
+    width: 14px;
+    height: 14px;
+    left: 591px;
+    bottom: 67px;
+    background-size: 100% 100%;
+}
+.map .map-content .position8:hover .position1-box{
+    display: block;
+}
+/*广西南宁*/
+
+
+
+/*海南海口*/
+.map .map-content .position9{
+    position: absolute;
+    left: 628px;
+    bottom: -3px;
+
+}
+
+.map .map-content .position9:hover{
+    width: 14px;
+    height: 14px;
+    left: 626px;
+    bottom: -5px;
+    background-size: 100% 100%;
+}
+.map .map-content .position9:hover .position1-box{
+    display: block;
+}
+/*海南海口*/
+
+
+/*重庆*/
+.map .map-content .position10{
+    position: absolute;
+    left: 552px;
+    bottom: 228px;
+
+}
+
+.map .map-content .position10:hover{
+    width: 14px;
+    height: 14px;
+    left: 550px;
+    bottom: 227px;
+    background-size: 100% 100%;
+}
+.map .map-content .position10:hover .position1-box{
+    display: block;
+}
+/*重庆*/
+
+
+
+/*银川*/
+.map .map-content .position11{
+    position: absolute;
+    left: 558px;
+    top: 372px;
+
+}
+
+.map .map-content .position11:hover{
+    width: 14px;
+    height: 14px;
+    left: 556px;
+    top: 370px;
+    background-size: 100% 100%;
+}
+.map .map-content .position11:hover .position1-box{
+    display: block;
+}
+/*银川*/
+
+/*内蒙古呼和尔特*/
+.map .map-content .position12{
+    position: absolute;
+    right: 336px;
+    top: 321px;
+
+}
+
+.map .map-content .position12:hover{
+    width: 14px;
+    height: 14px;
+    right: 334px;
+    top: 319px;
+    background-size: 100% 100%;
+}
+.map .map-content .position12:hover .position1-box{
+    display: block;
+}
+/*内蒙古呼和尔特*/
+
+
+/*陕西西安*/
+.map .map-content .position13{
+    position: absolute;
+    right: 385px;
+    top: 471px;
+
+}
+
+.map .map-content .position13:hover{
+    width: 14px;
+    height: 14px;
+    right: 383px;
+    top: 469px;
+    background-size: 100% 100%;
+}
+.map .map-content .position13:hover .position1-box{
+    display: block;
+}
+
+/*陕西西安*/
+
+
+
+
+/*湖北武汉*/
+.map .map-content .position14{
+    position: absolute;
+    right: 275px;
+    top: 557px;
+
+}
+
+.map .map-content .position14:hover{
+    width: 14px;
+    height: 14px;
+
+    right: 273px;
+    top: 555px;
+    background-size: 100% 100%;
+}
+.map .map-content .position14:hover .position1-box{
+    display: block;
+}
+
+/*湖北武汉*/
+
+
+
+/*湖南长沙*/
+.map .map-content .position15{
+    position: absolute;
+    right: 306px;
+    bottom: 193px
+
+}
+
+.map .map-content .position15:hover{
+    width: 14px;
+    height: 14px;
+    right: 304px;
+    bottom: 191px;
+    background-size: 100% 100%;
+}
+.map .map-content .position15:hover .position1-box{
+    display: block;
+}
+
+/*湖南长沙*/
+
+
+
+
+/*广东广州*/
+.map .map-content .position16{
+    position: absolute;
+    right: 289px;
+    bottom: 80px;
+
+}
+
+.map .map-content .position16:hover{
+    width: 14px;
+    height: 14px;
+    right: 286px;
+    bottom: 78px;
+    background-size: 100% 100%;
+}
+.map .map-content .position16:hover .position1-box{
+    display: block;
+}
+
+/*广东广州*/
+
+
+
+
+
+/*香港*/
+.map .map-content .position17{
+    position: absolute;
+    right: 275px;
+    bottom: 55px;
+
+}
+
+.map .map-content .position17:hover{
+    width: 14px;
+    height: 14px;
+    right: 273px;
+    bottom: 53px;
+    background-size: 100% 100%;
+}
+.map .map-content .position17:hover .position1-box{
+    display: block;
+}
+
+
+/*香港*/
+
+
+/*澳门*/
+.map .map-content .position18{
+    position: absolute;
+    right: 304px;
+    bottom: 52px;
+
+}
+
+.map .map-content .position18:hover{
+    width: 14px;
+    height: 14px;
+    right: 302px;
+    bottom: 50px;
+    background-size: 100% 100%;
+}
+.map .map-content .position18:hover .position1-box{
+    display: block;
+}
+
+
+/*澳门*/
+
+
+/*台湾台北*/
+.map .map-content .position19{
+    position: absolute;
+    right: 126px;
+    bottom: 128px;
+
+}
+
+.map .map-content .position19:hover{
+    width: 14px;
+    height: 14px;
+    right: 124px;
+    bottom: 126px;
+    background-size: 100% 100%;
+}
+.map .map-content .position19:hover .position1-box{
+    display: block;
+}
+
+/*台湾台北*/
+
+
+
+/*福建福州*/
+.map .map-content .position20{
+    position: absolute;
+    right: 174px;
+    bottom: 151px;
+
+}
+
+.map .map-content .position20:hover{
+    width: 14px;
+    height: 14px;
+    right: 172px;
+    bottom: 149px;
+    background-size: 100% 100%;
+}
+.map .map-content .position20:hover .position1-box{
+    display: block;
+}
+/*福建福州*/
+
+
+
+/*江西南昌*/
+.map .map-content .position21{
+    position: absolute;
+    right: 243px;
+    bottom: 204px;
+
+}
+
+.map .map-content .position21:hover{
+    width: 14px;
+    height: 14px;
+    right: 241px;
+    bottom: 202px;
+    background-size: 100% 100%;
+}
+.map .map-content .position21:hover .position1-box{
+    display: block;
+}
+/*江西南昌*/
+
+
+/*河南郑州*/
+.map .map-content .position22{
+    position: absolute;
+    right: 298px;
+    bottom: 342px;
+
+}
+
+.map .map-content .position22:hover{
+    width: 14px;
+    height: 14px;
+    right: 296px;
+    bottom: 340px;
+    background-size: 100% 100%;
+}
+.map .map-content .position22:hover .position1-box{
+    display: block;
+}
+/*河南郑州*/
+
+
+
+
+/*山西太原*/
+.map .map-content .position23{
+    position: absolute;
+    right: 318px;
+    bottom: 414px;
+
+}
+
+.map .map-content .position23:hover{
+    width: 14px;
+    height: 14px;
+    right: 316px;
+    bottom: 412px;
+    background-size: 100% 100%;
+}
+.map .map-content .position23:hover .position1-box{
+    display: block;
+}
+/*山西太原*/
+
+
+/*河北石家庄*/
+.map .map-content .position24{
+    position: absolute;
+    right: 283px;
+    bottom: 424px;
+
+}
+
+.map .map-content .position24:hover{
+    width: 14px;
+    height: 14px;
+    right: 280px;
+    bottom: 422px;
+    background-size: 100% 100%;
+}
+.map .map-content .position24:hover .position1-box{
+    display: block;
+}
+/*河北石家庄*/
+
+
+/*北京*/
+
+.map-content .beijing{
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 250px;
+    bottom: 466px;
+    background: url("../img/wujiaoxing.png")no-repeat;
+    background-size: 100% 100%;
+
+}
+.map .map-content .beijing:hover{
+    width: 24px;
+    height: 24px;
+    right: 248px;
+    bottom: 464px;
+    background-size: 100% 100%;
+}
+.map .map-content .beijing .position1-box{
+    margin-left: 23px;
+}
+
+.map .map-content .beijing:hover .position1-box{
+    display: block;
+}
+/*北京*/
+
+
+
+/*天津*/
+.map .map-content .position26{
+    position: absolute;
+    right: 233px;
+    top: 353px;
+
+}
+
+.map .map-content .position26:hover{
+    width: 14px;
+    height: 14px;
+    right: 230px;
+    top: 351px;
+    background-size: 100% 100%;
+}
+.map .map-content .position26:hover .position1-box{
+    display: block;
+}
+/*天津*/
+
+
+/*辽宁沈阳*/
+.map .map-content .position27{
+    position: absolute;
+    right: 136px;
+    top: 281px;
+
+}
+
+.map .map-content .position27:hover{
+    width: 14px;
+    height: 14px;
+    right: 134px;
+    top: 279px;
+    background-size: 100% 100%;
+}
+.map .map-content .position27:hover .position1-box{
+    display: block;
+}
+/*辽宁沈阳*/
+
+
+/*吉林长春*/
+.map .map-content .position28{
+    position: absolute;
+    right: 114px;
+    top: 235px;
+
+}
+
+.map .map-content .position28:hover{
+    width: 14px;
+    height: 14px;
+    right: 112px;
+    top: 233px;
+    background-size: 100% 100%;
+}
+.map .map-content .position28:hover .position1-box{
+    display: block;
+}
+/*吉林长春*/
+
+
+
+/*黑龙江哈尔滨*/
+.map .map-content .position29{
+    position: absolute;
+    right: 102px;
+    top: 192px;
+
+}
+
+.map .map-content .position29:hover{
+    width: 14px;
+    height: 14px;
+    right: 100px;
+    top: 190px;
+    background-size: 100% 100%;
+}
+.map .map-content .position29:hover .position1-box{
+    display: block;
+}
+/*黑龙江哈尔滨*/
+
+
+/*山东济南*/
+.map .map-content .position30{
+    position: absolute;
+    right: 233px;
+    bottom: 391px;
+}
+
+.map .map-content .position30:hover{
+    width: 14px;
+    height: 14px;
+    right: 231px;
+    bottom: 390px;
+    background-size: 100% 100%;
+}
+.map .map-content .position30:hover .position1-box{
+    display: block;
+}
+/*山东济南*/
+
+
+/*安徽合肥*/
+.map .map-content .position31{
+    position: absolute;
+    right: 221px;
+    bottom: 283px;
+
+}
+
+.map .map-content .position31:hover{
+    width: 14px;
+    height: 14px;
+    right: 219px;
+    bottom: 281px;
+    background-size: 100% 100%;
+}
+.map .map-content .position31:hover .position1-box{
+    display: block;
+}
+/*安徽合肥*/
+
+
+/*江苏南京*/
+.map .map-content .position32{
+    position: absolute;
+    right: 185px;
+    bottom: 281px;
+
+}
+
+.map .map-content .position32:hover{
+    width: 14px;
+    height: 14px;
+    right: 182px;
+    bottom: 280px;
+    background-size: 100% 100%;
+}
+.map .map-content .position32:hover .position1-box{
+    display: block;
+}
+/*江苏南京*/
+
+
+
+/*上海*/
+.map .map-content .position33{
+    position: absolute;
+    right: 138px;
+    bottom: 270px;
+    width: 16px;
+    height: 16px;
+
+}
+
+.map .map-content .position33:hover{
+    /*width: 16px;*/
+    /*height: 16px;*/
+    /*right: 140px;*/
+    /*bottom: 273px;*/
+    /*background-size: 100% 100%;*/
+}
+.map .map-content .position33:hover .position1-box{
+    display: block;
+}
+/*上海*/
+
+
+/*浙江杭州*/
+.map .map-content .position34{
+    position: absolute;
+    right: 169px;
+    bottom: 247px;
+
+}
+
+.map .map-content .position34:hover{
+    width: 14px;
+    height: 14px;
+    right: 167px;
+    bottom: 245px;
+    background-size: 100% 100%;
+}
+.map .map-content .position34:hover .position1-box{
+    display: block;
+}
+/*浙江杭州*/
+
+
 /*底部内容*/
 .footer{
     min-width: 1170px;
@@ -1718,13 +2578,6 @@ ul li {
 }
 
 
-
-
-
-
-
-
-
 .footer-b-c{
     height: 59px;
     line-height: 59px;
@@ -1768,21 +2621,6 @@ ul li {
     color: #fff;
 }
   /*底部内容*/
-
-
-.gd-nav{
-    position: fixed;
-    top: 86%;
-    right: 2%;
-
-    width: 44px;
-    height: 176px;
-
-    z-index: 99;
-
-}
-
-
 
 
 .gd-nav{
@@ -1903,7 +2741,7 @@ ul li {
 
     background: rgba(0,0,0,0.5);
     margin: auto;
-    z-index: 20;
+    z-index: 101;
 
 }
 

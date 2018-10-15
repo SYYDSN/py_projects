@@ -1,0 +1,37 @@
+{% extends "template.html" %}
+
+{% block css %}
+   <link rel="stylesheet" href="/static/css/root/root_login.css">
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row first_row">
+        <div class="col-lg-4 col-lg-offset-4 col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12 outer">
+            <div class="inner">
+                <div class="line">
+                    <h4>管理员登录</h4>
+                </div>
+                <div class="line">
+                    <label for="user_name">账户:</label>
+                    <input type="text" id="user_name">
+                </div>
+                <div class="line">
+                    <label for="password">密码:</label>
+                    <input type="password" id="password">
+                </div>
+                <div class="line">
+                    <button type="button" class="btn btn-primary" id="sub_btn">
+                        提交
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/jquery.md5.js"></script>
+    <script src="/static/js/root/root_login.js"></script>
+{% endblock %}

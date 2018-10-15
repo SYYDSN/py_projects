@@ -125,6 +125,38 @@
 
 
 
+//短信验证码倒计时
+
+    // var clock = '';
+    // var nums = 60;
+    // var btn;
+    // var col="#bbb";
+    // function sendCode(thisBtn)
+    // {
+    //     btn = thisBtn;
+    //     btn.disabled = true; //将按钮置为不可点击
+    //     btn.style.background= col; //将按钮置为不可点击
+    //     btn.value = nums+'秒后可重新获取';
+    //     clock = setInterval(doLoop, 1000); //一秒执行一次
+    // }
+    // function doLoop()
+    // {
+    //     nums--;
+    //     if(nums > 0){
+    //         btn.value = nums+'秒后可重新获取';
+    //     }else{
+    //         clearInterval(clock); //清除js定时器
+    //         btn.disabled = false;
+    //         btn.style.background=""
+    //         btn.value = '点击发送验证码';
+    //         nums = 60; //重置时间
+    //     }
+    // }
+
+
+
+
+
 var con=document.getElementsByName("color");
 
 console.log(con);
@@ -190,7 +222,6 @@ su_login2.onclick=function(){//点击底部快速注册标签
 
 
 //点击注册显示弹窗
-
 var regis=document.getElementById("res");//获取注册按钮标签
 var reg=document.getElementById("reg");//获取注册盒子标签
 function Res(){
@@ -199,28 +230,41 @@ function Res(){
     reg_box2.style.display="none";//登录盒子内容隐藏
     Resgi.style.display="block";//注册标题显示
     Logi.style.display="none"//登录标题隐藏
-
 }
 regis.onclick=Res; //点击注册按钮
 
 var guanbi=document.getElementById("guanbi")//获取关闭登录注册盒子标签
 guanbi.onclick=function(){
+    $(document).unbind("scroll.unable");//点击关闭按钮移除滚动条禁止函数
     reg.style.display="none"//点击关闭按钮  关闭登录注册盒子标签
 }
 
 
 var regis2=document.getElementById("res2");//获取下拉导航注册按钮
 function Res2(){
+    unScroll()//调用禁止滚动条滚动函数
     reg.style.display="block";//注册登录盒子内容显示
     reg_box.style.display="block";//注册内容盒子显示
     reg_box2.style.display="none";//登录内容盒子隐藏
     Resgi.style.display="block";//注册标题显示
     Logi.style.display="none"//登录标题隐藏
 }
+
+//禁止滚动条滚动函数
+function unScroll() {
+    var top = $(document).scrollTop();
+    $(document).on('scroll.unable',function (e) {
+        $(document).scrollTop(top);
+    })
+}
+
+
+
 regis2.onclick=Res2 //点击下拉导航注册按钮标签
 
 var logins=document.getElementById("login");//获取登录按钮
 function Log(){
+
     reg.style.display="block";//注册登录盒子内容显示
     reg_box2.style.display="block";//登录内容显示
     reg_box.style.display="none";//注册内容隐藏
@@ -234,6 +278,7 @@ logins.onclick=Log;//点击下拉导航登录按钮
 var logins2=document.getElementById("login2");//获取下拉导航登录按钮
 
 function Log2(){
+    unScroll()
     reg.style.display="block";//注册登录盒子内容显示
     reg_box2.style.display="block";//登录内容显示
     reg_box.style.display="none"//注册内容隐藏
@@ -245,18 +290,10 @@ logins2.onclick=Log2;//点击下拉导航登录按钮
 
 
 
-
-
-
-
-
-
-
-
 //联系我们跳转js
-var lx=document.getElementById("lx");
+var lx=document.getElementById("lx");//获取标签
 lx.onclick=function(){
-    location.href="about.html"
+    location.href="about.html"//跳转about.html文件
 };
 
 //点击回到头部
@@ -274,6 +311,8 @@ function D(em){
     }
 }
 D(document.getElementById("gd-nav-top-hide"));
+
+
 
 
 /*固定导航*/
@@ -313,6 +352,12 @@ D(document.getElementById("gd-nav-top-hide"));
 //gd_nav_jd.onmouseout=function(){
 //    jd_hide.style.display="none"
 //};
+
+
+
+
+
+
 
 
 //滚到指定位置出现返回向上按钮
@@ -680,10 +725,11 @@ function aftLoadImg(obj, url) {
     oImg.src = url; //oImg对象先下载该图像
 }
 
+
 var validate_phone = function (phone) {
     /*
-    * 检查手机号码是否合法?合法返回真,
-    * */
+     * 检查手机号码是否合法?合法返回真,
+     * */
     var myreg = /^(((1[3-9][0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
     if (myreg.test(phone)) {
         return true;
@@ -722,9 +768,9 @@ $("#v_container").click(function(){
 
         function sendCode()
         {
-           v_container.disabled = true; //将按钮置为不可点击
-           v_container.style.background= col; //将按钮置为不可点击
-           v_container.value = nums+'秒后可重新获取';
+            v_container.disabled = true; //将按钮置为不可点击
+            v_container.style.background= col; //将按钮置为不可点击
+            v_container.value = nums+'秒后可重新获取';
             clock = setInterval(doLoop, 1000); //一秒执行一次
         }
         function doLoop()
@@ -832,6 +878,20 @@ $("#su_mit2").click(function(){
         });
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*/!*轮播*!/
 var arrimg = ['img/9.JPG', 'img/2.jpg', 'img/3.jpg', 'img/4.JPG', 'img/5.JPG', 'img/6.jpg']
