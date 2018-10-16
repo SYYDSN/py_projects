@@ -15,6 +15,8 @@ from werkzeug.contrib.cache import SimpleCache
 from module.pickle_data import calculate_win_per_by_teacher_mix
 import dicttoxml
 import xmltodict
+from pymongo import WriteConcern
+from pymongo.collection import ReturnDocument
 from xml.parsers.expat import ExpatError
 
 
@@ -743,18 +745,34 @@ class WXUser(mongo_db.BaseDoc):
         mes = {"message": "取消跟踪失败"}
         user = cls.find_by_id(o_id=user_id, to_dict=True)
         if isinstance(user, dict):
-            f = {"_id": user['_id']}
+            user_id = user['_id']
+            f = {"_id": user_id}
             u = {"$set": {"follow": []}}
-            r = cls.find_one_and_update_plus(filter_dict=f, upsert=False, update_dict=u)
-            if r is None:
-                mes['message'] = "保存数据失败"
-            else:
-                mes['message'] = "success"
+            db = mongo_db.get_client()
+            con1 = mongo_db.get_conn(table_name=cls.get_table_name(), db_client=db)
+            con2 = mongo_db.get_conn(table_name=FollowRecord.get_table_name(), db_client=db)
+            w = WriteConcern(w=1, j=True)
+            with db.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction():
+                    r = con1.find_one_and_update(filter=f, upsert=False, update=u, return_document=ReturnDocument.AFTER,
+                                                 session=ses)
+                    if r is None or len(r['follow']) > 0:
+                        mes['message'] = "保存数据失败"
+                    else:
+                        f2 = {"user_id": user_id, "end": {"$exists": False}}
+                        u2 = {"$set": {"end": datetime.datetime.now()}}
+                        r2 = con2.find_one_and_update(filter=f2, upsert=True, update=u2,
+                                                      return_document=ReturnDocument.AFTER, session=ses)
+                        if r2 is None or not isinstance(r2.get("end"), datetime.datetime):
+                            mes['message'] = "保存record失败"
+                        else:
+                            mes['message'] = "success"
         else:
             ms = "错误的用户id: {}".format(user_id)
             logger.exception(msg=ms)
             print(ms)
             mes['message'] = "用户id错误"
+        return mes
 
     @classmethod
     def follow(cls, user_id: (str, ObjectId), t_id: (str, ObjectId)) -> dict:

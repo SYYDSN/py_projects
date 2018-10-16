@@ -275,14 +275,14 @@ def wx_js_api_demo(user: dict = None):
     return render_template("wx_js_api_demo.html")
 
 
-@check_platform_session
+# @check_platform_session
 def common_view_func(user: dict = None, html_name: str = ""):
     """
     通用页面视图
     param html_name:  html文件名,包含目录路径
     :return:
     """
-    user = WXUser.find_by_id(o_id=ObjectId("5b57a770f313841fc0effef7"), to_dict=True) if user is None else user
+    user = WXUser.find_by_id(o_id=ObjectId("5b6804a6c5aee8250b3e47fa"), to_dict=True) if user is None else user
     print("user: {}".format(user))
     template_dir = os.path.join(__project_dir__, 'templates', 'wx')
     file_names = os.listdir(template_dir)
@@ -348,7 +348,7 @@ def common_view_func(user: dict = None, html_name: str = ""):
         return abort(404)
 
 
-@check_platform_session
+# @check_platform_session
 def follow_teacher(user: dict = None):
     """
     跟随和反跟随老师
@@ -356,7 +356,7 @@ def follow_teacher(user: dict = None):
     """
 
     mes = {"message": "未知的错误"}
-    user = WXUser.find_by_id(o_id=ObjectId("5b57a770f313841fc0effef7"), to_dict=True) if user is None else user
+    user = WXUser.find_by_id(o_id=ObjectId("5b6804a6c5aee8250b3e47fa"), to_dict=True) if user is None else user
     phone = user.get("phone")
     if phone is None:
         mes['message'] = "请先绑定手机号码"

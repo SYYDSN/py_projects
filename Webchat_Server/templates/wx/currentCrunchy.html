@@ -222,7 +222,13 @@
                     </ul>
                 </div>
                 <div class="crunchy-btn">
-                    <button type="button" id="follow_btn" data-follow="{{ follow }}" class="button-link">跟踪高手</button>
+                    <button type="button" id="follow_btn" data-follow="{{ follow }}" class="button-link">
+                        {% if t_id == follow[0] %}
+                            取消跟踪
+                        {% else %}
+                            跟踪高手
+                        {% endif %}
+                    </button>
                 </div>
             </div>
         </div>

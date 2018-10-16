@@ -257,6 +257,7 @@ class Teacher(mongo_db.BaseDoc):
         p = ["_id", "name", "head_img"]
         ts = cls.find_plus(filter_dict=f, projection=p, to_dict=True)
         t_ids = [x['_id'] for x in ts]
+        t_ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
         ses = mongo_db.get_conn(table_name="wx_user")
         m = {"$match": {"follow": {"$elemMatch": {"$in": t_ids}}}}
         u = {"$unwind": "$follow"}
