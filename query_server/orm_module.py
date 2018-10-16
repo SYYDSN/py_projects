@@ -25,6 +25,7 @@ from pymongo import WriteConcern
 from pymongo.collection import Collection
 from log_module import get_logger
 from pymongo import ReturnDocument
+from pymongo.results import InsertOneResult
 import gridfs
 from pymongo.errors import *
 import warnings
@@ -91,18 +92,18 @@ def get_client() -> pymongo.MongoClient:
     return mongo_client
 
 
-def get_db(database: str = None):
+def get_schema(database: str = None):
     """
     获取一个针对db_name对应的数据库的的连接，一般用于ORM方面。比如构建一个类。
     :param database: 数据库名
     :return: 一个Database对象。
     """
-    mongodb_conn = get_client()
+    db_client = get_client()
     if database is None:
-        data_base = mongodb_conn[db_name]
+        schema = db_client[db_name]
     else:
-        data_base = mongodb_conn[database]
-    return data_base
+        schema = db_client[database]
+    return schema
 
 
 def get_conn(table_name: str, database: str = None, db_client: pymongo.MongoClient = None,
@@ -134,7 +135,7 @@ def get_conn(table_name: str, database: str = None, db_client: pymongo.MongoClie
     else:
         cur_db_name = database if database else db_name
         if db_client is None:
-            cur_db = get_db(cur_db_name)
+            cur_db = get_schema(cur_db_name)
         else:
             cur_db = db_client[cur_db_name]
         conn = cur_db[table_name]
@@ -155,6 +156,35 @@ def get_conn(table_name: str, database: str = None, db_client: pymongo.MongoClie
         return conn
 
 
+def collection_exists(database_name: str = None, table_name: str = None, auto_create: bool = False) -> bool:
+    """
+    根据表名检查一个表是否存在?
+    :param database_name:
+    :param table_name:
+    :param auto_create: 如果表不存在,是否自动创建表?
+    :return:
+    """
+    if isinstance(table_name, str) and table_name.strip() != '':
+        table_name = table_name.strip()
+        database_name = db_name if database_name is None else database_name
+        database = get_client()
+        schema = database[database_name]
+        names = schema.list_collection_names()
+        if table_name in names:
+            return True
+        else:
+            if auto_create:
+                col = Collection(database=schema, name=table_name, create=True)
+                if isinstance(col, Collection):
+                    return True
+                else:
+                    raise RuntimeError("创建Collection失败, table_name={}".format(table_name))
+            else:
+                return False
+    else:
+        raise ValueError("表名错误: {}".format(table_name))
+
+
 def get_fs(table_name: str, database: str = None) -> gridfs.GridFS:
     """
     获取一个GridFS对象
@@ -162,7 +192,7 @@ def get_fs(table_name: str, database: str = None) -> gridfs.GridFS:
     :param database: 数据库名
     :return:
     """
-    return gridfs.GridFS(database=get_db(database), collection=table_name)
+    return gridfs.GridFS(database=get_schema(database), collection=table_name)
 
 
 def expand_list(set_list: (list, tuple)) -> list:
@@ -684,6 +714,47 @@ class MyCache:
             return
 
 
+class GrantAuthorizationInfo:
+    """
+        需要身份授权的对象的表的容器
+    """
+    _table_name = "grant_authorization_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['table_name'] = str  # 表名
+
+    collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
+
+    @classmethod
+    def register(cls, table_name: str) -> None:
+        """
+        注册需要身份验证的表
+        :param table_name:
+        :return:
+        """
+        db_client = get_client()
+        col = get_conn(table_name=cls._table_name, db_client=db_client)
+        w = WriteConcern(w='majority', j=1)
+        with db_client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=w):
+                f = {"table_name": table_name}
+                r = col.find_one(filter=f)
+                if r is None:
+                    r2 = col.insert_one(document=f)
+                    if isinstance(r2, InsertOneResult) and isinstance(r2.inserted_id, ObjectId):
+                        pass  # 成功
+                    else:
+                        raise RuntimeError("注册需要身份验证的表没有正确返回.请检查")
+
+    @classmethod
+    def un_register(cls, table_name: str) -> None:
+        """
+        反注册需要身份验证的表
+        :param table_name:
+        :return:
+        """
+
+
 class BaseFile:
     """
     保存文件到mongodb数据库的GridFS操作基础类,
@@ -1016,6 +1087,11 @@ class BaseDoc:
     """
 
     __authentication = False  # 是否需要检查访问者权限?
+
+    if __authentication:
+        GrantAuthorizationInfo.register(table_name=_table_name)
+    else:
+        GrantAuthorizationInfo.un_register(table_name=_table_name)
 
     def table_name(self) -> str:
         """获取表名"""
@@ -2081,6 +2157,24 @@ class BaseDoc:
             "pages": pages
         }
         return resp
+
+
+class GrantAuthorizationInfo(BaseDoc):
+    """
+        需要身份授权的对象的表的容器
+    """
+    _table_name = "grant_authorization_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['table_name'] = str  # 表名
+
+    @classmethod
+    def register(cls, table_name: str) -> None:
+        """
+        注册需要身份验证的表
+        :param table_name:
+        :return:
+        """
 
 
 """
