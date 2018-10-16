@@ -332,6 +332,6 @@ class Identity:
 
 
 if __name__ == "__main__":
-    # User.add_user(user_name="proot2", user_password="P@root1234", group="admin", nick_name="系统管理员")
-    Identity.user_login('proot', md5('P@root1234'.encode()).hexdigest())
+    User.add_user(user_name="proot", user_password="P@root1234", group="admin", nick_name="系统管理员")
+    # Identity.user_login('proot', md5('P@root1234'.encode()).hexdigest())
     pass

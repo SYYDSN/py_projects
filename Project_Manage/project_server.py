@@ -809,7 +809,7 @@ def home_func(key1, key2):
                         x['children'] = item
                 c_list = [{"_id": x['_id'], "name": x['name'], "children": list() if c_p_dict.get(x['_id']) is None
                 else c_p_dict[x['_id']]} for x in categories]
-                tree_dict = {"name": "苏秦网络", "children": c_list}  # 产品架构树
+                tree_dict = {"name": "必弘信息", "children": c_list}  # 产品架构树
                 """ 求下个月第一天"""
                 next_month_first = get_datetime_from_str("{}-{}-{}".format(year, month, last_day)) + \
                                    datetime.timedelta(days=1)
