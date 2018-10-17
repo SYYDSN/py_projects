@@ -113,7 +113,7 @@ def process_praise(**kwargs) -> None:
             print("text = {}".format(text))
             markdown_doc['text'] = text
             data['markdown'] = markdown_doc
-            token_name = '努力拼搏 入金宣传表'
+            token_name = '入金宣传'
             send_signal(send_data=data, token_name=token_name)
         else:
             """发送钉订失败"""

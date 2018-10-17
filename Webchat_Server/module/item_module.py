@@ -44,7 +44,6 @@ class XMLMessage:
     def __init__(self, to_user: str):
         """
         :param to_user: 目标用户的openid
-        :param mes_type: 消息类型
         """
         xml = OrderedDict()
         xml['ToUserName'] = to_user
@@ -53,9 +52,39 @@ class XMLMessage:
         self.xml = xml
 
     def add_text(self, content: str = ""):
+        """添加文本消息"""
         xml = self.xml
         xml['MsgType'] = 'text'
         xml['Content'] = content
+        return xml
+
+    def add_news(self, item_list: list = None):
+        """
+        添加图文消息
+        :param item_list: 图文对象的字典的数组.第一个图文对象是大图.图文对象的格式如下:
+        item = {
+                    "Title": "标题",
+                    "Description": "文本描述",
+                    "PicUrl": "图片素材的地址,支持JPG、PNG格式，较好的效果为大图360*200，小图200*200",
+                    "Url": "点击图文消息跳转链接"
+                }
+        :return:
+        """
+        xml = self.xml
+        xml['MsgType'] = 'news'
+        xml['ArticleCount'] = len(item_list)
+        r = list()
+        if item_list is None:
+            xml['ArticleCount'] = 0
+        else:
+            for x in item_list:
+                temp = OrderedDict()
+                temp['Title'] = x['title']
+                temp['Description'] = x['desc']
+                temp['PicUrl'] = x['img_url']
+                temp['Url'] = x['url']
+                r.append(temp)
+        xml['Articles'] = r
         return xml
 
     @classmethod
@@ -74,8 +103,16 @@ class XMLMessage:
             res = obj.__getattribute__(func_name)(data)
             r = OrderedDict()
             r['xml'] = res
+
             if to_xml:
-                return dicttoxml.dicttoxml(obj=r, root=False, attr_type=False, cdata=True)
+                r = dicttoxml.dicttoxml(obj=r, root=False, attr_type=False, cdata=True)
+                if msg_type == "news" and len(data) > 1:
+                    """满足图文消息恢复格式不对int类型包裹cdata的要求"""
+                    l = len(data)
+                    b1 = "<ArticleCount><![CDATA[{}]]></ArticleCount>".format(l)
+                    b2 = "<ArticleCount>{}</ArticleCount>".format(l)
+                    r.replace(b1.encode(), b2.encode())
+                return r
             else:
                 return r
         else:
@@ -162,6 +199,10 @@ class EventHandler:
                     f = {"openid": openid}
                     u = {"$set": {"subscribe": 1}}
                     WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+                    # 文本不能换行
+                    data = "你好，欢迎关注汇赢智能！ \n 独立创新的智能交易平台，为用户提供全球先进的跟随交易系统以及优质的信号源；完善风控体系，让科技颠覆收益，让智能负责收益！"
+                    data = "你好，欢迎关注汇赢智能！ \n 独立创新的智能交易平台,为用户提供全球先进的跟随交易系统以及优质的信号源;完善风控体系,让科技颠覆收益,让智能负责收益!"
+                    res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
                 elif event == "unsubscribe":
                     """取消关注"""
                     ms = "用户: {} 取消关注".format(openid)
@@ -174,6 +215,14 @@ class EventHandler:
                     """扫码"""
                     event_key = xml['EventKey']  # 场景id
                     print("event_key is {}".format(event_key))
+                    if event_key == "456":
+                        """扫码关注公众号"""
+                        ms = "{}扫码关注公众号".format(openid)
+                        logger.info(msg=ms)
+                    else:
+                        title = "{} 未意料的扫码事件消息:{}.{}".format(now, msg_type, event_key)
+                        content = "{}".format(str(info))
+                        send_mail(title=title, content=content)
                 elif event == "view":
                     """点击菜单"""
                 elif event == "templatesendjobfinish":
@@ -186,10 +235,13 @@ class EventHandler:
             elif msg_type == "text":
                 """文本消息"""
                 s = xml['Content']
-                print(" 你输入的内容是: '{}'".format(s))
+                data = " 你输入的内容是: '{}'".format(s)
+                print(data)
                 if s == "喊单":
                     """回复老师喊单登录的链接"""
                     data = "芝麻开门. <a href='http://wx.yataitouzigl.com/teacher/login.html'>分析师登录入口</a>"
+                    res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
+                else:
                     res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
             elif msg_type == "image":
                 """图片消息"""

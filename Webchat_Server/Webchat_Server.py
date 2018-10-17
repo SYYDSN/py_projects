@@ -201,7 +201,23 @@ def message_func():
         else:
             return abort(403)
     elif request.method.lower() == "post":
-        """微信服务器推送的消息,为新服务器推送来的都是xml消息"""
+        """
+        微信服务器推送的消息,为新服务器推送来的都是xml消息
+        同时args里面也有参数
+        xml的内容取出后是一个有序字典:
+        OrderedDict([('xml',
+          OrderedDict([('ToUserName', 'gh_134657758ddf'),
+                       ('FromUserName', 'oBBcR1T5r6FCqOo2WNxMqPUqvK_I'),
+                       ('CreateTime', '1532479965'),
+                       ('MsgType', 'event'),
+                       ('Event', 'SCAN'),
+                       ('EventKey', '123'),
+                       ('Ticket',
+                        'gQHB8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAybmhTSjBKNG5jaGwxMDAwMHc
+                        wM0wAAgQYwlZbAwQAAAAA')]))])
+        
+        """
+        """对微信服务器推送的消息进行处理"""
         info = WebChatMessage.instance_from_request(request)
         resp = EventHandler.listen(info=info)
         if resp == b'':

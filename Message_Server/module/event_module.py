@@ -48,7 +48,7 @@ class PlatformEvent(BaseDoc):
         获取需要用钉钉机器人发送的消息，字典格式
         title 是要发送的消息的标题。共5种： 待审核客户，出金申请，入金申请，出金成功，入金成功
         text 是要发送的消息的内容字典和token，是符合markdown语法的字符串。
-        :param test_mode: 是否打开测试模式？
+        :param test_mode: 是否打开测试模式？ 打开后会在消息里显示'测试消息'字样
         :return:
         """
         data = dict()
@@ -95,18 +95,19 @@ class PlatformEvent(BaseDoc):
             ms = "错误的实例对象：{}".format(str(self.get_dict()))
             logger.exception(ms)
             print(ms)
-        name_map = {
-            "出金提醒": "客户消息通知群 消息助手",
-            "入金成功": "客户消息通知群 消息助手",
-            "提交入金": "努力拼搏 消息助手",
-            "待审核客户": "努力拼搏 消息助手"
-        }
-        if title not in name_map:
-            ms = "错误的title:{}".format(title)
-            logger.exception(ms)
-        else:
-            robot_name = name_map[title]
-            return {"robot_name": robot_name, "args": data}
+        return {"sales": p if isinstance(p, str) else str(p), "args": data}
+        # name_map = {
+        #     "出金提醒": "客户消息通知群 消息助手",
+        #     "入金成功": "客户消息通知群 消息助手",
+        #     "提交入金": "努力拼搏 消息助手",
+        #     "待审核客户": "努力拼搏 消息助手"
+        # }
+        # if title not in name_map:
+        #     ms = "错误的title:{}".format(title)
+        #     logger.exception(ms)
+        # else:
+        #     robot_name = name_map[title]
+        #     return {"robot_name": robot_name, "args": data}
 
     def send_message(self, test_mode: bool = False) -> bool:
         """
@@ -114,15 +115,35 @@ class PlatformEvent(BaseDoc):
         :param test_mode: 是否打开测试模式？
         :return: 是否发送成功？
         """
+        res = False
         resp = self.get_message_dict(test_mode=test_mode)
         markdown = resp['args']
         # robot_name = resp['robot_name']
+        """1. 发送到努力拼搏群"""
         robot_name = "努力拼搏 消息助手"
         data = dict()
         data['msgtype'] = "markdown"
         data['markdown'] = markdown
         data['at'] = {'atMobiles': [], 'isAtAll': False}
-        res = send_signal(send_data=data, token_name=robot_name)
+        res1 = send_signal(send_data=data, token_name=robot_name)
+        """2. 发送分组消息"""
+        sales = resp['sales']
+        robot_name2 = None
+        if sales.startswith("001"):
+            robot_name2 = "group_001"
+        elif sales.startswith("002"):
+            robot_name2 = "group_002"
+        elif sales.startswith("005"):
+            robot_name2 = "group_005"
+        else:
+            pass
+        if robot_name2 is None:
+            ms = "未意料的销售人员前缀,sales={}".format(sales)
+            logger.exception(ms)
+            res2 = True
+        else:
+            res2 = send_signal(send_data=data, token_name=robot_name2)
+        res = res1 and res2
         return res
 
 
@@ -144,14 +165,14 @@ if __name__ == "__main__":
     """测试发送消息"""
     init_args = {
         "_id" : ObjectId("5b3ee960a7a75160e480ed06"),
-        "user_parent_name" : "陈红兵",
+        "user_parent_name" : "001002",
         "time" : get_datetime_from_str("2018-07-06T12:00:31.000Z"),
         "status" : "审核已通过",
         "mt4_account" : "200370",
         "money" : -100.0,
-        "user_name" : "李梦薇",
+        "user_name" : "张三",
         "order" : "1576",
-        "title" : "出金处理"
+        "title" : "提交入金"
     }
     obj = PlatformEvent(**init_args)
     obj.send_message(test_mode=True)
