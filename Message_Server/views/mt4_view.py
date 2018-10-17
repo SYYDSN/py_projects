@@ -135,7 +135,8 @@ def mes_func(key) -> str:
                                             send_result = obj.send_message()  # 发送钉钉消息
                                         except Exception as e:
                                             t = "{} mt4_view模块发送钉钉消息失败".format(datetime.datetime.now())
-                                            send_mail(title=t)
+                                            content = "init: {}, error: {}".format(init, e)
+                                            send_mail(title=t, content=content)
                                             logger.exception(e)
                                         finally:
                                             if not send_result:

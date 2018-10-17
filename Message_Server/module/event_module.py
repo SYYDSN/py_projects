@@ -127,6 +127,7 @@ class PlatformEvent(BaseDoc):
         data['at'] = {'atMobiles': [], 'isAtAll': False}
         res1 = send_signal(send_data=data, token_name=robot_name)
         """2. 发送分组消息"""
+        res2 = True
         if "金" in resp['title']:
             """出入金相关的"""
             sales = resp['sales']
@@ -146,7 +147,7 @@ class PlatformEvent(BaseDoc):
             else:
                 res2 = send_signal(send_data=data, token_name=robot_name2)
         else:
-            res2 = True
+            pass
         res = res1 and res2
         return res
 

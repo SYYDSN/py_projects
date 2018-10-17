@@ -7,29 +7,28 @@ import warnings
 import datetime
 import calendar
 import hashlib
+import functools
 from flask import request
 from uuid import uuid4
 from bson.objectid import ObjectId
+from bson.dbref import DBRef
 from bson.code import Code
 from bson.errors import InvalidId
-from bson.dbref import DBRef
 from bson.son import SON
 from bson.binary import Binary
 import numpy as np
 import re
 import math
-from pymongo import errors
 from pymongo.client_session import ClientSession
 from werkzeug.contrib.cache import RedisCache
+from werkzeug.contrib.cache import SimpleCache
 from pymongo import WriteConcern
 from pymongo.collection import Collection
 from log_module import get_logger
 from pymongo import ReturnDocument
-from pymongo.results import InsertOneResult
+from pymongo.results import *
 import gridfs
 from pymongo.errors import *
-import warnings
-from pymongo.errors import DuplicateKeyError
 
 
 """
@@ -37,7 +36,8 @@ MongoDB4+ 的持久化类   2018-10-11
 """
 
 
-cache = RedisCache()
+cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设置决定
+s_cache = SimpleCache()      # 使用内存的缓存,重启/关机就清空了.
 logger = get_logger()
 # user = "test_root"              # 数据库用户名
 # password = "Test@1314"       # 数据库密码
@@ -714,47 +714,6 @@ class MyCache:
             return
 
 
-class GrantAuthorizationInfo:
-    """
-        需要身份授权的对象的表的容器
-    """
-    _table_name = "grant_authorization_info"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    type_dict['table_name'] = str  # 表名
-
-    collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
-
-    @classmethod
-    def register(cls, table_name: str) -> None:
-        """
-        注册需要身份验证的表
-        :param table_name:
-        :return:
-        """
-        db_client = get_client()
-        col = get_conn(table_name=cls._table_name, db_client=db_client)
-        w = WriteConcern(w='majority', j=1)
-        with db_client.start_session(causal_consistency=True) as ses:
-            with ses.start_transaction(write_concern=w):
-                f = {"table_name": table_name}
-                r = col.find_one(filter=f)
-                if r is None:
-                    r2 = col.insert_one(document=f)
-                    if isinstance(r2, InsertOneResult) and isinstance(r2.inserted_id, ObjectId):
-                        pass  # 成功
-                    else:
-                        raise RuntimeError("注册需要身份验证的表没有正确返回.请检查")
-
-    @classmethod
-    def un_register(cls, table_name: str) -> None:
-        """
-        反注册需要身份验证的表
-        :param table_name:
-        :return:
-        """
-
-
 class BaseFile:
     """
     保存文件到mongodb数据库的GridFS操作基础类,
@@ -1043,7 +1002,7 @@ class BaseFile:
         }
         args = {k: v for k, v in args.items() if v is not None}
         """开始计算分页数据"""
-        record_count = ses.count(filter=filter_dict)
+        record_count = ses.count_documents(filter=filter_dict)
         page_count = math.ceil(record_count / page_size)  # 共计多少页?
         delta = int(ruler / 2)
         range_left = 1 if (page_index - delta) <= 1 else page_index - delta
@@ -1085,13 +1044,6 @@ class BaseDoc:
     """定义表名，需要在子类中被重写
     _table_name = "table_name"  
     """
-
-    __authentication = False  # 是否需要检查访问者权限?
-
-    if __authentication:
-        GrantAuthorizationInfo.register(table_name=_table_name)
-    else:
-        GrantAuthorizationInfo.un_register(table_name=_table_name)
 
     def table_name(self) -> str:
         """获取表名"""
@@ -1215,7 +1167,7 @@ class BaseDoc:
             inserted_id = ses.insert_one(insert_dict).inserted_id
             if self._id is None and isinstance(inserted_id, ObjectId):
                 self._id = inserted_id
-        except errors.DuplicateKeyError as e:
+        except DuplicateKeyError as e:
             error_key = ""
             for x in self.type_dict.keys():
                 if x in e.details['errmsg']:
@@ -1713,84 +1665,19 @@ class BaseDoc:
                 return cls(**result)
 
     @classmethod
-    def find(cls, to_dict: bool = False, **kwargs)->(list, None):
-        """根据条件查找对象,返回多个对象的实例
-         :param to_dict: True,返回的是字典的数组，False，返回的是实例的数组
-         :return : list
-        """
-        table_name = cls._table_name
-        ses = get_conn(table_name=table_name)
-        args = dict()
-        for k, v in kwargs.items():
-            if k == "_id":
-                if isinstance(v, str):
-                    try:
-                        object_id = get_obj_id(v)
-                        args[k] = object_id
-                    except TypeError as e:
-                        print(e)
-                        raise TypeError("ObjectId转换失败.val:{}".format(v))
-                elif isinstance(v, ObjectId):
-                    args[k] = v
-                else:
-                    raise TypeError("{} 不能转换成ObjectId".format(v))
-            else:
-                args[k] = v
-        result = ses.find(args)
-        if result is None:
-            return result
-        else:
-            if to_dict:
-                pass
-            else:
-                result = [cls(**x) for x in result]
-            return result
-
-    @classmethod
-    def find_plus(cls, filter_dict: dict, sort_dict: dict = None, skip: int = None, limit: int = None,
-                  projection: list = None, to_dict: bool = False, can_json=False) -> (list, None):
+    def find(cls, can_json=False, *args, **kwargs) -> list:
         """
         find的增强版本,根据条件查找对象,返回多个对象的实例
-        :param filter_dict:   过滤器,筛选条件.
-        :param sort_dict:     排序字典. 比如: {"time": -1}  # -1表示倒序,注意排序字典参数的处理
-        :param skip:          跳过多少记录.
-        :param limit:         输出数量限制.
-        :param projection:    投影数组,决定输出哪些字段?
-        :param to_dict:       True,返回的是字典的数组，False，返回的是实例的数组
         :param can_json:       是否调用to_flat_dict函数转换成可以json的字典?
-        :return:
+        :return: list of doc
         """
+        ses = cls.get_collection()
+        res = ses.find(*args, **kwargs)
         if can_json:
-            to_dict = True
-        if sort_dict is not None:
-            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+            result = [to_flat_dict(x) for x in res]
         else:
-            sort_list = None
-        table_name = cls._table_name
-        ses = get_conn(table_name=table_name)
-        args = {
-            "filter": filter_dict,
-            "sort": sort_list,   # 可能是None,但是没问题.
-            "projection": projection,
-            "skip": skip,
-            "limit": limit
-        }
-        args = {k: v for k, v in args.items() if v is not None}
-        result = ses.find(**args)
-        if result is None:
-            return result
-        else:
-            if result.count() > 0:
-                if to_dict:
-                    if can_json:
-                        result = [to_flat_dict(x) for x in result]
-                    else:
-                        result = [x for x in result]
-                else:
-                    result = [cls(**x) for x in result]
-            else:
-                result = list()
-            return result
+            result = [x for x in res]
+        return result
 
     @classmethod
     def find_one(cls, **kwargs):
@@ -2168,13 +2055,200 @@ class GrantAuthorizationInfo(BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['table_name'] = str  # 表名
 
+    collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
+
     @classmethod
-    def register(cls, table_name: str) -> None:
+    def register(cls, table_name: str, columns: (list, dict), force: bool = False) -> None:
         """
         注册需要身份验证的表
         :param table_name:
+        :param columns: 列名/类的type_dict
+        :param force: 是否在目标已存在的情况下强制更新?
         :return:
         """
+        if isinstance(columns, dict):
+            columns = list(columns.keys())
+            columns.sort(reverse=False)
+        db_client = get_client()
+        col = get_conn(table_name=cls._table_name, db_client=db_client)
+        w = WriteConcern(w='majority', j=True)
+        f = {"table_name": table_name}
+        if force:
+            """强制更新"""
+            col = col.with_options(write_concern=w)
+            u = {"$set": {"columns": columns}}
+            r = col.find_one_and_update(filter=f, update=u, upsert=True, return_document=ReturnDocument.AFTER)
+            if r['table_name'] == table_name and r['columns'] == columns:
+                """成功"""
+                pass
+            else:
+                ms = "强制更新需要身份验证的collection信息失败"
+                logger.exception(msg=ms)
+                raise RuntimeError(ms)
+        else:
+            with db_client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction(write_concern=w):
+                    r = col.find_one(filter=f)
+                    if r is None:
+                        """没有注册过"""
+                        f['columns'] = columns
+                        r2 = col.insert_one(document=f)
+                        if isinstance(r2, InsertOneResult) and isinstance(r2.inserted_id, ObjectId):
+                            pass  # 注册成功
+                        else:
+                            raise RuntimeError("注册需要身份验证的表没有正确返回.请检查")
+                    else:
+                        """注册过"""
+                        pass
+
+    @classmethod
+    def un_register(cls, table_name: str) -> None:
+        """
+        反注册需要身份验证的表
+        :param table_name:
+        :return:
+        """
+        db_client = get_client()
+        col = get_conn(table_name=cls._table_name, db_client=db_client)
+        w = WriteConcern(w='majority', j=True)
+        with db_client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=w):
+                f = {"table_name": table_name}
+                r = col.find_one(filter=f)
+                if r is None:
+                    """没有注册过"""
+                    pass
+                else:
+                    """注册过"""
+                    r2 = col.delete_one(filter=f)
+                    if isinstance(r2, DeleteResult) and r2.deleted_count == 1:
+                        pass  # 反注册成功
+                    else:
+                        raise RuntimeError("注册需要身份验证的表没有正确返回.请检查")
+
+    @classmethod
+    def class_and_attribute(cls, remove: bool = False) -> list:
+        """
+        返回所有的需要验证的类和(他们的属性)
+        :param remove: 是否移除表中无用的信息? 注意,只有在单项状态下才可以启用
+        :return:
+        [
+         {
+         '_id': ObjectId('5bc6ab8d9f0a5e38f1eb8ce1'),
+         'table_name': 'test_a',
+         'columns': ['_id', 'name_a', 'phone_a', 'time']
+         },
+         {
+         '_id': ObjectId('5bc6ab8d9f0a5e38f1eb8ce2'),
+         'table_name': 'test_b',
+         'columns': ['_id', 'name_b', 'phone_b', 'time']
+         },
+         ...
+        ]
+        """
+        if remove:
+            ms = "注意,只有在单项目状态才能启用自动移除未注册权限collection的选项即" \
+                 "orm_module.GrantAuthorizationInfo.class_and_attribute(remove=True)," \
+                 "否则将有可能删除其他项目的collection"
+            warnings.warn(message=ms)
+        else:
+            pass
+        tables = cls.find()
+        return tables
+
+
+class OperateLog(BaseDoc):
+    """
+    管理员的操作日志,为了方便记录
+    """
+    _table_name = "global_admin"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['table_name'] = str   # 数据库表的名字
+    type_dict['handler_id'] = ObjectId  # 操作者id,配合table_name可以确定对象.
+    type_dict['class_name'] = str  # 类名
+    type_dict['function_name'] = str  # 函数名
+    type_dict['args'] = list  # args参数
+    type_dict['kwargs'] = dict  # kwargs参数
+
+    @classmethod
+    def _log(cls, *args, **kwargs) -> None:
+        """
+        记录操作.本方法理论上能记录所有的函数操作,唯一的限制就是
+        handler必须是类的实例对象.
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        doc = dict()
+        handler = kwargs.get("handler", None)
+        if isinstance(handler, BaseDoc):
+            """可以采集信息"""
+            table_name = handler.table_name()
+            handler_id = handler.get_id()
+        else:
+            table_name = None
+            handler_id = None
+        doc['table_name'] = table_name
+        doc['handler_id'] = handler_id
+
+    @staticmethod
+    def log(func):
+        """
+        记录操作的装饰器
+        本方法理论上能记录所有的函数操作,唯一的限制就是
+        handler必须是类的实例对象.
+        """
+        @functools.wraps(func)
+        def decorated_function(*args, **kwargs):
+            """取日志需要记录的内容"""
+            f_str = func.__str__()
+            class_name_str = f_str.split("at", 1)[0].split(" ")[1].strip()
+            function_name = func.__name__
+            if isinstance(args[0], type):
+                """类方法"""
+            elif isinstance(args[0], typing.TypeVar(class_name_str)):
+                pass
+
+            handler = kwargs.get("handler", None)
+            if isinstance(handler, BaseDoc):
+                """可以采集信息"""
+                table_name = handler.table_name()
+                handler_id = handler.get_id()
+            else:
+                table_name = None
+                handler_id = None
+
+            """返回原函数"""
+            return func(*args, **kwargs)
+
+        return decorated_function
+
+
+
+class GlobalAdmin(BaseDoc):
+    """
+    全局管理员类
+    """
+    _table_name = "global_admin"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['user_id'] = str
+    type_dict['password'] = str
+    type_dict['time'] = datetime.datetime
+
+
+class GlobalRole(BaseDoc):
+    """
+    全局角色/权限组
+    """
+    _table_name = "global_role"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['rules'] = dict
+    type_dict['time'] = datetime.datetime
+    type_dict['owner_id'] = ObjectId      # 创建者GlobalAdmin._id
+    type_dict['time'] = datetime.datetime
 
 
 """

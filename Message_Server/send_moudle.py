@@ -18,7 +18,11 @@ url_map = {
     "战报": "b1500b22ff1b8aa35f17a822f37e2b23127c7ad76e7947fbb83fb1391ade69df",   # 电销部门业务群
     "努力拼搏 消息助手": "e7692ed3a1b7e667b67c9af21d5d1d89009ae828c6b2048bac904b1fdadc0629",
     "努力拼搏 入金宣传表": "e7692ed3a1b7e667b67c9af21d5d1d89009ae828c6b2048bac904b1fdadc0629", # 和消息助手一样的
-    "客户消息通知群 消息助手": "54704700f073548352e5fbe802704b19f6abd10c289731c7a5ed6aa44a5bd858"
+    "客户消息通知群 消息助手": "54704700f073548352e5fbe802704b19f6abd10c289731c7a5ed6aa44a5bd858",
+    "group_001": "5f737e7c49a989d615cd6f2cc0236c0be3d2a8ea147fcaae6cee983d4e3e648c",  # 分组出入金消息
+    "group_002": "9f1722d8d1bd1c16258d430f9cd5e0c4af1febecfad1bb3ed39ead0b8f0acdea",  # 分组出入金消息
+    "group_005": "c035b57d094e021474bcc4fb6d0183677fe48a07f6e8fc53c611ffc182d3c4f7",  # 分组出入金消息
+    "入金宣传": "be6e9de55c5777862fb37a62bcfcc6a1af6590ed8fb80e82392667bb01808526",  # 入金宣传
 }
 
 

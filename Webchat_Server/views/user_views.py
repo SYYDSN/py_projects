@@ -275,7 +275,7 @@ def wx_js_api_demo(user: dict = None):
     return render_template("wx_js_api_demo.html")
 
 
-# @check_platform_session
+@check_platform_session
 def common_view_func(user: dict = None, html_name: str = ""):
     """
     通用页面视图
@@ -348,7 +348,7 @@ def common_view_func(user: dict = None, html_name: str = ""):
         return abort(404)
 
 
-# @check_platform_session
+@check_platform_session
 def follow_teacher(user: dict = None):
     """
     跟随和反跟随老师
