@@ -95,7 +95,7 @@ class PlatformEvent(BaseDoc):
             ms = "错误的实例对象：{}".format(str(self.get_dict()))
             logger.exception(ms)
             print(ms)
-        return {"sales": p if isinstance(p, str) else str(p), "args": data}
+        return {"sales": p if isinstance(p, str) else str(p), "title": title, "args": data}
         # name_map = {
         #     "出金提醒": "客户消息通知群 消息助手",
         #     "入金成功": "客户消息通知群 消息助手",
@@ -127,22 +127,26 @@ class PlatformEvent(BaseDoc):
         data['at'] = {'atMobiles': [], 'isAtAll': False}
         res1 = send_signal(send_data=data, token_name=robot_name)
         """2. 发送分组消息"""
-        sales = resp['sales']
-        robot_name2 = None
-        if sales.startswith("001"):
-            robot_name2 = "group_001"
-        elif sales.startswith("002"):
-            robot_name2 = "group_002"
-        elif sales.startswith("005"):
-            robot_name2 = "group_005"
+        if "金" in resp['title']:
+            """出入金相关的"""
+            sales = resp['sales']
+            robot_name2 = None
+            if sales.startswith("001"):
+                robot_name2 = "group_001"
+            elif sales.startswith("002"):
+                robot_name2 = "group_002"
+            elif sales.startswith("005"):
+                robot_name2 = "group_005"
+            else:
+                pass
+            if robot_name2 is None:
+                ms = "未意料的销售人员前缀,sales={}".format(sales)
+                logger.exception(ms)
+                res2 = True
+            else:
+                res2 = send_signal(send_data=data, token_name=robot_name2)
         else:
-            pass
-        if robot_name2 is None:
-            ms = "未意料的销售人员前缀,sales={}".format(sales)
-            logger.exception(ms)
             res2 = True
-        else:
-            res2 = send_signal(send_data=data, token_name=robot_name2)
         res = res1 and res2
         return res
 
