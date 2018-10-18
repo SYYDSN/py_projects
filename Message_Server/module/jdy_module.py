@@ -92,6 +92,7 @@ def process_praise(**kwargs) -> None:
     args['director'] = kwargs['director']
     args['event_time'] = mongo_db.get_datetime_from_str(kwargs['time'])
     money = kwargs['money']
+    desc = kwargs.get('desc', '')
     try:
         money = int(money)
     except Exception as e:
@@ -109,7 +110,10 @@ def process_praise(**kwargs) -> None:
             markdown_doc = dict()
             markdown_doc['title'] = "入金喜报"
             i = str(r)
-            text = "![screenshot](http://47.106.68.161:8000/normal/praise_image/view?fid={})".format(r)
+            if desc == '':
+                text = "![screenshot](http://47.106.68.161:8000/normal/praise_image/view?fid={})".format(r)
+            else:
+                text = "![screenshot](http://47.106.68.161:8000/normal/praise_image/view?fid={}) \n  ##### {}".format(r, desc)
             print("text = {}".format(text))
             markdown_doc['text'] = text
             data['markdown'] = markdown_doc

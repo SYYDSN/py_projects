@@ -125,11 +125,12 @@ class Praise(mongo_db.BaseDoc):
     type_dict['customer'] = str  # 客户
     type_dict['money'] = int  #
     type_dict['time'] = datetime.datetime  # 事件事件
-    type_dict['description'] = str
+    type_dict['desc'] = str
 
     @classmethod
     def create(cls, order: str, the_type: int = 0, director: str = '', manager: str = '', sales: str = '',
-                  customer: str = '', money: (int, float) = 0, event_time: datetime.datetime = None) -> ObjectId:
+               customer: str = '', money: (int, float) = 0, event_time: datetime.datetime = None,
+               desc: str = '') -> ObjectId:
         """
         根据条件获取加金,如果信息不存在就创建它.
         :param order: 平台事件序列号
@@ -140,6 +141,7 @@ class Praise(mongo_db.BaseDoc):
         :param customer: 客户 最长三个汉字
         :param money: 美金
         :param event_time:
+        :param desc:
         :return:  ObjectId
         """
         args = {
@@ -149,7 +151,8 @@ class Praise(mongo_db.BaseDoc):
             "sales": sales,
             "customer": customer,
             "money": money,
-            "time": event_time
+            "time": event_time,
+            "desc": desc
         }
         f = {"order": order}
         one = cls.find_one_plus(filter_dict=f)
