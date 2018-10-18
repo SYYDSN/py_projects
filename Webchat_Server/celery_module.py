@@ -5,7 +5,11 @@ from mail_module import send_mail
 import datetime
 import asyncio
 import requests
+from log_module import get_logger
+from log_module import recode
+import json
 from module.item_module import Score
+from module.server_api import new_order_message1
 from module.server_api import new_order_message2
 
 
@@ -18,6 +22,7 @@ unzip_file： 解压app用户上传的文件，是一个重负载的队列
 """
 
 
+logger = get_logger()
 broker_url = "redis://127.0.0.1:6379/15"
 backend_url = "redis://127.0.0.1:6379/14"
 
@@ -49,7 +54,7 @@ CELERY_ROUTES = (
 CELERY_IMPORTS = ('celery_module', )
 
 
-app = Celery('my_task', broker=broker_url, backend=backend_url)
+app = Celery('my_task2', broker=broker_url, backend=backend_url)
 app.conf.update(CELERY_TIMEZONE=CELERY_TIMEZONE,
                 CELERY_QUEUES=CELERY_QUEUES,
                 CELERY_ROUTES=CELERY_ROUTES,
@@ -92,13 +97,14 @@ def send_virtual_trade(trade_json: dict) -> None:
     if status == 200:
         resp = r.json()
         mes = resp['message']
+        # print("send_virtual_trade: trade={}".format(trade_json))
         if mes == "success":
-            print("ok")
+            print("celery_module.send_virtual_trade ok")
         else:
-            print("error")
+            print("celery_module.send_virtual_trade error")
     else:
         print(status)
-    print(trade_json)
+    # print(trade_json)
 
 
 @app.task(bind=False)
@@ -109,19 +115,18 @@ def send_template_message(mes_type: str, mes_dict: dict) -> None:
     :param mes_dict: 消息字典
     :return:
     """
-    type_map = {
-        "new_order_message2": new_order_message2
-    }
-    now = datetime.datetime.now()
-    if mes_type not in type_map:
-        ms = "错误的消息模板名称: {}, {}".format(mes_type, now)
-        send_mail(title=ms)
+    # logger.info("celery_module.send_template_message: mes_dict={}".format(mes_dict))
+    #
+    # now = datetime.datetime.now()
+    # ms = "消息模板名称: {}, {}".format(mes_type, now)
+    # c = "mes_type={}, keys={}".format(mes_type, str(12))
+    # recode(ms)
+    # send_mail(title=ms, content=c)
+    if mes_type == 'new_order_message1':
+        new_order_message1(**mes_dict)
     else:
-        handler = type_map[mes_type]
-        # send_mail(title=handler.__name__, content='{}'.format(datetime.datetime.now()))
-        print(mes_dict)
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(handler(**mes_dict))
+        loop.run_until_complete(new_order_message2(**mes_dict))
 
 
 @app.task(bind=False)

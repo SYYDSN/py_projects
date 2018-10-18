@@ -240,14 +240,15 @@ def listen_func(key):
     if key == "virtual_trade":
         """虚拟喊单延迟信号"""
         trade = get_args(req=request)
-        print("原始trade: {}".format(trade))
+        # print("原始trade: {}".format(trade))
         native = False
         if "native" in trade:
             native = True if trade['native'] == "True" else False
         trade['native'] = native
         trade = Trade(**trade)
         trade = trade.get_dict()
-        res = process_case(trade, native)
+        res = process_case(trade, native) # 调试注销
+        # res = "listen_func bypass, 不接受虚拟老师:{}信号.".format(trade['teacher_name'])   # 调试打开
         print(res)
     else:
         mes['message'] = '错误的path'

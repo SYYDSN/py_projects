@@ -545,65 +545,6 @@ def score_change_message(open_id: str, nick_name: str, change_num: int, score_am
             return True
 
 
-# def new_order_message(open_id: str, nick_name: str, order_type: str, t_name: str) -> bool:
-#     """
-#     新订单模板消息,使用requests,一般是单次发送.
-#     :param open_id:
-#     :param nick_name:
-#     :param order_type: 订单类型  进场/离场
-#     :param t_name:  老师名字
-#     :return:
-#     """
-#     now = datetime.datetime.now()
-#     now = now.strftime("%Y-%m-%d %H:%M:%S")
-#     u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
-#     args = {
-#         "touser": open_id,
-#         "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
-#         "url": "http://wx.91master.cn/user/html/index.html",
-#         "data": {
-#             "first": {
-#                 "value": "你关注的{}老师有新的操作...".format(t_name),
-#                 "color": "grey",
-#             },
-#             "tradeDateTime": {
-#                 "value": now,
-#                 "color": "#82B6F4",
-#             },
-#             "orderType": {
-#                 "value": order_type,
-#                 "color": "#82B6F4",
-#             },
-#             "customerInfo": {
-#                 "value": nick_name,
-#                 "color": "#82B6F4",
-#             },
-#             "remark": {
-#                 "value": "点击“详情”查看完整信息",
-#                 "color": "#173177"
-#             }
-#         }
-#     }
-#
-#     r = requests.post(u, data=json.dumps(args))
-#     status = r.status_code
-#     if status != 200:
-#         ms = "服务器返回了错误的状态码：{}".format(status)
-#         logger.exception(msg=ms)
-#         print(ms)
-#         return False
-#     else:
-#         resp = r.json()
-#         error_code = resp['errcode']
-#         if error_code != 0:
-#             ms = "服务器返回了错误的消息：{}, code: {}".format(resp['errmsg'], error_code)
-#             logger.exception(msg=ms)
-#             print(ms)
-#             return False
-#         else:
-#             return True
-
-
 class TemplateMessageResponse(mongo_db.BaseDoc):
     """
     模板消息发送的状态,用于查看消息是否发送成功?
@@ -618,13 +559,134 @@ class TemplateMessageResponse(mongo_db.BaseDoc):
     type_dict['time'] = datetime.datetime
 
 
-async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
+# async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
+#     """
+#     新订单模板消息,使用批量发送. 2018-10-18废止
+#     :param t_id:  老师id
+#     :param order_type: 订单类型  进场/离场
+#     :return:
+#     """
+#     # send_mail(title="func begin...", content='{}'.format(datetime.datetime.now()))
+#     ses = mongo_db.get_conn("teacher")
+#     t_id = ObjectId(t_id) if isinstance(t_id, str) else t_id
+#     f = {"_id": t_id}
+#     p = {"_id", "name"}
+#     t = ses.find_one(filter=f, projection=p)
+#     if t is None:
+#         ms = "发送模板消息出错,无效的t_id:{}".format(t_id)
+#         logger.exception(msg=ms)
+#         send_mail(title=ms)
+#         return False
+#     else:
+#         t_id = t['_id']
+#         t_name = t['name']
+#         f = {"follow": {"$elemMatch": {"$in": [t_id]}}}
+#         p = ['_id', "openid", "nick_name"]
+#         now = datetime.datetime.now()
+#         ses = mongo_db.get_conn(table_name="wx_user")
+#         us = ses.find(filter=f, projection=p)
+#         us = [x for x in us]
+#         us_l = len(us)
+#         # send_mail(title="if begin ...", content='us_l={}, {}'.format(us_l, datetime.datetime.now()))
+#         if us_l > 0:
+#             ms = "准备发送{}条模板消息,老师id={}".format(us_l, t_id)
+#             logger.info(msg=ms)
+#
+#             now = now.strftime("%Y-%m-%d %H:%M:%S")
+#             u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
+#             info = {
+#                 "t_id": t_id,
+#                 "t_name": t_name,
+#                 "time": now
+#             }
+#             # send_mail(title="async begin ...", content='{}'.format(datetime.datetime.now()))
+#             async with aiohttp.ClientSession() as session:
+#                 for x in us:
+#                     openid = x['openid']
+#                     nick_name = x['nick_name']
+#                     info['openid'] = openid
+#                     info['nick_name'] = nick_name
+#                     # send_mail(title="for begin ...", content='{}'.format(datetime.datetime.now()))
+#                     args = {
+#                         "touser": openid,
+#                         "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
+#                         "url": "http://wx.91master.cn/user/html/currentCrunchy.html?t_id={}".format(
+#                             str(t_id) if isinstance(t_id, ObjectId) else t_id),
+#                         "data": {
+#                             "first": {
+#                                 "value": "你关注的{}老师有新的操作..".format(t_name),
+#                                 "color": "grey",
+#                             },
+#                             "tradeDateTime": {
+#                                 "value": now,
+#                                 "color": "#82B6F4",
+#                             },
+#                             "orderType": {
+#                                 "value": order_type,
+#                                 "color": "#82B6F4",
+#                             },
+#                             "customerInfo": {
+#                                 "value": nick_name,
+#                                 "color": "#82B6F4",
+#                             },
+#                             "remark": {
+#                                 "value": "点击“详情”查看完整信息",
+#                                 "color": "#173177"
+#                             }
+#                         }
+#                     }
+#                     # print(args)
+#                     # send_mail(title="arg init...", content='{}'.format(datetime.datetime.now()))
+#                     async with session.post(url=u, data=json.dumps(args), timeout=5) as response:
+#                         resp = await response.json()
+#                         if isinstance(resp, dict):
+#                             info['return'] = "success"
+#                             info.update(resp)
+#                         else:
+#                             info['return'] = "error"
+#                         info['_id'] = ObjectId()
+#                         info['args'] = args
+#                         info['time'] = now
+#                         ses = TemplateMessageResponse.get_collection()
+#                         ses.insert_one(document=info)
+#
+#             return True
+#         else:
+#             return False
+
+
+def new_order_message1(t_id: str, t_name: str,product: str, order_type: str, enter_time: str,
+                       enter_price: (str, float, int), exit_time: str = None,
+                       exit_price: (str, float, int) = None) -> bool:
     """
-    新订单模板消息,使用批量发送.
-    :param t_id:  老师id
-    :param order_type: 订单类型  进场/离场
+    新订单模板消息,使用批量发送. 2018-10-18启用,同步函数
+    待发送的模板消息字典
+    格式:
+    2018-10-18之前:
+    {'t_id': '5b8c5452dbea62189b5c28f9', 'order_type': '开仓'}
+    2018-10-18之后:
+    {
+      'product': '原油',
+      'order_type': '开仓',
+      'enter_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),
+      'exit_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),  # 只有平仓才有
+      't_id': 5b8c5452dbea62189b5c28f9,
+      't_name': 非功,
+      'enter_price': 69.955,
+      'exit_price': 69.955,  # 只有平仓才有
+    }
+    :param t_id:
+    :param t_name:
+    :param product:
+    :param order_type:
+    :param enter_time:
+    :param enter_price:
+    :param exit_time:
+    :param exit_price:
     :return:
     """
+    ms = "new_order_message2正在处理发送请求:t_name={}, t_id={}".format(t_name, t_id)
+    logger.info(ms)
     # send_mail(title="func begin...", content='{}'.format(datetime.datetime.now()))
     ses = mongo_db.get_conn("teacher")
     t_id = ObjectId(t_id) if isinstance(t_id, str) else t_id
@@ -647,11 +709,152 @@ async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
         us = [x for x in us]
         us_l = len(us)
         # send_mail(title="if begin ...", content='us_l={}, {}'.format(us_l, datetime.datetime.now()))
-        if us_l > 0:
-            ms = "准备发送{}条模板消息,老师id={}".format(us_l, t_id)
-            logger.info(msg=ms)
+        ms = "准备发送{}条模板消息,查询条件={}".format(us_l, f)
+        # send_mail(title=ms)
+        logger.info(msg=ms)
 
-            now = now.strftime("%Y-%m-%d %H:%M:%S")
+        if us_l > 0:
+            u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
+            info = {
+                "t_id": t_id,
+                "t_name": t_name,
+                "time": now
+            }
+            doc_list = []  # 发送成功的结果集.需要记录到数据库
+            with requests.Session() as ses:
+                for x in us:
+                    openid = x['openid']
+                    nick_name = x['nick_name']
+                    info['openid'] = openid
+                    info['nick_name'] = nick_name
+                    # send_mail(title="for begin ...", content='{}'.format(datetime.datetime.now()))
+                    template_id = 'i6NuPzoeW1HqSNSf97KwDn3AVQk1_jmUHKoHtlCxA7k'
+                    args = {
+                        "touser": openid,
+                        "template_id": template_id,
+                        "url": "http://wx.91master.cn/user/html/currentCrunchy.html?t_id={}".format(
+                            str(t_id) if isinstance(t_id, ObjectId) else t_id),
+                        "data": {
+                            "first": {
+                                "value": "你关注的{}老师有新的操作..".format(t_name),
+                                "color": "grey",
+                            },
+                            "keyword1": {
+                                "value": product,  # 交易品种
+                                "color": "#82B6F4"
+                            },
+                            "keyword2": {
+                                "value": enter_time,  # 开仓时间
+                                "color": "#82B6F4"
+                            },
+                            "keyword3": {
+                                "value": "建仓" if order_type == "开仓" else order_type,
+                                "color": "#82B6F4",
+                            },
+                            "keyword4": {
+                                "value": enter_price,  # 开仓价格
+                                "color": "#82B6F4"
+                            },
+                            "keyword5": {
+                                "value": exit_price,  # 平仓价格
+                                "color": "#82B6F4"
+                            },
+                            "remark": {
+                                "value": "此信息代表{}老师个人观点,仅供参考.点击“详情”查看完整信息".format(t_name),
+                                "color": "#dc1c1c"
+                            }
+                        }
+                    }
+                    title = "发送给{}的模板消息".format(nick_name)
+                    content = "模板消息内容 data={}".format(args)
+                    ms = "{} | {}".format(title, content)
+                    logger.info(ms)
+                    response = ses.post(url=u, data=json.dumps(args), timeout=5)
+                    status = response.status_code
+                    if status == 200:
+                        resp = response.json()
+                        if isinstance(resp, dict):
+                            info['return'] = "success"
+                            info.update(resp)
+                        else:
+                            info['return'] = "error"
+                        info['_id'] = ObjectId()
+                        info['args'] = args
+                        info['time'] = now
+                        doc_list.append(info)
+                    else:
+                        title = "调用微信模板消息接口出错,{}".format(now)
+                        content = "微信模板接口返回了错误的代码:{}".format(status)
+                        send_mail(title=title, content=content)
+            """检查结果集"""
+            if len(doc_list) > 0:
+                col = TemplateMessageResponse.get_collection()
+                col.insert_many(documents=doc_list)
+            else:
+                pass
+            return True
+        else:
+            return False
+
+
+async def new_order_message2(t_id: str, t_name: str,product: str, order_type: str, enter_time: str,
+                             enter_price: (str, float, int), exit_time: str = None,
+                             exit_price: (str, float, int) = None) -> bool:
+    """
+    新订单模板消息,使用批量发送. 2018-10-18启用
+    待发送的模板消息字典
+    格式:
+    2018-10-18之前:
+    {'t_id': '5b8c5452dbea62189b5c28f9', 'order_type': '开仓'}
+    2018-10-18之后:
+    {
+      'product': '原油',
+      'order_type': '开仓',
+      'enter_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),
+      'exit_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),  # 只有平仓才有
+      't_id': 5b8c5452dbea62189b5c28f9,
+      't_name': 非功,
+      'enter_price': 69.955,
+      'exit_price': 69.955,  # 只有平仓才有
+    }
+    :param t_id:
+    :param t_name:
+    :param product:
+    :param order_type:
+    :param enter_time:
+    :param enter_price:
+    :param exit_time:
+    :param exit_price:
+    :return:
+    """
+    ms = "new_order_message2正在处理发送请求:t_name={}, t_id={}".format(t_name, t_id)
+    logger.info(ms)
+    # send_mail(title="func begin...", content='{}'.format(datetime.datetime.now()))
+    ses = mongo_db.get_conn("teacher")
+    t_id = ObjectId(t_id) if isinstance(t_id, str) else t_id
+    f = {"_id": t_id}
+    p = {"_id", "name"}
+    t = ses.find_one(filter=f, projection=p)
+    if t is None:
+        ms = "发送模板消息出错,无效的t_id:{}".format(t_id)
+        logger.exception(msg=ms)
+        send_mail(title=ms)
+        return False
+    else:
+        t_id = t['_id']
+        t_name = t['name']
+        f = {"follow": {"$elemMatch": {"$in": [t_id]}}}
+        p = ['_id', "openid", "nick_name"]
+        now = datetime.datetime.now()
+        ses = mongo_db.get_conn(table_name="wx_user")
+        us = ses.find(filter=f, projection=p)
+        us = [x for x in us]
+        us_l = len(us)
+        # send_mail(title="if begin ...", content='us_l={}, {}'.format(us_l, datetime.datetime.now()))
+        ms = "准备发送{}条模板消息,查询条件={}".format(us_l, f)
+        # send_mail(title=ms)
+        logger.info(msg=ms)
+        if us_l > 0:
             u = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(AccessToken.get_token())
             info = {
                 "t_id": t_id,
@@ -666,9 +869,10 @@ async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
                     info['openid'] = openid
                     info['nick_name'] = nick_name
                     # send_mail(title="for begin ...", content='{}'.format(datetime.datetime.now()))
+                    template_id = 'i6NuPzoeW1HqSNSf97KwDn3AVQk1_jmUHKoHtlCxA7k'
                     args = {
                         "touser": openid,
-                        "template_id": "4EPmCOZZVVmQ4vUi1A0ovhBesdupCpbBXSN_rCSBSIE",
+                        "template_id": template_id,
                         "url": "http://wx.91master.cn/user/html/currentCrunchy.html?t_id={}".format(
                             str(t_id) if isinstance(t_id, ObjectId) else t_id),
                         "data": {
@@ -676,26 +880,37 @@ async def new_order_message2(t_id: (str, ObjectId), order_type: str) -> bool:
                                 "value": "你关注的{}老师有新的操作..".format(t_name),
                                 "color": "grey",
                             },
-                            "tradeDateTime": {
-                                "value": now,
+                            "keyword1": {
+                                "value": product,  # 交易品种
+                                "color": "#82B6F4"
+                            },
+                            "keyword2": {
+                                "value": enter_time,  # 开仓时间
+                                "color": "#82B6F4"
+                            },
+                            "keyword3": {
+                                "value": "建仓" if order_type == "开仓" else order_type,
                                 "color": "#82B6F4",
                             },
-                            "orderType": {
-                                "value": order_type,
-                                "color": "#82B6F4",
+                            "keyword4": {
+                                "value": enter_price,  # 开仓价格
+                                "color": "#82B6F4"
                             },
-                            "customerInfo": {
-                                "value": nick_name,
-                                "color": "#82B6F4",
+                            "keyword5": {
+                                "value": exit_price,  # 平仓价格
+                                "color": "#82B6F4"
                             },
                             "remark": {
-                                "value": "点击“详情”查看完整信息",
-                                "color": "#173177"
+                                "value": "此信息代表{}老师个人观点,仅供参考.点击“详情”查看完整信息".format(t_name),
+                                "color": "#dc1c1c"
                             }
                         }
                     }
-                    # print(args)
-                    # send_mail(title="arg init...", content='{}'.format(datetime.datetime.now()))
+                    title = "发送给{}的模板消息".format(nick_name)
+                    content = "模板消息内容 data={}".format(args)
+                    ms = "{} | {}".format(title, content)
+                    logger.info(ms)
+                    # send_mail(title=title, content=content)
                     async with session.post(url=u, data=json.dumps(args), timeout=5) as response:
                         resp = await response.json()
                         if isinstance(resp, dict):

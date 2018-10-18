@@ -17,6 +17,7 @@ from tools_module import get_real_ip
 from send_moudle import *
 from mail_module import send_mail
 from pymongo import ReturnDocument
+# from module.server_api import new_order_message2
 from celery_module import send_template_message
 from celery_module import send_virtual_trade
 
@@ -102,20 +103,23 @@ def delay_virtual_trade(signal: dict) -> dict:
     return _generator_signal(signal)
 
 
-def _generator_signal(raw_signal: dict) -> dict:
+def _generator_signal(raw_signal: dict, real_teacher: bool = False) -> dict:
     """
     处理喊单信号.
     1. 原始信号不做处理.
     :param raw_signal:
+    :param real_teacher:是否是真实老师
     :return:
     """
+    print("_generator_signal 函数开始运行, raw_signal={}".format(raw_signal))
     now = datetime.datetime.now()
     res = raw_signal
     change = res['change']
     teacher_id = res['teacher_id']
     product = res['product']
     teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
-    if change == "raw":
+    # if change == "raw":
+    if real_teacher:
         """原始信号"""
         pass
     else:
@@ -161,18 +165,42 @@ def _generator_signal(raw_signal: dict) -> dict:
                 t2.find_one_and_update(filter=t_f, update=t_u, upsert=True)
     else:
         pass
-    """待发送的模板消息字典"""
+    """
+    待发送的模板消息字典
+    格式:
+    2018-10-18之前:
+    {'t_id': '5b8c5452dbea62189b5c28f9', 'order_type': '开仓'}
+    2018-10-18之后:
+    {
+      'product': '原油', 
+      'order_type': '开仓',
+      'enter_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692), 
+      'exit_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),  # 只有平仓才有
+      't_id': 5b8c5452dbea62189b5c28f9, 
+      'enter_price': 69.955,
+      'exit_price': 69.955,  # 只有平仓才有
+    }
+    """
     mes_dict = {
-        "t_id": str(teacher_id)
+        "t_id": str(teacher_id),
+        "t_name": res['teacher_name']
     }
     if res['case_type'] == "exit":
         """
         平仓信号
         """
         mes_dict['order_type'] = "平仓"  # 模板消息类型
+        mes_dict['exit_price'] = res['exit_price']
+        mes_dict['exit_time'] = res['exit_time'].strftime("%Y-%m-%d %H:%M:%S")
     else:
         mes_dict['order_type'] = "开仓"  # 模板消息类型
-        pass
+        mes_dict['exit_price'] = ''
+        mes_dict['exit_time'] = ''
+
+    mes_dict['product'] = res['product']
+    mes_dict['enter_price'] = res['enter_price']
+    mes_dict['enter_time'] = res['enter_time'].strftime("%Y-%m-%d %H:%M:%S")
+
     """
     calculate_trade函数负责
     1. 进场 保存数据
@@ -181,8 +209,12 @@ def _generator_signal(raw_signal: dict) -> dict:
     """
     calculate_trade(res)
     """发送模板消息阶段"""
-    print("_generator_signal 模板消息: {}".format(mes_dict))
-    send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
+    print("_generator_signal 接受的信号消息: real_teacher={}, raw_signal={}".format(real_teacher, raw_signal))
+    print("_generator_signal 发送模板消息: {}".format(mes_dict))
+    """直接使用异步工作队列调用同步的模板消息函数发送"""
+    send_template_message.delay(mes_type="new_order_message1", mes_dict=mes_dict)
+    # kw = {"mes_type": "new_order_message2", "mes_dict": mes_dict}
+    # send_template_message.apply_async(countdown=0, kwargs=kw)
     return res
 
 
@@ -528,6 +560,7 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
         if doc_dict['case_type'] == "enter":
             """进场"""
             t_map = Teacher.direction_map(include_raw=False)
+            print("process_case, 开始随机生成{}位老师的虚拟信号".format(len(t_map)))
             # t_map = dict()  # 生产环境请注销
             for k, t in t_map.items():
                 temp = doc_dict.copy()
@@ -552,7 +585,7 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
                 json_obj = mongo_db.to_flat_dict(temp)
                 count_down = 10  # 测试专用
                 send_virtual_trade.apply_async(countdown=count_down, kwargs={"trade_json": json_obj})
-                print("{}秒后发送数据. info={}".format(count_down, json_obj))
+                print("process_case, {}秒后发送虚拟老师进场数据(call celery_send_virtual_trade). info={}".format(count_down, json_obj))
         else:
             """离场"""
             f["change"] = {"$ne": "raw"}
@@ -575,11 +608,12 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
                     json_obj = mongo_db.to_flat_dict(temp)
                     count_down = 10  # 测试专用
                     send_virtual_trade.apply_async(countdown=count_down, kwargs={"trade_json": json_obj})
-                    print("{}秒后发送数据. info={}".format(count_down, json_obj))
+                    print("process_case, {}秒后发送虚拟老师离场数据(call celery_send_virtual_trade). info={}".format(count_down, json_obj))
     else:
         pass
     """接受原始喊单和虚拟立即保存数据并发送模板信息"""
-    _generator_signal(raw_signal=doc_dict)
+    print("process_case, 准备发送给_generator_signal的消息: real_teacher={}, raw_signal={}".format(raw, doc_dict))
+    _generator_signal(raw_signal=doc_dict, real_teacher=raw)
     return True
 
 
@@ -1363,6 +1397,18 @@ if __name__ == "__main__":
     # get_price(p_name="黄金", the_time=th_time)
     """测试计算单子盈利"""
     # calculate_trade(b)
+    """测试 celery"""
+    mes_dict = {
+      'product': '原油',
+      'order_type': '开仓',
+      'enter_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),
+      'exit_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),  # 只有平仓才有
+      't_id': '5bbd3279c5aee8250bbe17d0',
+      't_name': '非功',
+      'enter_price': 69.955,
+      'exit_price': 69.955,  # 只有平仓才有
+    }
+    send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
     pass
 
 
