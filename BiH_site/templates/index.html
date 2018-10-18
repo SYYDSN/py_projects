@@ -7,6 +7,7 @@
     <title>上海必弘信息技术有限公司</title>
     <link href="css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="css/bootstrap.css" />
+    <link href="img/logo_purple.png" rel="shortcut icon" type="image/x-icon" />
 </head>
 <body>
 <!--导航-->
@@ -237,8 +238,6 @@
     </div>
 </div>
 
-
-
 <!--产品介绍标题-->
 <div class="product">
     <div class="product-c">
@@ -338,36 +337,125 @@
 <!--企业OA-->
 <div class="by2">
     <div class="abbr">
-        <div class="abbr2">
+        <div class="abbr2" id="abbr2">
             <div class="abbr-content">
                 <div class="abbr-1">
                     <h2>OA</h2>
                     <p>企业OA也称为办公自动化(Office Automation)，是一门将计算机技术、通信技术、系统科学与行为科学应用于用传统的数据处理技术难以处理的量非常大而结构又不明确的那些业务上的一项综合技术。
                     </p>
-                    <a href="javascript:;" class="Logins">了解更多</a>
+                    <a href="javascript:;" class="Logins" data-type="oa">了解更多</a>
                 </div>
+
                 <div class="abbr-2">
                     <h2>CRM</h2>
 
                     <p>集中管控客户资源，严谨管控以客户为中心的售前、售中、售后过程，形成规范严谨的业务流程，让管理更轻松、工作效率更高。
                     </p>
-                        <a href="javascript:;" class="Logins">了解更多</a>
+                        <a href="javascript:;" class="Logins" data-type="CRM">了解更多</a>
                 </div>
                 <div class="abbr-3">
                     <h2>ERP</h2>
 
                     <p>通过应用德米萨ERP软件标准版，是以客户为中心、以产品创新为核心、实现从产品设计到生产制造、从销售管理到售后服务的整个产供销全生命周期的一体化管理。
                     </p>
-                    <a href="javascript:;" class="Logins">了解更多</a>
+                    <a href="javascript:;" class="Logins" data-type="ERP">了解更多</a>
                 </div>
             </div>
+            <!--系统内容-->
+            <!--OA系统-->
+            <div class="abbr_system " id="abbr_system">
+                    <div class="abbr_system_box" onmouseover="cle()" onmouseout="str()">
+                        <div class="system_banner" id="system_banner">
+                            <div class="first"><a href="javascript:;"><img src="" data-imgurl="img/OA2.jpg"></a></div>
+                            <div><a href="javascript:;"><img src="" data-imgurl="img/OA1.jpg"></a></div>
+                            <div><a href="javascript:;"><img src="" data-imgurl="img/OA3.jpg"></a></div>
+                            <div><a href="javascript:;"><img src="" data-imgurl="img/OA4.jpg"></a></div>
+                        </div>
+                        <div class="prev span1 hiddens" onmouseover="spans(1)" onmouseout="span1()"></div>
+                        <div class="next span2 hiddens" onmouseover="spans(2)" onmouseout="span1()"></div>
+                        <div class="system_hide" id="system_hide"></div>
+                    </div>
+            </div>
+            <!--CRM系统-->
+            <div class="abbr_system" id="abbr_system2">
+                <div class="abbr_system_box" onmouseover="cle()" onmouseout="str()">
+                    <div class="system_banner" id="system_banner2">
+                        <div class="first"><a href="javascript:;"><img src="" data-imgurl="img/crm.jpg"></a></div>
+                        <div><a href="javascript:;"><img src=""  data-imgurl="img/crm2.jpg"></a></div>
+                        <div><a href="javascript:;"><img src=""  data-imgurl="img/crm3.jpg"></a></div>
+                        <div><a href="javascript:;"><img src=""  data-imgurl="img/crm4.jpg"></a></div>
+                    </div>
+                    <div class="prev span3 hiddens" onmouseover="spans(3)" onmouseout="span1()"></div>
+                    <div class="next span4 hiddens" onmouseover="spans(4)" onmouseout="span1()"></div>
+                    <div class="system_hide" id="system_hide2"></div>
+                </div>
+            </div>
+            <!--ERP系统-->
+            <div class="abbr_system" id="abbr_system3">
+                <div class="abbr_system_box" onmouseover="cle()" onmouseout="str()">
+                    <div class="system_banner" id="system_banner3">
+                        <div class="first"><a href="javascript:;"><img src="" data-imgurl="img/ERP.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/ERP3.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/ERP4.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/EPR2.jpg"></a></div>
+                    </div>
+                    <div class="prev span5 hiddens" onmouseover="spans(5)" onmouseout="span1()"></div>
+                    <div class="next span6 hiddens" onmouseover="spans(6)" onmouseout="span1()"></div>
+                    <div class="system_hide" id="system_hide3"></div>
+                </div>
+            </div>
+            <!--商超管理系统-->
+            <div class="abbr_system" id="abbr_system4">
+                <div class="abbr_system_box" onmouseover="cle()" onmouseout="str()">
+                    <div class="system_banner" id="system_banner4">
+                        <div class="first"><a href="javascript:;"><img src="" data-imgurl="img/shangchao.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/shangchao2.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/shangchao3.jpg"></a></div>
+                    </div>
+                    <div class="prev span7 hiddens" onmouseover="spans(7)" onmouseout="span1()"></div>
+                    <div class="next span8 hiddens" onmouseover="spans(8)" onmouseout="span1()"></div>
+                    <div class="system_hide" id="system_hide4"></div>
+                </div>
+            </div>
+            <!--供应链系统-->
+            <div class="abbr_system" id="abbr_system5">
+                <div class="abbr_system_box" onmouseover="cle()" onmouseout="str()">
+                    <div class="system_banner" id="system_banner5">
+                        <div class="first"><a href="javascript:;"><img src="" data-imgurl="img/gongyinglian.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/gongyinglian2.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/gongyinglian3.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/gongyinglian4.jpg"></a></div>
+                    </div>
+                    <div class="prev span9 hiddens" onmouseover="spans(9)" onmouseout="span1()"></div>
+                    <div class="next span10 hiddens" onmouseover="spans(10)" onmouseout="span1()"></div>
+                    <div class="system_hide" id="system_hide5"></div>
+                </div>
+            </div>
+            <!--人事管理系统-->
+            <div class="abbr_system" id="abbr_system6">
+                <div class="abbr_system_box" onmouseover="cle()" onmouseout="str()">
+                    <div class="system_banner" id="system_banner6">
+                        <div class="first"><a href="javascript:;"><img src="" data-imgurl="img/HR1.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/HR2.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/hr4.jpg"></a></div>
+                        <div><a href="javascript:;"><img src="" data-imgurl="img/hr3.jpg"></a></div>
+                    </div>
+                    <div class="prev span11 hiddens" onmouseover="spans(11)" onmouseout="span1()"></div>
+                    <div class="next span12 hiddens" onmouseover="spans(12)" onmouseout="span1()"></div>
+                    <div class="system_hide" id="system_hide6"></div>
+                </div>
+            </div>
+
+
+
+
             <div class="abbr-content2 ">
                 <div class=" abbr-1">
                     <h2>商超商业管理</h2>
 
                     <p>针对大型商场、超市、连锁店、批发店等的行业特点，专业开发的一套集计算机技术、信息技术、网络通讯技术、数字化技术和全面综合管理为一体的商业管理系统
                     </p>
-                    <a href="javascript:;"  class="Logins">了解更多</a>
+                    <a href="javascript:;"  class="Logins" data-type="shangchao">了解更多</a>
 
                 </div>
                 <div class=" abbr-2">
@@ -376,7 +464,7 @@
                     <p>供应链管理系统是一款基于供应链管理及金融服务的创新型大型系统。供应链管理信息化将帮助企业建立高效、分销商和终端客户甚至在整个行业之间建立了一条畅通的高速公路一样。
                     </p>
 
-                    <a href="javascript:;" class="Logins">了解更多</a>
+                    <a href="javascript:;" class="Logins" data-type="gongyinglian">了解更多</a>
 
                 </div>
                 <div class=" abbr-3">
@@ -384,7 +472,7 @@
 
                     <p>人力资源信息化系统建设的经验，以信息技术实现对企业人力资源信息的高度集成化管理，为中国企业使用的人力资源管理解决方案。
                     </p>
-                    <a href="javascript:;"  class="Logins">了解更多</a>
+                    <a href="javascript:;"  class="Logins" data-type="hr">了解更多</a>
                 </div>
             </div>
         </div>
@@ -1755,13 +1843,6 @@
     </div>
 </div>
 
-
-
-
-
-
-
-
 <!--底部-->
 <div class="footer">
     <div class="footer-content">
@@ -1799,6 +1880,10 @@
         <div>©2018 BIHO<span id="lx"> 联系我们</span><span>隐私条款 </span>沪ICP备18034805号-1</div>
     </div>
 </div>
+
+
+
+
 <!--滚动导航开始-->
 <div class="gd-nav">
     <a href="javascript:;" class="gd-nav-kf"></a>
@@ -1816,9 +1901,40 @@
 
     <!--点击了解更多弹出登录注册界面-->
     $(".Logins").click(function(){
-        unScroll()//调用禁止滚动条滚动函数
-        reg.style.display="block";//点击显示登录注册盒子
+        //unScroll()//调用禁止滚动条滚动函数
+        //reg.style.display="block";//点击显示登录注册盒子
+        var the_type = $(this).attr("data-type");
+        if(the_type === "oa"){
+
+            abbr_system.style.display="block"
+
+        }else  if(the_type === "CRM"){
+
+            abbr_system2.style.display="block"
+
+        }else  if(the_type === "ERP"){
+
+            abbr_system3.style.display="block"
+
+        }else  if (the_type ==="shangchao"){
+
+            abbr_system4.style.display="block"
+
+        } else  if(the_type === "gongyinglian"){
+
+            abbr_system5.style.display="block"
+
+        }else  if(the_type === "hr"){
+
+            abbr_system6.style.display="block"
+
+        }else {
+
+        }
     })
+
+
+
 
     /*$('.carousel').carousel();*/
     /*轮播图*/

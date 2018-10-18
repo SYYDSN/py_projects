@@ -23,9 +23,9 @@ except ImportError as e:
 
 
 # bjoern部署方式,c语言,异步模式.注意,这种方式不支持ssl,也不能自定义headers
-# print("bjoern running on {} port ..".format(port))
-# bjoern.listen(app, "0.0.0.0", port)
-# bjoern.run()
+print("bjoern running on {} port ..".format(port))
+bjoern.listen(app, "0.0.0.0", port)
+bjoern.run()
 
 
 # cherrypy部署方式,py语言,线程池模式.生产环境使用较多

@@ -66,10 +66,10 @@ def test():
 if __name__ == "__main__":
     # GrantAuthorizationInfo.register(table_name='a', columns=[], force=True)
     # test()
-    # x = User.hello("jack", age="12")
-    # print(x)
-    u = User()
-    print(u.hello2("jack", age="12"))
+    x = User.hello("jack", age="12")
+    print(x)
+    # u = User()
+    # print(u.hello2("jack", age="12"))
     pass
 
 

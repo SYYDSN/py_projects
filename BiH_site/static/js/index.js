@@ -157,6 +157,270 @@
 
 
 
+//var imgs1 = ["img/pic_1.jpg", "img/pic_2.jpg", "img/pic_3.jpg", "img/pic_4.jpg"]; // 保存图片地址源
+//var imgs2 = ["img/pic_1.jpg", "img/pic_2.jpg", "img/pic_3.jpg", "img/pic_4.jpg"]; // 保存图片地址源
+var i = 0;  //  数组下标
+//var setIn;  //  保存定时器
+function cle() {//移入函数
+    //$(".hiddens").css({display:"block"})
+    $(".hiddens").css({display:"block"})//显示切换按钮
+}
+function spans(one) {
+    //OA系统js
+    if(one == 1 || one == 2){
+         //$('.span1').css({background:"url('../img/whiteguanbi2.png') no-repeat"})
+         //$('.span2').css({background:"url('../img/whiteguanbi.png') no-repeat"})
+        //$('.span1').css({background:"rgba(0,0,0,0.1)"})
+        $('.span' + one).click(function () {
+            //console.log($(this))
+            if (one == 1) {
+                i--
+                if (i < 0) {
+                    i = 3;
+                }
+                $("#system_banner div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            } else {
+                i++
+                //console.log(i)
+                if (i > 3) {
+                    i = 0;
+                }
+                $("#system_banner div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            }
+        })
+
+    }else {
+
+        // $('.span1').css({opacity:'0.4'})
+        // $('.span2').css({opacity:'0.4'})
+    }
+
+    //CRM系统js
+    if(one == 3 || one == 4){
+        // $('.span3').css({opacity:'1'})
+        // $('.span4').css({opacity:'1'})
+
+        $('.span' + one).click(function () {
+            //console.log($(this))
+            if (one == 3) {
+                i--
+                if (i < 0) {
+                    i = 3;
+                }
+                $("#system_banner2 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            } else {
+                i++
+                console.log(i)
+                if (i > 3) {
+                    i = 0;
+                }
+                $("#system_banner2 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            }
+        })
+
+    }else {
+
+        // $('.span1').css({opacity:'0.4'})
+        // $('.span2').css({opacity:'0.4'})
+    }
+    //ERP系统js
+    if(one == 5 || one == 6){
+        // $('.span3').css({opacity:'1'})
+        // $('.span4').css({opacity:'1'})
+        $('.span' + one).click(function () {
+            //console.log($(this))
+            if (one == 5) {
+                i--
+                if (i < 0) {
+                    i = 3;
+                }
+                $("#system_banner3 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            } else {
+                i++
+                console.log(i)
+                if (i > 3) {
+                    i = 0;
+                }
+                $("#system_banner3 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            }
+        })
+
+    }else {
+
+        // $('.span1').css({opacity:'0.4'})
+        // $('.span2').css({opacity:'0.4'})
+    }
+    //商超系统js
+    if(one == 7 || one == 8){
+        // $('.span3').css({opacity:'1'})
+        // $('.span4').css({opacity:'1'})
+        $('.span' + one).click(function () {
+            //console.log($(this))
+            if (one == 7) {
+                i--
+                if (i < 0) {
+                    i = 2;
+                }
+                $("#system_banner4 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            } else {
+                i++
+                console.log(i)
+                if (i > 2) {
+                    i = 0;
+                }
+                $("#system_banner4 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            }
+        })
+
+    }else {
+
+        // $('.span1').css({opacity:'0.4'})
+        // $('.span2').css({opacity:'0.4'})
+    }
+    //供应链系统js
+    if(one == 9 || one == 10){
+        // $('.span3').css({opacity:'1'})
+        // $('.span4').css({opacity:'1'})
+        $('.span' + one).click(function () {
+            //console.log($(this))
+            if (one == 9) {
+                i--
+                if (i < 0) {
+                    i = 3;
+                }
+                $("#system_banner5 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            } else {
+                i++
+                console.log(i)
+                if (i > 3) {
+                    i = 0;
+                }
+                $("#system_banner5 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            }
+        })
+
+    }else {
+
+        // $('.span1').css({opacity:'0.4'})
+        // $('.span2').css({opacity:'0.4'})
+    }
+    //人事管理系统js
+    if(one == 11 || one == 12){
+        // $('.span3').css({opacity:'1'})
+        // $('.span4').css({opacity:'1'})
+        $('.span' + one).click(function () {
+            //console.log($(this))
+            if (one == 11) {
+                i--
+                if (i < 0) {
+                    i = 3;
+                }
+                $("#system_banner6 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            } else {
+                i++
+                console.log(i)
+                if (i > 3) {
+                    i = 0;
+                }
+                $("#system_banner6 div").eq(i).css({
+                    Opacity:1,zIndex:1
+                }).siblings().css({
+                    Opacity:"",zIndex:""
+                })
+            }
+        })
+
+    }else {
+
+        // $('.span1').css({opacity:'0.4'})
+        // $('.span2').css({opacity:'0.4'})
+    }
+
+    //console.log(one)
+}
+// }
+
+function str() {//移出函数
+    //$(".hiddens").css({display:"none"})
+    $(".hiddens").css({display:"none"})//移除隐藏按钮
+
+}
+function span1(){
+    // $(".span1").css({Opacity:0.4})
+    // $(".span2").css({Opacity:0.4})
+    // span[2].style.opacity = 0.4;
+    // span[3].style.opacity = 0.4;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var con=document.getElementsByName("color");
 
 console.log(con);
@@ -291,10 +555,10 @@ logins2.onclick=Log2;//点击下拉导航登录按钮
 
 
 //联系我们跳转js
-var lx=document.getElementById("lx");//获取标签
-lx.onclick=function(){
-    location.href="about.html"//跳转about.html文件
-};
+// var lx=document.getElementById("lx");//获取标签
+// lx.onclick=function(){
+//     location.href="about.html"//跳转about.html文件
+// };
 
 //点击回到头部
 function D(em){
@@ -669,13 +933,85 @@ hide8.onclick=Hide8;
 
 
 
+//系统内容展示区
+
+//关闭按钮
+//OA
+var system_hide=document.getElementById("system_hide")
+var abbr_system=document.getElementById("abbr_system")
+
+
+function  system() {
+    abbr_system.style.display="none"
+}
+
+system_hide.onclick=system;
+
+
+
+//CRM
+var system_hide2=document.getElementById("system_hide2")
+var abbr_system2=document.getElementById("abbr_system2")
+
+
+function  system2() {
+    abbr_system2.style.display="none"
+}
+
+system_hide2.onclick=system2;
 
 
 
 
+//ERP
+var system_hide3=document.getElementById("system_hide3")
+var abbr_system3=document.getElementById("abbr_system3")
 
 
+function  system3() {
+    abbr_system3.style.display="none"
+}
 
+system_hide3.onclick=system3;
+
+
+//商超管理系统
+
+var system_hide4=document.getElementById("system_hide4")
+var abbr_system4=document.getElementById("abbr_system4")
+
+
+function  system4() {
+    abbr_system4.style.display="none"
+}
+
+system_hide4.onclick=system4;
+
+
+//供应链系统
+
+var system_hide5=document.getElementById("system_hide5")
+var abbr_system5=document.getElementById("abbr_system5")
+
+
+function  system5() {
+    abbr_system5.style.display="none"
+}
+
+system_hide5.onclick=system5;
+
+
+//人事管理系统
+
+var system_hide6=document.getElementById("system_hide6")
+var abbr_system6=document.getElementById("abbr_system6")
+
+
+function  system6() {
+    abbr_system6.style.display="none"
+}
+
+system_hide6.onclick=system6;
 
 
 
@@ -684,18 +1020,21 @@ hide8.onclick=Hide8;
 
 
 var aImages = document.getElementById("img").getElementsByTagName('img'); //获取id为img的文档内所有的图片
-var aImages2 = document.getElementById("img2").getElementsByTagName('img'); //获取id为img的文档内所有的图片
-var aImages3 = document.getElementById("img3").getElementsByTagName('img'); //获取id为img的文档内所有的图片
-var aImages4 = document.getElementById("tabs-center").getElementsByTagName('img'); //获取id为img的文档内所有的图片
+var aImages2 = document.getElementById("img2").getElementsByTagName('img'); //获取id为img2的文档内所有的图片
+var aImages3 = document.getElementById("img3").getElementsByTagName('img'); //获取id为img3的文档内所有的图片
+var aImages4 = document.getElementById("tabs-center").getElementsByTagName('img'); //获取id为tabs-center的文档内所有的图片
+var aImages5 = document.getElementById("abbr2").getElementsByTagName('img'); //获取id为abbr2的文档内所有的图片
 loadImg(aImages);
 loadImg(aImages2);
 loadImg(aImages3);
 loadImg(aImages4);
+loadImg(aImages5);
 window.onscroll = function() { //滚动条滚动触发
     loadImg(aImages);
     loadImg(aImages2);
     loadImg(aImages3);
     loadImg(aImages4);
+    loadImg(aImages5);
 };
 //getBoundingClientRect 是图片懒加载的核心
 function loadImg(arr) {
@@ -724,6 +1063,9 @@ function aftLoadImg(obj, url) {
     }
     oImg.src = url; //oImg对象先下载该图像
 }
+
+
+
 
 
 var validate_phone = function (phone) {
@@ -878,125 +1220,3 @@ $("#su_mit2").click(function(){
         });
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*/!*轮播*!/
-var arrimg = ['img/9.JPG', 'img/2.jpg', 'img/3.jpg', 'img/4.JPG', 'img/5.JPG', 'img/6.jpg']
-
-var arrcolor = ['#8cddfa', '#7da6c6', '#394052', '#6288b5', '#4f8da4','#a87a7a']
-var num = 0;
-
-function change() {
-    num += 1;
-    if (num >= arrimg.length) {
-        num = 0;
-    }
-    $(".img").css("background-image", "url(" + arrimg[num] + ")");
-    $(".content").css("background", arrcolor[num]);
-    $(".img").css("background-size", "100% 100%");
-}
-timer = setInterval(
-    function () {
-        change()
-    }, 2000);
-
-$(".set").mouseover(function () {
-    clearInterval(timer)
-
-    $('.prev').css("display", "block")
-    $('.next').css("display", "block")
-})
-
-$(".set").mouseleave(function () {
-    $('.prev').css("display", "none")
-    $('.next').css("display", "none")
-    timer = setInterval(
-        function () {
-            change()
-        }, 2000);
-})
-
-$('.prev').click(function () {
-    num--;
-    if (num<0) {
-        num = arrimg.length - 1
-    }
-    $(".img").css("background-image", "url(" + arrimg[num] + ")");
-    $(".content").css("background", arrcolor[num]);
-    $(".img").css("background-size", "100% 100%");
-})
-
-$('.next').click(function () {
-    change()
-})*/
-
-
-/*//底部轮播图
-var bottom_banner_lp=document.getElementById("bottom_banner_lp")
-function F(num){
-    bottom_banner_lp.style.marginLeft=-num*(bottom_banner_lp.clientWidth/16)+"px";
-    //console.log(num)
-    LP=num
-}
-
-// 定时器
-var LP=0;
-var TD=setInterval(function(){
-    LP++;
-    //console.log(LP)
-    //console.log(bottom_banner_lp.offsetLeft);
-    if(LP==11){
-        LP=0;
-    }
-    F(LP);
-},2000);
-
-//移入图片暂停定时器
-var bottom_banner_content=document.getElementById("bottom_banner_content");
-bottom_banner_content.onmouseover=function(){
-    clearInterval(TD);
-};
-
-// 移出图片开始定时器
-bottom_banner_content.onmouseout=function(){
-    TD=setInterval(function(){
-        LP++;
-        if(LP==11){
-            LP=0;
-        }
-        F(LP);
-    },2000);
-};
-
-//点击向左
-var btn_left=document.getElementById("btn-left");
-btn_left.onclick=function(){
-    LP--;
-    if(LP<0){
-        LP=10
-    }
-    F(LP);
-};
-
-//点击向右
-var btn_right=document.getElementById("btn-right");
-btn_right.onclick=function(){
-    LP++;
-    if(LP==11){
-        LP=0;
-    }
-    F(LP);
-};*/

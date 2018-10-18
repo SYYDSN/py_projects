@@ -242,6 +242,36 @@ def other_can_json(obj):
         return obj
 
 
+def other_can_save(obj):
+    """
+    把其他对象转换成可以保存进mongodb的类型
+    v = v.strftime("%F %H:%M:%S.%f")是v = v.strftime("%Y-%m-%d %H:%M:%S")的
+    简化写法，其中%f是指毫秒， %F等价于%Y-%m-%d.
+    注意，这个%F只可以用在strftime方法中，而不能用在strptime方法中
+    """
+    if isinstance(obj, (int, float, str, bytes, bool, ObjectId, DBRef, datetime.datetime, datetime.date)):
+        return obj
+    elif obj is None:
+        return obj
+    elif isinstance(obj, (list, tuple, set)):
+        return [other_can_save(x) for x in obj]
+    elif isinstance(obj, dict):
+        keys = list(obj.keys())
+        if len(keys) == 2 and "coordinates" in keys and "type" in keys:
+            """这是一个GeoJSON对象"""
+            return obj['coordinates']  # 前经度后纬度
+        else:
+            return {k: other_can_save(v) for k, v in obj.items()}
+    elif isinstance(obj, type) and hasattr(obj, '__init__'):
+        """类构造器cls"""
+        return obj.__name__ + ".cls"
+    elif isinstance(obj, BaseDoc):
+        """BaseFile子类的实例"""
+        return obj.__class__.__name__ + ".instance"
+    else:
+        return str(obj)
+
+
 def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
     """
     转换成可以json的字典,这是一个独立的方法
@@ -1471,23 +1501,43 @@ class BaseDoc:
             return obj
 
     @classmethod
-    def insert_one(cls, **kwargs) -> ObjectId:
+    def insert_one(cls, doc: dict, write_concern: (WriteConcern, dict) = None) -> ObjectId:
         """
         把参数转换为对象并插入
+        :param doc: 待插入文档
+        :param write_concern: 写关注. {w:'majority', j:True}
         :return: ObjectId
         """
-        instance = None
+        wc = dict()
+        if write_concern is None:
+            pass
+        elif isinstance(write_concern, dict):
+            wc = dict()
+            if "w" in write_concern:
+                wc['w'] = write_concern['w']
+            if "j" in write_concern:
+                wc['j'] = write_concern['j']
+            if len(wc) > 0:
+                wc = WriteConcern(**wc)
+        elif isinstance(write_concern, WriteConcern):
+            wc = write_concern
+        else:
+            pass
+        if isinstance(wc, WriteConcern):
+            col = cls.get_collection(write_concern=wc)
+        else:
+            col = cls.get_collection()
+        res = None
         try:
-            instance = cls(**kwargs)
-        except TypeError as e:
-            logger.exception("Error! args:rease:{},kwargs: {}".format(e, str(kwargs)))
+            res = col.insert_one(document=doc)
+        except Exception as e:
+            logger.exception(msg=e)
             raise e
         finally:
-            if instance is None:
-                return None
+            if isinstance(res, InsertOneResult):
+                return res.inserted_id
             else:
-                obj_id = instance.insert()
-                return obj_id
+                return None
 
     @classmethod
     def insert_many_and_return_doc(cls, input_list: list) -> list:
@@ -2161,36 +2211,35 @@ class OperateLog(BaseDoc):
     """
     管理员的操作日志,为了方便记录
     """
-    _table_name = "global_admin"
+    _table_name = "global_log"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['table_name'] = str   # 数据库表的名字
-    type_dict['handler_id'] = ObjectId  # 操作者id,配合table_name可以确定对象.
-    type_dict['class_name'] = str  # 类名
+    type_dict['handler_class'] = str   # 操作者的类的名字
+    type_dict['handler_collection'] = str   # 操作者的类的数据库表的名字
+    type_dict['handler_id'] = ObjectId  # 操作者id,
+    type_dict['func_class'] = str  # 函数所属的类名,可能为空(独立函数)
     type_dict['function_name'] = str  # 函数名
-    type_dict['args'] = list  # args参数
-    type_dict['kwargs'] = dict  # kwargs参数
+    type_dict['args'] = list  # 函数args参数
+    type_dict['kwargs'] = dict  # 函数kwargs参数
+    type_dict['time'] = datetime.datetime
 
     @classmethod
-    def _log(cls, *args, **kwargs) -> None:
+    def _log(cls, **kwargs) -> None:
         """
-        记录操作.本方法理论上能记录所有的函数操作,唯一的限制就是
-        handler必须是类的实例对象.
-        :param args:
-        :param kwargs:
+        记录操作的内部方法
+        kwargs内部共有如下参数:
+        :param handler_id:
+        :param handler_collection:
+        :param handler_class:
+        :param func_class:
+        :param function_name:
+        :param args_list:
+        :param kwargs_dict:
         :return:
         """
-        doc = dict()
-        handler = kwargs.get("handler", None)
-        if isinstance(handler, BaseDoc):
-            """可以采集信息"""
-            table_name = handler.table_name()
-            handler_id = handler.get_id()
-        else:
-            table_name = None
-            handler_id = None
-        doc['table_name'] = table_name
-        doc['handler_id'] = handler_id
+        if 'time' not in kwargs:
+            kwargs['time'] = datetime.datetime.now()
+        cls.insert_one(kwargs)
 
     @staticmethod
     def log(func):
@@ -2203,22 +2252,36 @@ class OperateLog(BaseDoc):
         def decorated_function(*args, **kwargs):
             """取日志需要记录的内容"""
             f_str = func.__str__()
+            func_class =None
             class_name_str = f_str.split("at", 1)[0].split(" ")[1].strip()
             function_name = func.__name__
-            if isinstance(args[0], type):
+            if function_name in class_name_str and function_name != class_name_str:
                 """类方法"""
-            elif isinstance(args[0], typing.TypeVar(class_name_str)):
+                func_class = class_name_str.split(".")[0]
+            else:
                 pass
-
+            kw = {"func_class": func_class, "function_name": function_name}
             handler = kwargs.get("handler", None)
             if isinstance(handler, BaseDoc):
                 """可以采集信息"""
-                table_name = handler.table_name()
+                handler_class = handler.__class__.__name__
+                handler_collection = handler.table_name()
                 handler_id = handler.get_id()
             else:
-                table_name = None
-                handler_id = None
-
+                handler_class = None
+                handler_collection = None
+                if isinstance(handler, dict) and "_id" in handler:
+                    handler_id = handler['_id']
+                else:
+                    handler_id = None
+            kw['handler_id'] = handler_id
+            kw['handler_collection'] = handler_collection
+            kw['handler_class'] = handler_class
+            args2 = other_can_save(args)
+            kw['args_list'] = args2
+            kw2 = other_can_save(kwargs)
+            kw['kwargs_dict'] = kw2
+            OperateLog._log(**kw)
             """返回原函数"""
             return func(*args, **kwargs)
 

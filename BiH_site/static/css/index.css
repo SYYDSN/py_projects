@@ -243,6 +243,9 @@ ul li {
 .carousel{
     cursor: pointer;
 }
+.carousel_btn{
+    z-index: 888;
+}
 /*导航修饰*/
 
 /*.banner{*/
@@ -752,6 +755,115 @@ ul li {
     background: #fff;
     padding: 15px 40px;
 }
+
+/*系统介绍窗口*/
+
+.abbr_system{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    margin: auto;
+    z-index: 8;
+    background: rgba(0,0,0,0.5);
+    text-align: center;
+    display: none;
+}
+.abbr_system .abbr_system_box{
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1000px;
+    margin: auto;
+    height: 450px;
+
+}
+.system_banner{
+    width: 1000px;
+    height: 450px;
+    position: relative;
+
+}
+.system_banner div{
+    width: 1000px;
+    height: 450px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+
+}
+.system_banner div a{
+    width: 1000px;
+    height: 450px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+
+
+}
+
+.system_banner div a img{
+    width: 100%;
+    height: 100%;
+
+}
+.system_banner .first{
+    opacity: 1;
+    z-index: 1;
+}
+
+.abbr_system_box .prev{
+    position: absolute;
+    top: 50%;
+    margin-top: -24px;
+    left: 30px;
+    width: 48px;
+    height: 48px;
+    background: url("../img/shangyibu.png")no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+
+    z-index: 888;
+    display: none;
+}
+.abbr_system_box .next{
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    margin-top: -24px;
+
+    width: 48px;
+    height: 48px;
+    background: url("../img/xiayizhang.png")no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+
+    z-index: 888;
+    display: none;
+}
+.abbr_system_box{
+    position: relative;
+}
+.abbr_system_box .system_hide{
+    width: 48px;
+    height: 48px;
+    background: url("../img/guanbi.png")no-repeat;
+    position: absolute;
+    top: -35px;
+    right: -70px;
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
 .abbr-content2 div{
     width: 300px;
     margin-top: 56px;
@@ -1263,7 +1375,7 @@ ul li {
 }
 .visible1-box .ps{
     position: relative;
-    width: 100%;
+    width:  100%;
     height: 100%;
 }
 @media  (max-width: 1200px){
