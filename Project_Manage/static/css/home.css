@@ -1,6 +1,6 @@
 .content  .dv-left{
     padding: 15px;
-    width: 30%;
+    width: 25%;
     display: inline-block;
     height: 49vw;
     box-shadow: 2px 0 5px #ccc;
@@ -88,7 +88,7 @@
 /*右边样式  */
 .content .dv-right{
     display: inline-block;
-    width: 69.99%;
+    width: 74.99%;
     margin: 21px 0;
     float: right;
 }

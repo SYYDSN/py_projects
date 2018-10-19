@@ -686,6 +686,7 @@ $(function(){
             {
                 type: 'tree',
                 name: tree_dict['name'],
+                roam: true,
                 initialTreeDepth: 4,  // 初始展开是深度
                 data: [tree_dict],
 
