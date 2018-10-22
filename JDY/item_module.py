@@ -10,8 +10,9 @@ from celery_module import to_jiandao_cloud_and_send_mail
 from werkzeug.contrib.cache import SimpleCache
 import datetime
 from browser.firefox_module import to_jiandao_cloud
-from module.send_moudle import send_signal
+from module.send_module import send_signal
 from module.spread_module import SpreadChannel
+from celery_module import send_reg_info_celery
 
 
 """基本模型模块"""
@@ -125,10 +126,12 @@ class Customer(mongo_db.BaseDoc):
                     kwargs['group_count'] = group_count
                     reg_dict['group_by'] = group_by
                     reg_dict['group_count'] = group_count
+                else:
+                    group_by = ''
                 customer = cls(**kwargs)
                 save = None
                 try:
-                    save = customer.save()  # 调试请关闭
+                    save = customer.save_plus()  # 调试请关闭
                     # save = ObjectId()  # 调试请开打
                 except Exception as e:
                     print(e)
@@ -140,14 +143,16 @@ class Customer(mongo_db.BaseDoc):
                         """发送到钉钉机器人"""
                         today_count = cls.today_register_count()
                         reg_dict['today_count'] = today_count
-                        cls.send_signal(reg_dict)   # 调试请关闭
-                        """转发到简道云"""
-                        ms = "用户已保存,开始调用to_jiandao_cloud_and_send_mail, arg={}".format(reg_dict)
-                        logger.info(ms)
+                        send_data = cls.package_info(reg_dict)
+                        cls.send_signal(send_data)   # 发送注册信息到大群. 调试请关闭
+                        send_reg_info_celery.delay(group_by, send_data)  #发送消息到钉钉群,包含分组消息
+                        """转发到简道云,2018-10-21暂时停止写简道云,将来使用api代替"""
+                        # ms = "用户已保存,开始调用to_jiandao_cloud_and_send_mail, arg={}".format(reg_dict)
+                        # logger.info(ms)
                         # to_jiandao_cloud(**reg_dict)  # 调试请开打
-                        to_jiandao_cloud_and_send_mail.delay(**reg_dict)  # 调试请关闭
-                        ms = "用户已发送到简道云, arg={}".format(reg_dict)
-                        logger.info(ms)
+                        # to_jiandao_cloud_and_send_mail.delay(**reg_dict)  # 调试请关闭
+                        # ms = "用户已发送到简道云, arg={}".format(reg_dict)
+                        # logger.info(ms)
                     else:
                         pass
             else:
@@ -155,15 +160,14 @@ class Customer(mongo_db.BaseDoc):
         return message
 
     @classmethod
-    def send_signal(cls, reg_info: dict):
+    def package_info(cls, reg_info: dict) -> dict:
         """
-        发送注册信息到钉钉机器人的消息服务器
+        封装钉钉消息
         :param reg_info:
         :return:
         """
         out_put = dict()
         markdown = dict()
-        token_name = "推广助手"
         out_put['msgtype'] = 'markdown'
         markdown['title'] = "注册信息"
         channel_info = SpreadChannel.analysis_url(reg_info.get('page_url'))
@@ -176,11 +180,40 @@ class Customer(mongo_db.BaseDoc):
         keywords = reg_info.get("search_keyword", "")
         title = "用户注册"
         markdown['title'] = title
-        markdown['text'] = "#### {}  \n > {}  \n > 注册通道：{}  \n > 搜索关键词： {}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 分组：{}  \n > 计数：{}/{}".\
+        markdown[
+            'text'] = "#### {}  \n > {}  \n > 注册通道：{}  \n > 搜索关键词： {}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 分组：{}  \n > 计数：{}/{}". \
             format(title, d, channel_str, keywords, n, p, reg_info['group_by'], reg_info['group_count'] + 1, c)
         out_put['markdown'] = markdown
         out_put['at'] = {'atMobiles': [], 'isAtAll': False}
-        res = send_signal(out_put, token_name=token_name)
+        return out_put
+
+    @classmethod
+    def send_signal(cls, send_data: dict):
+        """
+        发送注册信息到钉钉机器人的消息服务器, 大群
+        :param send_data: 包装好的钉钉消息字典
+        :return:
+        """
+        token_name = "推广助手"
+        # out_put = dict()
+        # markdown = dict()
+        # out_put['msgtype'] = 'markdown'
+        # markdown['title'] = "注册信息"
+        # channel_info = SpreadChannel.analysis_url(reg_info.get('page_url'))
+        # channel_str = ",".join(channel_info)
+        # d = datetime.datetime.now().strftime(
+        #     "%Y年%m月%d日 %H:%M:%S")
+        # n = "" if reg_info.get("user_name") is None else reg_info.get("user_name")
+        # p = "" if reg_info.get("phone") is None else reg_info.get("phone")
+        # c = 0 if reg_info.get("today_count") is None else reg_info.get("today_count")
+        # keywords = reg_info.get("search_keyword", "")
+        # title = "用户注册"
+        # markdown['title'] = title
+        # markdown['text'] = "#### {}  \n > {}  \n > 注册通道：{}  \n > 搜索关键词： {}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 分组：{}  \n > 计数：{}/{}".\
+        #     format(title, d, channel_str, keywords, n, p, reg_info['group_by'], reg_info['group_count'] + 1, c)
+        # out_put['markdown'] = markdown
+        # out_put['at'] = {'atMobiles': [], 'isAtAll': False}
+        res = send_signal(send_data, token_name=token_name)
         print(res)
 
     @classmethod
@@ -417,10 +450,11 @@ if __name__ == "__main__":
         "referrer" : "https://www.so.com/s?ie=utf-8&src=hao_360so_suggest_b&shb=1&hsid=fc569f7380160a98&eci=407b847fad15303c&nlpv=suggest_3.2.2&q=%E5%8D%9A%E5%BC%88%E5%A4%A7%E5%B8%88%E5%AE%98%E7%BD%91%E4%B8%8B%E8%BD%BD",
         "group_by" : "0",
         "phone" : [
-            "19971422786"
+            "19971422796"
         ],
         "user_agent" : "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36",
         "time" : "2018-12-12 0:0:0"
     }
     Customer.reg(**args)
+    # print(DistributionScheme.next_group())
     pass

@@ -484,6 +484,13 @@ def customer_list_func():
         return abort(404)
 
 
+@app.route("/test", methods=['post', 'get'])
+def test_func():
+    args = get_args(request)
+    print(args)
+    return abort(401)
+
+
 @app.after_request
 def allow_cross_domain(response):
     """允许跨域资源访问管理"""

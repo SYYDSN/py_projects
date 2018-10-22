@@ -2,7 +2,10 @@
 import datetime
 from celery import Celery
 from browser.firefox_module import to_jiandao_cloud
+import json
+from celery import exceptions
 from mail_module import send_mail
+from module.send_module import send_reg_info
 
 
 """
@@ -65,8 +68,36 @@ def test(self, *args, **kwargs):
     print(kwargs)
 
 
+@app.task(bind=True, max_retries=3, default_retry_delay=5)
+def send_reg_info_celery(self, group_by: str , send_data: dict):
+    """
+    发送注册信息的钉订消息到各个大部群
+    :param group_by:
+    :param send_data:
+    :return:
+    """
+    resp = send_reg_info(group_by, send_data)
+    if resp['message'] != "success":
+        try:
+            self.retry(countdown=5, max_retries=3)
+        except exceptions.MaxRetriesExceededError as e:
+            ms = "celery钉钉消息失败,已达最重试次数,{}".format(send_data)
+            title = "celery钉钉消息失败.{}".format(datetime.datetime.now())
+            c = "{} , 执行结果:{}. 重试失败原因:{}".format(ms, resp, e)
+            print(ms)
+            print(e)
+            send_mail(title=title, content=c)
+    print(resp)
+
+
 @app.task(bind=True)
 def to_jiandao_cloud_and_send_mail(*args, **kwargs):
+    """
+    使用handless浏览器向简道云写入注册信息,2018-10-21后,此方法不再使用.转而使用api的方式.
+    :param args:
+    :param kwargs:
+    :return:
+    """
     print(kwargs)
     res = to_jiandao_cloud(**kwargs)
     if not res:

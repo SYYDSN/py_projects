@@ -80,4 +80,4 @@ class User(mongo_db.BaseDoc):
 if __name__ == "__main__":
     args = {"phone": "15026826913", "password": "a21f914b336c14f503998d658c6d7c5d"}
     u = User(**args)
-    u.save()
+    u.save_plus()

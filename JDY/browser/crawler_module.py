@@ -13,7 +13,7 @@ import time
 import json
 import datetime
 import mongo_db
-from module import send_moudle
+from module import send_module
 from module.spread_module import SpreadChannel
 from gevent.queue import JoinableQueue
 from selenium.webdriver.support.ui import WebDriverWait
@@ -35,7 +35,7 @@ from mail_module import send_mail
 from threading import Lock
 
 
-send_signal = send_moudle.send_signal
+send_signal = send_module.send_signal
 ObjectId = mongo_db.ObjectId
 DBRef = mongo_db.DBRef
 logger = get_logger()
