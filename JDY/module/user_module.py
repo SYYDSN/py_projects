@@ -11,7 +11,6 @@ import datetime
 ObjectId = mongo_db.ObjectId
 
 
-
 """用户模块"""
 
 
@@ -44,7 +43,7 @@ class LoginLog(mongo_db.BaseDoc):
         a_args['ip'] = info.get("ip", "")
         a_args['agent'] = info.get("agent", "")
         a_args['time'] = info.get("time", datetime.datetime.now())
-        cls.insert_one(**a_args)
+        cls.insert_one(a_args)
 
 
 class User(mongo_db.BaseDoc):

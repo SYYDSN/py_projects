@@ -76,6 +76,8 @@ class RegisterLog(mongo_db.BaseDoc):
         data['desc3'] = desc3
         customer = kwargs.get('user_name')
         data['customer'] = customer
+        phone = kwargs.get('phone')
+        data['phone'] = phone
         content = kwargs.get('description')
         data['content'] = content
         search_keyword = kwargs.get('search_keyword')
@@ -92,28 +94,14 @@ class RegisterLog(mongo_db.BaseDoc):
         :param kwargs:
         :return:
         """
-        a_map = {
-            'reg_time': '_widget_1516604604240',
-            'customer': '_widget_1516604604227',
-            'phone': '_widget_1516604604250',
-            'desc1': '_widget_1516604604261',
-            'desc2': '_widget_1516604604274',
-            'desc3': '_widget_1516604604287',
-            'page_url': '_widget_1516604604300',
-            'content': '_widget_1516604604313',
-            'search_keyword1': '_widget_1519909133709',
-            'search_keyword2': '_widget_1519909133722',
-            'search_keyword3': '_widget_1519909133735',
-            'group_by': '_widget_1525778774114',
-        }
         u = "https://www.jiandaoyun.com/api/v1/app/5a658ca3b2596932dab31f0c/entry/5a658cbc7b87e86216236cb2/data_create"
         headers = {
-            'Authorization': 'Bearer gavQrjmjxekfyK4qeZAI0usSZmZq0oww'
+            'Authorization': 'Bearer gavQrjmjxekfyK4qeZAI0usSZmZq0oww',
+            'Content-Type': 'application/json;charset=utf-8'
         }
-        ks = a_map.keys()
-        kw = {a_map[k]: v for k, v in kwargs.items() if k in ks}
-        # kw = {"group_by": 10}
-        d ={"data":  kw}
+        kw = {k: {"value": v} for k, v in kwargs.items()}
+        # kw['creator'] = {'_id': '56956cdcf5377f7d03ff49bc', 'name': '上海迅迭网络科技有限公司', 'username': '测试人员'}
+        d ={"data": kw}
         resp = requests.post(u, data=json.dumps(d), headers=headers, verify=False)
         print(resp.json())
 
@@ -131,8 +119,8 @@ if __name__ == "__main__":
         "search_keyword": "长江是有交易所",
         "sms_code": "6659",
         "user_name": "测试人员",
-        "group": "2",
-        "phone": "00000000000"
+        "group_by": "2",
+        "phone": 156183217645
     }
     RegisterLog.send_reg_info(**args)
     pass

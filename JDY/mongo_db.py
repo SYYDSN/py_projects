@@ -26,12 +26,12 @@ from werkzeug.contrib.cache import SimpleCache
 from pymongo import WriteConcern
 from pymongo.collection import Collection
 from log_module import get_logger
+from pymongo.results import *
 from pymongo import ReturnDocument
 import gridfs
 from pymongo.errors import *
 import warnings
 from pymongo.errors import DuplicateKeyError
-
 
 
 cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设置决定
@@ -1822,6 +1822,52 @@ class BaseDoc:
                     return result
             else:
                 return cls(**result)
+
+    @classmethod
+    def find_plus(cls, filter_dict: dict, sort_dict: dict = None, skip: int = None, limit: int = None,
+                  projection: list = None, to_dict: bool = False, can_json=False) -> (list, None):
+        """
+        find的增强版本,根据条件查找对象,返回多个对象的实例
+        :param filter_dict:   过滤器,筛选条件.
+        :param sort_dict:     排序字典. 比如: {"time": -1}  # -1表示倒序,注意排序字典参数的处理
+        :param skip:          跳过多少记录.
+        :param limit:         输出数量限制.
+        :param projection:    投影数组,决定输出哪些字段?
+        :param to_dict:       True,返回的是字典的数组，False，返回的是实例的数组
+        :param can_json:       是否调用to_flat_dict函数转换成可以json的字典?
+        :return:
+        """
+        if can_json:
+            to_dict = True
+        if sort_dict is not None:
+            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        else:
+            sort_list = None
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        args = {
+            "filter": filter_dict,
+            "sort": sort_list,  # 可能是None,但是没问题.
+            "projection": projection,
+            "skip": skip,
+            "limit": limit
+        }
+        args = {k: v for k, v in args.items() if v is not None}
+        result = ses.find(**args)
+        if result is None:
+            return result
+        else:
+            if result.count() > 0:
+                if to_dict:
+                    if can_json:
+                        result = [to_flat_dict(x) for x in result]
+                    else:
+                        result = [x for x in result]
+                else:
+                    result = [cls(**x) for x in result]
+            else:
+                result = list()
+            return result
 
     @classmethod
     def find(cls, can_json=False, *args, **kwargs) -> list:

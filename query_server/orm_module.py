@@ -2098,12 +2098,14 @@ class BaseDoc:
 
 class GrantAuthorizationInfo(BaseDoc):
     """
-        需要身份授权的对象的表的容器
+        需要身份授权的对象的表的容器.
+        这里存放所有需要验证的collection的name和column_name
     """
     _table_name = "grant_authorization_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['table_name'] = str  # 表名
+    type_dict['columns'] = list  # 列名的集合,如果字段不再此集合内.则说明访问了无效的字段.
 
     collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
 
@@ -2180,7 +2182,7 @@ class GrantAuthorizationInfo(BaseDoc):
     def class_and_attribute(cls, remove: bool = False) -> list:
         """
         返回所有的需要验证的类和(他们的属性)
-        :param remove: 是否移除表中无用的信息? 注意,只有在单项状态下才可以启用
+        :param remove: 是否移除表中无用的信息? 注意,只有在单项目状态下才可以启用
         :return:
         [
          {
@@ -2288,10 +2290,9 @@ class OperateLog(BaseDoc):
         return decorated_function
 
 
-
 class GlobalAdmin(BaseDoc):
     """
-    全局管理员类
+    全局管理员类,注意,这个管理员组只有一个账户.不能添加账户.也不能删除账户. 这个管理员最大的用途就是操作GlobalRole和GlobalRule
     """
     _table_name = "global_admin"
     type_dict = dict()
@@ -2304,10 +2305,19 @@ class GlobalAdmin(BaseDoc):
 class GlobalRole(BaseDoc):
     """
     全局角色/权限组
+    所有需要设置权限的用户,都需要一个外键指过来
     """
     _table_name = "global_role"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    """
+    rules是一个字典,key是 GrantAuthorizationInfo中授权的表的名称
+    # 读权权限过滤器
+    type_dict['read'] = dict                 # 读权权限过滤器
+    type_dict['insert'] = dict               # 插入权限过滤器
+    type_dict['edit'] = dict                 # 编辑权限过滤器
+    type_dict['delete'] = dict               # 删除权限过滤器
+    """
     type_dict['rules'] = dict
     type_dict['time'] = datetime.datetime
     type_dict['owner_id'] = ObjectId      # 创建者GlobalAdmin._id

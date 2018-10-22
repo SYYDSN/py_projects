@@ -128,22 +128,30 @@ class Customer(mongo_db.BaseDoc):
                     reg_dict['group_count'] = group_count
                 else:
                     group_by = ''
-                customer = cls(**kwargs)
+                # customer = cls(**kwargs)
                 save = None
                 try:
-                    save = customer.save_plus()  # 调试请关闭
+                    ses = cls.get_collection()
+                    save = ses.insert_one(document=kwargs)  # 调试请关闭
                     # save = ObjectId()  # 调试请开打
                 except Exception as e:
                     print(e)
-                    message['message'] = str(e)
-                    logger.exception(exc_info=True, stack_info=True)
+                    ms = str(e)
+                    message['message'] = ms
+                    logger.exception(exc_info=True, stack_info=True, msg=ms)
                 finally:
-                    if isinstance(save, mongo_db.ObjectId):
-                        message['user_id'] = str(save)
+                    if hasattr(save, "inserted_id"):
+                        inserted_id = save.inserted_id
+                    else:
+                        inserted_id = None
+                    if isinstance(inserted_id, mongo_db.ObjectId):
+                        message['user_id'] = str(inserted_id)
                         """发送到钉钉机器人"""
                         today_count = cls.today_register_count()
                         reg_dict['today_count'] = today_count
                         send_data = cls.package_info(reg_dict)
+                        ms = "送注册信息到大群, arg={}".format(send_data)
+                        logger.info(ms)
                         cls.send_signal(send_data)   # 发送注册信息到大群. 调试请关闭
                         send_reg_info_celery.delay(group_by, send_data)  #发送消息到钉钉群,包含分组消息
                         """转发到简道云,2018-10-21暂时停止写简道云,将来使用api代替"""
@@ -441,7 +449,7 @@ if __name__ == "__main__":
     # r = DistributionScheme.next_group()
     # print(r)
     args = {
-        "_id" : ObjectId("5b554a76451353150ce742b6"),
+        # "_id" : ObjectId("5b554a76451353150ce742b6"),
         "search_keyword" : "迅迭 测试",
         "user_name" : "王满石",
         "group_count" : 0,
@@ -449,9 +457,9 @@ if __name__ == "__main__":
         "description" : "页面标题:",
         "referrer" : "https://www.so.com/s?ie=utf-8&src=hao_360so_suggest_b&shb=1&hsid=fc569f7380160a98&eci=407b847fad15303c&nlpv=suggest_3.2.2&q=%E5%8D%9A%E5%BC%88%E5%A4%A7%E5%B8%88%E5%AE%98%E7%BD%91%E4%B8%8B%E8%BD%BD",
         "group_by" : "0",
-        "phone" : [
-            "19971422796"
-        ],
+        "phone" :
+            "199814237061"
+        ,
         "user_agent" : "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36",
         "time" : "2018-12-12 0:0:0"
     }
