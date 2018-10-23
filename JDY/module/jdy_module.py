@@ -9,6 +9,7 @@ import requests
 import datetime
 import json
 from log_module import get_logger
+from mail_module import send_mail
 from module.spread_module import SpreadChannel
 
 
@@ -28,10 +29,11 @@ class RegisterLog(mongo_db.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['info'] = dict
+    type_dict['send_result'] = str   # 发送结果
     type_dict['time'] = datetime.datetime
 
     @classmethod
-    def send_reg_info(cls, **kwargs) -> bool:
+    def send_reg_info(cls, **kwargs) -> dict:
         """
         向简道云发送注册信息
         :param kwargs:
@@ -84,8 +86,10 @@ class RegisterLog(mongo_db.BaseDoc):
         data['search_keyword1'] = search_keyword
         group_by = kwargs.get('group_by')
         data['group_by'] = group_by
-        cls._send(**data)
-        return True
+        reg_time = kwargs.get("time")
+        data['reg_time'] = reg_time
+        resp = cls._send(**data)
+        return resp
 
     @classmethod
     def _send(cls, **kwargs) -> dict:
@@ -103,7 +107,37 @@ class RegisterLog(mongo_db.BaseDoc):
         # kw['creator'] = {'_id': '56956cdcf5377f7d03ff49bc', 'name': '上海迅迭网络科技有限公司', 'username': '测试人员'}
         d ={"data": kw}
         resp = requests.post(u, data=json.dumps(d), headers=headers, verify=False)
-        print(resp.json())
+        status = resp.status_code
+        now = datetime.datetime.now()
+        doc = dict()
+        doc['time'] = now
+        doc['info'] = d
+        return_dict = {"message": "success"}
+        if status != 200:
+            t = "服务器返回了错误的状态码:{}".format(status)
+            logger.exception(msg=t)
+            print(t)
+            doc['send_result'] = t
+            return_dict['message'] = t
+        else:
+            result = "json转dict失败"
+            try:
+                result = resp.json()
+            except Exception as e:
+                print(e)
+                result += ", 错误原因:{}".format(e)
+                return_dict['message'] = result
+            finally:
+                doc['send_result'] = result
+        """写入数据库"""
+        ses = cls.get_collection()
+        r = ses.insert_one(document=doc)
+        if hasattr(r, "inserted_id"):
+            """成功"""
+            pass
+        else:
+            return_dict['message'] = "写入数据库失败"
+        return return_dict
 
     @classmethod
     def _query(cls):

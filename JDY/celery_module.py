@@ -6,6 +6,7 @@ import json
 from celery import exceptions
 from mail_module import send_mail
 from module.send_module import send_reg_info
+from module.jdy_module import RegisterLog
 
 
 """
@@ -69,14 +70,37 @@ def test(self, *args, **kwargs):
 
 
 @app.task(bind=True, max_retries=3, default_retry_delay=5)
-def send_reg_info_celery(self, group_by: str , send_data: dict):
+def send_reg_info_celery(self, group_by: str, send_data: dict):
     """
     发送注册信息的钉订消息到各个大部群
+    :param self:
     :param group_by:
     :param send_data:
     :return:
     """
     resp = send_reg_info(group_by, send_data)
+    if resp['message'] != "success":
+        try:
+            self.retry(countdown=5, max_retries=3)
+        except exceptions.MaxRetriesExceededError as e:
+            ms = "celery钉钉消息失败,已达最重试次数,{}".format(send_data)
+            title = "celery钉钉消息失败.{}".format(datetime.datetime.now())
+            c = "{} , 执行结果:{}. 重试失败原因:{}".format(ms, resp, e)
+            print(ms)
+            print(e)
+            send_mail(title=title, content=c)
+    print(resp)
+
+
+@app.task(bind=True, max_retries=3, default_retry_delay=5)
+def send_reg_info_celery2(self, send_data: dict):
+    """
+    发送注册信息到简道云
+    :param self:
+    :param send_data:
+    :return:
+    """
+    resp = RegisterLog.send_reg_info(**send_data)
     if resp['message'] != "success":
         try:
             self.retry(countdown=5, max_retries=3)

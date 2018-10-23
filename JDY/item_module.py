@@ -13,6 +13,8 @@ from browser.firefox_module import to_jiandao_cloud
 from module.send_module import send_signal
 from module.spread_module import SpreadChannel
 from celery_module import send_reg_info_celery
+from celery_module import send_reg_info_celery2
+# from module.jdy_module import RegisterLog
 
 
 """基本模型模块"""
@@ -140,20 +142,26 @@ class Customer(mongo_db.BaseDoc):
                     message['message'] = ms
                     logger.exception(exc_info=True, stack_info=True, msg=ms)
                 finally:
-                    if hasattr(save, "inserted_id"):
+                    if isinstance(save, ObjectId):
+                        """這是應對調試"""
+                        inserted_id = save
+                    elif hasattr(save, "inserted_id"):
                         inserted_id = save.inserted_id
                     else:
                         inserted_id = None
                     if isinstance(inserted_id, mongo_db.ObjectId):
                         message['user_id'] = str(inserted_id)
-                        """发送到钉钉机器人"""
                         today_count = cls.today_register_count()
                         reg_dict['today_count'] = today_count
+                        """发送到简道云接口"""
+                        # RegisterLog.send_reg_info(**reg_dict)
+                        send_reg_info_celery2.delay(send_data=reg_dict)
+                        """发送到钉钉机器人"""
                         send_data = cls.package_info(reg_dict)
                         ms = "送注册信息到大群, arg={}".format(send_data)
                         logger.info(ms)
-                        cls.send_signal(send_data)   # 发送注册信息到大群. 调试请关闭
-                        send_reg_info_celery.delay(group_by, send_data)  #发送消息到钉钉群,包含分组消息
+                        # cls.send_signal(send_data)   # 发送注册信息到大群. 调试请关闭
+                        # send_reg_info_celery.delay(group_by, send_data)  #发送消息到钉钉群,包含分组消息
                         """转发到简道云,2018-10-21暂时停止写简道云,将来使用api代替"""
                         # ms = "用户已保存,开始调用to_jiandao_cloud_and_send_mail, arg={}".format(reg_dict)
                         # logger.info(ms)
