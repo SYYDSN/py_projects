@@ -4,13 +4,9 @@ import sys
 __project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
-from log_module import get_logger
 import mongo_db
 from send_moudle import *
-from mail_module import send_mail
-from pymongo import ReturnDocument
 from werkzeug.contrib.cache import SimpleCache
-from io import BytesIO
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -54,6 +50,63 @@ def add_comma(num: (int, float)) -> str:
     else:
         data = num_int + num_decimal.strip("")
     return data
+
+
+def create_image_01(the_type: int = 0, director: str = '', manager: str = '', sales: str = '', customer: str = '',
+                    money: (int, float) = 0) -> Image:
+    """
+    2018-10-23废止 第一批模板
+    生成一个图像文件
+    :param the_type: 类型,0为激活,1为加金
+    :param director: 总监 最长三个汉字
+    :param manager: 经历 最长三个汉字
+    :param sales: 销售 最长三个汉字
+    :param customer: 客户 最长三个汉字
+    :param money: 美金
+    :return:
+    """
+    cache_key = 'activate_img' if the_type == 0 else 'deposit_img'
+    im = s_cache.get(key=cache_key)
+    if im is None:
+        f_path = activate_path if the_type == 0 else deposit_path
+        im = Image.open(f_path)
+        s_cache.set(key=cache_key, value=im, timeout=None)
+    else:
+        pass
+    width, height = im.size
+    draw = ImageDraw.Draw(im)
+    font_path = os.path.join(__project_path, 'resource', 'fonts', 'YaHei.ttf')
+    title = "恭喜{} ({})".format(director, manager)
+    if len(title) < 10:
+        size1 = 55
+        title_position = (180, 552)
+    elif len(title) == 10:
+        size1 = 50
+        title_position = (180, 555)
+    else:
+        size1 = 45
+        title_position = (170, 560)
+    size2 = 45
+    my_font1 = ImageFont.truetype(font_path, size=size1)
+    my_font2 = ImageFont.truetype(font_path, size=size2)
+
+    line2 = "{}客户 : {}".format(sales, customer)
+    line2_position = ((width - len(line2) * size2) / 2 + 50, 850)
+    line3_activate = "激活:"
+    line3_deposit = "加金:"
+    line3 = line3_activate if the_type == 0 else line3_deposit
+    # l3l_position = (210, 930)
+    money = "{}美元".format(add_comma(money))
+    w2 = (width - (((len(line3 + money) - 4) / 2) + 4) * size2) / 2
+    l3l_position = (w2, 930)
+    # m_position = ((width - len(money) * size2) / 2 + 150, 930)
+    w3 = w2 + 2.5 * size2
+    m_position = (w3, 930)
+    draw.text(title_position, title, font=my_font1, fill="#f8e34d")
+    draw.text(line2_position, line2, font=my_font2, fill="black")
+    draw.text(l3l_position, line3, font=my_font2, fill="black")
+    draw.text(m_position, money, font=my_font2, fill="red")
+    return im
 
 
 def create_image(the_type: int = 0, director: str = '', manager: str = '', sales: str = '', customer: str = '',
@@ -202,7 +255,10 @@ class Praise(mongo_db.BaseDoc):
 if __name__ == "__main__":
     # image_id = Praise.create(order="12",the_type=1, director="李总监", manager="张经理", sales="张三", customer="李四", money=1200)
     # print(image_id)
-    i_id = "5bad2affdbea624788968109"
-    img = Praise.get_image(i_id)
-    img.show()
+    # i_id = "5bad2affdbea624788968109"
+    # img = Praise.get_image(i_id)
+    # img.show()
+    im = create_image(the_type=0, director="李总监", manager="张经理", sales="张三", customer="李四", money=1200)
+    im.show()
+
     pass
