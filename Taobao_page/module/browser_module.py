@@ -254,8 +254,22 @@ def login_taobao():
             time.sleep(10)
 
 
+def get_book(url):
+    """
+    抓取小说
+    :param url:
+    :return:
+    """
+    r = open_url(url="http://www.biquge.com.tw/14_14055/9200049.html")
+    browser = r['browser']
+    wait = r['wait']
+    id_str = 'content'
+    dom = get_dom(wait=wait, find_type="id", cond=id_str)
+    print(dom)
+
 
 
 if __name__ == "__main__":
-    login_taobao()
+    # login_taobao()
+    get_book(url="http://www.biquge.com.tw/14_14055/9200049.html")
     pass

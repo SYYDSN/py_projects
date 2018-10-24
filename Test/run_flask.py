@@ -3,8 +3,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from test_server import app, port
 import bjoern
-import cherrypy
-from cherrypy import _cpwsgi_server
+from waitress import serve
 from meinheld import server
 try:
     from gevent.wsgi import WSGIServer
@@ -23,19 +22,20 @@ except ImportError as e:
 
 
 # bjoern部署方式,c语言,异步模式.注意,这种方式不支持ssl,也不能自定义headers
-print("bjoern running on {} port ..".format(port))
-bjoern.listen(app, "0.0.0.0", port)
-bjoern.run()
+# print("bjoern running on {} port ..".format(port))
+# bjoern.listen(app, "0.0.0.0", port)
+# bjoern.run()
 
 
-# cherrypy部署方式,py语言,线程池模式.生产环境使用较多
-# cherrypy.tree.graft(app, "/")
-# server = cherrypy._cpserver.Server()
-# server.socket_host = '0.0.0.0'
-# server.socket_port = port
-# server.thread_pool = 1500
-# server.thread_pool_max = 5000
-# server.start()
+# waitress windows和unix皆可,推荐
+server_ini = {
+    "app": app,
+    "host": "0.0.0.0",
+    "port": port,
+    "connection_limit": 200,  # 连接限制
+    "asyncore_use_poll": True
+}
+serve(**server_ini)
 
 
 # meinheld 方式,部分c的py.

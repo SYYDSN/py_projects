@@ -87,7 +87,10 @@ class RegisterLog(mongo_db.BaseDoc):
         group_by = kwargs.get('group_by')
         data['group_by'] = group_by
         reg_time = kwargs.get("time")
-        data['reg_time'] = reg_time
+        reg_time = mongo_db.get_datetime_from_str(reg_time)
+        reg_time = reg_time - datetime.timedelta(hours=8)
+        data['reg_time'] = reg_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        data['save_id'] = kwargs.pop("save_id", None)
         resp = cls._send(**data)
         return resp
 
@@ -98,6 +101,7 @@ class RegisterLog(mongo_db.BaseDoc):
         :param kwargs:
         :return:
         """
+        save_id = kwargs.pop("save_id", None)
         u = "https://www.jiandaoyun.com/api/v1/app/5a658ca3b2596932dab31f0c/entry/5a658cbc7b87e86216236cb2/data_create"
         headers = {
             'Authorization': 'Bearer gavQrjmjxekfyK4qeZAI0usSZmZq0oww',
@@ -112,6 +116,7 @@ class RegisterLog(mongo_db.BaseDoc):
         doc = dict()
         doc['time'] = now
         doc['info'] = d
+        doc['save_id'] = save_id
         return_dict = {"message": "success"}
         if status != 200:
             t = "服务器返回了错误的状态码:{}".format(status)

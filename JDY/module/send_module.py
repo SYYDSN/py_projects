@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
+import mongo_db
 from mail_module import send_mail
 from log_module import get_logger
 import datetime
@@ -9,6 +10,7 @@ import datetime
 """发送消息给钉钉机器人"""
 
 
+ObjectId = mongo_db.ObjectId
 logger = get_logger()
 # 钉钉机器人的链接的token
 url_map = {
@@ -134,21 +136,50 @@ def send_reg_info(group_by: str, info: dict) -> dict:
         print(title)
         return mes
     else:
+        sent_dict = dict()
+        sent_dict['kwargs'] = {"info": info, "group_by": group_by}
+        sent_dict['result'] = 'success'
         token = url_map[key]
         data = json.dumps(info)
         headers = {'Content-Type': 'application/json'}
         base_url = "https://oapi.dingtalk.com/robot/send?access_token="
         robot_url = "{}{}".format(base_url, token)
         try:
-            r = requests.post(robot_url, data=data, headers=headers, timeout=5)
+            r = requests.post(robot_url, data=data, headers=headers, timeout=2)
             status = r.status_code
             if status != 200:
-                raise ValueError("{} 服务器返回了错误的代码:{}".format(robot_url, status))
+                ms = "{} 服务器返回了错误的代码:{}".format(robot_url, status)
+                logger.exception(ms)
+                sent_dict['result'] = ms
+            else:
+                pass
         except Exception as e:
+            reason = str(e)
             mes['message'] = "error"
-            mes['reason'] = e
+            mes['reason'] = reason
+            sent_dict['result'] = reason
         finally:
+            sent_dict['time'] = datetime.datetime.now()
+            col = DDSentResult.get_collection(write_concern={"w": 1, "j": True})
+            r = col.insert_one(document=sent_dict)
+            if hasattr(r, "inserted_id"):
+                pass
+            else:
+                ms = "向dd_sent_result表写入保存结果的时候失败,{}".format(sent_dict)
+                logger.exception(msg=ms)
             return mes
+
+
+class DDSentResult(mongo_db.BaseDoc):
+    """
+    钉钉机器人消息发送结果
+    """
+    _table_name = "dd_sent_result"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['kwargs'] = dict
+    type_dict['result'] = str  # 发送结果,只有success才是成功的
+    type_dict['time'] = datetime.datetime  # 发送的时间
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 # -*- coding:utf8 -*-
 from flask import session, request
 from flask_wtf import FlaskForm
+from flask import render_template
 from wtforms import StringField
 from wtforms import PasswordField
 import functools
@@ -21,6 +22,7 @@ import urllib.request
 import os
 from uuid import uuid4
 from werkzeug.contrib.cache import RedisCache
+from werkzeug.contrib.cache import SimpleCache
 from log_module import get_logger
 from module.system_module import Root
 from module.system_module import User
@@ -29,6 +31,7 @@ from module.system_module import User
 """公用的函数和装饰器"""
 ALLOWED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'gif', 'tif')  # 允许上传的图片后缀
 logger = get_logger()
+cache = SimpleCache()
 
 
 def allowed_file(filename):
@@ -118,6 +121,50 @@ def get_platform_session_arg(arg_name: str, default_val: str = None) -> (str, No
         print(e)
     finally:
         return arg_value
+
+
+def cached(timeout=5 * 60, key='view/%s'):
+    """
+    缓存装饰器
+    :param timeout:
+    :param key:
+    :return:
+    """
+    def decorator(f):
+        @functools.wraps(f)
+        def decorated_function(*args, **kwargs):
+            cache_key = key % request.path
+            rv = cache.get(cache_key)
+            if rv is not None:
+                return rv
+            rv = f(*args, **kwargs)
+            cache.set(cache_key, rv, timeout=timeout)
+            return rv
+        return decorated_function
+    return decorator
+
+
+def templated(template=None):
+    """
+    模板装饰器
+    :param template: 模板文件名
+    :return:
+    """
+    def decorator(f):
+        @functools.wraps(f)
+        def decorated_function(*args, **kwargs):
+            template_name = template
+            if template_name is None:
+                template_name = request.endpoint \
+                    .replace('.', '/') + '.html'
+            ctx = f(*args, **kwargs)
+            if ctx is None:
+                ctx = {}
+            elif not isinstance(ctx, dict):
+                return ctx
+            return render_template(template_name, **ctx)
+        return decorated_function
+    return decorator
 
 
 def check_phone(phone):

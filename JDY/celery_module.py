@@ -5,8 +5,8 @@ from browser.firefox_module import to_jiandao_cloud
 import json
 from celery import exceptions
 from mail_module import send_mail
-from module.send_module import send_reg_info
-from module.jdy_module import RegisterLog
+# from module.send_module import send_reg_info
+# from module.jdy_module import RegisterLog
 
 
 """
@@ -20,7 +20,7 @@ unzip_file： 解压app用户上传的文件，是一个重负载的队列
 
 CELERY_QUEUES = {
     "test": {"queue": "test", "exchange_type": "direct", "routing_key": "test"},
-    "batch_generator_report":{"queue":"batch_generator_report_exchange", "exchange_type": "direct", "routing_key": "batch_generator_report"}
+    "batch_generator_report": {"queue": "batch_generator_report_exchange", "exchange_type": "direct", "routing_key": "batch_generator_report"}
     # Queue(name="fanout_queue_01", exchange=Exchange(name='fanout_queue_01_exchange', type="fanout")),  # 广播类型
 }
 
@@ -30,10 +30,12 @@ CELERY_ROUTES = {
     "celery_module.test": "test"
 }
 
+
 broker_url = "redis://127.0.0.1:6379/12"
-backend_url = "redis://127.0.0.1:6379/13"
+backend_url = "redis://127.0.0.1:6379/11"
 
 
+WORKER_REDIRECT_STDOUTS = False
 CELERY_TIMEZONE = 'Asia/Shanghai'
 CELERY_TASK_SERIALIZER = "json"
 CELERYD_CONCURRENCY = 2  # 并发worker数
@@ -52,6 +54,9 @@ app.conf.update(CELERY_TIMEZONE=CELERY_TIMEZONE, CELERY_ROUTES=CELERY_ROUTES,
                    CELERY_DEFAULT_QUEUE=CELERY_DEFAULT_QUEUE)
 
 """broker是中间人，backend用来储存结果,从celery.result.AsyncResult对象返回响应结果，两者的设置可以一致"""
+
+
+"""由于队列经常失败,本模块暂停"""
 
 
 @app.task(bind=True)
@@ -78,6 +83,7 @@ def send_reg_info_celery(self, group_by: str, send_data: dict):
     :param send_data:
     :return:
     """
+    self
     resp = send_reg_info(group_by, send_data)
     if resp['message'] != "success":
         try:
@@ -89,6 +95,8 @@ def send_reg_info_celery(self, group_by: str, send_data: dict):
             print(ms)
             print(e)
             send_mail(title=title, content=c)
+    else:
+        pass
     print(resp)
 
 
