@@ -55,7 +55,7 @@ $(function(){
         var $this = $(this);
         $this.click(function(){
             $(".crunchy-tabList li").not($this).removeClass("on");
-            $this.addClass("on")
+            $this.addClass("on");
             if($this.hasClass("chart_li")){
                 $(".wrap:not(.chart_wrap)").hide(0);
                 $(".chart_wrap").show(0);
@@ -70,6 +70,7 @@ $(function(){
             }
         });
     });
+    $("#hold_page").click();  // 默认先显示持仓页面
 
     // 跟踪老师事件
     $("#follow_btn").click(function(){

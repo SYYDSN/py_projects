@@ -324,11 +324,14 @@ def common_view_func(user: dict = None, html_name: str = ""):
                 chart = data['chart']
                 history = data.get("history", list())
                 hold = data.get('hold', list())
+                t_name = info.get("name")
                 kwargs['chart'] = chart
                 kwargs['history'] = history
                 kwargs['hold'] = hold
                 kwargs['info'] = info
                 kwargs['t_id'] = t_id
+                kwargs['t_name'] = t_name
+                kwargs['page_title'] = "实战高手" if t_name is None else t_name + "老师"
                 kwargs['view_level'] = view_level
                 kwargs['profit_ratio'] = data['profit_ratio']
             else:

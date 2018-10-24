@@ -183,7 +183,8 @@ def _generator_signal(raw_signal: dict, real_teacher: bool = False) -> dict:
     """
     mes_dict = {
         "t_id": str(teacher_id),
-        "t_name": res['teacher_name']
+        "t_name": res['teacher_name'],
+        "direction": res['direction']
     }
     if res['case_type'] == "exit":
         """

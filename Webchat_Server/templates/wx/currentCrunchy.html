@@ -10,7 +10,7 @@
 
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-		<title>战绩榜单</title>
+		<title>{{ page_title }}</title>
 		<link rel="stylesheet" type="text/css" href="/static/css/index.css" />
         <link rel="stylesheet" href="/static/css/currentCrunchy.css?v={{ version }}">
 		<script type="text/javascript" src="/static/js/common.js"></script>
@@ -37,9 +37,9 @@
                 </div>
             </div>
             <ul class="crunchy-tabList">
-                <li class="on chart_li"><a href="javascript:;">数据统计</a></li>
-                <li class="hold_li"><a href="javascript:;">当前持仓</a></li>
-                <li class="history_li"><a href="javascript:;">历史交易</a></li>
+                <li id="count_page" class="on chart_li"><a href="javascript:;">数据统计</a></li>
+                <li id="hold_page" class="hold_li"><a href="javascript:;">当前持仓</a></li>
+                <li id="history_page" class="history_li"><a href="javascript:;">历史交易</a></li>
 
 
             </ul>

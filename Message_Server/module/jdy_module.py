@@ -113,7 +113,7 @@ def process_praise(**kwargs) -> None:
             if desc == '':
                 text = "![screenshot](http://47.106.68.161:8000/normal/praise_image/view?fid={})".format(r)
             else:
-                text = "![screenshot](http://47.106.68.161:8000/normal/praise_image/view?fid={}) \n  ##### {}".format(r, desc)
+                text = "![screenshot](http://47.106.68.161:8000/normal/praise_image/view?fid={}) \n  ##### {} [胜利][胜利][胜利]，继续加油！[加油][加油][加油]".format(r, desc)
             print("text = {}".format(text))
             markdown_doc['text'] = text
             data['markdown'] = markdown_doc
