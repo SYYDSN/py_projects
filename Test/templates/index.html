@@ -2,4 +2,25 @@
 
 {% block body %}
     <h1>{{ page_title }}</h1>
+    <div>
+    <input type="text" id="user_name">
+    <input type="password" id="password">
+    <button id="submit">提交</button>
+    </div>
+    <script>
+    let reg = function(){
+        let user_name = $.trim($("#user_name").val());
+        let password = $.trim($("#password").val());
+        let u = "/reg";
+        let args = {
+            "user_name": user_name,
+            "password": password
+        };
+        $.post(u, args, function(resp){
+            let json = JSON.parse(resp);
+            console.log(json);
+        });
+    };
+    $("#submit").click(function(){reg();});
+    </script>
 {% endblock %}
