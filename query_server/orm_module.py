@@ -19,6 +19,7 @@ from bson.binary import Binary
 import numpy as np
 import re
 import math
+from mail_module import send_mail
 from pymongo.client_session import ClientSession
 from werkzeug.contrib.cache import RedisCache
 from werkzeug.contrib.cache import SimpleCache
@@ -28,6 +29,9 @@ from log_module import get_logger
 from pymongo import ReturnDocument
 from pymongo.results import *
 import gridfs
+from flask import Flask
+from werkzeug.routing import Map
+from werkzeug.routing import Rule
 from pymongo.errors import *
 
 
@@ -71,6 +75,136 @@ mongodb_setting = {
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
 }
+
+
+class DBCommandListener(monitoring.CommandListener):
+    """
+    监听数据库执行的命令,注意所有监听器都是同步执行的!!!
+    1.没必要不要使用,因为多少对性能有影响.
+    2.必须要使用的情况下,注意不要对性能造成影响.
+    """
+    def started(self, event):
+        # command_name = event.command_name
+        # command_dict = event.command
+        # database_name = event.database_name
+        # ms = "{} 数据库的 {} 命令开始,参数:{}".format(database_name, command_name, command_dict)
+        # print(ms)
+        # logger.info(ms)
+        pass
+
+    def succeeded(self, event):
+        pass
+
+    def failed(self, event):
+        # command_name = event.command_name
+        # command_dict = event.command
+        # database_name = event.database_name
+        # ms = "Error: {} 数据库的 {} 命令执行失败,参数:{}".format(database_name, command_name, command_dict)
+        # print(ms)
+        # logger.exception(ms)
+        failure = event.failure
+        error_msg = failure.get("errmsg")
+        if error_msg is None:
+            pass
+        elif error_msg == "Authentication failed.":
+            """登录失败"""
+            title = "{}数据库登录失败! {}".format(db_name, datetime.datetime.now())
+            send_mail(title=title)
+        else:
+            pass
+        pass
+
+
+class DBServerListener(monitoring.ServerListener):
+    """
+    数据库服务器状态改变监听器
+    注意所有监听器都是同步执行的!!!
+    1.没必要不要使用,因为多少对性能有影响.
+    2.必须要使用的情况下,注意不要对性能造成影响.
+    """
+    def opened(self, event):
+        # ms = "Warning: server {} is opened!".format(":".join([str(x) for x in event.server_address]))
+        # logger.info(ms)
+        # print(ms)
+        pass
+
+    def description_changed(self, event):
+        previous_server_type = event.previous_description.server_type
+        new_server_type = event.new_description.server_type
+        # if new_server_type != previous_server_type:
+        #     ms = "Warning: server description changed: from {} to {}".format(previous_server_type, new_server_type)
+        #     logger.info(ms)
+        # else:
+        #     pass
+
+    def closed(self, event):
+        ms = "Warning: Server {0.server_address} removed from topology {0.topology_id}".format(event)
+        logger.info(ms)
+
+
+class DBHeartBeatListener(monitoring.ServerHeartbeatListener):
+    """
+    数据库心跳监听器.
+    注意所有监听器都是同步执行的!!!
+    1.没必要不要使用,因为多少对性能有影响.
+    2.必须要使用的情况下,注意不要对性能造成影响.
+    """
+    def started(self, event):
+        # ms = "Heartbeat sent to server {0.connection_id}".format(event)
+        # logger.info(ms)
+        pass
+
+    def succeeded(self, event):
+        # ms = "Heartbeat to server {0.connection_id} succeeded with reply {0.reply.document}".format(event)
+        # logger.info(ms)
+        pass
+
+    def failed(self, event):
+        ms = "Warning: Heartbeat to server {0.connection_id} failed with error {0.reply}".format(event)
+        logger.info(ms)
+
+
+class DBTopologyListener(monitoring.TopologyListener):
+    """
+    数据库拓扑变化监听器.
+    注意所有监听器都是同步执行的!!!
+    1.没必要不要使用,因为多少对性能有影响.
+    2.必须要使用的情况下,注意不要对性能造成影响.
+    """
+    def opened(self, event):
+        # ms = "Topology with id {0.topology_id} opened".format(event)
+        # logger.info(ms)
+        pass
+
+    def description_changed(self, event):
+        # ms = "Topology description updated for topology id {0.topology_id}".format(event)
+        # logger.info(ms)
+        previous_topology_type = event.previous_description.topology_type
+        new_topology_type = event.new_description.topology_type
+        # if new_topology_type != previous_topology_type:
+        #     ms = "Topology {0.topology_id} changed type from {0.previous_description.topology_type_name} " \
+        #          "to {0.new_description.topology_type_name}".format(event)
+        #     logger.info(ms)
+        #
+        # if not event.new_description.has_writable_serv/er():
+        #     ms = "Warning: No writable servers available."
+        #     logger.warning(ms)
+        #
+        # if not event.new_description.has_readable_server():
+        #     ms = "Warning: No readable servers available."
+        #     logger.warning(ms)
+
+    def closed(self, event):
+        # ms = "Warning: Topology with id {0.topology_id} closed".format(event)
+        # logger.info(ms)
+        pass
+
+
+"""注册全局监听器"""
+monitoring.register(DBCommandListener())
+monitoring.register(DBServerListener())
+monitoring.register(DBHeartBeatListener())
+monitoring.register(DBTopologyListener())
 
 
 class DB:
@@ -1188,31 +1322,11 @@ class BaseDoc:
         else:
             return {k: v for k, v in self.__dict__.items() if k not in ignore}
 
-    def insert(self) -> ObjectId:
-        """插入数据库,单个对象,返回ObjectId的实例"""
-        table_name = self.table_name()
-        ses = get_conn(table_name=table_name)
-        insert_dict = {k: v for k, v in self.__dict__.items() if v is not None}
-        try:
-            inserted_id = ses.insert_one(insert_dict).inserted_id
-            if self._id is None and isinstance(inserted_id, ObjectId):
-                self._id = inserted_id
-        except DuplicateKeyError as e:
-            error_key = ""
-            for x in self.type_dict.keys():
-                if x in e.details['errmsg']:
-                    error_key = x
-                    break
-            error_val = self.__dict__[error_key]
-            mes = "重复的 {}:{}".format(error_key, error_val)
-            raise ValueError(mes)
-        return inserted_id
-
-    def save_plus(self, ignore: list = None, upsert: bool = True) -> (None, ObjectId):
+    def save(self, ignore: list = None, upsert: bool = True) -> (None, ObjectId):
         """
         更新
         :param ignore: 忽略的更新的字段,一般是有唯一性验证的字段
-        :param upsert:
+        :param upsert:  在查找对象不存在的情况下,是否查询?
         :return: ObjectId
         """
         if isinstance(ignore, list):
@@ -1312,7 +1426,6 @@ class BaseDoc:
         :return:
         """
         result_dict = to_flat_dict(self.get_dict(), ignore_columns=ignore_columns)
-
         return result_dict
 
     @classmethod
@@ -1370,63 +1483,6 @@ class BaseDoc:
             return obj.insert(**kwargs)
         else:
             return obj._id
-
-    def find_one_and_update(self, filter_dict=None, update=None, projection=None, sort=None, upsert=True,
-                            return_document="after"):
-        """
-        找到一个文档然后更新它，如果找不到就插入,尽量使用类方法find_alone_and_update而不要使用本实例方法。
-        :param filter_dict: 查找时匹配参数 字典,
-        :param update: 更新的数据，字典
-        :param projection: 输出限制列  projection={'seq': True, '_id': False} 只输出seq，不输出_id
-        :param upsert: 找不到对象时是否插入新的对象 布尔值
-        :param sort: 排序列，一个字典的数组
-        :param return_document: 返回update之前的文档还是之后的文档？ after 和 before
-        :return:  doc或者None
-        example:
-        filter_dict = {"_id": self.get_id()}
-        update_dict = {"$set": {"prev_date": datetime.datetime.now(),
-                                "last_query_result_id": last_query_result_id},
-                       "$inc": {"online_query_count": 1, "all_count": 1,
-                                "today_online_query_count": 1}}
-        self.find_one_and_update(filter_dict=filter_dict, update=update_dict)
-        """
-        if return_document == "after":
-            return_document = ReturnDocument.AFTER
-        else:
-            return_document = ReturnDocument.BEFORE
-
-        """处理filter_dict数据
-            如果参数中包含_id参数，那filter_dict={"_id": _id}
-            若干阐述中包含_id参数或者为None ，那么filter_dict={"_id": self.get_id()}
-        """
-        # filter_dict = {k: (get_obj_id(v) if k == "_id" else v) for k, v in filter_dict.items()}
-        if filter_dict is None:
-            filter_dict = {"_id": self.get_id()}
-        else:
-            if "_id" in filter_dict:
-                # 只依id为准，抛弃其他条件了
-                filter_dict = {"_id": get_obj_id(filter_dict['_id'])}
-            else:
-                filter_dict = {"_id": self.get_id()}
-        """处理update数据"""
-        if update is None:
-            raise ValueError("update参数不能为空")
-        else:
-            keys = update.keys()
-            flag = [k for k in keys if k.startswith("$")]
-            if len(flag) > 0:
-                """如果用户已经自己定义了$开头的方法"""
-                pass
-            else:
-                update = {"$set": update}
-        ses = get_conn(self._table_name)
-        print("~~~~~~~~~~~~~~")
-        print(filter_dict)
-        print(update)
-        print("~~~~~~~~~~~~~~")
-        result = ses.find_one_and_update(filter=filter_dict, update=update, projection=projection, sort=sort,
-                                         return_document=return_document, upsert=upsert)
-        return result
 
     def push_one(self, col_name, col_val):
         """
@@ -1486,21 +1542,6 @@ class BaseDoc:
         return conn
 
     @classmethod
-    def insert_and_return_instance(cls, **kwargs):
-        """
-        把参数转成一个obj对象插入数据库并返回实例f对象
-        :param kwargs: 
-        :return: cls的实例
-        """
-        obj = cls(**kwargs)
-        _id = obj.insert()
-        if _id is None:
-            raise InvalidId("对象插入失败， {}".format(str(kwargs)))
-        else:
-            obj._id = _id
-            return obj
-
-    @classmethod
     def insert_one(cls, doc: dict, write_concern: (WriteConcern, dict) = None) -> ObjectId:
         """
         把参数转换为对象并插入
@@ -1508,6 +1549,7 @@ class BaseDoc:
         :param write_concern: 写关注. {w:'majority', j:True}
         :return: ObjectId
         """
+        result = None
         wc = dict()
         if write_concern is None:
             pass
@@ -1535,9 +1577,10 @@ class BaseDoc:
             raise e
         finally:
             if isinstance(res, InsertOneResult):
-                return res.inserted_id
+                result = res.inserted_id
             else:
-                return None
+                pass
+            return result
 
     @classmethod
     def insert_many_and_return_doc(cls, input_list: list) -> list:
@@ -2096,117 +2139,36 @@ class BaseDoc:
         return resp
 
 
-class GrantAuthorizationInfo(BaseDoc):
+class FlaskUrlRule(BaseDoc):
     """
-        需要身份授权的对象的表的容器.
-        这里存放所有需要验证的collection的name和column_name
+        App所有的路由规则
     """
-    _table_name = "grant_authorization_info"
+    _table_name = "flask_url_rule"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['table_name'] = str  # 表名
-    type_dict['columns'] = list  # 列名的集合,如果字段不再此集合内.则说明访问了无效的字段.
+    type_dict['methods'] = list  # 视图函数的方法
+    type_dict['args'] = list  # 视图函数的参数
+    type_dict['endpoint'] = str  # 视图函数的端点
+    type_dict['rule'] = str  # 路由规则
 
     collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
 
     @classmethod
-    def register(cls, table_name: str, columns: (list, dict), force: bool = False) -> None:
+    def init(cls, flask_app: Flask) -> None:
         """
-        注册需要身份验证的表
-        :param table_name:
-        :param columns: 列名/类的type_dict
-        :param force: 是否在目标已存在的情况下强制更新?
+        注册flask的app的所有路由规则
+        :param flask_app:
         :return:
         """
-        if isinstance(columns, dict):
-            columns = list(columns.keys())
-            columns.sort(reverse=False)
-        db_client = get_client()
-        col = get_conn(table_name=cls._table_name, db_client=db_client)
-        w = WriteConcern(w='majority', j=True)
-        f = {"table_name": table_name}
-        if force:
-            """强制更新"""
-            col = col.with_options(write_concern=w)
-            u = {"$set": {"columns": columns}}
-            r = col.find_one_and_update(filter=f, update=u, upsert=True, return_document=ReturnDocument.AFTER)
-            if r['table_name'] == table_name and r['columns'] == columns:
-                """成功"""
-                pass
-            else:
-                ms = "强制更新需要身份验证的collection信息失败"
-                logger.exception(msg=ms)
-                raise RuntimeError(ms)
-        else:
-            with db_client.start_session(causal_consistency=True) as ses:
-                with ses.start_transaction(write_concern=w):
-                    r = col.find_one(filter=f)
-                    if r is None:
-                        """没有注册过"""
-                        f['columns'] = columns
-                        r2 = col.insert_one(document=f)
-                        if isinstance(r2, InsertOneResult) and isinstance(r2.inserted_id, ObjectId):
-                            pass  # 注册成功
-                        else:
-                            raise RuntimeError("注册需要身份验证的表没有正确返回.请检查")
-                    else:
-                        """注册过"""
-                        pass
+        rules = flask_app.url_map.iter_rules()
 
-    @classmethod
-    def un_register(cls, table_name: str) -> None:
-        """
-        反注册需要身份验证的表
-        :param table_name:
-        :return:
-        """
-        db_client = get_client()
-        col = get_conn(table_name=cls._table_name, db_client=db_client)
-        w = WriteConcern(w='majority', j=True)
-        with db_client.start_session(causal_consistency=True) as ses:
-            with ses.start_transaction(write_concern=w):
-                f = {"table_name": table_name}
-                r = col.find_one(filter=f)
-                if r is None:
-                    """没有注册过"""
-                    pass
-                else:
-                    """注册过"""
-                    r2 = col.delete_one(filter=f)
-                    if isinstance(r2, DeleteResult) and r2.deleted_count == 1:
-                        pass  # 反注册成功
-                    else:
-                        raise RuntimeError("注册需要身份验证的表没有正确返回.请检查")
-
-    @classmethod
-    def class_and_attribute(cls, remove: bool = False) -> list:
-        """
-        返回所有的需要验证的类和(他们的属性)
-        :param remove: 是否移除表中无用的信息? 注意,只有在单项目状态下才可以启用
-        :return:
-        [
-         {
-         '_id': ObjectId('5bc6ab8d9f0a5e38f1eb8ce1'),
-         'table_name': 'test_a',
-         'columns': ['_id', 'name_a', 'phone_a', 'time']
-         },
-         {
-         '_id': ObjectId('5bc6ab8d9f0a5e38f1eb8ce2'),
-         'table_name': 'test_b',
-         'columns': ['_id', 'name_b', 'phone_b', 'time']
-         },
-         ...
-        ]
-        """
-        if remove:
-            ms = "注意,只有在单项目状态才能启用自动移除未注册权限collection的选项即" \
-                 "orm_module.GrantAuthorizationInfo.class_and_attribute(remove=True)," \
-                 "否则将有可能删除其他项目的collection"
-            warnings.warn(message=ms)
-        else:
-            pass
-        tables = cls.find()
-        return tables
+        for a_rule in rules:
+            methods = [x.lower() for x in a_rule.methods if x.lower() in ["post", 'get']]
+            args = [x for x in a_rule.arguments]
+            endpoint = a_rule.endpoint
+            rule = a_rule.rule
+            f = {"endpoint": endpoint}
+            u = {"$set": {"args": args, "rule": rule, "methods": methods}}
 
 
 class OperateLog(BaseDoc):

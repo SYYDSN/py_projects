@@ -25,5 +25,9 @@ def favicon_func():
     return send_file("static/image/favicon.ico")
 
 
+"""获取路由规则,必须在最后部分"""
+
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=port, debug=True, threaded=True)

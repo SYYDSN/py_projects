@@ -19,6 +19,7 @@ from bson.binary import Binary
 import numpy as np
 import re
 import math
+from mail_module import send_mail
 from pymongo.client_session import ClientSession
 from werkzeug.contrib.cache import RedisCache
 from werkzeug.contrib.cache import SimpleCache
@@ -71,6 +72,136 @@ mongodb_setting = {
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
 }
+
+
+class DBCommandListener(monitoring.CommandListener):
+    """
+    监听数据库执行的命令,注意所有监听器都是同步执行的!!!
+    1.没必要不要使用,因为多少对性能有影响.
+    2.必须要使用的情况下,注意不要对性能造成影响.
+    """
+    def started(self, event):
+        # command_name = event.command_name
+        # command_dict = event.command
+        # database_name = event.database_name
+        # ms = "{} 数据库的 {} 命令开始,参数:{}".format(database_name, command_name, command_dict)
+        # print(ms)
+        # logger.info(ms)
+        pass
+
+    def succeeded(self, event):
+        pass
+
+    def failed(self, event):
+        # command_name = event.command_name
+        # command_dict = event.command
+        # database_name = event.database_name
+        # ms = "Error: {} 数据库的 {} 命令执行失败,参数:{}".format(database_name, command_name, command_dict)
+        # print(ms)
+        # logger.exception(ms)
+        failure = event.failure
+        error_msg = failure.get("errmsg")
+        if error_msg is None:
+            pass
+        elif error_msg == "Authentication failed.":
+            """登录失败"""
+            title = "{}数据库登录失败! {}".format(db_name, datetime.datetime.now())
+            send_mail(title=title)
+        else:
+            pass
+        pass
+
+
+class DBServerListener(monitoring.ServerListener):
+    """
+    数据库服务器状态改变监听器
+    注意所有监听器都是同步执行的!!!
+    1.没必要不要使用,因为多少对性能有影响.
+    2.必须要使用的情况下,注意不要对性能造成影响.
+    """
+    def opened(self, event):
+        # ms = "Warning: server {} is opened!".format(":".join([str(x) for x in event.server_address]))
+        # logger.info(ms)
+        # print(ms)
+        pass
+
+    def description_changed(self, event):
+        previous_server_type = event.previous_description.server_type
+        new_server_type = event.new_description.server_type
+        # if new_server_type != previous_server_type:
+        #     ms = "Warning: server description changed: from {} to {}".format(previous_server_type, new_server_type)
+        #     logger.info(ms)
+        # else:
+        #     pass
+
+    def closed(self, event):
+        ms = "Warning: Server {0.server_address} removed from topology {0.topology_id}".format(event)
+        logger.info(ms)
+
+
+class DBHeartBeatListener(monitoring.ServerHeartbeatListener):
+    """
+    数据库心跳监听器.
+    注意所有监听器都是同步执行的!!!
+    1.没必要不要使用,因为多少对性能有影响.
+    2.必须要使用的情况下,注意不要对性能造成影响.
+    """
+    def started(self, event):
+        # ms = "Heartbeat sent to server {0.connection_id}".format(event)
+        # logger.info(ms)
+        pass
+
+    def succeeded(self, event):
+        # ms = "Heartbeat to server {0.connection_id} succeeded with reply {0.reply.document}".format(event)
+        # logger.info(ms)
+        pass
+
+    def failed(self, event):
+        ms = "Warning: Heartbeat to server {0.connection_id} failed with error {0.reply}".format(event)
+        logger.info(ms)
+
+
+class DBTopologyListener(monitoring.TopologyListener):
+    """
+    数据库拓扑变化监听器.
+    注意所有监听器都是同步执行的!!!
+    1.没必要不要使用,因为多少对性能有影响.
+    2.必须要使用的情况下,注意不要对性能造成影响.
+    """
+    def opened(self, event):
+        # ms = "Topology with id {0.topology_id} opened".format(event)
+        # logger.info(ms)
+        pass
+
+    def description_changed(self, event):
+        # ms = "Topology description updated for topology id {0.topology_id}".format(event)
+        # logger.info(ms)
+        previous_topology_type = event.previous_description.topology_type
+        new_topology_type = event.new_description.topology_type
+        # if new_topology_type != previous_topology_type:
+        #     ms = "Topology {0.topology_id} changed type from {0.previous_description.topology_type_name} " \
+        #          "to {0.new_description.topology_type_name}".format(event)
+        #     logger.info(ms)
+        #
+        # if not event.new_description.has_writable_serv/er():
+        #     ms = "Warning: No writable servers available."
+        #     logger.warning(ms)
+        #
+        # if not event.new_description.has_readable_server():
+        #     ms = "Warning: No readable servers available."
+        #     logger.warning(ms)
+
+    def closed(self, event):
+        # ms = "Warning: Topology with id {0.topology_id} closed".format(event)
+        # logger.info(ms)
+        pass
+
+
+"""注册全局监听器"""
+monitoring.register(DBCommandListener())
+monitoring.register(DBServerListener())
+monitoring.register(DBHeartBeatListener())
+monitoring.register(DBTopologyListener())
 
 
 class DB:
