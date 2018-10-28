@@ -9,38 +9,38 @@
     <link rel="stylesheet" href="css/bootstrap.css" />
     <link href="img/logo_purple.png" rel="shortcut icon" type="image/x-icon" />
 </head>
-<body>
+<body class="bodys">
 <!--导航-->
 {{ form.hidden_tag() }}
 <!--滚动条下拉导航-->
-<div class="fixed" id="hidden">
-    <div class="fixed-pd">
-        <div class="colors" id="colors2">
-            <div>
-                <a href="javascript:;" class="f1"><img src="img/logo_news.png"></a>
-                <a href="javascript:;" class=" hov f2 " name="color2">产 品</a>
-                <!--product.html -->
-                <a href="javascript:;" class=" hov f3 f3s" name="color2">解 决 方 案</a>
-                <!--scheme.html-->
-                <!--<a href="javascript:;" class=" hov f3" name="color2">合 作 企 业</a>-->
-                <!--cooperation.html -->
-                <a href="javascript:;" class=" hov f4" name="color2">案 例 介 绍</a>
-                <!-- -->
-                <a href="javascript:;" class=" hov f5" name="color2">在 线 演 示</a>
-                <!-- -->
-                <a href="javascript:;" class=" hov f6" name="color2">关 于 我 们</a>
-                <!--about.html -->
-                <a href="javascript:;" class=" hov f8" name="color2" id="login2">登录</a>
-                <a href="javascript:;" class=" hov f9" name="color2" id="res2">注册</a>
-            </div>
-        </div>
-        <div class="f7">
-            <input type="text" placeholder="搜点什么呢" id="text2">
-            <span class="search"><img src="img/incon.png"></span>
-        </div>
-    </div>
-    <div class="clear"></div>
-</div>
+<!--<div class="fixed" id="hidden">-->
+    <!--<div class="fixed-pd">-->
+        <!--<div class="colors" id="colors2">-->
+            <!--<div>-->
+                <!--<a href="javascript:;" class="f1"><img src="img/logo_news.png"></a>-->
+                <!--<a href="javascript:;" class=" hov f2 " name="color2">产 品</a>-->
+                <!--&lt;!&ndash;product.html &ndash;&gt;-->
+                <!--<a href="javascript:;" class=" hov f3 f3s" name="color2">解 决 方 案</a>-->
+                <!--&lt;!&ndash;scheme.html&ndash;&gt;-->
+                <!--&lt;!&ndash;<a href="javascript:;" class=" hov f3" name="color2">合 作 企 业</a>&ndash;&gt;-->
+                <!--&lt;!&ndash;cooperation.html &ndash;&gt;-->
+                <!--<a href="javascript:;" class=" hov f4" name="color2">案 例 介 绍</a>-->
+                <!--&lt;!&ndash; &ndash;&gt;-->
+                <!--<a href="javascript:;" class=" hov f5" name="color2">在 线 演 示</a>-->
+                <!--&lt;!&ndash; &ndash;&gt;-->
+                <!--<a href="javascript:;" class=" hov f6" name="color2">关 于 我 们</a>-->
+                <!--&lt;!&ndash;about.html &ndash;&gt;-->
+                <!--<a href="javascript:;" class=" hov f8" name="color2" id="login2">登录</a>-->
+                <!--<a href="javascript:;" class=" hov f9" name="color2" id="res2">注册</a>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="f7">-->
+            <!--<input type="text" placeholder="搜点什么呢" id="text2">-->
+            <!--<span class="search"><img src="img/incon.png"></span>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="clear"></div>-->
+<!--</div>-->
 <!--banner-->
 <!--<div class="banner" id="br">-->
     <!--<div class="banner-img" id="banner">-->
@@ -58,19 +58,19 @@
     <ul class="carousel-indicators">
         <li class="active" data-slide-to="0" data-target="#carousel"></li>
         <li data-slide-to="1" data-target="#carousel"></li>
-        <!--<li data-slide-to="2" data-target="#carousel"></li>-->
+        <li data-slide-to="2" data-target="#carousel"></li>
         <!--<li data-slide-to="3" data-target="#carousel"></li>-->
     </ul>
     <div class="carousel-inner">
         <div class="item active">
-            <img src="img/banner.jpg" width="100%">
+            <img src="img/AI.jpg" width="100%">
         </div>
         <div class="item">
-            <img src="img/banner2.jpg" width="100%">
+            <img src="img/AI2.jpg" width="100%">
         </div>
-        <!--<div class="item">-->
-            <!--<img src="img/Banner1.jpg" width="100%">-->
-        <!--</div>-->
+        <div class="item">
+            <img src="img/AI3.jpg" width="100%">
+        </div>
         <!--<div class="item">-->
             <!--<img src="img/Banner2222.jpg" width="100%">-->
         <!--</div>-->
@@ -99,54 +99,59 @@
     <div class="fixed-pd">
         <div class=" colors" id="colors">
             <!-- container-->
-            <div>
-                <a href="javascript:;" class=" f1"><img src="img/logo_news.png"></a>
-                <a href="javascript:;" class=" hov f2 " name="color">产 品</a>
-                <!--product.html -->
-                <a href="javascript:;" class=" hov f3 f3s" name="color">解 决 方 案</a>
-                <!--scheme.html-->
-                <!--<a href="javascript:;" class=" hov f3" name="color">合 作 企 业</a>-->
-                <!--cooperation.html -->
-                <a href="javascript:;" class=" hov f4" name="color">案 例 介 绍</a>
-                <!-- -->
-                <a href="javascript:;" class=" hov f5" name="color">在 线 演 示</a>
-                <!-- -->
-                <a href="javascript:;" class=" hov f6" name="color">关 于 我 们</a>
-                <!--about.html -->
+                <ul>
+                    <li>
+                        <a href="javascript:;" class=" f1">
+                            <img src="img/logo_white.png">
+                        </a>
+                    </li>
 
-                <a href="javascript:;" class=" hov f8" name="color" id="login">登录</a>
-                <a href="javascript:;" class=" hov f9" name="color" id="res">注册</a>
-            </div>
-            <div class="f7">
-                <input type="text" placeholder="搜点什么呢"  id="text">
-                <a href="" class="search"><img src="img/incon.png"></a>
-            </div>
+                    <li class="f2_hovs_pos">
+                        <a href="javascript:;" class=" hov f2 " name="color">产 品</a>
+
+                    </li>
+
+                    <!--product.html -->
+                   <li class="f2_hovs_pos f3_hovs_pos">
+                       <a href="javascript:;" class=" hov f3 f3s" name="color">解 决 方 案</a>
+
+                   </li>
+                    <!--scheme.html-->
+                    <!--<a href="javascript:;" class=" hov f3" name="color">合 作 企 业</a>-->
+                    <!--cooperation.html -->
+                   <li class="f2_hovs_pos f4_hovs_pos">
+                       <a href="javascript:;" class=" hov f4" name="color">案 例 介 绍</a>
+
+                   </li>
+                    <!-- -->
+                   <li class="f2_hovs_pos f5_hovs_pos">
+                       <a href="javascript:;" class=" hov f5" name="color">在 线 演 示</a>
+
+                   </li>
+                    <!-- -->
+                   <li class="f2_hovs_pos f6_hovs_pos">
+                       <a href="javascript:;" class=" hov f6" name="color">关 于 我 们</a>
+
+                   </li>
+                    <!--about.html -->
+
+                   <li>
+                       <a href="javascript:;" class=" hov f8" name="color" id="login">登录</a>
+                   </li>
+                   <li>
+                       <a href="javascript:;" class=" hov f9" name="color" id="res">注册</a>
+                   </li>
+                </ul>
+                <div class="f7">
+                    <input type="text" placeholder="搜点什么呢"  id="text">
+                    <a href="javascript:;" class="search"><img src="img/incon.png"></a>
+                </div>
+
         </div>
-        <!--<nav class="navbar navbar-default" role="navigation" id="kk">-->
-            <!--<div class="navbar-header">-->
-                <!--<button type="button" class="navbar-toggle" data-toggle="collapse"-->
-                        <!--data-target="#example-navbar-collapse" id="gg">-->
-                    <!--<span></span>-->
-                    <!--<span></span>-->
-                    <!--<span></span>-->
-                <!--</button>-->
-                <!--<a id="hh" class="navbar-brand" href=""></a>-->
-            <!--</div>-->
-            <!--<div class="collapse navbar-collapse" id="example-navbar-collapse">-->
-                <!--<ul class="nav navbar-nav" id="ul">-->
-                    <!--<li><a href="">Bootstrap2中文文档</a></li>-->
-                    <!--<li><a href=""> Bootstrap3中文文档</a></li>-->
-                    <!--<li><a href="">Bootstrap 4.0 预览</a></li>-->
-                    <!--<li><a href="">Less 教程</a></li>-->
-                    <!--<li><a href="">jQuery API</a></li>-->
-                    <!--<li><a href=""> 网站实例</a></li>-->
-                    <!--<li><a href="">关于</a></li>-->
-                <!--</ul>-->
-            <!--</div>-->
-        <!--</nav>-->
 
         <div class="clear"></div>
     </div>
+    <div class="hiddens" id="hiddens"></div>
 </div>
 <!--登录注册-->
 <div class="reg" id="reg">
@@ -160,30 +165,37 @@
             <div class="reg-b">
                 <div class="reg-box" id="reg-box1">
                     <div class="regInputBox">
-                        <div class="reginputImg"></div>
+                        <div class="reginputImg">
+                            <i class="reginputImg_img" id="reginputImg_img"></i>
+                        </div>
                         <input class="regInput  " maxlength="11" id="iphone" placeholder="请输入11位正确号码">
                         <!--<div class="regInputTips" id="regInputTips">手机号码不能为空</div>-->
                         <!-- 手机号输入框没有内容且失去焦点时显示这个ID的内容 regInputTips-->
                     </div>
                     <div class="regInputBox">
-                        <div class="reginputImg reginputImgPsw"></div>
+                        <div class="reginputImg reginputImgPsw">
+                            <i class="reginputImg_img" id="reginputImg_pwd"></i>
+                        </div>
                         <input type="password" class="regInput " placeholder="请设置登录密码" id="password" maxlength="16">
                         <!--<div class="regInputTips" id="regInputTips2">密码必须在6-16个字符之间,由数字、大小写字母、特殊字符组成</div>-->
                         <!-- 密码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips-->
                     </div>
                     <div class="regInputBox">
-                        <div class="reginputImg reginputImgPsw"></div>
+                        <div class="reginputImg reginputImgPsw">
+                            <i class="reginputImg_img" id="reginputImg_pwd2"></i>
+                        </div>
                         <input type="password" class="regInput " placeholder="请确认登录密码" id="password2" maxlength="16">
                         <!--<div class="regInputTips" id="regInputTips2">密码必须在6-16个字符之间,由数字、大小写字母、特殊字符组成</div>-->
                         <!-- 密码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips2-->
                     </div>
                     <div class="regInputBox">
                         <div class="regYZMbox" id="regYZMbox">
-                            <input class="regInputYZM" type="text" id="code_input" value="" placeholder="请输入短信验证码" maxlength="4">
-                            <!--<a href="javascript:;" class="sx_btn" id="my_button"></a>-->
-                            <input class="ver_mid"  type="button" id="v_container" value="获取短信验证码">
+                            <i class="reginputImg_img" id="reginputImg_yzm"></i>
                             <!---->
                         </div>
+                        <input class="regInputYZM" type="text" id="code_input" value="" placeholder="请输入短信验证码" maxlength="4">
+                        <!--<a href="javascript:;" class="sx_btn" id="my_button"></a>-->
+                        <input class="ver_mid"  type="button" id="v_container" value="获取短信验证码">
                         <!--<div class="regInputTips" id="regInputTips3">请输入验证码</div>-->
                         <!-- 验证码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips3-->
                     </div>
@@ -199,13 +211,17 @@
                 </div>
                 <div class="reg-box" id="reg-box2">
                     <div class="regInputBox">
-                        <div class="reginputImg"></div>
+                        <div class="reginputImg">
+                            <i class="reginputImg_img" id="reginputImg_iphone2"></i>
+                        </div>
                         <input class="regInput  " maxlength="11" id="iphone2" placeholder="请输入11位正确号码">
                         <!--<div class="regInputTips" id="regInputTips">手机号码不能为空</div>-->
                         <!-- 手机号输入框没有内容且失去焦点时显示这个ID的内容 regInputTips-->
                     </div>
                     <div class="regInputBox">
-                        <div class="reginputImg reginputImgPsw"></div>
+                        <div class="reginputImg reginputImgPsw">
+                            <i class="reginputImg_img" id="reginputImg_pwd3"></i>
+                        </div>
                         <input type="password" class="regInput " placeholder="请输入登录密码" id="password3" maxlength="16">
                         <!--<div class="regInputTips" id="regInputTips2">密码必须在6-16个字符之间,由数字、大小写字母、特殊字符组成</div>-->
                         <!-- 密码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips-->
@@ -238,6 +254,218 @@
     </div>
 </div>
 
+<!--功能介绍-->
+<div class="may_product">
+    <div class="my_product_content">
+        <ul id="may_product_ul">
+            <li class="float1">
+                <div>
+                    <img src="img/se1.png">
+                </div>
+                <h4>网站建设</h4>
+                <p>一站式解决网站解决方案</p>
+            </li>
+            <li>
+                <div>
+                    <img src="img/se2.png" >
+                </div>
+                <h4>电子科技</h4>
+                <p>解决工业电子与互联网对接方案</p>
+            </li>
+            <li>
+                <div>
+                    <img src="img/se3.png" >
+                </div>
+                <h4>智能应用</h4>
+                <p>加入AI,AR 呈现完美的用户体验</p>
+            </li>
+            <li class="float4">
+                <div>
+                    <img src="img/se4.png" >
+                </div>
+                <h4>企业管理</h4>
+                <p>OA,CRM 管理系统定制开发</p>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--功能介绍下案例-->
+<div class="sideShow">
+    <div class="sideTitle">
+        <div><img src="img/first.png">网站建设</div>
+        <div><img src="img/first.png">电子科技</div>
+        <div><img src="img/first.png">智能应用</div>
+        <div><img src="img/first.png">企业管理</div>
+    </div>
+    <div class="sideContent">
+        <div class="sideContent_left">
+            <div class="sideContent_left_title">
+                <span>解决方案</span>
+                <img src="img/right.png">
+                <a href="javascript:;">more></a>
+            </div>
+            <div class="sideContent_left_Box">
+                <div class="sideContent_left_box">
+                    <div class="sideContent_left_slider">
+                        <img src="img/wangzhan.jpg">
+                    </div>
+                    <div class="sideContent_left_text">
+                        <div class="sideContent_left_text_title">
+                            <h4>网站建设</h4>
+                            <p>
+                                深度剖析行业特征以确立品牌定位，并由此塑造并设计互联网系品牌化形象展示，
+                                让品牌内在与网站视觉设计形神兼备；而后制定精准的网络营销策略以此打造行之有效的网络营销体系。
+                            </p>
+                        </div>
+                        <div class="sideContent_left_texts">
+                            <h4 class="h4s">服务与应用</h4>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="sideContent_left_box">
+                    <div class="sideContent_left_slider">
+                        <img src="img/keji.png">
+                    </div>
+                    <div class="sideContent_left_text">
+                        <div class="sideContent_left_text_title">
+                            <h4>电子科技</h4>
+                            <p>
+                                创导智能电子科技技术、产品和服务，为电子科技互联网行业提供整体优化解决方案，提高人类的生活品质。
+                            </p>
+                        </div>
+                        <div class="sideContent_left_texts">
+                            <h4 class="h4s">服务与应用</h4>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="sideContent_left_box">
+                    <div class="sideContent_left_slider">
+                        <img src="img/zhineng.png">
+                    </div>
+                    <div class="sideContent_left_text">
+                        <div class="sideContent_left_text_title">
+                            <h4>智能应用</h4>
+                            <p>
+                                通过无线互联网,物联网技术,把互联网产品连接在一起通过人性化配置,
+                                实现智能化以云计算技术和大数据运营模式,大大提升了用户体验度。
+                            </p>
+                        </div>
+                        <div class="sideContent_left_texts">
+                            <h4 class="h4s">服务与应用</h4>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="sideContent_left_box">
+                    <div class="sideContent_left_slider">
+                        <img src="img/guanli.jpg">
+                    </div>
+                    <div class="sideContent_left_text">
+                        <div class="sideContent_left_text_title">
+                            <h4>企业管理</h4>
+                            <p>
+                                对企业生产经营活动进行计划、组织、指挥、协调和控制等一系列开发，
+                                利用企业的人力、物力、财力、 信息等资源，实现多、快、好、省的目标，取得最大的投入产出效率。
+                            </p>
+                        </div>
+                        <div class="sideContent_left_texts">
+                            <h4 class="h4s">服务与应用</h4>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                            <p>深度剖析行业特由此塑备</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="sideContent_right">
+            <div class="sideContent_right_title">
+                   <span>定制区</span>
+                    <img src="img/shop.png">
+            </div>
+            <div class="sideContent_right_Box">
+                <div class="sideContent_right_B">
+                    <div class="sideContent_right_box">
+                        <img src="img/wangzhanjianshe1.png">
+                        <p>
+                            官网门户 ￥<span>2000</span> 起
+                        </p>
+                        <div class="sideContent_right_btn">立即定制</div>
+                    </div>
+                    <div class="sideContent_right_box">
+                        <img src="img/wangzhanjianshe2.png">
+                        <p>
+                            商城店铺 ￥<span>5000</span> 起
+                        </p>
+                        <div class="sideContent_right_btn">立即定制</div>
+                    </div>
+                </div>
+                <div class="sideContent_right_B">
+                    <div class="sideContent_right_box">
+                        <img src="img/xinpian.png">
+                        <p>
+                            设备+互联网 ￥<span>2万</span> 起
+                        </p>
+                        <div class="sideContent_right_btn">立即定制</div>
+                    </div>
+                    <div class="sideContent_right_box">
+                        <img src="img/kji.png">
+                        <p>
+                            工业+互联网 ￥<span>5万</span> 起
+                        </p>
+                        <div class="sideContent_right_btn">立即定制</div>
+                    </div>
+                </div>
+                <div class="sideContent_right_B">
+                    <div class="sideContent_right_box">
+                        <img src="img/zhinengyingyong2.png">
+                        <p>
+                            图像处理+APP ￥<span>3万</span> 起
+                        </p>
+                        <div class="sideContent_right_btn">立即定制</div>
+                    </div>
+                    <div class="sideContent_right_box">
+                        <img src="img/zhinengyingyong1.png">
+                        <p>
+                            语音处理+APP ￥<span>3万</span> 起
+                        </p>
+                        <div class="sideContent_right_btn">立即定制</div>
+                    </div>
+                </div>
+                <div class="sideContent_right_B">
+                    <div class="sideContent_right_box">
+                        <img src="img/qiyeguanli.png">
+                        <p>
+                            OA+ ￥<span>2万 </span> 起
+                        </p>
+                        <div class="sideContent_right_btn">立即定制</div>
+                    </div>
+                    <div class="sideContent_right_box">
+                        <img src="img/guanli2.png">
+                        <p>
+                            ERP+ ￥<span>5万</span> 起
+                        </p>
+                        <div class="sideContent_right_btn">立即定制</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 <!--产品介绍标题-->
 <div class="product">
     <div class="product-c">
@@ -247,6 +475,7 @@
         <div class="product-R"></div>
     </div>
 </div>
+
 <!--产品介绍内容-->
 <div class="by">
     <div class="tabs">
@@ -445,10 +674,6 @@
                     <div class="system_hide" id="system_hide6"></div>
                 </div>
             </div>
-
-
-
-
             <div class="abbr-content2 ">
                 <div class=" abbr-1">
                     <h2>商超商业管理</h2>
@@ -1846,6 +2071,26 @@
 <!--底部-->
 <div class="footer">
     <div class="footer-content">
+        <div class="footer_tops">
+            <ul>
+                <li>
+                    <img src="img/money.png" width="50%">
+                    <p>首年免维护费</p>
+                </li>
+                <li>
+                    <img src="img/vip.png" width="50%">
+                    <p>尊享VIP套餐</p>
+                </li>
+                <li>
+                    <img src="img/time.png" width="50%">
+                    <p>7×24小时技术支持</p>
+                </li>
+                <li>
+                    <img src="img/serve.png" width="50%">
+                    <p>1V1大客户服务</p>
+                </li>
+            </ul>
+        </div>
         <div class="footer-l-top">
             <ul>
                 <li>
@@ -1871,16 +2116,28 @@
                 <span>企业微信</span>
             </div>
         </div>
+        <div class="clear"></div>
+        <div class="footer_bottoms">
+            <ul>
+                <li>官网门户</li>
+                <li>商城店铺</li>
+                <li>站点支持</li>
+                <li>设备对接</li>
+                <li>工业对接</li>
+                <li>智能应用</li>
+                <li>图像处理</li>
+                <li>企业管理</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-b-c">
+        <div class="footer-bottom">
+            <a href="" class="bh">上海必弘信息技术有限公司</a>
+            <a href="https://www.amap.com/place/B00155NMJ4" target="_blank">上海市嘉定区安亭镇新源路155弄v6时代新源商务楼1612室</a>
+            <div>©2018 BIHO<span id="lx"> 联系我们</span><span>隐私条款 </span>沪ICP备18034805号-1</div>
+        </div>
     </div>
 </div>
-<div class="footer-b-c">
-    <div class="footer-bottom">
-        <a href="" class="bh">上海必弘信息技术有限公司</a>
-        <a href="https://www.amap.com/place/B00155NMJ4" target="_blank">上海市嘉定区安亭镇新源路155弄v6时代新源商务楼1612室</a>
-        <div>©2018 BIHO<span id="lx"> 联系我们</span><span>隐私条款 </span>沪ICP备18034805号-1</div>
-    </div>
-</div>
-
 
 
 
@@ -1890,7 +2147,9 @@
     <a href="javascript:;" class="gd-nav-sj" id="gd-nav-sj"></a>
     <a href="javascript:;" class="gd-nav-wx" id="gd-nav-wx"></a>
     <!--<a href="javascript:;" class="gd-nav-jd" id="gd-nav-jd"></a>-->
-    <a href="javascript:;" class="gd-nav-top-hide" id="gd-nav-top-hide"></a>
+    <div class="gd-nav-top-hide" id="gd-nav-top-hide"></div>
+    <a href="javascript:;" class="gd-nav-top-hide2" id="gd-nav-top-hide2"></a>
+
     <div id="sj-hide"></div>
     <div id="wx-hide"></div>
     <div id="jd-hide"></div>
@@ -1932,6 +2191,8 @@
 
         }
     })
+
+
 
 
 
@@ -1981,11 +2242,16 @@
                 scrollTop: $(".succeed").offset().top }, {duration: 500,easing: "swing"});
             return false;
         });
+        $("#gd-nav-top-hide2").click(function () {
+            $("html, body").animate({
+                scrollTop: $(".footer").offset().top }, {duration: 500,easing: "swing"});
+            return false;
+        })
 
     })
 
 
-    function A(){
+    function tab(){
         /*成功案例选项卡1*/
         $(".succeed-left-content2 div").eq(1).siblings().hide();
         $(".succeed-right-hidden .succeed-right").eq(1).siblings().hide();
@@ -2020,8 +2286,8 @@
             T=setInterval(ti,3000);
         });
     }
-    A()
-    function B(){
+    tab()
+    function tab2(){
         /*成功案例选项卡2*/
         $(".tab-box div").eq(1).siblings().hide();
         $(".tab-btn div").eq(1).css({background:"blue",color:"white",height:"60px",width:"121px",marginLeft:"-12px",boxShadow:"0 0 7px #000"});
@@ -2055,7 +2321,7 @@
             T2=setInterval(ti2,3000);
         });
     }
-    B()
+    tab2()
 </script>
 </body>
 <script src="js/index.js"></script>

@@ -1,4 +1,4 @@
-html, body, div, p, span, a, ul, li, ol, h1, h2, h3, h4, h5, h6, dd, dt, input, img, select, form, table, td, tr, hr, br, video, audio, textarea {
+html,div, p, span, a, ul, li, ol, h1, h2, h3, h4, h5, h6, dd, dt, input, img, select, form, table, td, tr, hr, br, video, audio, textarea {
     margin: 0;
     padding: 0;
     background: none;
@@ -12,6 +12,10 @@ p{
 }
 body{
     min-width: 1170px;
+
+}
+.bodys{
+    background: #f4f1f1;
 }
 ul li {
     list-style: none;
@@ -24,7 +28,7 @@ ul li {
 
 /*导航修饰*/
 .fixed{
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 100%;
     min-width: 1170px;
@@ -35,30 +39,52 @@ ul li {
 
     transition: all 0.5s;
     /*background: #072640;*/
-    background: rgba(255,255,255,0.1);
+    /*background: rgba(255,255,255,0.1);*/
     margin-bottom: 40px;
 
 }
-
+.fixed:hover{
+    background:#1f2229;
+}
 
 #nav:hover{
 
 }
 .fixed-pd a{
     /*color: inherit;*/
-    color:#c7c2c2;
+    color:white;
     font-size: 16px;
     /*padding: 0 20px;*/
     /*transition: all 0.8s;*/
     padding: 0 30px;
-    font-weight: 600;
+    font-weight: 700;
 
 }
 .fixed .hov:hover{
     /*color: #3c3a3a;*/
-    color: #5808ef;
+
     text-decoration: none;
     background: rgba(255,255,255,0.3);
+}
+
+
+.fixed .colors{
+    /*overflow: hidden;*/
+}
+.colors ul{
+    margin-bottom: 0;
+}
+
+
+
+.f2_hovs ul li{
+    height: 30px;
+    line-height: 30px;
+    margin-bottom: 3px;
+}
+.f2_hovs ul li a{
+    font-size: 14px;
+
 }
 .fixed .fixed-pd{
     width: 1170px;
@@ -78,6 +104,43 @@ ul li {
     margin-bottom: 3px;
 
 }
+.hiddens{
+    width: inherit;
+    height: 0px;
+    background: #1f2229;
+    z-index: 888;
+    overflow: hidden;
+    transition: all 1s;
+}
+
+.hiddens_content{
+    width: 1170px;
+    margin: auto;
+    overflow: hidden;
+    padding: 0 80px;
+}
+
+.hiddens_content .f2_hovs{
+    float: left;
+    width: 120px;
+}
+.hiddens_content .f4_hovs{
+    width: 155px;
+    padding-left: 15px;
+}
+
+.hiddens_content .f6_hovs{
+    width: 155px;
+    padding-left: 15px;
+}
+.f2_hovs a{
+    color: #0a62c3;
+
+    padding: 0 10px;
+}
+
+
+
 .f1,.f2,.f3,.f4,.f5,.f6{
     float: left;
 
@@ -330,7 +393,7 @@ ul li {
     width: 1170px;
     height: 35px;
     line-height: 35px;
-    background: #fff;
+    /*background: #fff;*/
     text-align: center;
     margin: auto;
     margin-top: 60px;
@@ -409,7 +472,292 @@ ul li {
 }
 /*产品介绍标题修饰*/
 
-/*产品介绍内容修饰*/
+
+
+/*功能模块修饰*/
+
+.may_product{
+    height: 150px;
+    margin-top: 30px;
+    width: 100%;
+}
+
+.my_product_content{
+    width: 1184px;
+    height:150px;
+    margin: auto;
+
+}
+.my_product_content ul{
+    overflow: hidden;
+    margin-bottom: 0;
+    height: 140px;
+    padding-top: 5px;
+}
+.my_product_content ul li{
+    float: left;
+    width: 24%;
+    height: 130px;
+    margin-right: 10px;
+    padding: 10px 0 10px 10px;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.my_product_content ul li:hover{
+    box-shadow: 0px 0px 6px 3px #999;
+    -webkit-box-shadow: 0px 0px 6px 3px #999;
+    -moz-box-shadow: 0px 0px 6px 3px #999;
+    -o-box-shadow: 0px 0px 6px 3px #999;
+    -ms-box-shadow: 0px 0px 6px 3px #999;
+}
+
+
+.may_product_content ul .float4 {
+    margin-right: 0;
+}
+.my_product_content ul div{
+    float: left;
+    width: 65px;
+    height: 65px;
+    margin-top: 22px;
+    margin-right: 10px;
+}
+.my_product_content ul div img{
+    width: 100%;
+    vertical-align: middle;
+}
+
+.my_product_content ul li h4{
+    float: left;
+    font-weight: bold;
+    font-size: 22px;
+    margin-top: 32px;
+    margin-bottom: 0px;
+    margin-left: 15px;
+}
+.my_product_content ul li p{
+    float: left;
+    margin-top: 12px;
+    font-size: 13px;
+    color: gray;
+}
+.my_product_content ul .float1{
+    margin-left: 6px;
+}
+.my_product_content ul .float1 h4 {
+    float: left;
+    font-weight: bold;
+    font-size: 22px;
+    margin-top: 32px;
+    margin-left: 15px;
+    margin-bottom: 0px;
+}
+.my_product_content ul .float1 p{
+    float: left;
+    margin-top: 12px;
+}
+
+/*功能模块修饰*/
+
+/*功能介绍下案例修饰*/
+
+.sideShow{
+    width: 100%;
+    margin-top: 30px;
+}
+.sideShow .sideTitle{
+    width: 1170px;
+    height: 50px;
+    line-height: 50px;
+    margin: auto;
+    background: silver;
+    padding: 0 10px;
+    position: relative;
+}
+.sideTitle div {
+    color: white;
+    font-size: 16px;
+    position: absolute;
+}
+
+.sideTitle div img{
+    margin-right: 5px;
+}
+
+
+
+.sideContent{
+    width: 1170px;
+    margin: auto;
+    height: 500px;
+
+    background: #fff;
+}
+
+
+.sideContent .sideContent_left{
+    float: left;
+    width: 70%;
+    height: 100%;
+    border: 1px solid #dbd9d9;
+
+}
+.sideContent_left .sideContent_left_title{
+    border-bottom: 1px solid #dbd9d9;
+    position: relative;
+    height: 50px;
+    line-height: 50px;
+    font-size: 16px;
+    padding-left: 15px;
+}
+.sideContent_left .sideContent_left_title img{
+    width: 28px;
+    height: 28px;
+}
+.sideContent_left .sideContent_left_title a{
+    position: absolute;
+    right: 20px;
+    font-size: 18px;
+    color: gray;
+}
+.sideContent_left .sideContent_left_title a:hover{
+    color: #00c1de;
+    text-decoration: underline;
+}
+
+.sideContent_left_Box {
+    width: 100%;
+    height: 90%;
+    /*background: salmon;*/
+    padding:  20px 0 20px 20px;
+    position: relative;
+}
+
+.sideContent_left_Box .sideContent_left_box{
+    position: absolute;
+    width: 100%;
+    height: 90%;
+
+    overflow: hidden;
+}
+
+.sideContent_left_box div{
+    float: left;
+}
+
+.sideContent_left_box .sideContent_left_slider{
+    width: 70%;
+    height: 100%;
+}
+.sideContent_left_box .sideContent_left_slider img{
+    width: 100%;
+    height: 100%;
+}
+.sideContent_left_box .sideContent_left_text{
+    width: 27%;
+    height: 100%;
+    padding: 0 5px 5px 10px;
+}
+.sideContent_left_box .sideContent_left_text h4{
+    margin-top: 0;
+    font-weight: 600;
+}
+.sideContent_left_box .sideContent_left_text .h4s{
+    margin-top: 20px;
+}
+.sideContent_left_box .sideContent_left_text p{
+    font-size: 14px;
+    line-height: 26px;
+}
+.sideContent_left_text .sideContent_left_text_title{
+    height: 185px;
+}
+
+
+
+.sideContent_left_texts{
+    width: 104%;
+}
+
+.sideContent_left_text .sideContent_left_texts p{
+    width: 95%;
+    height: 35px;
+    line-height: 35px;
+    background: rgb(218, 211, 211);
+    border-left: 3px solid white;
+    color: white;
+    margin-bottom: 10px;
+    text-indent: 10px;
+    cursor: pointer;
+    font-weight: 700;
+}
+.sideContent_left_text .sideContent_left_texts p:hover{
+    border-left: 3px solid #00c1de;
+}
+
+.sideContent .sideContent_right{
+    float: left;
+    width: 30%;
+    height: 100%;
+    border-right: 1px solid #dbd9d9;
+    border-top: 1px solid #dbd9d9;
+    border-bottom: 1px solid #dbd9d9;
+}
+
+.sideContent .sideContent_right_title{
+    padding-left: 15px;
+    height: 50px;
+    line-height: 50px;
+    border-bottom: 1px solid #dbd9d9;
+    font-size: 16px;
+}
+.sideContent .sideContent_right_title img{
+    width: 28px;
+    height: 28px;
+}
+
+.sideContent .sideContent_right_Box{
+    position: relative;
+    width: 100%;
+}
+.sideContent .sideContent_right_Box .sideContent_right_B{
+    width: 100%;
+    position: absolute;
+    padding: 5px;
+}
+.sideContent_right_Box .sideContent_right_box{
+    text-align: center;
+    background: rgb(218, 211, 211);
+    font-weight: 600;
+    margin: 10px auto;
+    width: 88%;
+    padding: 5px;
+
+}
+
+.sideContent_right_box p{
+    font-size: 16px;
+}
+.sideContent_right_box p span{
+    color: red;
+}
+
+.sideContent_right_box .sideContent_right_btn{
+    width: 106px;
+    height: 33px;
+    background: rgb(245, 140, 3);
+    opacity: 0.7;
+    line-height: 33px;
+    border-radius: 5px;
+    color: white;
+    margin: 5px auto;
+    cursor: pointer;
+}
+
+
+    /*产品介绍内容修饰*/
 .by{
 
     height: 605px;
@@ -854,8 +1202,8 @@ ul li {
     position: relative;
 }
 .abbr_system_box .system_hide{
-    width: 48px;
-    height: 48px;
+    width: 32px;
+    height: 32px;
     background: url("../img/guanbi.png")no-repeat;
     position: absolute;
     top: -35px;
@@ -1148,7 +1496,7 @@ ul li {
 .succeed{
     min-width: 1170px;
     width: 1170px;
-    height: 507px;
+    height: 558px;
     margin: auto;
     position: relative;
     margin-bottom: 45px;
@@ -1156,12 +1504,13 @@ ul li {
 }
 .succeed-left{
     width: 650px;
-    height: 400px;
+    height: 430px;
     float: left;
 }
 .succeed-left-content{
     height: 66px;
     margin-bottom: 24px;
+    margin-top: 15px;
 }
 .succeed-left .succeed-left-content div{
     width: 130px;
@@ -1269,7 +1618,7 @@ ul li {
 .succeed .succeed-by{
     position: absolute;
     width: 934px;
-    height: 402px;
+    height: 428px;
     background: #e4e4e5;
     top: 127px;
     left: 236px;
@@ -1412,8 +1761,8 @@ ul li {
 }
 .visible1 .visible1-box a{
     display: inline-block;
-    width: 48px;
-    height: 48px;
+    width: 32px;
+    height: 32px;
     background: url("../img/guanbi.png")no-repeat;
     position: absolute;
     top: -35px;
@@ -2624,7 +2973,7 @@ ul li {
     min-width: 1170px;
     background: #1f2229;
     padding-top: 50px;
-    height: 330px;
+
 }
 .footer-content{
     margin: auto;
@@ -2632,9 +2981,56 @@ ul li {
     height: inherit;
     overflow: hidden;
 }
+.footer_tops{
+    margin-bottom: 60px;
+}
+.footer_tops ul {
+    overflow: hidden;
+    height: 200px;
+}
+.footer_tops ul li{
+    width: 25%;
+    height: 200px;
+    border-bottom: 1px solid rgba(136,136,136,0.1);
+    float: left;
+    text-align: center;
+
+}
+.footer_tops ul li img{
+    line-height: 200px;
+}
+.footer_tops ul li p{
+    margin-top: 7px;
+    font-size: 20px;
+    color: white;
+}
+
+.footer_bottoms{
+    width: inherit;
+    height: 100px;
+}
+.footer_bottoms ul{
+    overflow: hidden;
+}
+.footer_bottoms ul li{
+    float: left;
+    list-style: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    width: calc(100%/8);
+    line-height: 111px;
+    text-align: center;
+    opacity: 0.5;
+}
+.footer_bottoms ul li:hover{
+    opacity: 1;
+    cursor: pointer;
+}
+
 .footer-l-top{
     width: 808px;
-    height: 280px;
+    height: auto;
     float: left;
 }
 .footer-l-top ul li{
@@ -2655,7 +3051,7 @@ ul li {
 
 .footer-r-top{
     width: 362px;
-    height: 280px;
+    height: auto;
 
     float: left;
     text-align: center;
@@ -2693,7 +3089,7 @@ ul li {
 .footer-b-c{
     height: 59px;
     line-height: 59px;
-    background: #191c22;
+    background: #1f2229;
 }
 
 .footer-bottom{
@@ -2797,17 +3193,30 @@ ul li {
     background-position: -1px -126px;
 }
 .gd-nav .gd-nav-top-hide{
-    display: block;
+    display: none;
     width: 40px;
     height: 40px;
     margin-bottom: 2px;
     background: url("../img/gudingdaohang.png") no-repeat -50px -168px;
     transition: all 0.3s;
     cursor: pointer;
-    visibility: hidden;
+
 }
 .gd-nav .gd-nav-top-hide:hover{
     background-position: -1px -168px;
+}
+.gd-nav .gd-nav-top-hide2{
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 2px;
+    transition: all 0.3s;
+    cursor: pointer;
+    visibility: hidden;
+    background: url("../img/gudingdaohang2.png") no-repeat -50px -210px;
+}
+.gd-nav .gd-nav-top-hide2:hover{
+    background-position: -1px -210px;
 }
 .gd-nav #sj-hide{
 
@@ -2831,7 +3240,6 @@ ul li {
 }
 
 .gd-nav #jd-hide{
-
     display: none;
     position: absolute;
     width: 150px;
@@ -2840,6 +3248,9 @@ ul li {
     top: 12px;
     background: url(../img/cberweima3.png) left top no-repeat;
 }
+
+
+
 
 /*侧边栏导航*/
 
@@ -2985,18 +3396,53 @@ ul li {
     margin-bottom: 15px;
     position: relative;
 }
-
+/*url("../img/shouji.png") no-repeat;*/
 .reginputImg{
-    background: #FFFFFF url("../img/regIcon.png") top left no-repeat;
+    background: #fafafa;
     width: 39px;
     height: 40px;
     position: absolute;
     top: 1px;
     left: 1px;
     z-index: 2;
+    border-right: 1px solid #b4b4b4;
+}
+.reginputImg .reginputImg_img{
+    display: inline-block;
+    background: url("../img/shouji.png")no-repeat;
+    background-size: 100% 100%;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
 }
 
 
+#reginputImg_pwd{
+    display: inline-block;
+    background: url("../img/mima.png")no-repeat;
+    background-size: 100% 100%;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
+}
+#reginputImg_pwd2{
+    display: inline-block;
+    background: url("../img/mima.png")no-repeat;
+    background-size: 100% 100%;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
+
+}
+#reginputImg_pwd3{
+    display: inline-block;
+    background: url("../img/mima.png")no-repeat;
+    background-size: 100% 100%;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
+
+}
 .regInput{
     width: 350px;
     height: 42px;
@@ -3026,6 +3472,7 @@ ul li {
 
 .regInputBox{
     overflow: hidden;
+
 }
 
 
@@ -3034,9 +3481,27 @@ ul li {
     height: 42px;
     padding: 10px 10px 10px 49px;
     border: 1px solid #b4b4b4;
-    background: #FFFFFF url("../img/regIcon.png") left -80px no-repeat;
     float: left;
     outline: none;
+}
+
+.regYZMbox{
+    width: 39px;
+    height: 40px;
+    background: #fafafa;
+    border-right: 1px solid #b4b4b4;
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    z-index: 2;
+}
+.regYZMbox #reginputImg_yzm{
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url("../img/dunpai.png")no-repeat;
+    background-size: 100% 100%;
+    margin-top: 10px;
 }
 
 .ver_mid{
@@ -3044,7 +3509,8 @@ ul li {
     width: 115px;
     height: 42px;
     line-height: 42px;
-    background: #ff6632;
+    /*background: #ff6632;*/
+    background: #1e90ff;
     color: white;
     margin-left: 30px;
     cursor: pointer;
@@ -3052,7 +3518,9 @@ ul li {
     font-size: 13px;
     border-radius: 5px;
 }
-
+.ver_mid:hover{
+    background: #2e90ef;
+}
 .ver_mid2{
     float: left;
     width: 90px;
@@ -3125,7 +3593,8 @@ ul li {
     line-height: 40px;
     text-align: center;
     margin: 15px 0;
-    background: #ff6632;
+    /*background: #ff6632;*/
+    background: #1e90ff;
     color: #fff;
     font-weight: bold;
     font-size: 16px;
@@ -3135,7 +3604,7 @@ ul li {
 }
 
 .regBtnOrg:hover{
-    background: #ff4001;
+    background: #2e90ef;
     cursor: pointer;
 }
 
