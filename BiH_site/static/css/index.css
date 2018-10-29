@@ -402,6 +402,11 @@ ul li {
     font-family: "Microsoft YaHei";
     font-size: 0;
 }
+
+.products{
+    margin-top: 50px;
+    margin-bottom: 35px;
+}
 .product .product-c{
     position: relative;
     color: #000000;
@@ -506,11 +511,11 @@ ul li {
     transition: all 0.3s;
 }
 .my_product_content ul li:hover{
-    box-shadow: 0px 0px 6px 3px #999;
-    -webkit-box-shadow: 0px 0px 6px 3px #999;
-    -moz-box-shadow: 0px 0px 6px 3px #999;
-    -o-box-shadow: 0px 0px 6px 3px #999;
-    -ms-box-shadow: 0px 0px 6px 3px #999;
+    box-shadow: 0px 0px 6px 1px #999;
+    -webkit-box-shadow: 0px 0px 6px 1px #999;
+    -moz-box-shadow: 0px 0px 6px 1px #999;
+    -o-box-shadow: 0px 0px 6px 1px #999;
+    -ms-box-shadow: 0px 0px 6px 1px #999;
 }
 
 
@@ -687,7 +692,7 @@ ul li {
     line-height: 35px;
     background: rgb(218, 211, 211);
     border-left: 3px solid white;
-    color: white;
+    color: #545b5e;
     margin-bottom: 10px;
     text-indent: 10px;
     cursor: pointer;
@@ -3212,7 +3217,6 @@ ul li {
     margin-bottom: 2px;
     transition: all 0.3s;
     cursor: pointer;
-    visibility: hidden;
     background: url("../img/gudingdaohang2.png") no-repeat -50px -210px;
 }
 .gd-nav .gd-nav-top-hide2:hover{

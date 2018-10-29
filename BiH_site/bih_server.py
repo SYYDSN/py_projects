@@ -7,7 +7,7 @@ from flask import make_response
 from flask import request
 from flask import session
 from flask_session import Session
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from flask import redirect
 from mail_module import send_mail
 import json
@@ -42,8 +42,9 @@ def favicon_func():
 
 @app.route("/")
 def index_func():
-    """首页重定向"""
-    return redirect("/index.html")
+    """首页"""
+    form = FlaskForm()
+    return render_template("index.html", form=form)
 
 
 @app.route("/fonts/<path>")
@@ -76,7 +77,7 @@ def sms_func(action):
     mes = {"message": "success"}
     if action in ['get', 'send']:
         """发送短信"""
-        form = Form()
+        form = FlaskForm()
         if form.validate_on_submit():
             phone = get_arg(request, "phone", "")
             if check_phone(phone):
@@ -128,7 +129,7 @@ def reg_func():
     :return:
     """
     mes = {"message": "success"}
-    form = Form()
+    form = FlaskForm()
     if form.validate_on_submit():
         args = get_args(request)
         args.pop('csrf_token', None)
@@ -174,7 +175,7 @@ def login_func():
     :return:
     """
     mes = {"message": "success"}
-    form = Form()
+    form = FlaskForm()
     if form.validate_on_submit():
         args = get_args(request)
         if 'phone' in args:
@@ -220,7 +221,7 @@ def common_func(the_path):
     if the_path not in path_list:
         return abort(404)
     else:
-        return render_template(the_path, form=Form())
+        return render_template(the_path, form=FlaskForm())
 
 
 if __name__ == '__main__':

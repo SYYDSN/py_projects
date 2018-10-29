@@ -27,6 +27,7 @@ def list_dir(replace_path: str = "") -> dict:
     res = dict()
     for r in r1:
         l2 = os.listdir(r)
+        l2 = [x for x in l2 if os.path.isfile(os.path.join(r, x))]
         if "readme.md" in l2:
             """找到有效的目录"""
             readme_path = os.path.join(r, "readme.md")

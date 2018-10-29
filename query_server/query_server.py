@@ -5,6 +5,7 @@ from views.root_view import root_blueprint
 from flask import session
 from flask import send_file
 from flask_session import Session
+from orm_module import FlaskUrlRule
 import datetime
 
 
@@ -27,6 +28,8 @@ def favicon_func():
 
 """获取路由规则,必须在最后部分"""
 
+
+FlaskUrlRule.init(flask_app=app)
 
 
 if __name__ == '__main__':

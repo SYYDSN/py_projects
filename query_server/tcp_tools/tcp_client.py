@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
-__project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if __project_dir__ not in sys.path:
-    sys.path.append(__project_dir__)
 import socket
+from uuid import uuid4
+from threading import Thread
 import time
 
 
@@ -34,7 +31,7 @@ class TCPClient:
         client = self.client
         client.sendall(s)
 
-    def listen(self):
+    def listen(self, delay: float = 2):
         """
 
         :return:
@@ -44,16 +41,38 @@ class TCPClient:
         while not self.stop:
             data = client.recv(1024).decode(encoding="utf-8")
             print(data)
-            time.sleep(0.01)
-            client.sendall("CheckTraceCodeCanUse, I coming!".encode(encoding="utf-8"))
+            time.sleep(delay)
+            s = "CheckTraceCodeCanUse, {}".format(uuid4().hex)
+            client.sendall(s.encode(encoding="utf-8"))
 
     def close(self):
         self.client.close()
         del self
 
+    @classmethod
+    def batch_listen(cls, num: int = 3, delay: float = 2) -> None:
+        """
+        批量监听
+        :param num:
+        :return:
+        """
+        for i in range(num):
+            cli = TCPClient()
+            cli.connect('127.0.0.1', 7000)
+            lis = cli.listen
+            t = Thread(target=lis, args=(delay,))
+            print(i)
+            t.start()
+
 
 if __name__ == "__main__":
-    cli = TCPClient()
-    cli.connect('127.0.0.1', 7000)
-    cli.listen()
+    # cli = TCPClient()
+    # cli.connect('127.0.0.1', 7000)
+    # cli.listen()
+    import os
+    os.fork()
+    os.fork()
+    os.fork()
+    os.fork()
+    TCPClient.batch_listen(10, 0.001)
     pass

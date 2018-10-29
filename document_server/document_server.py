@@ -67,10 +67,18 @@ def md_view():
 @app.route("/image/<img>")
 def image_func(img):
     """
-    图片重定向函数
+    项目的md中的图片重定向函数
     :return:
     """
-    return send_from_directory(directory="document/image/", filename=img)
+    referrer = request.referrer
+    sep = "?m_path=/"
+    if sep not in referrer:
+        directory = "document/image/"
+    else:
+        project_name = referrer.split(sep)[-1].split("/")[0]
+        directory = os.path.join(replace_path, project_name, "document/image/")
+    return send_from_directory(directory=directory, filename=img)
+
 
 
 if __name__ == '__main__':

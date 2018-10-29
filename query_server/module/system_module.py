@@ -19,6 +19,28 @@ ObjectId = orm_module.ObjectId
 """
 
 
+class Company(orm_module.BaseDoc):
+    """
+    公司信息
+    """
+    _table_name = "company"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['company_name'] = str
+    type_dict['short_name'] = str
+    type_dict['desc'] = str
+
+
+class Dept(orm_module.BaseDoc):
+    """部门信息"""
+    _table_name = "dept"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['company_id'] = ObjectId
+    type_dict['parent_id'] = ObjectId  # 上级部门id
+    type_dict['dept_name'] = str
+
+
 class Root(orm_module.BaseDoc):
     """管理员"""
     _table_name = "root_info"
@@ -29,9 +51,9 @@ class Root(orm_module.BaseDoc):
     type_dict['time'] = datetime.datetime
 
     @classmethod
-    def add_user(cls, user_name: str, password: str, shell: bool = False) -> bool:
+    def add_root(cls, user_name: str, password: str, shell: bool = False) -> bool:
         """
-        添加用户.此函数应该只在命令行运行
+        添加管理员.此函数应该只在命令行运行
         :param user_name:
         :param password:
         :param shell: 是否是在命令行执行?
@@ -65,7 +87,7 @@ class Root(orm_module.BaseDoc):
     @classmethod
     def login(cls, user_name: str, password: str) -> dict:
         """
-        登录检查
+        管理员登录检查
         :param user_name:
         :param password:
         :return:
@@ -84,10 +106,63 @@ class Root(orm_module.BaseDoc):
         return mes
 
 
+class Role(orm_module.BaseDoc):
+    """
+    角色/权限组
+    """
+    _table_name = "role_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['role_name'] = str
+    """
+    rules是规则字典.
+    {
+        rule: {
+            method: {desc: desc, filter: filter, operate: operate}}
+        }
+    }
+    举例:
+    {
+        "/login":{
+            {"get": {"desc": "登录页面", "filter": 0, "operate": 1}},
+            {"post": {"desc": "登录验证函数", "filter": 0, "operate": 1}},
+        }
+    }
+    rule 是视图函数的rule,唯一不重复.取自orm_module.FlaskUrlRule.rule
+    method取自orm_module.FlaskUrlRule.method
+    desc: 对视图函数的说明.
+    operate: 是否能操作页面上的按钮.
+        0: 不能操作任何按钮
+        1: 可以操作一类按钮(查询,翻页)
+        2: 可以操作二类按钮(编辑)
+        3: 可以操作三类按钮(删除)
+    filter: 过滤器,用于限制查找范围
+        0: 不做任何限制,任何人都可以访问全部的数据
+        1: 只能访问本人的数据.
+        2: 只能访问本部门的数据
+        3: 可以访问全公司的数据
+    限制:    
+    用户模型必须有
+    1. dept_id   部门id,也可以用组id代替 部门id中有公司id
+    2. role_id    角色id
+    """
+    type_dict['rules'] = dict
+
+
 class User(orm_module.BaseDoc):
     """用户表"""
+    _table_name = "user_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['user_name'] = str
+    type_dict['password'] = str
+    type_dict['nick_name'] = str
+    type_dict['dept_id'] = ObjectId
+    type_dict['role_id'] = ObjectId
+    type_dict['last_update'] = datetime.datetime
+    type_dict['create_time'] = datetime.datetime
 
 
 if __name__ == "__main__":
-    print(Root.add_user("root", "123456", True))
+    # print(Root.add_root("root", "123456", True))
     pass

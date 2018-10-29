@@ -17,8 +17,8 @@ import datetime
 """客户经理的电子邮件模块"""
 
 
-my_email = "1016699242@qq.com"
-my_auth = "vqsbeozbzbbqbdah"  # 授权码
+my_email = "425649040@qq.com"
+my_auth = "wsyargefvundcaej"  # 授权码
 cache = RedisCache()
 logger = get_logger(os.path.split(__file__)[-1].split(".", 1)[0])
 

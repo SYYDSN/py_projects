@@ -39,6 +39,10 @@ from pymongo.errors import *
 MongoDB4+ 的持久化类   2018-10-11
 """
 
+version = "0.0.1"
+
+print("ORM模块当前版本号: {}".format(version))
+
 
 cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设置决定
 s_cache = SimpleCache()      # 使用内存的缓存,重启/关机就清空了.
@@ -238,6 +242,17 @@ def get_schema(database: str = None):
     else:
         schema = db_client[database]
     return schema
+
+
+def get_write_concern(w: (str, int) = "majority", j: bool = True) -> WriteConcern:
+    """
+    获取一个写关注对象
+    :param w:
+    :param j:
+    :return:
+    """
+    res = WriteConcern(w=w, j=j)
+    return res
 
 
 def get_conn(table_name: str, database: str = None, db_client: pymongo.MongoClient = None,
@@ -2150,6 +2165,7 @@ class FlaskUrlRule(BaseDoc):
     type_dict['args'] = list  # 视图函数的参数
     type_dict['endpoint'] = str  # 视图函数的端点
     type_dict['rule'] = str  # 路由规则
+    type_dict['desc'] = str  # 路由说明
 
     collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
 
@@ -2161,7 +2177,7 @@ class FlaskUrlRule(BaseDoc):
         :return:
         """
         rules = flask_app.url_map.iter_rules()
-
+        ses = cls.get_collection(write_concern=get_write_concern())
         for a_rule in rules:
             methods = [x.lower() for x in a_rule.methods if x.lower() in ["post", 'get']]
             args = [x for x in a_rule.arguments]
@@ -2169,11 +2185,16 @@ class FlaskUrlRule(BaseDoc):
             rule = a_rule.rule
             f = {"endpoint": endpoint}
             u = {"$set": {"args": args, "rule": rule, "methods": methods}}
+            ses.find_one_and_update(filter=f, update=u, upsert=True)
 
 
 class OperateLog(BaseDoc):
     """
-    管理员的操作日志,为了方便记录
+    操作日志,使用装饰器记录@OperateLog.log,
+    唯一的限制就是
+    1. 函数中必须有一个handler参数
+    2. handler必须是(用户)类的实例对象.
+    否则无法记录函数是由什么类的实例调用的.
     """
     _table_name = "global_log"
     type_dict = dict()
@@ -2208,15 +2229,17 @@ class OperateLog(BaseDoc):
     @staticmethod
     def log(func):
         """
-        记录操作的装饰器
+        记录操作的装饰器.@OperateLog.log,
         本方法理论上能记录所有的函数操作,唯一的限制就是
-        handler必须是类的实例对象.
+        1. 函数中必须有一个handler参数
+        2. handler必须是(用户)类的实例对象.
+        否则无法记录函数是由什么类的实例调用的.
         """
         @functools.wraps(func)
         def decorated_function(*args, **kwargs):
             """取日志需要记录的内容"""
             f_str = func.__str__()
-            func_class =None
+            func_class = None
             class_name_str = f_str.split("at", 1)[0].split(" ")[1].strip()
             function_name = func.__name__
             if function_name in class_name_str and function_name != class_name_str:
@@ -2250,40 +2273,6 @@ class OperateLog(BaseDoc):
             return func(*args, **kwargs)
 
         return decorated_function
-
-
-class GlobalAdmin(BaseDoc):
-    """
-    全局管理员类,注意,这个管理员组只有一个账户.不能添加账户.也不能删除账户. 这个管理员最大的用途就是操作GlobalRole和GlobalRule
-    """
-    _table_name = "global_admin"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    type_dict['user_id'] = str
-    type_dict['password'] = str
-    type_dict['time'] = datetime.datetime
-
-
-class GlobalRole(BaseDoc):
-    """
-    全局角色/权限组
-    所有需要设置权限的用户,都需要一个外键指过来
-    """
-    _table_name = "global_role"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    """
-    rules是一个字典,key是 GrantAuthorizationInfo中授权的表的名称
-    # 读权权限过滤器
-    type_dict['read'] = dict                 # 读权权限过滤器
-    type_dict['insert'] = dict               # 插入权限过滤器
-    type_dict['edit'] = dict                 # 编辑权限过滤器
-    type_dict['delete'] = dict               # 删除权限过滤器
-    """
-    type_dict['rules'] = dict
-    type_dict['time'] = datetime.datetime
-    type_dict['owner_id'] = ObjectId      # 创建者GlobalAdmin._id
-    type_dict['time'] = datetime.datetime
 
 
 """
