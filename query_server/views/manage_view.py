@@ -8,34 +8,33 @@ from flask import request
 from flask import Blueprint
 from flask import render_template
 from flask import abort
-from module.system_module import Root
+from module.system_module import User
 import json
 import datetime
 from tools_module import *
 
 
 """"
-管理员模块,用于:
-1. 添加账户
-2. 设置权限
+对系统进行操作模块.
 """
 
 
 """注册蓝图"""
-root_blueprint = Blueprint("root_blueprint", __name__, url_prefix="/root", template_folder="templates/root")
+manage_blueprint = Blueprint("manage_blueprint", __name__, url_prefix="/manage", template_folder="templates")
+project_name = "生产线条码管理系统"
 
 
 def login_func():
-    """管理员登录页面"""
+    """用户登录页面"""
     method = request.method.lower()
     if method == 'get':
         """返回登录页"""
-        return render_template("root/root_login.html", page_title="管理员登录")
+        return render_template("login.html", page_title="用户登录", project_name=project_name)
     elif method == 'post':
         """检查登录函数"""
         user_name = get_arg(request, "user_name", "")
         password = get_arg(request, "password", "")
-        mes = Root.login(user_name=user_name, password=password)
+        mes = User.login(user_name=user_name, password=password)
         if mes['message'] == 'success':
             _id = mes.pop('_id', None)
             session['_id'] = _id
@@ -46,7 +45,6 @@ def login_func():
         return abort(405)
 
 
-@check_root_session
 def common_func(root: Root = None, file_name: str = ''):
     """
     通用视图
@@ -87,6 +85,6 @@ def common_func(root: Root = None, file_name: str = ''):
 
 """集中注册视图函数"""
 """登录"""
-root_blueprint.add_url_rule(rule="/login", view_func=login_func, methods=['get', 'post'])
+manage_blueprint.add_url_rule(rule="/login", view_func=login_func, methods=['get', 'post'])
 """通用页面解析"""
-root_blueprint.add_url_rule(rule="/common/<file_name>", view_func=common_func, methods=['get', 'post'])
+manage_blueprint.add_url_rule(rule="/common/<file_name>", view_func=common_func, methods=['get', 'post'])

@@ -1,15 +1,31 @@
 $(function(){
+    var time_out = null;
+    var show_mes = function(obj){
+        /*
+        * 显示警告消息
+        * params obj: 一个jquery对象, 是显示消息的div
+        * */
+        if(time_out){
+            clearTimeout(time_out);
+        }else{}
+        obj.fadeTo(400, 1, function(){
+            time_out = setTimeout(function(){
+                obj.fadeTo(800, 0);
+            }, 3000);
+        });
+    };
+
     // 提交登录事件
     $("#sub_btn").click(function(){
         var user_name = $.trim($("#user_name").val());
         var password = $.trim($("#password").val());
 
         if(user_name === ""){
-            alert("用户名不能为空!");
+            show_mes($("#name_error"));
             return false;
         }
         else if(password === ""){
-            alert("密码不能为空!");
+            show_mes($("#pwd_error"));
             return false;
         }
         else{
@@ -17,10 +33,8 @@ $(function(){
                 "user_name": user_name,
                 "password": $.md5(password)
             };
-            var url = "/root/login";
-            $.pop_alert("正在登录,请稍后...");
+            var url = "/manage/login";
             $.post(url, args, function(resp){
-                $.close_alert();
                 var json = JSON.parse(resp);
                 var status = json['message'];
                 if(status === "success"){

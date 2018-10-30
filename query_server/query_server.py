@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from flask import Flask
-from views.root_view import root_blueprint
+from views.manage_view import manage_blueprint
 from flask import session
 from flask import send_file
 from flask_session import Session
@@ -15,7 +15,7 @@ app.config['SECRET_KEY'] = key_str  # 配置会话密钥
 app.config['SESSION_TYPE'] = "redis"  # session类型为redis
 app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持久化的会话的生存时间
-app.register_blueprint(root_blueprint)           # 注册管理员视图
+app.register_blueprint(manage_blueprint)           # 注册平台操作视图
 SESSION_TYPE = "redis"
 Session(app)
 port = 7012

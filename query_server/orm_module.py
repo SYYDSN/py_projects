@@ -1788,31 +1788,17 @@ class BaseDoc:
         return result
 
     @classmethod
-    def find_one(cls, **kwargs):
-        """根据条件查找对象,返回单个对象的实例"""
-        table_name = cls._table_name
-        ses = get_conn(table_name=table_name)
-        args = dict()
-        for k, v in kwargs.items():
-            if k == "_id":
-                if isinstance(v, str):
-                    try:
-                        object_id = get_obj_id(v)
-                        args[k] = object_id
-                    except TypeError as e:
-                        print(e)
-                        raise TypeError("ObjectId转换失败.val:{}".format(v))
-                elif isinstance(v, ObjectId):
-                    args[k] = v
-                else:
-                    raise TypeError("{} 不能转换成ObjectId".format(v))
-            else:
-                args[k] = v
-        result = ses.find_one(args)
-        if result is None:
-            return result
-        else:
-            return cls(**result)
+    def find_one(cls, filter_dict: dict = None, *args, **kwargs) -> dict:
+        """
+        根据条件查找对象,返回单个对象的实例
+        :param filter_dict:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        ses = cls.get_collection()
+        result = ses.find_one(filter=filter_dict, *args, **kwargs)
+        return result
 
     @classmethod
     def find_one_plus(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
@@ -2186,6 +2172,30 @@ class FlaskUrlRule(BaseDoc):
             f = {"endpoint": endpoint}
             u = {"$set": {"args": args, "rule": rule, "methods": methods}}
             ses.find_one_and_update(filter=f, update=u, upsert=True)
+
+    @classmethod
+    def save_doc(cls, doc: dict) -> dict:
+        """
+        保存/更新
+        :param doc:
+        :return:
+        """
+        ses = cls.get_collection(write_concern=get_write_concern())
+        if "_id" in doc:
+            """有_id,这是在更新"""
+            f = {"_id": doc.pop("_id")}
+        else:
+            """没有id,这是在插入"""
+            endpoint = doc.pop("endpoint", None)
+            if endpoint is None:
+                ms = "{} 没有必须的属性 endpoint".format(doc)
+                raise ValueError(ms)
+            else:
+                f = {"endpoint": endpoint}
+        u = {"$set": doc}
+        ses = cls.get_collection(write_concern=get_write_concern())
+        re_doc = ses.find_one_and_update(filter=f, update=u, upsert=True, return_document=ReturnDocument.AFTER)
+        return re_doc
 
 
 class OperateLog(BaseDoc):
