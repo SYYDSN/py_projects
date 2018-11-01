@@ -30,6 +30,7 @@ $(function(){
         });
     });
 
+
     //左侧导航的hover事件
     $(".p_nav").hover(function(){
         let spn = $(this).find(".spn");
@@ -702,7 +703,9 @@ $(function(){
                         position: 'left',
                         verticalAlign: 'middle',
                         align: 'right',
-                        fontSize: 9
+                        // backgroundColor: "lightgrey",     // 背景色
+                        padding: 4,
+                        // fontSize: 14                       // 图标上的item的标签字体大小
                     }
                 },
 
@@ -762,8 +765,8 @@ $(function(){
        return { 'x': x, 'y': y };
 }
 
-    // 甘特图td的hover事件
-    
+    // 默认显示架构图
+    $("#show_chart").click();
 
 //end!!!
 });
