@@ -54,12 +54,12 @@ def add_text(image_path: str, content: str = None, font_size: int = 48, position
     :param color: 水印的颜色
     :return: 加上水印的图片保存的绝对路径
     """
-    cur_dir = os.path.dirname(os.path.realpath(__file__))
+    pro_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     if os.path.isfile(image_path):
         parent = Image.open(image_path)
         parent = parent.convert("RGBA")
         p_width, p_height = parent.size
-        font_path = os.path.join(cur_dir, 'resource', 'fonts', 'YaHei.ttf')
+        font_path = os.path.join(pro_dir, 'resource', 'fonts', 'YaHei.ttf')
         font = ImageFont.truetype(font_path, size=font_size)
         content = "必弘信息" if content is None else content
         color = "#42a4e8" if color is None else color
@@ -89,7 +89,6 @@ def add_text(image_path: str, content: str = None, font_size: int = 48, position
     else:
         ms = "路径{}不是一个文件".format(image_path)
         raise FileNotFoundError(ms)
-
 
 
 if __name__ == "__main__":

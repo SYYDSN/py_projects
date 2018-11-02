@@ -116,6 +116,7 @@ def listen_func(key):
 @app.route("/listen2_<key>", methods=['post'])
 def listen_func2(key):
     """
+    http://47.106.68.161:8000/listen_<key>
     监听简道云发送过来的消息,2018-10-8之后新建的简道云应用都用此接口.
     每次更新服务器应用后,需要检查简道云对应的接口状态
     1. 企划部.入金宣传表
@@ -142,6 +143,9 @@ def listen_func2(key):
             mes = listen_jdy(**kw)
         else:
             mes['message'] = "validate error"
+    elif key == "image":
+        """上传图片素材"""
+        pass
     else:
         mes['message'] = '错误的path'
     # print(mes)
