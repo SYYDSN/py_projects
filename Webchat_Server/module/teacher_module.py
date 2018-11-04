@@ -257,12 +257,13 @@ class Teacher(mongo_db.BaseDoc):
         p = ["_id", "name", "head_img"]
         ts = cls.find_plus(filter_dict=f, projection=p, to_dict=True)
         t_ids = [x['_id'] for x in ts]
-        t_ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
+        # t_ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
         ses = mongo_db.get_conn(table_name="wx_user")
         m = {"$match": {"follow": {"$elemMatch": {"$in": t_ids}}}}
         u = {"$unwind": "$follow"}
-        g = {"$group": {"_id": "$_id", "total": {"$sum": 1}}}
+        g = {"$group": {"_id": "$follow", "total": {"$sum": 1}}}
         pipeline = [m, u, g]
+        # pipeline = [m, u]
         r = ses.aggregate(pipeline=pipeline)
         count = {x['_id']: x['total'] for x in r}
         ts = {x['_id']: {"name": x['name'], "head_img": x.get("head_img", "/static/images/head_image/t1.jpg")} for x in ts}

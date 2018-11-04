@@ -44,7 +44,6 @@
 
             </ul>
             <div class="crunchy-InfoText">
-            {{ view_level }}
                 <div class="wrap chart_wrap">
                     <!--胜率统计图-->
 
@@ -86,7 +85,7 @@
                         {% for x in history %}
                             <li>
                                 <div class="textList">
-                                    <p>{{ x.direction + x.product }}</p>
+                                    <p style="text-align: center">{{ x.direction + x.product }}</p>
                                 </div>
                                 <div class="priceText">
                                     <p>{{ x.enter_price }}</p>开仓价
@@ -95,7 +94,7 @@
                                     <p>{{ x.exit_price }}</p>收盘价
                                 </div>
                                 <div class="earnings">
-                                    <p class="color12cb1b">${{ x.each_profit }}</p>收益
+                                    <p class="color12cb1b" style={{"color:#e35e57" if x.each_profit | float >= 0 else "color:#17b640"}}>${{ x.each_profit }}</p>收益
                                 </div>
                             </li>
                         {% endfor %}

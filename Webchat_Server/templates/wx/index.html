@@ -45,10 +45,10 @@
 							<li>收益高手</li>
 							<li>常胜高手</li>
 							-->
-                            <li>收益领先，表现突出</li>
-							<li>十单八盈，月收翻番</li>
+                            <li class="change_desc">收益高手</li>
+							<li class="change_desc">常胜大师</li>
 
-						</ul><span>收益领先 表现突出</span></div>
+						</ul><span class="show_desc">收益领先 表现突出</span></div>
 
 					<div class="bd" id="tabBox1-bd">
 						<div class="con">
@@ -59,10 +59,10 @@
                                             <img src="{{ x.head_img }}" />{{ x.name }}
                                         </p>
                                         <p class="num">
-                                            <span>{{ x.profit_ratio }}</span>累积收益率
+                                            <span style={{"color:#e35e57" if x.profit_ratio | float >= 0 else "color:#17b640"}}>{{ x.profit_ratio }}</span>累积收益率
                                         </p>
                                         <p class="history">
-                                            <span>{{ x.follow }}</span>历史跟随
+                                            <span>{{ x.total }}</span>历史跟随
                                         </p>
                                         <p class="p-btn">
                                             <a href="currentCrunchy.html?t_id={{ x._id }}" class="button-link">跟踪高手</a>
@@ -140,7 +140,7 @@
                                             <span>{{ x.win_ratio }}</span>累积胜率
                                         </p>
                                         <p class="history">
-                                            <span>{{ x.follow }}</span>历史跟随
+                                            <span>{{ x.total }}</span>历史跟随
                                         </p>
                                         <p class="p-btn">
                                             <a href="currentCrunchy.html?t_id={{ x._id }}" class="button-link">跟踪高手</a>
@@ -301,6 +301,19 @@
 				}
 
 			});
+
+			// 切换说明
+            $(".change_desc").each(function(){
+                var $this = $(this);
+                $this.click(function(){
+                    if($this.text() === "收益高手"){
+                        $(".show_desc").text("收益领先 表现突出");
+                    }
+                    else{
+                        $(".show_desc").text("十单八盈 月收翻番");
+                    }
+                });
+            });
 		})
 	</script>
 
