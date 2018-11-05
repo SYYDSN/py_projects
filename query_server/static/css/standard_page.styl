@@ -1,0 +1,95 @@
+.top
+  width 100%
+  font-size 28px
+  height 60px
+  padding-left 10px
+  background-color #457CD6
+  display flex
+  flex-direction row
+  justify-content space-between
+  align-items  center
+  .project_name
+    color #ffffff
+  .right_info
+    display flex
+    flex-direction row
+    justify-content flex-end
+    font-size 16px
+    align-items center
+    .small_item
+      color #ffffff
+      display flex
+      flex-direction row
+      padding 0 1em
+      justify-content flex-end
+      align-items center
+      >i
+        margin 0 1em
+      >img
+        width 2em
+        height 2em
+        margin 0 1em
+      >.dropdown
+        background-color #457CD6
+        //>ul
+        //  background-color #457CD6 !important
+        //  border-color #457CD6 !important
+        >button
+          color #ffffff
+          border-color #457CD6 !important
+          background-color #457CD6 !important
+          >.caret
+            color #ffffff
+
+.middle
+  width 100%
+  min-height calc(100% - 60px)
+  height calc(100% - 60px)
+  display flex
+  flex-direction row
+  justify-content flex-start
+  >.left_nav
+    font-size 16px
+    width 200px
+    min-height 100%
+    height 100%
+    background-color #393642
+    >ul
+      list-style-type none
+      padding 0
+      margin 0
+      a
+        text-decoration none
+      >li
+        padding 15px
+        display flex
+        flex-direction row
+        justify-content space-between
+        border-bottom 1px solid rgba(255,255,255,0.07)
+        >i
+          color lightgrey
+        >a
+          color rgba(255,255,255, 0.5)
+          margin-left 0
+        >.nav_icon
+          margin-left 0
+        >.plus_sign:hover
+          cursor pointer
+      >.sub_nav
+        display none
+        padding 0
+        margin 0
+        background-color rgba(43,41,51, 0.4)
+        >ul
+          list-style-type none
+          padding-top 10px
+          padding-bottom 10px
+          >li
+            padding 5px 0 5px 10px
+            >a
+              color rgba(255,255,255, 0.8)
+
+  >.right_main
+    width calc(100% - 200px)
+    min-height 100%
+    height 100%

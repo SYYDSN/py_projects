@@ -70,7 +70,7 @@ logger = get_logger()
 #     "username": user,       # 用户名
 #     "password": password    # 密码
 # }
-db_name = "test_db"
+db_name = "query_db"
 mongodb_setting = {
     "host": "127.0.0.1:27017",   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外

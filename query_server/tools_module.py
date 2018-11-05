@@ -24,7 +24,6 @@ from uuid import uuid4
 from werkzeug.contrib.cache import RedisCache
 from werkzeug.contrib.cache import SimpleCache
 from log_module import get_logger
-from module.system_module import Root
 from module.system_module import User
 
 
@@ -81,26 +80,9 @@ def check_session(f):
         else:
             user = None
         if user is None:
-            return redirect(url_for("user_blueprint.login_func"))
+            return redirect(url_for("manage_blueprint.login_func"))
         else:
             kwargs['user'] = user
-            return f(*args, **kwargs)
-    return decorated_function
-
-
-def check_root_session(f):
-    """检测root用户是否登录的装饰器"""
-    @functools.wraps(f)
-    def decorated_function(*args, **kwargs):
-        user_id = session.get("_id")  # 检测session中的user_id
-        if isinstance(user_id, ObjectId):
-            user = Root.find_by_id(o_id=user_id, to_dict=True)
-        else:
-            user = None
-        if user is None:
-            return redirect(url_for("root_blueprint.login_func"))
-        else:
-            kwargs['root'] = user
             return f(*args, **kwargs)
     return decorated_function
 

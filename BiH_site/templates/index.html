@@ -10,6 +10,22 @@
     <link href="img/logo_purple.png" rel="shortcut icon" type="image/x-icon" />
 </head>
 <body class="bodys">
+<script>
+    var mobileAgent = new Array("iphone", "ipod", "ipad", "android", "mobile", "blackberry", "webos", "incognito", "webmate", "bada", "nokia", "lg", "ucweb", "skyfire");
+
+    var browser = navigator.userAgent.toLowerCase();
+
+    var isMobile = false;
+
+    for (var i = 0; i < mobileAgent.length; i++) {
+        if (browser.indexOf(mobileAgent[i]) != -1) {
+            isMobile = true;
+            //alert(mobileAgent[i]);
+            location.href = 'bhxxjs_web/index_web.html';
+            break;
+        }
+    }
+</script>
 <!--导航-->
 {{ form.hidden_tag() }}
 <!--滚动条下拉导航-->
@@ -130,7 +146,7 @@
                    </li>
                     <!-- -->
                    <li class="f2_hovs_pos f6_hovs_pos">
-                       <a href="javascript:;" class=" hov f6" name="color">关 于 我 们</a>
+                       <a href="http://team.bhxxjs.cn" class=" hov f6" name="color">关 于 我 们</a>
 
                    </li>
                     <!--about.html -->
@@ -962,7 +978,7 @@
 <!--伙伴地图-->
 
 <div class="map">
-    <div class="map-content">
+    <div class="map-content" id="map-content">
         <img src="img/zhongguo2.png">
         <div class="position">
             <!--西藏拉萨-->
@@ -2087,7 +2103,7 @@
                 </li>
                 <li>
                     <img src="img/serve.png" width="50%">
-                    <p>1V1大客户服务</p>
+                    <p>1V1客户服务</p>
                 </li>
             </ul>
         </div>
@@ -2142,7 +2158,7 @@
 
 
 <!--滚动导航开始-->
-<div class="gd-nav">
+<div class="gd-nav" id="gd-nav">
     <a href="javascript:;" class="gd-nav-kf"></a>
     <a href="javascript:;" class="gd-nav-sj" id="gd-nav-sj"></a>
     <a href="javascript:;" class="gd-nav-wx" id="gd-nav-wx"></a>
@@ -2262,67 +2278,83 @@
             $(".succeed-left-content div").eq($(this).index()).css({height:"86px",width:"160px",marginTop:"-10px",transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"66",width:"130px",marginTop:""})
             x=$(this).index()
         });
-        var x=0;
-        function ti(){
-            x++;
-            if(x==$(".succeed-left-content2 div").length){
-                x=0;
-            }
-            $(".succeed-right-hidden  .succeed-right").eq(x).show().siblings().hide();
-            $(".succeed-left-content2 div").eq(x).show().siblings().hide();
-            $(".succeed-left-content div").eq(x).css({height:"86px",width:"160px",marginTop:"-10px",transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"66",width:"130px",marginTop:""})
-        }
-        T=setInterval(ti,3000);
-        $(".succeed-left-content2 div").mouseover(function(){
-            clearInterval(T)
-        });
-        $(".succeed-right-hidden  .succeed-right").mouseover(function(){
-            clearInterval(T)
-        });
-        $(".succeed-left-content2 div").mouseout(function(){
-            T=setInterval(ti,3000);
-        });
-        $(".succeed-right-hidden  .succeed-right").mouseout(function(){
-            T=setInterval(ti,3000);
-        });
+        // var x=0;
+        // function ti(){
+        //     x++;
+        //     if(x==$(".succeed-left-content2 div").length){
+        //         x=0;
+        //     }
+        //     $(".succeed-right-hidden  .succeed-right").eq(x).show().siblings().hide();
+        //     $(".succeed-left-content2 div").eq(x).show().siblings().hide();
+        //     $(".succeed-left-content div").eq(x).css({height:"86px",width:"160px",marginTop:"-10px",transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"66",width:"130px",marginTop:""})
+        // }
+        // T=setInterval(ti,3000);
+        // $(".succeed-left-content2 div").mouseover(function(){
+        //     clearInterval(T)
+        // });
+        // $(".succeed-right-hidden  .succeed-right").mouseover(function(){
+        //     clearInterval(T)
+        // });
+        // $(".succeed-left-content2 div").mouseout(function(){
+        //     T=setInterval(ti,3000);
+        // });
+        // $(".succeed-right-hidden  .succeed-right").mouseout(function(){
+        //     T=setInterval(ti,3000);
+        // });
     }
     tab()
     function tab2(){
         /*成功案例选项卡2*/
         $(".tab-box div").eq(1).siblings().hide();
-        $(".tab-btn div").eq(1).css({background:"blue",color:"white",height:"60px",width:"121px",marginLeft:"-12px",boxShadow:"0 0 7px #000"});
+
+        $(".tab-btn div").eq(1).css({
+            background:"blue",color:"white",height:"60px",width:"121px",
+            marginLeft:"-12px"
+        });
+
         $(".tab-btn div").click(function(){
+
             $(".tab-box div").eq($(this).index()).show().siblings().hide();
-            $(".tab-btn div").eq($(this).index()).css({background:"blue",color:"white",height:"60px",width:"121px",marginLeft:"-12px",
-                boxShadow:"0 0 7px #000",transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"48px",width:"97px",marginLeft:"",transition:"",boxShadow:""})
+
+            $(".tab-btn div")
+                .eq($(this).index())
+                .css({background:"blue", color:"white",height:"60px",width:"121px",
+                    marginLeft:"-12px", transition:"all 0.3s"
+                })
+                .siblings()
+                .css({
+                    background:"",color:"",height:"48px",width:"97px",
+                    marginLeft:"",transition:""
+                })
             a=$(this).index()
         });
-        var a=0;
-        function ti2(){
-            a++;
-            if(a==$(".tab-btn div").length){
-                a=0;
-            }
-            $(".tab-box div").eq(a).show().siblings().hide();
-            $(".tab-btn div").eq(a).css({background:"blue",color:"white",height:"60px",width:"121px",marginLeft:"-12px",
-                boxShadow:"0 0 7px #000",transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"48px",width:"97px",marginLeft:"",transition:"",boxShadow:""})
-        }
-        T2=setInterval(ti2,3000);
-        $(".tab-btn div").mouseover(function(){
-            clearInterval(T2)
-        });
-        $(".tab-box div").mouseover(function(){
-            clearInterval(T2)
-        });
-        $(".tab-btn div").mouseout(function(){
-            T2=setInterval(ti2,3000);
-        });
-        $(".tab-box div").mouseout(function(){
-            T2=setInterval(ti2,3000);
-        });
+        // var a=0;
+        // function ti2(){
+        //     a++;
+        //     if(a==$(".tab-btn div").length){
+        //         a=0;
+        //     }
+        //     $(".tab-box div").eq(a).show().siblings().hide();
+        //     $(".tab-btn div").eq(a).css({background:"blue",color:"white",height:"60px",width:"121px",marginLeft:"-12px",
+        //         transition:"all 0.3s"}).siblings().css({background:"",color:"",height:"48px",width:"97px",marginLeft:"",transition:"",boxShadow:""})
+        // }
+        // T2=setInterval(ti2,3000);
+        // $(".tab-btn div").mouseover(function(){
+        //     clearInterval(T2)
+        // });
+        // $(".tab-box div").mouseover(function(){
+        //     clearInterval(T2)
+        // });
+        // $(".tab-btn div").mouseout(function(){
+        //     T2=setInterval(ti2,3000);
+        // });
+        // $(".tab-box div").mouseout(function(){
+        //     T2=setInterval(ti2,3000);
+        // });
     }
     tab2()
 </script>
+
 </body>
 <script src="js/index.js"></script>
 </html>

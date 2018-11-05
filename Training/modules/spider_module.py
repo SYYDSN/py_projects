@@ -4,25 +4,25 @@ import sys
 __project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
-import mongo_db
+import orm_module
 import datetime
 import requests
 import pyquery
 from io import BytesIO
 
 
-ObjectId = mongo_db.ObjectId
+ObjectId = orm_module.ObjectId
 
 
 """爬虫模块"""
 
 
-class VegetableImage(mongo_db.BaseFile):
+class VegetableImage(orm_module.BaseFile):
     """蔬菜图片"""
     _table_name = "vegetable_image"
 
 
-class Vegetable(mongo_db.BaseDoc):
+class Vegetable(orm_module.BaseDoc):
     """
     蔬菜
     """
@@ -132,7 +132,7 @@ class Vegetable(mongo_db.BaseDoc):
 if __name__ == "__main__":
     # Vegetable.analysis_url()  # 获取所有的蔬菜的url
     f = dict()
-    vegetables = Vegetable.find_plus(filter_dict=f, to_dict=True)
+    vegetables = Vegetable.find(filter_dict=f)
     for vegetable in vegetables:
         Vegetable.find_image(vegetable)
     pass

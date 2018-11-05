@@ -4,14 +4,14 @@ import sys
 __project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
-import mongo_db
+import orm_module
 import datetime
 
 
-ObjectId = mongo_db.ObjectId
+ObjectId = orm_module.ObjectId
 
 
-class RawWebChatMessage(mongo_db.BaseDoc):
+class RawWebChatMessage(orm_module.BaseDoc):
     """
     原始微信的记录
     """
@@ -20,7 +20,7 @@ class RawWebChatMessage(mongo_db.BaseDoc):
     type_dict['_id'] = ObjectId
 
 
-class WXUserInfo(mongo_db.BaseDoc):
+class WXUserInfo(orm_module.BaseDoc):
     """从微信接口获取的用户身份信息,目前的用户是测试"""
     _table_name = "wx_user_info"
     type_dict = dict()

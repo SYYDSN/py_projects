@@ -804,6 +804,23 @@ function A(){
     })
 }
 A();
+window.onload=function () {
+    if(document.documentElement.scrollTop>70){
+        $("#nav").css({backgroundColor:"#1f2229"});
+    }else {
+        $("#nav").css({backgroundColor:""});
+    }
+}
+
+
+function C() {
+    if(document.documentElement.clientHeight<938){
+        document.getElementById("gd-nav").style.top="66%"
+    }else {
+        document.getElementById("gd-nav").style.top="72%"
+    }
+}
+C()
 
 
 
@@ -1086,17 +1103,20 @@ system_hide6.onclick=system6;
 var aImages = document.getElementById("img").getElementsByTagName('img'); //获取id为img的文档内所有的图片
 var aImages2 = document.getElementById("img2").getElementsByTagName('img'); //获取id为img2的文档内所有的图片
 var aImages3 = document.getElementById("img3").getElementsByTagName('img'); //获取id为img3的文档内所有的图片
+var aImages4 = document.getElementById("map-content").getElementsByTagName('img'); //获取id为map-content的文档内所有的图片
 var aImages5 = document.getElementById("abbr2").getElementsByTagName('img'); //获取id为abbr2的文档内所有的图片
+
 loadImg(aImages);
 loadImg(aImages2);
 loadImg(aImages3);
+loadImg(aImages4);
 
 loadImg(aImages5);
 window.onscroll = function() { //滚动条滚动触发
     loadImg(aImages);
     loadImg(aImages2);
     loadImg(aImages3);
-
+    loadImg(aImages4);
     loadImg(aImages5);
 };
 //getBoundingClientRect 是图片懒加载的核心

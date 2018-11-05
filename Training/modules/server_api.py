@@ -4,14 +4,14 @@ import sys
 __project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
-import mongo_db
+import orm_module
 from mail_module import send_mail
 import datetime
 import requests
 
 
-ObjectId = mongo_db.ObjectId
-DBRef = mongo_db.DBRef
+ObjectId = orm_module.ObjectId
+DBRef = orm_module.DBRef
 app_id = "wxd89f1f72776053ad"                       # app_id
 app_secret = "66a4200979bf09dd565180f1bd9c38d4"     # app_secret
 
@@ -19,7 +19,7 @@ app_secret = "66a4200979bf09dd565180f1bd9c38d4"     # app_secret
 """和微信服务器相关的功能"""
 
 
-class AccessToken(mongo_db.BaseDoc):
+class AccessToken(orm_module.BaseDoc):
     """
     微信服务器access_token对象,因为一天的请求access_token的次数有限,所以一旦获取了access_token后,
     需要自行保存在数据库中.

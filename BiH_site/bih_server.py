@@ -47,10 +47,22 @@ def index_func():
     return render_template("index.html", form=form)
 
 
+@app.route("/bhxxjs_web/<file_name>")
+def wap_func(file_name):
+    """移动端首页"""
+    return render_template("bhxxjs_web/{}".format(file_name))
+
+
 @app.route("/fonts/<path>")
 def re_fonts_func(path):
     """静态文件重定向"""
     return redirect("/static/fonts/{}".format(path))
+
+
+@app.route("/bhxxjs_web/fonts/<path>")
+def re_wap_fonts_func(path):
+    """移动端静态文件重定向"""
+    return redirect("/static/wap/fonts/{}".format(path))
 
 
 @app.route("/css/<path>")
@@ -59,16 +71,34 @@ def re_css_func(path):
     return redirect("/static/css/{}".format(path))
 
 
+@app.route("/bhxxjs_web/css/<path>")
+def re_wap_css_func(path):
+    """移动端静态文件重定向"""
+    return redirect("/static/wap/css/{}".format(path))
+
+
 @app.route("/js/<path>")
 def re_js_func(path):
     """静态文件重定向"""
     return redirect("/static/js/{}".format(path))
 
 
+@app.route("/bhxxjs_web/js/<path>")
+def re_wap_js_func(path):
+    """移动端静态文件重定向"""
+    return redirect("/static/wap/js/{}".format(path))
+
+
 @app.route("/img/<path>")
 def re_img_func(path):
     """静态文件重定向"""
     return redirect("/static/img/{}".format(path))
+
+
+@app.route("/bhxxjs_web/img/<path>")
+def re_wap_img_func(path):
+    """移动端静态文件重定向"""
+    return redirect("/static/wap/img/{}".format(path))
 
 
 @app.route("/sms/<action>", methods=['get', 'post'])

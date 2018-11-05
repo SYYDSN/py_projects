@@ -1,39 +1,64 @@
-{% extends "template.html" %}
+{% extends "standard_page.html" %}
 
 {% block css %}
    <link rel="stylesheet" href="/static/css/manage_user.css">
 {% endblock %}
 
-{% block body %}
-    <div class="top">
+{% block show_area %}
 
-    </div>
-    <div class="middle">
-
-    </div>
-
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 top_outer">
-            <div class="block_top">
-                <h2>用户管理系统</h2>
-            </div>
+    <div class="right_top">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="请输入搜索关键字...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Go!</button>
+              </span>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 middle_outer">
-            <div class="block_middle">
-                <div class="side_left">
-                    <ul class="nav">
-                        <li>用户管理</li>
-                        <li>角色管理</li>
-                    </ul>
+
+    <div class="user_list_outer">
+        <div class="user_list_inner">
+            <div class="insert_div">
+                <div class="left">
+                    <i class="fa fa-list-ul"></i>
+                    <span id="clear_condition">所有信息</span>
                 </div>
-                <div class="side_right"></div>
+                <div class="right">
+                    <button id="add_user" type="button" class="btn btn-default btn-primary">
+                        添加用户
+                    </button>
+                </div>
+            </div>
+            <div class="table_outer">
+                <table id="user_list" class="table table-hover">
+                    <tr class="active">
+                        <th>账户</th>
+                        <th>权限组</th>
+                        <th>姓名</th>
+                        <th>部门</th>
+                        <th>用户状态</th>
+                        <th>操作</th>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="bottom_div">
+                <div class="left">
+                    <input type="checkbox" id="check_all">
+                    <span>全选</span>
+                    <button id="delete_user" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除
+                    </button>
+                </div>
+                <div class="right">
+                    <input type="text" id="input_page">
+                    <button id="add_user" type="button" class="btn btn-sm btn-default btn-primary">
+                        Go
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
 {% endblock %}
 
 {% block js %}

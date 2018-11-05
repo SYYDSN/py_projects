@@ -6,13 +6,6 @@ if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 from flask.blueprints import Blueprint
 from flask import render_template
-from flask import send_file
-from flask import make_response
-from flask import abort
-from tools_module import *
-from mongo_db import BaseFile
-from io import BytesIO
-import json
 
 
 """注册蓝图"""

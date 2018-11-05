@@ -38,7 +38,7 @@ $(function(){
                 var json = JSON.parse(resp);
                 var status = json['message'];
                 if(status === "success"){
-                    var u = "/root/common/manage_user";
+                    var u = "/manage/user";
                     location.href = u;
                 }
                 else{

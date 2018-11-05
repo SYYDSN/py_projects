@@ -4,7 +4,7 @@ import sys
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
-from mongo_db import *
+from orm_module import *
 
 
 """闪卡训练使用的图片模块"""

@@ -1,0 +1,443 @@
+html,
+body,
+div,
+p,
+span,
+a,
+ul,
+li,
+ol,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+dd,
+dt,
+input,
+img,
+select,
+form,
+table,
+td,
+tr,
+hr,
+br,
+video,
+audio,
+textarea {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  vertical-align: top;
+  text-decoration: none;
+  list-style: none;
+}
+.clear {
+  clear: both;
+}
+.header {
+  width: 100%;
+  height: 640px;
+  margin-bottom: 100px;
+}
+.header img {
+  width: 100%;
+  height: 100%;
+}
+.content1 {
+  margin-bottom: 0;
+}
+.content1 img {
+  width: 100%;
+  height: 100%;
+}
+.content2 {
+  width: 100%;
+  height: 600px;
+  background: url("../img/tuandui.jpg") no-repeat;
+  position: relative;
+  overflow: hidden;
+  line-height: 600px;
+}
+.top,
+.bottom {
+  position: absolute;
+  width: 100%;
+  height: 300px;
+  z-index: 2;
+}
+.top img {
+  width: 100%;
+  height: 100%;
+}
+.bottom img {
+  width: 100%;
+  height: 100%;
+}
+.top {
+  top: 0px;
+}
+.bottom {
+  top: 300px;
+}
+.showTeam {
+  position: absolute;
+  top: calc(25% / 2);
+  left: calc(25% / 2);
+  width: 75%;
+  height: 75%;
+  background: rgba(255,255,255,0.5);
+  z-index: 1;
+  opacity: 0;
+}
+.teamRander_txt {
+  width: 54%;
+  opacity: 0.8;
+}
+.teamTitle {
+  width: 42%;
+  height: 40px;
+  line-height: 20px;
+  text-align: center;
+  margin: 0px auto;
+  margin-top: 46px;
+  font-size: 18px;
+  font-family: 'Plantagenet Cherokee';
+}
+.teamRander {
+  height: 196px;
+  line-height: 30px;
+  margin: 38px auto;
+  text-align: center;
+  font-size: 16px;
+  font-family: '微软雅黑';
+  font-weight: 600;
+}
+.teamMotto {
+  line-height: 0px;
+  text-align: right;
+  margin: -12px auto;
+  font-size: 30px;
+  color: #153ef0;
+  font-family: '微软雅黑';
+  font-weight: 700;
+}
+.teamFoot {
+  width: 10%;
+  height: 30px;
+  margin: 55px auto;
+  opacity: 0.5;
+}
+.content3 {
+  width: 100%;
+  height: 400px;
+  margin-bottom: 50px;
+}
+.content1 {
+  margin-bottom: 0;
+}
+.content3 img {
+  width: 100%;
+  height: 100%;
+}
+.content_function {
+  width: 100%;
+  height: 358px;
+}
+.content_function .content_function_b {
+  width: 1200px;
+  margin: auto;
+  height: inherit;
+}
+.content_function_b .content_function_ul {
+  overflow: hidden;
+}
+.content_function_b .content_function_ul li {
+  float: left;
+  margin: auto;
+  margin-right: 100px;
+  width: 13.3%;
+  height: 358px;
+  text-align: center;
+}
+@media (max-width: 1024px) {
+  .content_function_b .content_function_ul li {
+    margin-right: 85px;
+  }
+}
+.content_function_b .content_function_ul li img {
+  width: 100%;
+}
+.content_function_ul li img {
+  margin-bottom: 35px;
+}
+.content_function_ul li h3 {
+  font-size: 24px;
+  color: #262626;
+  margin-bottom: 14px;
+  font-family: '微软雅黑';
+}
+.content_function_ul li p {
+  font-size: 16px;
+  color: #262626;
+  font-family: '微软雅黑';
+}
+.English {
+  width: 100%;
+  height: 400px;
+}
+.English img {
+  width: 100%;
+  height: 100%;
+}
+.English h3 {
+  font-size: 56px;
+  color: #696666;
+  font-family: Vani;
+}
+.English p {
+  font-size: 14px;
+  color: #696666;
+  margin-top: -20px;
+}
+.English2 {
+  padding-top: 50px;
+  margin: auto;
+  text-align: center;
+  height: 250px;
+}
+.English2 p {
+  font-size: 24px;
+  color: #666;
+}
+.people {
+  width: 100%;
+  height: auto;
+  padding: 120px 0;
+}
+.people_img {
+  width: 600px;
+  height: 600px;
+  margin: auto;
+  text-align: center;
+}
+.people_img img {
+  width: 100%;
+  height: 100%;
+}
+.English,
+.English2,
+.English2_content {
+  background: #f6f6f6;
+}
+.English2_content {
+  width: 100%;
+  height: 440px;
+  margin-bottom: 50px;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+.English2_content .English2_content_b {
+  width: 1200px;
+  margin: auto;
+  padding-top: 5px;
+  height: 400px;
+}
+.English2_content_ul {
+  overflow: hidden;
+  height: 400px;
+  padding-top: 10px;
+  padding-left: 13px;
+}
+.English2_content_ul li {
+  float: left;
+  margin: auto;
+  margin-right: 84px;
+  width: 28%;
+  height: 369px;
+  text-align: center;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02), 1px 8px 32px -4px rgba(0,0,0,0.17);
+  padding-top: 20px;
+  box-sizing: border-box;
+}
+.English2_content_ul .marginb img {
+  margin-bottom: 55px;
+}
+.English2_content_ul li img {
+  margin-bottom: 60px;
+}
+.English2_content_ul li p {
+  display: block;
+  font-size: 18px;
+  color: #2a84f4;
+}
+.content4 {
+  width: 100%;
+  height: 160px;
+}
+.content4_img {
+  width: 100%;
+  height: inherit;
+  margin: auto;
+}
+.content4_img img {
+  width: 100%;
+  height: 100%;
+}
+.footer {
+  width: 100%;
+  line-height: 50px;
+  height: 50px;
+  background: #433f3f;
+}
+.footer_content {
+  width: 1200px;
+  height: inherit;
+  margin: auto;
+  overflow: hidden;
+}
+.footer_content div {
+  float: left;
+  font-size: 16px;
+  color: #dbd4d4;
+}
+.footer_content div a {
+  transition: all 0.3s;
+  color: inherit;
+}
+.floats {
+  float: right;
+}
+@media (max-width: 1366px) {
+  .teamTitle {
+    width: 62%;
+  }
+  .teamRander_txt {
+    width: 65%;
+  }
+  .teamRander {
+    line-height: 26px;
+    margin: 38px auto;
+    margin-top: 20px;
+    font-size: 15px;
+  }
+  .footer_content .floats {
+    float: right;
+  }
+  .English2_content_ul li {
+    margin-right: 88px;
+  }
+}
+@media (max-width: 1024px) {
+  .teamTitle {
+    width: 73%;
+  }
+  .teamRander_txt {
+    width: 78%;
+  }
+  .teamRander {
+    line-height: 26px;
+    margin: 38px auto;
+    margin-top: 20px;
+    font-size: 15px;
+  }
+  .teamMotto {
+    margin: 0px auto;
+  }
+  .content_function_b .content_function_ul li {
+    margin-right: 80px;
+  }
+  .content_function_ul li h3 {
+    font-size: 16px;
+  }
+  .content_function_ul li p {
+    font-size: 14px;
+  }
+  .content_function .content_function_b {
+    width: 100%;
+  }
+  .English2_content .English2_content_b {
+    width: 100%;
+  }
+  .English2_content_ul li {
+    margin-right: 71px;
+    height: 330px;
+  }
+  .English2_content_ul li p {
+    font-size: 18px;
+  }
+  .footer {
+    height: 135px;
+    line-height: 40px;
+    text-align: center;
+  }
+  .footer_content {
+    width: 100%;
+    padding-top: 15px;
+  }
+  .footer_content div {
+    float: none;
+    font-size: 18px;
+  }
+}
+@media (max-width: 800px) {
+  .teamTitle {
+    width: 91%;
+  }
+  .teamRander {
+    line-height: 26px;
+    margin: 38px auto;
+    margin-top: 20px;
+    font-size: 15px;
+  }
+  .teamMotto {
+    margin: 0px auto;
+  }
+  .teamRander_txt {
+    width: 90%;
+  }
+  .content_function_b .content_function_ul li {
+    margin-right: 54px;
+  }
+  .content_function_ul li h3 {
+    font-size: 14px;
+  }
+  .content_function_ul li p {
+    font-size: 12px;
+  }
+  .content_function .content_function_b {
+    width: 100%;
+  }
+  .English2_content .English2_content_b {
+    width: 100%;
+  }
+  .English2_content_ul li {
+    margin-right: 45px;
+    height: 300px;
+  }
+  .English2_content_ul li img {
+    width: 105px;
+    height: 115px;
+  }
+  .English2_content_ul li p {
+    font-size: 16px;
+  }
+  .footer {
+    height: 150px;
+    line-height: 40px;
+    text-align: center;
+  }
+  .footer_content {
+    width: 100%;
+  }
+  .footer_content div {
+    float: none;
+  }
+  .footer_content .floats {
+    float: none;
+  }
+}
