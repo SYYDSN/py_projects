@@ -1,4 +1,4 @@
-default_blue = #457CD6
+default_blue = #286090
 .right_main
   background-color #ebedf0
   height 55px
@@ -49,6 +49,7 @@ default_blue = #457CD6
           #add_user
             background-color default_blue
       .table_outer
+        min-height calc(100% - 100px)
         #user_list
           tr
             th
@@ -57,3 +58,31 @@ default_blue = #457CD6
               color rgba(113,113,113, 1)
             td
               color rgba(175,175,175, 0.4)
+
+      .bottom_div
+        height 50px
+        width 100%
+        display flex
+        flex-direction row
+        justify-content space-between
+        align-items center
+        >.left
+          color default_blue
+        >.right
+          color default_blue
+          font-size 16px
+          display flex
+          flex-direction row
+          justify-content center
+          align-items center
+          #page_num
+            width 50px
+            border 1px solid #d3d3d3
+            border-radius 10px
+            padding 4px
+            margin-right 10px
+          >.fa
+            font-size 36px
+            padding 0 15px
+          >.fa:hover
+            cursor pointer

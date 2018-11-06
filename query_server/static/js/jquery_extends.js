@@ -196,6 +196,17 @@ function get_url_arg(arg_name){
 
 function build_url(base_path, arg_dict) {
     // 根据基础url和参数字典拼接url,
+    if(typeof(base_path) === "object" && arg_dict === undefined){
+        // 第一个参数是空的.并且只有一个参数
+        arg_dict = base_path;
+        base_path = location.pathname;
+    }
+    else if(typeof(base_path) === "string" && arg_dict === undefined){
+        arg_dict = {};
+    }
+    else{
+        // nothing...
+    }
     base_path += "?";
     for (let name in arg_dict) {
         let val = arg_dict[name];
@@ -596,6 +607,118 @@ function my_upload2($obj, url, success_cb, error_cb, headers){
         opts['headers'] = headers;
     }
     return my_upload(opts);
+}
+
+
+function CustomException(message, exception_name) {
+    /*自定义异常类*/
+   this.message = message;
+   this.name = exception_name? exception_name: "UserException" ;
+}
+
+function raise (mes, exception_name) {
+    /*抛出异常*/
+    throw new CustomException(mes,exception_name);
+}
+
+function FoundNotDom(mes){
+    /*元素没有找到的错误*/
+    raise(mes, 'FoundNotDOM');
+}
+
+
+function PageHandler (prev_page, next_page, page_count, page_num, jump_btn){
+    /*
+    * 一个翻页器请把元素按照参数名作为id命名即可. 使用方法 PageHandler()即可.
+    * param prev_page: 上一页元素的id 默认id是prev_page
+    * param next_page: 下一页元素的id 默认id是next_page
+    * param page_count: 这个是显示当前页/共计多少页的元素的id, 默认id是page_count, text必须是1/10这种格式
+    * param page_num: 待跳转的页码元素的id, 默认id是page_num
+    * param jump_btn: 跳转按钮的id, 默认id是jump_btn
+    * */
+    prev_page = prev_page.startsWith("#")? prev_page: (prev_page === undefined? "prev_page": prev_page);
+    next_page = next_page.startsWith("#")? next_page: (next_page === undefined? "next_page": next_page);
+    page_count = page_count.startsWith("#")? page_count: (page_count === undefined? "page_count": page_count);
+    page_num = page_num.startsWith("#")? page_num: (page_num === undefined? "page_num": page_num);
+    jump_btn = jump_btn.startsWith("#")? jump_btn: (jump_btn === undefined? "jump_btn": jump_btn);
+    this.prev_page = $(prev_page);
+    this.next_page = $(next_page);
+    this.page_count = $(page_count);
+    this.page_num = $(page_num);
+    this.jump_btn = $(jump_btn);
+    if(this.page_count.length){
+        var text = $.trim(this.page_count.text());
+        if(text.indexOf("/") === -1){
+            var ms = "统计页码的元素的页码格式不对,这个元素会以'1/10'的样式显示当前页面和全部页码";
+            raise(ms);
+        }
+        else{
+            var temp = text.split("/");
+            var cur = parseInt(temp[0]);
+            var count = parseInt(temp[-1]);
+            this.cur = cur;
+            this.max = count;
+        }
+    }
+    else{
+        var ms = "缺少统计页码的元素,一般来说,这个元素会以'1/10'的样式显示当前页面和全部页码";
+        FoundNotDom(ms);
+    }
+
+    this.prev = function(){
+        /*
+        * 跳转到上一页
+        */
+        var page = this.cur - 1 ;
+        if(page < 1){
+            // nothing...
+        }
+        else{
+            var args = get_url_arg_dict();
+            args['page'] = page;
+            location.href = build_url(args);
+        }
+    };
+
+    this.next = function(){
+        /*
+        * 跳转到下一页
+        */
+        var page = this.cur + 1 ;
+        if(page > this.max){
+            // nothing...
+        }
+        else{
+            var args = get_url_arg_dict();
+            args['page'] = page;
+            location.href = build_url(args);
+        }
+    };
+
+    this.jump = function(){
+        /*
+        * 跳转到指定页
+        */
+        var page = $.trim(this.page_num.val());
+        if(isNaN(page)){
+            // nothing...
+        }
+        else{
+            page = parseInt(page);
+            if(page > this.max || page < 1){
+                // nothing...
+            }
+            else{
+                var args = get_url_arg_dict();
+                args['page'] = page;
+                location.href = build_url(args);
+            }
+        }
+    };
+
+    this.prev_page.click(function(){this.prev();});
+    this.next_page.click(function(){this.next();});
+    this.jump_btn.click(function(){this.jump();});
 }
 
 

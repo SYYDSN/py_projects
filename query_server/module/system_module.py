@@ -83,6 +83,28 @@ class Role(orm_module.BaseDoc):
     """
     type_dict['rules'] = dict
 
+    @classmethod
+    def get_range_level(cls, rule_dict: dict, rule: str, method: str) -> int:
+        """
+        根据rule计算用户的访问(范围)级别
+        :param rule_dict: 用户的规则字典,也就是Role.rules
+        :param rule: 规则.也就是用户访问时的路由path
+        :param method: 方法
+        :return: 返回None表示没有找到对应的权限
+        -1 表示禁止访问
+        0 标识只能访问自己
+        1 标识能访问全部
+        其他的自定义
+        """
+        res = None
+        if rule not in rule_dict:
+            pass
+        else:
+            method = method.lower()
+            res = rule_dict[rule].get(method)
+        res = -1 if res is None else res
+        return res
+
 
 class User(orm_module.BaseDoc):
     """用户表"""
@@ -130,7 +152,8 @@ class User(orm_module.BaseDoc):
                     if isinstance(nick_name, str) and len(nick_name) > 0:
                         pass
                     else:
-                        nick_name = "guest_{}".format()
+                        nick_name = "guest_{}".format(str(random.randint(1, 99)).zfill(2))
+                        args['nick_name'] = nick_name
                     r = conn.insert_one(args)
                     if r is None:
                         ms = "保存用户账户失败"
@@ -162,7 +185,7 @@ class User(orm_module.BaseDoc):
         return mes
 
     @classmethod
-    def get_role(cls, user: dict) -> dict:
+    def get_role(cls, user: (dict, str, ObjectId)) -> dict:
         """
         获取一个用户的权限组.权限组中有2个特殊的权限组
         root: 系统管理员.  拥有所有权限
@@ -171,6 +194,7 @@ class User(orm_module.BaseDoc):
         :return:
         """
         mes = {"message": "success"}
+        user = cls.find_by_id(o_id=user, to_dict=True) if isinstance(user, (str, ObjectId)) else user
         if isinstance(user, (User, dict)):
             user = user.get_dict() if isinstance(user, User) else user
             role_id = user.get("role_id", '')
@@ -183,10 +207,52 @@ class User(orm_module.BaseDoc):
                 if r is None:
                     mes['message'] = "错误的角色id: {}".format(role_id)
                 else:
-                    mes['data'] = r
+                    mes['role'] = r
         else:
             mes['message'] = "参数错误: user:{}".format(user)
         return mes
+
+    @classmethod
+    def range_level(cls, user_id: (str, ObjectId), rule: str, method: str) -> dict:
+        """
+        根据用户id,路由规则和方法, 查询用户的访问范围级别
+        :param user_id:
+        :param rule:
+        :param method:
+        :return:  {"message": "success", "range_level": 1}
+        """
+        mes = {"message": "success"}
+        resp = cls.get_role(user=user_id)
+        if "role" in resp:
+            role = resp['role']
+            if role['role_name'] == "root":
+                mes['range_level'] = 1  # 1 表示能访问全部数据
+            else:
+                rule_dict = role['rules']
+                range_level = Role.get_range_level(rule_dict=rule_dict, rule=rule, method=method)
+                mes['range_level'] = range_level
+        else:
+            mes = resp
+        return mes
+
+    @classmethod
+    def view_by_page(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False,) -> dict:
+        """
+        分页查看用户信息
+        :param filter_dict: 过滤器,由用户的权限生成
+        :param page_index: 页码(当前页码)
+        :param page_size: 每页多少条记录
+        :param can_json: 转换成可以json的字典?
+        :return:
+        """
+        kw = dict()
+        kw['filter_dict'] = filter_dict
+        kw['sort_cond'] = [('create_time', -1), ('last_update', -1)]
+        kw['page_index'] = page_index
+        kw['page_size'] = page_size
+        kw['can_json'] = can_json
+        res = cls.query_by_page(**kw)
+        return res
 
 
 if __name__ == "__main__":

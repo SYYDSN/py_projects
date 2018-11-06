@@ -39,7 +39,7 @@ from pymongo.errors import *
 MongoDB4+ 的持久化类   2018-10-11
 """
 
-version = "0.0.1"
+version = "0.0.3"
 
 print("ORM模块当前版本号: {}".format(version))
 
@@ -1355,50 +1355,53 @@ class BaseDoc:
         doc = self.__dict__
         _id = doc.get("_id", None)
         doc = {k: v for k, v in doc.items() if k not in ignore}
-        f = {"_id": _id}
-        res = None
-        try:
-            res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
-        except Exception as e:
-            ms = "error_cause:{},filter:{}, replacement:{}".format(e, f, doc)
-            print(ms)
-            logger.exception(ms)
-            raise e
-        if res is None:
-            return res
+        if _id is None:
+            return ses.insert_one(document=doc)
         else:
-            """
-            insert的情况
-            UpdateResult = {
-                ....
-                acknowledged: True,
-                matched_count: 0,
-                modified_count: 0,
-                raw_result: {
-                              'n': 1, 'updatedExisting': False, 
-                              'nModified': 0, 'ok': 1, 
-                              'upserted': ObjectId('5b051532c55c281e882494e0')
-                            }
-                upserted_id: ObjectId("5b051532c55c281e882494e0")
-            }
-            update的情况
-            UpdateResult = {
-                ....
-                acknowledged: True,
-                matched_count: 1,
-                modified_count: 1,
-                raw_result: {
-                              'nModified': 1, 
-                              'updatedExisting': True, 
-                              'ok': 1, 'n': 1
-                            }
-                upserted_id: None
-            }
-            如果是插入新的对象,res.upserted_id就是新对象的_id,
-            如果是修改旧的对象,res.upserted_id对象为空,这时返回的结果中不包含被修改的对象的id(另行查找),
-            本例是以_id查找,在修改旧对象的情况下,不用另行查找也能获得被修改对象的id.
-            """
-            return _id if res.upserted_id is None else res.upserted_id
+            f = {"_id": _id}
+            res = None
+            try:
+                res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
+            except Exception as e:
+                ms = "error_cause:{},filter:{}, replacement:{}".format(e, f, doc)
+                print(ms)
+                logger.exception(ms)
+                raise e
+            if res is None:
+                return res
+            else:
+                """
+                insert的情况
+                UpdateResult = {
+                    ....
+                    acknowledged: True,
+                    matched_count: 0,
+                    modified_count: 0,
+                    raw_result: {
+                                  'n': 1, 'updatedExisting': False, 
+                                  'nModified': 0, 'ok': 1, 
+                                  'upserted': ObjectId('5b051532c55c281e882494e0')
+                                }
+                    upserted_id: ObjectId("5b051532c55c281e882494e0")
+                }
+                update的情况
+                UpdateResult = {
+                    ....
+                    acknowledged: True,
+                    matched_count: 1,
+                    modified_count: 1,
+                    raw_result: {
+                                  'nModified': 1, 
+                                  'updatedExisting': True, 
+                                  'ok': 1, 'n': 1
+                                }
+                    upserted_id: None
+                }
+                如果是插入新的对象,res.upserted_id就是新对象的_id,
+                如果是修改旧的对象,res.upserted_id对象为空,这时返回的结果中不包含被修改的对象的id(另行查找),
+                本例是以_id查找,在修改旧对象的情况下,不用另行查找也能获得被修改对象的id.
+                """
+                return _id if res.upserted_id is None else res.upserted_id
 
     def delete_self(self, obj=None):
         """删除自己"""
@@ -1868,36 +1871,8 @@ class BaseDoc:
         return res
 
     @classmethod
-    def find_alone_and_update(cls, filter_dict: dict, update, projection=None, sort=None, upsert=True,
-                              return_document="after"):
-        """
-        找到一个文档然后更新它，如果找不到就插入,这个实例方法的find_one_and_update本质是同一方法。
-        :param filter_dict: 查找时匹配参数 字典
-        :param update: 更新的数据，字典
-        :param projection: 输出限制列  projection={'seq': True, '_id': False} 只输出seq，不输出_id
-        :param upsert: 找不到对象时是否插入新的对象 布尔值
-        :param sort: 排序列，一个字典的数组
-        :param return_document: 返回update之前的文档还是之后的文档？ after 和 before
-        :return:  doc或者None
-        example:
-        filter_dict = {"_id": self.get_id()}
-        update_dict = {"$set": {"prev_date": datetime.datetime.now(),
-                                "last_query_result_id": last_query_result_id},
-                       "$inc": {"online_query_count": 1, "all_count": 1,
-                                "today_online_query_count": 1}}
-        self.find_one_and_update(filter_dict=filter_dict, update=update_dict)
-        """
-        if "_id" in filter_dict:
-            obj = cls.find_by_id(filter_dict.pop('_id'))
-        else:
-            obj = cls(**filter_dict)
-        res = obj.find_one_and_update(filter_dict=None, update=update, projection=projection, sort=sort,
-                                      upsert=upsert, return_document=return_document)
-        return res
-
-    @classmethod
-    def find_one_and_update_plus(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
-                              return_document: str="after"):
+    def find_one_and_update(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
+                            return_document: str="after"):
         """
         本方法是find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
         和本方法相比find_one_and_update和find_alone_and_update更简单易用.
@@ -2036,15 +2011,15 @@ class BaseDoc:
                 return [x for x in res]
 
     @classmethod
-    def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
+    def query_by_page(cls, filter_dict: dict, sort_cond: (dict, list) = None, projection: list = None, page_size: int = 10,
                       ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False,
                       func: object = None, target: str = "dict") -> dict:
         """
         分页查询
         :param filter_dict:  查询条件字典
-        :param sort_dict:  排序条件字典
+        :param sort_cond:  排序条件字典/数组,如果是数组,那就是[(name, 1),(time,-1),...]这样的样式
         :param projection:  投影数组,决定输出哪些字段?
-        :param page_size:
+        :param page_size: 每页多少条记录
         :param ruler: 翻页器最多显示几个页码？
         :param page_index: 页码(当前页码)
         :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
@@ -2084,8 +2059,11 @@ class BaseDoc:
         skip = (page_index - 1) * page_size
         if can_json:
             to_dict = True
-        if sort_dict is not None:
-            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        if sort_cond is not None:
+            if isinstance(sort_cond, dict):
+                sort_list = [(k, v) for k, v in sort_cond.items()]  # 处理排序字典.
+            else:
+                sort_list = sort_cond
         else:
             sort_list = None
         table_name = cls._table_name

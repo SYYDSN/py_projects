@@ -39,7 +39,7 @@ from pymongo.errors import *
 MongoDB4+ 的持久化类   2018-10-11
 """
 
-version = "0.0.1"
+version = "0.0.2"
 
 print("ORM模块当前版本号: {}".format(version))
 
@@ -58,7 +58,7 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
 """
 mongodb_setting = {
-    "host": "47.106.68.161:27017",   # 数据库服务器地址  注意这个数据库是3.6.3版本的
+    "host": "47.106.68.161:27017",   # 数据库服务器地址  注意这个数据库是4.0.3版本的
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
