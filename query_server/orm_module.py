@@ -1447,7 +1447,7 @@ class BaseDoc:
         return result_dict
 
     @classmethod
-    def exec(cls, exe_name: str, write_concern: (dict, WriteConcern) = None, *args, **kwargs) -> ObjectId:
+    def exec(cls, exe_name: str, write_concern: (dict, WriteConcern) = None, *args, **kwargs) -> object:
         """
         执行Collection的原生命令
         :param exe_name:
@@ -1457,9 +1457,13 @@ class BaseDoc:
         :return:
         """
         conn = cls.get_collection(write_concern=write_concern)
-        if hasattr(conn, exe_name):
+        """
+        注意,由于collection实现__getitem__的方法.导致了collection在getattr的时候不会抛出错误.这会导致hasattr总是返回True
+        """
+        # if hasattr(conn, exe_name):
+        if exe_name in dir(conn):
             handler = getattr(conn, exe_name)
-            handler(*args, **kwargs)
+            return handler(*args, **kwargs)
         else:
             ms = "pymongo.Collection没有{}这个方法".format(exe_name)
             raise RuntimeError(ms)
@@ -2390,5 +2394,6 @@ if __name__ == "__main__":
     #         t1.insert_one(document={"name": "jack"}, session=session)  # 注意多了session这个参数
     #         k = dict()['name']  # 制造一个错误,你会发现t1和t2的插入都不会成功.
     #         t2.insert_one(document={"name": "jack2"}, session=session)
+    print(BaseDoc.exec("find"))
     pass
 
