@@ -77,13 +77,28 @@ def login_func():
         return abort(405)
 
 
+class LogoutView(MethodView):
+    """注销视图"""
+    def get(self):
+        clear_platform_session()
+        return redirect(url_for("manage_blueprint.login_func"))
+
+    def post(self):
+        return self.get()
+
+
 class ManageUserView(MethodView):
     """管理用户页面视图函数"""
     @check_session
     def get(self, user: User):
         """返回管理用户界面"""
         render_data['page_title'] = "用户管理"
-        render_data['user'] = user
+        rule = request.path.lower()
+        method = request.method.lower()
+        render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
+        access_filter = User.get_access_filter(user=user, rule=rule, method=method)
+        users = User.view_by_page(filter_dict=access_filter)  # 用户列表
+        render_data['users'] = users
         return render_template("manage_user.html", **render_data)
 
 
@@ -128,6 +143,10 @@ class ManageUserView(MethodView):
 """集中注册视图函数"""
 """登录"""
 manage_blueprint.add_url_rule(rule="/login", view_func=login_func, methods=['get', 'post'])
+"""注销"""
+manage_blueprint.add_url_rule(
+    rule="/logout", view_func=LogoutView.as_view(name="logout_view"), methods=['get', 'post']
+)
 """管理用户页面"""
 manage_blueprint.add_url_rule(
     rule="/user", view_func=ManageUserView.as_view(name="user_view"), methods=['get', 'post']

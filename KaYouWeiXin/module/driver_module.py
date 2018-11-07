@@ -738,7 +738,7 @@ class DriverResume(mongo_db2.BaseDoc):
                     "vehicle_ids": {"$ifNull": ["$vehicle", []]}  # 注意这里的$ifNull的用法,这相当于三元表达式
                 },
                 "pipeline": [
-                    {"$match": {"$expr": {"$in": ["$_id", "$$vehicle_ids"]}}}  # 注意这里的$in的用法
+                    {"$match": {"$expr": {"$in": ["$_id", "$$vehicle_ids"]}}}  # 注意这里的$in的用法,是匹配$_id在$$vehicle_ids中的情况.
                 ],
                 "as": "vehicle_list"
             }}

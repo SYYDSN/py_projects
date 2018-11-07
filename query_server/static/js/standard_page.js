@@ -7,7 +7,7 @@ $(function(){
         var sub = $dom.next();
         $(".plus_sign").removeClass("fa-minus-square");
         $(".plus_sign").addClass("fa-plus-square");
-        $(".left_nav .sub_nav").not(sub).slideUp(600, 'swing', function(){
+        $(".left_nav .sub_nav").not(sub).slideUp(300, 'swing', function(){
             var icon = $dom.find(".plus_sign");
             icon.removeClass('fa-plus-square');
             icon.addClass('fa-minus-square');

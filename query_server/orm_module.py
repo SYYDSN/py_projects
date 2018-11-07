@@ -47,9 +47,9 @@ print("ORM模块当前版本号: {}".format(version))
 cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设置决定
 s_cache = SimpleCache()      # 使用内存的缓存,重启/关机就清空了.
 logger = get_logger()
-# user = "test_root"              # 数据库用户名
-# password = "Test@1314"       # 数据库密码
-# db_name = "test_db"        # 库名称
+# user = "root2"              # 数据库用户名
+# password = "Shaojie@888"       # 数据库密码
+# db_name = "test2_db"        # 库名称
 # mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 #
 # """mongodb配置信息"""
@@ -65,7 +65,8 @@ logger = get_logger()
 #     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
 #     "authSource": db_name,  # 验证数据库
 #     'authMechanism': mechanism,  # 加密
-#     "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
+#     "readPreference": "primary",  # 读偏好,只读主.这是事务模式下的必须
+#     # "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
 #     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
 #     "username": user,       # 用户名
 #     "password": password    # 密码
@@ -2112,6 +2113,174 @@ class BaseDoc:
                         res = [cls(**x) for x in r]
             else:
                 pass
+        resp = {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        return resp
+
+    @classmethod
+    def query_by_page2(cls, filter_dict: dict, join_cond: (list, dict) = None, sort_cond: (dict, list) = None, projection: list = None, page_size: int = 10, ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False, func: object = None, target: str = "dict") -> dict:
+        """
+        分页查询,这个用的是aggerate查询的.有join部分.
+        join操作实际上对应的是aggregate中的lookup阶段:
+        一般来说.在mongodb的aggregate的lookup查询,主要由以下2种表达方式:
+        1. 相对简单的
+        {
+           $lookup:
+             {
+               from: 外连的表名,
+               localField: 本地字段,
+               foreignField: 外连表的字段,
+               as: 新的字段
+             }
+        }
+        2. 相对复杂的(嵌套管道的查询,可以用来查询多值属性,比如查询一个人的多条工作记录)
+
+        {
+           $lookup: {
+                "from": "外连的表名",
+                "let": {                         # let 用来创建新的变量.
+                    "work_list": {"$ifNull": ["$works", []]}  # 注意这里的$ifNull的用法,这相当于三元表达式.$works是null就返回第二个元素[]
+                },
+                "pipeline": [             # 嵌套的管道查询,
+                    {"$match": {"$expr": {"$in": ["$_id", "$$work_list"]}}},  # $expr是执行表达式语句.注意这里的$in的用法, 是匹配所有的$_id在$$work_list中的情况
+                    {"$sort": {"end": -1}}
+                ],
+                "as": "education_list"
+            }
+        }
+        考虑到功能的问题,一般都使用第二种
+
+        :param filter_dict:  查询条件字典
+        :param join_cond:  join查询条件单个join是字典格式,多个join是数组格式,
+        :param sort_cond:  排序条件字典/数组,如果是数组,那就是[(name, 1),(time,-1),...]这样的样式
+        :param projection:  投影数组,决定输出哪些字段?
+        :param page_size: 每页多少条记录
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
+        :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
+        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
+        :param target: 和func参数配合使用,指明func是对实例本身操作还是对doc进行操作(instance/dict)
+        :return: 字典对象.
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        """
+        """处理每页包含多少数据?"""
+        if isinstance(page_size, int):
+            pass
+        elif isinstance(page_size, float):
+            page_size = int(page_size)
+        elif isinstance(page_size, str) and page_size.isdigit():
+            page_size = int(page_size)
+        else:
+            page_size = 10
+        page_size = 1 if page_size < 1 else page_size
+        """处理页码"""
+        if isinstance(page_index, int):
+            pass
+        elif isinstance(page_index, float):
+            page_index = int(page_index)
+        elif isinstance(page_index, str) and page_index.isdigit():
+            page_index = int(page_index)
+        else:
+            page_size = 1
+        page_index = 1 if page_index < 1 else page_index
+        skip = (page_index - 1) * page_size
+        """处理can_json参数"""
+        if can_json:
+            to_dict = True
+        else:
+            pass
+        pipeline = list()
+        """处理过滤条件"""
+        match = filter_dict
+        pipeline.append({"$match": match})
+        """处理统计"""
+        count = {"total": {"$sum": 1}}
+        pipeline.append({"$addFields": count})
+        """处理投影字段"""
+        if isinstance(projection, (list, tuple, set)) and len(projection) > 0:
+            projection = {x: 1 for x in projection}
+            pipeline.append({"$project": projection})
+        else:
+            pass
+        """处理limit和skip"""
+        pipeline.append({"$skip": skip})
+        pipeline.append({"$limit": page_size})
+        """处理join/lookup查询条件"""
+        if isinstance(join_cond, dict) and len(join_cond) > 0:
+            lookup = join_cond
+            pipeline.append({"$lookup": lookup})
+        elif isinstance(join_cond, list) and len(join_cond) > 0:
+            [pipeline.append({"$lookup": x}) for x in join_cond]
+        else:
+            pass
+        replace = {
+            '$replaceRoot':
+                {'newRoot':
+                    {
+                        '$mergeObjects': [
+                            {'$arrayElemAt': [ "$role", 0] },
+                            '$$ROOT']
+                    }
+                }
+        }
+        pipeline.append(replace)
+        pro = {"$project": {"role": 0}}
+        pipeline.append(pro)
+        """处理排序"""
+        if isinstance(sort_cond, dict) and len(sort_cond) > 0:
+            sort_son = SON(data=[(k, v) for k, v in sort_cond.items()])
+        elif isinstance(sort_cond, list) and len(sort_cond) > 0:
+            sort_son = SON(data=sort_cond)
+        else:
+            sort_son = None
+        if sort_son is None:
+            pass
+        else:
+            pipeline.append({"$sort": sort_son})
+
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        r = ses.aggregate(pipeline=pipeline)
+        r = [x for x in r]
+        """开始计算分页数据"""
+        length = len(r)
+        record_count = 0 if length == 0 else r[0]['total']
+        page_count = math.ceil(record_count / page_size)  # 共计多少页?
+        delta = int(ruler / 2)
+        range_left = 1 if (page_index - delta) <= 1 else page_index - delta
+        range_right = page_count if (range_left + ruler - 1) >= page_count else range_left + ruler - 1
+        pages = [x for x in range(range_left, int(range_right) + 1)]
+        res = list()
+        if length > 0:
+            if to_dict:
+                if func and target == "dict":
+                    if can_json:
+                        res = [to_flat_dict(func(x)) for x in r]
+                    else:
+                        res = [func(x) for x in r]
+                else:
+                    if can_json:
+                        res = [to_flat_dict(x) for x in r]
+                    else:
+                        res = [x for x in r]
+            else:
+                if func and target == "instance":
+                    res = [func(cls(**x)) for x in r]
+                else:
+                    res = [cls(**x) for x in r]
         resp = {
             "total_record": record_count,
             "total_page": page_count,

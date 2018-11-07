@@ -84,7 +84,7 @@ class Role(orm_module.BaseDoc):
     type_dict['rules'] = dict
 
     @classmethod
-    def get_range_level(cls, rule_dict: dict, rule: str, method: str) -> int:
+    def get_rule_level(cls, rule_dict: dict, rule: str, method: str) -> int:
         """
         根据rule计算用户的访问(范围)级别
         :param rule_dict: 用户的规则字典,也就是Role.rules
@@ -196,6 +196,7 @@ class User(orm_module.BaseDoc):
         mes = {"message": "success"}
         user = cls.find_by_id(o_id=user, to_dict=True) if isinstance(user, (str, ObjectId)) else user
         if isinstance(user, (User, dict)):
+            """是实例或者doc"""
             user = user.get_dict() if isinstance(user, User) else user
             role_id = user.get("role_id", '')
             if role_id == "":
@@ -213,27 +214,47 @@ class User(orm_module.BaseDoc):
         return mes
 
     @classmethod
-    def range_level(cls, user_id: (str, ObjectId), rule: str, method: str) -> dict:
+    def rule_level(cls, user: (str, ObjectId, object), rule: str, method: str) -> dict:
         """
-        根据用户id,路由规则和方法, 查询用户的访问范围级别
-        :param user_id:
+        根据用户id,路由规则和方法, 查询用户的访问级别
+        :param user:
         :param rule:
         :param method:
         :return:  {"message": "success", "range_level": 1}
         """
-        mes = {"message": "success"}
-        resp = cls.get_role(user=user_id)
+        mes = {"message": "success", "rule_value": -1}
+        resp = cls.get_role(user=user)
         if "role" in resp:
             role = resp['role']
             if role['role_name'] == "root":
-                mes['range_level'] = 1  # 1 表示能访问全部数据
+                mes['rule_value'] = 1  # 1 表示能访问全部数据
             else:
                 rule_dict = role['rules']
-                range_level = Role.get_range_level(rule_dict=rule_dict, rule=rule, method=method)
-                mes['range_level'] = range_level
+                rule_value = Role.get_rule_level(rule_dict=rule_dict, rule=rule, method=method)
+                mes['rule_value'] = rule_value
         else:
             mes = resp
         return mes
+
+    @classmethod
+    def get_access_filter(cls, user: (str, ObjectId, object), rule: str, method: str) -> dict:
+        """
+        根据用户id,路由规则和方法, 获取用户的访问范围过滤器
+        :param user:
+        :param rule:
+        :param method:
+        :return:
+        """
+        value = cls.rule_level(user=user, rule=rule, method=method)
+        if value == 1:
+            f = dict()
+        elif value == -1:
+            f = None
+        elif value == 0:
+            f = {"user_id": user['_id']}
+        else:
+            f = None
+        return f
 
     @classmethod
     def view_by_page(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False,) -> dict:
@@ -257,10 +278,35 @@ class User(orm_module.BaseDoc):
 
 if __name__ == "__main__":
     """添加一个管理员"""
-    root_init = {
-        "user_name": "root", "password": "e10adc3949ba59abbe56e057f20f883e",
-        "role_id": ObjectId("5bdfad388e76d6efa7b92d9e"),
-        "nick_name": "系统管理员"
+    # root_init = {
+    #     "user_name": "root", "password": "e10adc3949ba59abbe56e057f20f883e",
+    #     "role_id": ObjectId("5bdfad388e76d6efa7b92d9e"),
+    #     "nick_name": "系统管理员"
+    # }
+    # print(User.add_user())
+    # sorted_cond = {"create_time": -1, "last_update": -1}
+    # r = User.query_by_page2(filter_dict=dict(), sort_cond=sorted_cond)
+    """事务测试"""
+    # db_client = orm_module.get_client()
+    # w = orm_module.get_write_concern()
+    # col = orm_module.get_conn(table_name="user_info", db_client=db_client, write_concern=w)
+    # with db_client.start_session(causal_consistency=True) as ses:
+    #     with ses.start_transaction(write_concern=w):
+    #         f = {"user_name": "root"}
+    #         r = col.find_one(filter=f, session=ses)
+    #         if r is None:
+    #             f['password'] = "123456"
+    #             r = col.insert_one(document=f, session=ses)
+    """join测试"""
+    join_cond = {
+        "from": "role_info",
+        "let": {"id": "$role_id"},
+        "pipeline": [
+            {"$match": {"$expr": {"$eq": ["$$id", "$_id"]}}},
+            {"$project": {"_id": 0, "role_name": 1}}
+        ],
+        "as": "role"
     }
-    print(User.add_user())
+    r = User.query_by_page2(filter_dict={}, join_cond=join_cond)
+    print(r)
     pass

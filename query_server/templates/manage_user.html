@@ -38,6 +38,13 @@
                         <th>用户状态</th>
                         <th>操作</th>
                     </tr>
+                    {% for user in users %}
+                        <tr id="{{ user._id }}">
+                            <td class="user_name">{{ user.user_name }}</td>
+                            <td class="role">{{ user.user_name }}</td>
+                            <td class="user_name">{{ user.user_name }}</td>
+                        </tr>
+                    {% endfor %}
                 </table>
             </div>
 
