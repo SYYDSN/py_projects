@@ -60,13 +60,17 @@
 .right_main .user_list_outer .user_list_inner .table_outer {
   min-height: calc(100% - 100px);
 }
+.right_main .user_list_outer .user_list_inner .table_outer #user_list .select {
+  width: 30px;
+}
 .right_main .user_list_outer .user_list_inner .table_outer #user_list tr th {
   border-top: none;
   text-align: center;
   color: #717171;
 }
 .right_main .user_list_outer .user_list_inner .table_outer #user_list tr td {
-  color: rgba(175,175,175,0.4);
+  text-align: center;
+  color: rgba(127,124,124,0.9);
 }
 .right_main .user_list_outer .user_list_inner .bottom_div {
   height: 50px;

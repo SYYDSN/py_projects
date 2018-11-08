@@ -23,22 +23,24 @@ class Company(orm_module.BaseDoc):
     """
     公司信息
     """
-    _table_name = "company"
+    _table_name = "company_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['company_name'] = str
     type_dict['short_name'] = str
     type_dict['desc'] = str
+    type_dict['time'] = datetime.datetime
+    type_dict['organization'] = list  # 组织架构
 
 
 class Dept(orm_module.BaseDoc):
     """部门信息"""
-    _table_name = "dept"
+    _table_name = "dept_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['company_id'] = ObjectId
-    type_dict['parent_id'] = ObjectId  # 上级部门id
     type_dict['dept_name'] = str
+    type_dict['time'] = datetime.datetime
 
 
 class Role(orm_module.BaseDoc):
@@ -82,6 +84,8 @@ class Role(orm_module.BaseDoc):
     2. role_id    角色id
     """
     type_dict['rules'] = dict
+    type_dict['last'] = datetime.datetime  # 最后修改时间
+    type_dict['time'] = datetime.datetime
 
     @classmethod
     def get_rule_level(cls, rule_dict: dict, rule: str, method: str) -> int:
@@ -118,6 +122,7 @@ class User(orm_module.BaseDoc):
     type_dict['role_id'] = ObjectId
     type_dict['last_update'] = datetime.datetime
     type_dict['create_time'] = datetime.datetime
+    type_dict['status'] = int         # 用户状态,默认值1.可用. 0禁用
 
     @classmethod
     def add_user(cls, **kwargs) -> bool:
@@ -216,7 +221,7 @@ class User(orm_module.BaseDoc):
     @classmethod
     def rule_level(cls, user: (str, ObjectId, object), rule: str, method: str) -> dict:
         """
-        根据用户id,路由规则和方法, 查询用户的访问级别
+        根据用户id,路由规则和方法, 查询用户的访问级别字典
         :param user:
         :param rule:
         :param method:
@@ -245,7 +250,13 @@ class User(orm_module.BaseDoc):
         :param method:
         :return:
         """
-        value = cls.rule_level(user=user, rule=rule, method=method)
+        value = cls.rule_level(user=user, rule=rule, method=method)['rule_value']
+        """
+        -1 表示禁止访问
+        0 标识只能访问自己
+        1 标识能访问全部
+        其他的自定义
+        """
         if value == 1:
             f = dict()
         elif value == -1:
@@ -257,23 +268,47 @@ class User(orm_module.BaseDoc):
         return f
 
     @classmethod
-    def view_by_page(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False,) -> dict:
+    def views_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False,
+                   include_role: bool = True, include_dept: bool = True) -> dict:
         """
         分页查看用户信息
         :param filter_dict: 过滤器,由用户的权限生成
         :param page_index: 页码(当前页码)
         :param page_size: 每页多少条记录
         :param can_json: 转换成可以json的字典?
+        :param include_role: 是否包含角色信息?
+        :param include_dept: 是否包含部门信息?
         :return:
         """
-        kw = dict()
-        kw['filter_dict'] = filter_dict
-        kw['sort_cond'] = [('create_time', -1), ('last_update', -1)]
-        kw['page_index'] = page_index
-        kw['page_size'] = page_size
-        kw['can_json'] = can_json
-        res = cls.query_by_page(**kw)
-        return res
+        join_cond = list()
+        if include_role:
+            join_cond_role = {
+                "table_name": "role_info",
+                "local_field": "role_id",
+                "field_map": {"role_name": "role_name", "role_id": "role_id"}
+            }
+            join_cond.append(join_cond_role)
+        else:
+            pass
+        if include_dept:
+            join_cond_dept = {
+                "table_name": "dept_info",
+                "local_field": "dept_id",
+                "field_map": {"dept_name": "dept_name", "dept_id": "dept_id"}
+            }
+            join_cond.append(join_cond_dept)
+        else:
+            pass
+        kw = {
+            "filter_dict": filter_dict,
+            "join_cond": join_cond,            # join查询角色表 role_info
+            "sort_cond": [('create_time', -1), ('last_update', -1)],   # 主文档排序条件
+            "page_index": page_index,        # 当前页
+            "page_size": page_size,  # 每页多少条记录
+            "can_json": can_json
+        }
+        r = User.query(**kw)
+        return r
 
 
 if __name__ == "__main__":
@@ -298,15 +333,11 @@ if __name__ == "__main__":
     #             f['password'] = "123456"
     #             r = col.insert_one(document=f, session=ses)
     """join测试"""
-    join_cond = {
-        "from": "role_info",
-        "let": {"id": "$role_id"},
-        "pipeline": [
-            {"$match": {"$expr": {"$eq": ["$$id", "$_id"]}}},
-            {"$project": {"_id": 0, "role_name": 1}}
-        ],
-        "as": "role"
-    }
-    r = User.query_by_page2(filter_dict={}, join_cond=join_cond)
-    print(r)
+    # join_cond = {
+    #     "table_name": "role_info",
+    #     "local_field": "role_id",
+    #     "field_map": {"role_name": "role_name", "role_id": "role_id"}
+    # }
+    # r = User.query(filter_dict={}, join_cond=join_cond)
+    # print(r)
     pass

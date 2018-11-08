@@ -2123,9 +2123,11 @@ class BaseDoc:
         return resp
 
     @classmethod
-    def query_by_page2(cls, filter_dict: dict, join_cond: (list, dict) = None, sort_cond: (dict, list) = None, projection: list = None, page_size: int = 10, ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False, func: object = None, target: str = "dict") -> dict:
+    def query(cls, filter_dict: dict, join_cond: (list, dict) = None, sort_cond: (dict, list) = None, projection: list = None, page_size: int = 10, ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False, func: object = None, target: str = "dict") -> dict:
         """
-        分页查询,这个用的是aggerate查询的.有join部分.
+        分页查询,这个用的是aggregate查询的.有join部分.
+        本函数的可以替代query_by_page函数.
+        本函数的存在的目的是为了简化查询操作.
         join操作实际上对应的是aggregate中的lookup阶段:
         一般来说.在mongodb的aggregate的lookup查询,主要由以下2种表达方式:
         1. 相对简单的
@@ -2154,6 +2156,23 @@ class BaseDoc:
             }
         }
         考虑到功能的问题,一般都使用第二种
+        实际操作种join_cond字典如果由多个,请用数组包裹.单个join_cond字典的格式如下:
+        join_cond = {
+            "table_name": table_name,        # 待join查询的表的名称.
+            "local_field": local_field,      # 本地表对应的字段,参考sql语句: where 本地表.local_field = 外部表.foreign_field
+            "foreign_field": foreign_field,  # 外部表对应的字段,默认是_id字段 参考上一行的sql语句
+            "field_map": field_map,          # 字段映射字典,如果要合并子文档,这个参数就是必须的了
+            "sort_by": sort_by,              # join子查询的排序字典, 非必要.
+            "symbol": =,                     # where 本地表.local_field = 外部表.foreign_field 中间的比较符号,默认是=
+            "flat": True                     # 布尔值.是否合并join子查询到文档,如果子查询结果是数组,只会保留第一个元素和父文档合并.
+                                               注意: 如果join子查询的字段和父文档中的字段同名的话将会被父文档的同名字段覆盖.
+        }
+        最简单的join条件只有3个字段, table_name, local_field和field_map.下面是一个例子:
+        join_cond = {
+                "table_name": "role_info",
+                "local_field": "role_id",
+                "field_map": {"role_name": "role"}
+            }
 
         :param filter_dict:  查询条件字典
         :param join_cond:  join查询条件单个join是字典格式,多个join是数组格式,
@@ -2203,53 +2222,50 @@ class BaseDoc:
         else:
             pass
         pipeline = list()
+
         """处理过滤条件"""
         match = filter_dict
         pipeline.append({"$match": match})
+
         """处理统计"""
-        count = {"total": {"$sum": 1}}
-        pipeline.append({"$addFields": count})
+        PipelineStage.add_count(pipeline=pipeline)
+        # count = {"total": {"$sum": 1}}
+        # pipeline.append({"$addFields": count})
+
         """处理投影字段"""
-        if isinstance(projection, (list, tuple, set)) and len(projection) > 0:
-            projection = {x: 1 for x in projection}
-            pipeline.append({"$project": projection})
-        else:
-            pass
+        PipelineStage.project(pipeline=pipeline, projection=projection)
+
         """处理limit和skip"""
         pipeline.append({"$skip": skip})
         pipeline.append({"$limit": page_size})
+
         """处理join/lookup查询条件"""
-        if isinstance(join_cond, dict) and len(join_cond) > 0:
-            lookup = join_cond
-            pipeline.append({"$lookup": lookup})
-        elif isinstance(join_cond, list) and len(join_cond) > 0:
-            [pipeline.append({"$lookup": x}) for x in join_cond]
+        if isinstance(join_cond, list):
+            PipelineStage.batch_join(pipeline=pipeline, conditions=join_cond)
+        elif isinstance(join_cond, dict):
+            PipelineStage.join(pipeline=pipeline, **join_cond)
         else:
             pass
-        replace = {
-            '$replaceRoot':
-                {'newRoot':
-                    {
-                        '$mergeObjects': [
-                            {'$arrayElemAt': [ "$role", 0] },
-                            '$$ROOT']
-                    }
-                }
-        }
-        pipeline.append(replace)
-        pro = {"$project": {"role": 0}}
-        pipeline.append(pro)
+        # if isinstance(join_cond, dict) and len(join_cond) > 0:
+        #     lookup = join_cond
+        #     pipeline.append({"$lookup": lookup})
+        # elif isinstance(join_cond, list) and len(join_cond) > 0:
+        #     [pipeline.append({"$lookup": x}) for x in join_cond]
+        # else:
+        #     pass
+
         """处理排序"""
-        if isinstance(sort_cond, dict) and len(sort_cond) > 0:
-            sort_son = SON(data=[(k, v) for k, v in sort_cond.items()])
-        elif isinstance(sort_cond, list) and len(sort_cond) > 0:
-            sort_son = SON(data=sort_cond)
-        else:
-            sort_son = None
-        if sort_son is None:
-            pass
-        else:
-            pipeline.append({"$sort": sort_son})
+        PipelineStage.sort(pipeline=pipeline, sort_cond=sort_cond)
+        # if isinstance(sort_cond, dict) and len(sort_cond) > 0:
+        #     sort_son = SON(data=[(k, v) for k, v in sort_cond.items()])
+        # elif isinstance(sort_cond, list) and len(sort_cond) > 0:
+        #     sort_son = SON(data=sort_cond)
+        # else:
+        #     sort_son = None
+        # if sort_son is None:
+        #     pass
+        # else:
+        #     pipeline.append({"$sort": sort_son})
 
         table_name = cls._table_name
         ses = get_conn(table_name=table_name)
@@ -2289,6 +2305,317 @@ class BaseDoc:
             "pages": pages
         }
         return resp
+
+
+class PipelineStage:
+    """
+    pipeline工具,用于生成复杂的阶段字典.
+    """
+
+    def __init__(self):
+        ms = "勿直接调用此初始化函数.请使用对应的静态和类方法"
+        raise RuntimeError(ms)
+
+    @staticmethod
+    def batch_join(pipeline: list, conditions: list) -> None:
+        """
+        批量执行 PipelineStage.join 函数
+        conditions = [
+            {
+              "table_name": table_name,
+              "local_field": local_field,
+              "foreign_field": foreign_field,
+              "field_map": field_map,
+              "sort_by": sort_by,
+              "flat": flat,
+            },
+            ...
+        ]
+        :param pipeline:
+        :param conditions: 条件字典的数组.
+        :return:
+        """
+        [PipelineStage.join(pipeline=pipeline, **x) for x in conditions]
+
+    @staticmethod
+    def join(pipeline: list, table_name: str, local_field: str, field_map: dict, sort_by: (list, tuple, dict) = None,
+             foreign_field: str = "_id", symbol: str = "=", flat: bool = False) -> None:
+        """
+        往aggregate的pipeline中插入join所需的stage字典.
+        原生的aggregate中并没有$join阶段.这里的join实际上是$lookup+$replaceRoot 2个阶段的组合.
+        field_map是一个字典.表示外部表中的字段和新表中字段的命名方式.
+        格式: field_map = {file_name: value, ....}
+        file_name表示外部表中此字段的名称.
+        value的取值有3种:
+        1. 0 ,表示此字段不显示. 一般来说,只要field_map不出现的字段都不会显示.但_id是个例外,必须显式的设置{_id: 0}才会忽略_id字段
+        2. 1 ,表示此字段显示并且不改变名称. 注意,如果本地表里有同名的字段,外地表中的同名字段将被覆盖.
+        3. new_name,  新的字段名. 在最终结果里会以value的值重命名字段.
+        如果field_map为None或者长度为0.那么外部表中的所有字段都会被当作一个名为table_name文档显示在最终结果中.
+
+        :param pipeline:  原始的pipeline
+        :param table_name:  待join查询的表的名称.
+        :param local_field:   本地表对应的字段,参考sql语句表达式: where 本地表.local_field = 外部表.foreign_field
+        :param foreign_field: 外部表对应的字段,一般是_id字段.参考sql语句表达式: where 本地表.local_field = 外部表.foreign_field
+        :param field_map: 字段映射.就是相当于外部表字段被join新表后的字段名.如果这个为空.那么就会以外部表.foreign_field_name来命名
+        :param sort_by: 排序字典.
+        :param symbol: 本地表.local_field 和 外部表.foreign_field中间的哪个符号. =/!=/>/</>=/=</in/not in
+        :param flat: 是否把lookup查询的子文档展开到主文档中?注意,如果你的子文档不止一个,展开后将只能保存所占开的文档中的第一个
+        :return: 加入过stage字典的pipeline
+        """
+        if field_map is None or len(field_map) < 1:
+            """join查询结果作为子文档最终结果"""
+            inner_project = None
+        else:
+            """join查询结果以字段形式放入主文档"""
+            inner_project = PipelineStage.project(pipeline=None, projection=field_map)
+            # inner_project = dict()   # $lookup内部的$project的子字典
+            # for k, v in field_map.items():
+            #     val = None
+            #     try:
+            #         val = v if isinstance(v, int) else int(v)
+            #     except Exception as e:
+            #         print(e)
+            #     finally:
+            #         if isinstance(val, int):
+            #             val = 0 if val == 0 else 1
+            #             inner_project[k] = val
+            #         else:
+            #             if isinstance(v, str) and len(v) > 0:
+            #                 inner_project[v] = "${}".format(k)
+            #             else:
+            #                 """不是字符串也不是数字的放弃"""
+            #                 ms = "错误的value的值或者类型:{}".format(v)
+            #                 raise ValueError(ms)
+
+        """需要重命名join查询结果字段的情况,必须有新旧字段的映射关系"""
+        kw = {
+            "pipeline": pipeline,
+            "table_name": table_name,
+            "local_field": local_field,
+            "foreign_field": foreign_field,
+            "symbol": symbol,
+            "inside_project": inner_project,
+            "inside_sort": sort_by
+        }
+        PipelineStage.lookup_simple(**kw)
+
+        if flat is None:
+            pass
+        else:
+            """
+            插入$replaceRoot阶段整合文档,
+            注意,如果join结果为空,这里不会生效
+            """
+            PipelineStage.flat_list(pipeline=pipeline, field=table_name)
+
+    @staticmethod
+    def add_count(pipeline: list, field_name: str = "total") -> dict:
+        """
+        加一个统计功能.注意这个$addFields的特例
+        :param pipeline:
+        :param field_name: 统计计算的名称
+        :return:
+        """
+        count = {field_name: {"$sum": 1}}
+        return PipelineStage.add_fields(pipeline=pipeline, field_dict=count)
+
+    @staticmethod
+    def add_fields(pipeline: list, field_dict: dict) -> dict:
+        """
+        $addFields阶段 增加字段
+        field_dict参数说明:
+        这是一个生成字段的表达式的字典.key是新字段的名字.key是字典/表达式.用于生成新字段的值(新字段的值是如何获取的?)
+        比如增加一个常见的total字段来统计记录数. field_dict = {"total": {"$sum": 1}}
+        也可以新字段由其他字段计算得来 field_dict = {"new_field": {"$add": ["$old_field1", "$old_field2"]}}
+        最通用的表达式是 field_dict = {field: expression,......}
+
+        :param pipeline:
+        :param field_dict: 字段表达式字典.
+        :return:
+        """
+        pipeline.append({"$addFields": field_dict})
+        return field_dict
+
+    @staticmethod
+    def lookup_simple(pipeline: list, table_name, local_field: str, foreign_field: str, symbol: str = "=",
+                      inside_project: dict = None, inside_sort: dict = None):
+        """
+        $lookup阶段. 本函数只能进行单字段的lookup操作. 多字段的逻辑比较复杂,以后再实现
+        :param pipeline:
+        :param table_name:
+        :param local_field:
+        :param foreign_field:
+        :param symbol: 布尔运算符 用来对local_field和foreign_field进行布尔运算
+                        1. =  等于
+                        2. !=  不等于
+                        3. >  大于
+                        4. <  小于
+                        5. >=  大于等于
+                        6. =<  小于等于
+                        7. in  包含
+                        8. not in  不包含
+
+        :param inside_project: 内置投影字典
+        :param inside_sort: 内置的排序字典
+        :return:
+        """
+        symbol_map = {
+            "=": "$eq", "!=": "$ne", ">": "$gt", ">=": "$gte",
+            "<": "$lt", "=<": "$lte", "in": "$in", "not in": "$nin"
+        }
+        symbol = symbol_map.get(symbol, "$eq")
+        inside_pipeline = list()
+        temp_field = "{}_v".format(local_field)
+        if symbol in ['$in', "$nin"]:
+            """对数组的比较,数组可能为空"""
+            let = {temp_field: {"$ifNull": ["${}".format(local_field), []]}}
+            """
+            $in和$nin是看第一个元素是否在/不在第二个元素中,这个大于小于的正常方式(第一个是否大于/小于第二个)
+            这导致数组内部的排序不同:
+            $in和$nin [foreign_field, local_field]
+            其他的是   [local_field, foreign_field]
+            """
+            match = {"$expr": {symbol: ["${}".format(foreign_field), "$${}".format(temp_field)]}}
+        else:
+            let = {temp_field: "${}".format(local_field)}
+            match = {"$expr": {symbol: ["$${}".format(temp_field), "${}".format(foreign_field)]}}
+        inside_pipeline.append({"$match": match})
+        if inside_project is not None and len(inside_project) > 0:
+            inside_pipeline.append({"$project": inside_project})
+        if inside_sort is not None and len(inside_sort) > 0:
+            inside_pipeline.append({"$sort": inside_sort})
+        lookup = {
+            "from": table_name,
+            "let": let,
+            "pipeline": inside_pipeline,
+            "as": table_name
+        }
+        pipeline.append({"$lookup": lookup})
+        return lookup
+
+    @staticmethod
+    def project(pipeline: list, projection: (list, tuple, dict)) -> dict:
+        """
+        $project阶段.
+        projection 参数形式可以由多种:
+
+        1. projection = [(field1, 1), (field2, 0), ....]
+        2. projection = ((field1, 1), (field2, 0), ....)
+        3. projection = {field1: 1, field2: 0, ....}
+        4. projection = {field1: new_filed1, field2: new_field2, ....}
+
+        field对应的值1表示显示此字段,0表示不显示此字段.不在参数中出现的字段默认不显示.但_id除外,_id必须显示的指示为0才会不显示.
+        第4种参数的形式可以把字段重命名.
+
+        :param pipeline:
+        :param projection:
+        :return: $project阶段的字典
+        """
+        if isinstance(projection, dict):
+            p_dict = dict()
+            for k, v in projection.items():
+                val = None
+                try:
+                    val = v if isinstance(v, int) else int(v)
+                except Exception as e:
+                    print(e)
+                finally:
+                    if isinstance(val, int):
+                        val = 0 if val == 0 else 1
+                        p_dict[k] = val
+                    else:
+                        if isinstance(v, str) and len(v) > 0:
+                            p_dict[v] = "${}".format(k)
+                        else:
+                            """不是字符串也不是数字的放弃"""
+                            ms = "错误的value的值或者类型:{}".format(v)
+                            raise ValueError(ms)
+        elif isinstance(projection, (list, tuple)):
+            p_dict = {x[0]: x[-1] for x in projection}
+        else:
+            p_dict = None
+        if p_dict is None:
+            pass
+        else:
+            if isinstance(pipeline, list):
+                pipeline.append({"$project": p_dict})
+            else:
+                pass
+        return p_dict
+
+    @staticmethod
+    def sort(pipeline: list, sort_cond: (list, tuple, dict)) -> dict:
+        """
+        $sort阶段.
+        :param pipeline:
+        :param sort_cond: 排序字典/数组
+        :return:
+        """
+        if isinstance(sort_cond, dict) and len(sort_cond) > 0:
+            sort_son = SON(data=[(k, v) for k, v in sort_cond.items()])
+        elif isinstance(sort_cond, list) and len(sort_cond) > 0:
+            sort_son = SON(data=sort_cond)
+        else:
+            sort_son = None
+        if sort_son is None:
+            pass
+        else:
+            pipeline.append({"$sort": sort_son})
+        return sort_son
+
+    @staticmethod
+    def flat_list(pipeline: list, field: str, index: int = 0, clear: bool = True) -> None:
+        """
+        $replaceRoot阶段.
+        把数组类型的字段的指定元素展开到父文档中,如果字段中的子文档的字段和父文档中的字段相同.那么他们将被父文档的同名字段覆盖
+        :param pipeline: 原始pipeline管道
+        :param field: 数组类型的字段名称
+        :param index: 要展开字段中第几个元素到父文档中?
+        :param clear: 是否从父文档中清除原始的展开字段?
+        :return:
+        """
+        replace = {
+            '$replaceRoot':  # 从根文档替换
+                {'newRoot':  # 作为新文档
+                    {
+                        '$mergeObjects': [  # 混合文档.value是一个数组,用第二个元素覆盖第一个.注意这个顺序很重要.
+                            {'$arrayElemAt': ["${}".format(field), index]},
+                            # 取上一阶段结果中.列表字段(数组的第一个元素指示)的第0个(数组的最后一个元素指示))
+                            '$$ROOT']  # 标识根文档
+                    }
+                }
+        }
+        pipeline.append(replace)
+        if clear:
+            pro = {"$project": {field: 0}}  # 把始的展开字段从根文档移除
+            pipeline.append(pro)
+
+    @staticmethod
+    def flat_doc(pipeline: list, field: str, clear: bool = True) -> None:
+        """
+        $replaceRoot阶段.
+        把数组类型的字段的指定元素展开到父文档中,如果字段中的子文档的字段和父文档中的字段相同.那么他们将被父文档的同名字段覆盖
+        :param pipeline: 原始pipeline管道
+        :param field: 数组类型的字段名称
+        :param clear: 是否从父文档中清除原始的展开字段?
+        :return:None
+        """
+        replace = {
+            '$replaceRoot':  # 从根文档替换
+                {'newRoot':  # 作为新文档
+                    {
+                        '$mergeObjects':
+                            [  # 混合文档.value是一个数组,用第二个元素覆盖第一个.注意这个顺序很重要.
+                                "${}".format(field),
+                                '$$ROOT'  # 标识根文档
+                            ]
+                    }
+                }
+        }
+        pipeline.append(replace)
+        if clear:
+            pro = {"$project": {field: 0}}  # 把始的展开字段从根文档移除
+            pipeline.append(pro)
 
 
 class FlaskUrlRule(BaseDoc):

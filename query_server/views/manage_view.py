@@ -97,8 +97,11 @@ class ManageUserView(MethodView):
         method = request.method.lower()
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
         access_filter = User.get_access_filter(user=user, rule=rule, method=method)
-        users = User.view_by_page(filter_dict=access_filter)  # 用户列表
+        r = User.views_info(filter_dict=access_filter)  # 用户列表
+        users = r.pop("data")
+        users = users * 12
         render_data['users'] = users
+        render_data.update(r)
         return render_template("manage_user.html", **render_data)
 
 

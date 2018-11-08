@@ -5,6 +5,7 @@ from views.manage_view import manage_blueprint
 from flask import session
 from flask import send_file
 from flask_session import Session
+from my_filter import mount_plugin
 from orm_module import FlaskUrlRule
 import datetime
 
@@ -19,6 +20,14 @@ app.register_blueprint(manage_blueprint)           # 注册平台操作视图
 SESSION_TYPE = "redis"
 Session(app)
 port = 7012
+
+
+"""扩展jinja2过滤器"""
+
+mount_plugin(app)
+
+
+"""视图函数"""
 
 
 @app.route('/favicon.ico')
