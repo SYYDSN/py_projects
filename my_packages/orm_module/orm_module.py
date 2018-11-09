@@ -19,13 +19,12 @@ from bson.binary import Binary
 import numpy as np
 import re
 import math
-from mail_module import send_mail
 from pymongo.client_session import ClientSession
 from werkzeug.contrib.cache import RedisCache
 from werkzeug.contrib.cache import SimpleCache
 from pymongo import WriteConcern
 from pymongo.collection import Collection
-from log_module import get_logger
+from .log_module import get_logger
 from pymongo import ReturnDocument
 from pymongo.results import *
 import gridfs
@@ -47,38 +46,30 @@ print("ORM模块当前版本号: {}".format(version))
 cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设置决定
 s_cache = SimpleCache()      # 使用内存的缓存,重启/关机就清空了.
 logger = get_logger()
-# user = "root2"              # 数据库用户名
-# password = "Shaojie@888"       # 数据库密码
-# db_name = "test2_db"        # 库名称
-# mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
-#
-# """mongodb配置信息"""
-# """
-# 注意,使用连接池就不能使用mongos load balancer
-# mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
-# """
-# mongodb_setting = {
-#     "host": "47.99.105.196:27017",   # 数据库服务器地址
-#     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
-#     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
-#     "minPoolSize": 0,  # 最小连接池,默认是0.
-#     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
-#     "authSource": db_name,  # 验证数据库
-#     'authMechanism': mechanism,  # 加密
-#     "readPreference": "primary",  # 读偏好,只读主.这是事务模式下的必须
-#     # "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
-#     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
-#     "username": user,       # 用户名
-#     "password": password    # 密码
-# }
-db_name = "query_db"
+user = "user_name"              # 数据库用户名
+password = "password"           # 数据库密码
+db_name = "test2_db"            # 库名称
+host = "47.99.105.196:27017"    # 数据库主机
+mechanism = "SCRAM-SHA-1"       # 加密方式，注意，不同版本的数据库加密方式不同。
+
+"""mongodb配置信息"""
+"""
+注意,使用连接池就不能使用mongos load balancer
+mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
+"""
 mongodb_setting = {
-    "host": "127.0.0.1:27017",   # 数据库服务器地址
+    "host": host,   # 数据库服务器地址
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
-    "minPoolSize": 2,  # 最小连接池,默认是0.
+    "minPoolSize": 0,  # 最小连接池,默认是0.
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
+    'authMechanism': mechanism,  # 加密
+    "readPreference": "primary",  # 读偏好,只读主.这是事务模式下的必须
+    # "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
+    # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
+    "username": user,       # 用户名
+    "password": password    # 密码
 }
 
 
@@ -114,7 +105,6 @@ class DBCommandListener(monitoring.CommandListener):
         elif error_msg == "Authentication failed.":
             """登录失败"""
             title = "{}数据库登录失败! {}".format(db_name, datetime.datetime.now())
-            send_mail(title=title)
         else:
             pass
         pass

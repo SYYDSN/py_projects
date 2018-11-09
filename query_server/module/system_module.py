@@ -285,7 +285,8 @@ class User(orm_module.BaseDoc):
             join_cond_role = {
                 "table_name": "role_info",
                 "local_field": "role_id",
-                "field_map": {"role_name": "role_name", "role_id": "role_id"}
+                "field_map": {"role_name": "role_name", "role_id": "role_id"},
+                "flat": True
             }
             join_cond.append(join_cond_role)
         else:
@@ -294,7 +295,8 @@ class User(orm_module.BaseDoc):
             join_cond_dept = {
                 "table_name": "dept_info",
                 "local_field": "dept_id",
-                "field_map": {"dept_name": "dept_name", "dept_id": "dept_id"}
+                "field_map": {"dept_name": "dept_name", "dept_id": "dept_id"},
+                "flat": True
             }
             join_cond.append(join_cond_dept)
         else:
@@ -333,11 +335,6 @@ if __name__ == "__main__":
     #             f['password'] = "123456"
     #             r = col.insert_one(document=f, session=ses)
     """join测试"""
-    # join_cond = {
-    #     "table_name": "role_info",
-    #     "local_field": "role_id",
-    #     "field_map": {"role_name": "role_name", "role_id": "role_id"}
-    # }
-    # r = User.query(filter_dict={}, join_cond=join_cond)
-    # print(r)
+    r = User.views_info(filter_dict={})
+    print(r)
     pass
