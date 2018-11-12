@@ -143,7 +143,7 @@ def listen_func2(key):
             mes = listen_jdy(**kw)
         else:
             mes['message'] = "validate error"
-    elif key == "image":
+    elif key == "listen_image":
         """上传图片素材"""
         pass
     else:

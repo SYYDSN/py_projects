@@ -46,3 +46,20 @@ except ImportError as e:
 # gevent 部署方式
 # server = WSGIServer(('0.0.0.0', port), app)
 # server.serve_forever()
+
+
+"""
+gunicorn的部署方式 需要virtualenv支持
+gunicorn  --config=gunicorn.py query_server:app
+"""
+
+"""
+uwsgi 部署方式.
+1. 安装uwsgi 
+    sudo apt install uwsgi 
+    或者 pip install uwsgi
+2. 安装python3插件
+    apt install uwsgi-plugin-python3
+    或者直接 sudo apt install uwsgi-plugins-all 安装所有的插件
+uwsgi --http-socket 127.0.0.1:7011 --plugin python3 --wsgi-file query_server.py --callable app --process 8 --threads 2
+"""

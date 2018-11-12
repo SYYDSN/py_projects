@@ -56,7 +56,9 @@ app.conf.update(CELERY_TIMEZONE=CELERY_TIMEZONE, CELERY_ROUTES=CELERY_ROUTES,
 """broker是中间人，backend用来储存结果,从celery.result.AsyncResult对象返回响应结果，两者的设置可以一致"""
 
 
-"""由于队列经常失败,本模块暂停"""
+"""
+由于队列经常失败,本模块暂停 2018-11-12 
+"""
 
 
 @app.task(bind=True)
@@ -77,7 +79,7 @@ def test(self, *args, **kwargs):
 @app.task(bind=True, max_retries=3, default_retry_delay=5)
 def send_reg_info_celery(self, group_by: str, send_data: dict):
     """
-    发送注册信息的钉订消息到各个大部群
+    发送注册信息的钉订消息到各个大部群.2018-11-12 此函数不再使用. 发送消息到简道云使用同步api方式
     :param self:
     :param group_by:
     :param send_data:
@@ -103,7 +105,7 @@ def send_reg_info_celery(self, group_by: str, send_data: dict):
 @app.task(bind=True, max_retries=3, default_retry_delay=5)
 def send_reg_info_celery2(self, send_data: dict):
     """
-    发送注册信息到简道云
+    发送注册信息到简道云 2018-11-12 此函数不再使用. 发送消息到简道云使用同步api方式
     :param self:
     :param send_data:
     :return:

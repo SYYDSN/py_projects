@@ -162,7 +162,7 @@ class Customer(mongo_db.BaseDoc):
                         ms = "送注册信息到大群, arg={}".format(send_data)
                         logger.info(ms)
                         cls.send_signal(send_data)   # 发送注册信息到大群. 调试请关闭
-                        send_reg_info(group_by, send_data)  #发送消息到钉钉群,包含分组消息
+                        send_reg_info(group_by, send_data)  # 发送消息到钉钉群,包含分组消息
                         """转发到简道云,2018-10-21暂时停止写简道云,将来使用api代替"""
                         # ms = "用户已保存,开始调用to_jiandao_cloud_and_send_mail, arg={}".format(reg_dict)
                         # logger.info(ms)
@@ -187,7 +187,8 @@ class Customer(mongo_db.BaseDoc):
         markdown = dict()
         out_put['msgtype'] = 'markdown'
         markdown['title'] = "注册信息"
-        channel_info = SpreadChannel.analysis_url(reg_info.get('page_url'))
+        u = reg_info.get("page_url", "")
+        channel_info = SpreadChannel.analysis_url(u)
         channel_str = ",".join(channel_info)
         d = datetime.datetime.now().strftime(
             "%Y年%m月%d日 %H:%M:%S")
@@ -198,8 +199,8 @@ class Customer(mongo_db.BaseDoc):
         title = "用户注册"
         markdown['title'] = title
         markdown[
-            'text'] = "#### {}  \n > {}  \n > 注册通道：{}  \n > 搜索关键词： {}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 分组：{}  \n > 计数：{}/{}". \
-            format(title, d, channel_str, keywords, n, p, reg_info['group_by'], reg_info['group_count'] + 1, c)
+            'text'] = "#### {}  \n > {}  \n > 注册通道：{}  \n > 搜索关键词： {}  \n > 注册地址: {}  \n > 用户姓名：{}  \n > 手机号码:{}  \n > 分组：{}  \n > 计数：{}/{}". \
+            format(title, d, channel_str, keywords, u, n, p, reg_info['group_by'], reg_info['group_count'] + 1, c)
         out_put['markdown'] = markdown
         out_put['at'] = {'atMobiles': [], 'isAtAll': False}
         return out_put

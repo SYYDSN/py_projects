@@ -6,7 +6,7 @@ sudo apt install uwsgi
 
 python的插件也是要安装的
 
-sudo apt install uwsgi-plugin-python
+sudo apt install uwsgi-plugin-python3
 
 你可以用 --version查看版本我当前的版本是2.015
 
@@ -17,7 +17,7 @@ uwsgi有独立部署和作为web容器的后端部署两种方式.这两种方�
 2. 后端部署 使用 --socket  host:port 方式绑定主机和端口
 
 * 当你使用 --http参数把uwsgi部署在web服务器后面时, 会导致uwsgi不停的反复重新加载对站,直至服务器宕机.
-* 当你使用  --http-socket或者--socket参数独立部署uwsgi的时候,你在访问服务器的时uwsgi会报错
+* 当你使用 --http-socket或者--socket参数独立部署uwsgi的时候,你在访问服务器的时uwsgi会报错
 ```shell
 invalid request block size: 21573 (max 4096)...skip
 ```
