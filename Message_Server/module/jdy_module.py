@@ -10,6 +10,7 @@ from send_moudle import *
 from pymongo import ReturnDocument
 import requests
 from module.image_module import Praise
+from module.image_module import MaterialPushHistory
 from send_moudle import send_signal
 import datetime
 
@@ -69,6 +70,9 @@ def listen_jdy(**kwargs) -> dict:
     if req_type == 'deposit':
         """入金宣传表"""
         process_praise(**kwargs)
+    elif req_type == "material":
+        """上传图片素材"""
+        MaterialPushHistory.push(**kwargs)
     else:
         ms = "错误的req_type:{}".format(req_type)
         print(ms)
@@ -127,6 +131,61 @@ def process_praise(**kwargs) -> None:
             ms = "{}, {}".format(title, content)
             logger.exception(msg=ms)
 
+
+def process_material(**kwargs) -> None:
+    """
+    处理简道云发送过来的每日素材
+    :param kwargs:
+    :return:
+    """
+    args = dict()
+    files = kwargs.get("file", [])
+    if len(files) < 1:
+        file_url = ''
+    else:
+        file = files[0]
+        file_url = file.get("url", "")
+    images = kwargs.get("image", [])
+    if len(images) < 1:
+        image_url = ''
+    else:
+        image = images[0]
+        image_url = image.get("url", "")
+    args["file_url"] = file_url
+    args["image_url"] = image_url
+    args['date_time'] = mongo_db.get_datetime_from_str(kwargs.get("date_time"))
+    args['groups'] = kwargs.get("group", list())
+    args['desc'] = kwargs.get("desc", '')
+    print("---------------")
+    print(args)
+
+    if isinstance(r, ObjectId):
+        """发送钉订消息"""
+        data = dict()
+        data['msgtype'] = 'markdown'
+        markdown_doc = dict()
+        markdown_doc['title'] = "入金喜报"
+        i = str(r)
+        if desc == '':
+            text = "![screenshot](http://47.106.68.161:8000/normal/praise_image/view?fid={})".format(r)
+        else:
+            text = "![screenshot](http://47.106.68.161:8000/normal/praise_image/view?fid={}) \n  ##### {} [胜利][胜利][胜利]，继续加油！[加油][加油][加油]".format(r, desc)
+        print("text = {}".format(text))
+        markdown_doc['text'] = text
+        data['markdown'] = markdown_doc
+        token_name = '入金宣传'
+        send_signal(send_data=data, token_name=token_name)
+    else:
+        """发送钉订失败"""
+        title = "使用钉钉机器人发送入金宣传失败{}".format(datetime.datetime.now())
+        content = "args: {}".format(args)
+        send_mail(title=title, content=content)
+        ms = "{}, {}".format(title, content)
+        logger.exception(msg=ms)
+    """创建并保存每日素材发送结果"""
+    r = MaterialPushHistory.insert_one(**args)
+    if r is None:
+        title = "保存每日素材失败{}".format(datetime.datetime.now())
 
 
 if __name__ == "__main__":

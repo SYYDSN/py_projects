@@ -252,6 +252,49 @@ class Praise(mongo_db.BaseDoc):
             return img
 
 
+class MaterialPushHistory(mongo_db.BaseDoc):
+    """
+    每日素材的推送历史
+    """
+    _table_name = "material_push_history"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['image_url'] = str
+    type_dict['file_url'] = str
+    type_dict['groups'] = list
+    type_dict['date_time'] = datetime.datetime
+    type_dict['push_time'] = datetime.datetime
+
+    @classmethod
+    def push(cls, **kwargs) -> None:
+        """
+        推送每日素材
+        :param kwargs:
+        :return:
+        """
+        files = kwargs.get("file", [])
+        if len(files) < 1:
+            file_url = ''
+        else:
+            file = files[0]
+            file_url = file.get("url", "")
+        images = kwargs.get("image", [])
+        if len(images) < 1:
+            image_url = ''
+        else:
+            image = images[0]
+            image_url = image.get("url", "")
+        kw = dict()
+        kw["file_url"] = file_url
+        kw["image_url"] = image_url
+        kw['date_time'] = mongo_db.get_datetime_from_str(kwargs.get("date_time"))
+        kw['groups'] = kwargs.get("group", list())
+        kw['desc'] = kwargs.get("desc", '')
+        print("---------------")
+        print(kw)
+
+
+
 if __name__ == "__main__":
     # image_id = Praise.create(order="12",the_type=1, director="李总监", manager="张经理", sales="张三", customer="李四", money=1200)
     # print(image_id)

@@ -58,7 +58,7 @@ def hello_world():
 
 @app.route("/listen_<key>", methods=['post'])
 def listen_func(key):
-    """监听
+    """监听   新增的监听请使用 listen_func2
     1. 简道云
     2. 虚拟喊单延迟信号
     发送过来的消息"""
@@ -132,9 +132,12 @@ def listen_func2(key):
     print(data)
     raw = RawSignal(**data)
     raw.save_plus()  # 保存原始喊单数据格式
-    if key == "deposit":
-        """企划部.入金宣传表"""
-        secret_str = "tYfHgynb10QJkoPTPFoEJaI8"  # 不同的消息定义的secret不同，用来验证消息的合法性
+    if key in ["deposit", "material"]:
+        """
+        deposit:       企划部.入金宣传表
+        material:      上传图片素材
+        """
+        secret_str = "tYfHgynb10QJkoPTPFoEJaI8"  # 消息定义的secret
         validate_result = validate_signature(request, secret_str, signature)
         print("deposit request validate result is {}".format(validate_result))
         if validate_result:
@@ -143,9 +146,6 @@ def listen_func2(key):
             mes = listen_jdy(**kw)
         else:
             mes['message'] = "validate error"
-    elif key == "listen_image":
-        """上传图片素材"""
-        pass
     else:
         mes['message'] = '错误的path'
     # print(mes)
