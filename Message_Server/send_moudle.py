@@ -49,27 +49,40 @@ def send_signal(send_data: dict, token_name: str = None) -> bool:
         headers = {'Content-Type': 'application/json'}
         base_url = "https://oapi.dingtalk.com/robot/send?access_token="
         robot_url = "{}{}".format(base_url, token)
-        r = requests.post(robot_url, data=data, headers=headers)
-        status_code = r.status_code
-        if status_code == 200:
-            r = r.json()
-            if r['errmsg'] == 'ok':
-                """success"""
-                res = True
+        now = datetime.datetime.now()
+        r = None
+        try:
+            r = requests.post(robot_url, data=data, headers=headers)
+        except Exception as e:
+
+            title = "调用钉钉机器人接口异常!{}".format(now)
+            content = "{}, 错误原因: {}".format(title, str(e))
+            send_mail(title=title, content=content)
+            logger.exception(e)
+            print(e)
+        finally:
+            if r is not None:
+                status_code = r.status_code
             else:
-                ms = '发送消息到钉钉机器人失败，错误原因：{}， 参数{}'.format(r['errmsg'], data)
+                status_code = -1
+            if status_code == 200:
+                r = r.json()
+                if r['errmsg'] == 'ok':
+                    """success"""
+                    res = True
+                else:
+                    ms = '发送消息到钉钉机器人失败，错误原因：{}， 参数{}'.format(r['errmsg'], data)
+                    title = "发送消息到钉钉机器人失败{}".format(ms, now)
+                    send_mail(title=title, content=ms)
+                    logger.exception(ms)
+                    raise ValueError(ms)
+            else:
+                ms = '钉钉机器人没有返回正确的响应，错误代码：{}'.format(status_code)
                 now = datetime.datetime.now()
-                title = "发送消息到钉钉机器人失败{}".format(ms, now)
-                send_mail(title=title, content=ms)
+                send_mail(title="{}{}".format(now, ms))
                 logger.exception(ms)
                 raise ValueError(ms)
-        else:
-            ms = '钉钉机器人没有返回正确的响应，错误代码：{}'.format(status_code)
-            now = datetime.datetime.now()
-            send_mail(title="{}{}".format(now, ms))
-            logger.exception(ms)
-            raise ValueError(ms)
-    return res
+        return res
 
 
 def add_money(group_name: str, sales_name: str, customer_name: str, money: (str, float)) -> None:

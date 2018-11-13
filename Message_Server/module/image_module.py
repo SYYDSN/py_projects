@@ -259,9 +259,10 @@ class MaterialPushHistory(mongo_db.BaseDoc):
     _table_name = "material_push_history"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['image_url'] = str
-    type_dict['file_url'] = str
+    type_dict['image'] = dict
+    type_dict['file'] = dict
     type_dict['groups'] = list
+    type_dict['send_result'] = dict
     type_dict['date_time'] = datetime.datetime
     type_dict['push_time'] = datetime.datetime
 
