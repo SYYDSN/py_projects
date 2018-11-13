@@ -1302,7 +1302,7 @@ $("#v_container").click(function(){
     // 注册框点击发送短信按钮事件.
     var phone = $.trim($("#iphone").val());
     if(validate_phone(phone)){
-        var url = "http://www.bhxxjs.cn/sms/get";
+        var url = "/sms/get";
         var args = {"phone": phone, "csrf_token": $("#csrf_token").val()};
         $.post(url, args, function(resp){
             var resp = JSON.parse(resp);

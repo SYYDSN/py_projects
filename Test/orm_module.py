@@ -16,6 +16,7 @@ from bson.code import Code
 from bson.errors import InvalidId
 from bson.son import SON
 from bson.binary import Binary
+import socket
 import numpy as np
 import re
 import math
@@ -29,6 +30,9 @@ from log_module import get_logger
 from pymongo import ReturnDocument
 from pymongo.results import *
 import gridfs
+from flask import Flask
+from werkzeug.routing import Map
+from werkzeug.routing import Rule
 from pymongo.errors import *
 
 
@@ -36,42 +40,56 @@ from pymongo.errors import *
 MongoDB4+ 的持久化类   2018-10-11
 """
 
+version = "0.0.3"
 
+print("ORM模块当前版本号: {}".format(version))
+
+hostname = socket.gethostname()
 cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设置决定
 s_cache = SimpleCache()      # 使用内存的缓存,重启/关机就清空了.
 logger = get_logger()
-# user = "test_root"              # 数据库用户名
-# password = "Test@1314"       # 数据库密码
-# db_name = "test_db"        # 库名称
-# mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
-#
-# """mongodb配置信息"""
-# """
-# 注意,使用连接池就不能使用mongos load balancer
-# mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
-# """
-# mongodb_setting = {
-#     "host": "47.99.105.196:27017",   # 数据库服务器地址
-#     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
-#     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
-#     "minPoolSize": 0,  # 最小连接池,默认是0.
-#     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
-#     "authSource": db_name,  # 验证数据库
-#     'authMechanism': mechanism,  # 加密
-#     "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
-#     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
-#     "username": user,       # 用户名
-#     "password": password    # 密码
-# }
-db_name = "test_db"
-mongodb_setting = {
-    "host": "127.0.0.1:27017",   # 数据库服务器地址
-    "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
-    "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
-    "minPoolSize": 2,  # 最小连接池,默认是0.
-    "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
-    "authSource": db_name,  # 验证数据库
-}
+host = "127.0.0.1"
+user = "test1"              # 数据库用户名
+password = "test@723456"       # 数据库密码
+db_name = "test_db"        # 库名称
+connect = True            # 立即开始在后台连接到MongoDB,否则在第一次操作时连接。
+mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
+
+
+
+
+"""mongodb配置信息"""
+"""
+注意,使用连接池就不能使用mongos load balancer
+mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
+"""
+if hostname != "walle-pc":
+    """远程服务器配置"""
+    mongodb_setting = {
+        "host": "47.99.105.196:27017",   # 数据库服务器地址
+        "connect": connect,              #
+        "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
+        "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
+        "minPoolSize": 0,  # 最小连接池,默认是0.
+        "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
+        "authSource": db_name,  # 验证数据库
+        'authMechanism': mechanism,  # 加密
+        "readPreference": "primary",  # 读偏好,主
+        # "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
+        # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
+        "username": user,       # 用户名
+        "password": password    # 密码
+    }
+else:
+    mongodb_setting = {
+        "host": "{}:27017".format(host),   # 数据库服务器地址
+        "connect": connect,
+        "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
+        "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
+        "minPoolSize": 2,  # 最小连接池,默认是0.
+        "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
+        "authSource": db_name,  # 验证数据库
+    }
 
 
 class DBCommandListener(monitoring.CommandListener):
@@ -235,6 +253,17 @@ def get_schema(database: str = None):
     else:
         schema = db_client[database]
     return schema
+
+
+def get_write_concern(w: (str, int) = "majority", j: bool = True) -> WriteConcern:
+    """
+    获取一个写关注对象
+    :param w:
+    :param j:
+    :return:
+    """
+    res = WriteConcern(w=w, j=j)
+    return res
 
 
 def get_conn(table_name: str, database: str = None, db_client: pymongo.MongoClient = None,
@@ -1319,31 +1348,11 @@ class BaseDoc:
         else:
             return {k: v for k, v in self.__dict__.items() if k not in ignore}
 
-    def insert(self) -> ObjectId:
-        """插入数据库,单个对象,返回ObjectId的实例"""
-        table_name = self.table_name()
-        ses = get_conn(table_name=table_name)
-        insert_dict = {k: v for k, v in self.__dict__.items() if v is not None}
-        try:
-            inserted_id = ses.insert_one(insert_dict).inserted_id
-            if self._id is None and isinstance(inserted_id, ObjectId):
-                self._id = inserted_id
-        except DuplicateKeyError as e:
-            error_key = ""
-            for x in self.type_dict.keys():
-                if x in e.details['errmsg']:
-                    error_key = x
-                    break
-            error_val = self.__dict__[error_key]
-            mes = "重复的 {}:{}".format(error_key, error_val)
-            raise ValueError(mes)
-        return inserted_id
-
-    def save_plus(self, ignore: list = None, upsert: bool = True) -> (None, ObjectId):
+    def save(self, ignore: list = None, upsert: bool = True) -> (None, ObjectId):
         """
         更新
         :param ignore: 忽略的更新的字段,一般是有唯一性验证的字段
-        :param upsert:
+        :param upsert:  在查找对象不存在的情况下,是否查询?
         :return: ObjectId
         """
         if isinstance(ignore, list):
@@ -1357,50 +1366,53 @@ class BaseDoc:
         doc = self.__dict__
         _id = doc.get("_id", None)
         doc = {k: v for k, v in doc.items() if k not in ignore}
-        f = {"_id": _id}
-        res = None
-        try:
-            res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
-        except Exception as e:
-            ms = "error_cause:{},filter:{}, replacement:{}".format(e, f, doc)
-            print(ms)
-            logger.exception(ms)
-            raise e
-        if res is None:
-            return res
+        if _id is None:
+            return ses.insert_one(document=doc)
         else:
-            """
-            insert的情况
-            UpdateResult = {
-                ....
-                acknowledged: True,
-                matched_count: 0,
-                modified_count: 0,
-                raw_result: {
-                              'n': 1, 'updatedExisting': False, 
-                              'nModified': 0, 'ok': 1, 
-                              'upserted': ObjectId('5b051532c55c281e882494e0')
-                            }
-                upserted_id: ObjectId("5b051532c55c281e882494e0")
-            }
-            update的情况
-            UpdateResult = {
-                ....
-                acknowledged: True,
-                matched_count: 1,
-                modified_count: 1,
-                raw_result: {
-                              'nModified': 1, 
-                              'updatedExisting': True, 
-                              'ok': 1, 'n': 1
-                            }
-                upserted_id: None
-            }
-            如果是插入新的对象,res.upserted_id就是新对象的_id,
-            如果是修改旧的对象,res.upserted_id对象为空,这时返回的结果中不包含被修改的对象的id(另行查找),
-            本例是以_id查找,在修改旧对象的情况下,不用另行查找也能获得被修改对象的id.
-            """
-            return _id if res.upserted_id is None else res.upserted_id
+            f = {"_id": _id}
+            res = None
+            try:
+                res = ses.replace_one(filter=f, replacement=doc, upsert=upsert)
+            except Exception as e:
+                ms = "error_cause:{},filter:{}, replacement:{}".format(e, f, doc)
+                print(ms)
+                logger.exception(ms)
+                raise e
+            if res is None:
+                return res
+            else:
+                """
+                insert的情况
+                UpdateResult = {
+                    ....
+                    acknowledged: True,
+                    matched_count: 0,
+                    modified_count: 0,
+                    raw_result: {
+                                  'n': 1, 'updatedExisting': False, 
+                                  'nModified': 0, 'ok': 1, 
+                                  'upserted': ObjectId('5b051532c55c281e882494e0')
+                                }
+                    upserted_id: ObjectId("5b051532c55c281e882494e0")
+                }
+                update的情况
+                UpdateResult = {
+                    ....
+                    acknowledged: True,
+                    matched_count: 1,
+                    modified_count: 1,
+                    raw_result: {
+                                  'nModified': 1, 
+                                  'updatedExisting': True, 
+                                  'ok': 1, 'n': 1
+                                }
+                    upserted_id: None
+                }
+                如果是插入新的对象,res.upserted_id就是新对象的_id,
+                如果是修改旧的对象,res.upserted_id对象为空,这时返回的结果中不包含被修改的对象的id(另行查找),
+                本例是以_id查找,在修改旧对象的情况下,不用另行查找也能获得被修改对象的id.
+                """
+                return _id if res.upserted_id is None else res.upserted_id
 
     def delete_self(self, obj=None):
         """删除自己"""
@@ -1443,11 +1455,10 @@ class BaseDoc:
         :return:
         """
         result_dict = to_flat_dict(self.get_dict(), ignore_columns=ignore_columns)
-
         return result_dict
 
     @classmethod
-    def exec(cls, exe_name: str, write_concern: (dict, WriteConcern) = None, *args, **kwargs) -> ObjectId:
+    def exec(cls, exe_name: str, write_concern: (dict, WriteConcern) = None, *args, **kwargs) -> object:
         """
         执行Collection的原生命令
         :param exe_name:
@@ -1457,9 +1468,13 @@ class BaseDoc:
         :return:
         """
         conn = cls.get_collection(write_concern=write_concern)
-        if hasattr(conn, exe_name):
+        """
+        注意,由于collection实现__getitem__的方法.导致了collection在getattr的时候不会抛出错误.这会导致hasattr总是返回True
+        """
+        # if hasattr(conn, exe_name):
+        if exe_name in dir(conn):
             handler = getattr(conn, exe_name)
-            handler(*args, **kwargs)
+            return handler(*args, **kwargs)
         else:
             ms = "pymongo.Collection没有{}这个方法".format(exe_name)
             raise RuntimeError(ms)
@@ -1501,63 +1516,6 @@ class BaseDoc:
             return obj.insert(**kwargs)
         else:
             return obj._id
-
-    def find_one_and_update(self, filter_dict=None, update=None, projection=None, sort=None, upsert=True,
-                            return_document="after"):
-        """
-        找到一个文档然后更新它，如果找不到就插入,尽量使用类方法find_alone_and_update而不要使用本实例方法。
-        :param filter_dict: 查找时匹配参数 字典,
-        :param update: 更新的数据，字典
-        :param projection: 输出限制列  projection={'seq': True, '_id': False} 只输出seq，不输出_id
-        :param upsert: 找不到对象时是否插入新的对象 布尔值
-        :param sort: 排序列，一个字典的数组
-        :param return_document: 返回update之前的文档还是之后的文档？ after 和 before
-        :return:  doc或者None
-        example:
-        filter_dict = {"_id": self.get_id()}
-        update_dict = {"$set": {"prev_date": datetime.datetime.now(),
-                                "last_query_result_id": last_query_result_id},
-                       "$inc": {"online_query_count": 1, "all_count": 1,
-                                "today_online_query_count": 1}}
-        self.find_one_and_update(filter_dict=filter_dict, update=update_dict)
-        """
-        if return_document == "after":
-            return_document = ReturnDocument.AFTER
-        else:
-            return_document = ReturnDocument.BEFORE
-
-        """处理filter_dict数据
-            如果参数中包含_id参数，那filter_dict={"_id": _id}
-            若干阐述中包含_id参数或者为None ，那么filter_dict={"_id": self.get_id()}
-        """
-        # filter_dict = {k: (get_obj_id(v) if k == "_id" else v) for k, v in filter_dict.items()}
-        if filter_dict is None:
-            filter_dict = {"_id": self.get_id()}
-        else:
-            if "_id" in filter_dict:
-                # 只依id为准，抛弃其他条件了
-                filter_dict = {"_id": get_obj_id(filter_dict['_id'])}
-            else:
-                filter_dict = {"_id": self.get_id()}
-        """处理update数据"""
-        if update is None:
-            raise ValueError("update参数不能为空")
-        else:
-            keys = update.keys()
-            flag = [k for k in keys if k.startswith("$")]
-            if len(flag) > 0:
-                """如果用户已经自己定义了$开头的方法"""
-                pass
-            else:
-                update = {"$set": update}
-        ses = get_conn(self._table_name)
-        print("~~~~~~~~~~~~~~")
-        print(filter_dict)
-        print(update)
-        print("~~~~~~~~~~~~~~")
-        result = ses.find_one_and_update(filter=filter_dict, update=update, projection=projection, sort=sort,
-                                         return_document=return_document, upsert=upsert)
-        return result
 
     def push_one(self, col_name, col_val):
         """
@@ -1617,21 +1575,6 @@ class BaseDoc:
         return conn
 
     @classmethod
-    def insert_and_return_instance(cls, **kwargs):
-        """
-        把参数转成一个obj对象插入数据库并返回实例f对象
-        :param kwargs: 
-        :return: cls的实例
-        """
-        obj = cls(**kwargs)
-        _id = obj.insert()
-        if _id is None:
-            raise InvalidId("对象插入失败， {}".format(str(kwargs)))
-        else:
-            obj._id = _id
-            return obj
-
-    @classmethod
     def insert_one(cls, doc: dict, write_concern: (WriteConcern, dict) = None) -> ObjectId:
         """
         把参数转换为对象并插入
@@ -1639,6 +1582,7 @@ class BaseDoc:
         :param write_concern: 写关注. {w:'majority', j:True}
         :return: ObjectId
         """
+        result = None
         wc = dict()
         if write_concern is None:
             pass
@@ -1666,9 +1610,10 @@ class BaseDoc:
             raise e
         finally:
             if isinstance(res, InsertOneResult):
-                return res.inserted_id
+                result = res.inserted_id
             else:
-                return None
+                pass
+            return result
 
     @classmethod
     def insert_many_and_return_doc(cls, input_list: list) -> list:
@@ -1861,31 +1806,17 @@ class BaseDoc:
         return result
 
     @classmethod
-    def find_one(cls, **kwargs):
-        """根据条件查找对象,返回单个对象的实例"""
-        table_name = cls._table_name
-        ses = get_conn(table_name=table_name)
-        args = dict()
-        for k, v in kwargs.items():
-            if k == "_id":
-                if isinstance(v, str):
-                    try:
-                        object_id = get_obj_id(v)
-                        args[k] = object_id
-                    except TypeError as e:
-                        print(e)
-                        raise TypeError("ObjectId转换失败.val:{}".format(v))
-                elif isinstance(v, ObjectId):
-                    args[k] = v
-                else:
-                    raise TypeError("{} 不能转换成ObjectId".format(v))
-            else:
-                args[k] = v
-        result = ses.find_one(args)
-        if result is None:
-            return result
-        else:
-            return cls(**result)
+    def find_one(cls, filter_dict: dict = None, *args, **kwargs) -> dict:
+        """
+        根据条件查找对象,返回单个对象的实例
+        :param filter_dict:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        ses = cls.get_collection()
+        result = ses.find_one(filter=filter_dict, *args, **kwargs)
+        return result
 
     @classmethod
     def find_one_plus(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
@@ -1955,36 +1886,8 @@ class BaseDoc:
         return res
 
     @classmethod
-    def find_alone_and_update(cls, filter_dict: dict, update, projection=None, sort=None, upsert=True,
-                              return_document="after"):
-        """
-        找到一个文档然后更新它，如果找不到就插入,这个实例方法的find_one_and_update本质是同一方法。
-        :param filter_dict: 查找时匹配参数 字典
-        :param update: 更新的数据，字典
-        :param projection: 输出限制列  projection={'seq': True, '_id': False} 只输出seq，不输出_id
-        :param upsert: 找不到对象时是否插入新的对象 布尔值
-        :param sort: 排序列，一个字典的数组
-        :param return_document: 返回update之前的文档还是之后的文档？ after 和 before
-        :return:  doc或者None
-        example:
-        filter_dict = {"_id": self.get_id()}
-        update_dict = {"$set": {"prev_date": datetime.datetime.now(),
-                                "last_query_result_id": last_query_result_id},
-                       "$inc": {"online_query_count": 1, "all_count": 1,
-                                "today_online_query_count": 1}}
-        self.find_one_and_update(filter_dict=filter_dict, update=update_dict)
-        """
-        if "_id" in filter_dict:
-            obj = cls.find_by_id(filter_dict.pop('_id'))
-        else:
-            obj = cls(**filter_dict)
-        res = obj.find_one_and_update(filter_dict=None, update=update, projection=projection, sort=sort,
-                                      upsert=upsert, return_document=return_document)
-        return res
-
-    @classmethod
-    def find_one_and_update_plus(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
-                              return_document: str="after"):
+    def find_one_and_update(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
+                            return_document: str="after"):
         """
         本方法是find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
         和本方法相比find_one_and_update和find_alone_and_update更简单易用.
@@ -2123,15 +2026,15 @@ class BaseDoc:
                 return [x for x in res]
 
     @classmethod
-    def query_by_page(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None, page_size: int = 10,
+    def query_by_page(cls, filter_dict: dict, sort_cond: (dict, list) = None, projection: list = None, page_size: int = 10,
                       ruler: int = 5, page_index: int = 1, to_dict: bool = True, can_json: bool = False,
                       func: object = None, target: str = "dict") -> dict:
         """
         分页查询
         :param filter_dict:  查询条件字典
-        :param sort_dict:  排序条件字典
+        :param sort_cond:  排序条件字典/数组,如果是数组,那就是[(name, 1),(time,-1),...]这样的样式
         :param projection:  投影数组,决定输出哪些字段?
-        :param page_size:
+        :param page_size: 每页多少条记录
         :param ruler: 翻页器最多显示几个页码？
         :param page_index: 页码(当前页码)
         :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
@@ -2171,8 +2074,11 @@ class BaseDoc:
         skip = (page_index - 1) * page_size
         if can_json:
             to_dict = True
-        if sort_dict is not None:
-            sort_list = [(k, v) for k, v in sort_dict.items()]  # 处理排序字典.
+        if sort_cond is not None:
+            if isinstance(sort_cond, dict):
+                sort_list = [(k, v) for k, v in sort_cond.items()]  # 处理排序字典.
+            else:
+                sort_list = sort_cond
         else:
             sort_list = None
         table_name = cls._table_name
@@ -2226,123 +2132,580 @@ class BaseDoc:
         }
         return resp
 
+    @classmethod
+    def query(cls, filter_dict: dict, join_cond: (list, dict) = None, sort_cond: (dict, list) = None,
+              projection: list = None, page_size: int = 10, ruler: int = 5, page_index: int = 1, to_dict: bool = True,
+              can_json: bool = False, func: object = None, target: str = "dict") -> dict:
+        """
+        分页查询,这个用的是aggregate查询的.有join部分.
+        本函数的可以替代query_by_page函数.
+        本函数的存在的目的是为了简化查询操作.
+        join操作实际上对应的是aggregate中的lookup阶段:
+        一般来说.在mongodb的aggregate的lookup查询,主要由以下2种表达方式:
+        1. 相对简单的
+        {
+           $lookup:
+             {
+               from: 外连的表名,
+               localField: 本地字段,
+               foreignField: 外连表的字段,
+               as: 新的字段
+             }
+        }
+        2. 相对复杂的(嵌套管道的查询,可以用来查询多值属性,比如查询一个人的多条工作记录)
 
-class GrantAuthorizationInfo(BaseDoc):
+        {
+           $lookup: {
+                "from": "外连的表名",
+                "let": {                         # let 用来创建新的变量.
+                    "work_list": {"$ifNull": ["$works", []]}  # 注意这里的$ifNull的用法,这相当于三元表达式.$works是null就返回第二个元素[]
+                },
+                "pipeline": [             # 嵌套的管道查询,
+                    {"$match": {"$expr": {"$in": ["$_id", "$$work_list"]}}},  # $expr是执行表达式语句.注意这里的$in的用法, 是匹配所有的$_id在$$work_list中的情况
+                    {"$sort": {"end": -1}}
+                ],
+                "as": "education_list"
+            }
+        }
+        考虑到功能的问题,一般都使用第二种
+        实际操作种join_cond字典如果由多个,请用数组包裹.单个join_cond字典的格式如下:
+        join_cond = {
+            "table_name": table_name,        # 待join查询的表的名称.
+            "local_field": local_field,      # 本地表对应的字段,参考sql语句: where 本地表.local_field = 外部表.foreign_field
+            "foreign_field": foreign_field,  # 外部表对应的字段,默认是_id字段 参考上一行的sql语句
+            "field_map": field_map,          # 字段映射字典,如果要合并子文档,这个参数就是必须的了
+            "sort_by": sort_by,              # join子查询的排序字典, 非必要.
+            "symbol": =,                     # where 本地表.local_field = 外部表.foreign_field 中间的比较符号,默认是=
+            "flat": True                     # 布尔值.是否合并join子查询到文档,如果子查询结果是数组,只会保留第一个元素和父文档合并.
+                                               注意: 如果join子查询的字段和父文档中的字段同名的话将会被父文档的同名字段覆盖.
+        }
+        最简单的join条件只有3个字段, table_name, local_field和field_map.下面是一个例子:
+        join_cond = {
+                "table_name": "role_info",
+                "local_field": "role_id",
+                "field_map": {"role_name": "role"}
+            }
+
+        :param filter_dict:  查询条件字典
+        :param join_cond:  join查询条件单个join是字典格式,多个join是数组格式,
+        :param sort_cond:  排序条件字典/数组,如果是数组,那就是[(name, 1),(time,-1),...]这样的样式
+        :param projection:  投影数组,决定输出哪些字段?
+        :param page_size: 每页多少条记录
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :param to_dict: 返回的元素是否转成字典(默认就是字典.否则是类的实例)
+        :param can_json: 是否调用to_flat_dict函数转换成可以json的字典?
+        :param func: 额外的处理函数.这种函数用于在返回数据前对每条数据进行额外的处理.会把doc或者实例当作唯一的对象传入
+        :param target: 和func参数配合使用,指明func是对实例本身操作还是对doc进行操作(instance/dict)
+        :return: 字典对象.
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        """
+        """处理每页包含多少数据?"""
+        if isinstance(page_size, int):
+            pass
+        elif isinstance(page_size, float):
+            page_size = int(page_size)
+        elif isinstance(page_size, str) and page_size.isdigit():
+            page_size = int(page_size)
+        else:
+            page_size = 10
+        page_size = 1 if page_size < 1 else page_size
+        """处理页码"""
+        if isinstance(page_index, int):
+            pass
+        elif isinstance(page_index, float):
+            page_index = int(page_index)
+        elif isinstance(page_index, str) and page_index.isdigit():
+            page_index = int(page_index)
+        else:
+            page_size = 1
+        page_index = 1 if page_index < 1 else page_index
+        skip = (page_index - 1) * page_size
+        """处理can_json参数"""
+        if can_json:
+            to_dict = True
+        else:
+            pass
+        pipeline = list()
+
+        """处理过滤条件"""
+        match = filter_dict
+        pipeline.append({"$match": match})
+
+        """处理统计"""
+        PipelineStage.add_count(pipeline=pipeline)
+        # count = {"total": {"$sum": 1}}
+        # pipeline.append({"$addFields": count})
+
+        """处理投影字段"""
+        PipelineStage.project(pipeline=pipeline, projection=projection)
+
+        """处理limit和skip"""
+        pipeline.append({"$skip": skip})
+        pipeline.append({"$limit": page_size})
+
+        """处理join/lookup查询条件"""
+        if isinstance(join_cond, list):
+            PipelineStage.batch_join(pipeline=pipeline, conditions=join_cond)
+        elif isinstance(join_cond, dict):
+            PipelineStage.join(pipeline=pipeline, **join_cond)
+        else:
+            pass
+        # if isinstance(join_cond, dict) and len(join_cond) > 0:
+        #     lookup = join_cond
+        #     pipeline.append({"$lookup": lookup})
+        # elif isinstance(join_cond, list) and len(join_cond) > 0:
+        #     [pipeline.append({"$lookup": x}) for x in join_cond]
+        # else:
+        #     pass
+
+        """处理排序"""
+        PipelineStage.sort(pipeline=pipeline, sort_cond=sort_cond)
+        # if isinstance(sort_cond, dict) and len(sort_cond) > 0:
+        #     sort_son = SON(data=[(k, v) for k, v in sort_cond.items()])
+        # elif isinstance(sort_cond, list) and len(sort_cond) > 0:
+        #     sort_son = SON(data=sort_cond)
+        # else:
+        #     sort_son = None
+        # if sort_son is None:
+        #     pass
+        # else:
+        #     pipeline.append({"$sort": sort_son})
+
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        r = ses.aggregate(pipeline=pipeline)
+        r = [x for x in r]
+        """开始计算分页数据"""
+        length = len(r)
+        record_count = 0 if length == 0 else r[0]['total']
+        page_count = math.ceil(record_count / page_size)  # 共计多少页?
+        delta = int(ruler / 2)
+        range_left = 1 if (page_index - delta) <= 1 else page_index - delta
+        range_right = page_count if (range_left + ruler - 1) >= page_count else range_left + ruler - 1
+        pages = [x for x in range(range_left, int(range_right) + 1)]
+        res = list()
+        if length > 0:
+            if to_dict:
+                if func and target == "dict":
+                    if can_json:
+                        res = [to_flat_dict(func(x)) for x in r]
+                    else:
+                        res = [func(x) for x in r]
+                else:
+                    if can_json:
+                        res = [to_flat_dict(x) for x in r]
+                    else:
+                        res = [x for x in r]
+            else:
+                if func and target == "instance":
+                    res = [func(cls(**x)) for x in r]
+                else:
+                    res = [cls(**x) for x in r]
+        resp = {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        return resp
+
+
+class PipelineStage:
     """
-        需要身份授权的对象的表的容器.
-        这里存放所有需要验证的collection的name和column_name
+    pipeline工具,用于生成复杂的阶段字典.
     """
-    _table_name = "grant_authorization_info"
+
+    def __init__(self):
+        ms = "勿直接调用此初始化函数.请使用对应的静态和类方法"
+        raise RuntimeError(ms)
+
+    @staticmethod
+    def batch_join(pipeline: list, conditions: list) -> None:
+        """
+        批量执行 PipelineStage.join 函数
+        conditions = [
+            {
+              "table_name": table_name,
+              "local_field": local_field,
+              "foreign_field": foreign_field,
+              "field_map": field_map,
+              "sort_by": sort_by,
+              "flat": flat,
+            },
+            ...
+        ]
+        :param pipeline:
+        :param conditions: 条件字典的数组.
+        :return:
+        """
+        [PipelineStage.join(pipeline=pipeline, **x) for x in conditions]
+
+    @staticmethod
+    def join(pipeline: list, table_name: str, local_field: str, field_map: dict = None,
+             sort_by: (list, tuple, dict) = None, foreign_field: str = "_id", symbol: str = "=",
+             flat: bool = False) -> None:
+        """
+        往aggregate的pipeline中插入join所需的stage字典.
+        原生的aggregate中并没有$join阶段.这里的join实际上是$lookup+$replaceRoot 2个阶段的组合.
+        field_map是一个字典.表示外部表中的字段和新表中字段的命名方式.
+        格式: field_map = {file_name: value, ....}
+        file_name表示外部表中此字段的名称.
+        value的取值有3种:
+        1. 0 ,表示此字段不显示. 一般来说,只要field_map不出现的字段都不会显示.但_id是个例外,必须显式的设置{_id: 0}才会忽略_id字段
+        2. 1 ,表示此字段显示并且不改变名称. 注意,如果本地表里有同名的字段,外地表中的同名字段将被覆盖.
+        3. new_name,  新的字段名. 在最终结果里会以value的值重命名字段.
+        如果field_map为None或者长度为0.那么外部表中的所有字段都会被当作一个名为table_name文档显示在最终结果中.
+
+        :param pipeline:  原始的pipeline
+        :param table_name:  待join查询的表的名称.
+        :param local_field:   本地表对应的字段,参考sql语句表达式: where 本地表.local_field = 外部表.foreign_field
+        :param foreign_field: 外部表对应的字段,一般是_id字段.参考sql语句表达式: where 本地表.local_field = 外部表.foreign_field
+        :param field_map: 字段映射.就是相当于外部表字段被join新表后的字段名.如果这个为空.那么就会以外部表.foreign_field_name来命名
+        :param sort_by: 排序字典.
+        :param symbol: 本地表.local_field 和 外部表.foreign_field中间的哪个符号. =/!=/>/</>=/=</in/not in
+        :param flat: 是否把lookup查询的子文档展开到主文档中?注意,如果你的子文档不止一个,展开后将只能保存所占开的文档中的第一个
+        :return: 加入过stage字典的pipeline
+        """
+        if field_map is None or len(field_map) < 1:
+            """join查询结果作为子文档最终结果"""
+            inner_project = None
+        else:
+            """join查询结果以字段形式放入主文档"""
+            inner_project = PipelineStage.project(pipeline=None, projection=field_map)
+            # inner_project = dict()   # $lookup内部的$project的子字典
+            # for k, v in field_map.items():
+            #     val = None
+            #     try:
+            #         val = v if isinstance(v, int) else int(v)
+            #     except Exception as e:
+            #         print(e)
+            #     finally:
+            #         if isinstance(val, int):
+            #             val = 0 if val == 0 else 1
+            #             inner_project[k] = val
+            #         else:
+            #             if isinstance(v, str) and len(v) > 0:
+            #                 inner_project[v] = "${}".format(k)
+            #             else:
+            #                 """不是字符串也不是数字的放弃"""
+            #                 ms = "错误的value的值或者类型:{}".format(v)
+            #                 raise ValueError(ms)
+
+        """需要重命名join查询结果字段的情况,必须有新旧字段的映射关系"""
+        if inner_project is None:
+            kw = {
+                "pipeline": pipeline,
+                "table_name": table_name,
+                "local_field": local_field,
+                "foreign_field": foreign_field,
+                "symbol": symbol,
+                "inside_sort": sort_by
+            }
+        else:
+            kw = {
+                "pipeline": pipeline,
+                "table_name": table_name,
+                "local_field": local_field,
+                "foreign_field": foreign_field,
+                "symbol": symbol,
+                "inside_project": inner_project,
+                "inside_sort": sort_by
+            }
+        PipelineStage.lookup_simple(**kw)
+
+        if not flat:
+            pass
+        else:
+            """
+            插入$replaceRoot阶段整合文档,
+            注意,如果join结果为空,这里不会生效
+            """
+            PipelineStage.flat_list(pipeline=pipeline, field=table_name)
+
+    @staticmethod
+    def add_count(pipeline: list, field_name: str = "total") -> dict:
+        """
+        加一个统计功能.注意这个$addFields的特例
+        :param pipeline:
+        :param field_name: 统计计算的名称
+        :return:
+        """
+        count = {field_name: {"$sum": 1}}
+        return PipelineStage.add_fields(pipeline=pipeline, field_dict=count)
+
+    @staticmethod
+    def add_fields(pipeline: list, field_dict: dict) -> dict:
+        """
+        $addFields阶段 增加字段
+        field_dict参数说明:
+        这是一个生成字段的表达式的字典.key是新字段的名字.key是字典/表达式.用于生成新字段的值(新字段的值是如何获取的?)
+        比如增加一个常见的total字段来统计记录数. field_dict = {"total": {"$sum": 1}}
+        也可以新字段由其他字段计算得来 field_dict = {"new_field": {"$add": ["$old_field1", "$old_field2"]}}
+        最通用的表达式是 field_dict = {field: expression,......}
+
+        :param pipeline:
+        :param field_dict: 字段表达式字典.
+        :return:
+        """
+        pipeline.append({"$addFields": field_dict})
+        return field_dict
+
+    @staticmethod
+    def lookup_simple(pipeline: list, table_name, local_field: str, foreign_field: str, symbol: str = "=",
+                      inside_project: dict = None, inside_sort: dict = None):
+        """
+        $lookup阶段. 本函数只能进行单字段的lookup操作. 多字段的逻辑比较复杂,以后再实现
+        :param pipeline:
+        :param table_name:
+        :param local_field:
+        :param foreign_field:
+        :param symbol: 布尔运算符 用来对local_field和foreign_field进行布尔运算
+                        1. =  等于
+                        2. !=  不等于
+                        3. >  大于
+                        4. <  小于
+                        5. >=  大于等于
+                        6. =<  小于等于
+                        7. in  包含
+                        8. not in  不包含
+
+        :param inside_project: 内置投影字典
+        :param inside_sort: 内置的排序字典
+        :return:
+        """
+        symbol_map = {
+            "=": "$eq", "!=": "$ne", ">": "$gt", ">=": "$gte",
+            "<": "$lt", "=<": "$lte", "in": "$in", "not in": "$nin"
+        }
+        symbol = symbol_map.get(symbol, "$eq")
+        inside_pipeline = list()
+        temp_field = "{}_v".format(local_field)
+        if symbol in ['$in', "$nin"]:
+            """对数组的比较,数组可能为空"""
+            let = {temp_field: {"$ifNull": ["${}".format(local_field), []]}}
+            """
+            $in和$nin是看第一个元素是否在/不在第二个元素中,这个大于小于的正常方式(第一个是否大于/小于第二个)
+            这导致数组内部的排序不同:
+            $in和$nin [foreign_field, local_field]
+            其他的是   [local_field, foreign_field]
+            """
+            match = {"$expr": {symbol: ["${}".format(foreign_field), "$${}".format(temp_field)]}}
+        else:
+            let = {temp_field: "${}".format(local_field)}
+            match = {"$expr": {symbol: ["$${}".format(temp_field), "${}".format(foreign_field)]}}
+        inside_pipeline.append({"$match": match})
+        if inside_project is not None and len(inside_project) > 0:
+            inside_pipeline.append({"$project": inside_project})
+        if inside_sort is not None and len(inside_sort) > 0:
+            inside_pipeline.append({"$sort": inside_sort})
+        lookup = {
+            "from": table_name,
+            "let": let,
+            "pipeline": inside_pipeline,
+            "as": table_name
+        }
+        pipeline.append({"$lookup": lookup})
+        return lookup
+
+    @staticmethod
+    def project(pipeline: list, projection: (list, tuple, dict)) -> dict:
+        """
+        $project阶段.
+        projection 参数形式可以由多种:
+
+        1. projection = [(field1, 1), (field2, 0), ....]
+        2. projection = ((field1, 1), (field2, 0), ....)
+        3. projection = {field1: 1, field2: 0, ....}
+        4. projection = {field1: new_filed1, field2: new_field2, ....}
+
+        field对应的值1表示显示此字段,0表示不显示此字段.不在参数中出现的字段默认不显示.但_id除外,_id必须显示的指示为0才会不显示.
+        第4种参数的形式可以把字段重命名.
+
+        :param pipeline:
+        :param projection:
+        :return: $project阶段的字典
+        """
+        if isinstance(projection, dict):
+            p_dict = dict()
+            for k, v in projection.items():
+                val = None
+                try:
+                    val = v if isinstance(v, int) else int(v)
+                except Exception as e:
+                    print(e)
+                finally:
+                    if isinstance(val, int):
+                        val = 0 if val == 0 else 1
+                        p_dict[k] = val
+                    else:
+                        if isinstance(v, str) and len(v) > 0:
+                            p_dict[v] = "${}".format(k)
+                        else:
+                            """不是字符串也不是数字的放弃"""
+                            ms = "错误的value的值或者类型:{}".format(v)
+                            raise ValueError(ms)
+        elif isinstance(projection, (list, tuple)):
+            p_dict = {x[0]: x[-1] for x in projection}
+        else:
+            p_dict = None
+        if p_dict is None:
+            pass
+        else:
+            if isinstance(pipeline, list):
+                pipeline.append({"$project": p_dict})
+            else:
+                pass
+        return p_dict
+
+    @staticmethod
+    def sort(pipeline: list, sort_cond: (list, tuple, dict)) -> dict:
+        """
+        $sort阶段.
+        :param pipeline:
+        :param sort_cond: 排序字典/数组
+        :return:
+        """
+        if isinstance(sort_cond, dict) and len(sort_cond) > 0:
+            sort_son = SON(data=[(k, v) for k, v in sort_cond.items()])
+        elif isinstance(sort_cond, list) and len(sort_cond) > 0:
+            sort_son = SON(data=sort_cond)
+        else:
+            sort_son = None
+        if sort_son is None:
+            pass
+        else:
+            pipeline.append({"$sort": sort_son})
+        return sort_son
+
+    @staticmethod
+    def flat_list(pipeline: list, field: str, index: int = 0, clear: bool = True) -> None:
+        """
+        $replaceRoot阶段.
+        把数组类型的字段的指定元素展开到父文档中,如果字段中的子文档的字段和父文档中的字段相同.那么他们将被父文档的同名字段覆盖
+        :param pipeline: 原始pipeline管道
+        :param field: 数组类型的字段名称
+        :param index: 要展开字段中第几个元素到父文档中?
+        :param clear: 是否从父文档中清除原始的展开字段?
+        :return:
+        """
+        replace = {
+            '$replaceRoot':  # 从根文档替换
+                {'newRoot':  # 作为新文档
+                    {
+                        '$mergeObjects': [  # 混合文档.value是一个数组,用第二个元素覆盖第一个.注意这个顺序很重要.
+                            {'$arrayElemAt': ["${}".format(field), index]},
+                            # 取上一阶段结果中.列表字段(数组的第一个元素指示)的第0个(数组的最后一个元素指示))
+                            '$$ROOT']  # 标识根文档
+                    }
+                }
+        }
+        pipeline.append(replace)
+        if clear:
+            pro = {"$project": {field: 0}}  # 把始的展开字段从根文档移除
+            pipeline.append(pro)
+
+    @staticmethod
+    def flat_doc(pipeline: list, field: str, clear: bool = True) -> None:
+        """
+        $replaceRoot阶段.
+        把数组类型的字段的指定元素展开到父文档中,如果字段中的子文档的字段和父文档中的字段相同.那么他们将被父文档的同名字段覆盖
+        :param pipeline: 原始pipeline管道
+        :param field: 数组类型的字段名称
+        :param clear: 是否从父文档中清除原始的展开字段?
+        :return:None
+        """
+        replace = {
+            '$replaceRoot':  # 从根文档替换
+                {'newRoot':  # 作为新文档
+                    {
+                        '$mergeObjects':
+                            [  # 混合文档.value是一个数组,用第二个元素覆盖第一个.注意这个顺序很重要.
+                                "${}".format(field),
+                                '$$ROOT'  # 标识根文档
+                            ]
+                    }
+                }
+        }
+        pipeline.append(replace)
+        if clear:
+            pro = {"$project": {field: 0}}  # 把始的展开字段从根文档移除
+            pipeline.append(pro)
+
+
+class FlaskUrlRule(BaseDoc):
+    """
+        App所有的路由规则
+    """
+    _table_name = "flask_url_rule"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['table_name'] = str  # 表名
-    type_dict['columns'] = list  # 列名的集合,如果字段不再此集合内.则说明访问了无效的字段.
+    type_dict['methods'] = list  # 视图函数的方法
+    type_dict['args'] = list  # 视图函数的参数
+    type_dict['endpoint'] = str  # 视图函数的端点
+    type_dict['rule'] = str  # 路由规则
+    type_dict['desc'] = str  # 路由说明
 
     collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
 
     @classmethod
-    def register(cls, table_name: str, columns: (list, dict), force: bool = False) -> None:
+    def init(cls, flask_app: Flask) -> None:
         """
-        注册需要身份验证的表
-        :param table_name:
-        :param columns: 列名/类的type_dict
-        :param force: 是否在目标已存在的情况下强制更新?
+        注册flask的app的所有路由规则
+        :param flask_app:
         :return:
         """
-        if isinstance(columns, dict):
-            columns = list(columns.keys())
-            columns.sort(reverse=False)
-        db_client = get_client()
-        col = get_conn(table_name=cls._table_name, db_client=db_client)
-        w = WriteConcern(w='majority', j=True)
-        f = {"table_name": table_name}
-        if force:
-            """强制更新"""
-            col = col.with_options(write_concern=w)
-            u = {"$set": {"columns": columns}}
-            r = col.find_one_and_update(filter=f, update=u, upsert=True, return_document=ReturnDocument.AFTER)
-            if r['table_name'] == table_name and r['columns'] == columns:
-                """成功"""
-                pass
+        rules = flask_app.url_map.iter_rules()
+        ses = cls.get_collection(write_concern=get_write_concern())
+        for a_rule in rules:
+            methods = [x.lower() for x in a_rule.methods if x.lower() in ["post", 'get']]
+            args = [x for x in a_rule.arguments]
+            endpoint = a_rule.endpoint
+            rule = a_rule.rule
+            f = {"endpoint": endpoint}
+            u = {"$set": {"args": args, "rule": rule, "methods": methods}}
+            ses.find_one_and_update(filter=f, update=u, upsert=True)
+
+    @classmethod
+    def save_doc(cls, doc: dict) -> dict:
+        """
+        保存/更新
+        :param doc:
+        :return:
+        """
+        ses = cls.get_collection(write_concern=get_write_concern())
+        if "_id" in doc:
+            """有_id,这是在更新"""
+            f = {"_id": doc.pop("_id")}
+        else:
+            """没有id,这是在插入"""
+            endpoint = doc.pop("endpoint", None)
+            if endpoint is None:
+                ms = "{} 没有必须的属性 endpoint".format(doc)
+                raise ValueError(ms)
             else:
-                ms = "强制更新需要身份验证的collection信息失败"
-                logger.exception(msg=ms)
-                raise RuntimeError(ms)
-        else:
-            with db_client.start_session(causal_consistency=True) as ses:
-                with ses.start_transaction(write_concern=w):
-                    r = col.find_one(filter=f)
-                    if r is None:
-                        """没有注册过"""
-                        f['columns'] = columns
-                        r2 = col.insert_one(document=f)
-                        if isinstance(r2, InsertOneResult) and isinstance(r2.inserted_id, ObjectId):
-                            pass  # 注册成功
-                        else:
-                            raise RuntimeError("注册需要身份验证的表没有正确返回.请检查")
-                    else:
-                        """注册过"""
-                        pass
-
-    @classmethod
-    def un_register(cls, table_name: str) -> None:
-        """
-        反注册需要身份验证的表
-        :param table_name:
-        :return:
-        """
-        db_client = get_client()
-        col = get_conn(table_name=cls._table_name, db_client=db_client)
-        w = WriteConcern(w='majority', j=True)
-        with db_client.start_session(causal_consistency=True) as ses:
-            with ses.start_transaction(write_concern=w):
-                f = {"table_name": table_name}
-                r = col.find_one(filter=f)
-                if r is None:
-                    """没有注册过"""
-                    pass
-                else:
-                    """注册过"""
-                    r2 = col.delete_one(filter=f)
-                    if isinstance(r2, DeleteResult) and r2.deleted_count == 1:
-                        pass  # 反注册成功
-                    else:
-                        raise RuntimeError("注册需要身份验证的表没有正确返回.请检查")
-
-    @classmethod
-    def class_and_attribute(cls, remove: bool = False) -> list:
-        """
-        返回所有的需要验证的类和(他们的属性)
-        :param remove: 是否移除表中无用的信息? 注意,只有在单项目状态下才可以启用
-        :return:
-        [
-         {
-         '_id': ObjectId('5bc6ab8d9f0a5e38f1eb8ce1'),
-         'table_name': 'test_a',
-         'columns': ['_id', 'name_a', 'phone_a', 'time']
-         },
-         {
-         '_id': ObjectId('5bc6ab8d9f0a5e38f1eb8ce2'),
-         'table_name': 'test_b',
-         'columns': ['_id', 'name_b', 'phone_b', 'time']
-         },
-         ...
-        ]
-        """
-        if remove:
-            ms = "注意,只有在单项目状态才能启用自动移除未注册权限collection的选项即" \
-                 "orm_module.GrantAuthorizationInfo.class_and_attribute(remove=True)," \
-                 "否则将有可能删除其他项目的collection"
-            warnings.warn(message=ms)
-        else:
-            pass
-        tables = cls.find()
-        return tables
+                f = {"endpoint": endpoint}
+        u = {"$set": doc}
+        ses = cls.get_collection(write_concern=get_write_concern())
+        re_doc = ses.find_one_and_update(filter=f, update=u, upsert=True, return_document=ReturnDocument.AFTER)
+        return re_doc
 
 
 class OperateLog(BaseDoc):
     """
-    管理员的操作日志,为了方便记录
+    操作日志,使用装饰器记录@OperateLog.log,
+    唯一的限制就是
+    1. 函数中必须有一个handler参数
+    2. handler必须是(用户)类的实例对象.
+    否则无法记录函数是由什么类的实例调用的.
     """
     _table_name = "global_log"
     type_dict = dict()
@@ -2377,15 +2740,17 @@ class OperateLog(BaseDoc):
     @staticmethod
     def log(func):
         """
-        记录操作的装饰器
+        记录操作的装饰器.@OperateLog.log,
         本方法理论上能记录所有的函数操作,唯一的限制就是
-        handler必须是类的实例对象.
+        1. 函数中必须有一个handler参数
+        2. handler必须是(用户)类的实例对象.
+        否则无法记录函数是由什么类的实例调用的.
         """
         @functools.wraps(func)
         def decorated_function(*args, **kwargs):
             """取日志需要记录的内容"""
             f_str = func.__str__()
-            func_class =None
+            func_class = None
             class_name_str = f_str.split("at", 1)[0].split(" ")[1].strip()
             function_name = func.__name__
             if function_name in class_name_str and function_name != class_name_str:
@@ -2419,40 +2784,6 @@ class OperateLog(BaseDoc):
             return func(*args, **kwargs)
 
         return decorated_function
-
-
-class GlobalAdmin(BaseDoc):
-    """
-    全局管理员类,注意,这个管理员组只有一个账户.不能添加账户.也不能删除账户. 这个管理员最大的用途就是操作GlobalRole和GlobalRule
-    """
-    _table_name = "global_admin"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    type_dict['user_id'] = str
-    type_dict['password'] = str
-    type_dict['time'] = datetime.datetime
-
-
-class GlobalRole(BaseDoc):
-    """
-    全局角色/权限组
-    所有需要设置权限的用户,都需要一个外键指过来
-    """
-    _table_name = "global_role"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    """
-    rules是一个字典,key是 GrantAuthorizationInfo中授权的表的名称
-    # 读权权限过滤器
-    type_dict['read'] = dict                 # 读权权限过滤器
-    type_dict['insert'] = dict               # 插入权限过滤器
-    type_dict['edit'] = dict                 # 编辑权限过滤器
-    type_dict['delete'] = dict               # 删除权限过滤器
-    """
-    type_dict['rules'] = dict
-    type_dict['time'] = datetime.datetime
-    type_dict['owner_id'] = ObjectId      # 创建者GlobalAdmin._id
-    type_dict['time'] = datetime.datetime
 
 
 """
@@ -2582,5 +2913,6 @@ if __name__ == "__main__":
     #         t1.insert_one(document={"name": "jack"}, session=session)  # 注意多了session这个参数
     #         k = dict()['name']  # 制造一个错误,你会发现t1和t2的插入都不会成功.
     #         t2.insert_one(document={"name": "jack2"}, session=session)
+    print(BaseDoc.exec("find"))
     pass
 

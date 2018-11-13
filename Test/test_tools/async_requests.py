@@ -95,6 +95,7 @@ def async_test(num: int = 10):
     :return:
     """
     u = "http://127.0.0.1:7011/query"
+    u = "http://192.168.1.112:7011/query"
     data = {"sn": "12", "name": "tom"}
     def inner(res):
         global count
@@ -116,7 +117,7 @@ if __name__ == "__main__":
     # resp = loop.run_until_complete(asyncio.wait(fs=[fetch(url=u, method="post", data=data)]))
     # print(resp)
     """测试async_test"""
-    all_req = 9000
+    all_req = 2000
     begin = datetime.datetime.now()
     loop.run_until_complete(asyncio.wait(fs=async_test(all_req)))
     end = datetime.datetime.now()

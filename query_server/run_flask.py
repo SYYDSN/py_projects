@@ -1,10 +1,10 @@
+# -*- coding: utf-8 -*-
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
-from test_server import app, port
+from query_server import app, port
 import bjoern
-import cherrypy
-from cherrypy import _cpwsgi_server
+from waitress import serve
 from meinheld import server
 try:
     from gevent.wsgi import WSGIServer
@@ -28,14 +28,15 @@ except ImportError as e:
 # bjoern.run()
 
 
-# cherrypy部署方式,py语言,线程池模式.生产环境使用较多
-# cherrypy.tree.graft(app, "/")
-# server = cherrypy._cpserver.Server()
-# server.socket_host = '0.0.0.0'
-# server.socket_port = port
-# server.thread_pool = 1500
-# server.thread_pool_max = 5000
-# server.start()
+# waitress windows和unix皆可,推荐
+server_ini = {
+    "app": app,
+    "host": "0.0.0.0",
+    "port": port,
+    "connection_limit": 400,  # 连接限制
+    "asyncore_use_poll": True
+}
+serve(**server_ini)
 
 
 # meinheld 方式,部分c的py.
@@ -50,7 +51,7 @@ except ImportError as e:
 
 """
 gunicorn的部署方式 需要virtualenv支持
-gunicorn  --config=gunicorn.py query_server:app
+gunicorn  --config=gunicorn.py test_server:app
 """
 
 """
@@ -61,5 +62,5 @@ uwsgi 部署方式.
 2. 安装python3插件
     apt install uwsgi-plugin-python3
     或者直接 sudo apt install uwsgi-plugins-all 安装所有的插件
-uwsgi --http-socket 127.0.0.1:7011 --plugin python3 --wsgi-file query_server.py --callable app --process 8 --threads 2
+uwsgi --http-socket 127.0.0.1:7011 --plugin python3 --wsgi-file test_server.py --callable app --process 8 --threads 2
 """

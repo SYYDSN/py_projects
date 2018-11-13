@@ -33,9 +33,9 @@ from pymongo.errors import DuplicateKeyError
 
 cache = RedisCache()
 logger = get_logger()
-user = "test_root"              # 数据库用户名
-password = "Test@1314"       # 数据库密码
-db_name = "test_db"        # 库名称
+user = "file_root"              # 数据库用户名
+password = "MyFile@1314"       # 数据库密码
+db_name = "file_db"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 
 """mongodb配置信息"""
@@ -51,7 +51,7 @@ mongodb_setting = {
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
-    "readPreference": "primary",  # 读偏好
+    "readPreference": "primary",  # 读偏好,
     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
     "username": user,       # 用户名
     "password": password    # 密码

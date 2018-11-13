@@ -17,6 +17,7 @@ import os
 import json
 from tools_module import *
 from mail2_module import send_mail as send_mail2
+from module.user_module import UserInfo
 import time
 
 
@@ -164,35 +165,69 @@ def reg_func():
         args = get_args(request)
         args.pop('csrf_token', None)
         """检查短信验证码"""
+        phone = args.pop("phone", "")
         code = args.pop("code", "")
-        """向后台提交注册信息"""
-        r = None
-        u = "http://192.168.1.102:8080/bhxx/register"
-        u = "http://www.bhxxjs.cn:8080/bhxx/register"
-        try:
-            r = requests.post(u, params=args, headers=hs, timeout=3)
-        except Exception as e:
-            n = datetime.datetime.now()
-            t = "调用注册接口失败.{}".format(n)
-            c = "args:{}, auth:{}, error:{}".format(args, AUTH, e)
-            send_mail(title=t, content=c)
-            ms = "{} {}".format(t, c)
-            logger.exception(msg=ms)
-        finally:
-            if r is None:
-                mes['message'] = "注册服务暂时不可用"
-            else:
+        password = args.pop("password", "")
+        if phone == '' or password == '' or code == '':
+            mes['message'] = "缺少必要的信息"
+        else:
+            """检查短信验证码"""
+            f = {"phone": phone, 'code': code}
+            u = "http://file.bhxxjs.cn/api/validate_code"
+            u = "http://127.0.0.1:7001/api/validate_code"
+            try:
+                r = requests.get(u, params=f, headers=hs)
+            except Exception as e:
+                n = datetime.datetime.now()
+                t = "短信验证接口调用失败.{}".format(n)
+                c = "args:{}, auth:{}, error:{}".format(f, AUTH, e)
+                send_mail(title=t, content=c)
+                ms = "{} {}".format(t, c)
+                logger.exception(msg=ms)
+            finally:
                 status = r.status_code
                 if status != 200:
-                    mes['message'] = "注册服务未工作"
+                    mes['message'] = "验证短信服务未工作"
                     n = datetime.datetime.now()
-                    t = "调用注册服务接口返回了错误的状态.{}".format(n)
+                    t = "调用验证短信服务接口返回了错误的状态.{}".format(n)
                     c = "args:{}, auth:{}, status:{}".format(args, AUTH, status)
                     send_mail(title=t, content=c)
                     ms = "{} {}".format(t, c)
                     logger.exception(msg=ms)
                 else:
-                    mes = r.json()
+                    r = r.json()
+                    if r['message'] != "success":
+                        mes['message'] = "短信验证失败"
+                    else:
+                        """验证成功.向后台提交注册信息"""
+                        args = {"loginname": phone, "password": password}
+                        r = None
+                        u = "http://www.bhxxjs.cn:8080/bdurs/user/toAddUser"
+                        u = "http://192.168.1.107:8080/BDUrs/user/toAddUser"
+                        try:
+                            r = requests.get(u, params=args, headers=hs, timeout=3)
+                        except Exception as e:
+                            n = datetime.datetime.now()
+                            t = "调用注册接口失败.{}".format(n)
+                            c = "args:{}, auth:{}, error:{}".format(args, AUTH, e)
+                            send_mail(title=t, content=c)
+                            ms = "{} {}".format(t, c)
+                            logger.exception(msg=ms)
+                        finally:
+                            if r is None:
+                                mes['message'] = "注册服务暂时不可用"
+                            else:
+                                status = r.status_code
+                                if status != 200:
+                                    mes['message'] = "注册服务未工作"
+                                    n = datetime.datetime.now()
+                                    t = "调用注册服务接口返回了错误的状态.{}".format(n)
+                                    c = "args:{}, auth:{}, status:{}".format(args, AUTH, status)
+                                    send_mail(title=t, content=c)
+                                    ms = "{} {}".format(t, c)
+                                    logger.exception(msg=ms)
+                                else:
+                                    mes = r.json()
     else:
         mes['message'] = "提交错误,请刷新页面后重试"
     return json.dumps(mes)
@@ -208,39 +243,21 @@ def login_func():
     form = FlaskForm()
     if form.validate_on_submit():
         args = get_args(request)
-        if 'phone' in args:
-            args['login_name'] = args.pop("phone")
         args.pop('csrf_token', None)
-        """向后台提交登录信息"""
-        r = None
-        u = "http://192.168.1.102:8080/bhxx/login"
-        u = "http://www.bhxxjs.cn:8080/bhxx/login"
         try:
-            r = requests.post(u, params=args, headers=hs, timeout=3)
+            mes = UserInfo.login(**args)
         except Exception as e:
             n = datetime.datetime.now()
-            t = "调用登录接口失败.{}".format(n)
+            t = "官网登录失败.{}".format(n)
             c = "args:{}, auth:{}, error:{}".format(args, AUTH, e)
             send_mail(title=t, content=c)
             ms = "{} {}".format(t, c)
             logger.exception(msg=ms)
         finally:
-            if r is None:
-                mes['message'] = "登录服务暂时不可用"
-            else:
-                status = r.status_code
-                if status != 200:
-                    mes['message'] = "登录服务未工作"
-                    n = datetime.datetime.now()
-                    t = "调用登录服务接口返回了错误的状态.{}".format(n)
-                    c = "args:{}, auth:{}, status:{}".format(args, AUTH, status)
-                    send_mail(title=t, content=c)
-                    ms = "{} {}".format(t, c)
-                    logger.exception(msg=ms)
-                else:
-                    mes = r.json()
+            if mes['message']
     else:
         mes['message'] = "提交错误,请刷新页面后重试"
+
     return json.dumps(mes)
 
 
