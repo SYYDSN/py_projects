@@ -59,7 +59,43 @@ def send_signal():
     print(r.json())
 
 
+def send_material():
+    """发送一个素材"""
+    data = {
+        "createTime" : "2018-11-13T23:39:39.991Z",
+        "image" : [],
+        "deleteTime" : "null",
+        "appId" : "5a4c6eaf4c87d243ff1e21c0",
+        "entryId" : "5bdbd399c1c35b02b7ccc691",
+        "formName" : "每日素材推送",
+        "date_time" : "null",
+        "creator" : {
+            "username" : "dingtmp-ding16f68f12362ff0f4",
+            "name" : "上海迅迭网络科技有限公司",
+            "_id" : "56956cdcf5377f7d03ff49bc"
+        },
+        "group" : [
+            "素材群"
+        ],
+        "desc" : "fgf",
+        "updateTime" : "2018-11-13T23:39:39.991Z",
+        "deleter" : "null",
+        "_id" : "5beb60bb3fe07f21ea699bf2",
+        "updater" : {
+            "username" : "dingtmp-ding16f68f12362ff0f4",
+            "name" : "上海迅迭网络科技有限公司",
+            "_id" : "56956cdcf5377f7d03ff49bc"
+        },
+        "file" : []
+    }
+    url = "http://127.0.0.1:8000/listen2_material"
+    hs = {"X-JDY-Signature": "tYfHgynb10QJkoPTPFoEJaI8"}
+    r = requests.post(url=url, json={"data": data}, headers=hs)
+    print(r)
+
+
 if __name__ == "__main__":
     """测试发送喊单信号"""
-    send_signal()
+    # send_signal()
+    send_material()
     pass

@@ -22,7 +22,7 @@ for(var s=0;s<sildeShow.length;s++){
             }
             this.className="opens"
             sildeShow_hd_border[this.num].style.display="block"
-            sildeShow_hd_icon[this.num].style.transform="rotate(180deg)"
+            sildeShow_hd_icon[this.num].style.transform="rotate(360deg)"
          }
 
     }

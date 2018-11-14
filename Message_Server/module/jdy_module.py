@@ -72,7 +72,7 @@ def listen_jdy(**kwargs) -> dict:
         process_praise(**kwargs)
     elif req_type == "material":
         """上传图片素材"""
-        MaterialPushHistory.push(**kwargs)
+        process_material(**kwargs)
     else:
         ms = "错误的req_type:{}".format(req_type)
         print(ms)

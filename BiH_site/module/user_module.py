@@ -43,6 +43,8 @@ class UserInfo(mongo_db.BaseDoc):
                     mes['message'] = "手机号码重复"
                 else:
                     f['password'] = password
+                    nick_name = "用户{}".format(phone[-4:])
+                    f['nick_name'] = nick_name
                     now = datetime.datetime.now()
                     f['create_date'] = now
                     r = col.insert_one(document=f, session=session)
@@ -74,9 +76,11 @@ class UserInfo(mongo_db.BaseDoc):
                     if password != pw2:
                         mes['message'] = '密码错误'
                     else:
+                        _id = r['_id']
+                        mes['_id'] = _id
                         now = datetime.datetime.now()
                         f = dict()
-                        f['_id'] = r['_id']
+                        f['_id'] = _id
                         u = {"$set": {"last_login": now}}
                         # 更新最后的登录时间
                         col.find_one_and_update(filter=f, update=u, session=session)

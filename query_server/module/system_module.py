@@ -109,6 +109,55 @@ class Role(orm_module.BaseDoc):
         res = -1 if res is None else res
         return res
 
+    @classmethod
+    def all_rules(cls) -> list:
+        """
+        查询所有的rule
+        :return:
+        """
+        data = orm_module.FlaskUrlRule.exec("find")
+        return [x for x in data]
+
+    @classmethod
+    def views_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False) -> dict:
+        """
+        分页查看角色信息
+        :param filter_dict: 过滤器,由用户的权限生成
+        :param page_index: 页码(当前页码)
+        :param page_size: 每页多少条记录
+        :param can_json: 转换成可以json的字典?
+        :return:
+        """
+        pipeline = list()
+        pipeline.append({"$match": filter_dict})
+        lookup = {
+            "from": "user_info",
+            "let": {"role_id": "$_id"},
+            "pipeline": [
+                {"$match": {"$expr": {"$eq": ["$role_id", "$$role_id"]}}},  # user_info.role_id = role_info._id
+                {"$addFields": {"count": {"$sum": 1}}},                     # 增加一个计数字段.
+                {"$project": {"_id": 0, "user_count": "$count"}}            # 不显示_id,重命名子查询的count字段
+            ],
+            "as": "user_info"
+        }
+        replace = {
+            '$replaceRoot':  # 从根文档替换
+                {'newRoot':  # 作为新文档
+                    {
+                        '$mergeObjects': [  # 混合文档.value是一个数组,用第二个元素覆盖第一个.注意这个顺序很重要.
+                            {'$arrayElemAt': ["$user_info", 0]},  # 取主文档中user_info字段的第一个元素
+                            # 取上一阶段结果中.列表字段(数组的第一个元素指示)的第0个(数组的最后一个元素指示))
+                            '$$ROOT']  # 标识根文档
+                    }
+                }
+
+        }
+        pipeline.append({"$lookup": lookup})
+        pipeline.append(replace)
+        pipeline.append({"$project": {"user_info": 0}})  # 移除子查询字段
+        r = cls.aggregate(pipeline=pipeline)
+        return r
+
 
 class User(orm_module.BaseDoc):
     """用户表"""
@@ -335,6 +384,6 @@ if __name__ == "__main__":
     #             f['password'] = "123456"
     #             r = col.insert_one(document=f, session=ses)
     """join测试"""
-    r = User.views_info(filter_dict={})
+    r = Role.views_info(filter_dict=dict())
     print(r)
     pass

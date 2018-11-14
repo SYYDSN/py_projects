@@ -235,14 +235,12 @@ class EventHandler:
             elif msg_type == "text":
                 """文本消息"""
                 s = xml['Content']
-                data = " 你输入的内容是: '{}'".format(s)
-                print(data)
                 if s == "喊单":
                     """回复老师喊单登录的链接"""
                     data = "芝麻开门. <a href='http://wx.yataitouzigl.com/teacher/login.html'>分析师登录入口</a>"
                     res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
                 else:
-                    res = XMLMessage.produce(to_user=openid, msg_type="text", data=data)
+                    pass
             elif msg_type == "image":
                 """图片消息"""
             else:

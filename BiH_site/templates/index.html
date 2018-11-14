@@ -141,7 +141,8 @@
                    </li>
                     <!-- -->
                    <li class="f2_hovs_pos f5_hovs_pos">
-                       <a href="javascript:;" class=" hov f5" name="color">在 线 演 示</a>
+                       <a style="display: {{ 'none' if user else '' }}" href="javascript:alert('请先登录!');" class=" hov f5" name="color">在 线 演 示</a>
+                       <a style="display: {{ '' if user else 'none' }}" href="http://demo.bhxxjs.cn/bdurs/loginForm" class=" hov f5" name="color">在 线 演 示</a>
 
                    </li>
                     <!-- -->
@@ -151,11 +152,17 @@
                    </li>
                     <!--about.html -->
 
-                   <li>
+                   <li style="display: {{'none' if user else '' }}">
                        <a href="javascript:;" class=" hov f8" name="color" id="login">登录</a>
                    </li>
-                   <li>
+                   <li style="display: {{'none' if user else '' }}">
                        <a href="javascript:;" class=" hov f9" name="color" id="res">注册</a>
+                   </li>
+                    <li style="display: {{'' if user else 'none' }}">
+                       <a href="/logout" class=" hov f9" name="color" id="login_out">注销</a>
+                   </li>
+                    <li style="display: {{'' if user else 'none' }}">
+                       <a href="javascript:;" class=" hov f8" name="color" id="nick_name">{{ user.nick_name if user.nick_name else "guest" }}</a>
                    </li>
                 </ul>
                 <div class="f7">

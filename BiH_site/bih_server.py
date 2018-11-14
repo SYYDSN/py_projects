@@ -45,7 +45,12 @@ def favicon_func():
 def index_func():
     """首页"""
     form = FlaskForm()
-    return render_template("index.html", form=form)
+    _id = session.get("_id", None)
+    if isinstance(_id, ObjectId):
+        user = UserInfo.find_by_id(o_id=_id, to_dict=True)
+    else:
+        user = None
+    return render_template("index.html", form=form, user=user)
 
 
 @app.route("/bhxxjs_web/<file_name>")
@@ -203,7 +208,7 @@ def reg_func():
                         args = {"loginname": phone, "password": password}
                         r = None
                         u = "http://www.bhxxjs.cn:8080/bdurs/user/toAddUser"
-                        u = "http://192.168.1.107:8080/BDUrs/user/toAddUser"
+                        # u = "http://192.168.1.107:8080/BDUrs/user/toAddUser"
                         try:
                             r = requests.get(u, params=args, headers=hs, timeout=3)
                         except Exception as e:
@@ -227,10 +232,19 @@ def reg_func():
                                     ms = "{} {}".format(t, c)
                                     logger.exception(msg=ms)
                                 else:
-                                    mes = r.json()
+                                    """保存到mongodb"""
+                                    args = {"phone": phone, "password": password}
+                                    mes = UserInfo.register(**args)
     else:
         mes['message'] = "提交错误,请刷新页面后重试"
     return json.dumps(mes)
+
+
+@app.route("/logout")
+def logout_func():
+    """注销"""
+    session.pop("_id", None)
+    return redirect(url_for("index_func"))
 
 
 @app.route("/login", methods=['get', 'post'])
@@ -254,7 +268,11 @@ def login_func():
             ms = "{} {}".format(t, c)
             logger.exception(msg=ms)
         finally:
-            if mes['message']
+            if mes['message'] == "success":
+                """登录成功"""
+                session['_id'] = mes.pop('_id')  # 保存会话
+            else:
+                pass
     else:
         mes['message'] = "提交错误,请刷新页面后重试"
 
@@ -268,7 +286,12 @@ def common_func(the_path):
     if the_path not in path_list:
         return abort(404)
     else:
-        return render_template(the_path, form=FlaskForm())
+        _id = session.get("_id", None)
+        if isinstance(_id, ObjectId):
+            user = UserInfo.find_by_id(o_id=_id, to_dict=True)
+        else:
+            user = None
+        return render_template(the_path, form=FlaskForm(), user=user)
 
 
 if __name__ == '__main__':

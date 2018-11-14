@@ -106,6 +106,9 @@
 .middle >.left_nav >ul >.sub_nav >ul >li >a {
   color: rgba(255,255,255,0.8);
 }
+.middle >.left_nav >ul >.sub_nav >ul .active_nav_inner {
+  color: #76a9d4;
+}
 .middle >.right_main {
   width: calc(100% - 200px);
   min-height: 100%;

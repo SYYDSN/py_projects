@@ -1,7 +1,7 @@
 {% extends "standard_page.html" %}
 
 {% block css %}
-   <link rel="stylesheet" href="/static/css/manage_user.css">
+   <link rel="stylesheet" href="/static/css/manage_role.css">
 {% endblock %}
 
 {% block show_area %}
@@ -15,44 +15,38 @@
         </div>
     </div>
 
-    <div class="user_list_outer">
-        <div class="user_list_inner">
+    <div class="role_list_outer">
+        <div class="role_list_inner">
             <div class="insert_div">
                 <div class="left">
                     <i class="fa fa-list-ul"></i>
                     <span id="clear_condition">所有信息</span>
                 </div>
                 <div class="right">
-                    <button id="add_user" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
-                        添加用户
+                    <button id="add_role" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                        添加角色
                     </button>
                 </div>
             </div>
             <div class="table_outer">
-                <table id="user_list" class="table table-hover">
+                <table id="role_list" class="table table-hover">
                     <tr class="info">
                         <th class="select"></th>
-                        <th>账户</th>
-                        <th>权限组</th>
-                        <th>姓名</th>
-                        <th>部门</th>
-                        <th>创建日期</th>
-                        <th>用户状态</th>
+                        <th>角色/权限组名</th>
+                        <th>权限</th>
+                        <th>成员数</th>
                         <th>操作</th>
                     </tr>
-                    {% for user in users %}
-                        <tr id="{{ user._id }}">
+                    {% for role in roles %}
+                        <tr id="{{ role._id }}">
                             <td  class="select">
                                 <input type="checkbox" >
                             </td>
-                            <td class="user_name">{{ user.user_name }}</td>
-                            <td data-id="{{ user.role_id }}" class="role">{{ user.role_name }}</td>
-                            <td class="nick_name">{{ user.nick_name }}</td>
-                            <td data-id="{{ user.dept_id }}" class="dept">{{ user.dept_name }}</td>
-                            <td class="create_time">{{ user.create_time | short_date2 }}</td>
-                            <td class="status">{{ "正常" if user.status == 1 else "禁用" }}</td>
+                            <td class="role_name">{{ role.role_name }}</td>
+                            <td class="rules">{{ role.rules }}</td>
+                            <td class="user_count">{{ role.user_count if role.user_count else 0 }}</td>
                             <td class="operation">
-                                <button data-id="{{ user._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_user">编辑</button>
+                                <button data-id="{{ role._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_role">编辑</button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -63,7 +57,7 @@
                 <div class="left">
                     <input type="checkbox" id="check_all">
                     <span>全选</span>
-                    <button id="delete_user" type="button" class="btn btn-sm btn-default btn-primary">
+                    <button id="delete_role" type="button" class="btn btn-sm btn-default btn-primary">
                         删除
                     </button>
                 </div>
@@ -85,21 +79,21 @@
         <div class="modal_inner">
             <div class="modal_top">
                 <h3 id="modal_title">
-                    添加用户
+                    添加角色
                 </h3>
             </div>
             <div class="modal_mid">
                 <div class="line">
-                    <label>姓名</label><input type="text" id="nick_name">
-                </div>
-                <div class="line">
-                    <label>账户</label><input type="text" id="user_name">
+                    <label>角色名</label><input type="text" id="role_name">
                     </div>
                 <div class="line">
-                    <label>密码</label><input type="password" id="u_password1">
-                    </div>
-                <div class="line">
-                    <label>重复密码</label><input type="password" id="u_password2">
+                    <ul class="all_rules">
+                        {% for rule in rules %}
+                            <li class="rule">
+                            {{ rule }}
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
 
             </div>
@@ -114,5 +108,5 @@
 {% endblock %}
 
 {% block js %}
-    <script src="/static/js/manage_user.js"></script>
+    <script src="/static/js/manage_role.js"></script>
 {% endblock %}

@@ -9,6 +9,10 @@ import calendar
 import hashlib
 import functools
 from flask import request
+from flask.views import MethodView
+from flask import Flask
+from flask import Blueprint
+from collections import OrderedDict
 from uuid import uuid4
 from bson.objectid import ObjectId
 from bson.dbref import DBRef
@@ -30,7 +34,6 @@ from log_module import get_logger
 from pymongo import ReturnDocument
 from pymongo.results import *
 import gridfs
-from flask import Flask
 from werkzeug.routing import Map
 from werkzeug.routing import Rule
 from pymongo.errors import *
@@ -40,7 +43,7 @@ from pymongo.errors import *
 MongoDB4+ 的持久化类   2018-10-11
 """
 
-version = "0.0.3"
+version = "0.0.4"
 
 print("ORM模块当前版本号: {}".format(version))
 
@@ -48,7 +51,6 @@ hostname = socket.gethostname()
 cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设置决定
 s_cache = SimpleCache()      # 使用内存的缓存,重启/关机就清空了.
 logger = get_logger()
-host = "127.0.0.1"
 user = "test1"              # 数据库用户名
 password = "test@723456"       # 数据库密码
 db_name = "test_db"        # 库名称
@@ -81,6 +83,7 @@ if hostname != "walle-pc":
         "password": password    # 密码
     }
 else:
+    db_name = "query_db"
     mongodb_setting = {
         "host": "127.0.0.1:27017",   # 数据库服务器地址
         "connect": connect,
@@ -316,7 +319,7 @@ def get_conn(table_name: str, database: str = None, db_client: pymongo.MongoClie
         return conn
 
 
-def collection_exists(database_name: str = None, table_name: str = None, auto_create: bool = False) -> bool:
+def collection_exists(database_name: str = None, table_name: str = None, clear: bool = False, auto_create: bool = False) -> bool:
     """
     根据表名检查一个表是否存在?
     :param database_name:
@@ -2133,6 +2136,80 @@ class BaseDoc:
         return resp
 
     @classmethod
+    def aggregate(cls, pipeline: list = None, page_size: int = 10, ruler: int = 5, page_index: int = 1) -> dict:
+        """
+        带分页的聚合查询,本函数最大限度了提供了聚合查询的自由度.在使用cls.jquery函数不方便时,请使用本函数
+
+        :param pipeline:  聚合管道
+        :param page_size: 每页多少条记录
+        :param ruler: 翻页器最多显示几个页码？
+        :param page_index: 页码(当前页码)
+        :return: 字典对象.
+        查询结果示范:
+        {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": res,
+            "current_page": page_index,
+            "pages": pages
+        }
+        """
+        pipeline = list() if pipeline is None else pipeline
+        """加入统计总数的阶段"""
+        count_cond = {"$addFields": PipelineStage.add_count()}
+        """在第一个$match之后插入统计阶段"""
+        if len(pipeline) > 1 and pipeline[0].get("$match") is not None:
+            pipeline.insert(1, count_cond)
+        else:
+            pipeline.insert(0, count_cond)
+        """处理每页包含多少数据?"""
+        if isinstance(page_size, int):
+            pass
+        elif isinstance(page_size, float):
+            page_size = int(page_size)
+        elif isinstance(page_size, str) and page_size.isdigit():
+            page_size = int(page_size)
+        else:
+            page_size = 10
+        page_size = 1 if page_size < 1 else page_size
+        """处理页码"""
+        if isinstance(page_index, int):
+            pass
+        elif isinstance(page_index, float):
+            page_index = int(page_index)
+        elif isinstance(page_index, str) and page_index.isdigit():
+            page_index = int(page_index)
+        else:
+            page_size = 1
+        page_index = 1 if page_index < 1 else page_index
+        skip = (page_index - 1) * page_size
+
+        """处理limit和skip"""
+        pipeline.append({"$skip": skip})
+        pipeline.append({"$limit": page_size})
+
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        r = ses.aggregate(pipeline=pipeline)
+        r = [x for x in r]
+        """开始计算分页数据"""
+        length = len(r)
+        record_count = 0 if length == 0 else r[0]['total']
+        page_count = math.ceil(record_count / page_size)  # 共计多少页?
+        delta = int(ruler / 2)
+        range_left = 1 if (page_index - delta) <= 1 else page_index - delta
+        range_right = page_count if (range_left + ruler - 1) >= page_count else range_left + ruler - 1
+        pages = [x for x in range(range_left, int(range_right) + 1)]
+        resp = {
+            "total_record": record_count,
+            "total_page": page_count,
+            "data": r,
+            "current_page": page_index,
+            "pages": pages
+        }
+        return resp
+
+    @classmethod
     def query(cls, filter_dict: dict, join_cond: (list, dict) = None, sort_cond: (dict, list) = None,
               projection: list = None, page_size: int = 10, ruler: int = 5, page_index: int = 1, to_dict: bool = True,
               can_json: bool = False, func: object = None, target: str = "dict") -> dict:
@@ -2432,7 +2509,7 @@ class PipelineStage:
             PipelineStage.flat_list(pipeline=pipeline, field=table_name)
 
     @staticmethod
-    def add_count(pipeline: list, field_name: str = "total") -> dict:
+    def add_count(pipeline: list = None, field_name: str = "total") -> dict:
         """
         加一个统计功能.注意这个$addFields的特例
         :param pipeline:
@@ -2443,7 +2520,7 @@ class PipelineStage:
         return PipelineStage.add_fields(pipeline=pipeline, field_dict=count)
 
     @staticmethod
-    def add_fields(pipeline: list, field_dict: dict) -> dict:
+    def add_fields(pipeline: list = None, field_dict: dict = None) -> dict:
         """
         $addFields阶段 增加字段
         field_dict参数说明:
@@ -2456,7 +2533,10 @@ class PipelineStage:
         :param field_dict: 字段表达式字典.
         :return:
         """
-        pipeline.append({"$addFields": field_dict})
+        if pipeline is not None and isinstance(field_dict, dict) and len(field_dict) > 0:
+            pipeline.append({"$addFields": field_dict})
+        else:
+            pass
         return field_dict
 
     @staticmethod
@@ -2649,11 +2729,13 @@ class FlaskUrlRule(BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['methods'] = list  # 视图函数的方法
-    type_dict['args'] = list  # 视图函数的参数
     type_dict['endpoint'] = str  # 视图函数的端点
-    type_dict['rule'] = str  # 路由规则
-    type_dict['desc'] = str  # 路由说明
-
+    type_dict['url_path'] = str  # 路由规则
+    type_dict['desc'] = str  # 视图说明
+    type_dict['rules'] = list  # 可选的权限规则[{value:0, desc: "只能访问自己的数据"}, .....]
+    type_dict['time'] = datetime.datetime
+    schema = get_schema()
+    schema.drop_collection(name_or_collection=_table_name)  # 清除旧表
     collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
 
     @classmethod
@@ -2697,6 +2779,147 @@ class FlaskUrlRule(BaseDoc):
         ses = cls.get_collection(write_concern=get_write_concern())
         re_doc = ses.find_one_and_update(filter=f, update=u, upsert=True, return_document=ReturnDocument.AFTER)
         return re_doc
+
+
+class MyView(MethodView):
+    """
+    自定义视图.可以定制用户的访问权限
+    """
+    _access_rules = OrderedDict()           # 定义访问级别
+    _access_rules[0] = "禁止访问"
+    _access_rules[1] = "访问自己的数据"
+    _access_rules[2] = "访问本部门的数据"
+    _access_rules[3] = "无限制的访问数据"
+
+    _root_role = ObjectId("5bdfad388e76d6efa7b92d9e")  # 设置root权限组的id,此角色有全部的访问权限
+    _endpoint = None                                   # 定义endpoint名 子类必须定义,否则自动使用类名称替代
+    _rule = None                                       # 定义url访问规则. 子类必须定义,否则需要在注册时候手动添加
+    _desc = "默认的自定义视图"                            # 视图的说明.很重要.
+    _allowed = [0, 1, 2, 3]                            # 允许的权限的值 ,必须是_access_rules的子集.用于定义可用的权限的值.
+
+    """
+    子类继承的时候,建议重写以下函数以实现精确的权限控制:
+    1. cls.__get_filter  
+        用于详细定义和权限值对应的过滤器.这个函数只有uer_id(用户id)和access_value(权限值),返回过滤器字典
+    """
+
+    @classmethod
+    def identity(cls, user_dict: dict, url_path: str, role_field: str = "role_id", role_table: str = "role_info") -> dict:
+        """
+        根据用户字典获取控制用户范围的查询字典.此字典可以用作find查询或者aggregate的$match阶段
+        :param user_dict: 用户信息的字典
+        :param url_path: 访问路径
+        :param role_field: 角色id在用户信息中对应的字段
+        :param role_table: 角色信息表的名称
+        :return:
+        """
+        res = None
+        if isinstance(user_dict, dict):
+            if role_field not in user_dict:
+                ms = "user_dict中缺少{}字段".format(role_field)
+                raise ValueError(ms)
+            else:
+                role_id = user_dict[role_field]
+                if isinstance(role_id, str) and len(role_id) == 24:
+                    role_id = ObjectId(role_id)
+                else:
+                    pass
+                if not isinstance(role_id, ObjectId):
+                    ms = "非法的role_id: {}".format(role_id)
+                    raise ValueError(ms)
+                else:
+                    if role_id == cls._root_role:
+                        """是管理员"""
+                        res = dict()
+                    else:
+                        ses = get_conn(table_name=role_table)
+                        role = ses.find_one(filter={"_id": role_id})
+                        if role is None:
+                            ms = "无效的role_id: {}".format(role_id)
+                            raise ValueError(ms)
+                        else:
+                            rules = role.get("rules")
+                            value = rules.get(url_path, 0)
+                            res = cls.__get_filter(user_id=user_dict['_id'], access_value=value)
+        else:
+            ms = "user_dict必须字典类型"
+            raise ValueError(ms)
+        return res
+
+    @classmethod
+    def __get_filter(cls, user_id: ObjectId, access_value: int) -> dict:
+        """
+        根据用户信息和访问级别的值.返回一个用于查询的字典.此函数应该只被cls.identity调用.
+        当你重新定义过访问级别的值后.请重构此函数
+        :param user_id: 过滤器中的字段,一般是user_id,也可能是其他字段.不同的视图类请重构此函数.
+        :param access_value:
+        :return:
+        """
+        ms = "当你重新定义过访问级别的值后.请重构此函数,以避免查询失败"
+        warnings.warn(message=ms)
+        res = None
+        _access_rules = cls._access_rules
+        d = list(_access_rules.keys())
+        if access_value not in d:
+            ms = "权限值:{} 未被定义".format(access_value)
+            raise ValueError(ms)
+        else:
+            if access_value == 1:
+                res = {"user_id": user_id}
+            elif access_value == 2:
+                ms = "未实现的访问级别控制: {}".format(access_value)
+                raise NotImplementedError(ms)
+            elif access_value == 3:
+                res = dict()
+            else:
+                pass
+        return res
+
+    @classmethod
+    def register(cls, app: (Flask, Blueprint), rule: str = None) -> None:
+        """
+        注册视图函数.
+        :param app:
+        :param rule:
+        :return:
+        """
+        methods = [x.lower() for x in cls.methods]
+        endpoint = cls._endpoint if cls._endpoint else cls.__class__.__name__
+        rule = rule.strip() if rule else cls._rule
+        if rule is None or rule == "":
+            ms = "rule 没有定义"
+            raise ValueError(ms)
+        else:
+            rule = rule if rule.startswith("/") else "/{}".format(rule)
+            if isinstance(app, Blueprint):
+                url_prefix = app.url_prefix
+            else:
+                url_prefix = ""
+            app.add_url_rule(rule=rule, view_func=cls.as_view(name=endpoint), methods=methods)
+            url_path = "{}{}".format(url_prefix, rule)
+            """处理允许访问的值"""
+            rules = list()
+            for val in cls._allowed:
+                if val in cls._access_rules:
+                    temp = {"value": val, "desc": cls._access_rules[val]}
+                    rules.append(temp)
+            rules.sort(key=lambda obj: obj['value'], reverse=False)
+            doc = {
+                "methods": methods,
+                "endpoint": endpoint,
+                "url_path": url_path,
+                "desc": cls._desc,
+                "rules": rules,
+                "time": datetime.datetime.now()
+            }
+            w = get_write_concern()
+            r = FlaskUrlRule.insert_one(doc=doc,write_concern=w)
+            if r is None:
+                ms = "注册视图失败: {}".format(doc)
+                raise ValueError(ms)
+            else:
+                pass
+
 
 
 class OperateLog(BaseDoc):

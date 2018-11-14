@@ -1,4 +1,3 @@
-
 ////轮播图
 //function LP(){
 //    var banner = document.getElementById("banner");
@@ -124,37 +123,33 @@
 //},3000)
 
 
-
 //短信验证码倒计时
 
-    // var clock = '';
-    // var nums = 60;
-    // var btn;
-    // var col="#bbb";
-    // function sendCode(thisBtn)
-    // {
-    //     btn = thisBtn;
-    //     btn.disabled = true; //将按钮置为不可点击
-    //     btn.style.background= col; //将按钮置为不可点击
-    //     btn.value = nums+'秒后可重新获取';
-    //     clock = setInterval(doLoop, 1000); //一秒执行一次
-    // }
-    // function doLoop()
-    // {
-    //     nums--;
-    //     if(nums > 0){
-    //         btn.value = nums+'秒后可重新获取';
-    //     }else{
-    //         clearInterval(clock); //清除js定时器
-    //         btn.disabled = false;
-    //         btn.style.background=""
-    //         btn.value = '点击发送验证码';
-    //         nums = 60; //重置时间
-    //     }
-    // }
-
-
-
+// var clock = '';
+// var nums = 60;
+// var btn;
+// var col="#bbb";
+// function sendCode(thisBtn)
+// {
+//     btn = thisBtn;
+//     btn.disabled = true; //将按钮置为不可点击
+//     btn.style.background= col; //将按钮置为不可点击
+//     btn.value = nums+'秒后可重新获取';
+//     clock = setInterval(doLoop, 1000); //一秒执行一次
+// }
+// function doLoop()
+// {
+//     nums--;
+//     if(nums > 0){
+//         btn.value = nums+'秒后可重新获取';
+//     }else{
+//         clearInterval(clock); //清除js定时器
+//         btn.disabled = false;
+//         btn.style.background=""
+//         btn.value = '点击发送验证码';
+//         nums = 60; //重置时间
+//     }
+// }
 
 
 //var imgs1 = ["img/pic_1.jpg", "img/pic_2.jpg", "img/pic_3.jpg", "img/pic_4.jpg"]; // 保存图片地址源
@@ -163,13 +158,14 @@ var i = 0;  //  数组下标
 //var setIn;  //  保存定时器
 function cle() {//移入函数
     //$(".hiddens").css({display:"block"})
-    $(".hiddens").css({display:"block"})//显示切换按钮
+    $(".hiddens").css({display: "block"})//显示切换按钮
 }
+
 function spans(one) {
     //OA系统js
-    if(one == 1 || one == 2){
-         //$('.span1').css({background:"url('../img/whiteguanbi2.png') no-repeat"})
-         //$('.span2').css({background:"url('../img/whiteguanbi.png') no-repeat"})
+    if (one == 1 || one == 2) {
+        //$('.span1').css({background:"url('../img/whiteguanbi2.png') no-repeat"})
+        //$('.span2').css({background:"url('../img/whiteguanbi.png') no-repeat"})
         //$('.span1').css({background:"rgba(0,0,0,0.1)"})
         $('.span' + one).click(function () {
             //console.log($(this))
@@ -179,9 +175,9 @@ function spans(one) {
                     i = 3;
                 }
                 $("#system_banner div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             } else {
                 i++
@@ -190,21 +186,21 @@ function spans(one) {
                     i = 0;
                 }
                 $("#system_banner div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             }
         })
 
-    }else {
+    } else {
 
         // $('.span1').css({opacity:'0.4'})
         // $('.span2').css({opacity:'0.4'})
     }
 
     //CRM系统js
-    if(one == 3 || one == 4){
+    if (one == 3 || one == 4) {
         // $('.span3').css({opacity:'1'})
         // $('.span4').css({opacity:'1'})
 
@@ -216,9 +212,9 @@ function spans(one) {
                     i = 3;
                 }
                 $("#system_banner2 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             } else {
                 i++
@@ -227,20 +223,20 @@ function spans(one) {
                     i = 0;
                 }
                 $("#system_banner2 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             }
         })
 
-    }else {
+    } else {
 
         // $('.span1').css({opacity:'0.4'})
         // $('.span2').css({opacity:'0.4'})
     }
     //ERP系统js
-    if(one == 5 || one == 6){
+    if (one == 5 || one == 6) {
         // $('.span3').css({opacity:'1'})
         // $('.span4').css({opacity:'1'})
         $('.span' + one).click(function () {
@@ -251,9 +247,9 @@ function spans(one) {
                     i = 3;
                 }
                 $("#system_banner3 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             } else {
                 i++
@@ -262,20 +258,20 @@ function spans(one) {
                     i = 0;
                 }
                 $("#system_banner3 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             }
         })
 
-    }else {
+    } else {
 
         // $('.span1').css({opacity:'0.4'})
         // $('.span2').css({opacity:'0.4'})
     }
     //商超系统js
-    if(one == 7 || one == 8){
+    if (one == 7 || one == 8) {
         // $('.span3').css({opacity:'1'})
         // $('.span4').css({opacity:'1'})
         $('.span' + one).click(function () {
@@ -286,9 +282,9 @@ function spans(one) {
                     i = 2;
                 }
                 $("#system_banner4 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             } else {
                 i++
@@ -297,20 +293,20 @@ function spans(one) {
                     i = 0;
                 }
                 $("#system_banner4 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             }
         })
 
-    }else {
+    } else {
 
         // $('.span1').css({opacity:'0.4'})
         // $('.span2').css({opacity:'0.4'})
     }
     //供应链系统js
-    if(one == 9 || one == 10){
+    if (one == 9 || one == 10) {
         // $('.span3').css({opacity:'1'})
         // $('.span4').css({opacity:'1'})
         $('.span' + one).click(function () {
@@ -321,9 +317,9 @@ function spans(one) {
                     i = 3;
                 }
                 $("#system_banner5 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             } else {
                 i++
@@ -332,20 +328,20 @@ function spans(one) {
                     i = 0;
                 }
                 $("#system_banner5 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             }
         })
 
-    }else {
+    } else {
 
         // $('.span1').css({opacity:'0.4'})
         // $('.span2').css({opacity:'0.4'})
     }
     //人事管理系统js
-    if(one == 11 || one == 12){
+    if (one == 11 || one == 12) {
         // $('.span3').css({opacity:'1'})
         // $('.span4').css({opacity:'1'})
         $('.span' + one).click(function () {
@@ -356,9 +352,9 @@ function spans(one) {
                     i = 3;
                 }
                 $("#system_banner6 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             } else {
                 i++
@@ -367,14 +363,14 @@ function spans(one) {
                     i = 0;
                 }
                 $("#system_banner6 div").eq(i).css({
-                    Opacity:1,zIndex:1
+                    Opacity: 1, zIndex: 1
                 }).siblings().css({
-                    Opacity:"",zIndex:""
+                    Opacity: "", zIndex: ""
                 })
             }
         })
 
-    }else {
+    } else {
 
         // $('.span1').css({opacity:'0.4'})
         // $('.span2').css({opacity:'0.4'})
@@ -382,14 +378,16 @@ function spans(one) {
 
     //console.log(one)
 }
+
 // }
 
 function str() {//移出函数
     //$(".hiddens").css({display:"none"})
-    $(".hiddens").css({display:"none"})//移除隐藏按钮
+    $(".hiddens").css({display: "none"})//移除隐藏按钮
 
 }
-function span1(){
+
+function span1() {
     // $(".span1").css({Opacity:0.4})
     // $(".span2").css({Opacity:0.4})
     // span[2].style.opacity = 0.4;
@@ -397,43 +395,19 @@ function span1(){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var con=document.getElementsByName("color");
+var con = document.getElementsByName("color");
 
 //console.log(con);
-for(var a=0;a<con.length;a++){
-    con[a].love=a;
-    con[a].onclick=function(){
-        for(var s=0;s<con.length;s++){
-            con[s].style.background="";
+for (var a = 0; a < con.length; a++) {
+    con[a].love = a;
+    con[a].onclick = function () {
+        for (var s = 0; s < con.length; s++) {
+            con[s].style.background = "";
             // con[s].style.color="";
             //con2[s].style.background="";
             //con2[s].style.color="";
         }
-        this.style.background="rgba(255,255,255,0.3)";
+        this.style.background = "rgba(255,255,255,0.3)";
         // this.style.color="#5808ef";
         //con2[this.love].style.background="rgba(255,255,255,0.3)";
         //con2[this.love].style.color="#5808ef";
@@ -460,47 +434,48 @@ for(var a=0;a<con.length;a++){
 // }
 
 //切换注册登录
-var reg_box=document.getElementById("reg-box1");//获取注册盒子标签
-var su_login=document.getElementById("su-login");//获取底部快速登录标签
-var reg_box2=document.getElementById("reg-box2");//获取登录盒子标签
-var su_login2=document.getElementById("su-login2");//获取底部快速注册标签
-var Resgi=document.getElementById("resgi")//获取注册标题标签
-var Logi=document.getElementById("logi")//获取登录标题标签
-Resgi.style.display="block";//注册标题盒子显示
+var reg_box = document.getElementById("reg-box1");//获取注册盒子标签
+var su_login = document.getElementById("su-login");//获取底部快速登录标签
+var reg_box2 = document.getElementById("reg-box2");//获取登录盒子标签
+var su_login2 = document.getElementById("su-login2");//获取底部快速注册标签
+var Resgi = document.getElementById("resgi")//获取注册标题标签
+var Logi = document.getElementById("logi")//获取登录标题标签
+Resgi.style.display = "block";//注册标题盒子显示
 
 
-reg_box.style.display="block";//注册盒子显示
-su_login.onclick=function(){//点击底部快速登录标签
-    reg_box2.style.display="block";//显示登录盒子内容
-    Logi.style.display="block";//显示登录标题文字
-    reg_box.style.display="none";//隐藏注册盒子内容
-    Resgi.style.display="none";//隐藏注册标题
+reg_box.style.display = "block";//注册盒子显示
+su_login.onclick = function () {//点击底部快速登录标签
+    reg_box2.style.display = "block";//显示登录盒子内容
+    Logi.style.display = "block";//显示登录标题文字
+    reg_box.style.display = "none";//隐藏注册盒子内容
+    Resgi.style.display = "none";//隐藏注册标题
 };
 
-su_login2.onclick=function(){//点击底部快速注册标签
-    reg_box2.style.display="none";//登录盒子隐藏
-    Logi.style.display="none";//登录标题隐藏
-    reg_box.style.display="block";//注册盒子内容显示
-    Resgi.style.display="block";//注册标题显示
+su_login2.onclick = function () {//点击底部快速注册标签
+    reg_box2.style.display = "none";//登录盒子隐藏
+    Logi.style.display = "none";//登录标题隐藏
+    reg_box.style.display = "block";//注册盒子内容显示
+    Resgi.style.display = "block";//注册标题显示
 };
 
 
 //点击注册显示弹窗
-var regis=document.getElementById("res");//获取注册按钮标签
-var reg=document.getElementById("reg");//获取注册盒子标签
-function Res(){
-    reg.style.display="block";//注册登录弹窗显示
-    reg_box.style.display="block";//注册盒子内容显示
-    reg_box2.style.display="none";//登录盒子内容隐藏
-    Resgi.style.display="block";//注册标题显示
-    Logi.style.display="none"//登录标题隐藏
+var regis = document.getElementById("res");//获取注册按钮标签
+var reg = document.getElementById("reg");//获取注册盒子标签
+function Res() {
+    reg.style.display = "block";//注册登录弹窗显示
+    reg_box.style.display = "block";//注册盒子内容显示
+    reg_box2.style.display = "none";//登录盒子内容隐藏
+    Resgi.style.display = "block";//注册标题显示
+    Logi.style.display = "none"//登录标题隐藏
 }
-regis.onclick=Res; //点击注册按钮
 
-var guanbi=document.getElementById("guanbi")//获取关闭登录注册盒子标签
-guanbi.onclick=function(){
+regis.onclick = Res; //点击注册按钮
+
+var guanbi = document.getElementById("guanbi")//获取关闭登录注册盒子标签
+guanbi.onclick = function () {
     $(document).unbind("scroll.unable");//点击关闭按钮移除滚动条禁止函数
-    reg.style.display="none"//点击关闭按钮  关闭登录注册盒子标签
+    reg.style.display = "none"//点击关闭按钮  关闭登录注册盒子标签
 }
 
 
@@ -519,24 +494,24 @@ guanbi.onclick=function(){
 //禁止滚动条滚动函数
 function unScroll() {
     var top = $(document).scrollTop();
-    $(document).on('scroll.unable',function (e) {
+    $(document).on('scroll.unable', function (e) {
         $(document).scrollTop(top);
     })
 }
 
 
+var logins = document.getElementById("login");//获取登录按钮
+function Log() {
 
-var logins=document.getElementById("login");//获取登录按钮
-function Log(){
-
-    reg.style.display="block";//注册登录盒子内容显示
-    reg_box2.style.display="block";//登录内容显示
-    reg_box.style.display="none";//注册内容隐藏
-    Logi.style.display="block";//登录标题显示
-    Resgi.style.display="none"//注册标题隐藏
+    reg.style.display = "block";//注册登录盒子内容显示
+    reg_box2.style.display = "block";//登录内容显示
+    reg_box.style.display = "none";//注册内容隐藏
+    Logi.style.display = "block";//登录标题显示
+    Resgi.style.display = "none"//注册标题隐藏
 
 }
-logins.onclick=Log;//点击下拉导航登录按钮
+
+logins.onclick = Log;//点击下拉导航登录按钮
 
 
 // var logins2=document.getElementById("login2");//获取下拉导航登录按钮
@@ -553,7 +528,6 @@ logins.onclick=Log;//点击下拉导航登录按钮
 // logins2.onclick=Log2;//点击下拉导航登录按钮
 
 
-
 //联系我们跳转js
 // var lx=document.getElementById("lx");//获取标签
 // lx.onclick=function(){
@@ -561,66 +535,65 @@ logins.onclick=Log;//点击下拉导航登录按钮
 // };
 
 //点击回到头部
-function D(em){
+function D(em) {
     var x;
-    em.onclick=function(){
-        x=setInterval(function(){
-            if((document.body.scrollTop||document.documentElement.scrollTop)==0){
+    em.onclick = function () {
+        x = setInterval(function () {
+            if ((document.body.scrollTop || document.documentElement.scrollTop) == 0) {
                 clearInterval(x);
             }
-            document.documentElement.scrollTop=document.documentElement.scrollTop-document.documentElement.scrollTop/20;
-            document.body.scrollTop=document.body.scrollTop-document.body.scrollTop/20;
-            console.log( document.body.scrollTop);
-        },1);
+            document.documentElement.scrollTop = document.documentElement.scrollTop - document.documentElement.scrollTop / 20;
+            document.body.scrollTop = document.body.scrollTop - document.body.scrollTop / 20;
+            console.log(document.body.scrollTop);
+        }, 1);
     }
 }
+
 D(document.getElementById("gd-nav-top-hide"));
 
 //滚到指定位置出现返回向上按钮
-function X(){
-    var hd_top2=document.getElementById("gd-nav-top-hide2");
-    var s=false;
+function X() {
+    var hd_top2 = document.getElementById("gd-nav-top-hide2");
+    var s = false;
 
-    window.addEventListener("scroll",function(){
-        if(document.documentElement.scrollTop+document.body.scrollTop>=4700){
-            hd_top2.style.display="none";
-            s=true;
+    window.addEventListener("scroll", function () {
+        if (document.documentElement.scrollTop + document.body.scrollTop >= 4700) {
+            hd_top2.style.display = "none";
+            s = true;
 
-        }else
-            if(s){
+        } else if (s) {
 
-                hd_top2.style.display="block"
-                s=false
-            }
+            hd_top2.style.display = "block"
+            s = false
+        }
     });
 
 }
+
 X();
 
 //console.log(document.documentElement.scrollTop+document.body.scrollTop)
-function X2(){
-    var hd_top2=document.getElementById("gd-nav-top-hide2");
-    var hd_top=document.getElementById("gd-nav-top-hide");
-    var s=false;
-    window.addEventListener("scroll",function(){
-        if(document.documentElement.scrollTop+document.body.scrollTop>=2000){
-            hd_top.style.display="block";
+function X2() {
+    var hd_top2 = document.getElementById("gd-nav-top-hide2");
+    var hd_top = document.getElementById("gd-nav-top-hide");
+    var s = false;
+    window.addEventListener("scroll", function () {
+        if (document.documentElement.scrollTop + document.body.scrollTop >= 2000) {
+            hd_top.style.display = "block";
             //hd_top2.style.visibility="hidden"
 
-            s=true;
-        }else{
-            if(s){
-                hd_top.style.display="none";
+            s = true;
+        } else {
+            if (s) {
+                hd_top.style.display = "none";
                 //hd_top2.style.visibility="block"
             }
-            s=false;
+            s = false;
         }
     });
 }
+
 X2();
-
-
-
 
 
 /*固定导航*/
@@ -662,25 +635,14 @@ X2();
 //};
 
 
-
-
-
-
-
-
-
-
-
-
-
 //输入框得到焦点事件
-var texts=document.getElementById("text");
+var texts = document.getElementById("text");
 
-texts.onfocus=function(){
-    texts.style.width="235px"
+texts.onfocus = function () {
+    texts.style.width = "235px"
 }
-texts.onblur=function(){
-    texts.style.width="170px";
+texts.onblur = function () {
+    texts.style.width = "170px";
 }
 // var texts2=document.getElementById("text2")
 //
@@ -690,7 +652,6 @@ texts.onblur=function(){
 // // texts2.onblur=function(){
 // //     texts2.style.width="170px";
 // // }
-
 
 
 /*图片叠加选项卡*/
@@ -782,322 +743,323 @@ texts.onblur=function(){
 //}
 
 
-
-
 /*导航栏滚动条*/
 
-function A(){
-    var header=false;
-    $(document).ready(function(){
-        $(window).scroll(function(){
-                if(document.documentElement.scrollTop+document.body.scrollTop>=100){
-                    $("#nav").css({backgroundColor:"#1f2229"});
-                    header=true
-                }else{
-                    if(header){
-                        $("#nav").css({backgroundColor:""});
+function A() {
+    var header = false;
+    $(document).ready(function () {
+        $(window).scroll(function () {
+                if (document.documentElement.scrollTop + document.body.scrollTop >= 100) {
+                    $("#nav").css({backgroundColor: "#1f2229"});
+                    header = true
+                } else {
+                    if (header) {
+                        $("#nav").css({backgroundColor: ""});
                     }
-                    header=false;
+                    header = false;
                 }
             }
         );
     })
 }
+
 A();
-window.onload=function () {
-    if(document.documentElement.scrollTop>70){
-        $("#nav").css({backgroundColor:"#1f2229"});
-    }else {
-        $("#nav").css({backgroundColor:""});
+window.onload = function () {
+    if (document.documentElement.scrollTop > 70) {
+        $("#nav").css({backgroundColor: "#1f2229"});
+    } else {
+        $("#nav").css({backgroundColor: ""});
     }
 }
 
 
 function C() {
-    if(document.documentElement.clientHeight<938){
-        document.getElementById("gd-nav").style.top="66%"
-    }else {
-        document.getElementById("gd-nav").style.top="72%"
+    if (document.documentElement.clientHeight < 938) {
+        document.getElementById("gd-nav").style.top = "66%"
+    } else {
+        document.getElementById("gd-nav").style.top = "72%"
     }
 }
+
 C()
 
 
-
-
 function offset() {
-    var s=true
-    $(document).ready(function() {
-        $(window).scroll(function() {
+    var s = true
+    $(document).ready(function () {
+        $(window).scroll(function () {
             //var navs=document.getElementById("nav")
             var hiddens = document.getElementById("hiddens")
 
             //var s = document.documentElement.clientHeight - carousel.offsetHeight;
             //console.log(s)
-            var footr_b=$(".footer-b-c").height()
+            var footr_b = $(".footer-b-c").height()
             //console.log(document.documentElement.scrollTop)
-            var clienheigth=document.documentElement.clientHeight
-            var nav_height=$("#nav").height()
-            var footer_height=$(".footer").height()
-        //console.log(clienheigth)
-            var hiddens2=clienheigth-nav_height-footer_height
+            var clienheigth = document.documentElement.clientHeight
+            var nav_height = $("#nav").height()
+            var footer_height = $(".footer").height()
+            //console.log(clienheigth)
+            var hiddens2 = clienheigth - nav_height - footer_height
             //console.log(hiddens2)
-            var nav_footer=-$(".footer").height()-$("#nav").height()
-            if (document.documentElement.scrollTop>=4690) {
-                hiddens.style.height = hiddens2+"px"
-                if(clienheigth<=footer_height){
-                    $("#nav").css({top:"-50px",transaction:"all 0.3s"})
+            var nav_footer = -$(".footer").height() - $("#nav").height()
+            if (document.documentElement.scrollTop >= 4690) {
+                hiddens.style.height = hiddens2 + "px"
+                if (clienheigth <= footer_height) {
+                    $("#nav").css({top: "-50px", transaction: "all 0.3s"})
 
                 }
-                s=false
+                s = false
             } else {
-                $("#nav").css({top:"0"})
+                $("#nav").css({top: "0"})
                 hiddens.style.height = '0'
-                s=true
+                s = true
             }
 
         })
     })
 }
+
 offset();
-
-
 
 
 /*案例展示放大图片*/
 /*第一张*/
-var visible1=document.getElementById("visible1");//点击显示盒子按钮
-var v_hidden=document.getElementById("v_hidden");//显示盒子
+var visible1 = document.getElementById("visible1");//点击显示盒子按钮
+var v_hidden = document.getElementById("v_hidden");//显示盒子
 
-function Visible(){
-    v_hidden.style.display="block";//显示盒子
+function Visible() {
+    v_hidden.style.display = "block";//显示盒子
 }
-visible1.onclick=Visible;
 
-var hide=document.getElementById("hide"); //关闭按钮
+visible1.onclick = Visible;
 
-function Hide(){
-    v_hidden.style.display="none"; //隐藏盒子
+var hide = document.getElementById("hide"); //关闭按钮
+
+function Hide() {
+    v_hidden.style.display = "none"; //隐藏盒子
 
 }
-hide.onclick=Hide;
+
+hide.onclick = Hide;
 
 /*第二张*/
-var visible2=document.getElementById("visible2");//点击显示盒子按钮
-var v_hidden2=document.getElementById("v_hidden2");//显示盒子
+var visible2 = document.getElementById("visible2");//点击显示盒子按钮
+var v_hidden2 = document.getElementById("v_hidden2");//显示盒子
 
-function Visible2(){
-    v_hidden2.style.display="block";//显示盒子
+function Visible2() {
+    v_hidden2.style.display = "block";//显示盒子
 }
-visible2.onclick=Visible2;
+
+visible2.onclick = Visible2;
 
 
-var hide2=document.getElementById("hide2"); //关闭按钮
+var hide2 = document.getElementById("hide2"); //关闭按钮
 
-function Hide2(){
-    v_hidden2.style.display="none"; //隐藏盒子
+function Hide2() {
+    v_hidden2.style.display = "none"; //隐藏盒子
 }
-hide2.onclick=Hide2;
+
+hide2.onclick = Hide2;
 
 
 /*第三张*/
-var visible3=document.getElementById("visible3");//点击显示盒子按钮
-var v_hidden3=document.getElementById("v_hidden3");//显示盒子
+var visible3 = document.getElementById("visible3");//点击显示盒子按钮
+var v_hidden3 = document.getElementById("v_hidden3");//显示盒子
 
-function Visible3(){
-    v_hidden3.style.display="block";//显示盒子
+function Visible3() {
+    v_hidden3.style.display = "block";//显示盒子
 }
-visible3.onclick=Visible3;
+
+visible3.onclick = Visible3;
 
 
-var hide3=document.getElementById("hide3"); //关闭按钮
+var hide3 = document.getElementById("hide3"); //关闭按钮
 
-function Hide3(){
-    v_hidden3.style.display="none"; //隐藏盒子
+function Hide3() {
+    v_hidden3.style.display = "none"; //隐藏盒子
 }
-hide3.onclick=Hide3;
+
+hide3.onclick = Hide3;
 
 
 /*第四张*/
-var visible4=document.getElementById("visible4");//点击显示盒子按钮
-var v_hidden4=document.getElementById("v_hidden4");//显示盒子
+var visible4 = document.getElementById("visible4");//点击显示盒子按钮
+var v_hidden4 = document.getElementById("v_hidden4");//显示盒子
 
-function Visible4(){
-    v_hidden4.style.display="block";//显示盒子
+function Visible4() {
+    v_hidden4.style.display = "block";//显示盒子
 }
-visible4.onclick=Visible4;
+
+visible4.onclick = Visible4;
 
 
-var hide4=document.getElementById("hide4"); //关闭按钮
+var hide4 = document.getElementById("hide4"); //关闭按钮
 
-function Hide4(){
-    v_hidden4.style.display="none"; //隐藏盒子
+function Hide4() {
+    v_hidden4.style.display = "none"; //隐藏盒子
 }
-hide4.onclick=Hide4;
 
-
+hide4.onclick = Hide4;
 
 
 /*第五张*/
-var visible5=document.getElementById("visible5");//点击显示盒子按钮
-var v_hidden5=document.getElementById("v_hidden5");//显示盒子
+var visible5 = document.getElementById("visible5");//点击显示盒子按钮
+var v_hidden5 = document.getElementById("v_hidden5");//显示盒子
 
-function Visible5(){
-    v_hidden5.style.display="block";//显示盒子
-
-}
-visible5.onclick=Visible5;
-
-var hide5=document.getElementById("hide5"); //关闭按钮
-
-function Hide5(){
-    v_hidden5.style.display="none"; //隐藏盒子
+function Visible5() {
+    v_hidden5.style.display = "block";//显示盒子
 
 }
-hide5.onclick=Hide5;
+
+visible5.onclick = Visible5;
+
+var hide5 = document.getElementById("hide5"); //关闭按钮
+
+function Hide5() {
+    v_hidden5.style.display = "none"; //隐藏盒子
+
+}
+
+hide5.onclick = Hide5;
 
 /*第六张*/
-var visible6=document.getElementById("visible6");//点击显示盒子按钮
-var v_hidden6=document.getElementById("v_hidden6");//显示盒子
+var visible6 = document.getElementById("visible6");//点击显示盒子按钮
+var v_hidden6 = document.getElementById("v_hidden6");//显示盒子
 
-function Visible6(){
-    v_hidden6.style.display="block";//显示盒子
-
-}
-visible6.onclick=Visible6;
-
-var hide6=document.getElementById("hide6"); //关闭按钮
-
-function Hide6(){
-    v_hidden6.style.display="none"; //隐藏盒子
+function Visible6() {
+    v_hidden6.style.display = "block";//显示盒子
 
 }
-hide6.onclick=Hide6;
+
+visible6.onclick = Visible6;
+
+var hide6 = document.getElementById("hide6"); //关闭按钮
+
+function Hide6() {
+    v_hidden6.style.display = "none"; //隐藏盒子
+
+}
+
+hide6.onclick = Hide6;
 
 /*第七张*/
-var visible7=document.getElementById("visible7");//点击显示盒子按钮
-var v_hidden7=document.getElementById("v_hidden7");//显示盒子
+var visible7 = document.getElementById("visible7");//点击显示盒子按钮
+var v_hidden7 = document.getElementById("v_hidden7");//显示盒子
 
-function Visible7(){
-    v_hidden7.style.display="block";//显示盒子
-
-}
-visible7.onclick=Visible7;
-
-var hide7=document.getElementById("hide7"); //关闭按钮
-
-function Hide7(){
-    v_hidden7.style.display="none"; //隐藏盒子
+function Visible7() {
+    v_hidden7.style.display = "block";//显示盒子
 
 }
-hide7.onclick=Hide7;
 
+visible7.onclick = Visible7;
+
+var hide7 = document.getElementById("hide7"); //关闭按钮
+
+function Hide7() {
+    v_hidden7.style.display = "none"; //隐藏盒子
+
+}
+
+hide7.onclick = Hide7;
 
 
 /*第八张*/
-var visible8=document.getElementById("visible8");//点击显示盒子按钮
-var v_hidden8=document.getElementById("v_hidden8");//显示盒子
+var visible8 = document.getElementById("visible8");//点击显示盒子按钮
+var v_hidden8 = document.getElementById("v_hidden8");//显示盒子
 
-function Visible8(){
-    v_hidden8.style.display="block";//显示盒子
-
-}
-visible8.onclick=Visible8;
-
-var hide8=document.getElementById("hide8"); //关闭按钮
-
-function Hide8(){
-    v_hidden8.style.display="none"; //隐藏盒子
+function Visible8() {
+    v_hidden8.style.display = "block";//显示盒子
 
 }
-hide8.onclick=Hide8;
 
+visible8.onclick = Visible8;
+
+var hide8 = document.getElementById("hide8"); //关闭按钮
+
+function Hide8() {
+    v_hidden8.style.display = "none"; //隐藏盒子
+
+}
+
+hide8.onclick = Hide8;
 
 
 //系统内容展示区
 
 //关闭按钮
 //OA
-var system_hide=document.getElementById("system_hide")
-var abbr_system=document.getElementById("abbr_system")
+var system_hide = document.getElementById("system_hide")
+var abbr_system = document.getElementById("abbr_system")
 
 
-function  system() {
-    abbr_system.style.display="none"
+function system() {
+    abbr_system.style.display = "none"
 }
 
-system_hide.onclick=system;
-
+system_hide.onclick = system;
 
 
 //CRM
-var system_hide2=document.getElementById("system_hide2")
-var abbr_system2=document.getElementById("abbr_system2")
+var system_hide2 = document.getElementById("system_hide2")
+var abbr_system2 = document.getElementById("abbr_system2")
 
 
-function  system2() {
-    abbr_system2.style.display="none"
+function system2() {
+    abbr_system2.style.display = "none"
 }
 
-system_hide2.onclick=system2;
-
-
+system_hide2.onclick = system2;
 
 
 //ERP
-var system_hide3=document.getElementById("system_hide3")
-var abbr_system3=document.getElementById("abbr_system3")
+var system_hide3 = document.getElementById("system_hide3")
+var abbr_system3 = document.getElementById("abbr_system3")
 
 
-function  system3() {
-    abbr_system3.style.display="none"
+function system3() {
+    abbr_system3.style.display = "none"
 }
 
-system_hide3.onclick=system3;
+system_hide3.onclick = system3;
 
 
 //商超管理系统
 
-var system_hide4=document.getElementById("system_hide4")
-var abbr_system4=document.getElementById("abbr_system4")
+var system_hide4 = document.getElementById("system_hide4")
+var abbr_system4 = document.getElementById("abbr_system4")
 
 
-function  system4() {
-    abbr_system4.style.display="none"
+function system4() {
+    abbr_system4.style.display = "none"
 }
 
-system_hide4.onclick=system4;
+system_hide4.onclick = system4;
 
 
 //供应链系统
 
-var system_hide5=document.getElementById("system_hide5")
-var abbr_system5=document.getElementById("abbr_system5")
+var system_hide5 = document.getElementById("system_hide5")
+var abbr_system5 = document.getElementById("abbr_system5")
 
 
-function  system5() {
-    abbr_system5.style.display="none"
+function system5() {
+    abbr_system5.style.display = "none"
 }
 
-system_hide5.onclick=system5;
+system_hide5.onclick = system5;
 
 
 //人事管理系统
 
-var system_hide6=document.getElementById("system_hide6")
-var abbr_system6=document.getElementById("abbr_system6")
+var system_hide6 = document.getElementById("system_hide6")
+var abbr_system6 = document.getElementById("abbr_system6")
 
 
-function  system6() {
-    abbr_system6.style.display="none"
+function system6() {
+    abbr_system6.style.display = "none"
 }
 
-system_hide6.onclick=system6;
-
-
-
-
-
+system_hide6.onclick = system6;
 
 
 var aImages = document.getElementById("img").getElementsByTagName('img'); //获取id为img的文档内所有的图片
@@ -1112,22 +1074,23 @@ loadImg(aImages3);
 loadImg(aImages4);
 
 loadImg(aImages5);
-window.onscroll = function() { //滚动条滚动触发
+window.onscroll = function () { //滚动条滚动触发
     loadImg(aImages);
     loadImg(aImages2);
     loadImg(aImages3);
     loadImg(aImages4);
     loadImg(aImages5);
 };
+
 //getBoundingClientRect 是图片懒加载的核心
 function loadImg(arr) {
-    for(var i = 0, len = arr.length; i < len; i++) {
-        if(arr[i].getBoundingClientRect().top < document.documentElement.clientHeight && !arr[i].isLoad) {
+    for (var i = 0, len = arr.length; i < len; i++) {
+        if (arr[i].getBoundingClientRect().top < document.documentElement.clientHeight && !arr[i].isLoad) {
             arr[i].isLoad = true; //图片显示标志位
             //arr[i].style.cssText = "opacity: 0;";
-            (function(i) {
-                setTimeout(function() {
-                    if(arr[i].dataset) { //兼容不支持data的浏览器
+            (function (i) {
+                setTimeout(function () {
+                    if (arr[i].dataset) { //兼容不支持data的浏览器
                         aftLoadImg(arr[i], arr[i].dataset.imgurl);
                     } else {
                         aftLoadImg(arr[i], arr[i].getAttribute("data-imgurl"));
@@ -1141,7 +1104,7 @@ function loadImg(arr) {
 
 function aftLoadImg(obj, url) {
     var oImg = new Image();
-    oImg.onload = function() {
+    oImg.onload = function () {
         obj.src = oImg.src; //下载完成后将该图片赋给目标obj目标对象
     }
     oImg.src = url; //oImg对象先下载该图像
@@ -1150,44 +1113,44 @@ function aftLoadImg(obj, url) {
 //手机号
 
 $("#iphone").focus(function () {//得到焦点出现边框
-    $("#iphone").attr("placeholder","")
+    $("#iphone").attr("placeholder", "")
     $("#iphone").css({
-        border:"1px solid #1e90ff",
+        border: "1px solid #1e90ff",
     })
     //$(".reginputImg_img").removeClass("reginputImg_img").addClass("reginputImg_img2")
     // $(".reginputImg_img").css({
     //     background_image:"+url+(+'+../img/iphoneblue.png+'+)+"
     // })
     $("#reginputImg_img").css({
-        background:"url(img/iphoneblue.png) no-repeat",backgroundSize:"100% 100%"
+        background: "url(img/iphoneblue.png) no-repeat", backgroundSize: "100% 100%"
     })
 })
 
 
 $("#iphone").blur(function () {//失去焦点隐藏边框
-    $("#iphone").css({border:""})
-    $("#iphone").attr("placeholder","请输入11位正确号码")
-    $("#reginputImg_img").css({background:""})
+    $("#iphone").css({border: ""})
+    $("#iphone").attr("placeholder", "请输入11位正确号码")
+    $("#reginputImg_img").css({background: ""})
 
 })
 
 
 $("#iphone2").focus(function () {//得到焦点出现边框
-    $("#iphone2").attr("placeholder","")
+    $("#iphone2").attr("placeholder", "")
     $("#iphone2").css({
-        border:"1px solid #1e90ff",
+        border: "1px solid #1e90ff",
     })
     $("#reginputImg_iphone2").css({
-        background:"url(img/iphoneblue.png) no-repeat",
-        backgroundSize:"100% 100%"
+        background: "url(img/iphoneblue.png) no-repeat",
+        backgroundSize: "100% 100%"
     })
 
 })
 
 $("#iphone2").blur(function () {//失去焦点隐藏边框
-    $("#iphone2").css({border:""})
-    $("#iphone2").attr("placeholder","请输入11位正确号码")
-    $("#reginputImg_iphone2").css({background:"",backgroundSize:""})
+    $("#iphone2").css({border: ""})
+    $("#iphone2").attr("placeholder", "请输入11位正确号码")
+    $("#reginputImg_iphone2").css({background: "", backgroundSize: ""})
 })
 
 
@@ -1202,35 +1165,35 @@ $("#iphone2").blur(function () {//失去焦点隐藏边框
 
 //密码
 $("#password").focus(function () {//得到焦点出现边框
-    $("#password").css({border:"1px solid #1e90ff"})
-    $("#password").attr("placeholder","")
+    $("#password").css({border: "1px solid #1e90ff"})
+    $("#password").attr("placeholder", "")
     $("#reginputImg_pwd").css({
-        background:"url(img/mima2.png) no-repeat",backgroundSize:"100% 100%"
+        background: "url(img/mima2.png) no-repeat", backgroundSize: "100% 100%"
     })
 })
 
 $("#password").blur(function () {//失去焦点隐藏边框
-    $("#password").css({border:""})
-    $("#password").attr("placeholder","请输入登录密码")
+    $("#password").css({border: ""})
+    $("#password").attr("placeholder", "请输入登录密码")
     $("#reginputImg_pwd").css({
-        background:"",backgroundSize:""
+        background: "", backgroundSize: ""
     })
 })
 
 //登录密码
 $("#password3").focus(function () {//得到焦点出现边框
-    $("#password3").css({border:"1px solid #1e90ff"})
-    $("#password3").attr("placeholder","")
+    $("#password3").css({border: "1px solid #1e90ff"})
+    $("#password3").attr("placeholder", "")
     $("#reginputImg_pwd3").css({
-        background:"url(img/mima2.png) no-repeat",backgroundSize:"100% 100%"
+        background: "url(img/mima2.png) no-repeat", backgroundSize: "100% 100%"
     })
 })
 
 $("#password3").blur(function () {//失去焦点隐藏边框
-    $("#password3").css({border:""})
-    $("#password3").attr("placeholder","请输入登录密码")
+    $("#password3").css({border: ""})
+    $("#password3").attr("placeholder", "请输入登录密码")
     $("#reginputImg_pwd3").css({
-        background:"",backgroundSize:""
+        background: "", backgroundSize: ""
     })
 })
 
@@ -1246,41 +1209,38 @@ $("#password3").blur(function () {//失去焦点隐藏边框
 
 //确认密码
 $("#password2").focus(function () {//得到焦点出现边框
-    $("#password2").css({border:"1px solid #1e90ff"})
-    $("#password2").attr("placeholder","")
+    $("#password2").css({border: "1px solid #1e90ff"})
+    $("#password2").attr("placeholder", "")
     $("#reginputImg_pwd2").css({
-        background:"url(img/mima2.png) no-repeat",backgroundSize:"100% 100%"
+        background: "url(img/mima2.png) no-repeat", backgroundSize: "100% 100%"
     })
 })
 
 $("#password2").blur(function () {//失去焦点隐藏边框
-    $("#password2").css({border:""})
-    $("#password2").attr("placeholder","请确认登录密码")
+    $("#password2").css({border: ""})
+    $("#password2").attr("placeholder", "请确认登录密码")
     $("#reginputImg_pwd2").css({
-        background:"",backgroundSize:""
+        background: "", backgroundSize: ""
     })
 })
 
 //验证码
 $("#code_input").focus(function () {//得到焦点出现边框
-    $("#code_input").css({border:"1px solid #1e90ff"})
-    $("#code_input").attr("placeholder","")
+    $("#code_input").css({border: "1px solid #1e90ff"})
+    $("#code_input").attr("placeholder", "")
     $("#reginputImg_yzm").css({
-        background:"url(img/dunpaiblue.png) no-repeat",backgroundSize:"100% 100%"
+        background: "url(img/dunpaiblue.png) no-repeat", backgroundSize: "100% 100%"
     })
 
 })
 
 $("#code_input").blur(function () {//失去焦点隐藏边框
-    $("#code_input").css({border:""})
-    $("#code_input").attr("placeholder","请输入短信验证码")
+    $("#code_input").css({border: ""})
+    $("#code_input").attr("placeholder", "请输入短信验证码")
     $("#reginputImg_yzm").css({
-        background:"",backgroundSize:""
+        background: "", backgroundSize: ""
     })
 })
-
-
-
 
 
 var validate_phone = function (phone) {
@@ -1297,22 +1257,21 @@ var validate_phone = function (phone) {
 };
 
 
-
-$("#v_container").click(function(){
+$("#v_container").click(function () {
     // 注册框点击发送短信按钮事件.
     var phone = $.trim($("#iphone").val());
-    if(validate_phone(phone)){
+    if (validate_phone(phone)) {
         var url = "/sms/get";
         var args = {"phone": phone, "csrf_token": $("#csrf_token").val()};
-        $.post(url, args, function(resp){
+        $.post(url, args, function (resp) {
             var resp = JSON.parse(resp);
             var status = resp['message'];
-            if(status === "success"){
+            if (status === "success") {
                 alert("短信已发送,请注意查收.");
-                return  true;
+                return true;
 
             }
-            else{
+            else {
                 alert(status);
                 return false;
             }
@@ -1320,36 +1279,34 @@ $("#v_container").click(function(){
 
         var clock = '';
         var nums = 60;
-        var col="#bbb";
-        var v_container=document.getElementById("v_container");
+        var col = "#bbb";
+        var v_container = document.getElementById("v_container");
 
-        function sendCode()
-        {
+        function sendCode() {
             v_container.disabled = true; //将按钮置为不可点击
-            v_container.style.background= col; //将按钮置为不可点击
-            v_container.value = nums+'秒后可重新获取';
+            v_container.style.background = col; //将按钮置为不可点击
+            v_container.value = nums + '秒后可重新获取';
             clock = setInterval(doLoop, 1000); //一秒执行一次
         }
-        function doLoop()
-        {
+
+        function doLoop() {
             nums--;
-            if(nums > 0){
-                v_container.value = nums+'秒后可重新获取';
-            }else{
+            if (nums > 0) {
+                v_container.value = nums + '秒后可重新获取';
+            } else {
                 clearInterval(clock); //清除js定时器
                 v_container.disabled = false;
-                v_container.style.background=""
+                v_container.style.background = ""
                 v_container.value = '点击发送验证码';
                 nums = 60; //重置时间
             }
         }
+
         sendCode()
 
 
-
-
     }
-    else{
+    else {
         var str = `手机号码不正确!`;
         alert(str);
 
@@ -1357,41 +1314,49 @@ $("#v_container").click(function(){
     }
 });
 
-$("#su_mit").click(function(){
+$("#code_input").keydown(function(event){
+    // 注册框的短信输入框回车事件
+    var code = event.keyCode;
+    if(code === 13){
+        $("#su_mit").click();
+    }
+});
+
+$("#su_mit").click(function () {
     /*提交注册信息的函数*/
     var phone = $.trim($("#iphone").val());
     var password = $.trim($("#password").val());
     var password2 = $.trim($("#password2").val());
     var code = $.trim($("#code_input").val());
-    if(phone === ""){
+    if (phone === "") {
 
         alert("手机号码必须");
-        $("#iphone").css({border:"1px solid red"})
+        $("#iphone").css({border: "1px solid red"})
         return false;
     }
-    else if(!validate_phone(phone)){
+    else if (!validate_phone(phone)) {
         alert("手机号码不正确");
-        $("#iphone").css({border:"1px solid red"})
+        $("#iphone").css({border: "1px solid red"})
         return false;
 
     }
-    else if(password === "" || password !== password2){
+    else if (password === "" || password !== password2) {
         alert("密码不能为空且两次输入的密码必须一致");
-        $("#password").css({border:"1px solid red"})
-        $("#password2").css({border:"1px solid red"})
+        $("#password").css({border: "1px solid red"})
+        $("#password2").css({border: "1px solid red"})
         return false;
     }
-    else if(code === ""){
+    else if (code === "") {
         alert("短信验证码不能为空");
-        $("#code_input").css({border:"1px solid red"})
+        $("#code_input").css({border: "1px solid red"})
         return false;
     }
-    else if(code.length !== 4){
+    else if (code.length !== 4) {
         alert("短信验证码是4位数字");
-        $("#code_input").css({border:"1px solid red"})
+        $("#code_input").css({border: "1px solid red"})
         return false;
     }
-    else{
+    else {
         // $("#iphone").css({border:""})
         // $("#password").css({border:""})
         // $("#password2").css({border:""})
@@ -1404,14 +1369,14 @@ $("#su_mit").click(function(){
             "csrf_token": $("#csrf_token").val()
         };
         var url = "/register";
-        $.post(url, args, function(resp){
+        $.post(url, args, function (resp) {
             var json = JSON.parse(resp);
             var status = json['message'];
-            if(status === "success"){
+            if (status === "success") {
                 alert("注册成功!");
                 location.reload();
             }
-            else{
+            else {
                 alert(status);
                 return false;
             }
@@ -1420,50 +1385,51 @@ $("#su_mit").click(function(){
 });
 
 
-$("#su_mit2").click(function(){
+$("#password3").keydown(function(event){
+    // 登录页面,密码输入框回车事件.
+    var code = event.keyCode;
+    if(code === 13){
+        $("#su_mit2").click();
+    }
+});
+
+
+$("#su_mit2").click(function () {
     var phone = $.trim($("#iphone2").val());
     var password = $.trim($("#password3").val());
-    if(phone=== ""){
+    if (phone === "") {
         alert("账户不能为空!");
-        $("#iphone2").css({border:"1px solid red"})
+        $("#iphone2").css({border: "1px solid red"})
         return false;
 
-    }else if(password === ""){
+    } else if (password === "") {
         alert("密码不能为空!");
 
-        $("#password3").css({border:"1px solid red"})
+        $("#password3").css({border: "1px solid red"})
         return false;
-    }else{
+    } else {
         var url = "/login";
         var args = {
             "phone": phone,
             "password": $.md5(password),
             "csrf_token": $("#csrf_token").val()
         };
-        $.post(url, args, function(resp){
+        $.post(url, args, function (resp) {
             var json = JSON.parse(resp);
             var status = json['message'];
-            if(status === "success"){
+            if (status === "success") {
                 console.log("登录成功");
                 /*执行登录成功后的函数*/
+                location.reload();
             }
-            else{
+            else {
                 alert(status);
-
-
 
                 return false;
             }
         });
     }
 });
-// if(phone === "" || password === ""){
-//     alert("账户和密码不能为空!");
-//     $("#iphone2").css({border:"1px solid red"})
-//     $("#password3").css({border:"1px solid red"})
-//     return false;
-// }
-
 
 
 function sildshow() {
@@ -1471,48 +1437,50 @@ function sildshow() {
     $(".sideTitle div").eq(0).siblings().hide();
     $(".sideContent_left_Box .sideContent_left_box").eq(0).siblings().hide();
     $(".sideContent_right_Box .sideContent_right_B").eq(0).siblings().hide();
-    $("#may_product_ul li").eq(0).css({boxShadow:"0 0 6px 1px #999"})
+    $("#may_product_ul li").eq(0).css({boxShadow: "0 0 6px 1px #999"})
     $("#may_product_ul li").click(function () {
         $(".sideTitle div").eq($(this).index()).show().siblings().hide();
         $(".sideContent_left_Box .sideContent_left_box").eq($(this).index()).show().siblings().hide();
         $(".sideContent_right_Box .sideContent_right_B").eq($(this).index()).show().siblings().hide();
-        $("#may_product_ul li").eq($(this).index()).css({boxShadow:"0 0  6px 1px #999"}).siblings().css({boxShadow: ""})
+        $("#may_product_ul li").eq($(this).index()).css({boxShadow: "0 0  6px 1px #999"}).siblings().css({boxShadow: ""})
         x = $(this).index()
     });
 
-    var x=0;
-    function ti(){
+    var x = 0;
+
+    function ti() {
         x++;
-        if(x==$("#may_product_ul li").length){
-            x=0;
+        if (x == $("#may_product_ul li").length) {
+            x = 0;
         }
         $(".sideTitle div").eq(x).show().siblings().hide();
         $(".sideContent_left_Box .sideContent_left_box").eq(x).show().siblings().hide();
         $(".sideContent_right_Box .sideContent_right_B").eq(x).show().siblings().hide();
-        $("#may_product_ul li").eq(x).css({boxShadow:"0 0  6px 1px #999"}).siblings().css({boxShadow: ""})
+        $("#may_product_ul li").eq(x).css({boxShadow: "0 0  6px 1px #999"}).siblings().css({boxShadow: ""})
     }
-    T=setInterval(ti,2500);
+
+    T = setInterval(ti, 2500);
 
 
-    $(".sideContent").mouseover(function(){
+    $(".sideContent").mouseover(function () {
         clearInterval(T)
     });
 
 
-    $(".sideContent").mouseout(function(){
-        T=setInterval(ti,2500)
+    $(".sideContent").mouseout(function () {
+        T = setInterval(ti, 2500)
     });
 
-    $("#may_product_ul").mouseover(function(){
+    $("#may_product_ul").mouseover(function () {
         clearInterval(T)
 
     });
 
-    $("#may_product_ul").mouseout(function(){
-        T=setInterval(ti,2500)
+    $("#may_product_ul").mouseout(function () {
+        T = setInterval(ti, 2500)
     });
 }
 
-sildshow()
+sildshow();
 
 

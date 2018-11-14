@@ -170,9 +170,6 @@ header .reg {
   -webkit-align-items: center;
   align-items: center;
 }
-.swiper-container2 .lwc-imghandle:nth-child(2n) {
-  width: 60%;
-}
 .swiper-container2 {
   width: 100%;
   height: 100%;
@@ -200,6 +197,9 @@ header .reg {
   display: block;
   height: 180px;
 }
+.swiper-container2 .swiper-slide .erps {
+  width: 100%;
+}
 .swiper-container2 .swiper-slide a img {
   width: 100%;
   height: 100%;
@@ -210,14 +210,14 @@ header .reg {
 }
 .swiper-container2 .lwc-imghandle .swiper-slide_txt {
   position: absolute;
-  width: 248px;
+  width: 100%;
   height: 180px;
   text-align: center;
-  background: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.5);
   margin-left: 10px;
 }
 .swiper-container2 .lwc-imghandle .swiper-slide_txt2 {
-  width: 331px;
+  width: 100%;
 }
 .swiper-container2 .lwc-imghandle .swiper-slide_txt h4 {
   color: #383636;
@@ -364,27 +364,34 @@ header .reg {
 .sildeShow .sildeShow_hd h4 {
   float: left;
   font-size: 0.3rem;
-  margin-left: 5px;
+  margin-left: 12px;
   font-weight: normal;
 }
 .sildeShow .sildeShow_hd .keji {
   margin-left: 12px;
 }
 .sildeShow .sildeShow_hd .zhineng {
-  margin-left: 9px;
+  margin-left: 13px;
 }
 .sildeShow .sildeShow_hd .qiye {
   margin-left: 12px;
 }
 .sildeShow .sildeShow_hd .sildeShow_hd_icon {
   float: right;
-  background: url("../img/xiahua.png") no-repeat;
-  width: 22px;
-  height: 10px;
-  margin-top: 16px;
+  background: url("../img/shanghuabtn.png") no-repeat;
+  background-size: 100% 100%;
+  width: 28px;
+  height: 24px;
+  margin-top: 9px;
 }
 .sildeShow_hd .customization {
   position: relative;
+}
+.sildeShow_hd .customization .customization_p {
+  width: 50%;
+  float: left;
+  font-size: 12px;
+  text-align: left;
 }
 .sildeShow_hd .sildeShow_hd_border {
   position: absolute;
@@ -399,7 +406,7 @@ header .reg {
   font-size: 0.3rem;
 }
 .opens {
-  height: 84px;
+  height: 124px;
   line-height: 41px;
   border: 1px solid #6ebff8;
   padding: 0 4px;
@@ -418,27 +425,34 @@ header .reg {
 .sildeShow .opens h4 {
   float: left;
   font-size: 0.3rem;
-  margin-left: 5px;
+  margin-left: 12px;
   font-weight: normal;
 }
 .sildeShow .opens .keji {
   margin-left: 12px;
 }
 .sildeShow .opens .zhineng {
-  margin-left: 9px;
+  margin-left: 13px;
 }
 .sildeShow .opens .qiye {
   margin-left: 12px;
 }
 .sildeShow .opens .sildeShow_hd_icon {
   float: right;
-  background: url("../img/xiahua.png") no-repeat;
-  width: 22px;
-  height: 10px;
-  margin-top: 16px;
+  background: url("../img/xiahuabtn.png") no-repeat;
+  background-size: 100% 100%;
+  width: 28px;
+  height: 24px;
+  margin-top: 9px;
 }
 .opens .customization {
   position: relative;
+}
+.opens .customization .customization_p {
+  width: 50%;
+  float: left;
+  font-size: 12px;
+  text-align: left;
 }
 .opens .sildeShow_hd_border {
   position: absolute;
@@ -530,7 +544,7 @@ footer .footer_top ul .vip img {
 }
 footer .footer_top ul .ershi img {
   width: 49px;
-  height: 45px;
+  height: 47px;
 }
 .footer_top ul li p {
   font-size: 0.24rem;

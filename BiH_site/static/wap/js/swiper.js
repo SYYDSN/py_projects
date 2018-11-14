@@ -5749,7 +5749,7 @@
       if (!gesture.$slideEl || !gesture.$slideEl.length) {
         gesture.$slideEl = $(e.target).closest('.swiper-slide');
         if (gesture.$slideEl.length === 0) { gesture.$slideEl = swiper.slides.eq(swiper.activeIndex); }
-        gesture.$imageEl = gesture.$slideEl.find('img, svg, canvas');
+        gesture.$imageEl = gesture.$slideEl.find('css, svg, canvas');
         gesture.$imageWrapEl = gesture.$imageEl.parent(("." + (params.containerClass)));
         gesture.maxRatio = gesture.$imageWrapEl.attr('data-swiper-zoom') || params.maxRatio;
         if (gesture.$imageWrapEl.length === 0) {
@@ -5992,7 +5992,7 @@
 
       if (!gesture.$slideEl) {
         gesture.$slideEl = swiper.clickedSlide ? $(swiper.clickedSlide) : swiper.slides.eq(swiper.activeIndex);
-        gesture.$imageEl = gesture.$slideEl.find('img, svg, canvas');
+        gesture.$imageEl = gesture.$slideEl.find('css, svg, canvas');
         gesture.$imageWrapEl = gesture.$imageEl.parent(("." + (params.containerClass)));
       }
       if (!gesture.$imageEl || gesture.$imageEl.length === 0) { return; }
@@ -6078,7 +6078,7 @@
 
       if (!gesture.$slideEl) {
         gesture.$slideEl = swiper.clickedSlide ? $(swiper.clickedSlide) : swiper.slides.eq(swiper.activeIndex);
-        gesture.$imageEl = gesture.$slideEl.find('img, svg, canvas');
+        gesture.$imageEl = gesture.$slideEl.find('css, svg, canvas');
         gesture.$imageWrapEl = gesture.$imageEl.parent(("." + (params.containerClass)));
       }
       if (!gesture.$imageEl || gesture.$imageEl.length === 0) { return; }

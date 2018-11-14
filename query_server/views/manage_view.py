@@ -8,10 +8,10 @@ from flask import request
 from flask import Blueprint
 from flask import render_template
 from flask import abort
-from module.system_module import User
+from module.system_module import *
 import json
 import datetime
-from flask.views import MethodView
+from orm_module import MyView
 from tools_module import *
 
 
@@ -77,8 +77,11 @@ def login_func():
         return abort(405)
 
 
-class LogoutView(MethodView):
+class LogoutView(MyView):
     """注销视图"""
+    _access_rules = dict()
+    _access_rules[3] = "允许所有人访问注销链接"
+
     def get(self):
         clear_platform_session()
         return redirect(url_for("manage_blueprint.login_func"))
@@ -87,7 +90,7 @@ class LogoutView(MethodView):
         return self.get()
 
 
-class ManageUserView(MethodView):
+class ManageUserView(MyView):
     """管理用户页面视图函数"""
     @check_session
     def get(self, user: User):
@@ -105,48 +108,31 @@ class ManageUserView(MethodView):
         return render_template("manage_user.html", **render_data)
 
 
-# def common_func(root: User = None, file_name: str = ''):
-#     """
-#     通用视图 此函数闲置不用.
-#     :param root: 用户对象
-#     :param file_name:  访问的html文件名,带不带html后缀都可以
-#     :return:
-#     """
-#     method = request.method.lower()
-#     if root is None:
-#         return abort(401)
-#     elif file_name == '':
-#         return abort(404, 'file name is null')
-#     elif method not in ['get', 'post']:
-#         return abort(405)
-#     elif method == 'get':
-#         """返回页面"""
-#         file_path = os.path.join(__project_dir__, 'templates', 'root')
-#         if file_name.endswith(".html"):
-#             pass
-#         else:
-#             file_name = "{}.html".format(file_name)
-#         files = os.listdir(file_path)
-#         files = [x for x in files if x not in ['root_login.html']]
-#         if file_name in files:
-#             kws = dict()
-#             if file_name == "manage_user.html":
-#                 kws['page_title'] = "用户管理"
-#             else:
-#                 pass
-#             template = "root/{}".format(file_name)
-#             return render_template(template, **kws)
-#         else:
-#             return abort(404, "not found '{}'".format(file_name))
-#     else:
-#         mes = {"message": "success"}
-#         return json.dumps(mes)
+class ManageRoleView(MyView):
+    """管理权限页面视图函数"""
+    @check_session
+    def get(self, user: User):
+        """返回管理权限界面"""
+        render_data['page_title'] = "权限管理"
+        rule = request.path.lower()
+        method = request.method.lower()
+        render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
+        access_filter = User.get_access_filter(user=user, rule=rule, method=method)
+        r = Role.views_info(filter_dict=access_filter)  # 角色列表
+        roles = r.pop("data")
+        roles = roles * 12
+        render_data['roles'] = roles
+        render_data.update(r)
+        all_rules = Role.all_rules()
+        render_data['rules'] = all_rules
+        return render_template("manage_role.html", **render_data)
 
 
 """集中注册视图函数"""
 """登录"""
 manage_blueprint.add_url_rule(rule="/login", view_func=login_func, methods=['get', 'post'])
 """注销"""
+LogoutView.register(manage_blueprint)
 manage_blueprint.add_url_rule(
     rule="/logout", view_func=LogoutView.as_view(name="logout_view"), methods=['get', 'post']
 )
@@ -154,3 +140,9 @@ manage_blueprint.add_url_rule(
 manage_blueprint.add_url_rule(
     rule="/user", view_func=ManageUserView.as_view(name="user_view"), methods=['get', 'post']
 )
+"""管理权限页面"""
+manage_blueprint.add_url_rule(
+    rule="/role", view_func=ManageRoleView.as_view(name="role_view"), methods=['get', 'post']
+)
+
+MyView.register(manage_blueprint, "/xxx")

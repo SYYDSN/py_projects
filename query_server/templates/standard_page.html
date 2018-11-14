@@ -53,7 +53,7 @@
                         <ul>
                             {% for child in nav.children %}
                                 <li>
-                                    <a class="nav_name" href="javascript:;">
+                                    <a class="nav_name" href="{{ child.path }}">
                                         {{ child.name }}
                                     </a>
                                 </li>
