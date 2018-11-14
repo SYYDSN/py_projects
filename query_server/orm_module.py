@@ -2786,10 +2786,10 @@ class MyView(MethodView):
     自定义视图.可以定制用户的访问权限
     """
     _access_rules = OrderedDict()           # 定义访问级别
-    _access_rules[0] = "禁止访问"
-    _access_rules[1] = "访问自己的数据"
-    _access_rules[2] = "访问本部门的数据"
-    _access_rules[3] = "无限制的访问数据"
+    _access_rules[0] = "禁止访问本视图"
+    _access_rules[1] = "只能在本视图中访问自己的数据"
+    _access_rules[2] = "只能在本视图中访问本部门/组的数据"
+    _access_rules[3] = "本视图对数据的访问没有限制"
 
     _root_role = ObjectId("5bdfad388e76d6efa7b92d9e")  # 设置root权限组的id,此角色有全部的访问权限
     _endpoint = None                                   # 定义endpoint名 子类必须定义,否则自动使用类名称替代

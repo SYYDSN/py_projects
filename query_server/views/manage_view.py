@@ -79,8 +79,9 @@ def login_func():
 
 class LogoutView(MyView):
     """注销视图"""
-    _access_rules = dict()
-    _access_rules[3] = "允许所有人访问注销链接"
+    _allowed = [3]
+    _endpoint = "logout_view"
+    _rule = "/logout"
 
     def get(self):
         clear_platform_session()
@@ -133,9 +134,7 @@ class ManageRoleView(MyView):
 manage_blueprint.add_url_rule(rule="/login", view_func=login_func, methods=['get', 'post'])
 """注销"""
 LogoutView.register(manage_blueprint)
-manage_blueprint.add_url_rule(
-    rule="/logout", view_func=LogoutView.as_view(name="logout_view"), methods=['get', 'post']
-)
+
 """管理用户页面"""
 manage_blueprint.add_url_rule(
     rule="/user", view_func=ManageUserView.as_view(name="user_view"), methods=['get', 'post']
