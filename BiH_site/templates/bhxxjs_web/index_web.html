@@ -9,12 +9,18 @@
 </head>
 <body>
 <!--头部-->
-<header>
+<header class="header_index">
     <div class="logo">
         <img src="img/logo_white.png">
     </div>
     <p class="bh">必弘科技</p>
-    <div class="reg" href="javascript:;">注册有礼</div>
+    <!--显示用户信息-->
+    <span id="user"></span>
+    <!--显示用户信息-->
+    <a class="reg" id="reg" href="reg.html">注册</a>
+    <!--注册成功之后跳转到登录界面-->
+    <a id="login" style="margin-right: 5px"  class="reg" href="login.html">登录</a>
+    <!--注册+登录成功后 或者登录成功后 隐藏 注册和登录两个标签-->
 </header>
 <!--轮播-->
 <div class="swiper-container swiper-container1">
@@ -99,7 +105,6 @@
         <div class="function">
             <img src="img/erm.png">
         </div>
-
         <p>ERP系统系统</p>
     </div>
     <div  class="Introduction_h">
@@ -323,6 +328,11 @@
     });
 </script>
 <script src="js/jquery.js"></script>
+<script src="js/login_reg.js"></script>
 <script src="js/index_web.js"></script>
+
+<script>
+
+</script>
 </body>
 </html>

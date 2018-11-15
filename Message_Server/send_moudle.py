@@ -24,7 +24,8 @@ url_map = {
     "group_005": "c035b57d094e021474bcc4fb6d0183677fe48a07f6e8fc53c611ffc182d3c4f7",  # 分组出入金消息
     "入金宣传": "be6e9de55c5777862fb37a62bcfcc6a1af6590ed8fb80e82392667bb01808526",  # 入金宣传
     "素材群": "497a9b8dcbde3bc6bcc55867c0963cf17f71bea2530ed7c3b606e85c4b18d1c2",   # 素材群
-    "高管沟通群": "b0d40fa1e3d589eae169ab4e3a7f13628b47e836d35a75f891fb83473bdc428b"   # 高管沟通群
+    "高管沟通群": "6c58b6174a3523ccc942db00bfdb4f978a0859b274469b22701de667b7c65d16",   # 高管沟通群
+    "管理沟通群": "b0d40fa1e3d589eae169ab4e3a7f13628b47e836d35a75f891fb83473bdc428b"   # 管理沟通群
 }
 
 

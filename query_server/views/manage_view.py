@@ -79,9 +79,9 @@ def login_func():
 
 class LogoutView(MyView):
     """注销视图"""
-    _allowed = [3]
     _endpoint = "logout_view"
     _rule = "/logout"
+    _allowed = [3]
 
     def get(self):
         clear_platform_session()

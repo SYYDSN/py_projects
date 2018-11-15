@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="css/index_web.css">
+    <title>用户登录</title>
+    <style>
+        html,body{
+            background: #f4f1f1;
+            height: 100%;
+        }
+        .reg_header{
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: #40464d;
+
+        }
+
+        .reg_header .top{
+            font-size: .33rem;
+            color: white;
+        }
+
+
+        .reg{
+            width: 100%;
+            height: calc(100% - 40px);
+            overflow: hidden;
+            background: #fff;
+            /*-webkit-box-shadow: 1px 2px 9px #999;*/
+            /*-moz-box-shadow: 1px 2px 9px #999;*/
+            /*-ms-box-shadow: 1px 2px 9px #999;*/
+            /*-o-box-shadow: 1px 2px 9px #999;*/
+            /*box-shadow: 1px 2px 9px #999*/
+        }
+        input[type="button"], input[type="submit"], input[type="reset"],input[type="text"],input[type="password"]{
+            -webkit-appearance: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+
+    </style>
+</head>
+<body>
+{{ form.hidden_tag() }}
+<header class="reg_header">
+    <div class="top">登录</div>
+</header>
+
+<div class="reg">
+    <div class="reg-b">
+        <div class="reg-box" id="reg-box2">
+        <div class="regInputBox">
+        <div class="reginputImg">
+        <i class="reginputImg_img" id="reginputImg_iphone2"></i>
+        </div>
+        <input type="text" class="regInput  " maxlength="11" id="iphone2" placeholder="请输入11位正确号码">
+        <!--<div class="regInputTips" id="regInputTips">手机号码不能为空</div>-->
+        <!-- 手机号输入框没有内容且失去焦点时显示这个ID的内容 regInputTips-->
+        </div>
+        <div class="regInputBox">
+        <div class="reginputImg reginputImgPsw">
+        <i class="reginputImg_img" id="reginputImg_pwd3"></i>
+        </div>
+        <input type="password" class="regInput " placeholder="请输入登录密码" id="password3" maxlength="16">
+        <!--<div class="regInputTips" id="regInputTips2">密码必须在6-16个字符之间,由数字、大小写字母、特殊字符组成</div>-->
+        <!-- 密码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips-->
+        </div>
+
+        <div class="regInputBox">
+        <div class="regYZMbox" id="regYZMbox2">
+        <input class="regInputYZM" type="text" id="code_input2" value="" placeholder="请输入验证码" maxlength="4">
+        <a href="javascript:;" class="sx_btn" id="my_button2"></a>
+        <div class="ver_mid2"   id="v_container2"></div>
+        <!---->
+        </div>
+        <!--<div class="regInputTips" id="regInputTips3">请输入验证码</div>-->
+        <!-- 验证码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips3-->
+        </div>
+        <div>
+        <input class="regBtnOrg" value="登录" type="button" id="su_mit2">
+        <!--<div class="regInputTips">-->
+        <!--当前系统繁忙，请稍后再试-->
+        <!--</div>-->
+
+        </div>
+        <div class="fontcLBlack fonts12 account">
+        没有账号？<a href="reg.html" class="regBule" id="su-login2">快速注册</a>
+        </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.js"></script>
+<script src="js/jquery.md5.js"></script>
+<script src="js/login_reg.js"></script>
+<script>
+    $("#iphone2").focus(function () {//得到焦点出现边框
+        $("#iphone2").attr("placeholder", "")
+        $("#iphone2").css({
+            border: "1px solid #1e90ff",
+        })
+        $("#reginputImg_iphone2").css({
+            background: "url(img/iphoneblue.png) no-repeat",
+            backgroundSize: "100% 100%"
+        })
+
+    })
+
+    $("#iphone2").blur(function () {//失去焦点隐藏边框
+        $("#iphone2").css({border: ""})
+        $("#iphone2").attr("placeholder", "请输入11位正确号码")
+        $("#reginputImg_iphone2").css({background: "", backgroundSize: ""})
+    })
+
+    //登录密码
+    $("#password3").focus(function () {//得到焦点出现边框
+        $("#password3").css({border: "1px solid #1e90ff"})
+        $("#password3").attr("placeholder", "")
+        $("#reginputImg_pwd3").css({
+            background: "url(img/mima2.png) no-repeat", backgroundSize: "100% 100%"
+        })
+    })
+
+    $("#password3").blur(function () {//失去焦点隐藏边框
+        $("#password3").css({border: ""})
+        $("#password3").attr("placeholder", "请输入登录密码")
+        $("#reginputImg_pwd3").css({
+            background: "", backgroundSize: ""
+        })
+    })
+
+
+
+</script>
+</html>

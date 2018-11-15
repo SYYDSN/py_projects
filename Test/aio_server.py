@@ -31,5 +31,8 @@ async def query_func(request):
 if __name__ == "__main__":
     app.router.add_routes(routes)
     aiohttp.web.run_app(app=app, host="0.0.0.0", port=port)
-    """不知道为何速度很慢,应该是程序写的问题"""
+    """
+    工厂模式
+    gunicorn aio_server:app --bind 127.0.0.1:7011 --worker-class aiohttp.GunicornWebWorker --workers 4
+    """
     pass

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0">
+    <title>用户注册</title>
+    <link rel="stylesheet" href="css/index_web.css">
+
+    <style>
+        html,body{
+            background: #f4f1f1;
+            height: 100%;
+        }
+        .reg_header{
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: #40464d;
+
+        }
+
+        .reg_header .top{
+            font-size: .33rem;
+            color: white;
+        }
+        input[type="button"], input[type="submit"], input[type="reset"],input[type="text"],input[type="password"]{
+            -webkit-appearance: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+
+        .reg{
+            width: 100%;
+            /*height: 400px;*/
+            height: calc(100% - 40px);
+            background: #fff;
+            /*-webkit-box-shadow: 1px 2px 9px #999;*/
+            /*-moz-box-shadow: 1px 2px 9px #999;*/
+            /*-ms-box-shadow: 1px 2px 9px #999;*/
+            /*-o-box-shadow: 1px 2px 9px #999;*/
+            /*box-shadow: 1px 2px 9px #999;*/
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+<body>
+{{ form.hidden_tag() }}
+<!--<div class="tiaozhuan" style="background: pink;height: auto;-->
+<!--width: 100%">跳转</div>-->
+<header class="reg_header">
+    <div class="top">注册</div>
+</header>
+<div class="reg">
+    <div class="reg-b">
+        <div class="reg-box" id="reg-box1">
+            <div class="regInputBox">
+                    <div class="reginputImg">
+                        <i class="reginputImg_img" id="reginputImg_img"></i>
+                    </div>
+                    <input type="text" class="regInput  " maxlength="11" id="iphone" placeholder="请输入11位正确号码">
+                    <!--<div class="regInputTips" id="regInputTips">手机号码不能为空</div>-->
+                    <!-- 手机号输入框没有内容且失去焦点时显示这个ID的内容 regInputTips-->
+
+            </div>
+            <div class="regInputBox">
+                    <div class="reginputImg reginputImgPsw">
+                        <i class="reginputImg_img" id="reginputImg_pwd"></i>
+                    </div>
+                    <input type="password" class="regInput " placeholder="请设置登录密码" id="password" maxlength="16">
+                    <!--<div class="regInputTips" id="regInputTips2">密码必须在6-16个字符之间,由数字、大小写字母、特殊字符组成</div>-->
+                    <!-- 密码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips-->
+            </div>
+            <!--<div class="regInputBox">-->
+                <!--<div class="reginputImg reginputImgPsw">-->
+                    <!--<i class="reginputImg_img" id="reginputImg_pwd2"></i>-->
+                <!--</div>-->
+                <!--<input type="password" class="regInput " placeholder="请确认登录密码" id="password2" maxlength="16">-->
+                <!--&lt;!&ndash;<div class="regInputTips" id="regInputTips2">密码必须在6-16个字符之间,由数字、大小写字母、特殊字符组成</div>&ndash;&gt;-->
+                <!--&lt;!&ndash; 密码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips2&ndash;&gt;-->
+            <!--</div>-->
+            <div class="regInputBox">
+                <div class="regYZMbox" id="regYZMbox">
+                    <i class="reginputImg_img" id="reginputImg_yzm"></i>
+                    <!---->
+                </div>
+                <input class="regInputYZM" type="text" id="code_input" value="" placeholder="请输入短信验证码" maxlength="4">
+                <!--<a href="javascript:;" class="sx_btn" id="my_button"></a>-->
+                <input class="ver_mid"  type="button" id="v_container" value="获取短信验证码">
+                <!--<div class="regInputTips" id="regInputTips3">请输入验证码</div>-->
+                <!-- 验证码输入框没有内容且失去焦点时提示这个ID的内容 regInputTips3-->
+            </div>
+
+            <div>
+                <input class="regBtnOrg" value="立即注册" type="button" id="su_mit">
+                <div class="regInputTips">
+                    当前系统繁忙，请稍后再试
+                </div>
+            </div>
+            <div class="fontcLBlack fonts12 account">
+                已有账号？<a  href="login.html" class="regBule" id="su-login">快速登陆</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="js/jquery.js"></script>
+<script src="js/jquery.md5.js"></script>
+<script src="js/login_reg.js"></script>
+<script>
+
+
+    // var heigth=document.body.clientWidth
+    // alert(heigth)
+    //手机号码
+    $("#iphone").focus(function ()
+
+    {//得到焦点出现边框
+        $("#iphone").attr("placeholder", "")
+        $("#iphone").css({
+            border: "1px solid #1e90ff",
+        })
+        //$(".reginputImg_img").removeClass("reginputImg_img").addClass("reginputImg_img2")
+        // $(".reginputImg_img").css({
+        //     background_image:"+url+(+'+../img/iphoneblue.png+'+)+"
+        // })
+        $("#reginputImg_img").css({
+            background: "url(img/iphoneblue.png) no-repeat", backgroundSize: "100% 100%"
+        })
+    })
+
+
+    $("#iphone").blur(function () {//失去焦点隐藏边框
+        $("#iphone").css({border: ""})
+        $("#iphone").attr("placeholder", "请输入11位正确号码")
+        $("#reginputImg_img").css({background: ""})
+
+    })
+
+    //密码
+    $("#password").focus(function () {//得到焦点出现边框
+        $("#password").css({border: "1px solid #1e90ff"})
+        $("#password").attr("placeholder", "")
+        $("#reginputImg_pwd").css({
+            background: "url(img/mima2.png) no-repeat", backgroundSize: "100% 100%"
+        })
+    })
+
+    $("#password").blur(function () {//失去焦点隐藏边框
+        $("#password").css({border: ""})
+        $("#password").attr("placeholder", "请输入登录密码")
+        $("#reginputImg_pwd").css({
+            background: "", backgroundSize: ""
+        })
+    })
+
+
+    //验证码
+    $("#code_input").focus(function () {//得到焦点出现边框
+        $("#code_input").css({border: "1px solid #1e90ff"})
+        $("#code_input").attr("placeholder", "")
+        $("#reginputImg_yzm").css({
+            background: "url(img/dunpaiblue.png) no-repeat", backgroundSize: "100% 100%"
+        })
+    })
+
+    $("#code_input").blur(function () {//失去焦点隐藏边框
+        $("#code_input").css({border: ""})
+        $("#code_input").attr("placeholder", "请输入短信验证码")
+        $("#reginputImg_yzm").css({
+            background: "", backgroundSize: ""
+        })
+    })
+</script>
+</body>
+</html>

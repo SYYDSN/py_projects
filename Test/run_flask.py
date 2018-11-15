@@ -14,12 +14,12 @@ except ImportError as e:
 
 
 # tornado方式部署,异步模式.
-# http_server = HTTPServer(WSGIContainer(app))
-# http_server.bind(port)
-# http_server.start(0)
-# # http_server.start(1)
-# print("server running on {} port ...".format(port))
-# IOLoop.current().start()
+http_server = HTTPServer(WSGIContainer(app))
+http_server.bind(port)
+http_server.start(0)
+# http_server.start(1)
+print("server running on {} port ...".format(port))
+IOLoop.current().start()
 
 
 # bjoern部署方式,c语言,异步模式.注意,这种方式不支持ssl,也不能自定义headers
@@ -29,14 +29,14 @@ except ImportError as e:
 
 
 # waitress windows和unix皆可,推荐
-server_ini = {
-    "app": app,
-    "host": "0.0.0.0",
-    "port": port,
-    "connection_limit": 400,  # 连接限制
-    "asyncore_use_poll": True
-}
-serve(**server_ini)
+# server_ini = {
+#     "app": app,
+#     "host": "0.0.0.0",
+#     "port": port,
+#     "connection_limit": 600,  # 连接限制
+#     "asyncore_use_poll": True
+# }
+# serve(**server_ini)
 
 
 # meinheld 方式,部分c的py.
@@ -50,8 +50,11 @@ serve(**server_ini)
 
 
 """
-gunicorn的部署方式 需要virtualenv支持
+gunicorn的部署 最好需要virtualenv支持
+方式1 使用配置文件
 gunicorn  --config=gunicorn.py test_server:app
+方式2 命令行
+gunicorn --bind :7011 --workers=4 --worker-class="egg:meinheld#gunicorn_worker"  test_server:app
 """
 
 """

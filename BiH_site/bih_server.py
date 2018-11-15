@@ -56,7 +56,12 @@ def index_func():
 @app.route("/bhxxjs_web/<file_name>")
 def wap_func(file_name):
     """移动端首页"""
-    return render_template("bhxxjs_web/{}".format(file_name))
+    _id = session.get("_id", None)
+    if isinstance(_id, ObjectId):
+        user = UserInfo.find_by_id(o_id=_id, to_dict=True)
+    else:
+        user = None
+    return render_template("bhxxjs_web/{}".format(file_name), form=FlaskForm(), user=user)
 
 
 @app.route("/fonts/<path>")
@@ -179,7 +184,8 @@ def reg_func():
             """检查短信验证码"""
             f = {"phone": phone, 'code': code}
             u = "http://file.bhxxjs.cn/api/validate_code"
-            u = "http://127.0.0.1:7001/api/validate_code"
+            # u = "http://127.0.0.1:7001/api/validate_code"
+            r = None
             try:
                 r = requests.get(u, params=f, headers=hs)
             except Exception as e:
@@ -190,7 +196,7 @@ def reg_func():
                 ms = "{} {}".format(t, c)
                 logger.exception(msg=ms)
             finally:
-                status = r.status_code
+                status = r.status_code if hasattr(r, 'status_code') else None
                 if status != 200:
                     mes['message'] = "验证短信服务未工作"
                     n = datetime.datetime.now()
