@@ -73,6 +73,9 @@
   text-align: center;
   color: rgba(127,124,124,0.9);
 }
+.right_main .role_list_outer .role_list_inner .table_outer #role_list tr >.rules {
+  overflow-y: ellipsis;
+}
 .right_main .role_list_outer .role_list_inner .bottom_div {
   height: 50px;
   width: 100%;
@@ -119,10 +122,11 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  display: none;
 }
 .right_main .modal_outer >.modal_inner {
-  width: 500px;
-  height: 400px;
+  width: 600px;
+  height: 500px;
   margin-top: -20%;
   border-radius: 5px;
   background-color: #fff;
@@ -149,18 +153,47 @@
   align-items: center;
   padding: 15px 50px 15px 15px;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >label {
-  display: block;
-  text-align: center;
-  width: 30%;
-  font-weight: 400;
+.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules {
+  width: 100%;
+  list-style-type: none;
+  height: 240px;
+  overflow-y: scroll;
+  padding: 20px;
+  border: 1px solid #a0a0a0;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >input {
-  width: 70%;
-  padding: 5px;
-  border: 1px solid #b4b4b4;
-  border-radius: 6px;
-  box-shadow: none;
+.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.right {
+  width: 16em;
+}
+.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.right >.rule_value {
+  display: inline-block;
+  width: 3em;
+  text-align: center;
+  margin: 0.5em;
+  color: #333;
+  background-color: #d3d3d3;
+  border: 1px solid #a0a0a0;
+  border-radius: 2px;
+}
+.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.right >.rule_value:hover {
+  cursor: pointer;
+}
+.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.right >.select_value {
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #337ab7;
+}
+.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.left {
+  width: calc(100% - 16em);
+}
+.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.left >.view_name {
+  width: 6em;
+  color: #337ab7;
 }
 .right_main .modal_outer >.modal_inner .modal_bot {
   padding-bottom: 20px;

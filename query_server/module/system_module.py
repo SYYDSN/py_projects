@@ -53,31 +53,7 @@ class Role(orm_module.BaseDoc):
     type_dict['role_name'] = str  # root 权限组只能有一个用户
     """
     rules是规则字典.
-    {
-        rule: {
-            method: {desc: desc, filter: filter, operate: operate}}
-        }
-    }
-    举例:
-    {
-        "/login":{
-            {"get": {"desc": "登录页面", "filter": 0, "operate": 1}},
-            {"post": {"desc": "登录验证函数", "filter": 0, "operate": 1}},
-        }
-    }
-    rule 是视图函数的rule,唯一不重复.取自orm_module.FlaskUrlRule.rule
-    method取自orm_module.FlaskUrlRule.method
-    desc: 对视图函数的说明.
-    operate: 是否能操作页面上的按钮.
-        0: 不能操作任何按钮
-        1: 可以操作一类按钮(查询,翻页)
-        2: 可以操作二类按钮(编辑)
-        3: 可以操作三类按钮(删除)
-    filter: 过滤器,用于限制查找范围
-        0: 不做任何限制,任何人都可以访问全部的数据
-        1: 只能访问本人的数据.
-        2: 只能访问本部门的数据
-        3: 可以访问全公司的数据
+    {view_url1: 1, view_url2: 3, ....}
     限制:    
     用户模型必须有
     1. dept_id   部门id,也可以用组id代替 部门id中有公司id
@@ -88,34 +64,41 @@ class Role(orm_module.BaseDoc):
     type_dict['time'] = datetime.datetime
 
     @classmethod
-    def get_rule_level(cls, rule_dict: dict, rule: str, method: str) -> int:
+    def add(cls, **kwargs) -> dict:
         """
-        根据rule计算用户的访问(范围)级别
-        :param rule_dict: 用户的规则字典,也就是Role.rules
-        :param rule: 规则.也就是用户访问时的路由path
-        :param method: 方法
-        :return: 返回None表示没有找到对应的权限
-        -1 表示禁止访问
-        0 标识只能访问自己
-        1 标识能访问全部
-        其他的自定义
+        添加角色
+        :param kwargs:
+        :return:
         """
-        res = None
-        if rule not in rule_dict:
-            pass
-        else:
-            method = method.lower()
-            res = rule_dict[rule].get(method)
-        res = -1 if res is None else res
-        return res
+        mes = {"message": "success"}
+        role_name = kwargs.get("role_name", '')
+        db = orm_module.get_client()
+        conn = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db)
+        write_concern = WriteConcern(w=1, j=True)
+        with db.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=write_concern):
+                r = conn.find_one(filter={'role_name': role_name})
+                if r is not None:
+                    ms = "角色 {} 已存在!".format(role_name)
+                    mes['message'] = ms
+                else:
+                    """添加"""
+                    r = conn.insert_one(kwargs)
+                    if r is None:
+                        ms = "保存用户账户失败"
+                        mes['message'] = ms
+                    else:
+                        pass
+        return mes
 
     @classmethod
     def all_rules(cls) -> list:
         """
-        查询所有的rule
+        查询所有的rule,不包括root
         :return:
         """
-        data = orm_module.FlaskUrlRule.exec("find")
+        f = {"role_name": {"$ne": "root"}}
+        data = cls.find(filter_dict=f)
         return [x for x in data]
 
     @classmethod
@@ -266,55 +249,6 @@ class User(orm_module.BaseDoc):
         else:
             mes['message'] = "参数错误: user:{}".format(user)
         return mes
-
-    @classmethod
-    def rule_level(cls, user: (str, ObjectId, object), rule: str, method: str) -> dict:
-        """
-        根据用户id,路由规则和方法, 查询用户的访问级别字典
-        :param user:
-        :param rule:
-        :param method:
-        :return:  {"message": "success", "range_level": 1}
-        """
-        mes = {"message": "success", "rule_value": -1}
-        resp = cls.get_role(user=user)
-        if "role" in resp:
-            role = resp['role']
-            if role['role_name'] == "root":
-                mes['rule_value'] = 1  # 1 表示能访问全部数据
-            else:
-                rule_dict = role['rules']
-                rule_value = Role.get_rule_level(rule_dict=rule_dict, rule=rule, method=method)
-                mes['rule_value'] = rule_value
-        else:
-            mes = resp
-        return mes
-
-    @classmethod
-    def get_access_filter(cls, user: (str, ObjectId, object), rule: str, method: str) -> dict:
-        """
-        根据用户id,路由规则和方法, 获取用户的访问范围过滤器
-        :param user:
-        :param rule:
-        :param method:
-        :return:
-        """
-        value = cls.rule_level(user=user, rule=rule, method=method)['rule_value']
-        """
-        -1 表示禁止访问
-        0 标识只能访问自己
-        1 标识能访问全部
-        其他的自定义
-        """
-        if value == 1:
-            f = dict()
-        elif value == -1:
-            f = None
-        elif value == 0:
-            f = {"user_id": user['_id']}
-        else:
-            f = None
-        return f
 
     @classmethod
     def views_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False,

@@ -59,12 +59,5 @@ def upload_func():
     return json.dumps(mes)
 
 
-
-"""获取路由规则,必须在最后部分"""
-
-
-FlaskUrlRule.init(flask_app=app)
-
-
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=port, debug=True, threaded=True)

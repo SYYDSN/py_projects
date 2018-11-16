@@ -1794,13 +1794,15 @@ class BaseDoc:
                 return cls(**result)
 
     @classmethod
-    def find(cls, can_json=False, *args, **kwargs) -> list:
+    def find(cls, filter_dict: dict, can_json=False, *args, **kwargs) -> list:
         """
         find的增强版本,根据条件查找对象,返回多个对象的实例
+        :param filter_dict:       查询字典
         :param can_json:       是否调用to_flat_dict函数转换成可以json的字典?
         :return: list of doc
         """
         ses = cls.get_collection()
+        kwargs['filter'] = filter_dict
         res = ses.find(*args, **kwargs)
         if can_json:
             result = [to_flat_dict(x) for x in res]
@@ -2458,24 +2460,6 @@ class PipelineStage:
         else:
             """join查询结果以字段形式放入主文档"""
             inner_project = PipelineStage.project(pipeline=None, projection=field_map)
-            # inner_project = dict()   # $lookup内部的$project的子字典
-            # for k, v in field_map.items():
-            #     val = None
-            #     try:
-            #         val = v if isinstance(v, int) else int(v)
-            #     except Exception as e:
-            #         print(e)
-            #     finally:
-            #         if isinstance(val, int):
-            #             val = 0 if val == 0 else 1
-            #             inner_project[k] = val
-            #         else:
-            #             if isinstance(v, str) and len(v) > 0:
-            #                 inner_project[v] = "${}".format(k)
-            #             else:
-            #                 """不是字符串也不是数字的放弃"""
-            #                 ms = "错误的value的值或者类型:{}".format(v)
-            #                 raise ValueError(ms)
 
         """需要重命名join查询结果字段的情况,必须有新旧字段的映射关系"""
         if inner_project is None:
@@ -2622,6 +2606,7 @@ class PipelineStage:
                     val = v if isinstance(v, int) else int(v)
                 except Exception as e:
                     print(e)
+                    print("子查询重命名")
                 finally:
                     if isinstance(val, int):
                         val = 0 if val == 0 else 1
@@ -2728,6 +2713,7 @@ class FlaskUrlRule(BaseDoc):
     _table_name = "flask_url_rule"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['name'] = str     # 视图函数名称.用于在编辑角色的时候方便识别
     type_dict['methods'] = list  # 视图函数的方法
     type_dict['endpoint'] = str  # 视图函数的端点
     type_dict['url_path'] = str  # 路由规则
@@ -2741,20 +2727,23 @@ class FlaskUrlRule(BaseDoc):
     @classmethod
     def init(cls, flask_app: Flask) -> None:
         """
+        声明作废  2018-11-16
         注册flask的app的所有路由规则
         :param flask_app:
         :return:
         """
-        rules = flask_app.url_map.iter_rules()
-        ses = cls.get_collection(write_concern=get_write_concern())
-        for a_rule in rules:
-            methods = [x.lower() for x in a_rule.methods if x.lower() in ["post", 'get']]
-            args = [x for x in a_rule.arguments]
-            endpoint = a_rule.endpoint
-            rule = a_rule.rule
-            f = {"endpoint": endpoint}
-            u = {"$set": {"args": args, "rule": rule, "methods": methods}}
-            ses.find_one_and_update(filter=f, update=u, upsert=True)
+        ms = "废止声明: 2018-11-16之后,你应该使用基于MyView的派生类的register函数注册视图的路由规则"
+        raise RuntimeError(ms)
+        # rules = flask_app.url_map.iter_rules()
+        # ses = cls.get_collection(write_concern=get_write_concern())
+        # for a_rule in rules:
+        #     methods = [x.lower() for x in a_rule.methods if x.lower() in ["post", 'get']]
+        #     args = [x for x in a_rule.arguments]
+        #     endpoint = a_rule.endpoint
+        #     rule = a_rule.rule
+        #     f = {"endpoint": endpoint}
+        #     u = {"$set": {"args": args, "rule": rule, "methods": methods}}
+        #     ses.find_one_and_update(filter=f, update=u, upsert=True)
 
     @classmethod
     def save_doc(cls, doc: dict) -> dict:
@@ -2763,7 +2752,6 @@ class FlaskUrlRule(BaseDoc):
         :param doc:
         :return:
         """
-        ses = cls.get_collection(write_concern=get_write_concern())
         if "_id" in doc:
             """有_id,这是在更新"""
             f = {"_id": doc.pop("_id")}
@@ -2786,15 +2774,15 @@ class MyView(MethodView):
     自定义视图.可以定制用户的访问权限
     """
     _access_rules = OrderedDict()           # 定义访问级别
-    _access_rules[0] = "禁止访问本视图"
-    _access_rules[1] = "只能在本视图中访问自己的数据"
-    _access_rules[2] = "只能在本视图中访问本部门/组的数据"
-    _access_rules[3] = "本视图对数据的访问没有限制"
+    _access_rules[0] = "禁止访问"
+    _access_rules[1] = "只能访问自己的数据"
+    _access_rules[2] = "只能访问与自己同组/部门的用户数据"
+    _access_rules[3] = "能访问全部的数据"
 
     _root_role = ObjectId("5bdfad388e76d6efa7b92d9e")  # 设置root权限组的id,此角色有全部的访问权限
     _endpoint = None                                   # 定义endpoint名 子类必须定义,否则自动使用类名称替代
     _rule = None                                       # 定义url访问规则. 子类必须定义,否则需要在注册时候手动添加
-    _desc = "默认的自定义视图"                            # 视图的说明.很重要.
+    _name = ""                                         # 视图的说明.用于识别视图, 在编辑角色权限的时候很重要.
     _allowed = [0, 1, 2, 3]                            # 允许的权限的值 ,必须是_access_rules的子集.用于定义可用的权限的值.
 
     """
@@ -2803,23 +2791,37 @@ class MyView(MethodView):
         用于详细定义和权限值对应的过滤器.这个函数只有uer_id(用户id)和access_value(权限值),返回过滤器字典
     """
 
-    @classmethod
-    def identity(cls, user_dict: dict, url_path: str, role_field: str = "role_id", role_table: str = "role_info") -> dict:
+    def get_filter(self, user: dict, role_field: str = "role_id", role_table: str = "role_info") -> dict:
         """
-        根据用户字典获取控制用户范围的查询字典.此字典可以用作find查询或者aggregate的$match阶段
-        :param user_dict: 用户信息的字典
-        :param url_path: 访问路径
+        cls.identity的实例方法(根据用户字典获取控制用户范围的查询字典.此字典可以用作find查询或者aggregate的$match阶段)
+        :param user: 用户信息的字典
         :param role_field: 角色id在用户信息中对应的字段
         :param role_table: 角色信息表的名称
         :return:
         """
+        cls = self.__class__
+        url_path = cls._rule
+        data = cls.identity(user=user, url_path=url_path, role_field=role_field, role_table=role_table)
+        return data
+
+    @classmethod
+    def identity(cls, user: dict, url_path: str, role_field: str = "role_id", role_table: str = "role_info") \
+            -> dict:
+        """
+        根据用户字典获取控制用户范围的查询字典.此字典可以用作find查询或者aggregate的$match阶段
+        :param user: 用户信息的字典
+        :param url_path: 访问路径
+        :param role_field: 角色id在用户信息中对应的字段
+        :param role_table: 角色信息表的名称
+        :return: 返回None表示禁止访问
+        """
         res = None
-        if isinstance(user_dict, dict):
-            if role_field not in user_dict:
+        if isinstance(user, dict):
+            if role_field not in user:
                 ms = "user_dict中缺少{}字段".format(role_field)
                 raise ValueError(ms)
             else:
-                role_id = user_dict[role_field]
+                role_id = user[role_field]
                 if isinstance(role_id, str) and len(role_id) == 24:
                     role_id = ObjectId(role_id)
                 else:
@@ -2840,7 +2842,7 @@ class MyView(MethodView):
                         else:
                             rules = role.get("rules")
                             value = rules.get(url_path, 0)
-                            res = cls.__get_filter(user_id=user_dict['_id'], access_value=value)
+                            res = cls.__get_filter(user_id=user['_id'], access_value=value)
         else:
             ms = "user_dict必须字典类型"
             raise ValueError(ms)
@@ -2849,11 +2851,11 @@ class MyView(MethodView):
     @classmethod
     def __get_filter(cls, user_id: ObjectId, access_value: int) -> dict:
         """
-        根据用户信息和访问级别的值.返回一个用于查询的字典.此函数应该只被cls.identity调用.
+        根据用户信息和访问级别的值.构建并返回一个用于查询的字典.此函数应该只被cls.identity调用.
         当你重新定义过访问级别的值后.请重构此函数
         :param user_id: 过滤器中的字段,一般是user_id,也可能是其他字段.不同的视图类请重构此函数.
         :param access_value:
-        :return:
+        :return: 返回None表示禁止访问
         """
         ms = "当你重新定义过访问级别的值后.请重构此函数,以避免查询失败"
         warnings.warn(message=ms)
@@ -2883,42 +2885,49 @@ class MyView(MethodView):
         :param rule:
         :return:
         """
-        methods = [x.lower() for x in cls.methods]
-        endpoint = cls._endpoint if cls._endpoint else cls.__class__.__name__
-        rule = rule.strip() if rule else cls._rule
-        if rule is None or rule == "":
-            ms = "rule 没有定义"
-            raise ValueError(ms)
+        methods = cls.methods
+        if methods is None:
+            ms = "{}视图没有定义任何的方法".format(cls.__name__)
+            raise AttributeError(ms)
         else:
-            rule = rule if rule.startswith("/") else "/{}".format(rule)
-            if isinstance(app, Blueprint):
-                url_prefix = app.url_prefix
-            else:
-                url_prefix = ""
-            app.add_url_rule(rule=rule, view_func=cls.as_view(name=endpoint), methods=methods)
-            url_path = "{}{}".format(url_prefix, rule)
-            """处理允许访问的值"""
-            rules = list()
-            for val in cls._allowed:
-                if val in cls._access_rules:
-                    temp = {"value": val, "desc": cls._access_rules[val]}
-                    rules.append(temp)
-            rules.sort(key=lambda obj: obj['value'], reverse=False)
-            doc = {
-                "methods": methods,
-                "endpoint": endpoint,
-                "url_path": url_path,
-                "desc": cls._desc,
-                "rules": rules,
-                "time": datetime.datetime.now()
-            }
-            w = get_write_concern()
-            r = FlaskUrlRule.insert_one(doc=doc,write_concern=w)
-            if r is None:
-                ms = "注册视图失败: {}".format(doc)
+            methods = [x.lower() for x in methods]
+            rule = rule.strip() if rule else cls._rule
+            if rule is None or rule == "":
+                ms = "rule 没有定义"
                 raise ValueError(ms)
             else:
-                pass
+                endpoint = cls._endpoint if cls._endpoint else cls.__name__
+                rule = rule if rule.startswith("/") else "/{}".format(rule)
+                if isinstance(app, Blueprint):
+                    url_prefix = app.url_prefix
+                else:
+                    url_prefix = ""
+                app.add_url_rule(rule=rule, view_func=cls.as_view(name=endpoint), methods=methods)
+                url_path = "{}{}".format(url_prefix, rule)
+                """处理允许访问的值"""
+                rules = list()
+                for val in cls._allowed:
+                    if val in cls._access_rules:
+                        temp = {"value": val, "desc": cls._access_rules[val]}
+                        rules.append(temp)
+                rules.sort(key=lambda obj: obj['value'], reverse=False)
+                desc = cls.__dict__['__doc__']
+                doc = {
+                    "name": cls._name,
+                    "methods": methods,
+                    "endpoint": endpoint,
+                    "url_path": url_path,
+                    "desc": desc,
+                    "rules": rules,
+                    "time": datetime.datetime.now()
+                }
+                w = get_write_concern()
+                r = FlaskUrlRule.insert_one(doc=doc, write_concern=w)
+                if r is None:
+                    ms = "注册视图失败: {}".format(doc)
+                    raise ValueError(ms)
+                else:
+                    pass
 
 
 

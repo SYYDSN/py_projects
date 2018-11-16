@@ -33,20 +33,18 @@
                     <tr class="info">
                         <th class="select"></th>
                         <th>角色/权限组名</th>
-                        <th>权限</th>
                         <th>成员数</th>
                         <th>操作</th>
                     </tr>
                     {% for role in roles %}
                         <tr id="{{ role._id }}">
                             <td  class="select">
-                                <input type="checkbox" >
+                                <input data-id="{{ role._id }}" type="checkbox" >
                             </td>
                             <td class="role_name">{{ role.role_name }}</td>
-                            <td class="rules">{{ role.rules }}</td>
                             <td class="user_count">{{ role.user_count if role.user_count else 0 }}</td>
                             <td class="operation">
-                                <button data-id="{{ role._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_role">编辑</button>
+                                <button data-name="{{ role.role_name }}" data-id="{{ role._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_role">编辑</button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -78,7 +76,7 @@
     <div class="modal_outer">
         <div class="modal_inner">
             <div class="modal_top">
-                <h3 id="modal_title">
+                <h3 data-current-id="" id="modal_title">
                     添加角色
                 </h3>
             </div>
@@ -89,8 +87,20 @@
                 <div class="line">
                     <ul class="all_rules">
                         {% for rule in rules %}
-                            <li class="rule">
-                            {{ rule }}
+                            <li id="{{ rule._id }}" data-url="{{ rule.url_path }}" class="rule">
+                                <div class="left">
+                                    <span title="{{ rule.url_path }}" class="view_name">{{ rule.name }}</span>
+                                    <span title="{{ rule.url_path }}" class="view_desc">{{ rule.desc }}</span>
+                                </div>
+                                <div class="right" data-url="{{ rule.url_path }}">
+                                   {% for item in rule.rules %}
+                                       {% if loop.index0 == 0 %}
+                                            <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
+                                       {% else %}
+                                           <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
+                                       {% endif %}
+                                   {% endfor %}
+                                </div>
                             </li>
                         {% endfor %}
                     </ul>
@@ -99,7 +109,7 @@
             </div>
             <div class="modal_bot">
                 <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
-                <button class="btn btn-md btn-primary last">保存</button>
+                <button id="submit" class="btn btn-md btn-primary last">保存</button>
             </div>
         </div>
 

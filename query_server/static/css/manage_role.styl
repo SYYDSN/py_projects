@@ -61,6 +61,8 @@ default_blue = #286090
             td
               text-align center
               color rgba(127,124,124, 0.9)
+            >.rules
+              overflow-y ellipsis
 
       .bottom_div
         height 50px
@@ -105,10 +107,10 @@ default_blue = #286090
     flex-direction row
     justify-content center
     align-items center
-    //display none
+    display none
     >.modal_inner
-      width 500px
-      height 400px
+      width 600px
+      height 500px
       margin-top -20%
       border-radius 5px
       background-color rgba(255, 255, 255, 1)
@@ -130,17 +132,40 @@ default_blue = #286090
           justify-content center
           align-items center
           padding 15px 50px 15px 15px
-          >label
-            display block
-            text-align center
-            width 30%
-            font-weight 400
-          >input
-            width 70%
-            padding 5px
-            border 1px solid rgba(180,180,180, 1)
-            border-radius 6px
-            box-shadow none
+          >.all_rules
+            width 100%
+            list-style-type none
+            height 240px
+            overflow-y scroll
+            padding 20px
+            border 1px solid rgba(160,160,160, 1)
+            >li
+              display flex
+              flex-direction row
+              justify-content flex-start
+              align-items center
+              >.right
+                width 16em
+                >.rule_value
+                  display inline-block
+                  width 3em
+                  text-align center
+                  margin 0.5em
+                  color rgba(51, 51, 51, 1)
+                  background-color lightgrey
+                  border 1px solid rgba(160,160,160, 1)
+                  border-radius 2px
+                >.rule_value:hover
+                  cursor pointer
+                >.select_value
+                  color #ffffff
+                  background-color #337ab7
+                  border-color #337ab7
+              >.left
+                width calc(100% - 16em)
+                >.view_name
+                  width 6em
+                  color #337ab7
       .modal_bot
         padding-bottom 20px
         display flex
