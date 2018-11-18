@@ -152,52 +152,56 @@ class User(orm_module.BaseDoc):
     type_dict['nick_name'] = str
     type_dict['dept_id'] = ObjectId
     type_dict['role_id'] = ObjectId
-    type_dict['last_update'] = datetime.datetime
-    type_dict['create_time'] = datetime.datetime
+    type_dict['last'] = datetime.datetime
+    type_dict['time'] = datetime.datetime
     type_dict['status'] = int         # 用户状态,默认值1.可用. 0禁用
 
     @classmethod
-    def add_user(cls, **kwargs) -> bool:
+    def add_user(cls, **kwargs) -> dict:
         """
         添加用户
         :param kwargs:
         :return:
         """
+        mes = {"message": "success"}
         user_name = kwargs.get("user_name", '')
         pwd = kwargs.get("password", '')
         args = {"user_name": user_name, "password": pwd}
         db = orm_module.get_client()
         conn = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db)
         write_concern = WriteConcern(w=1, j=True)
-        resp = False
         with db.start_session(causal_consistency=True) as ses:
             with ses.start_transaction(write_concern=write_concern):
                 r = conn.find_one(filter={'user_name': user_name})
                 if r is not None:
                     ms = "账户 {} 已存在!".format(user_name)
-                    raise ValueError(ms)
+                    mes['message'] = ms
                 else:
                     """提取其他信息"""
                     role_id_str = kwargs.get("role_id", '')
                     if isinstance(role_id_str, str) and len(role_id_str) == 24:
                         role_id = ObjectId(role_id_str)
                     else:
-                        role_id = ObjectId("5bdfae528e76d6efa7b92dca")   # 来宾权限组
+                        role_id = None
                     args['role_id'] = role_id
-                    args['create_time'] = datetime.datetime.now()  # 创建时间
+                    args['dept_id'] = None
+                    now = datetime.datetime.now()  # 创建时间
+                    args['time'] = now
+                    args['last'] = now
+                    args['status'] = 1
                     nick_name = kwargs.get("nick_name", "")
                     if isinstance(nick_name, str) and len(nick_name) > 0:
-                        pass
+                        args['nick_name'] = nick_name
                     else:
                         nick_name = "guest_{}".format(str(random.randint(1, 99)).zfill(2))
                         args['nick_name'] = nick_name
                     r = conn.insert_one(args)
                     if r is None:
                         ms = "保存用户账户失败"
-                        raise ValueError(ms)
+                        mes['message'] = ms
                     else:
-                        resp = True
-        return resp
+                        pass
+        return mes
 
     @classmethod
     def login(cls, user_name: str, password: str) -> dict:
@@ -287,7 +291,7 @@ class User(orm_module.BaseDoc):
         kw = {
             "filter_dict": filter_dict,
             "join_cond": join_cond,            # join查询角色表 role_info
-            "sort_cond": [('create_time', -1), ('last_update', -1)],   # 主文档排序条件
+            "sort_cond": [('time', -1), ('last', -1)],   # 主文档排序条件
             "page_index": page_index,        # 当前页
             "page_size": page_size,  # 每页多少条记录
             "can_json": can_json

@@ -122,7 +122,64 @@ class ManageUserView(MyView):
         else:
             return abort(401, "access refused!")
 
-
+    @check_session
+    def post(self, user: dict):
+        """
+        req_type 代表请求的类型, 有4种:
+        1. add          添加角色
+        2. edit         修改角色
+        3. delete       删除角色
+        4. rules        根据role的id查询规则
+        :param user:
+        :return:
+        """
+        mes = {"message": "access refused"}
+        f = self.get_filter(user)
+        if f is None:
+            pass
+        else:
+            req_type = get_arg(request, "type", "")
+            if req_type == "add":
+                nick_name = get_arg(request, "nick_name", "")
+                user_name = get_arg(request, "user_name", "")
+                password = get_arg(request, "password", "")
+                doc = {
+                    "nick_name": nick_name,
+                    "user_name": user_name,
+                    "password": password
+                }
+                mes = User.add_user(**doc)
+            elif req_type == "rules":
+                role_id = get_arg(request, "role_id", "")
+                role_id = ObjectId(role_id) if isinstance(role_id, str) and len(role_id) == 24 else role_id
+                f.update({"_id": role_id})
+                r = Role.find_one(filter_dict=f)
+                if "rules" in r:
+                    mes['message'] = "success"
+                    mes['data'] = r['rules']
+                else:
+                    mes['message'] = "查询数据失败"
+            elif req_type == "edit":
+                role_id = ObjectId(get_arg(request, "role_id"))
+                rules = json.loads(get_arg(request, "rules"))
+                role_name = get_arg(request, "role_name", "")
+                f.update({"_id": role_id})
+                u = {"$set": {
+                    "role_name": role_name,
+                    "rules": rules,
+                    "last": datetime.datetime.now()
+                }}
+                Role.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
+                mes['message'] = "success"
+            elif req_type == "delete":
+                ids = json.loads(get_arg(request, "ids"))
+                ids = [ObjectId(x) for x in ids]
+                f.update({"_id": {"$in": ids}})
+                Role.delete_many(filter_dict=f)
+                mes['message'] = "success"
+            else:
+                mes['message'] = "无效的类型: {}".format(req_type)
+        return json.dumps(mes)
 
 
 class ManageRoleView(MyView):

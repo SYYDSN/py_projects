@@ -89,4 +89,23 @@ $(function(){
         }
     });
 
+    /*模态框选择角色事件*/
+    $(".select_role").each(function(){
+        var $this = $(this);
+        $this.click(function(){
+            var role_id = $this.attr("data-id");
+            var role_name = $.trim($this.text());
+            $(".current_role").attr("data-role-id", role_id).text(role_name);
+        });
+    });
+
+    /*模态框选择用户状态事件*/
+    $(".status_value").each(function(){
+        var $this = $(this);
+        $this.click(function(){
+            $(".status_value").not($this).removeClass("select_status");
+            $this.addClass("select_status");
+        });
+    });
+
 });

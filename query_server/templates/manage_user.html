@@ -47,16 +47,7 @@
                             </td>
                             <td class="user_name">{{ user.user_name }}</td>
                             <td data-id="{{ user.role_id }}" class="role">
-                                <select class="role">
-                                    {% for role in roles %}
-                                        {% if role.role_name == user.role_id %}
-                                            <option value="{{ role._id }}" selected>{{ role.role_name }}</option>
-                                        {% else %}
-                                            <option value="{{ role._id }}">{{ role.role_name }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-
-                                </select>
+                                {{ user.role_name }}
                             </td>
                             <td class="nick_name">{{ user.nick_name }}</td>
                             <td data-id="{{ user.dept_id }}" class="dept">{{ user.dept_name }}</td>
@@ -101,6 +92,21 @@
             </div>
             <div class="modal_mid">
                 <div class="line">
+                    <label>工作组</label>
+                        <div class="my_input dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span></span>
+                                <span data-role-id="" class="current_role"></span>
+                                <span class="caret"></span>
+                            </button>
+                          <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                            {% for role in roles %}
+                                <li data-id="{{ role._id }}" class="select_role">{{ role.role_name }}</li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                </div>
+                <div class="line">
                     <label>姓名</label><input type="text" id="nick_name">
                 </div>
                 <div class="line">
@@ -112,7 +118,13 @@
                 <div class="line">
                     <label>重复密码</label><input type="password" id="u_password2">
                 </div>
-
+                <div class="line">
+                    <label>用户状态</label>
+                    <div class="my_status">
+                        <button class="left status_value select_status" data-value="1">正常</button>
+                        <button class="right status_value" data-value="0">禁用</button>
+                    </div>
+                </div>
             </div>
             <div class="modal_bot">
                 <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
@@ -125,5 +137,6 @@
 {% endblock %}
 
 {% block js %}
+    <script src="/static/js/jquery.md5.js"></script>
     <script src="/static/js/manage_user.js"></script>
 {% endblock %}
