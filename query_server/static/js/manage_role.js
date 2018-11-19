@@ -56,8 +56,8 @@ $(function(){
        rules.each(function(){
            var $this = $(this);
            var url = $this.attr("data-url");
-           var value = parseInt($.trim($this.find(".select_value").text()));
-           data[url] = value;
+           var val = parseInt($.trim($this.find(".select_value").text()));
+           data[url] = val;
        });
        console.log(data);
        var role_name = $.trim($("#role_name").val());
@@ -194,6 +194,17 @@ $(function(){
                    alert(status);
                }
         });
+    });
+
+        /*全选事件*/
+    $("#check_all").click(function(){
+        var checked = $("#check_all:checked").length === 1? true: false;
+        if(checked){
+            $(".table_outer .select >input[type='checkbox']").prop("checked", true);
+        }
+        else{
+            $(".table_outer .select >input[type='checkbox']").prop("checked", false);
+        }
     });
 
 });

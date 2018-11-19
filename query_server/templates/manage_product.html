@@ -1,0 +1,120 @@
+{% extends "standard_page.html" %}
+
+{% block css %}
+   <link rel="stylesheet" href="/static/css/manage_product.css">
+{% endblock %}
+
+{% block show_area %}
+
+    <div class="right_top">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="请输入搜索关键字...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Go!</button>
+              </span>
+        </div>
+    </div>
+
+    <div class="product_list_outer">
+        <div class="product_list_inner">
+            <div class="insert_div">
+                <div class="left">
+                    <i class="fa fa-list-ul"></i>
+                    <span id="clear_condition">所有信息</span>
+                </div>
+                <div class="right">
+                    <button id="add_product" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                        添加产品
+                    </button>
+                </div>
+            </div>
+            <div class="table_outer">
+                <table id="product_list" class="table table-hover">
+                    <tr class="info">
+                        <th class="select"></th>
+                        <th>产品名称</th>
+                        <th>产品规格</th>
+                        <th>净含量</th>
+                        <th>包装比例</th>
+                        <th>创建日期</th>
+                        <th>操作</th>
+                    </tr>
+                    {% for product in products %}
+                        <tr id="{{ product._id }}">
+                            <td  class="select">
+                                <input  data-id="{{ product._id }}" type="checkbox" >
+                            </td>
+                            <td class="product_name">{{ product.product_name }}</td>
+                            <td class="specification">{{ product.specification }}</td>
+                            <td class="net_contents">{{ product.net_contents }}</td>
+                            <td class="package_ratio">{{ product.package_ratio }}</td>
+                            <td class="create_time">{{ product.time | short_date2 }}</td>
+                            <td class="operation">
+                                <button data-id="{{ product._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_product">编辑</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="bottom_div">
+                <div class="left">
+                    <input type="checkbox" id="check_all">
+                    <span>全选</span>
+                    <button id="delete_product" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除
+                    </button>
+                </div>
+                <div class="right">
+                    <i id="prev_page" class="fa fa-caret-left"></i>
+                    <span id="page_count">{{ current_page }}/{{ total_page }}</span>
+                    <i id="next_page" class="fa fa-caret-right"></i>
+                    <input type="text" id="page_num">
+                    <button id="jump_btn" type="button" class="btn btn-sm btn-default btn-primary">
+                        Go
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--弹框部分-->
+    <div class="modal_outer">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 id="modal_title">
+                    添加产品
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line">
+                    <label>产品名称</label><input type="text" id="product_name">
+                </div>
+                <div class="line">
+                    <label>产品规格</label><input type="text" id="specification">
+                    </div>
+                <div class="line">
+                    <label>净含量</label><input type="text" id="net_contents" placeholder="单位: 毫升/ml">
+                    </div>
+                <div class="line">
+                    <label>包装比例</label>
+                    <div class="my_package">
+                        <input type="text" class="left" id="package_ratio">
+                        <span class="my_sep">:</span>
+                        <input type="text" class="my_one right" value="1">
+                    </div>
+                </div>
+            </div>
+            <div class="modal_bot">
+                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
+                <button id="submit" class="btn btn-md btn-primary last">保存</button>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/manage_product.js"></script>
+{% endblock %}

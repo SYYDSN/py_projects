@@ -39,7 +39,19 @@ def __short_date2(d: datetime.datetime) -> str:
     :return:
     """
     if d:
-        return "{}年{}月{}日".format(d.year,d.month, d.day)
+        return "{}年{}月{}日".format(d.year, d.month, d.day)
+    else:
+        return ""
+
+
+def __short_date3(d: datetime.datetime) -> str:
+    """
+    日期格式化,返回'xxxx年x月x日 xx时xx分xx秒'这样的格式
+    :param d:
+    :return:
+    """
+    if d:
+        return "{}年{}月{}日 {}时{}分{}秒".format(d.year, d.month, d.day, d.hour, d.minute, d.second)
     else:
         return ""
 
@@ -113,6 +125,7 @@ def mount_plugin(app):
     app.jinja_env.filters['short_num2'] = __short_num2
     app.jinja_env.filters['short_date'] = __short_date
     app.jinja_env.filters['short_date2'] = __short_date2
+    app.jinja_env.filters['short_date3'] = __short_date3
     app.jinja_env.tests['startswith'] = __startswith
     app.jinja_env.tests['endswith'] = __endswith
     app.jinja_env.filters['str_time'] = __str_time

@@ -131,6 +131,7 @@ class PlatformEvent(BaseDoc):
         if "金" in resp['title']:
             """出入金相关的"""
             sales = resp['sales']
+            sales = "".join([x for x in sales if x in ["0", '1', "2", '3', '4', '5', '6', '7', '8', '9']])
             robot_name2 = None
             if sales.startswith("001"):
                 robot_name2 = "group_001"

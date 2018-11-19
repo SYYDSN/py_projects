@@ -1,0 +1,121 @@
+{% extends "standard_page.html" %}
+
+{% block css %}
+   <link rel="stylesheet" href="/static/css/code_import.css">
+{% endblock %}
+
+{% block show_area %}
+
+    <div class="right_top">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="请输入搜索关键字...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Go!</button>
+              </span>
+        </div>
+    </div>
+
+    <div class="code_list_outer">
+        <div class="code_list_inner">
+            <div class="insert_div">
+                <div class="left">
+                    <i class="fa fa-list-ul"></i>
+                    <span id="clear_condition">所有信息</span>
+                </div>
+
+                <div class="right">
+                    <input type="file" name="file" id="upload_file">
+                    <button id="open_file" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                       上传文件
+                    </button>
+                </div>
+            </div>
+
+            <div class="table_outer">
+                <table id="file_list" class="table table-hover">
+                    <tr class="info">
+                        <th class="select"></th>
+                        <th>文件名</th>
+                        <th>文件大小</th>
+                        <th>有效记录</th>
+                        <th>无效记录</th>
+                        <th>导入日期</th>
+                        <th>上传日期</th>
+                    </tr>
+                    {% for file in files %}
+                        <tr id="{{ file._id }}">
+                            <td  class="select">
+                                <input data-id="{{ file._id }}" type="checkbox" >
+                            </td>
+                            <td class="file_name">{{ file.file_name }}</td>
+                            <td class="file_size">{{ file.file_size }}</td>
+                            <td class="valid_count">{{ file.valid_count }}</td>
+                            <td class="invalid_count">{{ file.invalid_count }}</td>
+                            <td class="upload_time">{{ file.upload_time | short_date3 }}</td>
+                            <td class="import_time">{{ file.import_time | short_date3 }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="bottom_div">
+                <div class="left">
+                    <input type="checkbox" id="check_all">
+                    <span>全选</span>
+                    <button id="delete_role" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除
+                    </button>
+                </div>
+                <div class="right">
+                    <i id="prev_page" class="fa fa-caret-left"></i>
+                    <span id="page_count">{{ current_page }}/{{ total_page }}</span>
+                    <i id="next_page" class="fa fa-caret-right"></i>
+                    <input type="text" id="page_num">
+                    <button id="jump_btn" type="button" class="btn btn-sm btn-default btn-primary">
+                        Go
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--弹框部分-->
+    <div class="modal_outer">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 id="modal_title">
+                    添加产品
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line">
+                    <label>产品名称</label><input type="text" id="product_name">
+                </div>
+                <div class="line">
+                    <label>产品规格</label><input type="text" id="specification">
+                    </div>
+                <div class="line">
+                    <label>净含量</label><input type="text" id="net_contents" placeholder="单位: 毫升/ml">
+                    </div>
+                <div class="line">
+                    <label>包装比例</label>
+                    <div class="my_package">
+                        <input type="text" class="left" id="package_ratio">
+                        <span class="my_sep">:</span>
+                        <input type="text" class="my_one right" value="1">
+                    </div>
+                </div>
+            </div>
+            <div class="modal_bot">
+                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
+                <button id="submit" class="btn btn-md btn-primary last">保存</button>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/code_import.js"></script>
+{% endblock %}

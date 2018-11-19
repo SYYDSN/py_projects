@@ -33,6 +33,57 @@ class Company(orm_module.BaseDoc):
     type_dict['organization'] = list  # 组织架构
 
 
+class Product(orm_module.BaseDoc):
+    """公司产品信息"""
+    _table_name = "product_info"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['product_name'] = str  # 产品名称
+    type_dict['specification'] = str  # 产品规格
+    type_dict['net_contents'] = int  # 净含量, 单位,毫升
+    type_dict['package_ratio'] = int  # 包装比例 200:1
+    # type_dict['batch_number'] = str  # 批号
+    type_dict['last'] = datetime.datetime
+    type_dict['time'] = datetime.datetime
+
+    @classmethod
+    def add(cls, **kwargs) -> dict:
+        """
+        添加产品
+        :param kwargs:
+        :return:
+        """
+        mes = {"message": "success"}
+        product_name = kwargs.get("product_name", "")
+        specification = kwargs.get("specification", "")
+        net_contents = kwargs.get("net_contents", "")
+        package_ratio = kwargs.get("package_ratio", "")
+        db_client = orm_module.get_client()
+        w = orm_module.get_write_concern()
+        col = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client, write_concern=w)
+        f = {
+            "product_name": product_name,
+            "specification": specification,
+            "net_contents": net_contents,
+            "package_ratio": package_ratio
+        }
+        with db_client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=w):
+                r = col.find_one(filter=f, session=ses)
+                if r is None:
+                    now = datetime.datetime.now()
+                    f['time'] = now
+                    f['last'] = now
+                    r = col.insert_one(document=f, session=ses)
+                    if r is None:
+                        mes['message'] = "保存失败"
+                    else:
+                        pass
+                else:
+                    mes['message'] = "重复的产品信息"
+        return mes
+
+
 class Dept(orm_module.BaseDoc):
     """部门信息"""
     _table_name = "dept_info"
@@ -181,6 +232,8 @@ class User(orm_module.BaseDoc):
                     role_id_str = kwargs.get("role_id", '')
                     if isinstance(role_id_str, str) and len(role_id_str) == 24:
                         role_id = ObjectId(role_id_str)
+                    elif isinstance(role_id_str, ObjectId):
+                        role_id = role_id_str
                     else:
                         role_id = None
                     args['role_id'] = role_id

@@ -28,7 +28,7 @@ port = 7012  # 7012是管理平台的端口, 7013是异步查询平台的端口,
 
 """扩展jinja2过滤器"""
 
-mount_plugin(app)
+mount_plugin(app)  # 注册jinja2的自定义过滤器
 
 
 """视图函数"""
