@@ -85,6 +85,15 @@ class TeacherImage(mongo_db.BaseFile):
 
 class Teacher(mongo_db.BaseDoc):
     """
+    2018-11-21新增真实老师(从虚拟老师变更).真实老师的几个字段
+    native = True, direction字段删除
+    0020 豪何
+    0019 誉杰
+    0018 东晖
+    0016 铭远
+    0015 俊彦
+    0014 扬波
+    默认密码都是 xd123457
     老师,微信项目（Webchat_Server）有一个同名的类，不同的是：
     Message_Server项目下的Teacher类主要负责item_module.Trade.sync_from_signal(生成虚拟老师交易信号)时取老师列表。
     Webchat_Server项目项目下的Teacher类，主要负责老师的管理。（属性，头像的修改）
