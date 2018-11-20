@@ -41,6 +41,7 @@
                         <th>无效记录</th>
                         <th>导入日期</th>
                         <th>上传日期</th>
+                        <th>操作</th>
                     </tr>
                     {% for file in files %}
                         <tr id="{{ file._id }}">
@@ -51,8 +52,15 @@
                             <td class="file_size">{{ file.file_size }}</td>
                             <td class="valid_count">{{ file.valid_count }}</td>
                             <td class="invalid_count">{{ file.invalid_count }}</td>
-                            <td class="upload_time">{{ file.upload_time | short_date3 }}</td>
                             <td class="import_time">{{ file.import_time | short_date3 }}</td>
+                            <td class="upload_time">{{ file.upload_time | short_date3 }}</td>
+                            <td class="operation">
+                                {% if file.import_time %}
+                                    已导入
+                                {% else %}
+                                    <button data-id="{{ file._id }}" class="import_btn btn btn-xs btn-default btn-primary">导入</button>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>

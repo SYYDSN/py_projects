@@ -110,7 +110,8 @@ class CodeImportView(MyView):
 
         if isinstance(access_filter, dict):
             page_index = get_arg(request, "index", 1)
-            result = UploadFile.query(filter_dict=access_filter, page_index=page_index)
+            s = {"upload_time": -1}
+            result = UploadFile.query(filter_dict=access_filter, page_index=page_index, sort_cond=s)
             files = result['data']
             render_data.update(result)
             render_data['files'] = files

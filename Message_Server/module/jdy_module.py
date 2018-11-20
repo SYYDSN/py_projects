@@ -171,7 +171,7 @@ def process_material(**kwargs) -> None:
     data['msgtype'] = 'markdown'
     markdown_doc = dict()
     markdown_doc['title'] = "每日素材"
-    text = "![{}]({}) \n  [{}]({})  \n  {}".format(image_name, image_url, file_name, file_url, desc)
+    text = "![{}]({})  \n  [{}]({})   \n   >  {}".format(image_name, image_url, file_name, file_url, desc)
     print("text = {}".format(text))
     markdown_doc['text'] = text
     data['markdown'] = markdown_doc

@@ -2316,6 +2316,9 @@ class BaseDoc:
         """处理投影字段"""
         PipelineStage.project(pipeline=pipeline, projection=projection)
 
+        """处理排序"""
+        PipelineStage.sort(pipeline=pipeline, sort_cond=sort_cond)
+
         """处理limit和skip"""
         pipeline.append({"$skip": skip})
         pipeline.append({"$limit": page_size})
@@ -2334,19 +2337,6 @@ class BaseDoc:
         #     [pipeline.append({"$lookup": x}) for x in join_cond]
         # else:
         #     pass
-
-        """处理排序"""
-        PipelineStage.sort(pipeline=pipeline, sort_cond=sort_cond)
-        # if isinstance(sort_cond, dict) and len(sort_cond) > 0:
-        #     sort_son = SON(data=[(k, v) for k, v in sort_cond.items()])
-        # elif isinstance(sort_cond, list) and len(sort_cond) > 0:
-        #     sort_son = SON(data=sort_cond)
-        # else:
-        #     sort_son = None
-        # if sort_son is None:
-        #     pass
-        # else:
-        #     pipeline.append({"$sort": sort_son})
 
         table_name = cls._table_name
         ses = get_conn(table_name=table_name)

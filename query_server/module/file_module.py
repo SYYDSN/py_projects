@@ -204,6 +204,26 @@ class UploadFile(orm_module.BaseDoc):
         """
         cache.delete(key=key)
 
+    @classmethod
+    def import_code(cls, key: str) -> bool:
+        """
+        导入数据
+        :param key:
+        :return:
+        """
+        key = str(key) if isinstance(key, ObjectId) else key
+        values = cls.get_values(key)
+        res = False
+        if values is not None:
+            file_id = ObjectId(key)
+            values = [{"_id": x, "used": 0, "file_id": file_id} for x in values]
+            w = orm_module.get_write_concern()
+            col = cls.get_collection(write_concern=w)
+            r = col.insert_many(documents=values)
+            print(r)
+            res = True
+        return res
+
 
 if __name__ == "__main__":
     a = "aasa\n\r\n\t"
