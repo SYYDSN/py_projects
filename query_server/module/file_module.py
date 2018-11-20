@@ -9,6 +9,7 @@ from flask import request
 import datetime
 import re
 import chardet
+from io import TextIOWrapper
 
 
 """
@@ -18,6 +19,7 @@ import chardet
 """
 
 
+cache = orm_module.RedisCache()
 ObjectId = orm_module.ObjectId
 
 
@@ -30,6 +32,9 @@ class UploadFile(orm_module.BaseDoc):
     type_dict['storage_name'] = str
     type_dict['file_size'] = int  # 单位字节
     type_dict['file_type'] = str
+    type_dict['valid_index'] = int      # 有效列
+    type_dict['valid_count'] = int      # 有效条码计数
+    type_dict['valid_count'] = int      # 无效条码计数
     type_dict['upload_time'] = datetime.datetime
     type_dict['import_time'] = datetime.datetime
 
@@ -65,7 +70,12 @@ class UploadFile(orm_module.BaseDoc):
             col = cls.get_collection(write_concern=orm_module.get_write_concern())
             r = col.insert_one(document=doc)
             if isinstance(r, orm_module.InsertOneResult):
-                cls.read_file(file_path=f_p)
+                r = cls.read_file(file_path=f_p)
+                if isinstance(r, dict) and r.get("valid_count", 0) > 0:
+                    """成功"""
+                    pass
+                else:
+                    mes['message'] = "没有解析到正确的结果"
             else:
                 mes['message'] = "保存失败"
         return mes
@@ -87,34 +97,115 @@ class UploadFile(orm_module.BaseDoc):
         f.close()
         if os.path.exists(file_path):
             with open(file_path, mode="r", encoding=encoding) as lines:
-                for line in lines:
-                    print(line)
+                res = cls.parse_lines(lines)
+        else:
+            pass
+        """修改条码统计的信息"""
+        _id = ObjectId(file_path.split("/")[-1].split(".")[0])
+        f = {"_id": _id}
+        u = {"$set":
+            {
+                "valid_index": res['valid_index'],
+                "valid_count": res['valid_count'],
+                "invalid_count": res['invalid_count']
+            }
+        }
+        w = orm_module.get_write_concern()
+        col = cls.get_collection(write_concern=w)
+        col.find_one_and_update(filter=f, update=u, upsert=False)
+        values = res.pop('values', None)
+        if values is not None:
+            """设置缓存"""
+            cls.cache_values(_id, values)
         else:
             pass
         return res
 
     @classmethod
-    def parse_line(cls, line: str) -> dict:
+    def discovery_feature(cls, lines: list) -> dict:
         """
-        解析读取的一行数据
-        :param line:
+        从一行读取的数据中发现特征
+        :param lines:
         :return:
         """
-        line = line.strip()
-        print(line)
-        re.
+        value = ""
+        index = -1
+        for i, x in enumerate([re.findall('\d{12,}', line) for line in lines]):
+            if len(x) > len(value):
+                value = x
+                index = i
 
+        return dict() if index == -1 else {"index": index, "value": value[0]}
 
-def get_file_info(file_name: str, limit: int = 100) -> dict:
-    """
-    获取文件信息
-    :param file_name:
-    :param limit:
-    :return:
-    """
+    @classmethod
+    def parse_lines(cls, lines: (TextIOWrapper, list)) -> dict:
+        """
+        解析读取的一行数据
+        :param lines:
+        :return:
+        """
+        s = dict()
+        for line in lines:
+            line = line.strip()
+            res = cls.discovery_feature(line.split(","))
+            index = res.get("index")
+            if index is None:
+                pass
+            else:
+                temp = s.get(index)
+                if temp is None:
+                    temp = {"count": 0, "values": []}
+                else:
+                    pass
+                temp['count'] += 1
+                temp['values'].append(res['value'])
+                s[index] = temp
+        s = [{"index": k, "info": v} for k, v in s.items()]
+        s.sort(key=lambda obj: obj['info']['count'], reverse=True)
+        valid = s.pop(0)
+        valid_index = valid['index']      # 有效索引
+        info = valid['info']
+        valid_count = info['count']      # 有效条码统计
+        values = info['values']          # 有效条码
+        invalid_count = sum([x['count'] for x in s])
+        res = {
+            "valid_count": valid_count, "invalid_count": invalid_count,
+            "values": values, "valid_index": valid_index
+        }
+        return res
+
+    @staticmethod
+    def cache_values(file_id: (str, ObjectId), values: list) -> None:
+        """
+        缓存值
+        :param file_id:
+        :param values:
+        :return:
+        """
+        file_id = file_id if isinstance(file_id, str) else str(file_id)
+        cache.set(file_id, values, timeout=60 * 60)
+
+    @staticmethod
+    def get_values(key: str) -> list:
+        """
+        获取缓存的值
+        :param key:
+        :return:
+        """
+        values = cache.get(key=key)
+        return list() if values is None else values
+
+    @staticmethod
+    def remove_cache(key: str) -> None:
+        """
+        清除缓存
+        :param key:
+        :return:
+        """
+        cache.delete(key=key)
 
 
 if __name__ == "__main__":
     a = "aasa\n\r\n\t"
-    UploadFile.parse_line(a)
+    UploadFile.read_file("导出.txt")
     pass
