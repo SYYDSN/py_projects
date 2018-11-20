@@ -218,7 +218,7 @@ class UploadFile(orm_module.BaseDoc):
             file_id = ObjectId(key)
             values = [{"_id": x, "used": 0, "file_id": file_id} for x in values]
             w = orm_module.get_write_concern()
-            col = cls.get_collection(write_concern=w)
+            col = orm_module.get_conn(table_name="code_info", write_concern=w)
             r = col.insert_many(documents=values)
             print(r)
             res = True
@@ -227,5 +227,5 @@ class UploadFile(orm_module.BaseDoc):
 
 if __name__ == "__main__":
     a = "aasa\n\r\n\t"
-    UploadFile.read_file("导出.txt")
+    UploadFile.import_code("5bf3aad85e32d75611898054")
     pass

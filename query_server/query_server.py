@@ -9,7 +9,7 @@ from module.item_module import TempRecord
 from tools_module import get_arg
 from flask_session import Session
 from my_filter import mount_plugin
-from orm_module import FlaskUrlRule
+from module.code_module import CodeInfo
 import json
 import datetime
 
@@ -29,6 +29,8 @@ port = 7012  # 7012是管理平台的端口, 7013是异步查询平台的端口,
 """扩展jinja2过滤器"""
 
 mount_plugin(app)  # 注册jinja2的自定义过滤器
+prev = None
+count = 0
 
 
 """视图函数"""
@@ -42,10 +44,25 @@ def favicon_func():
 @app.route("/query", methods=['get', 'post'])
 def query_func():
     """查询条码信息"""
+    global prev, count
+    count += 1
+    print("第{}条信息".format(count))
+    prev = datetime.datetime.now() if prev is None else prev
+    begin = datetime.datetime.now()
+    s = "距离上次返回数据的时间间隔： {}".format((begin - prev).total_seconds())
+    print(begin)
+    print(s)
     mes = {"message": "success"}
     sn = get_arg(request, "sn", "")
-    result = "{}, {}".format(sn, 1)
+    r = CodeInfo.query_code(code=sn)
+    result = "{}, {}".format(sn, r)
     mes['result'] = result
+    print(mes)
+    end = datetime.datetime.now()
+    print(end)
+    s = "本次查询处理耗时： {}".format((end - begin).total_seconds())
+    prev = end
+    print(s)
     return json.dumps(mes)
 
 
@@ -54,8 +71,10 @@ def upload_func():
     """查询条码信息"""
     mes = {"message": "success"}
     sn = get_arg(request, "sn", "")
-    result = "{}, {}".format(sn, 1)
+    r = CodeInfo.query_code(code=sn)
+    result = "{}, {}".format(sn, r)
     mes['result'] = result
+    print(mes)
     return json.dumps(mes)
 
 

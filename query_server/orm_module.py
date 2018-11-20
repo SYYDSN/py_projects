@@ -52,6 +52,7 @@ cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设�
 s_cache = SimpleCache()      # 使用内存的缓存,重启/关机就清空了.
 logger = get_logger()
 host = "47.99.105.196"
+host = "127.0.0.1"
 port = 27017
 user = "test1"              # 数据库用户名
 password = "test@723456"       # 数据库密码

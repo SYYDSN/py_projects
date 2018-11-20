@@ -19,13 +19,13 @@ class WebServer:
         self.tcp_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # 2.绑定端口
         self.host = "0.0.0.0"
-        self.port = 7000
+        self.port = 32000
         self.tcp_server.bind((self.host, self.port))
         # 3.设为被动套接字
         self.tcp_server.listen(128)
 
     def run(self):
-        print("server run on {}{}".format(self.host, self.port))
+        print("server run on {}:{}".format(self.host, self.port))
         """运行一个服务器"""
         # 1.把服务器设置为非阻塞模式
         self.tcp_server.setblocking(False)
@@ -69,7 +69,7 @@ class WebServer:
                             # 说明客户端发送数据过来了
                             print(data)
                             c_str = "{}:{}".format(c_ip, c_port)
-                            client.send('{}我已经收到你的数据了！\n'.format(c_str).encode('utf-8'))
+                            # client.send('{}我已经收到你的数据了！\n'.format(c_str).encode('utf-8'))
                             if data.startswith("CheckTraceCodeCanUse"):
                                 """
                                 条码合格判定
@@ -82,7 +82,9 @@ class WebServer:
                                 """
                                 code = data.split(",")[-1].strip("")
                                 r = CodeInfo.query_code(code=code)
-                                print(r)
+                                resp = '{},{}'.format(code, r).encode('utf-8')
+                                print(resp)
+                                client.send(resp)
                                 pass
                             elif data.startswith("UploadTraceCodeToDb"):
                                 """
