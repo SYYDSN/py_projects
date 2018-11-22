@@ -52,14 +52,15 @@ cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设�
 s_cache = SimpleCache()      # 使用内存的缓存,重启/关机就清空了.
 logger = get_logger()
 host = "47.99.105.196"
-host = "127.0.0.1"
 port = 27017
 user = "test1"              # 数据库用户名
 password = "test@723456"       # 数据库密码
 db_name = "test_db"        # 库名称
 connect = True            # 立即开始在后台连接到MongoDB,否则在第一次操作时连接。
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
-
+local = True                  # 是否使用本机数据库?
+if local:
+    host = "127.0.0.1"
 
 
 
