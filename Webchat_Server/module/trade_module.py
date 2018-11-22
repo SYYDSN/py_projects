@@ -346,20 +346,17 @@ def calculate_trade(raw_signal: dict) -> None:
         """非功老师是测试账户"""
         pass
     else:
-        d_res = None
+        d_res = False
         try:
             d_res = send_tips_to_dingding(raw_signal)
         except Exception as e:
-            title = "{}往直播群发送钉钉机器人消息失败".format(datetime.datetime.now())
+            title = "{}web_chat往直播群发送钉钉机器人消息失败".format(datetime.datetime.now())
             content = "错误原因:{}, trade = {}".format(e, raw_signal)
             send_mail(title=title, content=content)
-            d_res = "往直播群发送钉钉机器人消息失败! {}".format(content)
+            d_res = "{} {}".format(title, content)
             logger.exception(msg=d_res)
         finally:
-            if d_res is None:
-                pass
-            else:
-                print("钉订消息发送结果:{}".format(d_res))
+            print("钉订消息发送结果:{}".format(d_res))
 
 
 def generator_signal_and_save(raw_signal: dict) -> list:
@@ -662,8 +659,15 @@ def send_tips_to_dingding(info: dict) -> bool:
         out_put['at'] = {'atMobiles': [], 'isAtAll': False}
 
         """发送消息到钉钉群"""
-        res = send_signal(out_put, token_name="策略助手 小迅")
-        return res
+        res = False
+        try:
+            res = send_signal(out_put, token_name="策略助手 小迅")
+        except Exception as e:
+            title = "send_signal函数执行时抛出异常,{}".format(datetime.datetime.now())
+            content = "错误原因:{}, out_put={}".format(e, out_put)
+            send_mail(title=title, content=content)
+        finally:
+            return res
     else:
         pass
 
