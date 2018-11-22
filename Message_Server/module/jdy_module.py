@@ -171,10 +171,18 @@ def process_material(**kwargs) -> None:
     data['msgtype'] = 'markdown'
     markdown_doc = dict()
     markdown_doc['title'] = "每日素材"
-    text = "![{}]({})  \n  [{}]({})   \n   >  {}".format(image_name, image_url, file_name, file_url, desc)
+    if image_name == "" and file_name == "":
+        text = ">  {}  ".format(desc)
+    elif image_name == "":
+        text = ">  {}  \n  [{}]({})".format(desc, file_name, file_url)
+    elif file_name == "":
+        text = ">  ![{}]({})  \n  {}  \n".format(image_name, image_url, desc)
+    else:
+        text = ">  ![{}]({})  \n  {}  \n  [{}]({})".format(image_name, image_url, desc, file_name, file_url)
     print("text = {}".format(text))
     markdown_doc['text'] = text
     data['markdown'] = markdown_doc
+
     transform = {
         "素材群": "素材群",
         "高管沟通群": "高管沟通群",
