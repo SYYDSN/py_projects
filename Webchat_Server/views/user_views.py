@@ -282,7 +282,9 @@ def common_view_func(user: dict = None, html_name: str = ""):
     param html_name:  html文件名,包含目录路径
     :return:
     """
+    """此用户当前跟踪的是5b8c5452dbea62189b5c28fb 宇向老师"""
     user = WXUser.find_by_id(o_id=ObjectId("5b6804a6c5aee8250b3e47fa"), to_dict=True) if user is None else user
+    # user = WXUser.find_by_id(o_id=ObjectId("5b57a770f313841fc0effef7"), to_dict=True) if user is None else user
     print("user: {}".format(user))
     template_dir = os.path.join(__project_dir__, 'templates', 'wx')
     file_names = os.listdir(template_dir)
@@ -320,7 +322,7 @@ def common_view_func(user: dict = None, html_name: str = ""):
                 info = Teacher.find_by_id(o_id=t_id, to_dict=True, can_json=True)
                 if info.get("head_img") is None or info.get("head_img") == "":
                     info['head_img'] = "/static/images/head_image/t3.jpg"
-                data = Teacher.single_info(t_id)
+                data = Teacher.single_info2(t_id)
                 chart = data['chart']
                 history = data.get("history", list())
                 hold = data.get('hold', list())

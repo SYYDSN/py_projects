@@ -22,6 +22,7 @@ app.conf.CELERYBEAT_SCHEDULE = {
     'every_monday_calculate_score': {
         'task': 'celery_module.calculate_score_and_send_mail',
         'schedule': crontab(day_of_week="1", minute="0", hour="6"),  # 每周1检查扣分情况一次
+        # 'schedule': crontab(day_of_week="*", minute="*/1", hour="*"),  # 每周1检查扣分情况一次
         'args': ()
     }
 }

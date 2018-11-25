@@ -2,31 +2,19 @@ $(function(){
     console.log(chart);
 
     // 生成一个线图
-    line = function($obj, data){
+    draw = function(type, title, subtext, x, y){
         // $obj warp容器
-        // data数据
-        var x = [];
-        var y = [];
-        var d = data['data'];
-        var l = d.length;
-        var p_name = data['product'];
-        var count = 0;
-        var sub = [];
-        for(var i=0; i<l; i++){
-            var temp = d[i];
-            count += temp['all_count'];
-            x.push(temp['week']);
-            y.push(temp['win_per']);
-            if(i == 0 || i == (l - 1)){
-                sub.push(temp['week']);
-            }
-        }
-        sub.reverse();
         var option = {
             title:{
-                text: p_name,
-                subtext: `${sub.join("-")} 共计 ${count}单`
+                text: title,
+                subtext: subtext
             },
+            grid:{
+                top: 60,
+                left: 50,
+                bottom: 30
+            },
+            color: ["#437ab7"],
             xAxis: {
                 type: 'category',
                 data: x
@@ -36,19 +24,44 @@ $(function(){
             },
             series: [{
                 data: y,
-                type: 'line'
+                type: type
             }]
         };
         var chart_div = $("<div class='chart_div'></div>");
-        $obj.append(chart_div);
+        $(".chart_wrap").append(chart_div);
         let charts = echarts.init(chart_div[0]);
         charts.setOption(option);
     };
 
-    // 绘制所有产品的图标
+    /*绘制所有产品的图标
+    2018-11-25日，原有的分产品的线图取消．代之的是：
+    １.按照周切分的胜率柱状图
+    2.按照周切分的收益率柱状图
+    3 .按照周切分的收益率线图
+    */
+    var dx = [];
+    var d1 = [];  // 每周胜率柱状图
+    var d2 = [];  // 每周净赢利柱状图
+    var d3 = [];  // 累计每手盈利线图
+    var raw_profit = 0;  // 原始每手净盈利
     for(var x of chart){
-        line($(".chart_wrap"), x);
+        var week = x['_id'];  // 周
+        dx.push(week);
+        var v1 = x['win_per'] * 100;  // 胜率
+        d1.push(v1);
+        var v2 = x['avg_profit'];  // 每单每手净盈利
+        d2.push(v2);
+        var v3 = raw_profit + v2;  // 每单每手累计净盈利
+        raw_profit = v3;
+        d3.push(Math.floor(v3));
+        // d3.push(Math.floor(v3 / 100));
     }
+    console.log(d3);
+    draw("bar", "周胜率统计", "单位: %", dx, d1);
+    draw("bar", "周平均盈利", "单位: 美元/手", dx, d2);
+    draw("line", "每手累计盈利", "单位: 美元/手", dx, d3);
+    // draw("line", "周收益率", "单位: %", dx, d3);
+
 
     // 切换 数据统计/当前持仓和历史交易 的按钮的时间
     $(".crunchy-tabList li").each(function(){

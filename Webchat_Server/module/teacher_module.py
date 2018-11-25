@@ -334,6 +334,50 @@ class Teacher(mongo_db.BaseDoc):
         return data
 
     @classmethod
+    def single_info2(cls, t_id: (str, ObjectId), begin: (str, datetime.datetime) = None,
+                    end: (str, datetime.datetime) = None) -> dict:
+        """
+        老师的个人页面，有图表，持仓和历史数据
+        cls.single_info的替代函数，两者的差别是：
+        single_info　提供的是按照产品分组，以周切分的胜率统计 2018-11-25
+        single_info２　提供的是:
+            １.按照周切分的胜率柱状图
+            2.按照周切分的收益率柱状图
+            3 .按照周切分的收益率线图
+
+        :param t_id:
+        :param begin:
+        :param end:
+        :return:
+        """
+        data = cls.chart_data(t_id=t_id, begin=begin, end=end)
+        t = Teacher.find_by_id(o_id=t_id, can_json=True)
+        data = {"chart": data}  # 图表数据
+        data.update(cls.history_and_hold(t_id=t_id))  # 历史和持仓
+        data.update(t)
+        return data
+
+    @classmethod
+    def history_and_hold(cls,t_id: (str, ObjectId), prev: int = 60) -> dict:
+        """
+        获取老师最近的60天持仓和交易历史
+        :param t_id:
+        :param prev:
+        :return:
+        """
+        now = datetime.datetime.now()
+        prev = now - datetime.timedelta(days=60)
+        t_id = ObjectId(t_id) if isinstance(t_id, str) and len(t_id) == 24 else t_id
+        f = {"teacher_id": t_id, "enter_time": {"$gte": prev}}
+        s = [("enter_time", -1)]
+        ses = mongo_db.get_conn(table_name="trade")
+        r = ses.find(filter=f, sort=s)
+        history = [x for x in r]
+        hold = [x for x in history if x['case_type'] == "enter"]
+        return {"hold": hold, "history": history}
+
+
+    @classmethod
     def get_hold(cls, t_id: (str, ObjectId), h_id: (str, ObjectId) = None) -> (None, dict, list):
         """
         获取老师的持仓记录
@@ -351,6 +395,47 @@ class Teacher(mongo_db.BaseDoc):
                 return None
             else:
                 return res[0]
+
+    @classmethod
+    def chart_data(cls, t_id: (str, ObjectId), begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
+        """
+        查询老师个人的图表数据，目前是输出三种：　２０１８－１１－２５
+        1. 按照周切分的胜率柱状图
+        2. 按照周切分的收益率柱状图
+        3. 按照周切分的收益率线图
+        :param t_id:
+        :param begin:
+        :param end:
+        :return:
+        """
+        end = datetime.datetime.now() if end is None else end
+        begin = (end + datetime.timedelta(days=182.5)) if begin is None else begin
+        t_id = ObjectId(t_id) if isinstance(t_id, str) and len(t_id) == 24 else t_id
+        ses = mongo_db.get_conn(table_name="trade")
+        pipeline = list()
+        match = {"teacher_id": t_id, "case_type": "exit"}
+        pipeline.append({"$match": match})
+        group = {
+            "_id": {"$isoWeek": "$enter_time"},
+            "teacher_name": {"$first": "$teacher_name"},
+            # "cases": {"$push": "$enter_time"},  # 单子的日期
+            "all_case": {"$sum": 1},            # 总单子数
+            "win_case": {"$sum": {"$cond": {"if": {"$gte": ["$the_profit", 0]}, "then": 1, "else": 0}}},  # 胜单
+            "sum_profit": {"$sum": "$the_profit"},
+            "sum_lots": {"$sum": "$lots"}
+        }
+        pipeline.append({"$group": group})
+        add_field = {
+            "avg_profit": {"$divide": ["$sum_profit", "$sum_lots"]},
+            "win_per": {"$divide": ["$win_case", "$all_case"]}
+        }
+        pipeline.append({"$addFields": add_field})
+        pipeline.append({"$sort": {"_id": 1}})
+        res = ses.aggregate(pipeline=pipeline)
+        res = [x for x in res]
+        return res
+
+
 
     @classmethod
     def direction_map(cls, include_raw: bool = True) -> dict:
@@ -490,7 +575,6 @@ class Teacher(mongo_db.BaseDoc):
 
 if __name__ == "__main__":
     """查询单个老师的持仓记录"""
-    # cc = Teacher.get_hold(t_id="5b65f2d9dbea625d78469f23")
-    # print(cc)
-    Teacher.import_info()
+    t_id = ObjectId("5b8c5451dbea62189b5c28ed")
+    Teacher.chart_data(t_id=t_id)
     pass

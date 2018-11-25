@@ -481,7 +481,6 @@ def hold_info_from_db(t_id: (str, ObjectId) = None, begin: datetime.datetime = N
     return records
 
 
-
 def calculate_win_per_by_teacher(begin: str = None, end: str = None) -> dict:
     """
     以老师为分组依据计算的胜率，分每个产品的胜率

@@ -94,7 +94,7 @@
                                     <p>{{ x.exit_price }}</p>收盘价
                                 </div>
                                 <div class="earnings">
-                                    <p class="color12cb1b" style={{"color:#e35e57" if x.each_profit | float >= 0 else "color:#17b640"}}>${{ x.each_profit }}</p>收益
+                                    <p class="color12cb1b" style={{"color:#e35e57" if x.each_profit | float >= 0 else "color:#17b640"}}>${{ x.each_profit | short_num2 }}</p>收益
                                 </div>
                             </li>
                         {% endfor %}
