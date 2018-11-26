@@ -171,10 +171,10 @@
   padding: 5px 10px;
   margin-bottom: 5px;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li >.right {
   width: 20em;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li >.right >.inner_line {
   width: 100%;
   min-height: 37px;
   display: flex;
@@ -183,7 +183,7 @@
   align-items: center;
   border-bottom: 1px solid #d3d3d3;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line >.operate {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li >.right >.inner_line >.operate {
   width: 3em;
   display: inline-block;
   padding-left: 8px 20px;
@@ -191,7 +191,7 @@
   text-align: center;
   font-size: 16px;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line > .rule_value {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li >.right >.inner_line > .rule_value {
   display: inline-block;
   width: 3em;
   text-align: center;
@@ -201,13 +201,16 @@
   border: 1px solid #a0a0a0;
   border-radius: 2px;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line > .rule_value:hover {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li >.right >.inner_line > .rule_value:hover {
   cursor: pointer;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line > .select_value {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li >.right >.inner_line > .select_value {
   color: #fff;
   background-color: #337ab7;
   border-color: #337ab7;
+}
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li >.right >.last_inner_line {
+  border-bottom: none;
 }
 .right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .left {
   width: calc(100% - 20em);
@@ -217,6 +220,7 @@
   align-items: center;
 }
 .right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .left >.view_name {
+  font-size: 16px;
   text-align: center;
   color: #337ab7;
 }

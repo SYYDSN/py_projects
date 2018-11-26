@@ -30,7 +30,7 @@ class Company(orm_module.BaseDoc):
     type_dict['short_name'] = str
     type_dict['desc'] = str
     type_dict['time'] = datetime.datetime
-    type_dict['organization'] = list  # 组织架构
+    type_dict['organization'] = dict  # 组织架构 {"name": 生产部: "children": [], ...},
 
 
 class Product(orm_module.BaseDoc):
@@ -272,10 +272,13 @@ class User(orm_module.BaseDoc):
         if r is None:
             mes['message'] = "用户名不存在"
         else:
-            if password.lower() == r['password'].lower():
-                mes['_id'] = r['_id']
+            if user_name != "root" and r['status'] == 0:
+                mes['message'] = "账户已被禁用"
             else:
-                mes['message'] = '密码错误'
+                if password.lower() == r['password'].lower():
+                    mes['_id'] = r['_id']
+                else:
+                    mes['message'] = '密码错误'
         return mes
 
     @classmethod
@@ -386,6 +389,23 @@ class User(orm_module.BaseDoc):
         }
         r = User.query(**kw)
         return r
+
+
+class ProductLine(orm_module.BaseDoc):
+    """
+    生产线设备
+    """
+    _table_name = "product_line"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['name'] = str
+    type_dict['desc'] = str
+
+
+class MasterBoard(orm_module.BaseDoc):
+    """
+    嵌入式设备的主控版
+    """
 
 
 if __name__ == "__main__":

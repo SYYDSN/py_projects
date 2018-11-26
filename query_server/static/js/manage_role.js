@@ -43,22 +43,49 @@ $(function(){
     $(".rule_value").each(function(){
         var $this = $(this);
         $this.click(function(){
-            var values = $this.parents(".right:first").find(".rule_value");
+            var values = $this.parents(".inner_line:first").find(".rule_value");
             values.removeClass("select_value");
             $this.addClass("select_value");
         });
     });
 
+    // 取出模态框的信息打包成字典
+    var pick_data = function(){
+        var rules = $(".all_rules > .rule");
+        var data = {};
+        rules.each(function(){
+            var $this = $(this);
+            var url = $this.attr("data-url");
+            var view_val = $.trim($this.find(".view_rule .select_value").text());
+            var edit_val = $.trim($this.find(".edit_rule .select_value").text());
+            var delete_val = $.trim($this.find(".delete_rule .select_value").text());
+            var rules = {};
+            if(isNaN(view_val) || !view_val){
+                // pass
+            }
+            else{
+                rules['view'] = parseInt(view_val);
+            }
+            if(isNaN(edit_val) || !edit_val){
+                // pass
+            }
+            else{
+                rules['edit'] = parseInt(edit_val);
+            }
+            if(isNaN(delete_val) || !delete_val){
+                // pass
+            }
+            else{
+                rules['delete'] = parseInt(delete_val);
+            }
+            data[url] = rules;
+        });
+        return data;
+    };
+
     /*添加角色*/
     var add = function(){
-       var rules = $(".all_rules > .rule");
-       var data = {};
-       rules.each(function(){
-           var $this = $(this);
-           var url = $this.attr("data-url");
-           var val = parseInt($.trim($this.find(".select_value").text()));
-           data[url] = val;
-       });
+       var data = pick_data();
        console.log(data);
        var role_name = $.trim($("#role_name").val());
        if(role_name === ""){
@@ -87,14 +114,7 @@ $(function(){
 
     /*编辑角色*/
     var edit = function(){
-       var rules = $(".all_rules > .rule");
-       var data = {};
-       rules.each(function(){
-           var $this = $(this);
-           var url = $this.attr("data-url");
-           var value = parseInt($.trim($this.find(".select_value").text()));
-           data[url] = value;
-       });
+       var data = pick_data();
        console.log(data);
        var role_name = $.trim($("#role_name").val());
        if(role_name === ""){
@@ -139,11 +159,34 @@ $(function(){
                    $("#role_name").val(role_name);
                    $(".all_rules .right").each(function(){
                        var $self = $(this);
-                       var cur_val = rules[$self.attr("data-url")];
-                       $self.find(".rule_value").each(function(){
+                       var cur_rules = rules[$self.attr("data-url")];
+                       var view_val = cur_rules['view'];
+                       var edit_val = cur_rules['edit'];
+                       var delete_val = cur_rules['delete'];
+
+                       $self.find(".view_rule .rule_value").each(function(){
                            var item = $(this);
-                           // console.log($.trim(item.text()), cur_val);
-                           if($.trim(item.text()) === String(cur_val)){
+                           if($.trim(item.text()) === String(view_val)){
+                               item.addClass("select_value");
+                           }
+                           else{
+                               item.removeClass("select_value");
+                           }
+                       });
+
+                       $self.find(".edit_rule .rule_value").each(function(){
+                           var item = $(this);
+                           if($.trim(item.text()) === String(edit_val)){
+                               item.addClass("select_value");
+                           }
+                           else{
+                               item.removeClass("select_value");
+                           }
+                       });
+
+                       $self.find(".delete_rule .rule_value").each(function(){
+                           var item = $(this);
+                           if($.trim(item.text()) === String(delete_val)){
                                item.addClass("select_value");
                            }
                            else{

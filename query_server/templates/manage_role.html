@@ -93,7 +93,7 @@
                                     <div title="{{ rule.url_path }}" class="view_desc">{{ rule.desc }}</div>
                                 </div>
                                 <div class="right" data-url="{{ rule.url_path }}">
-                                    <div class="inner_line">
+                                    <div class="inner_line view_rule">
                                         <span class="operate">
                                             访问
                                         </span>
@@ -105,7 +105,7 @@
                                            {% endif %}
                                        {% endfor %}
                                     </div>
-                                    <div class="inner_line">
+                                    <div class="inner_line edit_rule">
                                         <span class="operate">
                                             修改
                                         </span>
@@ -117,7 +117,7 @@
                                            {% endif %}
                                        {% endfor %}
                                     </div>
-                                   <div class="inner_line">
+                                   <div class="inner_line delete last_inner_line">
                                         <span class="operate last_operate">
                                             删除
                                         </span>
