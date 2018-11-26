@@ -54,6 +54,7 @@ class TCPClient:
         """
         批量监听
         :param num:
+        :param delay:
         :return:
         """
         for i in range(num):
@@ -67,7 +68,7 @@ class TCPClient:
 
 if __name__ == "__main__":
     cli = TCPClient()
-    cli.connect('127.0.0.1', 7012)
+    cli.connect('127.0.0.1', 32000)
     cli.listen()
     # import os
     # os.fork()

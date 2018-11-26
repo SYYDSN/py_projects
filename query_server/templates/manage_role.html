@@ -89,17 +89,46 @@
                         {% for rule in rules %}
                             <li id="{{ rule._id }}" data-url="{{ rule.url_path }}" class="rule">
                                 <div class="left">
-                                    <span title="{{ rule.url_path }}" class="view_name">{{ rule.name }}</span>
-                                    <span title="{{ rule.url_path }}" class="view_desc">{{ rule.desc }}</span>
+                                    <div title="{{ rule.url_path }}" class="view_name">{{ rule.name }}</div>
+                                    <div title="{{ rule.url_path }}" class="view_desc">{{ rule.desc }}</div>
                                 </div>
                                 <div class="right" data-url="{{ rule.url_path }}">
-                                   {% for item in rule.rules %}
-                                       {% if loop.index0 == 0 %}
-                                            <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
-                                       {% else %}
-                                           <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
-                                       {% endif %}
-                                   {% endfor %}
+                                    <div class="inner_line">
+                                        <span class="operate">
+                                            访问
+                                        </span>
+                                        {% for item in rule.rules.get('view', dict()) %}
+                                           {% if loop.index0 == 0 %}
+                                                <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
+                                           {% else %}
+                                               <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
+                                           {% endif %}
+                                       {% endfor %}
+                                    </div>
+                                    <div class="inner_line">
+                                        <span class="operate">
+                                            修改
+                                        </span>
+                                        {% for item in rule.rules.get('edit', dict()) %}
+                                           {% if loop.index0 == 0 %}
+                                                <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
+                                           {% else %}
+                                               <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
+                                           {% endif %}
+                                       {% endfor %}
+                                    </div>
+                                   <div class="inner_line">
+                                        <span class="operate last_operate">
+                                            删除
+                                        </span>
+                                        {% for item in rule.rules.get('delete', dict()) %}
+                                           {% if loop.index0 == 0 %}
+                                                <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
+                                           {% else %}
+                                               <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
+                                           {% endif %}
+                                       {% endfor %}
+                                    </div>
                                 </div>
                             </li>
                         {% endfor %}

@@ -57,6 +57,8 @@
                             <td class="operation">
                                 {% if file.import_time %}
                                     已导入
+                                {% elif file._id | string not in disk_import_file %}
+
                                 {% else %}
                                     <button data-id="{{ file._id }}" class="import_btn btn btn-xs btn-default btn-primary">导入</button>
                                 {% endif %}
@@ -70,7 +72,7 @@
                 <div class="left">
                     <input type="checkbox" id="check_all">
                     <span>全选</span>
-                    <button id="delete_role" type="button" class="btn btn-sm btn-default btn-primary">
+                    <button id="delete_import" type="button" class="btn btn-sm btn-default btn-primary">
                         删除
                     </button>
                 </div>

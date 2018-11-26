@@ -18,7 +18,7 @@ from io import TextIOWrapper
 2. 合成导出文件
 """
 
-
+root_dir = __root_path
 cache = orm_module.RedisCache()
 ObjectId = orm_module.ObjectId
 
@@ -83,7 +83,7 @@ class UploadFile(orm_module.BaseDoc):
     @classmethod
     def read_file(cls, file_path) -> dict:
         """
-        读取文件
+        根据文件路径读取文件
         :param file_path:
         :return:
         """
@@ -205,27 +205,85 @@ class UploadFile(orm_module.BaseDoc):
         cache.delete(key=key)
 
     @classmethod
-    def import_code(cls, key: str) -> bool:
+    def delete_file_and_record(cls, ids: list, include_record: bool = True) -> dict:
+        """
+        批量删除文件和导入记录.
+        :param ids:
+        :param include_record: 是否连记录一起删除?
+        :return:
+        """
+        mes = {"message": "success"}
+        if include_record:
+            ids2 = [ObjectId(x) for x in ids]
+            cls.delete_many(filter_dict={"_id": {"$in": ids2}})
+        else:
+            pass
+        p = os.path.join(root_dir, "import_data")
+        names = os.listdir(p)
+        resp = []
+        for name in names:
+            prefix = name.split(".")[0]
+            if prefix in ids:
+                os.remove(os.path.join(p, name))
+            else:
+                pass
+        return mes
+
+    @classmethod
+    def all_file_name(cls) -> list:
+        """
+        获取import_data目录下,所有文件的名字(不包括扩展名).
+        用于和数据库记录比对看哪个文件在磁盘上存在?
+        :return:
+        """
+        p = os.path.join(root_dir, "import_data")
+        names = os.listdir(p)
+        resp = []
+        for name in names:
+            if os.path.isfile(os.path.join(p, name)):
+                resp.append(name[0: 24])
+            else:
+                pass
+        return resp
+
+    @classmethod
+    def import_code(cls, key: str) -> dict:
         """
         导入数据
         :param key:
         :return:
         """
+        mes = {"message": "success"}
         key = str(key) if isinstance(key, ObjectId) else key
         values = cls.get_values(key)
-        res = False
         if values is not None:
             file_id = ObjectId(key)
             values = [{"_id": x, "used": 0, "file_id": file_id} for x in values]
             w = orm_module.get_write_concern()
             col = orm_module.get_conn(table_name="code_info", write_concern=w)
-            r = col.insert_many(documents=values)
-            print(r)
-            res = True
-        return res
+            r = None
+            try:
+                r = col.insert_many(documents=values)
+            except orm_module.BulkWriteError as e1:
+                mes['message'] = "重复导入"
+            except Exception as e:
+                mes['message'] = "{}".format(e)
+            finally:
+                if isinstance(r, orm_module.InsertManyResult):
+                    f = {"_id": ObjectId(key)}
+                    u = {"$set": {"import_time": datetime.datetime.now()}}
+                    cls.find_one_and_update(filter_dict=f, update_dict=u)
+                    inserted = len(r.inserted_ids)
+                    mes['inserted'] = inserted
+                else:
+                    pass
+        else:
+            mes['message'] = "请重新上传文件"
+        return mes
 
 
 if __name__ == "__main__":
-    a = "aasa\n\r\n\t"
-    UploadFile.import_code("5bf3aad85e32d75611898054")
+    # a = "aasa\n\r\n\t"
+    # UploadFile.import_code("5bf3aad85e32d75611898054")
+    UploadFile.all_file_name()
     pass

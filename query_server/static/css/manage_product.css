@@ -156,40 +156,13 @@
   width: 30%;
   font-weight: 400;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line > input,
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package {
+.right_main .modal_outer > .modal_inner .modal_mid .line > input {
   outline: none;
   width: 70%;
   padding: 5px;
   border: 1px solid #b4b4b4;
   border-radius: 6px;
   box-shadow: none;
-}
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package {
-  border: none;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-}
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package >input {
-  border: 1px solid #b4b4b4;
-  outline: none;
-  width: 46%;
-  padding: 4px 5px;
-}
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package >.left {
-  maegin-right: -1px;
-  border-radius: 6px 0 0 6px;
-}
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package >.right {
-  margin-left: -1px;
-  border-radius: 0 6px 6px 0;
-}
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package >span {
-  display: inline-block;
-  text-align: center;
-  width: 10%;
 }
 .right_main .modal_outer > .modal_inner .modal_bot {
   padding-bottom: 20px;

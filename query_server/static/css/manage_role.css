@@ -7,10 +7,10 @@
   width: 100%;
   font-size: 16px;
 }
-.right_main .right_top >.input-group {
+.right_main .right_top > .input-group {
   padding: 10px 15px;
 }
-.right_main .right_top >.input-group >.form-control {
+.right_main .right_top > .input-group > .form-control {
   background-color: #d3d3d3;
   border: none;
   border-top-left-radius: 8px !important;
@@ -18,7 +18,7 @@
   -moz-border-radius-topleft: 8px !important;
   -moz-border-radius-bottomleft: 8px !important;
 }
-.right_main .right_top >.input-group button {
+.right_main .right_top > .input-group button {
   background-color: #d3d3d3;
   border-top-right-radius: 8px !important;
   border-bottom-right-radius: 8px !important;
@@ -45,17 +45,17 @@
   justify-content: space-between;
   align-items: center;
 }
-.right_main .role_list_outer .role_list_inner .insert_div >.left:hover {
+.right_main .role_list_outer .role_list_inner .insert_div > .left:hover {
   cursor: pointer;
 }
-.right_main .role_list_outer .role_list_inner .insert_div >.left >i {
+.right_main .role_list_outer .role_list_inner .insert_div > .left > i {
   color: #286090;
   margin-right: 1em;
 }
-.right_main .role_list_outer .role_list_inner .insert_div >.left >#clear_condition {
+.right_main .role_list_outer .role_list_inner .insert_div > .left > #clear_condition {
   color: #286090;
 }
-.right_main .role_list_outer .role_list_inner .insert_div >.right #add_role {
+.right_main .role_list_outer .role_list_inner .insert_div > .right #add_role {
   background-color: #286090;
 }
 .right_main .role_list_outer .role_list_inner .table_outer {
@@ -73,7 +73,7 @@
   text-align: center;
   color: rgba(127,124,124,0.9);
 }
-.right_main .role_list_outer .role_list_inner .table_outer #role_list tr >.rules {
+.right_main .role_list_outer .role_list_inner .table_outer #role_list tr > .rules {
   overflow-y: ellipsis;
 }
 .right_main .role_list_outer .role_list_inner .bottom_div {
@@ -84,10 +84,10 @@
   justify-content: space-between;
   align-items: center;
 }
-.right_main .role_list_outer .role_list_inner .bottom_div >.left {
+.right_main .role_list_outer .role_list_inner .bottom_div > .left {
   color: #286090;
 }
-.right_main .role_list_outer .role_list_inner .bottom_div >.right {
+.right_main .role_list_outer .role_list_inner .bottom_div > .right {
   color: #286090;
   font-size: 16px;
   display: flex;
@@ -95,18 +95,18 @@
   justify-content: center;
   align-items: center;
 }
-.right_main .role_list_outer .role_list_inner .bottom_div >.right #page_num {
+.right_main .role_list_outer .role_list_inner .bottom_div > .right #page_num {
   width: 50px;
   border: 1px solid #d3d3d3;
   border-radius: 10px;
   padding: 4px;
   margin-right: 10px;
 }
-.right_main .role_list_outer .role_list_inner .bottom_div >.right >.fa {
+.right_main .role_list_outer .role_list_inner .bottom_div > .right > .fa {
   font-size: 36px;
   padding: 0 15px;
 }
-.right_main .role_list_outer .role_list_inner .bottom_div >.right >.fa:hover {
+.right_main .role_list_outer .role_list_inner .bottom_div > .right > .fa:hover {
   cursor: pointer;
 }
 .right_main .modal_outer {
@@ -124,7 +124,7 @@
   align-items: center;
   display: none;
 }
-.right_main .modal_outer >.modal_inner {
+.right_main .modal_outer > .modal_inner {
   width: 600px;
   height: 500px;
   margin-top: -20%;
@@ -132,20 +132,20 @@
   background-color: #fff;
   border: 1px solid #c8c8c8;
 }
-.right_main .modal_outer >.modal_inner .modal_top {
+.right_main .modal_outer > .modal_inner .modal_top {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   border-bottom: 1px solid #a0a0a0;
 }
-.right_main .modal_outer >.modal_inner .modal_top >h3 {
+.right_main .modal_outer > .modal_inner .modal_top > h3 {
   color: #969696;
 }
-.right_main .modal_outer >.modal_inner .modal_mid {
+.right_main .modal_outer > .modal_inner .modal_mid {
   padding: 20px 0;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line {
+.right_main .modal_outer > .modal_inner .modal_mid .line {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -153,7 +153,7 @@
   align-items: center;
   padding: 15px 50px 15px 15px;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules {
   width: 100%;
   list-style-type: none;
   height: 240px;
@@ -161,16 +161,37 @@
   padding: 20px;
   border: 1px solid #a0a0a0;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  border: 1px solid #d3d3d3;
+  border-radius: 6px;
+  padding: 5px 10px;
+  margin-bottom: 5px;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.right {
-  width: 16em;
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right {
+  width: 20em;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.right >.rule_value {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line {
+  width: 100%;
+  min-height: 37px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  border-bottom: 1px solid #d3d3d3;
+}
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line >.operate {
+  width: 3em;
+  display: inline-block;
+  padding-left: 8px 20px;
+  color: #337ab7;
+  text-align: center;
+  font-size: 16px;
+}
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line > .rule_value {
   display: inline-block;
   width: 3em;
   text-align: center;
@@ -180,35 +201,42 @@
   border: 1px solid #a0a0a0;
   border-radius: 2px;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.right >.rule_value:hover {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line > .rule_value:hover {
   cursor: pointer;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.right >.select_value {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .right > .inner_line > .select_value {
   color: #fff;
   background-color: #337ab7;
   border-color: #337ab7;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.left {
-  width: calc(100% - 16em);
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .left {
+  width: calc(100% - 20em);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-.right_main .modal_outer >.modal_inner .modal_mid .line >.all_rules >li >.left >.view_name {
-  width: 6em;
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .left >.view_name {
+  text-align: center;
   color: #337ab7;
 }
-.right_main .modal_outer >.modal_inner .modal_bot {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .all_rules > li > .left >.view_desc {
+  padding: 3px 5px;
+}
+.right_main .modal_outer > .modal_inner .modal_bot {
   padding-bottom: 20px;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 }
-.right_main .modal_outer >.modal_inner .modal_bot >button {
+.right_main .modal_outer > .modal_inner .modal_bot > button {
   padding-left: 30px;
   padding-right: 30px;
 }
-.right_main .modal_outer >.modal_inner .modal_bot >.first {
+.right_main .modal_outer > .modal_inner .modal_bot > .first {
   margin-right: 10px;
 }
-.right_main .modal_outer >.modal_inner .modal_bot >.last {
+.right_main .modal_outer > .modal_inner .modal_bot > .last {
   margin-left: 10px;
 }

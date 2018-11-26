@@ -41,7 +41,7 @@ class Product(orm_module.BaseDoc):
     type_dict['product_name'] = str  # 产品名称
     type_dict['specification'] = str  # 产品规格
     type_dict['net_contents'] = int  # 净含量, 单位,毫升
-    type_dict['package_ratio'] = int  # 包装比例 200:1
+    type_dict['package_ratio'] = str  # 包装比例 200:1
     # type_dict['batch_number'] = str  # 批号
     type_dict['last'] = datetime.datetime
     type_dict['time'] = datetime.datetime

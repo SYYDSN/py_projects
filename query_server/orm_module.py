@@ -2753,18 +2753,47 @@ class MyView(MethodView):
     _access_rules[2] = "只能访问与自己同组/部门的用户数据"
     _access_rules[3] = "能访问全部的数据"
 
-    _url_prefix = ""                                   # 蓝图的前缀,一般不需要设置.注册的时候会自动修正这个值
-    _root_role = ObjectId("5bdfad388e76d6efa7b92d9e")  # 设置root权限组的id,此角色有全部的访问权限
-    _endpoint = None                                   # 定义endpoint名 子类必须定义,否则自动使用类名称替代
-    _rule = None                                       # 定义url访问规则. 子类必须定义,否则需要在注册时候手动添加,那样会缺失功能
-    _name = ""                                         # 视图的说明.用于识别视图, 在编辑角色权限的时候很重要.
-    _allowed = [0, 1, 2, 3]                            # 允许的权限的值 ,必须是_access_rules的子集.用于定义可用的权限的值.
-
+    _url_prefix = ""                                     # 蓝图的前缀,一般不需要设置.注册的时候会自动修正这个值
+    _root_role = ObjectId("5bdfad388e76d6efa7b92d9e")    # 设置root权限组的id,此角色有全部的访问权限
+    _endpoint = None                                     # 定义endpoint名 子类必须定义,否则自动使用类名称替代
+    _rule = None                                         # 定义url访问规则. 子类必须定义,否则需要在注册时候手动添加,那样会缺失功能
+    _name = ""                                           # 视图的说明.用于识别视图, 在编辑角色权限的时候很重要.
+    _allowed_view = list(_access_rules.keys()).sort()    # 允许的查看权限的值 ,必须是_access_rules的子集.用于定义可用的权限的值.
+    _allowed_edit = _allowed_view                        # 允许的编辑权限的值 ,必须是_access_rules的子集.用于定义可用的权限的值.
+    _allowed_delete = _allowed_edit                      # 允许的删除权限的值 ,必须是_access_rules的子集.用于定义可用的权限的值.
     """
+    建议的权限定义方式: 
+    _allowed_view = [0, 1, 2, 3] 
+    _allowed_edit = [0, 1, 2, 3] 
+    _allowed_delete = [0, 1, 2, 3] 
+    最简情况下,你可以只定义_allowed_view:
+    _allowed_view = [0, 1, 2, 3] 
+    如果不允许设置某一类操作,请做如下设置
+    _allowed_edit = [] 
+    千万不要 _allowed_edit = None 或者不设置.那样默认的等于和_allowed_view一样的设置
+
     子类继承的时候,建议重写以下函数以实现精确的权限控制:
     1. cls.__get_filter  
-        用于详细定义和权限值对应的过滤器.这个函数只有uer_id(用户id)和access_value(权限值),返回过滤器字典
+    用于详细定义和权限值对应的过滤器.这个函数只有uer_id(用户id),access_value(权限值) operate(访问类型),返回过滤器字典
     """
+
+    @classmethod
+    def get_rules(cls, operate: str = "view") -> list:
+        """
+        获取某种类型的操作设定的权限值的集合
+        :param operate: 权限的类型 分为 view/edit/delete  查看/编辑/删除
+        :return:
+        """
+        res = list()
+        if operate == "view":
+            res = cls._allowed_view
+        elif operate == "edit":
+            res = cls._allowed_view if cls._allowed_edit is None else cls._allowed_edit
+        elif operate == "delete":
+            res = cls.get_rules("edit") if cls._allowed_delete is None else cls._allowed_delete
+        else:
+            pass
+        return res
 
     @classmethod
     def set_url_prefix(cls, url_prefix: str) -> None:
@@ -2832,7 +2861,8 @@ class MyView(MethodView):
                                 ms = "无效的role_id: {}".format(role_id)
                                 raise ValueError(ms)
                             else:
-                                rules = role.get("rules")
+                                all_rules = role.get("rules")
+                                rules = all_rules.get("view", dict())
                                 res.extend(self.check_nav(navs=navs, user=user, rules=rules))
             else:
                 ms = "错误的user对象:{}".format(user)
@@ -2853,26 +2883,29 @@ class MyView(MethodView):
                         res.append(nav)
         return res
 
-    def get_filter(self, user: dict, role_field: str = "role_id", role_table: str = "role_info") -> dict:
+    def operate_filter(self, user: dict, role_field: str = "role_id", role_table: str = "role_info",
+                   operate: str = "view") -> dict:
         """
         cls.identity的实例方法(根据用户字典获取控制用户范围的查询字典.此字典可以用作find查询或者aggregate的$match阶段)
         :param user: 用户信息的字典
         :param role_field: 角色id在用户信息中对应的字段
         :param role_table: 角色信息表的名称
+        :param operate: 权限的类型 分为 view/edit/delete  查看/编辑/删除
         :return:
         """
         cls = self.__class__
         url_path = cls.get_full_path()
-        data = cls.identity(user=user, url_path=url_path, role_field=role_field, role_table=role_table)
+        data = cls.identity(operate=operate, user=user, url_path=url_path, role_field=role_field, role_table=role_table)
         return data
 
     @classmethod
-    def identity(cls, user: dict, url_path: str, role_field: str = "role_id", role_table: str = "role_info") \
-            -> dict:
+    def identity(cls, user: dict, url_path: str, operate: str = "view", role_field: str = "role_id",
+                 role_table: str = "role_info") -> dict:
         """
         根据用户字典获取控制用户范围的查询字典.此字典可以用作find查询或者aggregate的$match阶段
         :param user: 用户信息的字典
         :param url_path: 访问路径
+        :param operate: 权限的类型 分为 view/edit/delete  查看/编辑/删除
         :param role_field: 角色id在用户信息中对应的字段
         :param role_table: 角色信息表的名称
         :return: 返回None表示禁止访问
@@ -2902,28 +2935,29 @@ class MyView(MethodView):
                             ms = "无效的role_id: {}".format(role_id)
                             raise ValueError(ms)
                         else:
-                            rules = role.get("rules")
-                            value = rules.get(url_path, 0)
-                            res = cls._get_filter(user_id=user['_id'], access_value=value)
+                            rules = role.get("rules", dict())
+                            operate_rules = rules.get(operate, dict())
+                            value = operate_rules.get(url_path, 0)
+                            res = cls._get_filter(user_id=user['_id'], access_value=value, operate=operate)
         else:
             ms = "user_dict必须字典类型"
             raise ValueError(ms)
         return res
 
     @classmethod
-    def _get_filter(cls, user_id: ObjectId, access_value: int) -> dict:
+    def _get_filter(cls, user_id: ObjectId, access_value: int, operate: str = "view") -> dict:
         """
         根据用户信息和访问级别的值.构建并返回一个用于查询的字典.此函数应该只被cls.identity调用.
-        当你重新定义过访问级别的值后.请重构此函数
+        当你重新定义过访问级别的值后.请重构此函数.注意,你可以根据operate的类型不同,分别针对类型去重构过滤器.
         :param user_id: 过滤器中的字段,一般是user_id,也可能是其他字段.不同的视图类请重构此函数.
         :param access_value:
+        :param operate:  权限的类型 分为 view/edit/delete  查看/编辑/删除
         :return: 返回None表示禁止访问
         """
-        ms = "当你重新定义过访问级别的值后.请重构此函数,以避免查询失败"
+        ms = "当你重新定义过访问级别的值后.请重构此函数定义范围过滤器"
         warnings.warn(message=ms)
         res = None
-        _access_rules = cls._access_rules
-        d = list(_access_rules.keys())
+        d = cls.get_rules(operate=operate)
         if access_value not in d:
             ms = "权限值:{} 未被定义".format(access_value)
             raise ValueError(ms)
@@ -2968,13 +3002,31 @@ class MyView(MethodView):
                 app.add_url_rule(rule=rule, view_func=cls.as_view(name=endpoint), methods=methods)
                 url_path = "{}{}".format(url_prefix, rule)
                 """处理允许访问的值"""
-                rules = list()
-                for val in cls._allowed:
+
+                view_rules = list()
+                for val in cls.get_rules("view"):
                     if val in cls._access_rules:
                         temp = {"value": val, "desc": cls._access_rules[val]}
-                        rules.append(temp)
-                rules.sort(key=lambda obj: obj['value'], reverse=False)
+                        view_rules.append(temp)
+                view_rules.sort(key=lambda obj: obj['value'], reverse=False)
+                edit_rules = list()
+                for val in cls.get_rules("edit"):
+                    if val in cls._access_rules:
+                        temp = {"value": val, "desc": cls._access_rules[val]}
+                        edit_rules.append(temp)
+                edit_rules.sort(key=lambda obj: obj['value'], reverse=False)
+                delete_rules = list()
+                for val in cls.get_rules("delete"):
+                    if val in cls._access_rules:
+                        temp = {"value": val, "desc": cls._access_rules[val]}
+                        delete_rules.append(temp)
+                delete_rules.sort(key=lambda obj: obj['value'], reverse=False)
                 desc = cls.__dict__['__doc__']
+                rules = {
+                    "view": view_rules,
+                    "edit": edit_rules,
+                    "delete": delete_rules
+                }
                 doc = {
                     "name": cls._name,
                     "methods": methods,
