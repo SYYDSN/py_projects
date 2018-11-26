@@ -22,7 +22,8 @@ from tools_module import *
 
 
 """注册蓝图"""
-manage_blueprint = Blueprint("manage_blueprint", __name__, url_prefix="/manage", template_folder="templates")
+url_prefix = "/manage"
+manage_blueprint = Blueprint("manage_blueprint", __name__, url_prefix=url_prefix, template_folder="templates")
 project_name = "生产线条码管理系统"
 render_data = dict()  # 用来渲染的数据
 render_data['project_name'] = project_name
@@ -53,7 +54,6 @@ navs = [
         {"name": "用户管理", "path": "/manage/user"}
     ]}
 ]
-render_data['navs'] = navs
 
 
 class LoginView(MyView):
@@ -106,7 +106,8 @@ class CodeImportView(MyView):
         """返回条码信息导入界面"""
         render_data['page_title'] = "条码信息导入"
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
-        access_filter = self.get_filter(user)
+        access_filter = self.get_filter(user)   # 数据访问权
+        render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
 
         if isinstance(access_filter, dict):
             page_index = get_arg(request, "index", 1)
@@ -130,7 +131,7 @@ class CodeImportView(MyView):
         :return:
         """
         mes = {"message": "access refused"}
-        f = self.get_filter(user)
+        f = self.get_filter(user)  # 数据访问权
         if f is None:
             pass
         else:
@@ -159,7 +160,8 @@ class ManageProductView(MyView):
         """返回管理用户界面"""
         render_data['page_title'] = "产品管理"
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
-        access_filter = self.get_filter(user)
+        access_filter = self.get_filter(user)  # 数据访问权
+        render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
 
         if isinstance(access_filter, dict):
             page_index = get_arg(request, "index", 1)
@@ -182,7 +184,7 @@ class ManageProductView(MyView):
         :return:
         """
         mes = {"message": "access refused"}
-        f = self.get_filter(user)
+        f = self.get_filter(user)  # 数据访问权
         if f is None:
             pass
         else:
@@ -232,12 +234,41 @@ class ManageUserView(MyView):
     _allowed = [0, 1, 3]
     _name = "用户管理"
 
+    @classmethod
+    def _get_filter(cls, user_id: ObjectId, access_value: int) -> dict:
+        """
+        根据用户信息和访问级别的值.构建并返回一个用于查询的字典.此函数应该只被cls.identity调用.
+        当你重新定义过访问级别的值后.请重构此函数
+        :param user_id: 过滤器中的字段,一般是user_id,也可能是其他字段.不同的视图类请重构此函数.
+        :param access_value:
+        :return: 返回None表示禁止访问
+        """
+        res = None
+        _access_rules = cls._access_rules
+        d = list(_access_rules.keys())
+        if access_value not in d:
+            ms = "权限值:{} 未被定义".format(access_value)
+            raise ValueError(ms)
+        else:
+            if access_value == 1:
+                res = {"_id": user_id}
+            elif access_value == 2:
+                ms = "未实现的访问级别控制: {}".format(access_value)
+                raise NotImplementedError(ms)
+            elif access_value == 3:
+                res = dict()
+            else:
+                pass
+        return res
+
     @check_session
     def get(self, user: dict):
         """返回管理用户界面"""
         render_data['page_title'] = "用户管理"
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
-        access_filter = self.get_filter(user)
+        access_filter = self.get_filter(user)  # 数据访问权
+        c = self.check_nav(navs=navs, user=user)  # 导航访问权
+        render_data['navs'] = c
 
         if isinstance(access_filter, dict):
             """不显示管理员用户"""
@@ -266,7 +297,7 @@ class ManageUserView(MyView):
         :return:
         """
         mes = {"message": "access refused"}
-        f = self.get_filter(user)
+        f = self.get_filter(user)  # 数据访问权
         if f is None:
             pass
         else:
@@ -329,19 +360,23 @@ class ManageRoleView(MyView):
         """返回管理权限界面"""
         render_data['page_title'] = "权限管理"
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
-        access_filter = self.get_filter(user)
-        access_filter.update({"role_name": {"$ne": "root"}})
-        page_index = get_arg(request, "index", 1)
-        r = Role.views_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
-        if r is None:
-            return abort(401, "access refused!")
+        access_filter = self.get_filter(user)  # 数据访问权
+        render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
+        if access_filter is None:
+            return abort(401)
         else:
-            roles = r.pop("data")
-            render_data['roles'] = roles
-            render_data.update(r)
-            all_rules = orm_module.FlaskUrlRule.find(filter_dict=dict())  # 所有的访问规则
-            render_data['rules'] = all_rules
-            return render_template("manage_role.html", **render_data)
+            access_filter.update({"role_name": {"$ne": "root"}})
+            page_index = get_arg(request, "index", 1)
+            r = Role.views_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
+            if r is None:
+                return abort(401, "access refused!")
+            else:
+                roles = r.pop("data")
+                render_data['roles'] = roles
+                render_data.update(r)
+                all_rules = orm_module.FlaskUrlRule.find(filter_dict=dict())  # 所有的访问规则
+                render_data['rules'] = all_rules
+                return render_template("manage_role.html", **render_data)
 
     @check_session
     def post(self, user: dict):
@@ -355,7 +390,7 @@ class ManageRoleView(MyView):
         :return:
         """
         mes = {"message": "access refused"}
-        f = self.get_filter(user)
+        f = self.get_filter(user)  # 数据访问权
         if f is None:
             pass
         else:
@@ -404,6 +439,42 @@ class ManageRoleView(MyView):
         return json.dumps(mes)
 
 
+class SelfInfoView(MyView):
+    """
+    查看修改自己的信息
+    """
+    _rule = "/self_info"
+    _allowed = [1]
+    _name = "个人信息"
+
+    @check_session
+    def post(self, user: dict):
+        mes = {"message": "success"}
+        f = self.get_filter(user=user)
+        req_id = get_arg(request, "_id", "")
+        req_id = ObjectId(req_id) if isinstance(req_id, str) and len(req_id) == 24 else req_id
+        if user['_id'] == req_id:
+            """身份验证正确"""
+            the_type = get_arg(request, "type", "")
+            if the_type == "change_pw":
+                """修改密码"""
+                pwd_old = get_arg(request, "pw_old", '')
+                pw_n1 = get_arg(request, "pw_n1", '')
+                pw_n2 = get_arg(request, "pw_n2", '')
+                mes = User.change_pw(u_id=req_id, pwd_old=pwd_old, pw_n1=pw_n1, pw_n2=pw_n2)
+            elif the_type == "change_nick":
+                """修改昵称"""
+                nick_name = get_arg(request, "nick_name", '')
+                f = {"_id": req_id}
+                u = {"$set": {"nick_name": nick_name}}
+                r = User.find_one_and_update(filter_dict=f, update_dict=u)
+            else:
+                mes['message'] = "错误的操作:{}".format(the_type)
+        else:
+            mes['message'] = "权限不足"
+        return json.dumps(mes)
+
+
 """集中注册视图函数"""
 """登录"""
 LoginView.register(manage_blueprint)
@@ -417,4 +488,6 @@ ManageProductView.register(app=manage_blueprint)
 ManageUserView.register(app=manage_blueprint)
 """管理权限页面"""
 ManageRoleView.register(app=manage_blueprint)
+"""查看修改自己的信息"""
+SelfInfoView.register(app=manage_blueprint)
 

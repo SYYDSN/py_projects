@@ -70,7 +70,7 @@ def query_func():
 def upload_func():
     """查询条码信息"""
     mes = {"message": "success"}
-    sn = get_arg(request, "sn", "")
+    sn = get_arg(request, "sn_queue", "")
     r = CodeInfo.query_code(code=sn)
     result = "{}, {}".format(sn, r)
     mes['result'] = result

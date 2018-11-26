@@ -57,4 +57,82 @@ $(function(){
         });
     })();
 
+    // 弹出修改密码模态框
+    $("#change_pw").click(function(){
+        $(".modal_outer_pw").css("display", "flex");
+    });
+
+    // 关闭修改密码模态框
+    $("#modal_outer_pw").click(function(){
+        $(".modal_outer_pw input").val("");
+        $(".modal_outer_pw").css("display", "none");
+    });
+
+    // 提交修改密码请求.
+    $("#submit_change_pw").click(function(){
+        var _id = $.trim($(this).attr("data-id"));
+        var pw_old = $.trim($("#u_password_old").val());
+        var pw_n1 = $.trim($("#u_password_new1").val());
+        var pw_n2 = $.trim($("#u_password_new2").val());
+        if(pw_n1 !== pw_n2){
+            alert("两次输入的新密码必须相同!");
+            return false;
+        }
+        else{
+            var args = {
+                "_id": _id,
+                "type": "change_pw",
+                "pw_old": $.md5(pw_old),
+                "pw_n1": $.md5(pw_n1),
+                "pw_n2": $.md5(pw_n2)
+            };
+            $.post("/manage/self_info", args, function(resp){
+                var json = JSON.parse(resp);
+                console.log(json);
+                var status = json['message'];
+                if(status === "success"){
+                    alert("修改密码成功,请重新登录");
+                    location.href = "/manage/login";
+                }
+                else{
+                    alert(status);
+                }
+            });
+        }
+    });
+
+    // 弹出修改昵称模态框
+    $("#change_nick").click(function(){
+        $(".modal_outer_nick").css("display", "flex");
+    });
+
+    // 关闭修改昵称模态框
+    $("#modal_outer_nick").click(function(){
+        $(".modal_outer_nick input").val("");
+        $(".modal_outer_nick").css("display", "none");
+    });
+
+    // 提交修改昵称请求.
+    $("#submit_change_nick").click(function(){
+        var _id = $.trim($(this).attr("data-id"));
+        var nick_name = $.trim($("#nick_name_new").val());
+        var args = {
+            "_id": _id,
+            "type": "change_nick",
+            "nick_name": nick_name
+        };
+        $.post("/manage/self_info", args, function(resp){
+            var json = JSON.parse(resp);
+            console.log(json);
+            var status = json['message'];
+            if(status === "success"){
+                alert("修改昵称成功");
+                location.reload();
+            }
+            else{
+                alert(status);
+            }
+        });
+    });
+
 });

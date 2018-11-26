@@ -103,7 +103,7 @@ class Role(orm_module.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['role_name'] = str  # root 权限组只能有一个用户
     """
-    rules是规则字典.
+    rules是规则字典. url_path: access_value
     {view_url1: 1, view_url2: 3, ....}
     限制:    
     用户模型必须有
@@ -260,7 +260,7 @@ class User(orm_module.BaseDoc):
     def login(cls, user_name: str, password: str) -> dict:
         """
         管理员登录检查
-        当前管理员: root/123456
+        当前管理员: root/Ems@123457
         :param user_name:
         :param password:
         :return:
@@ -276,6 +276,41 @@ class User(orm_module.BaseDoc):
                 mes['_id'] = r['_id']
             else:
                 mes['message'] = '密码错误'
+        return mes
+
+    @classmethod
+    def change_pw(cls, u_id: ObjectId, pwd_old: str, pw_n1: str, pw_n2: str) -> dict:
+        """
+        修改密码
+        :param u_id:
+        :param pwd_old:
+        :param pw_n1:
+        :param pw_n2:
+        :return:
+        """
+        mes = {"message": 'unknow error!'}
+        db_client = orm_module.get_client()
+        w = orm_module.get_write_concern()
+        col = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client, write_concern=w)
+        with db_client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=w):
+                f = {"_id": u_id}
+                p = ["_id", "password"]
+                r = col.find_one(filter=f, projection=p)
+                if r is None:
+                    mes['message'] = "错误的用户id:{}".format(u_id)
+                else:
+                    if r.get("password", "").lower() == pwd_old.lower():
+                        if pw_n1 == pw_n2:
+                            pw = pw_n1.lower()
+                            u = {"$set": {"password": pw}}
+                            r = col.find_one_and_update(filter=f, update=u, return_document=orm_module.ReturnDocument.AFTER)
+                            if r['password'] == pw:
+                                mes['message'] = "success"
+                            else:
+                                mes['message'] = "保存失败"
+                    else:
+                        mes['message'] = "原始密码错误"
         return mes
 
     @classmethod

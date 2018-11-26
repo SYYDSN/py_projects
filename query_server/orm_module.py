@@ -58,7 +58,7 @@ password = "test@723456"       # 数据库密码
 db_name = "test_db"        # 库名称
 connect = True            # 立即开始在后台连接到MongoDB,否则在第一次操作时连接。
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
-local = True                  # 是否使用本机数据库?
+local = False                  # 是否使用本机数据库?
 if local:
     host = "127.0.0.1"
 
@@ -2703,6 +2703,7 @@ class FlaskUrlRule(BaseDoc):
     type_dict['rules'] = list  # 可选的权限规则[{value:0, desc: "只能访问自己的数据"}, .....]
     type_dict['time'] = datetime.datetime
     schema = get_schema()
+    """以下2个是本类专用的,为的是每次启动系统保证视图自动更新"""
     schema.drop_collection(name_or_collection=_table_name)  # 清除旧表
     collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
 
@@ -2716,16 +2717,7 @@ class FlaskUrlRule(BaseDoc):
         """
         ms = "废止声明: 2018-11-16之后,你应该使用基于MyView的派生类的register函数注册视图的路由规则"
         raise RuntimeError(ms)
-        # rules = flask_app.url_map.iter_rules()
-        # ses = cls.get_collection(write_concern=get_write_concern())
-        # for a_rule in rules:
-        #     methods = [x.lower() for x in a_rule.methods if x.lower() in ["post", 'get']]
-        #     args = [x for x in a_rule.arguments]
-        #     endpoint = a_rule.endpoint
-        #     rule = a_rule.rule
-        #     f = {"endpoint": endpoint}
-        #     u = {"$set": {"args": args, "rule": rule, "methods": methods}}
-        #     ses.find_one_and_update(filter=f, update=u, upsert=True)
+
 
     @classmethod
     def save_doc(cls, doc: dict) -> dict:
@@ -2761,9 +2753,10 @@ class MyView(MethodView):
     _access_rules[2] = "只能访问与自己同组/部门的用户数据"
     _access_rules[3] = "能访问全部的数据"
 
+    _url_prefix = ""                                   # 蓝图的前缀,一般不需要设置.注册的时候会自动修正这个值
     _root_role = ObjectId("5bdfad388e76d6efa7b92d9e")  # 设置root权限组的id,此角色有全部的访问权限
     _endpoint = None                                   # 定义endpoint名 子类必须定义,否则自动使用类名称替代
-    _rule = None                                       # 定义url访问规则. 子类必须定义,否则需要在注册时候手动添加
+    _rule = None                                       # 定义url访问规则. 子类必须定义,否则需要在注册时候手动添加,那样会缺失功能
     _name = ""                                         # 视图的说明.用于识别视图, 在编辑角色权限的时候很重要.
     _allowed = [0, 1, 2, 3]                            # 允许的权限的值 ,必须是_access_rules的子集.用于定义可用的权限的值.
 
@@ -2772,6 +2765,93 @@ class MyView(MethodView):
     1. cls.__get_filter  
         用于详细定义和权限值对应的过滤器.这个函数只有uer_id(用户id)和access_value(权限值),返回过滤器字典
     """
+
+    @classmethod
+    def set_url_prefix(cls, url_prefix: str) -> None:
+        """
+        设置路由规则的前缀
+        :param url_prefix:
+        :return:
+        """
+        cls._url_prefix = url_prefix
+
+    @classmethod
+    def get_url_prefix(cls) -> str:
+        """
+        获取路由规则的前缀
+        :return:
+        """
+        return cls._url_prefix
+
+    @classmethod
+    def get_full_path(cls, url_path: str = None) -> str:
+        """
+        获取url_path的完全路径
+        :param url_path:
+        :return:
+        """
+        url_path = cls._rule if url_path is None or url_path == "" else url_path
+        return url_path if cls.get_url_prefix() == "" else "{}{}".format(cls.get_url_prefix(), url_path)
+
+    def check_nav(self, navs: list, user: dict, role_field: str = "role_id", role_table: str = "role_info",
+                  rules: dict = None) -> list:
+        """
+        检查导航的访问权限.如果某个页面的访问权是0,则移除此页面的导航.
+        :param navs:
+        :param user: 用户信息的字典
+        :param role_field: 角色id在用户信息中对应的字段
+        :param role_table: 角色信息表的名称
+        :param rules: 递归调用,无需传递这个值
+        :return:
+        """
+        res = []
+        if rules is None:
+            """先计算rules的值"""
+            if isinstance(user, dict):
+                if role_field not in user:
+                    ms = "user_dict中缺少{}字段".format(role_field)
+                    raise ValueError(ms)
+                else:
+                    role_id = user[role_field]
+                    if isinstance(role_id, str) and len(role_id) == 24:
+                        role_id = ObjectId(role_id)
+                    else:
+                        pass
+                    if not isinstance(role_id, ObjectId):
+                        ms = "非法的role_id: {}".format(role_id)
+                        raise ValueError(ms)
+                    else:
+                        if role_id == self.__class__._root_role:
+                            """是管理员"""
+                            res = navs
+                            return res       # 管理员拥有所有页面的访问权
+                        else:
+                            ses = get_conn(table_name=role_table)
+                            role = ses.find_one(filter={"_id": role_id})
+                            if role is None:
+                                ms = "无效的role_id: {}".format(role_id)
+                                raise ValueError(ms)
+                            else:
+                                rules = role.get("rules")
+                                res.extend(self.check_nav(navs=navs, user=user, rules=rules))
+            else:
+                ms = "错误的user对象:{}".format(user)
+                raise ValueError(ms)
+        else:
+            for nav in navs:
+                if "children" in nav:
+                    children = nav['children']
+                    children = self.check_nav(navs=children, user=user, rules=rules)
+                    nav['children'] = children
+                    res.append(nav)
+                else:
+                    url_path = nav['path']
+                    value = rules.get(url_path, 0)
+                    if value == 0:
+                        pass
+                    else:
+                        res.append(nav)
+        return res
 
     def get_filter(self, user: dict, role_field: str = "role_id", role_table: str = "role_info") -> dict:
         """
@@ -2782,7 +2862,7 @@ class MyView(MethodView):
         :return:
         """
         cls = self.__class__
-        url_path = cls._rule
+        url_path = cls.get_full_path()
         data = cls.identity(user=user, url_path=url_path, role_field=role_field, role_table=role_table)
         return data
 
@@ -2824,14 +2904,14 @@ class MyView(MethodView):
                         else:
                             rules = role.get("rules")
                             value = rules.get(url_path, 0)
-                            res = cls.__get_filter(user_id=user['_id'], access_value=value)
+                            res = cls._get_filter(user_id=user['_id'], access_value=value)
         else:
             ms = "user_dict必须字典类型"
             raise ValueError(ms)
         return res
 
     @classmethod
-    def __get_filter(cls, user_id: ObjectId, access_value: int) -> dict:
+    def _get_filter(cls, user_id: ObjectId, access_value: int) -> dict:
         """
         根据用户信息和访问级别的值.构建并返回一个用于查询的字典.此函数应该只被cls.identity调用.
         当你重新定义过访问级别的值后.请重构此函数
@@ -2884,6 +2964,7 @@ class MyView(MethodView):
                     url_prefix = app.url_prefix
                 else:
                     url_prefix = ""
+                cls.set_url_prefix(url_prefix=url_prefix)
                 app.add_url_rule(rule=rule, view_func=cls.as_view(name=endpoint), methods=methods)
                 url_path = "{}{}".format(url_prefix, rule)
                 """处理允许访问的值"""

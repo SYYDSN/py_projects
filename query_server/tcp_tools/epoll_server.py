@@ -26,7 +26,7 @@ class WebServer:
         self.tcp_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # 2.绑定端口
         self.host = "0.0.0.0"
-        self.port = 7000
+        self.port = 7011
         self.tcp_server.bind((self.host, self.port))
         # 3.设为被动套接字
         self.tcp_server.listen(128)

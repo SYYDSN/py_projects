@@ -8,6 +8,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+/*修改昵称密码modal部分*/
 }
 .top .project_name {
   color: #fff;
@@ -27,24 +28,197 @@
   justify-content: flex-end;
   align-items: center;
 }
-.top .right_info .small_item >i {
+.top .right_info .small_item > i {
   margin: 0 1em;
 }
-.top .right_info .small_item >img {
+.top .right_info .small_item > img {
   width: 2em;
   height: 2em;
   margin: 0 1em;
 }
-.top .right_info .small_item >.dropdown {
+.top .right_info .small_item > .dropdown {
   background-color: #286090;
 }
-.top .right_info .small_item >.dropdown >button {
+.top .right_info .small_item > .dropdown > button {
   color: #fff;
   border-color: #286090 !important;
   background-color: #286090 !important;
 }
-.top .right_info .small_item >.dropdown >button >.caret {
+.top .right_info .small_item > .dropdown > button > .caret {
   color: #fff;
+}
+.top .modal_outer_pw,
+.top .modal_outer_nick {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  float: left;
+  font-size: 16px;
+  background-color: rgba(180,180,180,0.9);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+.top .modal_outer_pw > .modal_inner,
+.top .modal_outer_nick > .modal_inner {
+  width: 400px;
+  height: 380px;
+  margin-top: -5%;
+  border-radius: 5px;
+  background-color: #fff;
+  border: 1px solid #c8c8c8;
+}
+.top .modal_outer_pw > .modal_inner .modal_top,
+.top .modal_outer_nick > .modal_inner .modal_top {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #a0a0a0;
+}
+.top .modal_outer_pw > .modal_inner .modal_top > h3,
+.top .modal_outer_nick > .modal_inner .modal_top > h3 {
+  color: #969696;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid,
+.top .modal_outer_nick > .modal_inner .modal_mid {
+  padding: 20px 0;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line,
+.top .modal_outer_nick > .modal_inner .modal_mid .line {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 50px 15px 15px;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line > label,
+.top .modal_outer_nick > .modal_inner .modal_mid .line > label {
+  display: block;
+  text-align: center;
+  width: 30%;
+  font-weight: 400;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line > input,
+.top .modal_outer_nick > .modal_inner .modal_mid .line > input,
+.top .modal_outer_pw > .modal_inner .modal_mid .line .my_input,
+.top .modal_outer_nick > .modal_inner .modal_mid .line .my_input,
+.top .modal_outer_pw > .modal_inner .modal_mid .line .my_status,
+.top .modal_outer_nick > .modal_inner .modal_mid .line .my_status {
+  outline: none;
+  width: 70%;
+  padding: 5px;
+  border: 1px solid #b4b4b4;
+  border-radius: 6px;
+  box-shadow: none;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line > .my_input,
+.top .modal_outer_nick > .modal_inner .modal_mid .line > .my_input {
+  border: none;
+  padding: 5px 1px;
+  height: 45px;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line > .my_input > button,
+.top .modal_outer_nick > .modal_inner .modal_mid .line > .my_input > button {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  outline: none;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line > .my_input > button >.current_role,
+.top .modal_outer_nick > .modal_inner .modal_mid .line > .my_input > button >.current_role {
+  text-align: center;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line > .my_input > ul,
+.top .modal_outer_nick > .modal_inner .modal_mid .line > .my_input > ul {
+  width: 100%;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line > .my_input > ul > li,
+.top .modal_outer_nick > .modal_inner .modal_mid .line > .my_input > ul > li {
+  padding: 3px 0;
+  width: 100%;
+  text-align: center;
+  color: #333;
+  border: 1px solid #fff;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line > .my_input > ul > li:hover,
+.top .modal_outer_nick > .modal_inner .modal_mid .line > .my_input > ul > li:hover {
+  cursor: pinter;
+  background-color: #e6e6e6;
+  border: 1px solid #e6e6e6;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line >.my_status,
+.top .modal_outer_nick > .modal_inner .modal_mid .line >.my_status {
+  border-radius: 0;
+  border: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line >.my_status >button,
+.top .modal_outer_nick > .modal_inner .modal_mid .line >.my_status >button {
+  width: calc(50% - 2px);
+  padding: 5px 0;
+  color: #fff;
+  border: 1px solid #a0a0a0;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line >.my_status >.status_value,
+.top .modal_outer_nick > .modal_inner .modal_mid .line >.my_status >.status_value {
+  outline: none;
+  color: #989393;
+  background-color: #c8c3c3;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line >.my_status >.select_status,
+.top .modal_outer_nick > .modal_inner .modal_mid .line >.my_status >.select_status {
+  color: #fff;
+  background-color: #337ab7;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line >.my_status >.left,
+.top .modal_outer_nick > .modal_inner .modal_mid .line >.my_status >.left {
+  border-right: none;
+  maegin-right: -1px;
+  border-radius: 0.6em 0 0 0.6em;
+}
+.top .modal_outer_pw > .modal_inner .modal_mid .line >.my_status >.right,
+.top .modal_outer_nick > .modal_inner .modal_mid .line >.my_status >.right {
+  border-left: none;
+  margin-left: -1px;
+  border-radius: 0 0.6em 0.6em 0;
+}
+.top .modal_outer_pw > .modal_inner .modal_bot,
+.top .modal_outer_nick > .modal_inner .modal_bot {
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.top .modal_outer_pw > .modal_inner .modal_bot > button,
+.top .modal_outer_nick > .modal_inner .modal_bot > button {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.top .modal_outer_pw > .modal_inner .modal_bot > .first,
+.top .modal_outer_nick > .modal_inner .modal_bot > .first {
+  margin-right: 10px;
+}
+.top .modal_outer_pw > .modal_inner .modal_bot > .last,
+.top .modal_outer_nick > .modal_inner .modal_bot > .last {
+  margin-left: 10px;
+}
+.top .modal_outer_nick > .modal_inner {
+  width: 400px;
+  height: 240px;
 }
 .middle {
   width: 100%;
@@ -54,62 +228,62 @@
   flex-direction: row;
   justify-content: flex-start;
 }
-.middle >.left_nav {
+.middle > .left_nav {
   font-size: 16px;
   width: 200px;
   min-height: 100%;
   height: 100%;
   background-color: #393642;
 }
-.middle >.left_nav >ul {
+.middle > .left_nav > ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
-.middle >.left_nav >ul a {
+.middle > .left_nav > ul a {
   text-decoration: none;
 }
-.middle >.left_nav >ul >li {
+.middle > .left_nav > ul > li {
   padding: 15px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,0.07);
 }
-.middle >.left_nav >ul >li >i {
+.middle > .left_nav > ul > li > i {
   color: #d3d3d3;
 }
-.middle >.left_nav >ul >li >a {
+.middle > .left_nav > ul > li > a {
   color: rgba(255,255,255,0.5);
   margin-left: 0;
 }
-.middle >.left_nav >ul >li >.nav_icon {
+.middle > .left_nav > ul > li > .nav_icon {
   margin-left: 0;
 }
-.middle >.left_nav >ul >li >.plus_sign:hover {
+.middle > .left_nav > ul > li > .plus_sign:hover {
   cursor: pointer;
 }
-.middle >.left_nav >ul >.sub_nav {
+.middle > .left_nav > ul > .sub_nav {
   display: none;
   padding: 0;
   margin: 0;
   background-color: rgba(43,41,51,0.4);
 }
-.middle >.left_nav >ul >.sub_nav >ul {
+.middle > .left_nav > ul > .sub_nav > ul {
   list-style-type: none;
   padding-top: 10px;
   padding-bottom: 10px;
 }
-.middle >.left_nav >ul >.sub_nav >ul >li {
+.middle > .left_nav > ul > .sub_nav > ul > li {
   padding: 5px 0 5px 10px;
 }
-.middle >.left_nav >ul >.sub_nav >ul >li >a {
+.middle > .left_nav > ul > .sub_nav > ul > li > a {
   color: rgba(255,255,255,0.8);
 }
-.middle >.left_nav >ul >.sub_nav >ul .active_nav_inner {
+.middle > .left_nav > ul > .sub_nav > ul .active_nav_inner {
   color: #76a9d4;
 }
-.middle >.right_main {
+.middle > .right_main {
   width: calc(100% - 200px);
   min-height: 100%;
   height: 100%;

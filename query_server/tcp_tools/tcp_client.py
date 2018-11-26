@@ -58,7 +58,7 @@ class TCPClient:
         """
         for i in range(num):
             cli = TCPClient()
-            cli.connect('127.0.0.1', 7000)
+            cli.connect('127.0.0.1', 7012)
             lis = cli.listen
             t = Thread(target=lis, args=(delay,))
             print(i)
@@ -66,13 +66,13 @@ class TCPClient:
 
 
 if __name__ == "__main__":
-    # cli = TCPClient()
-    # cli.connect('127.0.0.1', 7000)
-    # cli.listen()
-    import os
-    os.fork()
-    os.fork()
-    os.fork()
-    os.fork()
-    TCPClient.batch_listen(10, 0.001)
+    cli = TCPClient()
+    cli.connect('127.0.0.1', 7012)
+    cli.listen()
+    # import os
+    # os.fork()
+    # os.fork()
+    # os.fork()
+    # os.fork()
+    # TCPClient.batch_listen(1, 0.001)
     pass
