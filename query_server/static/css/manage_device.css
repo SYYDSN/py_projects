@@ -74,6 +74,10 @@
   text-align: center;
   color: rgba(127,124,124,0.9);
 }
+.right_main .user_list_outer .user_list_inner .table_outer #user_list tr .line_embedded {
+/*控制板和执行板*/
+  display: flex;
+}
 .right_main .user_list_outer .user_list_inner .bottom_div {
   height: 50px;
   width: 100%;

@@ -60,6 +60,7 @@
 }
 .right_main .role_list_outer .role_list_inner .table_outer {
   min-height: calc(100% - 100px);
+  overflow-y: scroll;
 }
 .right_main .role_list_outer .role_list_inner .table_outer #role_list .select {
   width: 30px;

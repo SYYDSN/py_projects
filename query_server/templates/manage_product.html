@@ -23,6 +23,9 @@
                     <span id="clear_condition">所有信息</span>
                 </div>
                 <div class="right">
+                    <button id="pop_company_modal" type="button" class="pop_modal btn btn-default btn-sm btn-info">
+                        修改公司信息
+                    </button>
                     <button id="add_product" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
                         添加产品
                     </button>
@@ -32,6 +35,7 @@
                 <table id="product_list" class="table table-hover">
                     <tr class="info">
                         <th class="select"></th>
+                        <th>公司名称</th>
                         <th>产品名称</th>
                         <th>产品规格</th>
                         <th>净含量</th>
@@ -44,6 +48,7 @@
                             <td  class="select">
                                 <input  data-id="{{ product._id }}" type="checkbox" >
                             </td>
+                            <td class="company_name">{{ company.company_name }}</td>
                             <td class="product_name">{{ product.product_name }}</td>
                             <td class="specification">{{ product.specification }}</td>
                             <td class="net_contents">{{ product.net_contents }}</td>
@@ -78,8 +83,8 @@
         </div>
     </div>
 
-    <!--弹框部分-->
-    <div class="modal_outer">
+    <!--产品弹框部分-->
+    <div class="modal_outer modal_outer_product">
         <div class="modal_inner">
             <div class="modal_top">
                 <h3 id="modal_title">
@@ -102,11 +107,38 @@
                 </div>
             </div>
             <div class="modal_bot">
-                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
+                <button class="close_modal btn btn-md btn-default first">关闭</button>
                 <button id="submit" class="btn btn-md btn-primary last">保存</button>
             </div>
         </div>
-
+    </div>
+    <!--公司框部分-->
+    <div class="modal_outer modal_outer_company">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 id="company_modal_title">
+                    公司信息
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line">
+                    <label>公司全称</label><input value="{{ company.company_name }}" type="text" id="company_name">
+                </div>
+                <div class="line">
+                    <label>条码长度</label><input type="text"  value="{{ company.code_length }}" id="code_length">
+                </div>
+                <div class="line">
+                    <label>库存可用条码下限</label><input type="text" value="{{ company.inventory_threshold }}" id="inventory_threshold">
+                </div>
+                <div class="line">
+                    <label>已打印可用条码下限</label><input type="text"  value="{{ company.printed_threshold }}" id="printed_threshold">
+                </div>
+            </div>
+            <div class="modal_bot">
+                <button class="close_modal btn btn-md btn-default first">关闭</button>
+                <button data-id="{{ company._id }}" id="submit_company" class="btn btn-md btn-primary last">保存</button>
+            </div>
+        </div>
     </div>
 
 {% endblock %}

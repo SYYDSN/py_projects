@@ -21,10 +21,111 @@ from io import TextIOWrapper
 root_dir = __root_path
 cache = orm_module.RedisCache()
 ObjectId = orm_module.ObjectId
+IMPORT_DIR = os.path.join(__root_path, "import_data")  # 上传文件的默认目录
+EXPORT_DIR = os.path.join(__root_path, "export_data")  # 导出文件的默认目录
+
+
+class PrintBatch(orm_module.BaseDoc):
+    """导出打印条码记录"""
+    _table_name = "print_batch"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['suffix'] = str   # 文件的后缀名,不包含.
+    type_dict['product_id'] = ObjectId
+    type_dict['desc'] = str  # 备注
+    type_dict['time'] = datetime.datetime  # 导出打印条码的时间
+
+    orm_module.collection_exists(table_name=_table_name, auto_create=True)
+
+    @classmethod
+    def pickle(cls, file_name: str, data: list, suffix: str = "txt") -> bool:
+        """
+        把数据保存到文件.
+        :param file_name: file_name 其实就是记录id
+        :param data:
+        :param suffix: 文件后缀名
+        :return:
+        """
+        if not os.path.exists(EXPORT_DIR):
+            os.makedirs(EXPORT_DIR)
+        else:
+            pass
+        file_path = os.path.join(EXPORT_DIR, "{}.{}".format(file_name, suffix))
+        data = ['{}\r\n'.format(x) for x in data]
+        with open(file=file_path, mode="w", encoding="utf-8") as f:
+            f.writelines(data)
+        return True
+
+    @classmethod
+    def export(cls, limit: int, product_id: ObjectId, desc: str = '', suffix: str = "txt") -> dict:
+        """
+        导出条码
+        :param limit:
+        :param product_id: 产品id
+        :param desc: 备注
+        :param suffix: 文件后缀名
+        :return:
+        """
+        mes = {"message": "success"}
+        db_client = orm_module.get_client()
+        write_concern = orm_module.get_write_concern()
+        table = "code_info"
+        f = {"print_id": {"$exists": False}, "status": 0}
+        col = orm_module.get_conn(table_name=table, db_client=db_client)
+        me = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)
+        pipeline = list()
+        pipeline.append({'$match': f})
+        pipeline.append({"$project": {"_id": 1}})
+        with db_client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=write_concern):
+                r = col.aggregate(pipeline=pipeline, allowDiskUse=True, session=ses)
+                codes = [x["_id"] for x in r]
+                count = len(codes)
+                if count < limit:
+                    mes['message'] = "空白条码存量不足: 需求: {},库存: {}".format(limit, count)
+                else:
+                    """创建一个实例"""
+                    now = datetime.datetime.now()
+                    doc = {
+                        "product_id": product_id,
+                        "desc": desc,
+                        "suffix": suffix,
+                        "time": now
+                    }
+                    r2 = me.insert_one(document=doc, session=ses)
+                    if isinstance(r2, orm_module.InsertOneResult):
+                        inserted_id = r2.inserted_id
+                        """批量更新"""
+                        f = {"_id": {"$in": codes}}
+                        u = {"$set": {"print_id": inserted_id}}
+                        r3 = col.update_many(filter=f, update=u, session=ses)
+                        if isinstance(r3, orm_module.UpdateResult):
+                            matched_count = r3.matched_count
+                            modified_count = r3.modified_count
+                            if count == matched_count == modified_count:
+                                id_str = str(r2.inserted_id)
+                                r4 = cls.pickle(file_name=id_str, data=codes, suffix=suffix)
+                                if r4:
+                                    pass  # 成功
+                                else:
+                                    mes['message'] = "保存导出文件失败"
+                                    ses.abort_transaction()
+                            else:
+                                ms = "共计{}个条码,更新了{}条条码状态, 其中{}条更新成功".format(count, matched_count,
+                                                                            modified_count)
+                                mes['message'] = ms
+                                ses.abort_transaction()
+                        else:
+                            mes['message'] = "标记导出文件出错,函数未正确执行"
+                            ses.abort_transaction()
+                    else:
+                        mes['message'] = "插入打印条码导出记录出错"
+                        ses.abort_transaction()
+        return mes
 
 
 class UploadFile(orm_module.BaseDoc):
-    """上传文件的记录"""
+    """上传文件的记录/导入记录"""
     _table_name = "upload_file_history"
     type_dict = dict()
     type_dict['_id'] = ObjectId
@@ -39,13 +140,16 @@ class UploadFile(orm_module.BaseDoc):
     type_dict['import_time'] = datetime.datetime
 
     @classmethod
-    def upload(cls, req: request, dir_path: str) -> dict:
+    def upload(cls, req: request, dir_path: str = None) -> dict:
         """
         上传条码文件
         :param req:
-        :param dir_path:
+        :param dir_path: 保存上传文件的目录
         :return:
         """
+        dir_path = IMPORT_DIR if dir_path is None else dir_path
+        if not os.path.exists(dir_path):
+            os.makedirs(path=dir_path)
         mes = {"message": "success"}
         file = req.files.get("file")
         if file is None:
@@ -205,7 +309,7 @@ class UploadFile(orm_module.BaseDoc):
         cache.delete(key=key)
 
     @classmethod
-    def delete_file_and_record(cls, ids: list, include_record: bool = True) -> dict:
+    def delete_file_and_record(cls, ids: list, include_record: bool = False) -> dict:
         """
         批量删除文件和导入记录.
         :param ids:
@@ -218,13 +322,11 @@ class UploadFile(orm_module.BaseDoc):
             cls.delete_many(filter_dict={"_id": {"$in": ids2}})
         else:
             pass
-        p = os.path.join(root_dir, "import_data")
-        names = os.listdir(p)
-        resp = []
+        names = os.listdir(IMPORT_DIR)
         for name in names:
             prefix = name.split(".")[0]
             if prefix in ids:
-                os.remove(os.path.join(p, name))
+                os.remove(os.path.join(IMPORT_DIR, name))
             else:
                 pass
         return mes
@@ -236,11 +338,10 @@ class UploadFile(orm_module.BaseDoc):
         用于和数据库记录比对看哪个文件在磁盘上存在?
         :return:
         """
-        p = os.path.join(root_dir, "import_data")
-        names = os.listdir(p)
+        names = os.listdir(IMPORT_DIR)
         resp = []
         for name in names:
-            if os.path.isfile(os.path.join(p, name)):
+            if os.path.isfile(os.path.join(IMPORT_DIR, name)):
                 resp.append(name[0: 24])
             else:
                 pass
@@ -258,7 +359,7 @@ class UploadFile(orm_module.BaseDoc):
         values = cls.get_values(key)
         if values is not None:
             file_id = ObjectId(key)
-            values = [{"_id": x, "used": 0, "file_id": file_id} for x in values]
+            values = [{"_id": x, "status": 0, "file_id": file_id} for x in values]
             w = orm_module.get_write_concern()
             col = orm_module.get_conn(table_name="code_info", write_concern=w)
             r = None
@@ -285,5 +386,7 @@ class UploadFile(orm_module.BaseDoc):
 if __name__ == "__main__":
     # a = "aasa\n\r\n\t"
     # UploadFile.import_code("5bf3aad85e32d75611898054")
-    UploadFile.all_file_name()
+    # UploadFile.all_file_name()
+    """测试导出文件"""
+    PrintBatch.export(limit=13000, product_id=ObjectId("5bf22efa9f0a5e34eb35741c"))
     pass

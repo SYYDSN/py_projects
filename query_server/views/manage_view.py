@@ -6,11 +6,13 @@ if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 from flask import request
 from flask import Blueprint
+from flask import  send_file
 from flask import flash
 from flask import render_template
 from flask import abort
 from module.system_module import *
 from module.file_module import *
+from module.code_module import set_code_length
 from uuid import uuid4
 import json
 import datetime
@@ -37,8 +39,8 @@ navs = [
     ]},
     {"name": "设备信息", "path": "/manage/device", "class": "fa fa-cogs", "children": [
         {"name": "设备信息一览", "path": "/manage/device_summary"},
-        {"name": "生产线", "path": "/manage/device_line"},
-        {"name": "嵌入式", "path": "/manage/device_embed"}
+        # {"name": "生产线", "path": "/manage/device_line"},
+        # {"name": "嵌入式", "path": "/manage/device_embed"}
     ]},
     {"name": "条码信息", "path": "/manage/code_summary", "class": "fa fa-qrcode", "children": [
         {"name": "条码信息概要", "path": "/manage/code_summary"},
@@ -102,6 +104,42 @@ class LogoutView(MyView):
         return self.get()
 
 
+class DownLoadPrintFile(MyView):
+    """下载批量打印的文件函数"""
+    _rule = "/print_file"
+    _allowed_view = [0, 3]
+    _allowed_edit = []
+    _allowed_delete = []
+    _name = "下载批量打印的文件"
+
+    @check_session
+    def get(self, user: dict):
+        """
+        下载
+        :param user:
+        :return:
+        """
+        f_id = get_arg(request, "f_id", "")
+        if isinstance(f_id, str) and len(f_id) == 24:
+            access_filter = self.operate_filter(user=user, operate="view")
+            if isinstance(access_filter, dict):
+                access_filter['_id'] = ObjectId(f_id)
+                r = PrintBatch.find_one(filter_dict=access_filter)
+                if isinstance(r, dict):
+                    suffix = r.get("suffix", 'txt')
+                    file_name1 = "{}.{}".format(f_id, suffix)
+                    p_dir = EXPORT_DIR
+                    file_path = os.path.join(p_dir, file_name1)
+                    file_name2 = "导出.{}".format(suffix)
+                    return send_file(filename_or_fp=file_path, attachment_filename=file_name2, as_attachment=True)
+                else:
+                    return abort(404)
+            else:
+                return abort(403)  # 权限不足
+        else:
+            return abort(401)  # 文件id错误
+
+
 class CodeImportView(MyView):
     """条码信息导入页面视图函数"""
     _rule = "/code_import"
@@ -147,12 +185,7 @@ class CodeImportView(MyView):
             upload = request.headers.get("upload-file", "0", str)
             if upload == "1":
                 """上传文件"""
-                p = os.path.join(__project_dir__, "import_data")
-                if not os.path.exists(p):
-                    os.makedirs(p)
-                else:
-                    pass
-                mes = UploadFile.upload(request, p)
+                mes = UploadFile.upload(request)
             else:
                 the_type = get_arg(request, "type", "")
                 if the_type == "import":
@@ -177,6 +210,66 @@ class CodeImportView(MyView):
         return json.dumps(mes)
 
 
+class ManageCompanyView(MyView):
+    """公司信息"""
+    _rule = "/company"
+    _allowed_view = [3]
+    _allowed_edit = []   # 任何人都不能编辑,除了管理员
+    _allowed_delete = []  # 任何人都不能删除,除了管理员
+    _name = "公司信息"
+
+    @check_session
+    def post(self, user: dict):
+        """对公司信息的操作(只有添加和编辑)"""
+        mes = {"message": "access refused"}
+        if self.is_root(user):
+            _id = get_arg(request, "_id", "")   # 公司id
+            company_name = get_arg(request, "company_name", "")  # 公司名称
+            doc = {"company_name": company_name}
+            _id = ObjectId(_id) if isinstance(_id, str) and len(_id) == 24 else _id
+            inventory_threshold = get_arg(request, "inventory_threshold", None)   # 库存条码下限
+            printed_threshold = get_arg(request, "printed_threshold", None)      # 已打印的可用条码下限
+            try:
+                doc['inventory_threshold'] = int(inventory_threshold)
+            except Exception as e:
+                print(e)
+            try:
+                doc['printed_threshold'] = int(printed_threshold)
+            except Exception as e:
+                print(e)
+            code_length = get_arg(request, "code_length", "")     # 标准条码长度
+            try:
+                code_length = int(code_length)
+            except Exception as e:
+                print(e)
+                code_length = 35
+            finally:
+                now = datetime.datetime.now()
+                doc['code_length'] = code_length
+                if isinstance(_id, ObjectId):
+                    """修改"""
+                    doc['last'] = now
+                    r = Company.find_one_and_update(filter_dict={"_id": _id}, update_dict={"$set": doc})
+                    if r is None:
+                        mes['message'] = "保存数据失败"
+                    else:
+                        mes['message'] = "success"
+                        set_code_length(code_length)  # 重设标准条码长度
+                else:
+                    """添加"""
+                    doc['time'] = now
+                    r = Company.insert_one(doc=doc)
+                    if r is None:
+                        mes['message'] = "保存数据失败"
+                    else:
+                        mes['message'] = "success"
+                        set_code_length(code_length)  # 重设标准条码长度
+        else:
+            """不是管理员"""
+            pass
+        return json.dumps(mes)
+
+
 class ManageProductView(MyView):
     """管理产品信息页面视图函数"""
     _rule = "/product"
@@ -197,6 +290,9 @@ class ManageProductView(MyView):
             products = r.pop("data")
             render_data['products'] = products
             render_data.update(r)
+            company = Company.find_one(filter_dict=dict())
+            company = dict() if company is None else company
+            render_data['company'] = company
             return render_template("manage_product.html", **render_data)
         else:
             return abort(401, "access refused!")
@@ -303,7 +399,7 @@ class ManageUserView(MyView):
             """不显示管理员用户"""
             access_filter.update({"role_id": {"$ne": ObjectId("5bdfad388e76d6efa7b92d9e")}})
             page_index = get_arg(request, "index", 1)
-            r = User.views_info(filter_dict=access_filter, page_index=page_index)  # 用户列表
+            r = User.paging_info(filter_dict=access_filter, page_index=page_index)  # 用户列表
             users = r.pop("data")
             f = {"_id": {"$ne": ObjectId("5bdfad388e76d6efa7b92d9e")}}
             projection = ["_id", "role_name"]
@@ -396,16 +492,13 @@ class ManageRoleView(MyView):
         else:
             access_filter.update({"role_name": {"$ne": "root"}})
             page_index = get_arg(request, "index", 1)
-            r = Role.views_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
-            if r is None:
-                return abort(401, "access refused!")
-            else:
-                roles = r.pop("data")
-                render_data['roles'] = roles
-                render_data.update(r)
-                all_rules = orm_module.FlaskUrlRule.find(filter_dict=dict())  # 所有的访问规则
-                render_data['rules'] = all_rules
-                return render_template("manage_role.html", **render_data)
+            r = Role.paging_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
+            roles = r.pop("data")
+            render_data['roles'] = roles
+            render_data.update(r)
+            all_rules = orm_module.FlaskUrlRule.find(filter_dict=dict())  # 所有的访问规则
+            render_data['rules'] = all_rules
+            return render_template("manage_role.html", **render_data)
 
     @check_session
     def post(self, user: dict):
@@ -468,16 +561,16 @@ class ManageRoleView(MyView):
         return json.dumps(mes)
 
 
-class EmbedDeviceView(MyView):
-    """管理嵌入式页面视图函数"""
-    _rule = "/device_embed"
+class ManageDeviceView(MyView):
+    """管理设备页面视图函数"""
+    _rule = "/device_summary"
     _allowed_view = [0, 3]
     _name = "嵌入式设备管理"
 
     @check_session
     def get(self, user: dict):
-        """嵌入式设备管理界面"""
-        render_data['page_title'] = "嵌入式设备"
+        """生产线设备管理界面"""
+        render_data['page_title'] = "设备信息"
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
         access_filter = self.operate_filter(user)  # 数据访问权
         render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
@@ -485,16 +578,11 @@ class EmbedDeviceView(MyView):
             return abort(401)
         else:
             page_index = get_arg(request, "index", 1)
-            r = Role.views_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
-            if r is None:
-                return abort(401, "access refused!")
-            else:
-                roles = r.pop("data")
-                render_data['roles'] = roles
-                render_data.update(r)
-                all_rules = orm_module.FlaskUrlRule.find(filter_dict=dict())  # 所有的访问规则
-                render_data['rules'] = all_rules
-                return render_template("manage_role.html", **render_data)
+            r = ProductLine.paging_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
+            lines = r.pop("data")
+            render_data['lines'] = lines
+            render_data.update(r)
+            return render_template("manage_device.html", **render_data)
 
     @check_session
     def post(self, user: dict):
@@ -599,14 +687,20 @@ class SelfInfoView(MyView):
 LoginView.register(manage_blueprint)
 """注销"""
 LogoutView.register(manage_blueprint)
+"""下载批量打印的文件函数"""
+DownLoadPrintFile.register(app=manage_blueprint)
 """导入条码页面"""
 CodeImportView.register(app=manage_blueprint)
+"""管理公司信息接口"""
+ManageCompanyView.register(app=manage_blueprint)
 """管理产品页面"""
 ManageProductView.register(app=manage_blueprint)
 """管理用户页面"""
 ManageUserView.register(app=manage_blueprint)
 """管理权限页面"""
 ManageRoleView.register(app=manage_blueprint)
+"""管理生产线页面"""
+ManageDeviceView.register(app=manage_blueprint)
 """查看修改自己的信息"""
 SelfInfoView.register(app=manage_blueprint)
 

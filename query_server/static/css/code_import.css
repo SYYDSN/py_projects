@@ -66,6 +66,7 @@
 }
 .right_main .code_list_outer .code_list_inner .table_outer {
   min-height: calc(100% - 100px);
+  overflow-y: scroll;
 }
 .right_main .code_list_outer .code_list_inner .table_outer #file_list .select {
   width: 30px;

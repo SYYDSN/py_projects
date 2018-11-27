@@ -60,6 +60,7 @@
 }
 .right_main .product_list_outer .product_list_inner .table_outer {
   min-height: calc(100% - 100px);
+  overflow-y: scroll;
 }
 .right_main .product_list_outer .product_list_inner .table_outer #product_list .select {
   width: 30px;
@@ -180,4 +181,7 @@
 }
 .right_main .modal_outer > .modal_inner .modal_bot > .last {
   margin-left: 10px;
+}
+.right_main .modal_outer_company > .modal_inner {
+  height: 410px;
 }

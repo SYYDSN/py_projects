@@ -2535,6 +2535,7 @@ class PipelineStage:
         symbol = symbol_map.get(symbol, "$eq")
         inside_pipeline = list()
         temp_field = "{}_v".format(local_field)
+        temp_field = temp_field[1: ] if temp_field.startswith("_") else temp_field
         if symbol in ['$in', "$nin"]:
             """对数组的比较,数组可能为空"""
             let = {temp_field: {"$ifNull": ["${}".format(local_field), []]}}
@@ -2718,7 +2719,6 @@ class FlaskUrlRule(BaseDoc):
         ms = "废止声明: 2018-11-16之后,你应该使用基于MyView的派生类的register函数注册视图的路由规则"
         raise RuntimeError(ms)
 
-
     @classmethod
     def save_doc(cls, doc: dict) -> dict:
         """
@@ -2821,6 +2821,19 @@ class MyView(MethodView):
         """
         url_path = cls._rule if url_path is None or url_path == "" else url_path
         return url_path if cls.get_url_prefix() == "" else "{}{}".format(cls.get_url_prefix(), url_path)
+
+    def is_root(self, user: dict, role_field: str = "role_id") -> bool:
+        """
+        检查用户是否是管理员身份
+        :param user:
+        :param role_field: 角色id在用户信息中对应的字段
+        :return:
+        """
+        cls = self.__class__
+        if user.get(role_field) == cls._root_role:
+            return True
+        else:
+            return False
 
     def check_nav(self, navs: list, user: dict, role_field: str = "role_id", role_table: str = "role_info",
                   rules: dict = None) -> list:

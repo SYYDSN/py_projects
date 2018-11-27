@@ -2,6 +2,7 @@
 import socket
 import select
 from module.code_module import CodeInfo
+from module.code_module import SocketListener
 
 
 """
@@ -46,8 +47,8 @@ class WebServer:
                     epoll.register(client.fileno(), select.EPOLLIN)
                     # 把客户端和客户端对应的fd添加到client字典中去
                     client_dict[client.fileno()] = client
-                    """延时发送数据"""
-                    client.send("hello world".encode("utf-8"))
+                    """发送欢迎数据"""
+                    client.send("{} connected, welcome!".format(addr).encode("utf-8"))
                 else:
                     # 有客户端发送数据过来,但是该如何去获得这个客户端呢？
                     client = client_dict[fd]
@@ -66,40 +67,43 @@ class WebServer:
                         print(e)
                     finally:
                         if data and data != "":
+                            """处理接收到的数据"""
                             # 说明客户端发送数据过来了
                             print(data)
-                            c_str = "{}:{}".format(c_ip, c_port)
+                            resp = SocketListener.listen(mes=data, ip=c_ip, port=c_port)
+                            client.send(resp.encode(encoding="utf-8"))
+                            # c_str = "{}:{}".format(c_ip, c_port)
                             # client.send('{}我已经收到你的数据了！\n'.format(c_str).encode('utf-8'))
-                            if data.startswith("CheckTraceCodeCanUse"):
-                                """
-                                条码合格判定
-                                请求检测数据是否合格: CheckTraceCodeCanUse, 10401911001201805011536541033317
-                                系统检测条码合格返回数据格式: 10401911001201805011536541033317,1    
-                                系统检测条码重复返回数据格式: 10401911001201805011536541033317,2 
-                                系统检测条码非当前生产数据格式: 10401911001201805011536541033317,3 
-                                系统检测条码格式错误: 10401911001201805011536541033317,4 
-                                条码加请求检测结果后的返回值，返回值为以上定义的 1-4数据。
-                                """
-                                code = data.split(",")[-1].strip("")
-                                r = CodeInfo.query_code(code=code)
-                                resp = '{},{}'.format(code, r).encode('utf-8')
-                                print(resp)
-                                client.send(resp)
-                                pass
-                            elif data.startswith("UploadTraceCodeToDb"):
-                                """
-                                UploadTraceCodeToDb
-                                请求检测数据是否合格: UploadTraceCodeToDb, 10401911001201805011536541033317, 
-                                10401911001201805011536541033318, 10401911001201805011536541033319, 
-                                10401911001201805011536541033311, 10401911001201805011536541033312,
-                                ……
-                                系统检测条码合格返回数据格式: UploadTraceCodeToDb ,10401911001201805011536541033317,1
-                                系统数据返回格式解释: 用请求的接口名，加第一个请求的条码内容，加结果。
-                                1. 代表本次请求接口处理成功，0则代表本次接口处理数据失败。
-                                """
-                                pass
-                            else:
-                                client.send('{}你发送的数据我未能理解: data={}！\n'.format(c_str, data).encode('utf-8'))
+                            # if data.startswith("CheckTraceCodeCanUse"):
+                            #     """
+                            #     条码合格判定
+                            #     请求检测数据是否合格: CheckTraceCodeCanUse, 10401911001201805011536541033317
+                            #     系统检测条码合格返回数据格式: 10401911001201805011536541033317,1
+                            #     系统检测条码重复返回数据格式: 10401911001201805011536541033317,2
+                            #     系统检测条码非当前生产数据格式: 10401911001201805011536541033317,3
+                            #     系统检测条码格式错误: 10401911001201805011536541033317,4
+                            #     条码加请求检测结果后的返回值，返回值为以上定义的 1-4数据。
+                            #     """
+                            #     code = data.split(",")[-1].strip("")
+                            #     r = CodeInfo.query_code(code=code)
+                            #     resp = '{},{}'.format(code, r).encode('utf-8')
+                            #     print(resp)
+                            #     client.send(resp)
+                            #     pass
+                            # elif data.startswith("UploadTraceCodeToDb"):
+                            #     """
+                            #     UploadTraceCodeToDb
+                            #     请求检测数据是否合格: UploadTraceCodeToDb, 10401911001201805011536541033317,
+                            #     10401911001201805011536541033318, 10401911001201805011536541033319,
+                            #     10401911001201805011536541033311, 10401911001201805011536541033312,
+                            #     ……
+                            #     系统检测条码合格返回数据格式: UploadTraceCodeToDb ,10401911001201805011536541033317,1
+                            #     系统数据返回格式解释: 用请求的接口名，加第一个请求的条码内容，加结果。
+                            #     1. 代表本次请求接口处理成功，0则代表本次接口处理数据失败。
+                            #     """
+                            #     pass
+                            # else:
+                            #     client.send('{}你发送的数据我未能理解: data={}！\n'.format(c_str, data).encode('utf-8'))
                         else:
                             # 说明客户端已经关闭了
                             print('{}:{}已断开！\n'.format(c_ip, c_port))

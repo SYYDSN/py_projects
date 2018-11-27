@@ -27,8 +27,11 @@ class Company(orm_module.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['company_name'] = str
-    type_dict['short_name'] = str
+    type_dict['code_length'] = int  # 条码长度.默认35
+    type_dict['inventory_threshold'] = int  # 设定的最小库存空白条码数量阈值,低于此会报警
+    type_dict['printed_threshold'] = int  # 设定的已打印未使用的条码数量阈值,低于此会报警
     type_dict['desc'] = str
+    type_dict['last'] = datetime.datetime
     type_dict['time'] = datetime.datetime
     type_dict['organization'] = dict  # 组织架构 {"name": 生产部: "children": [], ...},
 
@@ -153,7 +156,7 @@ class Role(orm_module.BaseDoc):
         return [x for x in data]
 
     @classmethod
-    def views_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False) -> dict:
+    def paging_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False) -> dict:
         """
         分页查看角色信息
         :param filter_dict: 过滤器,由用户的权限生成
@@ -346,7 +349,7 @@ class User(orm_module.BaseDoc):
         return mes
 
     @classmethod
-    def views_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False,
+    def paging_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False,
                    include_role: bool = True, include_dept: bool = True) -> dict:
         """
         分页查看用户信息
@@ -400,12 +403,52 @@ class ProductLine(orm_module.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['name'] = str
     type_dict['desc'] = str
-
-
-class MasterBoard(orm_module.BaseDoc):
     """
-    嵌入式设备的主控版
+    嵌入式设备的数据结构
+    embedded = {
+        "control_board_ip1": {
+            "execute_board_ip1": {},
+            "execute_board_ip2": {},
+            ......
+            "execute_board_ipn": {}
+        },
+        "control_board_ip2": {
+            ......
+        },
+        "control_board_ip3": {},
+        ........
+    }
     """
+    type_dict['embedded'] = dict
+    type_dict['time'] = datetime.datetime
+    # 子设备,就是type=control的嵌入式设备(Embedded)
+
+    @classmethod
+    def paging_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10,
+                    can_json: bool = False) -> dict:
+        """
+        分页查看设备信息
+        :param filter_dict: 过滤器,由用户的权限生成
+        :param page_index: 页码(当前页码)
+        :param page_size: 每页多少条记录
+        :param can_json: 转换成可以json的字典?
+        :return:
+        """
+        """
+        不用field_map字段是不对子查询做更名,
+        flat = False是保留多个子查询的内容
+        """
+
+        kw = {
+            "filter_dict": filter_dict,
+            "join_cond": None,
+            "sort_cond": [('time', -1)],  # 主文档排序条件
+            "page_index": page_index,  # 当前页
+            "page_size": page_size,  # 每页多少条记录
+            "can_json": can_json
+        }
+        r = cls.query(**kw)
+        return r
 
 
 if __name__ == "__main__":
@@ -430,6 +473,6 @@ if __name__ == "__main__":
     #             f['password'] = "123456"
     #             r = col.insert_one(document=f, session=ses)
     """join测试"""
-    r = Role.views_info(filter_dict=dict())
+    r = Role.paging_info(filter_dict=dict())
     print(r)
     pass

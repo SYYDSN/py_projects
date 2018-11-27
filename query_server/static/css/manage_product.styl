@@ -50,6 +50,7 @@ default_blue = #286090
                         background-color default_blue
             .table_outer
                 min-height calc(100% - 100px)
+                overflow-y scroll
                 #product_list
                     .select
                         width 30px
@@ -141,27 +142,6 @@ default_blue = #286090
                         border 1px solid rgba(180, 180, 180, 1)
                         border-radius 6px
                         box-shadow none
-                    //.my_package
-                    //    border none
-                    //    display flex
-                    //    flex-direction row
-                    //    justify-content flex-start
-                    //    align-items center
-                    //    >input
-                    //        border 1px solid #b4b4b4
-                    //        outline none
-                    //        width 46%
-                    //        padding 4px 5px
-                    //    >.left
-                    //        maegin-right -1px
-                    //        border-radius 6px 0 0 6px
-                    //    >.right
-                    //        margin-left -1px
-                    //        border-radius 0 6px 6px 0
-                    //    >span
-                    //        display inline-block
-                    //        text-align center
-                    //        width 10%
             .modal_bot
                 padding-bottom 20px
                 display flex
@@ -175,3 +155,6 @@ default_blue = #286090
                     margin-right 10px
                 > .last
                     margin-left 10px
+    .modal_outer_company
+        > .modal_inner
+            height 410px
