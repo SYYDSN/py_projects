@@ -1,0 +1,20 @@
+{% extends "template.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/io_client.css">
+    <script type="text/javascript" src="/static/js/socket.io.js"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="show">
+
+    </div>
+    <div class="bottom">
+        <input type="text" placeholder="请输入...">
+    <button type="button" class="btn btn-md btn-primary" id="submit">提交</button>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/io_client.js"></script>
+{% endblock %}
