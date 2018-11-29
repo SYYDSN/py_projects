@@ -23,13 +23,13 @@
                     <span id="clear_condition">所有信息</span>
                 </div>
                 <div class="right">
-                    <button id="add_line" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                    <button id="add_line" type="button" class="pop_modal_line btn btn-default btn-sm btn-primary">
                         添加生产线
                     </button>
-                    <button id="add_control" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                    <button id="add_control" type="button" class="pop_modal_control btn btn-default btn-sm btn-primary">
                         添加主控板
                     </button>
-                    <button id="add_execute" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                    <button id="add_execute" type="button" class="pop_modal_execute btn btn-default btn-sm btn-primary">
                         添加执行板
                     </button>
                 </div>
@@ -83,7 +83,7 @@
                 <div class="left">
                     <input type="checkbox" id="check_all">
                     <span>全选</span>
-                    <button id="delete_user" type="button" class="btn btn-sm btn-default btn-primary">
+                    <button id="delete_line" type="button" class="btn btn-sm btn-default btn-primary">
                         删除
                     </button>
                 </div>
@@ -114,8 +114,8 @@
                 </div>
             </div>
             <div class="modal_bot">
-                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
-                <button data-id="" id="submit_btn" class="btn btn-md btn-primary last">保存</button>
+                <button class="close_medal btn btn-md btn-default first">关闭</button>
+                <button data-id="" class="submit_btn btn btn-md btn-primary last">保存</button>
             </div>
         </div>
     </div>
@@ -130,26 +130,17 @@
             <div class="modal_mid">
                 <div class="line">
                     <label>生产线</label>
-                    <div class="my_input dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="line_drop_1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <span></span>
-                            <span data-role-id="" class="current_role"></span>
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                            {% for line in lines %}
-                                <li data-id="{{ line._id }}" class="select_line">{{ line.name }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    <select class="my_input line_name">
+                        <option></option>
+                    </select>
                 </div>
                 <div class="line">
                     <label>主控板IP</label><input type="text" class="control_ip">
                 </div>
             </div>
             <div class="modal_bot">
-                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
-                <button data-id=""  id="submit_btn" class="btn btn-md btn-primary last">保存</button>
+                <button  class="close_medal btn btn-md btn-default first">关闭</button>
+                <button data-id="" class="submit_btn btn btn-md btn-primary last">保存</button>
             </div>
         </div>
     </div>
@@ -157,7 +148,7 @@
     <div class="modal_outer modal_outer_execute">
         <div class="modal_inner">
             <div class="modal_top">
-                <h3 id="execute_modal_title">
+                <h3 class="modal_title">
                     添加执行板
                 </h3>
             </div>
@@ -198,8 +189,8 @@
                 </div>
             </div>
             <div class="modal_bot">
-                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
-                <button  data-id="" data-control-ip="" id="submit_btn" class="btn btn-md btn-primary last">保存</button>
+                <button class="close_medal btn btn-md btn-default first">关闭</button>
+                <button  data-id="" data-control-ip="" class="submit_btn btn btn-md btn-primary last">保存</button>
             </div>
         </div>
     </div>

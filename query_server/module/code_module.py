@@ -14,7 +14,7 @@ from log_module import get_logger
 """
 
 
-logger = get_logger()
+logger = get_logger("条码查询")
 ObjectId = orm_module.ObjectId
 cache = orm_module.RedisCache()
 
@@ -161,22 +161,6 @@ class CodeInfo(orm_module.BaseDoc):
     type_dict['time'] = datetime.datetime   # 使用时间,可能为空
 
     @classmethod
-    def get_threshold(cls) -> dict:
-        """
-        获取公司的空白库存最低阈值和已打印可用条码阈值
-        :return:
-        """
-        res = {"inventory_threshold": None, "printed_threshold": None}
-        col = orm_module.get_conn(table_name="company_info")
-        r = col.find_one(filter=dict())
-        if r is None:
-            pass
-        else:
-            res['inventory_threshold'] = r.get("inventory_threshold")
-            res['printed_threshold'] = r.get("printed_threshold")
-        return res
-
-    @classmethod
     def query_code(cls, code: str) -> int:
         """
         查询条码
@@ -188,20 +172,71 @@ class CodeInfo(orm_module.BaseDoc):
         :return:
         """
         res = 4
-        f = {"_id": code}
-        r = cls.find_one(filter_dict=f)
-        if r is None:
+        threshold = get_code_length()
+        if len(code) != threshold:
             pass
         else:
-            r.get("used")
-            if r == 0:
-                res = 0
+            debug = True   # 当前保持测试模式
+            begin = datetime.datetime.now()
+            f = {"_id": code}
+            if debug:
+                """测试模式"""
+                r = cls.find_one(filter_dict=f)
+                if r is None:
+                    """没有查询到"""
+                    res = 3
+                else:
+                    status = r.get("status", -1)
+                    print_id = r.get("print_id", None)
+                    if isinstance(print_id, ObjectId):
+                        if status == 0:
+                            res = 1
+                        elif status == -1:
+                            res = 3
+                        else:
+                            res = 2
+                    else:
+                        """条码未打印"""
+                        res = 3
             else:
-                res = 1
+                """生产模式"""
+            db_client = orm_module.get_client()
+            write_concern = orm_module.get_write_concern()
+            col = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client, write_concern=write_concern)
+            with db_client.start_session(causal_consistency=True) as ses:
+                with ses.start_transaction(write_concern=write_concern):
+                    r = col.find_one(filter=f)
+                    if r is None:
+                        """没有查询到"""
+                        res = 3
+                    else:
+                        status = r.get("status", -1)
+                        print_id = r.get("print_id", None)
+                        if isinstance(print_id, ObjectId):
+                            if status == 0:
+                                res = 1
+                                """标记当前条码已被使用"""
+                                u = {"$set": {"status": 1}}
+                                return_document = orm_module.ReturnDocument.AFTER
+                                r2 = col.find_one_and_update(filter=f, update=u, return_document=return_document)
+                                if r2 is None:
+                                    ms = "标记已用条码时出错,已用标记未写入, 条码: {}".format(code)
+                                    logger.exception(msg=ms)
+                                else:
+                                    pass
+                            elif status == -1:
+                                res = 3
+                            else:
+                                res = 2
+                        else:
+                            """条码未打印"""
+                            res = 3
+            end = datetime.datetime.now()
+            ms = (end - begin).total_seconds()
+            print(ms)
         return res
 
 
-
-
 if __name__ == "__main__":
+    CodeInfo.query_code("23132104307180149268677481490882207")
     pass

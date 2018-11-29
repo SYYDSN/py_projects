@@ -35,6 +35,22 @@ class Company(orm_module.BaseDoc):
     type_dict['time'] = datetime.datetime
     type_dict['organization'] = dict  # 组织架构 {"name": 生产部: "children": [], ...},
 
+    @classmethod
+    def get_threshold(cls) -> dict:
+        """
+        获取公司的空白库存最低阈值和已打印可用条码阈值
+        :return:
+        """
+        res = {"inventory_threshold": None, "printed_threshold": None}
+        col = orm_module.get_conn(table_name=cls.get_table_name())
+        r = col.find_one(filter=dict())
+        if r is None:
+            pass
+        else:
+            res['inventory_threshold'] = r.get("inventory_threshold")
+            res['printed_threshold'] = r.get("printed_threshold")
+        return res
+
 
 class Product(orm_module.BaseDoc):
     """公司产品信息"""

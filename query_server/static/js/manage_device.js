@@ -6,206 +6,85 @@ $(function(){
     };
 
     /*关闭摩态框按钮*/
-    $("#close_medal").click(function(){
+    $(".close_medal").click(function(){
         $(".modal_outer").css("display", "none");
     });
 
-    /*填充信息到摩态框*/
-    var fill_line_info = function($obj){
-        var $this = $(this);
+    /*填充信息到生产线模态框*/
+    var fill_line_info = function(id_str){
+        console.log(id_str);
 
     };
 
-    // 弹出编辑生产线模态框
-    $(".edit_line, .edit_control, .edit_execute").each(function(){
-        var $this = $(this);
-        $this.click(function(){
-            var kind = "line";
-            if($this.hasClass("edit_control")){
-                kind = "control";
-            }
-            else if($this.hasClass("edit_execute")){
-                kind = "execute";
-            }else{}
-            var class_name = `.modal_outer_${kind}`;
-            var this_modal = $(class_name);
-            $(".modal_outer").not(this_modal).css("display", "none");
-            this_modal.css("display", "flex");
-            clear_modal();
-            // 填充待编辑数据
-            if(kind === "control"){
-
-            }
-            else if(kind === "execute"){
-
-            }
-            else{
-                fill_line_info($this);
-            }
-        });
-    });
-
-
-    /*添加用户按钮*/
-    $(".pop_modal").each(function(){
+    /*弹出生产线模态框*/
+    $(".pop_modal_line").each(function(){
         var $this = $(this);
         $this.click(function(){
             clear_modal();
             var text = $.trim($this.text());
-            var title = "添加用户";
+            var title = "添加生产线";
             if(text === "编辑"){
-                title = "编辑用户";
+                title = "编辑生产线";
                 var _id = $this.attr("data-id");
-                fill_user_info(_id);
+                fill_line_info(_id);
             }
             else{
                 // nothing...
             }
-            $("#modal_title").text(title);
-            $(".modal_outer").css("display", "flex");
+            $(".modal_outer_line .modal_title").text(title);
+            $(".modal_outer_line").css("display", "flex");
         });
     });
 
-
-    /*添加角色*/
-    var add = function(){
-       var nick_name = $.trim($("#nick_name").val());
-       var user_name = $.trim($("#user_name").val());
-       var pw1 = $.trim($("#u_password1").val());
-       var pw2 = $.trim($("#u_password2").val());
-       var role_id = $.trim($(".current_role").attr("data-role-id"));
-
-       if(nick_name === ""){
-           alert("姓名不能为空");
-           return false;
-       }
-       else if(user_name === ""){
-           alert("账户不能为空");
-           return false;
-       }
-       else if(pw1 === "" || pw2 === ""){
-           alert("密码必须");
-           return false;
-       }
-       else if(pw1 !== pw2){
-           alert("两次输入的密码必须一致");
-           return false;
-       }
-       else if(role_id === ""){
-           alert("工作组不能为空!");
-           return false;
-       }
-       else{
-           var args = {
-               "nick_name": nick_name,
-               "user_name": user_name,
-               "role_id": role_id,
-               "status": parseInt($.trim($(".select_status").attr("data-value"))),
-               "password": $.md5(pw1),
-               "type": "add"
-           };
-           $.post(location.pathname, args, function(resp){
-               var json = JSON.parse(resp);
-               var status = json['message'];
-               if(status === "success"){
-                   alert("添加成功!");
-                   location.reload();
-               }
-               else{
-                   alert(status);
-               }
-           });
-       }
-    };
-
-    /*编辑用户事件*/
-    var edit = function(c_id){
-        var nick_name = $.trim($("#nick_name").val());
-       var user_name = $.trim($("#user_name").val());
-       var pw1 = $.trim($("#u_password1").val());
-       var pw2 = $.trim($("#u_password2").val());
-       var role_id = $.trim($(".current_role").attr("data-role-id"));
-
-       if(nick_name === ""){
-           alert("姓名不能为空");
-           return false;
-       }
-       else if(user_name === ""){
-           alert("账户不能为空");
-           return false;
-       }
-       else if(pw1 !== pw2){
-           alert("两次输入的密码必须一致");
-           return false;
-       }
-       else if(role_id === ""){
-           alert("工作组不能为空!");
-           return false;
-       }
-       else{
-           var args = {
-               "_id": c_id,
-               "nick_name": nick_name,
-               "user_name": user_name,
-               "role_id": role_id,
-               "status": parseInt($.trim($(".select_status").attr("data-value"))),
-               "type": "edit"
-           };
-           if(pw1 === ""){
-               // 置空表示不修改密码
-           }
-           else{
-               args['password'] = $.md5(pw1);
-           }
-
-           $.post(location.pathname, args, function(resp){
-               var json = JSON.parse(resp);
-               var status = json['message'];
-               if(status === "success"){
-                   alert("修改成功!");
-                   location.reload();
-               }
-               else{
-                   alert(status);
-               }
-           });
-       }
-    };
+    /*弹出主控板模态框*/
+    $(".pop_modal_control").each(function(){
+        var $this = $(this);
+        $this.click(function(){
+            clear_modal();
+            var text = $.trim($this.text());
+            var title = "添加主控板";
+            if(text === "编辑"){
+                title = "编辑主控板";
+                var _id = $this.attr("data-id");
+                fill_line_info(_id);
+            }
+            else{
+                // nothing...
+            }
+            $(".modal_outer_control .modal_title").text(title);
+            $(".modal_outer_control").css("display", "flex");
+        });
+    });
 
     /*弹出框提交按钮事件*/
-    $("#submit").click(function(){
-        var current_id = $.trim($("#modal_title").attr("data-current-id"));
-        if(current_id === ""){
-            // 添加角色
-            add();
-        }
-        else{
-            // 编辑角色
-            edit(current_id);
-        }
-    });
-
-    /*模态框选择角色事件*/
-    $(".select_role").each(function(){
+    $(".submit").each(function(){
         var $this = $(this);
         $this.click(function(){
-            var role_id = $this.attr("data-id");
-            var role_name = $.trim($this.text());
-            $(".current_role").attr("data-role-id", role_id).text(role_name);
+            var l_id = $.trim($this.attr("data-id"));
+            var c_id = $.trim($this.attr("data-control-ip"));
+            var line_name = $.trim($(".modal_outer .line_name").val());
+            var args = {};
+            if(l_id === ""){
+                // 添加生产线
+
+                if(line_name === ""){
+                    alert("生产线名必须!");
+                    return false;
+                }
+                else{
+                    args['name'] = line_name
+                }
+            }
+            else{
+                // 编辑主控板或者添加编辑子设备
+            }
         });
     });
 
-    /*模态框选择用户状态事件*/
-    $(".status_value").each(function(){
-        var $this = $(this);
-        $this.click(function(){
-            $(".status_value").not($this).removeClass("select_status");
-            $this.addClass("select_status");
-        });
-    });
 
-    /*删除用户*/
-    $("#delete_user").click(function(){
+
+    /*删除生产线*/
+    $("#delete_line").click(function(){
         var d = [];
         $(".select > input[type='checkbox']:checked").each(function(){
             var $this = $(this);

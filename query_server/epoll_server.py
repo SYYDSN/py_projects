@@ -6,12 +6,15 @@ from module.code_module import SocketListener
 
 
 """
-利用非阻塞和epoll来实现一个服务器
+利用非阻塞和epoll来实现一个服务器.
+本模块是生产环境是用的.
 """
 
 
 class WebServer:
-    """定义一个web服务器"""
+    """
+    定义一个web服务器
+    """
 
     def __init__(self):
         # 1.创建TCP 服务器

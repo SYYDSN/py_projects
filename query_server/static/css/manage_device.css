@@ -253,3 +253,12 @@
 .right_main .modal_outer > .modal_inner .modal_bot > .last {
   margin-left: 10px;
 }
+.right_main .modal_outer_line > .modal_inner {
+  height: 240px;
+}
+.right_main .modal_outer_control > .modal_inner {
+  height: 320px;
+}
+.right_main .modal_outer_execute > .modal_inner {
+  height: 240px;
+}
