@@ -155,8 +155,10 @@ class CodeImportView(MyView):
         render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
 
         if isinstance(access_filter, dict):
-            page_index = get_arg(request, "index", 1)
+            page_index = get_arg(request, "page", 1)
             s = {"upload_time": -1}
+            selector = Product.selector_data()
+            render_data.update(selector)
             result = UploadFile.query(filter_dict=access_filter, page_index=page_index, sort_cond=s)
             disk_import_file = UploadFile.all_file_name()  # 获取磁盘上的所有文件名
             files = result['data']
@@ -188,12 +190,21 @@ class CodeImportView(MyView):
                 mes = UploadFile.upload(request)
             else:
                 the_type = get_arg(request, "type", "")
-                if the_type == "import":
-                    """导入条码操作"""
-                    key = get_arg(request, "key", "")
-                    mes = UploadFile.import_code(key=key)
+                if the_type == "cancel":
+                    """撤销导入条码操作"""
+                    ids = []
+                    try:
+                        ids = json.loads(get_arg(request, "ids"))
+                    except Exception as e:
+                        print(e)
+                    finally:
+                        if len(ids) == 0:
+                            mes['message'] = "没有需要撤销的文件记录"
+                        else:
+                            ids = [ObjectId(x) for x in ids]
+                            mes = UploadFile.cancel_data(f_ids=ids)
                 elif the_type == "delete":
-                    """批量删除"""
+                    """批量删除文件和日志"""
                     ids = []
                     try:
                         ids = json.loads(get_arg(request, "ids"))
@@ -203,7 +214,9 @@ class CodeImportView(MyView):
                         if len(ids) == 0:
                             mes['message'] = "没有发现需要删除的文件"
                         else:
-                            mes = UploadFile.delete_file_and_record(ids=ids)
+                            ids = [ObjectId(x) for x in ids]
+                            include_record = get_arg(request, "include_record")
+                            mes = UploadFile.delete_file_and_record(ids=ids, include_record=include_record)
 
                 else:
                     mes['message'] = "无效的操作类型:{}".format(the_type)
@@ -285,7 +298,7 @@ class ManageProductView(MyView):
         render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
 
         if isinstance(access_filter, dict):
-            page_index = get_arg(request, "index", 1)
+            page_index = get_arg(request, "page", 1)
             r = Product.query(filter_dict=access_filter, page_index=page_index)  # 产品列表
             products = r.pop("data")
             render_data['products'] = products
@@ -398,7 +411,7 @@ class ManageUserView(MyView):
         if isinstance(access_filter, dict):
             """不显示管理员用户"""
             access_filter.update({"role_id": {"$ne": ObjectId("5bdfad388e76d6efa7b92d9e")}})
-            page_index = get_arg(request, "index", 1)
+            page_index = get_arg(request, "page", 1)
             r = User.paging_info(filter_dict=access_filter, page_index=page_index)  # 用户列表
             users = r.pop("data")
             f = {"_id": {"$ne": ObjectId("5bdfad388e76d6efa7b92d9e")}}
@@ -491,7 +504,7 @@ class ManageRoleView(MyView):
             return abort(401)
         else:
             access_filter.update({"role_name": {"$ne": "root"}})
-            page_index = get_arg(request, "index", 1)
+            page_index = get_arg(request, "page", 1)
             r = Role.paging_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
             roles = r.pop("data")
             render_data['roles'] = roles
@@ -577,7 +590,7 @@ class ManageDeviceView(MyView):
         if access_filter is None:
             return abort(401)
         else:
-            page_index = get_arg(request, "index", 1)
+            page_index = get_arg(request, "page", 1)
             r = ProductLine.paging_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
             lines = r.pop("data")
             render_data['lines'] = lines

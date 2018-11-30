@@ -2305,15 +2305,20 @@ class BaseDoc:
         else:
             pass
         pipeline = list()
+        table_name = cls.get_table_name()
+        ses = get_conn(table_name=table_name)
 
         """处理过滤条件"""
         match = filter_dict
         pipeline.append({"$match": match})
 
-        """处理统计"""
-        PipelineStage.add_count(pipeline=pipeline)
-        # count = {"total": {"$sum": 1}}
-        # pipeline.append({"$addFields": count})
+        """统计总数"""
+        p2 = [{"$match": match}, {"$count": "total"}]
+        r2 = [x for x in ses.aggregate(pipeline=p2)]
+        if len(r2) > 0:
+            record_count = r2[0]['total']
+        else:
+            record_count = 0
 
         """处理投影字段"""
         PipelineStage.project(pipeline=pipeline, projection=projection)
@@ -2339,14 +2344,10 @@ class BaseDoc:
         #     [pipeline.append({"$lookup": x}) for x in join_cond]
         # else:
         #     pass
-
-        table_name = cls._table_name
-        ses = get_conn(table_name=table_name)
         r = ses.aggregate(pipeline=pipeline)
         r = [x for x in r]
         """开始计算分页数据"""
         length = len(r)
-        record_count = 0 if length == 0 else r[0]['total']
         page_count = math.ceil(record_count / page_size)  # 共计多少页?
         delta = int(ruler / 2)
         range_left = 1 if (page_index - delta) <= 1 else page_index - delta
@@ -2370,11 +2371,12 @@ class BaseDoc:
                     res = [func(cls(**x)) for x in r]
                 else:
                     res = [cls(**x) for x in r]
+        total_page = 1 if page_count == 0 else page_count  # 最少显示页码1
         resp = {
             "total_record": record_count,
-            "total_page": 1 if page_count == 0 else page_count,  # 最少显示页码1
+            "total_page": total_page,
             "data": res,
-            "current_page": page_index,
+            "current_page": total_page if page_index > total_page else (page_index if page_index > 1 else 1),
             "pages": pages
         }
         return resp

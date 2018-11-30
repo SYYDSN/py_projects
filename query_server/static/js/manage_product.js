@@ -102,15 +102,15 @@ $(function () {
             alert("产品规格不能为空");
             return false;
         }
-        else if (isNaN(net_contents)) {
-            alert("净含量必须是数值");
+        else if (net_contents === "") {
+            alert("净含量不能为空");
             return false;
         }
         else {
             var args = {
                 "product_name": product_name,
                 "specification": specification,
-                "net_contents": parseInt(net_contents),
+                "net_contents": net_contents,
                 "package_ratio": package_ratio,
                 "type": "add"
             };
@@ -143,8 +143,8 @@ $(function () {
             alert("产品规格不能为空");
             return false;
         }
-        else if (isNaN(net_contents)) {
-            alert("净含量必须是数值");
+        else if (net_contents === "") {
+            alert("净含量不能为空");
             return false;
         }
         else {
@@ -152,7 +152,7 @@ $(function () {
                 "_id": p_id,
                 "product_name": product_name,
                 "specification": specification,
-                "net_contents": parseInt(net_contents),
+                "net_contents": net_contents,
                 "package_ratio": package_ratio,
                 "type": "edit"
             };
@@ -217,5 +217,8 @@ $(function () {
             $(".table_outer .select >input[type='checkbox']").prop("checked", false);
         }
     });
+
+    // 翻页事件
+    PageHandler();
 
 });

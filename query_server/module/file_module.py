@@ -23,6 +23,10 @@ cache = orm_module.RedisCache()
 ObjectId = orm_module.ObjectId
 IMPORT_DIR = os.path.join(__root_path, "import_data")  # 上传文件的默认目录
 EXPORT_DIR = os.path.join(__root_path, "export_data")  # 导出文件的默认目录
+if not os.path.exists(IMPORT_DIR):
+    os.makedirs(IMPORT_DIR)
+if not os.path.exists(EXPORT_DIR):
+    os.makedirs(EXPORT_DIR)
 
 
 class PrintBatch(orm_module.BaseDoc):
@@ -162,26 +166,55 @@ class UploadFile(orm_module.BaseDoc):
             f_p = os.path.join(dir_path, storage_name)
             with open(f_p, "wb") as f:
                 file.save(dst=f)
+            """读取文件信息"""
+            file_info = cls.read_file(f_p)
+            values = file_info.pop('values', None)
             file_size = os.path.getsize(f_p)
+            now = datetime.datetime.now()
             doc = {
                 "_id": _id,
                 "file_name": file_name,
                 "storage_name": storage_name,
                 "file_size": file_size,
-                "file_type": file_type,
-                "upload_time": datetime.datetime.now()
+                "valid_index": file_info['valid_index'],
+                "valid_count": file_info['valid_count'],
+                "invalid_count": file_info['invalid_count'],
+                "upload_time": now,
+                "import_time": now
             }
-            col = cls.get_collection(write_concern=orm_module.get_write_concern())
-            r = col.insert_one(document=doc)
-            if isinstance(r, orm_module.InsertOneResult):
-                r = cls.read_file(file_path=f_p)
-                if isinstance(r, dict) and r.get("valid_count", 0) > 0:
-                    """成功"""
-                    pass
-                else:
-                    mes['message'] = "没有解析到正确的结果"
+            if values is None or len(values) == 0:
+                mes['message'] = "没有在文件里发现条码信息"
             else:
-                mes['message'] = "保存失败"
+                w = orm_module.get_write_concern()
+                db_client = orm_module.get_client()
+                col1 = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)
+                col2 = orm_module.get_conn(table_name="code_info", db_client=db_client)
+                with db_client.start_session(causal_consistency=True) as ses:
+                    with ses.start_transaction(write_concern=w):
+                        r = col1.insert_one(document=doc, session=ses)
+                        if isinstance(r, orm_module.InsertOneResult):
+                            r = cls.read_file(file_path=f_p)
+                            if isinstance(r, dict):
+                                """成功,开始批量插入"""
+                                r = None
+                                values = [{"_id": x, "status": 0, "file_id": _id} for x in values]
+                                try:
+                                    r = col2.insert_many(documents=values)
+                                except orm_module.BulkWriteError as e1:
+                                    mes['message'] = "有重复的数据"
+                                except Exception as e:
+                                    mes['message'] = "{}".format(e)
+                                finally:
+                                    if isinstance(r, orm_module.InsertManyResult):
+                                        pass
+                                    else:
+                                        ses.abort_transaction()
+                            else:
+                                mes['message'] = "没有解析到正确的结果"
+                                ses.abort_transaction()
+                        else:
+                            mes['message'] = "保存失败"
+                            ses.abort_transaction()
         return mes
 
     @classmethod
@@ -204,25 +237,15 @@ class UploadFile(orm_module.BaseDoc):
                 res = cls.parse_lines(lines)
         else:
             pass
-        """修改条码统计的信息"""
-        _id = ObjectId(file_path.split("/")[-1].split(".")[0])
-        f = {"_id": _id}
-        u = {"$set":
-            {
+        """条码统计的信息"""
+
+        res = {
                 "valid_index": res['valid_index'],
                 "valid_count": res['valid_count'],
-                "invalid_count": res['invalid_count']
+                "invalid_count": res['invalid_count'],
+                "values": res.pop('values', None)
             }
-        }
-        w = orm_module.get_write_concern()
-        col = cls.get_collection(write_concern=w)
-        col.find_one_and_update(filter=f, update=u, upsert=False)
-        values = res.pop('values', None)
-        if values is not None:
-            """设置缓存"""
-            cls.cache_values(_id, values)
-        else:
-            pass
+
         return res
 
     @classmethod
@@ -278,36 +301,6 @@ class UploadFile(orm_module.BaseDoc):
         }
         return res
 
-    @staticmethod
-    def cache_values(file_id: (str, ObjectId), values: list) -> None:
-        """
-        缓存值
-        :param file_id:
-        :param values:
-        :return:
-        """
-        file_id = file_id if isinstance(file_id, str) else str(file_id)
-        cache.set(file_id, values, timeout=60 * 60)
-
-    @staticmethod
-    def get_values(key: str) -> list:
-        """
-        获取缓存的值
-        :param key:
-        :return:
-        """
-        values = cache.get(key=key)
-        return list() if values is None else values
-
-    @staticmethod
-    def remove_cache(key: str) -> None:
-        """
-        清除缓存
-        :param key:
-        :return:
-        """
-        cache.delete(key=key)
-
     @classmethod
     def delete_file_and_record(cls, ids: list, include_record: bool = False) -> dict:
         """
@@ -317,11 +310,12 @@ class UploadFile(orm_module.BaseDoc):
         :return:
         """
         mes = {"message": "success"}
+        ids = [x if isinstance(x, ObjectId) else ObjectId(x) for x in ids]
         if include_record:
-            ids2 = [ObjectId(x) for x in ids]
-            cls.delete_many(filter_dict={"_id": {"$in": ids2}})
+            cls.delete_many(filter_dict={"_id": {"$in": ids}})
         else:
             pass
+        ids = [str(x) for x in ids]
         names = os.listdir(IMPORT_DIR)
         for name in names:
             prefix = name.split(".")[0]
@@ -329,6 +323,22 @@ class UploadFile(orm_module.BaseDoc):
                 os.remove(os.path.join(IMPORT_DIR, name))
             else:
                 pass
+        return mes
+
+    @classmethod
+    def cancel_data(cls, f_ids: list) -> dict:
+        """
+        撤销导入的文件
+        :param f_ids: 文件id的list
+        :return:
+        """
+        mes = {"message": "success"}
+        ids2 = [x if isinstance(x, ObjectId) else ObjectId(x) for x in f_ids]
+        f = {"file_id": {"$in": ids2}}
+        w = orm_module.get_write_concern()
+        col = orm_module.get_conn(table_name="code_info", write_concern=w)
+        col.delete_many(filter=f)
+        mes = cls.delete_file_and_record(ids=ids2, include_record=True)
         return mes
 
     @classmethod
@@ -346,41 +356,6 @@ class UploadFile(orm_module.BaseDoc):
             else:
                 pass
         return resp
-
-    @classmethod
-    def import_code(cls, key: str) -> dict:
-        """
-        导入数据
-        :param key:
-        :return:
-        """
-        mes = {"message": "success"}
-        key = str(key) if isinstance(key, ObjectId) else key
-        values = cls.get_values(key)
-        if values is not None:
-            file_id = ObjectId(key)
-            values = [{"_id": x, "status": 0, "file_id": file_id} for x in values]
-            w = orm_module.get_write_concern()
-            col = orm_module.get_conn(table_name="code_info", write_concern=w)
-            r = None
-            try:
-                r = col.insert_many(documents=values)
-            except orm_module.BulkWriteError as e1:
-                mes['message'] = "重复导入"
-            except Exception as e:
-                mes['message'] = "{}".format(e)
-            finally:
-                if isinstance(r, orm_module.InsertManyResult):
-                    f = {"_id": ObjectId(key)}
-                    u = {"$set": {"import_time": datetime.datetime.now()}}
-                    cls.find_one_and_update(filter_dict=f, update_dict=u)
-                    inserted = len(r.inserted_ids)
-                    mes['inserted'] = inserted
-                else:
-                    pass
-        else:
-            mes['message'] = "请重新上传文件"
-        return mes
 
 
 if __name__ == "__main__":

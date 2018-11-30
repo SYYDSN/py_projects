@@ -225,4 +225,6 @@ $(function(){
         }
     });
 
+    // 翻页事件
+    PageHandler();
 });

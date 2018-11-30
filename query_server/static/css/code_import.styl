@@ -40,18 +40,54 @@ default_blue = #286090
                 > .left:hover
                     cursor pointer
                 > .left
+                    width 15%
                     > i
                         color default_blue
                         margin-right 1em
                     > #clear_condition
                         color default_blue
                 > .right
+                    width 85%
                     display flex
                     flex-direction row
                     justify-content flex-end
                     align-items center
+                    >.select_group
+                        display flex
+                        flex-direction row
+                        justify-content flex-start
+                        align-items center
+                        width calc(100% - 100px)
+                        .select_div
+                            height 30px
+                            display flex
+                            flex-direction row
+                            justify-content center
+                            align-items center
+                            >label
+                                padding 0 8px
+                                color #717171
+                                font-weight 400
+                            >.my_input
+                                position relative
+                                >button
+                                    height 32px
+                                    >.current_value
+                                        display inline-block
+                                        width 5em
+                                >ul
+                                    width 5em
+                                    >li
+                                        text-align center
+                                    >li:hover
+                                        cursor pointer
+                    #upload_file
+                        display none
+                    >.file_path
+                        margin-right 50px
                     #open_file
                         background-color default_blue
+
             .table_outer
                 min-height calc(100% - 100px)
                 overflow-y scroll
@@ -180,3 +216,62 @@ default_blue = #286090
                     margin-right 10px
                 > .last
                     margin-left 10px
+
+    /*modal部分*/
+    .modal_outer_progress
+        position absolute
+        top 0
+        left 0
+        width 100%
+        height 100%
+        z-index: 9999
+        float left
+        background-color rgba(180, 180, 180, 0.9)
+        display flex
+        flex-direction row
+        justify-content center
+        align-items center
+        display none
+        > .modal_inner
+            width 500px
+            height 260px
+            margin-top -20%
+            border-radius 5px
+            background-color rgba(255, 255, 255, 1)
+            border 1px solid rgba(200, 200, 200, 1)
+            .modal_top
+                display flex
+                flex-direction row
+                justify-content center
+                align-items center
+                border-bottom 1px solid rgba(160, 160, 160, 1)
+                > h3
+                    color rgba(150, 150, 150, 1)
+            .modal_mid
+                .line
+                    width 100%
+                    display flex
+                    flex-direction column
+                    justify-content center
+                    align-items center
+                    padding 15px
+                    >div
+                        margin 15px 10px
+                        width 100%
+                        text-align center
+                    #my_progress
+                        >.my_per
+                            display block
+                            width 30px
+                            margin-left 208px
+                            position absolute
+                .process_line
+                    display flex
+                    font-size 16px
+                    display none
+                    justify-content center
+                    align-items center
+                    >i
+                        margin-top 10px
+
+

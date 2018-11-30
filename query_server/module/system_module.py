@@ -102,6 +102,43 @@ class Product(orm_module.BaseDoc):
                     mes['message'] = "重复的产品信息"
         return mes
 
+    @classmethod
+    def selector_data(cls) -> dict:
+        """
+        获取产品的选择器数据,此数据用于多级联动的下拉选择器
+        :return:
+        """
+        f = dict()
+        data = cls.find(filter_dict=f)
+        level_1 = dict()
+        level_2 = dict()
+        level_3 = dict()
+
+        for x in data:
+            product_name = x['product_name']
+            specification = x['specification']
+            net_contents = x['net_contents']
+            package_ratio = x['package_ratio']
+            t3 = level_3.get(net_contents, list())
+            t3.append({package_ratio:str(x['_id'])})
+            level_3[net_contents] = t3
+            t2 = level_2.get(specification, list())
+            t2.append(net_contents)
+            level_2[specification] = t2
+            t1 = level_1.get(product_name, list())
+            t1.append(specification)
+            level_1[product_name] = t1
+        l1 = dict()
+        l2 = dict()
+        l3 = level_3
+        for k, v in level_1.items():
+            l1[k] = list(set(v))
+        for k, v in level_2.items():
+            l2[k] = list(set(v))
+
+        resp = {"l1": l1, "l2": l2, "l3": l3}
+        return resp
+
 
 class Dept(orm_module.BaseDoc):
     """部门信息"""
@@ -488,7 +525,5 @@ if __name__ == "__main__":
     #         if r is None:
     #             f['password'] = "123456"
     #             r = col.insert_one(document=f, session=ses)
-    """join测试"""
-    r = Role.paging_info(filter_dict=dict())
-    print(r)
+    Product.selector_data()
     pass

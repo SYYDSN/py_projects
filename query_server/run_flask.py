@@ -23,20 +23,20 @@ except ImportError as e:
 
 
 # bjoern部署方式,c语言,异步模式.注意,这种方式不支持ssl,也不能自定义headers
-# print("bjoern running on {} port ..".format(port))
-# bjoern.listen(app, "0.0.0.0", port)
-# bjoern.run()
+print("bjoern running on {} port ..".format(port))
+bjoern.listen(app, "0.0.0.0", port)
+bjoern.run()
 
 
 # waitress windows和unix皆可,推荐
-server_ini = {
-    "app": app,
-    "host": "0.0.0.0",
-    "port": port,
-    "connection_limit": 400,  # 连接限制
-    "asyncore_use_poll": True
-}
-serve(**server_ini)
+# server_ini = {
+#     "app": app,
+#     "host": "0.0.0.0",
+#     "port": port,
+#     "connection_limit": 400,  # 连接限制
+#     "asyncore_use_poll": True
+# }
+# serve(**server_ini)
 
 
 # meinheld 方式,部分c的py.

@@ -636,11 +636,16 @@ function PageHandler (prev_page, next_page, page_count, page_num, jump_btn){
     * param page_num: 待跳转的页码元素的id, 默认id是page_num
     * param jump_btn: 跳转按钮的id, 默认id是jump_btn
     * */
-    prev_page = prev_page.startsWith("#")? prev_page: (prev_page === undefined? "prev_page": prev_page);
-    next_page = next_page.startsWith("#")? next_page: (next_page === undefined? "next_page": next_page);
-    page_count = page_count.startsWith("#")? page_count: (page_count === undefined? "page_count": page_count);
-    page_num = page_num.startsWith("#")? page_num: (page_num === undefined? "page_num": page_num);
-    jump_btn = jump_btn.startsWith("#")? jump_btn: (jump_btn === undefined? "jump_btn": jump_btn);
+    prev_page = prev_page === undefined? "prev_page": prev_page;
+    prev_page = prev_page.startsWith("#")? prev_page: "#" + prev_page;
+    next_page = next_page === undefined? "next_page": next_page;
+    next_page = next_page.startsWith("#")? next_page: "#" + next_page;
+    page_count = page_count === undefined? "page_count": page_count;
+    page_count = page_count.startsWith("#")? page_count: "#" + page_count;
+    page_num = page_num === undefined? "page_num": page_num;
+    page_num = page_num.startsWith("#")? page_num: "#" + page_num;
+    jump_btn = jump_btn === undefined? "jump_btn": jump_btn;
+    jump_btn = jump_btn.startsWith("#")? jump_btn: "#" + jump_btn;
     this.prev_page = $(prev_page);
     this.next_page = $(next_page);
     this.page_count = $(page_count);
@@ -716,11 +721,10 @@ function PageHandler (prev_page, next_page, page_count, page_num, jump_btn){
         }
     };
 
-    this.prev_page.click(function(){this.prev();});
-    this.next_page.click(function(){this.next();});
-    this.jump_btn.click(function(){this.jump();});
+    this.prev_page.click(() => this.prev());
+    this.next_page.click(() => this.next());
+    this.jump_btn.click(() => this.jump());
 }
-
 
 /*扩展函数注册区域*/
 

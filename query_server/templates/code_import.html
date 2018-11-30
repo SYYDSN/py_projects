@@ -2,6 +2,12 @@
 
 {% block css %}
    <link rel="stylesheet" href="/static/css/code_import.css">
+   <script>
+   /*传递多级联动选择器的3个全局变量*/
+   l1 = {{ l1 | safe }};
+   l2 = {{ l2 | safe }};
+   l3 = {{ l3 | safe }};
+   </script>
 {% endblock %}
 
 {% block show_area %}
@@ -24,7 +30,60 @@
                 </div>
 
                 <div class="right">
+                    <div class="select_group">
+                        <div class="select_div">
+                            <label>名称</label>
+                            <div class="my_input dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="select_product_name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span data-role-id="" class="current_value"></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    {% for name in l1.keys() %}
+                                        <li class="select_value">{{ name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="select_div">
+                            <label>规格</label>
+                            <div class="my_input dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="select_specification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span data-role-id="" class="current_value"></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="select_div">
+                            <label>净含量</label>
+                            <div class="my_input dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="select_net_contents" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span data-role-id="" class="current_value"></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="select_div">
+                            <label>包装比例</label>
+                            <div class="my_input dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="select_package_ratio" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span data-role-id="" class="current_value"></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                     <input type="file" name="file" id="upload_file">
+                    <span class="file_path"></span>
                     <button id="open_file" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
                        上传文件
                     </button>
@@ -41,7 +100,6 @@
                         <th>无效记录</th>
                         <th>导入日期</th>
                         <th>上传日期</th>
-                        <th>操作</th>
                     </tr>
                     {% for file in files %}
                         <tr id="{{ file._id }}">
@@ -54,15 +112,6 @@
                             <td class="invalid_count">{{ file.invalid_count }}</td>
                             <td class="import_time">{{ file.import_time | short_date3 }}</td>
                             <td class="upload_time">{{ file.upload_time | short_date3 }}</td>
-                            <td class="operation">
-                                {% if file.import_time %}
-                                    已导入
-                                {% elif file._id | string not in disk_import_file %}
-
-                                {% else %}
-                                    <button data-id="{{ file._id }}" class="import_btn btn btn-xs btn-default btn-primary">导入</button>
-                                {% endif %}
-                            </td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -72,8 +121,11 @@
                 <div class="left">
                     <input type="checkbox" id="check_all">
                     <span>全选</span>
-                    <button id="delete_import" type="button" class="btn btn-sm btn-default btn-primary">
-                        删除
+                    <button id="cancel_import" type="button" class="btn btn-sm btn-default btn-primary">
+                        撤销已导入数据
+                    </button>
+                    <button id="delete_import2" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除文件和日志
                     </button>
                 </div>
                 <div class="right">
@@ -121,8 +173,35 @@
                 <button id="submit" class="btn btn-md btn-primary last">保存</button>
             </div>
         </div>
-
     </div>
+
+    <!--上传模态框部分-->
+    <div class="modal_outer_progress">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 id="modal_title_progress">
+                    条码导入
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line upload_line">
+                    <div>正在上传文件</div>
+                    <div id="my_progress" class="progress">
+                        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+
+                        </div>
+                        <span class="my_per">0%</span>
+                    </div>
+                </div>
+                <div class="line process_line">
+                    <span>数据处理中.视文件的大小,可能需要数分钟...</span>
+                    <i class="fa fa-spinner fa-pulse fa-4x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 {% endblock %}
 
