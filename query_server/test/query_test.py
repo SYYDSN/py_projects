@@ -125,8 +125,20 @@ class TempRecord(orm_module.BaseDoc):
         print("mongodb 1000次事物操作耗时 {}秒".format(delta))
 
 
+def generator_file():
+    """生成一个导入的文件"""
+    with open("500万.txt", "a", encoding="utf-8") as f:
+
+        for x in range(500 * 10000):
+            if x % 100000 == 0:
+                print("{}万, {}".format(x / 10000, datetime.datetime.now()))
+            else:
+                pass
+            s = uuid4().hex
+            print(s, file=f)
 
 
 if __name__ == "__main__":
-    TempRecord.insert_mongodb()
+    # TempRecord.insert_mongodb()
+    generator_file()
     pass

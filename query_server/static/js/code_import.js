@@ -18,7 +18,25 @@ $(function(){
 
     /*上传*/
     $("#open_file").click(function(){
-        $("#upload_file").upload(location.pathname, upload_success, upload_error, {"upload-file": "1"});
+        var $obj = $("#upload_file");
+        let file_name = $obj.attr("name");
+        if(file_name){
+            // nothing...
+        }
+        else{
+            file_name = "file"
+        }
+        let file_data = $obj[0].files[0];
+        let opts = {
+            headers: {"upload-file": "1"},
+            file_name: file_name,
+            file_data: file_data,
+            max_size: 900000,
+            url: location.pathname,
+            success_cb: upload_success,
+            error_cb: upload_error
+        };
+        $.upload(opts);
     });
 
     /*导入数据*/
