@@ -67,39 +67,30 @@ $(function(){
             file_name = "file"
         }
         let file_data = $obj[0].files[0];
-        let opts = {
-            headers: {"upload-file": "1"},
-            file_name: file_name,
-            file_data: file_data,
-            max_size: 900000,
-            url: location.pathname,
-            success_cb: upload_success,
-            progress_cb: progress_cb,
-            error_cb: upload_error
-        };
-        $(".modal_outer_progress").css("display", "flex");
-        $.upload(opts);
+        var product_id = $.trim($("#select_package_ratio .current_value").attr("data-id"));
+        var product_name = $.trim($("#select_product_name .current_value"));
+        var specification = $.trim($("#select_specification .current_value"));
+        var net_contents = $.trim($("#select_net_contents .current_value"));
+        var package_ratio  = $.trim($("#select_package_ratio .current_value"));
+        if(product_id === "" || product_name === "" || specification === "" || net_contents === "" || package_ratio === ""){
+            alert("请选择正确的产品信息!");
+            location.reload();
+        }
+        else{
+            var opts = {
+                headers: {"upload-file": "1", "product_id": product_id},
+                file_name: file_name,
+                file_data: file_data,
+                max_size: 900000,
+                url: location.pathname,
+                success_cb: upload_success,
+                progress_cb: progress_cb,
+                error_cb: upload_error
+            };
+            $(".modal_outer_progress").css("display", "flex");
+            $.upload(opts);
+        }
     };
-
-    /*导入数据*/
-    $(".import_btn").each(function(){
-        var $this = $(this);
-        $this.click(function(){
-            var key = $.trim($this.attr("data-id"));
-            var args = {"key": key, "type": "import"};
-            $.post(location.pathname, args, function(resp){
-                var json = JSON.parse(resp);
-                var status = json['message'];
-                if(status === "success"){
-                    alert(`成功导入${json['inserted']}条数据`);
-                    location.reload();
-                }
-                else{
-                    alert(status);
-                }
-            });
-        });
-    });
 
     // 撤销导入的数据
     $("#cancel_import").click(function(){
@@ -165,48 +156,55 @@ $(function(){
     // 选择器点击事件
     select_value = function($obj){
         var text = $.trim($obj.text());
-        $obj.parents(".my_input:first").find(".current_value").text(text).trigger("change_value");
+        var $current_value = $obj.parents(".my_input:first").find(".current_value");
+        $current_value.text(text);
+        var a_id = $obj.attr("data-id");
+        if(a_id !== undefined && a_id !== ""){
+            $current_value.attr("data-id", $.trim(a_id));
+        }else{
+            // nothing...
+        }
+        $obj.parents(".select_div:first").next().find(".current_value").text("");
+        var $ul = $obj.parents("ul:first");
+        if($.trim($ul.attr("data-type")) === "product_name"){
+            var $next_ul = $("ul[data-type='specification']");
+            $next_ul.empty();
+            var data = l1[text];
+            var lis = "";
+            for(var x of data){
+                lis += `<li onclick="select_value($(this))" class='select_value'>${x}</li>`;
+            }
+            lis = $(lis);
+            $next_ul.append(lis);
+        }
+        else if($.trim($ul.attr("data-type")) === "specification"){
+            var $next_ul = $("[data-type='net_contents']");
+            $next_ul.empty();
+            var data = l2[text];
+            var lis = "";
+            for(var x of data){
+                lis += `<li onclick="select_value($(this))" class='select_value'>${x}</li>`;
+            }
+            lis = $(lis);
+            $next_ul.append(lis);
+        }
+        else if($.trim($ul.attr("data-type")) === "net_contents"){
+            var $next_ul = $("[data-type='package_ratio']");
+            $next_ul.empty();
+            var data = l3[text];
+            var lis = "";
+            for(var x of data){
+                lis += `<li onclick="select_value($(this))" data-id="${x[1]}" class='select_value'>${x[0]}</li>`;
+            }
+            lis = $(lis);
+            $next_ul.append(lis);
+        }
+        else{
+            // nothing...
+        }
     };
 
-    // 初始绑定选择器点击事件
-    $(".dropdown-menu .select_value").each(function(){
-        var $this = $(this);
-        $this.click(function(){
-            select_value($this);
-        });
-    });
-
-    // 绑定多级联动选择器,l1
-    $("#select_product_name .current_value").on("change_value", function(){
-        var text = $.trim($(this).text());
-        var $div = $("#select_specification");
-
-        $div.find(".current_value").text("");
-        var ul = $div.parents(".my_input:first").find("ul");
-        ul.empty();
-        var data = l1[text];
-        var lis = ""
-        for(var x of data){
-            lis += `<li onclick="select_value($(this))" class='select_value'>${x}</li>`;
-        }
-        lis = $(lis);
-        ul.append(lis);
-
-        // 绑定多级联动选择器,l2
-        lis.on("change_value", function(){
-            var text = $.trim($(this).text());
-            var $div = $("#select_net_contents");
-
-            $div.find(".current_value").text("");
-            var ul = $div.parents(".my_input:first").find("ul");
-            ul.empty();
-            var data = l2[text];
-            for(var x of data){
-                var li = $(`<li onclick="select_value($(this))" class='select_value'>${x}</li>`);
-                ul.append(li);
-            }
-        });
-    });
+    // 导出打印条码
     
     /*全选事件*/
     $("#check_all").click(function(){

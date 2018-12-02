@@ -35,12 +35,12 @@
                             <label>名称</label>
                             <div class="my_input dropdown">
                                 <button class="btn btn-default dropdown-toggle" type="button" id="select_product_name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span data-role-id="" class="current_value"></span>
+                                    <span data-id="" class="current_value"></span>
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                <ul data-type="product_name" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
                                     {% for name in l1.keys() %}
-                                        <li class="select_value">{{ name }}</li>
+                                        <li onclick="select_value($(this))"  class="select_value">{{ name }}</li>
                                     {% endfor %}
                                 </ul>
                             </div>
@@ -49,10 +49,10 @@
                             <label>规格</label>
                             <div class="my_input dropdown">
                                 <button class="btn btn-default dropdown-toggle" type="button" id="select_specification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span data-role-id="" class="current_value"></span>
+                                    <span data-id="" class="current_value "></span>
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                <ul data-type="specification" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
                                     <li></li>
                                 </ul>
                             </div>
@@ -64,7 +64,7 @@
                                     <span data-role-id="" class="current_value"></span>
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                <ul data-type="net_contents" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
                                     <li></li>
                                 </ul>
                             </div>
@@ -73,10 +73,10 @@
                             <label>包装比例</label>
                             <div class="my_input dropdown">
                                 <button class="btn btn-default dropdown-toggle" type="button" id="select_package_ratio" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span data-role-id="" class="current_value"></span>
+                                    <span data-id="" class="current_value"></span>
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                <ul data-type="package_ratio" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
                                     <li></li>
                                 </ul>
                             </div>
@@ -84,8 +84,8 @@
                     </div>
                     <input type="file" name="file" id="upload_file">
                     <span class="file_path"></span>
-                    <button id="open_file" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
-                       上传文件
+                    <button id="open_file" type="button" class="btn btn-default btn-sm btn-primary">
+                       导入空白条码
                     </button>
                 </div>
             </div>
@@ -98,8 +98,8 @@
                         <th>文件大小</th>
                         <th>有效记录</th>
                         <th>无效记录</th>
+                        <th>产品信息</th>
                         <th>导入日期</th>
-                        <th>上传日期</th>
                     </tr>
                     {% for file in files %}
                         <tr id="{{ file._id }}">
@@ -110,8 +110,10 @@
                             <td class="file_size">{{ file.file_size }}</td>
                             <td class="valid_count">{{ file.valid_count }}</td>
                             <td class="invalid_count">{{ file.invalid_count }}</td>
+                            <td class="product_info">
+                                {{ file.product_name + " " + file.specification + " " + (file.net_contents | string) + " " + file.package_ratio }}
+                            </td>
                             <td class="import_time">{{ file.import_time | short_date3 }}</td>
-                            <td class="upload_time">{{ file.upload_time | short_date3 }}</td>
                         </tr>
                     {% endfor %}
                 </table>

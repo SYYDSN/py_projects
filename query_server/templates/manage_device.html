@@ -23,7 +23,7 @@
                     <span id="clear_condition">所有信息</span>
                 </div>
                 <div class="right">
-                    <button id="add_line" type="button" class="pop_modal_line btn btn-default btn-sm btn-primary">
+                    <button id="add_line" onclick="pop_modal_line($(this))" type="button" class="pop_modal_line btn btn-default btn-sm btn-primary">
                         添加生产线
                     </button>
                     <button id="add_control" type="button" class="pop_modal_control btn btn-default btn-sm btn-primary">
@@ -48,30 +48,47 @@
                                 <input  data-id="{{ line._id }}" type="checkbox" >
                             </td>
                             <td title="{{ line.desc }}" class="line_name">
-                                <span>{{ line.name }}</span>
-                                <button data-id="{{ line._id }}" class="btn btn-xs btn-default btn-primary edit_line">编辑</button>
+                                <div class="line_name_outer">
+                                    <span>{{ line.name }}</span>
+                                    <button data-id="{{ line._id }}" onclick="pop_modal_line($(this))" class="btn btn-xs btn-default btn-primary edit_line">编辑</button>
+                                </div>
                             </td>
                             <td class="line_embedded">
-                                {% for control_ip, exe_dict in line.embedded.items() %}
+                            {% if line.embedded | length > 0 %}
+                                {% for control_unit in line.embedded %}
                                     <div class="control_and_execute">
                                         <div class="control_item">
-                                            <span class="control_ip">{{ control_ip }}</span>
-                                            <button data-id="{{ line._id }}" class="btn btn-xs btn-default btn-primary edit_control">编辑</button>
-                                            {% if exe_dict | length == 0 %}
-                                                <button data-id="{{ line._id }}" class="btn btn-xs btn-default btn-primary edit_control">删除</button>
+                                            <span class="control_ip">{{ control_unit.ip }}</span>
+                                            <button data-id="{{ control_unit._id }}" data-line-id="{{ control_unit.line_id }}" class="btn btn-xs btn-default btn-primary edit_control">编辑</button>
+                                            {% if control_unit.children | length == 0 %}
+                                                <button data-id="{{ control_unit._id }}" class="btn btn-xs btn-default btn-primary delete_control">删除</button>
                                             {% endif %}
                                         </div>
                                         <div class="execute_items">
-                                            {% for execute_ip, x in exe_dict.items() %}
-                                                <div class="execute_item">
-                                                    <span class="execute_ip">{{ execute_ip }}</span>
-                                                    <button data-id="{{ line._id }}" data-control="{{ control_ip }}" class="btn btn-xs btn-default btn-primary edit_execute">编辑</button>
-                                                    <button data-id="{{ line._id }}" data-control="{{ control_ip }}" class="btn btn-xs btn-default btn-primary edit_execute">删除</button>
-                                                </div>
-                                            {% endfor %}
+                                            {% if control_unit.children | length > 0 %}
+                                                {% for key, execute_ip in control_unit.children.items() %}
+                                                    <div class="execute_item">
+                                                        <span class="execute_ip">{{ execute_ip }}</span>
+                                                        <button data-id="{{ control_unit._id }}" data-key="{{ key }}" class="btn btn-xs btn-default btn-primary edit_execute">编辑</button>
+                                                        <button data-id="{{ control_unit._id }}" data-key="{{ key }}" class="btn btn-xs btn-default btn-primary delete_execute">删除</button>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
                                         </div>
                                     </div>
                                 {% endfor %}
+                            {% else %}
+
+                                <div class="control_and_execute">
+                                    <div class="control_item">
+                                        <span class="control_ip"></span>
+                                    </div>
+                                    <div class="execute_items">
+
+                                    </div>
+                                </div>
+
+                            {% endif %}
                             </td>
                             <td class="create_time">{{ line.time | short_date2 }}</td>
                         </tr>
@@ -104,7 +121,7 @@
     <div class="modal_outer modal_outer_line">
         <div class="modal_inner">
             <div class="modal_top">
-                <h3 class="modal_title">
+                <h3 data-id="" class="modal_title">
                     添加生产线
                 </h3>
             </div>
@@ -130,9 +147,18 @@
             <div class="modal_mid">
                 <div class="line">
                     <label>生产线</label>
-                    <select class="my_input line_name">
-                        <option></option>
-                    </select>
+                    <div class="my_input dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="line_drop_2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <span></span>
+                            <span data-id="" class="current_value"></span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                            {% for line in lines %}
+                                <li data-id="{{ line._id }}" class="select_line">{{ line.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
                 <div class="line">
                     <label>主控板IP</label><input type="text" class="control_ip">
@@ -154,43 +180,28 @@
             </div>
             <div class="modal_mid">
                 <div class="line">
-                    <label>生产线</label>
-                    <div class="line">
-                        <label>生产线</label>
-                        <div class="my_input dropdown">
-                            <button class="btn btn-default dropdown-toggle" type="button" id="line_drop_2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                <span></span>
-                                <span data-role-id="" class="current_role"></span>
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                                {% for line in lines %}
-                                    <li data-id="{{ line._id }}" class="select_line">{{ line.name }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="line">
-                    <label>主控板IP</label>
+                    <label>主控板</label>
                     <div class="my_input dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="control_drop_1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="line_drop_3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             <span></span>
-                            <span data-role-id="" class="current_role"></span>
+                            <span data-id="" class="current_value"></span>
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                            <!--<li class="select_control"></li>-->
+                            {% for _id, item in embedded_dict.items() %}
+                                <li data-id="{{ _id }}" class="select_control">{{ item.ip }}</li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>
                 <div class="line">
-                    <label>执行板板IP</label><input type="text" class="execute_ip">
+                    <label>执行板板IP</label>
+                    <input type="text" data-key="" class="execute_ip">
                 </div>
             </div>
             <div class="modal_bot">
                 <button class="close_medal btn btn-md btn-default first">关闭</button>
-                <button  data-id="" data-control-ip="" class="submit_btn btn btn-md btn-primary last">保存</button>
+                <button  data-id=""  class="submit_btn btn btn-md btn-primary last">保存</button>
             </div>
         </div>
     </div>

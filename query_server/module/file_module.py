@@ -34,7 +34,8 @@ class PrintBatch(orm_module.BaseDoc):
     _table_name = "print_batch"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['suffix'] = str   # 文件的后缀名,不包含.
+    type_dict['file_name'] = str   # 文件名,包含
+    type_dict['count'] = int   # 导出数量
     type_dict['product_id'] = ObjectId
     type_dict['desc'] = str  # 备注
     type_dict['time'] = datetime.datetime  # 导出打印条码的时间
@@ -42,32 +43,31 @@ class PrintBatch(orm_module.BaseDoc):
     orm_module.collection_exists(table_name=_table_name, auto_create=True)
 
     @classmethod
-    def pickle(cls, file_name: str, data: list, suffix: str = "txt") -> bool:
+    def pickle(cls, file_name: str, data: list) -> bool:
         """
         把数据保存到文件.
         :param file_name: file_name 其实就是记录id
         :param data:
-        :param suffix: 文件后缀名
         :return:
         """
         if not os.path.exists(EXPORT_DIR):
             os.makedirs(EXPORT_DIR)
         else:
             pass
-        file_path = os.path.join(EXPORT_DIR, "{}.{}".format(file_name, suffix))
+        file_path = os.path.join(EXPORT_DIR, "{}".format(file_name))
         data = ['{}\r\n'.format(x) for x in data]
         with open(file=file_path, mode="w", encoding="utf-8") as f:
             f.writelines(data)
         return True
 
     @classmethod
-    def export(cls, limit: int, product_id: ObjectId, desc: str = '', suffix: str = "txt") -> dict:
+    def export(cls, number: int, product_id: ObjectId, file_name: str, desc: str = '') -> dict:
         """
-        导出条码
-        :param limit:
+        导出要打印的条码记录
+        :param number: 导出数量
         :param product_id: 产品id
+        :param file_name: 文件名
         :param desc: 备注
-        :param suffix: 文件后缀名
         :return:
         """
         mes = {"message": "success"}
@@ -85,15 +85,16 @@ class PrintBatch(orm_module.BaseDoc):
                 r = col.aggregate(pipeline=pipeline, allowDiskUse=True, session=ses)
                 codes = [x["_id"] for x in r]
                 count = len(codes)
-                if count < limit:
-                    mes['message'] = "空白条码存量不足: 需求: {},库存: {}".format(limit, count)
+                if count < number:
+                    mes['message'] = "空白条码存量不足: 需求: {},库存: {}".format(number, count)
                 else:
                     """创建一个实例"""
                     now = datetime.datetime.now()
                     doc = {
                         "product_id": product_id,
                         "desc": desc,
-                        "suffix": suffix,
+                        "file_name": file_name,
+                        "count": number,
                         "time": now
                     }
                     r2 = me.insert_one(document=doc, session=ses)
@@ -107,8 +108,7 @@ class PrintBatch(orm_module.BaseDoc):
                             matched_count = r3.matched_count
                             modified_count = r3.modified_count
                             if count == matched_count == modified_count:
-                                id_str = str(r2.inserted_id)
-                                r4 = cls.pickle(file_name=id_str, data=codes, suffix=suffix)
+                                r4 = cls.pickle(file_name=file_name, data=codes)
                                 if r4:
                                     pass  # 成功
                                 else:
@@ -127,12 +127,41 @@ class PrintBatch(orm_module.BaseDoc):
                         ses.abort_transaction()
         return mes
 
+    @classmethod
+    def paging_info(cls, filter_dict: dict, sort_cond: dict, page_index: int = 1, page_size: int = 10,
+                    can_json: bool = False) -> dict:
+        """
+        分页查看角色信息
+        :param filter_dict: 过滤器,由用户的权限生成
+        :param sort_cond: 过滤器,由用户的权限生成
+        :param page_index: 页码(当前页码)
+        :param page_size: 每页多少条记录
+        :param can_json: 转换成可以json的字典?
+        :return:
+        """
+        join_cond = {
+            "table_name": "product_info",
+            "local_field": "product_id",
+            "flat": True
+        }
+        kw = {
+            "filter_dict": filter_dict,
+            "join_cond": join_cond,
+            "sort_cond": sort_cond,
+            "page_index": page_index,
+            "page_size": page_size,
+            "can_json": can_json
+        }
+        res = cls.query(**kw)
+        return res
+
 
 class UploadFile(orm_module.BaseDoc):
     """上传文件的记录/导入记录"""
     _table_name = "upload_file_history"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['product_id'] = ObjectId  # 对应的产品id
     type_dict['file_name'] = str
     type_dict['storage_name'] = str
     type_dict['file_size'] = int  # 单位字节
@@ -159,62 +188,69 @@ class UploadFile(orm_module.BaseDoc):
         if file is None:
             mes['message'] = "没有找到上传的文件"
         else:
-            file_name = file.filename
-            file_type = file.content_type
-            _id = ObjectId()
-            storage_name = "{}.{}".format(str(_id), file_name.split(".")[-1])
-            f_p = os.path.join(dir_path, storage_name)
-            with open(f_p, "wb") as f:
-                file.save(dst=f)
-            """读取文件信息"""
-            file_info = cls.read_file(f_p)
-            values = file_info.pop('values', None)
-            file_size = os.path.getsize(f_p)
-            now = datetime.datetime.now()
-            doc = {
-                "_id": _id,
-                "file_name": file_name,
-                "storage_name": storage_name,
-                "file_size": file_size,
-                "valid_index": file_info['valid_index'],
-                "valid_count": file_info['valid_count'],
-                "invalid_count": file_info['invalid_count'],
-                "upload_time": now,
-                "import_time": now
-            }
-            if values is None or len(values) == 0:
-                mes['message'] = "没有在文件里发现条码信息"
-            else:
-                w = orm_module.get_write_concern()
-                db_client = orm_module.get_client()
-                col1 = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)
-                col2 = orm_module.get_conn(table_name="code_info", db_client=db_client)
-                with db_client.start_session(causal_consistency=True) as ses:
-                    with ses.start_transaction(write_concern=w):
-                        r = col1.insert_one(document=doc, session=ses)
-                        if isinstance(r, orm_module.InsertOneResult):
-                            r = cls.read_file(file_path=f_p)
-                            if isinstance(r, dict):
-                                """成功,开始批量插入"""
-                                r = None
-                                values = [{"_id": x, "status": 0, "file_id": _id} for x in values]
-                                try:
-                                    r = col2.insert_many(documents=values)
-                                except orm_module.BulkWriteError as e1:
-                                    mes['message'] = "有重复的数据"
-                                except Exception as e:
-                                    mes['message'] = "{}".format(e)
-                                finally:
-                                    if isinstance(r, orm_module.InsertManyResult):
-                                        pass
-                                    else:
-                                        ses.abort_transaction()
+            product_id = req.headers.get("product_id", None)
+            if isinstance(product_id, str) and len(product_id) == 24:
+                product_id = ObjectId(product_id)
+                file_name = file.filename
+                file_type = file.content_type
+                _id = ObjectId()
+                storage_name = "{}.{}".format(str(_id), file_name.split(".")[-1])
+                f_p = os.path.join(dir_path, storage_name)
+                with open(f_p, "wb") as f:
+                    file.save(dst=f)
+                """读取文件信息"""
+                file_info = cls.read_file(f_p)
+                values = file_info.pop('values', None)
+                file_size = os.path.getsize(f_p)
+                now = datetime.datetime.now()
+                doc = {
+                    "_id": _id,
+                    "file_name": file_name,
+                    "product_id": product_id,
+                    "storage_name": storage_name,
+                    "file_size": file_size,
+                    "file_type": file_type,
+                    "valid_index": file_info['valid_index'],
+                    "valid_count": file_info['valid_count'],
+                    "invalid_count": file_info['invalid_count'],
+                    "upload_time": now,
+                    "import_time": now
+                }
+                if values is None or len(values) == 0:
+                    mes['message'] = "没有在文件里发现条码信息"
+                else:
+                    w = orm_module.get_write_concern()
+                    db_client = orm_module.get_client()
+                    col1 = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)
+                    col2 = orm_module.get_conn(table_name="code_info", db_client=db_client)
+                    with db_client.start_session(causal_consistency=True) as ses:
+                        with ses.start_transaction(write_concern=w):
+                            r = col1.insert_one(document=doc, session=ses)
+                            if isinstance(r, orm_module.InsertOneResult):
+                                r = cls.read_file(file_path=f_p)
+                                if isinstance(r, dict):
+                                    """成功,开始批量插入"""
+                                    r = None
+                                    values = [{"_id": x, "status": 0, "file_id": _id, "product_id": product_id} for x in values]
+                                    try:
+                                        r = col2.insert_many(documents=values)
+                                    except orm_module.BulkWriteError as e1:
+                                        mes['message'] = "有重复的数据"
+                                    except Exception as e:
+                                        mes['message'] = "{}".format(e)
+                                    finally:
+                                        if isinstance(r, orm_module.InsertManyResult):
+                                            pass
+                                        else:
+                                            ses.abort_transaction()
+                                else:
+                                    mes['message'] = "没有解析到正确的结果"
+                                    ses.abort_transaction()
                             else:
-                                mes['message'] = "没有解析到正确的结果"
+                                mes['message'] = "保存失败"
                                 ses.abort_transaction()
-                        else:
-                            mes['message'] = "保存失败"
-                            ses.abort_transaction()
+            else:
+                mes['message'] = "没有发现产品信息"
         return mes
 
     @classmethod
@@ -340,6 +376,33 @@ class UploadFile(orm_module.BaseDoc):
         col.delete_many(filter=f)
         mes = cls.delete_file_and_record(ids=ids2, include_record=True)
         return mes
+
+    @classmethod
+    def paging_info(cls, filter_dict: dict, sort_cond: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False) -> dict:
+        """
+        分页查看角色信息
+        :param filter_dict: 过滤器,由用户的权限生成
+        :param sort_cond: 过滤器,由用户的权限生成
+        :param page_index: 页码(当前页码)
+        :param page_size: 每页多少条记录
+        :param can_json: 转换成可以json的字典?
+        :return:
+        """
+        join_cond = {
+            "table_name": "product_info",
+            "local_field": "product_id",
+            "flat": True
+        }
+        kw = {
+            "filter_dict": filter_dict,
+            "join_cond": join_cond,
+            "sort_cond": sort_cond,
+            "page_index": page_index,
+            "page_size": page_size,
+            "can_json": can_json
+        }
+        res = cls.query(**kw)
+        return res
 
     @classmethod
     def all_file_name(cls) -> list:

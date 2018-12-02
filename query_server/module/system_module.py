@@ -59,7 +59,7 @@ class Product(orm_module.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['product_name'] = str  # 产品名称
     type_dict['specification'] = str  # 产品规格
-    type_dict['net_contents'] = int  # 净含量, 单位,毫升
+    type_dict['net_contents'] = str  # 净含量,
     type_dict['package_ratio'] = str  # 包装比例 200:1
     # type_dict['batch_number'] = str  # 批号
     type_dict['last'] = datetime.datetime
@@ -120,7 +120,7 @@ class Product(orm_module.BaseDoc):
             net_contents = x['net_contents']
             package_ratio = x['package_ratio']
             t3 = level_3.get(net_contents, list())
-            t3.append({package_ratio:str(x['_id'])})
+            t3.append([package_ratio, str(x['_id'])])
             level_3[net_contents] = t3
             t2 = level_2.get(specification, list())
             t2.append(net_contents)
@@ -456,25 +456,7 @@ class ProductLine(orm_module.BaseDoc):
     type_dict['_id'] = ObjectId
     type_dict['name'] = str
     type_dict['desc'] = str
-    """
-    嵌入式设备的数据结构
-    embedded = {
-        "control_board_ip1": {
-            "execute_board_ip1": {},
-            "execute_board_ip2": {},
-            ......
-            "execute_board_ipn": {}
-        },
-        "control_board_ip2": {
-            ......
-        },
-        "control_board_ip3": {},
-        ........
-    }
-    """
-    type_dict['embedded'] = dict
     type_dict['time'] = datetime.datetime
-    # 子设备,就是type=control的嵌入式设备(Embedded)
 
     @classmethod
     def paging_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10,
@@ -491,10 +473,15 @@ class ProductLine(orm_module.BaseDoc):
         不用field_map字段是不对子查询做更名,
         flat = False是保留多个子查询的内容
         """
-
+        join_cond = {
+            "table_name": "embedded",
+            "local_field": "_id",
+            "foreign_field": "line_id",
+            "flat": False
+        }
         kw = {
             "filter_dict": filter_dict,
-            "join_cond": None,
+            "join_cond": join_cond,
             "sort_cond": [('time', -1)],  # 主文档排序条件
             "page_index": page_index,  # 当前页
             "page_size": page_size,  # 每页多少条记录
@@ -502,6 +489,24 @@ class ProductLine(orm_module.BaseDoc):
         }
         r = cls.query(**kw)
         return r
+
+
+class Embedded(orm_module.BaseDoc):
+    """
+    嵌入式设备
+    """
+    _table_name = "embedded"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['line_id'] = ObjectId
+    type_dict['ip'] = str
+    """
+    children是执行板信息
+    children = {
+        uuid4().hex: ip,
+    }
+    """
+    type_dict['children'] = dict
 
 
 if __name__ == "__main__":

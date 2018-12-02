@@ -143,7 +143,7 @@ class DownLoadPrintFile(MyView):
 class CodeImportView(MyView):
     """条码信息导入页面视图函数"""
     _rule = "/code_import"
-    _allowed_view = [0, 1, 3]
+    _allowed_view = [0, 3]
     _name = "条码信息导入"
 
     @check_session
@@ -159,7 +159,90 @@ class CodeImportView(MyView):
             s = {"upload_time": -1}
             selector = Product.selector_data()
             render_data.update(selector)
-            result = UploadFile.query(filter_dict=access_filter, page_index=page_index, sort_cond=s)
+            result = UploadFile.paging_info(filter_dict=access_filter, page_index=page_index, sort_cond=s)
+            disk_import_file = UploadFile.all_file_name()  # 获取磁盘上的所有文件名
+            files = result['data']
+            render_data.update(result)
+            render_data['files'] = files
+            render_data['disk_import_file'] = disk_import_file
+            return render_template("code_import.html", **render_data)
+        else:
+            return abort(401, "access refused!")
+
+    @check_session
+    def post(self, user: dict):
+        """
+        req_type 代表请求的类型, 有3种:
+        1. add          添加产品
+        2. edit         修改产品
+        3. delete       删除产品
+        :param user:
+        :return:
+        """
+        mes = {"message": "access refused"}
+        f = self.operate_filter(user)  # 数据访问权
+        if f is None:
+            pass
+        else:
+            upload = request.headers.get("upload-file", "0", str)
+            if upload == "1":
+                """上传文件"""
+                mes = UploadFile.upload(request)
+            else:
+                the_type = get_arg(request, "type", "")
+                if the_type == "cancel":
+                    """撤销导入条码操作"""
+                    ids = []
+                    try:
+                        ids = json.loads(get_arg(request, "ids"))
+                    except Exception as e:
+                        print(e)
+                    finally:
+                        if len(ids) == 0:
+                            mes['message'] = "没有需要撤销的文件记录"
+                        else:
+                            ids = [ObjectId(x) for x in ids]
+                            mes = UploadFile.cancel_data(f_ids=ids)
+                elif the_type == "delete":
+                    """批量删除文件和日志"""
+                    ids = []
+                    try:
+                        ids = json.loads(get_arg(request, "ids"))
+                    except Exception as e:
+                        print(e)
+                    finally:
+                        if len(ids) == 0:
+                            mes['message'] = "没有发现需要删除的文件"
+                        else:
+                            ids = [ObjectId(x) for x in ids]
+                            include_record = get_arg(request, "include_record")
+                            mes = UploadFile.delete_file_and_record(ids=ids, include_record=include_record)
+
+                else:
+                    mes['message'] = "无效的操作类型:{}".format(the_type)
+        return json.dumps(mes)
+
+
+class CodeExportView(MyView):
+    """条码信息导入页面视图函数"""
+    _rule = "/code_export"
+    _allowed_view = [0, 3]
+    _name = "条码信息导入"
+
+    @check_session
+    def get(self, user: dict):
+        """返回条码信息导出界面"""
+        render_data['page_title'] = "条码信息导出"
+        render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
+        access_filter = self.operate_filter(user)   # 数据访问权
+        render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
+
+        if isinstance(access_filter, dict):
+            page_index = get_arg(request, "page", 1)
+            s = {"upload_time": -1}
+            selector = Product.selector_data()
+            render_data.update(selector)
+            result = UploadFile.paging_info(filter_dict=access_filter, page_index=page_index, sort_cond=s)
             disk_import_file = UploadFile.all_file_name()  # 获取磁盘上的所有文件名
             files = result['data']
             render_data.update(result)
@@ -329,7 +412,7 @@ class ManageProductView(MyView):
             if req_type == "add":
                 product_name = get_arg(request, "product_name", "")
                 specification = get_arg(request, "specification", "")
-                net_contents = int(get_arg(request, "net_contents", ""))
+                net_contents = get_arg(request, "net_contents", "")
                 package_ratio = get_arg(request, "package_ratio", "")
                 doc = {
                     "product_name": product_name,
@@ -342,7 +425,7 @@ class ManageProductView(MyView):
                 _id = ObjectId(get_arg(request, "_id", ""))
                 product_name = get_arg(request, "product_name", "")
                 specification = get_arg(request, "specification", "")
-                net_contents = int(get_arg(request, "net_contents", ""))
+                net_contents = get_arg(request, "net_contents", "")
                 package_ratio = get_arg(request, "package_ratio", "")
                 f.update({"_id": _id})
                 u = {"$set": {
@@ -594,6 +677,9 @@ class ManageDeviceView(MyView):
             r = ProductLine.paging_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
             lines = r.pop("data")
             render_data['lines'] = lines
+            embedded = Embedded.find(filter_dict=access_filter)
+            embedded_dict = {x["_id"]: {"ip": x['ip'], "children": x.get('children', dict())} for x in embedded}
+            render_data['embedded_dict'] = embedded_dict
             render_data.update(r)
             return render_template("manage_device.html", **render_data)
 
@@ -614,47 +700,187 @@ class ManageDeviceView(MyView):
             pass
         else:
             req_type = get_arg(request, "type", "")
-            if req_type == "add":
-                rules = json.loads(get_arg(request, "rules"))
-                role_name = get_arg(request, "role_name", "")
-                now = datetime.datetime.now()
-                doc = {
-                    "role_name": role_name,
-                    "rules": rules,
-                    "last": now,
-                    "time": now
-                }
-                mes = Role.add(**doc)
-            elif req_type == "rules":
-                role_id = get_arg(request, "role_id", "")
-                role_id = ObjectId(role_id) if isinstance(role_id, str) and len(role_id) == 24 else role_id
-                f.update({"_id": role_id})
-                r = Role.find_one(filter_dict=f)
-                if "rules" in r:
-                    mes['message'] = "success"
-                    mes['data'] = r['rules']
+            if req_type == "line":
+                """生产线的操作"""
+                _id = get_arg(request, "_id", "")
+                operate = get_arg(request, "operate", "")
+                if operate == "edit" and isinstance(_id, str) and len(_id) == 24:
+                    """编辑生产线"""
+                    line_name = get_arg(request, "line_name", "")
+                    f = {"_id": ObjectId(_id)}
+                    u = {"$set": {"name": line_name}}
+                    kw = {
+                        "filter_dict": f,
+                        "update_dict": u
+                    }
+                    r = ProductLine.find_one_and_update(**kw)
+                    if line_name == r.get('name'):
+                        mes['message'] = "success"
+                    else:
+                        mes['message'] = "修改生产线信息失败"
+                elif operate == "add":
+                    """添加"""
+                    line_name = get_arg(request, "line_name", "")
+                    doc = {"name": line_name}
+                    r = ProductLine.insert_one(doc=doc)
+                    if r is None:
+                        mes['message'] = "插入失败"
+                    else:
+                        mes['message'] = "success"
+                elif operate == "delete":
+                    """删除"""
+                    ids = json.loads(get_arg(request, "ids", ""))
+                    ids = [ObjectId(x) for x in ids]
+                    r = Embedded.find_one(filter_dict={"line_id": {"$in": ids}})
+                    if isinstance(r, dict):
+                        mes['message'] = "请先删除主控板:{}".format(r['ip'])
+                    else:
+                        ProductLine.delete_many(filter_dict={"_id": {"$in": ids}})
+                        mes['message'] = "success"
                 else:
-                    mes['message'] = "查询数据失败"
-            elif req_type == "edit":
-                role_id = ObjectId(get_arg(request, "role_id"))
-                rules = json.loads(get_arg(request, "rules"))
-                role_name = get_arg(request, "role_name", "")
-                f.update({"_id": role_id})
-                u = {"$set": {
-                    "role_name": role_name,
-                    "rules": rules,
-                    "last": datetime.datetime.now()
-                }}
-                Role.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
-                mes['message'] = "success"
-            elif req_type == "delete":
-                ids = json.loads(get_arg(request, "ids"))
-                ids = [ObjectId(x) for x in ids]
-                f.update({"_id": {"$in": ids}})
-                Role.delete_many(filter_dict=f)
-                mes['message'] = "success"
+                    mes['message'] = "未知的操作:{}".format(operate)
+            elif req_type == "control":
+                """主控板的操作"""
+                _id = get_arg(request, "_id", "")
+                operate = get_arg(request, "operate", "")
+                if operate == "edit" and isinstance(_id, str) and len(_id) == 24:
+                    """编辑主控板"""
+                    line_id = ObjectId(get_arg(request, "line_id", ""))
+                    ip = get_arg(request, "ip", "")
+                    f = {"_id": ObjectId(_id)}
+                    u = {"$set": {"line_id": line_id, "ip": ip}}
+                    kw = {
+                        "filter_dict": f,
+                        "update_dict": u
+                    }
+                    r = Embedded.find_one_and_update(**kw)
+                    if ip == r.get('ip') and line_id == r.get("line_id"):
+                        mes['message'] = "success"
+                    else:
+                        mes['message'] = "修改主控板信息失败"
+                elif operate == "add":
+                    """添加"""
+                    line_id = ObjectId(get_arg(request, "line_id", ""))
+                    ip = get_arg(request, "ip", "")
+                    doc = {"line_id": line_id, "ip": ip}
+                    r = Embedded.insert_one(doc=doc)
+                    if r is None:
+                        mes['message'] = "插入失败"
+                    else:
+                        mes['message'] = "success"
+                elif operate == "delete":
+                    """删除"""
+                    _id = get_arg(request, "_id", "")
+                    f = {"_id": ObjectId(_id)}
+                    Embedded.find_one_and_delete(filter_dict=f)
+                    mes['message'] = "success"
+                else:
+                    mes['message'] = "未知的操作:{}".format(operate)
+            elif req_type == "execute":
+                """执行板的操作"""
+                operate = get_arg(request, "operate", "")
+                if operate == "add":
+                    """添加"""
+                    key = uuid4().hex if get_arg(request, "key", '') == "" else get_arg(request, "key")
+                    ip = get_arg(request, "ip", "")
+                    _id = get_arg(request, "_id", "")
+                    raw = Embedded.find_by_id(o_id=_id, to_dict=True)
+                    if raw is None:
+                        mes['message'] = "对象不存在"
+                    else:
+                        children = raw.get('children', dict())
+                        children[key] = ip
+                        f = {"_id": ObjectId(_id)}
+                        u = {"$set": {"children": children}}
+                        kw = {
+                            "filter_dict": f,
+                            "update_dict": u
+                        }
+                        r = Embedded.find_one_and_update(**kw)
+                        if isinstance(r, dict):
+                            mes['message'] = "success"
+                        else:
+                            mes['message'] = "添加执行板信息失败"
+                elif operate == "edit":
+                    """编辑"""
+                    key = get_arg(request, "key", '')
+                    ip = get_arg(request, "ip", "")
+                    _id = get_arg(request, "_id", "")
+                    old_id = get_arg(request, "old_id", "")
+                    _id = ObjectId(_id)
+                    old_id = ObjectId(old_id)
+                    raw = Embedded.find_by_id(o_id=old_id, to_dict=True)
+                    if raw is None:
+                        mes['message'] = "对象不存在"
+                    else:
+                        if old_id != _id:
+                            """调整了主控板"""
+                            children = raw.get('children', dict())
+                            children.pop(key, None)
+                            u = {"$set": {"children": children}}
+                            kw = {
+                                "filter_dict": {"_id": old_id},
+                                "update_dict": u
+                            }
+                            r = Embedded.find_one_and_update(**kw)
+                            if isinstance(r, dict):
+                                n = Embedded.find_by_id(o_id=_id, to_dict=True)
+                                if n is None:
+                                    mes['message'] = "新主控板不存在"
+                                else:
+                                    children = n.get('children', dict())
+                                    children[key] = ip
+                                    u = {"$set": {"children": children}}
+                                    kw = {
+                                        "filter_dict": {"_id": _id},
+                                        "update_dict": u
+                                    }
+                                    r2 = Embedded.find_one_and_update(**kw)
+                                    if isinstance(r2, dict):
+                                        mes['message'] = "success"
+                                    else:
+                                        mes['message'] = "修改执行板信息失败"
+                            else:
+                                mes['message'] = "修改原始主控板信息失败"
+                        else:
+                            children = raw.get('children', dict())
+                            children[key] = ip
+                            u = {"$set": {"children": children}}
+                            kw = {
+                                "filter_dict": {"_id": old_id},
+                                "update_dict": u
+                            }
+                            r = Embedded.find_one_and_update(**kw)
+                            if isinstance(r, dict):
+                                mes['message'] = "success"
+                            else:
+                                mes['message'] = "修改执行板信息失败"
+                elif operate == "delete":
+                    """删除"""
+                    key = get_arg(request, "key", "")
+                    _id = get_arg(request, "_id", "")
+                    _id = ObjectId(_id)
+                    f = {"_id": _id}
+                    raw = Embedded.find_by_id(o_id=_id, to_dict=True)
+                    if raw is None or key not in raw['children']:
+                        mes['message'] = "对象不存在"
+                    else:
+                        children = raw['children']
+                        children.pop(key, None)
+                        u = {"$set": {"children": children}}
+                        kw = {
+                            "filter_dict": f,
+                            "update_dict": u
+                        }
+                        r = Embedded.find_one_and_update(**kw)
+                        if isinstance(r, dict):
+                            mes['message'] = "success"
+                        else:
+                            mes['message'] = "删除执行板信息失败"
+                else:
+                    mes['message'] = "未知的操作:{}".format(operate)
             else:
-                mes['message'] = "无效的类型: {}".format(req_type)
+                mes['message'] = "无效的请求类型: {}".format(req_type)
         return json.dumps(mes)
 
 

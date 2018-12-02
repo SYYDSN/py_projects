@@ -74,9 +74,40 @@
   text-align: center;
   color: rgba(127,124,124,0.9);
 }
+.right_main .user_list_outer .user_list_inner .table_outer #user_list tr >.line_name {
+  vertical-align: middle !important;
+}
+.right_main .user_list_outer .user_list_inner .table_outer #user_list tr >.line_name >.line_name_outer {
+  width: 100%;
+  height: 100%;
+}
 .right_main .user_list_outer .user_list_inner .table_outer #user_list tr .line_embedded {
 /*控制板和执行板*/
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.right_main .user_list_outer .user_list_inner .table_outer #user_list tr .line_embedded .control_and_execute {
+  width: 100%;
+  min-height: 35px;
+  margin: 2px 5px;
+  padding: 3px;
+  border: 1px solid #acacac;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+.right_main .user_list_outer .user_list_inner .table_outer #user_list tr .line_embedded .control_and_execute >.control_item {
+  width: 50%;
+}
+.right_main .user_list_outer .user_list_inner .table_outer #user_list tr .line_embedded .control_and_execute >.execute_items {
+  width: 50%;
+}
+.right_main .user_list_outer .user_list_inner .table_outer #user_list tr .line_embedded .control_and_execute >.execute_items >.execute_item {
+  width: 100%;
+  height: 24px;
 }
 .right_main .user_list_outer .user_list_inner .bottom_div {
   height: 50px;
@@ -260,5 +291,5 @@
   height: 320px;
 }
 .right_main .modal_outer_execute > .modal_inner {
-  height: 240px;
+  height: 320px;
 }

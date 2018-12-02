@@ -108,10 +108,11 @@
   display: none;
 }
 .right_main .code_list_outer .code_list_inner .insert_div > .right >.file_path {
+  display: none;
   margin-right: 50px;
 }
-.right_main .code_list_outer .code_list_inner .insert_div > .right #open_file {
-  background-color: #286090;
+.right_main .code_list_outer .code_list_inner .insert_div > .right .btn-default {
+  margin-left: 15px;
 }
 .right_main .code_list_outer .code_list_inner .table_outer {
   min-height: calc(100% - 100px);
