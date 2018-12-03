@@ -29,12 +29,13 @@ if not os.path.exists(EXPORT_DIR):
     os.makedirs(EXPORT_DIR)
 
 
-class PrintBatch(orm_module.BaseDoc):
+class PrintCode(orm_module.BaseDoc):
     """导出打印条码记录"""
-    _table_name = "print_batch"
+    _table_name = "print_code"
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['file_name'] = str   # 文件名,包含
+    type_dict['file_size'] = int   # 文件名,包含
     type_dict['count'] = int   # 导出数量
     type_dict['product_id'] = ObjectId
     type_dict['desc'] = str  # 备注
@@ -43,12 +44,12 @@ class PrintBatch(orm_module.BaseDoc):
     orm_module.collection_exists(table_name=_table_name, auto_create=True)
 
     @classmethod
-    def pickle(cls, file_name: str, data: list) -> bool:
+    def pickle(cls, file_name: str, data: list) -> int:
         """
         把数据保存到文件.
         :param file_name: file_name 其实就是记录id
         :param data:
-        :return:
+        :return: file_size
         """
         if not os.path.exists(EXPORT_DIR):
             os.makedirs(EXPORT_DIR)
@@ -58,10 +59,11 @@ class PrintBatch(orm_module.BaseDoc):
         data = ['{}\r\n'.format(x) for x in data]
         with open(file=file_path, mode="w", encoding="utf-8") as f:
             f.writelines(data)
-        return True
+        size = os.path.getsize(file_path)
+        return size
 
     @classmethod
-    def export(cls, number: int, product_id: ObjectId, file_name: str, desc: str = '') -> dict:
+    def export(cls, number: int, product_id: ObjectId, file_name: str = None, desc: str = '') -> dict:
         """
         导出要打印的条码记录
         :param number: 导出数量
@@ -88,43 +90,49 @@ class PrintBatch(orm_module.BaseDoc):
                 if count < number:
                     mes['message'] = "空白条码存量不足: 需求: {},库存: {}".format(number, count)
                 else:
-                    """创建一个实例"""
-                    now = datetime.datetime.now()
-                    doc = {
-                        "product_id": product_id,
-                        "desc": desc,
-                        "file_name": file_name,
-                        "count": number,
-                        "time": now
-                    }
-                    r2 = me.insert_one(document=doc, session=ses)
-                    if isinstance(r2, orm_module.InsertOneResult):
-                        inserted_id = r2.inserted_id
-                        """批量更新"""
-                        f = {"_id": {"$in": codes}}
-                        u = {"$set": {"print_id": inserted_id}}
-                        r3 = col.update_many(filter=f, update=u, session=ses)
-                        if isinstance(r3, orm_module.UpdateResult):
-                            matched_count = r3.matched_count
-                            modified_count = r3.modified_count
-                            if count == matched_count == modified_count:
-                                r4 = cls.pickle(file_name=file_name, data=codes)
-                                if r4:
-                                    pass  # 成功
+                    """保存文件"""
+                    codes = codes[0: number]
+                    _id = ObjectId()
+                    save_name = "{}.txt".format(str(_id))
+                    file_size = cls.pickle(file_name=save_name, data=codes)
+                    if not isinstance(file_size, int):
+                        mes['message'] = "保存导出文件失败"
+                        ses.abort_transaction()
+                    else:
+                        """创建一个实例"""
+                        now = datetime.datetime.now()
+                        file_name = file_name if file_name is not None else "{}.txt".format(now.strftime("%Y-%m-%d %H:%M:%S"))
+                        doc = {
+                            "_id": _id,
+                            "product_id": product_id,
+                            "desc": desc,
+                            "file_name": file_name,
+                            "file_size": file_size,
+                            "count": number,
+                            "time": now
+                        }
+                        r2 = me.insert_one(document=doc, session=ses)
+                        if isinstance(r2, orm_module.InsertOneResult):
+                            inserted_id = r2.inserted_id
+                            """批量更新"""
+                            f = {"_id": {"$in": codes}}
+                            u = {"$set": {"print_id": inserted_id}}
+                            r3 = col.update_many(filter=f, update=u, session=ses)
+                            if isinstance(r3, orm_module.UpdateResult):
+                                matched_count = r3.matched_count
+                                modified_count = r3.modified_count
+                                if len(codes) == matched_count == modified_count:
+                                    pass # 成功
                                 else:
-                                    mes['message'] = "保存导出文件失败"
+                                    ms = "更新了{}条条码状态, 其中{}条更新成功".format(matched_count, modified_count)
+                                    mes['message'] = ms
                                     ses.abort_transaction()
                             else:
-                                ms = "共计{}个条码,更新了{}条条码状态, 其中{}条更新成功".format(count, matched_count,
-                                                                            modified_count)
-                                mes['message'] = ms
+                                mes['message'] = "标记导出文件出错,函数未正确执行"
                                 ses.abort_transaction()
                         else:
-                            mes['message'] = "标记导出文件出错,函数未正确执行"
+                            mes['message'] = "批量更新条码导出记录出错"
                             ses.abort_transaction()
-                    else:
-                        mes['message'] = "插入打印条码导出记录出错"
-                        ses.abort_transaction()
         return mes
 
     @classmethod
@@ -154,6 +162,63 @@ class PrintBatch(orm_module.BaseDoc):
         }
         res = cls.query(**kw)
         return res
+
+    @classmethod
+    def all_file_name(cls) -> list:
+        """
+        获取import_data目录下,所有文件的名字(不包括扩展名).
+        用于和数据库记录比对看哪个文件在磁盘上存在?
+        :return:
+        """
+        names = os.listdir(IMPORT_DIR)
+        resp = []
+        for name in names:
+            if os.path.isfile(os.path.join(IMPORT_DIR, name)):
+                resp.append(name[0: 24])
+            else:
+                pass
+        return resp
+
+    @classmethod
+    def delete_file_and_record(cls, ids: list, include_record: bool = False) -> dict:
+        """
+        批量删除文件和导入记录.
+        :param ids:
+        :param include_record: 是否连记录一起删除?
+        :return:
+        """
+        mes = {"message": "success"}
+        ids = [x if isinstance(x, ObjectId) else ObjectId(x) for x in ids]
+        if include_record:
+            cls.delete_many(filter_dict={"_id": {"$in": ids}})
+        else:
+            pass
+        ids = [str(x) for x in ids]
+        names = os.listdir(EXPORT_DIR)
+        for name in names:
+            prefix = name.split(".")[0]
+            if prefix in ids:
+                os.remove(os.path.join(EXPORT_DIR, name))
+            else:
+                pass
+        return mes
+
+    @classmethod
+    def cancel_data(cls, f_ids: list) -> dict:
+        """
+        撤销导入的文件
+        :param f_ids: 文件id的list
+        :return:
+        """
+        mes = {"message": "success"}
+        ids2 = [x if isinstance(x, ObjectId) else ObjectId(x) for x in f_ids]
+        f = {"print_id": {"$in": ids2}}
+        w = orm_module.get_write_concern()
+        col = orm_module.get_conn(table_name="code_info", write_concern=w)
+        u = {"$unset": {"print_id": ""}}
+        col.update_many(filter=f, update=u)
+        mes = cls.delete_file_and_record(ids=ids2, include_record=True)
+        return mes
 
 
 class UploadFile(orm_module.BaseDoc):
@@ -426,5 +491,5 @@ if __name__ == "__main__":
     # UploadFile.import_code("5bf3aad85e32d75611898054")
     # UploadFile.all_file_name()
     """测试导出文件"""
-    PrintBatch.export(limit=13000, product_id=ObjectId("5bf22efa9f0a5e34eb35741c"))
+
     pass

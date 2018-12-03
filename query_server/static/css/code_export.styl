@@ -35,19 +35,19 @@ default_blue = #286090
                 height 50px
                 display flex
                 flex-direction row
-                justify-content space-between
+                justify-content flex-end
                 align-items center
-                > .left:hover
-                    cursor pointer
-                > .left
-                    width 15%
-                    > i
-                        color default_blue
-                        margin-right 1em
-                    > #clear_condition
-                        color default_blue
+                //> .left:hover
+                //    cursor pointer
+                //> .left
+                //    width 15%
+                //    > i
+                //        color default_blue
+                //        margin-right 1em
+                //    > #clear_condition
+                //        color default_blue
                 > .right
-                    width 85%
+                    width 100%
                     display flex
                     flex-direction row
                     justify-content flex-end
@@ -70,6 +70,8 @@ default_blue = #286090
                                 font-weight 400
                             >.my_input
                                 position relative
+                                >.deposit
+                                    color default_blue
                                 >button
                                     height 32px
                                     >.current_value
@@ -256,20 +258,9 @@ default_blue = #286090
                     justify-content center
                     align-items center
                     padding 15px
-                    >div
-                        margin 15px 10px
-                        width 100%
-                        text-align center
-                    #my_progress
-                        >.my_per
-                            display block
-                            width 30px
-                            margin-left 208px
-                            position absolute
                 .process_line
                     display flex
                     font-size 16px
-                    display none
                     justify-content center
                     align-items center
                     >i

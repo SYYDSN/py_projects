@@ -1,7 +1,7 @@
 {% extends "standard_page.html" %}
 
 {% block css %}
-   <link rel="stylesheet" href="/static/css/code_import.css">
+   <link rel="stylesheet" href="/static/css/code_export.css">
    <script>
    /*传递多级联动选择器的3个全局变量*/
    l1 = {{ l1 | safe }};
@@ -24,10 +24,10 @@
     <div class="code_list_outer">
         <div class="code_list_inner">
             <div class="insert_div">
-                <div class="left">
+                <!--<div class="left">
                     <i class="fa fa-list-ul"></i>
                     <span id="clear_condition">所有信息</span>
-                </div>
+                </div>-->
 
                 <div class="right">
                     <div class="select_group">
@@ -81,17 +81,20 @@
                                 </ul>
                             </div>
                         </div>
+                        <div class="select_div">
+                            <label>库存:</label>
+                            <div class="my_input">
+                                <span class="deposit">0</span>
+                            </div>
+                        </div>
                     </div>
+                    <!--
                     <button id="export_all" type="button" class="btn btn-default btn-sm btn-primary">
                         导出全部条码
                     </button>
-                    <button id="export_print" type="button" class="btn btn-default btn-sm btn-primary">
-                        导出打印条码
-                    </button>
-                    <input type="file" name="file" id="upload_file">
-                    <span class="file_path"></span>
-                    <button id="open_file" type="button" class="btn btn-default btn-sm btn-primary">
-                       导入空白条码
+                    -->
+                    <button id="pickle_file" type="button" class="btn btn-default btn-sm btn-primary">
+                        生成打印条码文件
                     </button>
                 </div>
             </div>
@@ -102,10 +105,10 @@
                         <th class="select"></th>
                         <th>文件名</th>
                         <th>文件大小</th>
-                        <th>有效记录</th>
-                        <th>无效记录</th>
+                        <th>记录数</th>
+                        <th>下载地址</th>
                         <th>产品信息</th>
-                        <th>导入日期</th>
+                        <th>导出日期</th>
                     </tr>
                     {% for file in files %}
                         <tr id="{{ file._id }}">
@@ -114,12 +117,12 @@
                             </td>
                             <td class="file_name">{{ file.file_name }}</td>
                             <td class="file_size">{{ file.file_size }}</td>
-                            <td class="valid_count">{{ file.valid_count }}</td>
-                            <td class="invalid_count">{{ file.invalid_count }}</td>
+                            <td class="count">{{ file.count }}</td>
+                            <td class="download"><a target="_blank" href="/manage/print_file/{{ file._id }}.txt">下载</a></td>
                             <td class="product_info">
                                 {{ file.product_name + " " + file.specification + " " + (file.net_contents | string) + " " + file.package_ratio }}
                             </td>
-                            <td class="import_time">{{ file.import_time | short_date3 }}</td>
+                            <td class="export_time">{{ file.time | short_date3 }}</td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -129,11 +132,11 @@
                 <div class="left">
                     <input type="checkbox" id="check_all">
                     <span>全选</span>
-                    <button id="cancel_import" type="button" class="btn btn-sm btn-default btn-primary">
-                        撤销已导入数据
+                    <button id="cancel_export" type="button" class="btn btn-sm btn-default btn-primary">
+                        撤销已导出数据
                     </button>
-                    <button id="delete_import2" type="button" class="btn btn-sm btn-default btn-primary">
-                        删除文件和日志
+                    <button id="delete_export" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除已导出的文件和日志
                     </button>
                 </div>
                 <div class="right">
@@ -150,6 +153,7 @@
     </div>
 
     <!--弹框部分-->
+    <!--
     <div class="modal_outer">
         <div class="modal_inner">
             <div class="modal_top">
@@ -182,25 +186,17 @@
             </div>
         </div>
     </div>
+    -->
 
-    <!--上传模态框部分-->
+    <!--生成下载文件模态框部分-->
     <div class="modal_outer_progress">
         <div class="modal_inner">
             <div class="modal_top">
                 <h3 id="modal_title_progress">
-                    条码导入
+                    生成文件
                 </h3>
             </div>
             <div class="modal_mid">
-                <div class="line upload_line">
-                    <div>正在上传文件</div>
-                    <div id="my_progress" class="progress">
-                        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
-
-                        </div>
-                        <span class="my_per">0%</span>
-                    </div>
-                </div>
                 <div class="line process_line">
                     <span>数据处理中.视文件的大小,可能需要数分钟...</span>
                     <i class="fa fa-spinner fa-pulse fa-4x"></i>
@@ -214,5 +210,5 @@
 {% endblock %}
 
 {% block js %}
-    <script src="/static/js/code_import.js"></script>
+    <script src="/static/js/code_export.js"></script>
 {% endblock %}

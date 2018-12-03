@@ -7,6 +7,8 @@ if __project_dir__ not in sys.path:
 import orm_module
 
 
+ObjectId = orm_module.ObjectId
+
 
 """金10数据的持久化部分"""
 
@@ -15,3 +17,14 @@ class JinTen(orm_module.BaseDoc):
     """
     金10 数据,包含日历和新闻数据
     """
+    _table_name = "jin10_data"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['type'] = str   # 消息类型,2种, 新闻和日历 news/calendar
+
+
+
+if __name__ == "__main__":
+    j = JinTen(type="news")
+    j.save()
+    pass

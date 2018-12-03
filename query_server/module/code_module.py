@@ -149,8 +149,8 @@ class CodeInfo(orm_module.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = str  # 条码的码
     type_dict['product_id'] = ObjectId  # 产品id
-    type_dict['print_id'] = ObjectId   # 打印批次id
-    type_dict['file_id'] = ObjectId     # 导入时的文件id
+    type_dict['print_id'] = ObjectId   # 打印批次id PrintCode._id
+    type_dict['file_id'] = ObjectId     # 导入时的文件id  UploadFile._id
     """
     status标识状态:
     -1 标记作废
@@ -159,6 +159,29 @@ class CodeInfo(orm_module.BaseDoc):
     """
     type_dict['status'] = int               # 默认是0
     type_dict['time'] = datetime.datetime   # 使用时间,可能为空
+
+    @classmethod
+    def deposit(cls, product_id: ObjectId, printed: bool = False) -> int:
+        """
+        统计可用条码余量
+        :param product_id:
+        :param printed:  是统计已打印的条码还是统计未打印的条码?
+        :return:
+        """
+        match = {
+            "$match":
+                {
+                    "product_id": product_id,
+                    "print_id": {"$exists": printed}
+                }
+        }
+        projection = {"$project": {"_id": 1}}
+        count = {"$count": "total"}
+        pipeline = [match, projection, count]
+        col = cls.get_collection()
+        r = col.aggregate(pipeline=pipeline)
+        r = [x for x in r]
+        return 0 if len(r) == 0 else r[0]['total']
 
     @classmethod
     def query_code(cls, code: str) -> int:
@@ -238,5 +261,6 @@ class CodeInfo(orm_module.BaseDoc):
 
 
 if __name__ == "__main__":
-    CodeInfo.query_code("23132104307180149268677481490882207")
+    # CodeInfo.query_code("23132104307180149268677481490882207")
+    CodeInfo.deposit(product_id=ObjectId("5c00f2659f0a5e2ed772fd97"))
     pass

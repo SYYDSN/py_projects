@@ -110,7 +110,7 @@ $(function(){
                 var json = JSON.parse(resp);
                 var status = json['message'];
                 if(status === "success"){
-                    alert("删除成功");
+                    alert("撤销成功");
                     location.reload();
                 }else{
                     alert(status);

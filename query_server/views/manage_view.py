@@ -6,13 +6,14 @@ if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 from flask import request
 from flask import Blueprint
-from flask import  send_file
+from flask import send_from_directory
 from flask import flash
 from flask import render_template
 from flask import abort
 from module.system_module import *
 from module.file_module import *
 from module.code_module import set_code_length
+from module.code_module import CodeInfo
 from uuid import uuid4
 import json
 import datetime
@@ -104,40 +105,28 @@ class LogoutView(MyView):
         return self.get()
 
 
-class DownLoadPrintFile(MyView):
+class DownLoadPrintFileView(MyView):
     """下载批量打印的文件函数"""
-    _rule = "/print_file"
+    _rule = "/print_file/<file_name>"
     _allowed_view = [0, 3]
     _allowed_edit = []
     _allowed_delete = []
     _name = "下载批量打印的文件"
 
     @check_session
-    def get(self, user: dict):
+    def get(self, user: dict, file_name: str):
         """
         下载
         :param user:
+        :param file_name:
         :return:
         """
-        f_id = get_arg(request, "f_id", "")
-        if isinstance(f_id, str) and len(f_id) == 24:
-            access_filter = self.operate_filter(user=user, operate="view")
-            if isinstance(access_filter, dict):
-                access_filter['_id'] = ObjectId(f_id)
-                r = PrintBatch.find_one(filter_dict=access_filter)
-                if isinstance(r, dict):
-                    suffix = r.get("suffix", 'txt')
-                    file_name1 = "{}.{}".format(f_id, suffix)
-                    p_dir = EXPORT_DIR
-                    file_path = os.path.join(p_dir, file_name1)
-                    file_name2 = "导出.{}".format(suffix)
-                    return send_file(filename_or_fp=file_path, attachment_filename=file_name2, as_attachment=True)
-                else:
-                    return abort(404)
-            else:
-                return abort(403)  # 权限不足
+        access_filter = self.operate_filter(user=user, operate="view")
+        if isinstance(access_filter, dict):
+            directory = os.path.join(__project_dir__, "export_data")
+            return send_from_directory(directory=directory, filename=file_name, attachment_filename=file_name, as_attachment=True)
         else:
-            return abort(401)  # 文件id错误
+            return abort(403)  # 权限不足
 
 
 class CodeImportView(MyView):
@@ -242,13 +231,11 @@ class CodeExportView(MyView):
             s = {"upload_time": -1}
             selector = Product.selector_data()
             render_data.update(selector)
-            result = UploadFile.paging_info(filter_dict=access_filter, page_index=page_index, sort_cond=s)
-            disk_import_file = UploadFile.all_file_name()  # 获取磁盘上的所有文件名
+            result = PrintCode.paging_info(filter_dict=access_filter, page_index=page_index, sort_cond=s)
             files = result['data']
             render_data.update(result)
             render_data['files'] = files
-            render_data['disk_import_file'] = disk_import_file
-            return render_template("code_import.html", **render_data)
+            return render_template("code_export.html", **render_data)
         else:
             return abort(401, "access refused!")
 
@@ -267,42 +254,49 @@ class CodeExportView(MyView):
         if f is None:
             pass
         else:
-            upload = request.headers.get("upload-file", "0", str)
-            if upload == "1":
-                """上传文件"""
-                mes = UploadFile.upload(request)
-            else:
-                the_type = get_arg(request, "type", "")
-                if the_type == "cancel":
-                    """撤销导入条码操作"""
-                    ids = []
-                    try:
-                        ids = json.loads(get_arg(request, "ids"))
-                    except Exception as e:
-                        print(e)
-                    finally:
-                        if len(ids) == 0:
-                            mes['message'] = "没有需要撤销的文件记录"
-                        else:
-                            ids = [ObjectId(x) for x in ids]
-                            mes = UploadFile.cancel_data(f_ids=ids)
-                elif the_type == "delete":
-                    """批量删除文件和日志"""
-                    ids = []
-                    try:
-                        ids = json.loads(get_arg(request, "ids"))
-                    except Exception as e:
-                        print(e)
-                    finally:
-                        if len(ids) == 0:
-                            mes['message'] = "没有发现需要删除的文件"
-                        else:
-                            ids = [ObjectId(x) for x in ids]
-                            include_record = get_arg(request, "include_record")
-                            mes = UploadFile.delete_file_and_record(ids=ids, include_record=include_record)
+            the_type = get_arg(request, "type", "")
+            if the_type == "count":
+                """统计条码余量"""
+                mes['message'] = "success"
+                p_id = get_arg(request, "product_id", None)
+                p_id = ObjectId(p_id)
+                mes['count'] = CodeInfo.deposit(product_id=p_id)
+            elif the_type == "export":
+                """生成导出文件"""
+                p_id = get_arg(request, "product_id", None)
+                number = int(get_arg(request, "number", "0"))
+                p_id = ObjectId(p_id)
+                mes = PrintCode.export(product_id=p_id, number=number)
+            elif the_type == "cancel":
+                """撤销导出条码操作"""
+                ids = []
+                try:
+                    ids = json.loads(get_arg(request, "ids"))
+                except Exception as e:
+                    print(e)
+                finally:
+                    if len(ids) == 0:
+                        mes['message'] = "没有需要撤销的文件记录"
+                    else:
+                        ids = [ObjectId(x) for x in ids]
+                        mes = PrintCode.cancel_data(f_ids=ids)
+            elif the_type == "delete":
+                """批量删除文件和日志"""
+                ids = []
+                try:
+                    ids = json.loads(get_arg(request, "ids"))
+                except Exception as e:
+                    print(e)
+                finally:
+                    if len(ids) == 0:
+                        mes['message'] = "没有发现需要删除的文件"
+                    else:
+                        ids = [ObjectId(x) for x in ids]
+                        include_record = get_arg(request, "include_record")
+                        mes = PrintCode.delete_file_and_record(ids=ids, include_record=include_record)
 
-                else:
-                    mes['message'] = "无效的操作类型:{}".format(the_type)
+            else:
+                mes['message'] = "无效的操作类型:{}".format(the_type)
         return json.dumps(mes)
 
 
@@ -927,9 +921,11 @@ LoginView.register(manage_blueprint)
 """注销"""
 LogoutView.register(manage_blueprint)
 """下载批量打印的文件函数"""
-DownLoadPrintFile.register(app=manage_blueprint)
+DownLoadPrintFileView.register(app=manage_blueprint)
 """导入条码页面"""
 CodeImportView.register(app=manage_blueprint)
+"""导出条码页面"""
+CodeExportView.register(app=manage_blueprint)
 """管理公司信息接口"""
 ManageCompanyView.register(app=manage_blueprint)
 """管理产品页面"""

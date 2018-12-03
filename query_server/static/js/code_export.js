@@ -1,129 +1,22 @@
 $(function(){
-    /*上传成功事件*/
-    var upload_success = function(resp){
-        $(".file_path").text("");
-        $(".modal_outer_progress").css("display", "none");
-        $("#my_progress div").css("width", "0%");
-        $("#my_progress .my_per").text("0%");
-        $(".upload_line").css("display", "flex");
-        $(".process_line").css("display", "none");
-
-        console.log(resp);
-        var json = JSON.parse(resp);
-        var status = json['message'];
-        if(status === "success"){
-            alert("导入成功!");
-        }
-        else{
-            alert(status);
-        }
-        location.reload();
-    };
-
-    /*上传失败事件*/
-    var upload_error= function(resp){
-        $(".file_path").text("");
-        $(".modal_outer_progress").css("display", "none");
-        $("#my_progress div").css("width", "0%");
-        $("#my_progress .my_per").text("0%");
-        $(".upload_line").css("display", "flex");
-        $(".process_line").css("display", "none");
-
-        console.log(resp);
-        alert("上传失败");
-    };
-
-    /*上传进度处理函数*/
-    var progress_cb = function(resp){
-        console.log(resp);
-        var val = `${resp}%`;
-        $("#my_progress div").css("width", val);
-        $("#my_progress .my_per").text(val);
-        if(resp === 100){
-            $(".upload_line").css("display", "none");
-            $(".process_line").css("display", "flex");
-        }else{}
-    };
-
-    // 弹出选择上传文件框
-    $("#open_file").click(function(){
-        $("#upload_file").click();
-    });
-
-    // 选择文件后,自动上传
-    $("#upload_file").change(function(){
-        $(".file_path").text($("#upload_file").val());
-        upload();
-    });
-
-    /*上传函数*/
-    var upload = function(){
-        var $obj = $("#upload_file");
-        let file_name = $obj.attr("name");
-        if(file_name){
-            // nothing...
-        }
-        else{
-            file_name = "file"
-        }
-        let file_data = $obj[0].files[0];
-        var product_id = $.trim($("#select_package_ratio .current_value").attr("data-id"));
+    // 是否四级联动选择框就绪? 就绪返回产品id,不就绪返回空字符串
+    var select_success = function(){
+        var product_id = "";
         var product_name = $.trim($("#select_product_name .current_value"));
         var specification = $.trim($("#select_specification .current_value"));
         var net_contents = $.trim($("#select_net_contents .current_value"));
         var package_ratio  = $.trim($("#select_package_ratio .current_value"));
-        if(product_id === "" || product_name === "" || specification === "" || net_contents === "" || package_ratio === ""){
-            alert("请选择正确的产品信息!");
-            location.reload();
+        if(product_name === "" || specification === "" || net_contents === "" || package_ratio === ""){
+            console.log("还未选择正确的产品信息!");
         }
-        else{
-            var opts = {
-                headers: {"upload-file": "1", "product_id": product_id},
-                file_name: file_name,
-                file_data: file_data,
-                max_size: 900000,
-                url: location.pathname,
-                success_cb: upload_success,
-                progress_cb: progress_cb,
-                error_cb: upload_error
-            };
-            $(".modal_outer_progress").css("display", "flex");
-            $.upload(opts);
+        else {
+            product_id = $.trim($("#select_package_ratio .current_value").attr("data-id"));
         }
+        return product_id;
     };
 
-    // 下载/导出函数
-    var download = function(is_print){
-        // is_print是指是否是导出打印的条码,布尔值
-        var product_id = $.trim($("#select_package_ratio .current_value").attr("data-id"));
-        var product_name = $.trim($("#select_product_name .current_value"));
-        var specification = $.trim($("#select_specification .current_value"));
-        var net_contents = $.trim($("#select_net_contents .current_value"));
-        var package_ratio  = $.trim($("#select_package_ratio .current_value"));
-        if(product_id === "" || product_name === "" || specification === "" || net_contents === "" || package_ratio === ""){
-            alert("还未选择正确的产品信息!");
-            return false;
-        }
-        else{
-            var args = {
-                "type": "can_print",  // 获取剩余的可打印的条码数量
-                "product_id": product_id
-            };
-            $.post(location.pathname, args, function(resp){
-                var json = JSON.parse(resp);
-        var status = json['message'];
-        if(status === "success"){
-            // 查询可打印的条码余量
-        }
-        else{
-            alert(status);
-        }
-            });
-        }
-    };
-
-    // 撤销导入的数据
-    $("#cancel_import").click(function(){
+    // 撤销导出的数据
+    $("#cancel_export").click(function(){
         var d = [];
         $(".select > input[type='checkbox']:checked").each(function(){
             var $this = $(this);
@@ -134,13 +27,13 @@ $(function(){
             "type": "cancel",
             "ids": JSON.stringify(d)
         };
-        var p = confirm("这将撤销导入的数据并删除文件和日志!");
+        var p = confirm("这将撤销导出的数据并删除文件和日志!");
         if(p){
             $.post(location.pathname, args, function(resp){
                 var json = JSON.parse(resp);
                 var status = json['message'];
                 if(status === "success"){
-                    alert("删除成功");
+                    alert("撤销成功");
                     location.reload();
                 }else{
                     alert(status);
@@ -152,8 +45,8 @@ $(function(){
         }
     });
 
-    /*删除导入文件和记录*/
-    $("#delete_import2").click(function(){
+    /*删除已导出的文件和日志*/
+    $("#delete_export").click(function(){
         var d = [];
         $(".select > input[type='checkbox']:checked").each(function(){
             var $this = $(this);
@@ -165,7 +58,7 @@ $(function(){
             "include_record": true,
             "ids": JSON.stringify(d)
         };
-        var p = confirm("这将会把导入文件和日志一起删除!");
+        var p = confirm("这将会把已导出的文件和日志一起删除!");
         if(p){
             $.post(location.pathname, args, function(resp){
                 var json = JSON.parse(resp);
@@ -232,9 +125,67 @@ $(function(){
         else{
             // nothing...
         }
+        // 检测是否选择ok?
+        var product_id = select_success();
+        if(product_id === ""){
+            $(".my_input .deposit").text(0);
+        }
+        else{
+            // 查询剩余条码
+            var args = {
+                "type": "count",
+                "product_id": product_id,
+            };
+            $.post(location.pathname, args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status === "success"){
+                    // 查询可打印的条码余量
+                    var count = json['count'];
+                    $(".my_input .deposit").text(count);
+                }
+                else{
+                    alert(status);
+                }
+            });
+        }
     };
 
     // 导出打印条码
+    $("#pickle_file").click(function(){
+        var product_id = select_success();
+        var count = parseInt($.trim($(".my_input .deposit").text()));
+        if(product_id.length === 24 && count > 0){
+            var cn = prompt(`请输入需要导出的条码数目(不能大于${count})`);
+            var number = parseInt(cn);
+            if(isNaN(number) || number > count){
+                alert("导出数量必须是数字");
+            }else{
+                $(".modal_outer_progress").css("display", "flex");
+                var args = {
+                    "type": 'export',
+                    "product_id": product_id,
+                    "number": number
+                };
+                $.post(location.pathname, args, function(resp){
+                    $(".modal_outer_progress").css("display", "none");
+                    var json = JSON.parse(resp);
+                    var status = json['message'];
+                    if(status === "success"){
+                        alert("生成成功!");
+                        location.reload();
+                    }
+                    else{
+                        alert(status);
+                    }
+                });
+            }
+        }
+        else{
+            // nothing...
+        }
+    });
+
     
     /*全选事件*/
     $("#check_all").click(function(){
