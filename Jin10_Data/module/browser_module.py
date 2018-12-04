@@ -16,9 +16,11 @@ from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.webdriver import FirefoxWebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver import ChromeOptions
+from selenium.common.exceptions import *
 from mail_module import send_mail
 from log_module import get_logger
 from selenium.webdriver import Chrome
+import re
 import time
 import datetime
 
@@ -257,29 +259,38 @@ def switch_to_calendar(b: WebDriver) -> bool:
             return True
 
 
-def calendar_data(b: WebDriver, w: WebDriverWait) -> dict:
+def parse_news(item, b) -> dict:
     """
-    取金10数据的日历
-    :param b:
-    :param w:
-    :return:
-    """
-    switch_to_calendar(b)
-
-
-def parse_news(item) -> dict:
-    """
-    解析一条新闻
+    解析一条新闻,现在只解析文本新闻
     :param item: WebElement对象.
+    :param b:
     :return:
     """
     id_str = item.get_attribute("id")
-    text = item.text
     t = datetime.datetime.strptime(id_str, "%Y%m%d%H%M%S%f")
-    return {"time": t, "text": text}
+    w = WebDriverWait(b, timeout=0.01)
+    dom = None
+    try:
+        dom = item.find_element_by_class_name("is-only-text")
+    except NoSuchElementException as e:
+        print(e)
+    finally:
+        if dom is None:
+            resp = dict()
+        else:
+            resp = dict()
+            a_time = item.find_element_by_class_name("jin-flash_time").text.strip()
+            a_text = dom.text.strip()
+            if a_text.startswith("【金十电台】"):
+                pass
+            else:
+                resp['time'] = a_time
+                text_3 = a_text if len(a_text.split("。")) < 1 else a_text.split("。")[0]
+                resp['text'] = text_3
+        return resp
 
 
-def news_data(b: WebDriver, last: datetime.datetime = None) -> list:
+def get_news_data(b: WebDriver, last: datetime.datetime = None) -> list:
     """
     取金10数据的新闻
     :param b:
@@ -291,17 +302,89 @@ def news_data(b: WebDriver, last: datetime.datetime = None) -> list:
     items = get_dom(wait=w, cond="#J_flashList .jin-flash_item", lot=True)
     news_list = list()
     for x in items:
-        temp = parse_news(x)
-        if last is not None and temp['time'] > last:
-            news_list.append(temp)
-        else:
-            break
+        temp = parse_news(x, b)
+        news_list.append(temp)
     return news_list
+
+
+def parse_calendar_data(item) -> dict:
+    """
+    解析一条数据日历
+    :param item: WebElement对象.
+    :return:
+    """
+    # a_time = item.find_element_by_class_name("jin-rili_content-time").text.strip()
+    # title = item.find_element_by_class_name("jin-table_alignLeft").text.strip()
+    # level = re.findall("\d{2}", item.find_element_by_class_name("jin-star_active").get_attribute("style"))
+    tds = item.find_elements_by_tag_name("td")
+    a_time = tds[0].text.strip()  #
+    print(len(tds))
+    if len(tds) == 9:
+        title = tds[2].text.strip()  #
+        level = re.findall("\d{2}", tds[3].find_element_by_class_name("jin-star_active").get_attribute("style"))
+        star = 0 if len(level) == 0 else int(int(level[0]) / 20)
+        td_prev = tds[4].text.strip()  # 前值
+        td_forecast = tds[5].text.strip()  # 预测值
+        td_publish = tds[6].text.strip()  # 公布值
+        td_effect = tds[7].text.strip()  # 影响
+    else:
+        title = tds[1].text.strip()  #
+        level = re.findall("\d{2}", tds[2].get_attribute("style"))
+        star = 0 if len(level) == 0 else int(int(level[0]) / 20)
+        td_prev = tds[3].text.strip()  # 前值
+        td_forecast = tds[4].text.strip()  # 预测值
+        td_publish = tds[5].text.strip()  # 公布值
+        td_effect = tds[6].text.strip()  # 影响
+    data = {
+        "time": a_time,
+        "title": title,
+        "star": star,
+        "prev": td_prev,
+        "forecast": td_forecast,
+        "publish": td_publish,
+        "effect": td_effect
+    }
+    return data
+
+
+def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> list:
+    """
+    取金10数据的日历
+    :param b:
+    :param last: 最后的日历的time
+    :return:
+    """
+    switch_to_calendar(b)
+    w = WebDriverWait(b, timeout=1)
+    today_dom = get_dom(wait=w, find_type="class", cond="jin-rili_content-title", lot=False)
+    year, month, day = re.findall("\d{2,4}", today_dom.text)
+    current_date = "{}{}{}".format(year, month, day)
+    today = datetime.date.today().strftime("%Y%m%d")
+    items = get_dom(wait=w, find_type="css", cond=".jin-rili_body .jin-rili_content", lot=True)
+    doms1 = items[0]  # 数据一览
+    doms2 = items[1]  # 财经大事
+    doms2 = items[2]  # 休市一览
+    d1 = list()
+    doms1 =doms1.find_elements_by_css_selector(".jin-table_body tr")
+    for x in doms1:
+        temp = parse_calendar_data(x)
+        d1.append(temp)
+    """目前只处理数据日历"""
+    return d1
 
 
 if __name__ == "__main__":
     u = "http://127.0.0.1:7999/news"
-    handler_group = open_url(url=u)
-    browser = handler_group['browser']
-    news_data(browser)
+    browser = get_browser(headless=True, browser_class=1)
+    open_url(url=u, browser=browser)
+    while 1:
+        calendar_data = get_calendar_data(browser)
+        news_data = get_news_data(b=browser)
+        # print(calendar_data[0])
+        data = {
+            "strategy": [],
+            "news": news_data,
+            "calendar": calendar_data
+        }
+        time.sleep(5)
     pass
