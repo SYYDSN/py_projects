@@ -509,6 +509,54 @@ class Embedded(orm_module.BaseDoc):
     type_dict['children'] = dict
 
 
+class ProduceTask(orm_module.BaseDoc):
+    """
+    生产任务
+    """
+    _table_name = "produce_task"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['task_name'] = str
+    type_dict['task_desc'] = str
+    type_dict['plan_number'] = int  # 计划生产数量
+    type_dict['actual_number'] = int  # 实际生产数量
+    type_dict['begin'] = datetime.datetime
+    type_dict['end'] = datetime.datetime
+    type_dict['status'] = int   # 状态, -1 删除, 0 默认未开始, 1 进行中, 2 结束. 3 暂停.
+    type_dict['create'] = datetime.datetime  # 任务创建日期
+    type_dict['product_id'] = ObjectId
+
+    @classmethod
+    def paging_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False) -> dict:
+        """
+        分页查看生产任务信息.
+        :param filter_dict: 过滤器,由用户的权限生成
+        :param page_index: 页码(当前页码)
+        :param page_size: 每页多少条记录
+        :param can_json: 转换成可以json的字典?
+        :return:
+        """
+        join_cond = list()
+        product_cond = {
+            "table_name": "product_info",
+            "local_field": "product_id",
+            "foreign_field": "_id",
+            "flat": False
+        }
+        join_cond.append(product_cond)
+
+        kw = {
+            "filter_dict": filter_dict,
+            "join_cond": join_cond,  # join查询角色表 role_info
+            "sort_cond": [('create', -1), ('begin', -1)],  # 主文档排序条件
+            "page_index": page_index,  # 当前页
+            "page_size": page_size,  # 每页多少条记录
+            "can_json": can_json
+        }
+        r = ProduceTask.query(**kw)
+        return r
+
+
 if __name__ == "__main__":
     """添加一个管理员"""
     # root_init = {

@@ -22,6 +22,7 @@ from log_module import get_logger
 from selenium.webdriver import Chrome
 import re
 import time
+from module.data_module import save_data
 import datetime
 
 
@@ -49,6 +50,7 @@ def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
     :return:
     """
     """
+    selenium安装方法: pip3 install selenium
     firefox的headless浏览器
     因为headless的浏览器的语言跟随操作系统,为了保证爬回来的数据是正确的语言,
     这里必须设置浏览器的初始化参数,
@@ -303,7 +305,8 @@ def get_news_data(b: WebDriver, last: datetime.datetime = None) -> list:
     news_list = list()
     for x in items:
         temp = parse_news(x, b)
-        news_list.append(temp)
+        if len(temp) > 0:
+            news_list.append(temp)
     return news_list
 
 
@@ -368,7 +371,8 @@ def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> list:
     doms1 =doms1.find_elements_by_css_selector(".jin-table_body tr")
     for x in doms1:
         temp = parse_calendar_data(x)
-        d1.append(temp)
+        if len(temp) > 0:
+            d1.append(temp)
     """目前只处理数据日历"""
     return d1
 
@@ -386,5 +390,6 @@ if __name__ == "__main__":
             "news": news_data,
             "calendar": calendar_data
         }
+        save_data(data)
         time.sleep(5)
     pass

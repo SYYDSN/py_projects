@@ -63,7 +63,6 @@ if local:
     host = "127.0.0.1"
 
 
-
 """mongodb配置信息"""
 """
 注意,使用连接池就不能使用mongos load balancer

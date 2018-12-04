@@ -53,7 +53,7 @@ navs = [
     ]},
     {"name": "生产任务", "path": "/manage/task_summary", "class": "fa fa-server", "children": [
         {"name": "生产任务概况", "path": "/manage/task_summary"},
-        {"name": "生产任务列表", "path": "/manage/task_list"}
+        {"name": "生产任务列表", "path": "/manage/task_manage"}
     ]},
     {"name": "系统管理", "path": "/manage/user",  "class": "fa fa-bar-chart", "children": [
         {"name": "权限组管理", "path": "/manage/role"},
@@ -297,6 +297,92 @@ class CodeExportView(MyView):
 
             else:
                 mes['message'] = "无效的操作类型:{}".format(the_type)
+        return json.dumps(mes)
+
+
+class ProduceTaskView(MyView):
+    """生产任务管理的视图函数"""
+    _rule = "/task_<key>"
+    _allowed_view = [0, 3]
+    _name = "生产任务管理"
+
+    @check_session
+    def get(self, user: dict, key):
+        render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
+        access_filter = self.operate_filter(user)  # 数据访问权
+        render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
+        if key == "manage":
+            """返回生产任务管理界面"""
+            render_data['page_title'] = "生产任务管理"
+            if isinstance(access_filter, dict):
+                page_index = get_arg(request, "page", 1)
+                selector = Product.selector_data()
+                render_data.update(selector)
+                result = ProduceTask.paging_info(filter_dict=access_filter, page_index=page_index)
+                tasks = result['data']
+                render_data.update(result)
+                render_data['tasks'] = tasks
+                return render_template("produce_task.html", **render_data)
+            else:
+                return abort(401, "access refused!")
+        elif key == "summary":
+            """生产任务概况"""
+            render_data['page_title'] = "生产任务概况"
+            pass
+        else:
+            return abort(404)
+
+    @check_session
+    def post(self, user: dict):
+        """
+        req_type 代表请求的类型, 有3种:
+        1. add          添加产品
+        2. edit         修改产品
+        3. delete       删除产品
+        :param user:
+        :return:
+        """
+        mes = {"message": "access refused"}
+        f = self.operate_filter(user)  # 数据访问权
+        if f is None:
+            pass
+        else:
+            upload = request.headers.get("upload-file", "0", str)
+            if upload == "1":
+                """上传文件"""
+                mes = UploadFile.upload(request)
+            else:
+                the_type = get_arg(request, "type", "")
+                if the_type == "cancel":
+                    """撤销导入条码操作"""
+                    ids = []
+                    try:
+                        ids = json.loads(get_arg(request, "ids"))
+                    except Exception as e:
+                        print(e)
+                    finally:
+                        if len(ids) == 0:
+                            mes['message'] = "没有需要撤销的文件记录"
+                        else:
+                            ids = [ObjectId(x) for x in ids]
+                            mes = UploadFile.cancel_data(f_ids=ids)
+                elif the_type == "delete":
+                    """批量删除文件和日志"""
+                    ids = []
+                    try:
+                        ids = json.loads(get_arg(request, "ids"))
+                    except Exception as e:
+                        print(e)
+                    finally:
+                        if len(ids) == 0:
+                            mes['message'] = "没有发现需要删除的文件"
+                        else:
+                            ids = [ObjectId(x) for x in ids]
+                            include_record = get_arg(request, "include_record")
+                            mes = UploadFile.delete_file_and_record(ids=ids, include_record=include_record)
+
+                else:
+                    mes['message'] = "无效的操作类型:{}".format(the_type)
         return json.dumps(mes)
 
 
@@ -926,6 +1012,8 @@ DownLoadPrintFileView.register(app=manage_blueprint)
 CodeImportView.register(app=manage_blueprint)
 """导出条码页面"""
 CodeExportView.register(app=manage_blueprint)
+"""生产任务管理"""
+ProduceTaskView.register(app=manage_blueprint)
 """管理公司信息接口"""
 ManageCompanyView.register(app=manage_blueprint)
 """管理产品页面"""

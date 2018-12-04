@@ -149,6 +149,7 @@ class CodeInfo(orm_module.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = str  # 条码的码
     type_dict['product_id'] = ObjectId  # 产品id
+    type_dict['task_id'] = ObjectId  # 生产任务id,ProduceTask._id 和product_id有数据冗余,可以检验是否当前生产数据
     type_dict['print_id'] = ObjectId   # 打印批次id PrintCode._id
     type_dict['file_id'] = ObjectId     # 导入时的文件id  UploadFile._id
     """
@@ -189,7 +190,7 @@ class CodeInfo(orm_module.BaseDoc):
         查询条码
         系统检测条码合格返回数据格式: 1
         系统检测条码重复返回数据格式: 2
-        系统检测条码非当前生产数据格式: 3  条码没有打印过.
+        系统检测条码非当前生产数据格式: 3  条码没有打印过或者条码关联的产品id和生产任务中的产品id不符..
         系统检测条码格式错误: 4  条码长度不够.
         :param code:
         :return:
