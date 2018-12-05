@@ -58,36 +58,13 @@ default_blue = #286090
                         justify-content flex-start
                         align-items center
                         width calc(100% - 100px)
-                        .select_div
-                            height 30px
-                            display flex
-                            flex-direction row
-                            justify-content center
-                            align-items center
-                            >label
-                                padding 0 8px
-                                color #717171
-                                font-weight 400
-                            >.my_input
-                                position relative
-                                >button
-                                    height 32px
-                                    >.current_value
-                                        display inline-block
-                                        width 5em
-                                >ul
-                                    width 5em
-                                    >li
-                                        text-align center
-                                    >li:hover
-                                        cursor pointer
                     >.btn-default
                         margin-left 15px
 
             .table_outer
                 min-height calc(100% - 100px)
                 overflow-y scroll
-                #file_list
+                #task_list
                     .select
                         width 30px
                     tr
@@ -144,7 +121,7 @@ default_blue = #286090
         display none
         > .modal_inner
             width 500px
-            height 400px
+            height 560px
             margin-top -20%
             border-radius 5px
             background-color rgba(255, 255, 255, 1)
@@ -166,39 +143,33 @@ default_blue = #286090
                     justify-content center
                     align-items center
                     padding 15px 50px 15px 15px
+                    font-size 16px
                     > label
                         display block
                         text-align center
                         width 30%
                         font-weight 400
-                    > input, .my_package
-                        outline none
-                        width 70%
-                        padding 5px
-                        border 1px solid rgba(180, 180, 180, 1)
-                        border-radius 6px
-                        box-shadow none
-                    .my_package
-                        border none
-                        display flex
-                        flex-direction row
-                        justify-content flex-start
-                        align-items center
-                        > input
-                            border 1px solid #b4b4b4
-                            outline none
-                            width 46%
-                            padding 4px 5px
-                        > .left
-                            maegin-right -1px
-                            border-radius 6px 0 0 6px
-                        > .right
-                            margin-left -1px
-                            border-radius 0 6px 6px 0
-                        > span
-                            display inline-block
-                            text-align center
-                            width 10%
+                    >.my_input
+                        width calc(100% - 6em) !important
+                        >input
+                            width 100%
+                            border 1px solid rgba(200, 200, 200, 1)
+                            border-radius 5px
+                            padding 8px
+                        >.btn
+                            width 100%
+                            display flex
+                            flex-direction row
+                            justify-content flex-end
+                            align-items center
+                            >.current_value
+                                display block
+                                min-height 1.5em
+                                width 95%
+                        >ul
+                            width 100%
+                            >li
+                                width 100%
             .modal_bot
                 padding-bottom 20px
                 display flex
@@ -213,61 +184,5 @@ default_blue = #286090
                 > .last
                     margin-left 10px
 
-    /*modal部分*/
-    .modal_outer_progress
-        position absolute
-        top 0
-        left 0
-        width 100%
-        height 100%
-        z-index: 9999
-        float left
-        background-color rgba(180, 180, 180, 0.9)
-        display flex
-        flex-direction row
-        justify-content center
-        align-items center
-        display none
-        > .modal_inner
-            width 500px
-            height 260px
-            margin-top -20%
-            border-radius 5px
-            background-color rgba(255, 255, 255, 1)
-            border 1px solid rgba(200, 200, 200, 1)
-            .modal_top
-                display flex
-                flex-direction row
-                justify-content center
-                align-items center
-                border-bottom 1px solid rgba(160, 160, 160, 1)
-                > h3
-                    color rgba(150, 150, 150, 1)
-            .modal_mid
-                .line
-                    width 100%
-                    display flex
-                    flex-direction column
-                    justify-content center
-                    align-items center
-                    padding 15px
-                    >div
-                        margin 15px 10px
-                        width 100%
-                        text-align center
-                    #my_progress
-                        >.my_per
-                            display block
-                            width 30px
-                            margin-left 208px
-                            position absolute
-                .process_line
-                    display flex
-                    font-size 16px
-                    display none
-                    justify-content center
-                    align-items center
-                    >i
-                        margin-top 10px
 
 

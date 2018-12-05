@@ -2,10 +2,10 @@ $(function(){
     // 是否四级联动选择框就绪? 就绪返回产品id,不就绪返回空字符串
     var select_success = function(){
         var product_id = "";
-        var product_name = $.trim($("#select_product_name .current_value"));
-        var specification = $.trim($("#select_specification .current_value"));
-        var net_contents = $.trim($("#select_net_contents .current_value"));
-        var package_ratio  = $.trim($("#select_package_ratio .current_value"));
+        var product_name = $.trim($("#select_product_name .current_value").text());
+        var specification = $.trim($("#select_specification .current_value").text());
+        var net_contents = $.trim($("#select_net_contents .current_value").text());
+        var package_ratio  = $.trim($("#select_package_ratio .current_value").text());
         if(product_name === "" || specification === "" || net_contents === "" || package_ratio === ""){
             console.log("还未选择正确的产品信息!");
         }
@@ -76,6 +76,111 @@ $(function(){
         }
     });
 
+    // 点击未填充的产品规格选择器的事件
+    $("#select_specification .current_value").click(function(){
+        // 相当与再次点击了上一个选择器
+        var l = $(this).parents(".my_input:first").find("ul>.select_value").length;
+        if(l > 0){
+            // 已填充过了
+        }
+        else{
+            var current_div = $(this).parents(".select_div:first");
+            var text = $.trim(current_div.prev().find(".current_value").text());
+            var a_id = $(this).attr("data-id");
+            var args = {"product_name": text, "_id": a_id, "type": "selector"};
+            $.post("/manage/product", args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status !== "success"){
+                    alert(status);
+                    return false;
+                }
+                else{
+                    var data = json['data'];
+                    var lis = "";
+                    for(var k in data){
+                        var v = data[k];
+                        lis += `<li onclick="select_value($(this))" data-id="${v}" class='select_value'>${k}</li>`;
+                    }
+                    lis = $(lis);
+                    var ul = current_div.find("ul");
+                    ul.empty();
+                    ul.append(lis);
+                }
+            });
+        }
+    });
+
+    // 点击未填充的产品规格选择器的事件
+    $("#select_net_contents .current_value").click(function(){
+        // 相当与再次点击了上一个选择器
+        var l = $(this).parents(".my_input:first").find("ul>.select_value").length;
+        if(l > 0){
+            // 已填充过了
+        }
+        else{
+            var current_div = $(this).parents(".select_div:first");
+            var text = $.trim(current_div.prev().find(".current_value").text());
+            var a_id = $(this).attr("data-id");
+            var args = {"specification": text, "_id": a_id, "type": "selector"};
+            $.post("/manage/product", args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status !== "success"){
+                    alert(status);
+                    return false;
+                }
+                else{
+                    var data = json['data'];
+                    var lis = "";
+                    for(var k in data){
+                        var v = data[k];
+                        lis += `<li onclick="select_value($(this))" data-id="${v}" class='select_value'>${k}</li>`;
+                    }
+                    lis = $(lis);
+                    var ul = current_div.find("ul");
+                    ul.empty();
+                    ul.append(lis);
+                }
+            });
+        }
+    });
+
+    // 点击未填充的产品规格选择器的事件
+    $("#select_package_ratio .current_value").click(function(){
+        // 相当与再次点击了上一个选择器
+        var l = $(this).parents(".my_input:first").find("ul>.select_value").length;
+        if(l > 0){
+            // 已填充过了
+        }
+        else{
+            var current_div = $(this).parents(".select_div:first");
+            var text = $.trim(current_div.prev().find(".current_value").text());
+            var a_id = $(this).attr("data-id");
+            var args = {"net_contents": text, "_id": a_id, "type": "selector"};
+            $.post("/manage/product", args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status !== "success"){
+                    alert(status);
+                    return false;
+                }
+                else{
+                    var data = json['data'];
+                    var lis = "";
+                    for(var k in data){
+                        var v = data[k];
+                        lis += `<li onclick="select_value($(this))" data-id="${v}" class='select_value'>${k}</li>`;
+                    }
+                    lis = $(lis);
+                    var ul = current_div.find("ul");
+                    ul.empty();
+                    ul.append(lis);
+                }
+            });
+        }
+    });
+
     // 选择器点击事件
     select_value = function($obj){
         var text = $.trim($obj.text());
@@ -91,36 +196,72 @@ $(function(){
         var $ul = $obj.parents("ul:first");
         if($.trim($ul.attr("data-type")) === "product_name"){
             var $next_ul = $("ul[data-type='specification']");
-            $next_ul.empty();
-            var data = l1[text];
-            var lis = "";
-            for(var x of data){
-                lis += `<li onclick="select_value($(this))" class='select_value'>${x}</li>`;
-            }
-            lis = $(lis);
-            $next_ul.append(lis);
+            var args = {"product_name": text, "_id": a_id, "type": "selector"};
+            $.post("/manage/product", args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status !== "success"){
+                    alert(status);
+                    return false;
+                }
+                else{
+                    var data = json['data'];
+                    var lis = "";
+                    for(var k in data){
+                        var v = data[k];
+                        lis += `<li onclick="select_value($(this))" data-id="${v}" class='select_value'>${k}</li>`;
+                    }
+                    lis = $(lis);
+                    $next_ul.empty();
+                    $next_ul.append(lis);
+                }
+            });
         }
         else if($.trim($ul.attr("data-type")) === "specification"){
             var $next_ul = $("[data-type='net_contents']");
-            $next_ul.empty();
-            var data = l2[text];
-            var lis = "";
-            for(var x of data){
-                lis += `<li onclick="select_value($(this))" class='select_value'>${x}</li>`;
-            }
-            lis = $(lis);
-            $next_ul.append(lis);
+            var args = {"specification": text, "_id": a_id, "type": "selector"};
+            $.post("/manage/product", args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status !== "success"){
+                    alert(status);
+                    return false;
+                }
+                else{
+                    var data = json['data'];
+                    var lis = "";
+                    for(var k in data){
+                        var v = data[k];
+                        lis += `<li onclick="select_value($(this))" data-id="${v}" class='select_value'>${k}</li>`;
+                    }
+                    lis = $(lis);
+                    $next_ul.empty();
+                    $next_ul.append(lis);
+                }
+            });
         }
         else if($.trim($ul.attr("data-type")) === "net_contents"){
             var $next_ul = $("[data-type='package_ratio']");
-            $next_ul.empty();
-            var data = l3[text];
-            var lis = "";
-            for(var x of data){
-                lis += `<li onclick="select_value($(this))" data-id="${x[1]}" class='select_value'>${x[0]}</li>`;
-            }
-            lis = $(lis);
-            $next_ul.append(lis);
+            var args = {"net_contents": text, "_id": a_id, "type": "selector"};
+            $.post("/manage/product", args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status !== "success"){
+                    alert(status);
+                    return false;
+                }
+                else{
+                    var data = json['data'];
+                    var lis = "";
+                    for(var k in data){
+                        var v = data[k];
+                        lis += `<li onclick="select_value($(this))" data-id="${v}" class='select_value'>${k}</li>`;
+                    }
+                    lis = $(lis);
+                    $next_ul.empty();
+                    $next_ul.append(lis);
+                }
+            });
         }
         else{
             // nothing...
@@ -183,6 +324,7 @@ $(function(){
         }
         else{
             // nothing...
+            alert("请先查询条码库存");
         }
     });
 

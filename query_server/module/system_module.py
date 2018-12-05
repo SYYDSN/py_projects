@@ -103,40 +103,42 @@ class Product(orm_module.BaseDoc):
         return mes
 
     @classmethod
-    def selector_data(cls) -> dict:
+    def selector_data(cls, filter_dict: dict = None) -> dict:
         """
-        获取产品的选择器数据,此数据用于多级联动的下拉选择器
+        获取产品的选择器
+        :param filter_dict: 查询字典,None表示查询第一级
         :return:
+        每一级别的查询方式如下:
+        第一级: None
+            返回{product_name:_id}
+        第二级: {"product_name": product_name}
+            返回{specification:_id}
+        第三级: {"specification": specification}
+            返回{net_contents:_id}
+        第四级: {"net_contents": net_contents}
+            返回{package_ratio:_id}
         """
-        f = dict()
-        data = cls.find(filter_dict=f)
-        level_1 = dict()
-        level_2 = dict()
-        level_3 = dict()
-
-        for x in data:
-            product_name = x['product_name']
-            specification = x['specification']
-            net_contents = x['net_contents']
-            package_ratio = x['package_ratio']
-            t3 = level_3.get(net_contents, list())
-            t3.append([package_ratio, str(x['_id'])])
-            level_3[net_contents] = t3
-            t2 = level_2.get(specification, list())
-            t2.append(net_contents)
-            level_2[specification] = t2
-            t1 = level_1.get(product_name, list())
-            t1.append(specification)
-            level_1[product_name] = t1
-        l1 = dict()
-        l2 = dict()
-        l3 = level_3
-        for k, v in level_1.items():
-            l1[k] = list(set(v))
-        for k, v in level_2.items():
-            l2[k] = list(set(v))
-
-        resp = {"l1": l1, "l2": l2, "l3": l3}
+        pipeline = []
+        match = {"$match": filter_dict if filter_dict else dict()}
+        pipeline.append(match)
+        if filter_dict is None:
+            add = {"$addFields": {"name": "$product_name"}}
+            pipeline.append(add)
+        elif "product_name" in filter_dict:
+            add = {"$addFields": {"name": "$specification"}}
+            pipeline.append(add)
+        elif "specification" in filter_dict:
+            add = {"$addFields": {"name": "$net_contents"}}
+            pipeline.append(add)
+        elif "net_contents" in filter_dict:
+            add = {"$addFields": {"name": "$package_ratio"}}
+            pipeline.append(add)
+        else:
+            pass
+        pipeline.append({"$project": {"_id": 1, "name": 1}})
+        col = cls.get_collection()
+        resp = col.aggregate(pipeline=pipeline)
+        resp = {x['name']: str(x['_id']) for x in resp}
         return resp
 
 
@@ -522,7 +524,7 @@ class ProduceTask(orm_module.BaseDoc):
     type_dict['actual_number'] = int  # 实际生产数量
     type_dict['begin'] = datetime.datetime
     type_dict['end'] = datetime.datetime
-    type_dict['status'] = int   # 状态, -1 删除, 0 默认未开始, 1 进行中, 2 结束. 3 暂停.
+    type_dict['status'] = int   # 状态, -1 删除, 0 默认未开始/停止, 1 进行中
     type_dict['create'] = datetime.datetime  # 任务创建日期
     type_dict['product_id'] = ObjectId
 
@@ -536,12 +538,13 @@ class ProduceTask(orm_module.BaseDoc):
         :param can_json: 转换成可以json的字典?
         :return:
         """
+        filter_dict.update({"status": {"$ne": -1}})
         join_cond = list()
         product_cond = {
             "table_name": "product_info",
             "local_field": "product_id",
             "foreign_field": "_id",
-            "flat": False
+            "flat": True
         }
         join_cond.append(product_cond)
 

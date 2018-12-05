@@ -152,6 +152,7 @@ class CodeInfo(orm_module.BaseDoc):
     type_dict['task_id'] = ObjectId  # 生产任务id,ProduceTask._id 和product_id有数据冗余,可以检验是否当前生产数据
     type_dict['print_id'] = ObjectId   # 打印批次id PrintCode._id
     type_dict['file_id'] = ObjectId     # 导入时的文件id  UploadFile._id
+    type_dict['level'] = int     # 条码的级别,只是在最后回传结果的时候才能确定.
     """
     status标识状态:
     -1 标记作废

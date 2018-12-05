@@ -317,7 +317,7 @@ class ProduceTaskView(MyView):
             if isinstance(access_filter, dict):
                 page_index = get_arg(request, "page", 1)
                 selector = Product.selector_data()
-                render_data.update(selector)
+                render_data['selector'] = selector
                 result = ProduceTask.paging_info(filter_dict=access_filter, page_index=page_index)
                 tasks = result['data']
                 render_data.update(result)
@@ -333,12 +333,12 @@ class ProduceTaskView(MyView):
             return abort(404)
 
     @check_session
-    def post(self, user: dict):
+    def post(self, user: dict, key):
         """
         req_type 代表请求的类型, 有3种:
-        1. add          添加产品
-        2. edit         修改产品
-        3. delete       删除产品
+        1. add          添加任务
+        2. edit         修改任务
+        3. delete       删除任务
         :param user:
         :return:
         """
@@ -347,13 +347,43 @@ class ProduceTaskView(MyView):
         if f is None:
             pass
         else:
-            upload = request.headers.get("upload-file", "0", str)
-            if upload == "1":
-                """上传文件"""
-                mes = UploadFile.upload(request)
-            else:
+            if key == "manage":
                 the_type = get_arg(request, "type", "")
-                if the_type == "cancel":
+                product_id = ObjectId(get_arg(request, "product_id", None))
+                task_name = get_arg(request, "task_name", "")
+                plan_number = int(get_arg(request, "plan_number", "0"))
+                if the_type == "add":
+                    """新建任务"""
+                    args = {
+                        "task_name": task_name,
+                        "plan_number": plan_number,
+                        "create": datetime.datetime.now(),
+                        "status": 0,
+                        "product_id": product_id
+                    }
+                    r = ProduceTask.insert_one(doc=args)
+                    if isinstance(r, ObjectId):
+                        mes['message'] = "success"
+                    else:
+                        mes['message'] = "插入失败"
+                elif the_type == "edit":
+                    """编辑任务"""
+                    _id = ObjectId(get_arg(request, "_id", None))
+                    args = {
+                        "task_name": task_name,
+                        "plan_number": plan_number,
+                        "create": datetime.datetime.now(),
+                        "status": 0,
+                        "product_id": product_id
+                    }
+                    u = {"$set": args}
+                    f = {"_id": _id}
+                    r = ProduceTask.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
+                    if isinstance(r, dict):
+                        mes['message'] = "success"
+                    else:
+                        mes['message'] = "插入失败"
+                elif the_type == "cancel":
                     """撤销导入条码操作"""
                     ids = []
                     try:
@@ -383,6 +413,11 @@ class ProduceTaskView(MyView):
 
                 else:
                     mes['message'] = "无效的操作类型:{}".format(the_type)
+            elif key == "summary":
+                """"""
+                pass
+            else:
+                mes['message'] = "unknown error"
         return json.dumps(mes)
 
 
@@ -476,10 +511,11 @@ class ManageProductView(MyView):
     @check_session
     def post(self, user: dict):
         """
-        req_type 代表请求的类型, 有3种:
+        req_type 代表请求的类型, 有4种:
         1. add          添加产品
         2. edit         修改产品
         3. delete       删除产品
+        4. selector     获取选择器数据
         :param user:
         :return:
         """
@@ -523,6 +559,16 @@ class ManageProductView(MyView):
                 f.update({"_id": {"$in": ids}})
                 Product.delete_many(filter_dict=f)
                 mes['message'] = "success"
+            elif req_type == "selector":
+                """获取级联选择器数据"""
+                args = get_args(request)
+                args.pop("type", None)
+                _id = args.pop("_id", "")
+                if isinstance(_id, str) and len(_id) == 24:
+                    args['_id'] = ObjectId(_id)
+                selector = Product.selector_data(filter_dict=args)
+                mes['message'] = "success"
+                mes['data'] = selector
             else:
                 mes['message'] = "无效的类型: {}".format(req_type)
         return json.dumps(mes)

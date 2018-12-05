@@ -2,7 +2,6 @@
   background-color: #ebedf0;
   height: 55px;
 /*modal部分*/
-/*modal部分*/
 }
 .right_main .right_top {
   width: 100%;
@@ -73,37 +72,6 @@
   align-items: center;
   width: calc(100% - 100px);
 }
-.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group .select_div {
-  height: 30px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
-.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group .select_div >label {
-  padding: 0 8px;
-  color: #717171;
-  font-weight: 400;
-}
-.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group .select_div >.my_input {
-  position: relative;
-}
-.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group .select_div >.my_input >button {
-  height: 32px;
-}
-.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group .select_div >.my_input >button >.current_value {
-  display: inline-block;
-  width: 5em;
-}
-.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group .select_div >.my_input >ul {
-  width: 5em;
-}
-.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group .select_div >.my_input >ul >li {
-  text-align: center;
-}
-.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group .select_div >.my_input >ul >li:hover {
-  cursor: pointer;
-}
 .right_main .code_list_outer .code_list_inner .insert_div > .right >.btn-default {
   margin-left: 15px;
 }
@@ -111,15 +79,15 @@
   min-height: calc(100% - 100px);
   overflow-y: scroll;
 }
-.right_main .code_list_outer .code_list_inner .table_outer #file_list .select {
+.right_main .code_list_outer .code_list_inner .table_outer #task_list .select {
   width: 30px;
 }
-.right_main .code_list_outer .code_list_inner .table_outer #file_list tr th {
+.right_main .code_list_outer .code_list_inner .table_outer #task_list tr th {
   border-top: none;
   text-align: center;
   color: #717171;
 }
-.right_main .code_list_outer .code_list_inner .table_outer #file_list tr td {
+.right_main .code_list_outer .code_list_inner .table_outer #task_list tr td {
   text-align: center;
   color: rgba(127,124,124,0.9);
 }
@@ -173,7 +141,7 @@
 }
 .right_main .modal_outer > .modal_inner {
   width: 500px;
-  height: 400px;
+  height: 560px;
   margin-top: -20%;
   border-radius: 5px;
   background-color: #fff;
@@ -199,6 +167,7 @@
   justify-content: center;
   align-items: center;
   padding: 15px 50px 15px 15px;
+  font-size: 16px;
 }
 .right_main .modal_outer > .modal_inner .modal_mid .line > label {
   display: block;
@@ -206,40 +175,32 @@
   width: 30%;
   font-weight: 400;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line > input,
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package {
-  outline: none;
-  width: 70%;
-  padding: 5px;
-  border: 1px solid #b4b4b4;
-  border-radius: 6px;
-  box-shadow: none;
+.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input {
+  width: calc(100% - 6em) !important;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package {
-  border: none;
+.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >input {
+  width: 100%;
+  border: 1px solid #c8c8c8;
+  border-radius: 5px;
+  padding: 8px;
+}
+.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >.btn {
+  width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package > input {
-  border: 1px solid #b4b4b4;
-  outline: none;
-  width: 46%;
-  padding: 4px 5px;
+.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >.btn >.current_value {
+  display: block;
+  min-height: 1.5em;
+  width: 95%;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package > .left {
-  maegin-right: -1px;
-  border-radius: 6px 0 0 6px;
+.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >ul {
+  width: 100%;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package > .right {
-  margin-left: -1px;
-  border-radius: 0 6px 6px 0;
-}
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package > span {
-  display: inline-block;
-  text-align: center;
-  width: 10%;
+.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >ul >li {
+  width: 100%;
 }
 .right_main .modal_outer > .modal_inner .modal_bot {
   padding-bottom: 20px;
@@ -257,66 +218,4 @@
 }
 .right_main .modal_outer > .modal_inner .modal_bot > .last {
   margin-left: 10px;
-}
-.right_main .modal_outer_progress {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  float: left;
-  background-color: rgba(180,180,180,0.9);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  display: none;
-}
-.right_main .modal_outer_progress > .modal_inner {
-  width: 500px;
-  height: 260px;
-  margin-top: -20%;
-  border-radius: 5px;
-  background-color: #fff;
-  border: 1px solid #c8c8c8;
-}
-.right_main .modal_outer_progress > .modal_inner .modal_top {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  border-bottom: 1px solid #a0a0a0;
-}
-.right_main .modal_outer_progress > .modal_inner .modal_top > h3 {
-  color: #969696;
-}
-.right_main .modal_outer_progress > .modal_inner .modal_mid .line {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-}
-.right_main .modal_outer_progress > .modal_inner .modal_mid .line >div {
-  margin: 15px 10px;
-  width: 100%;
-  text-align: center;
-}
-.right_main .modal_outer_progress > .modal_inner .modal_mid .line #my_progress >.my_per {
-  display: block;
-  width: 30px;
-  margin-left: 208px;
-  position: absolute;
-}
-.right_main .modal_outer_progress > .modal_inner .modal_mid .process_line {
-  display: flex;
-  font-size: 16px;
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-.right_main .modal_outer_progress > .modal_inner .modal_mid .process_line >i {
-  margin-top: 10px;
 }

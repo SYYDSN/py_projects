@@ -3,10 +3,6 @@
 {% block css %}
    <link rel="stylesheet" href="/static/css/produce_task.css">
    <script>
-   /*传递多级联动选择器的3个全局变量*/
-   l1 = {{ l1 | safe }};
-   l2 = {{ l2 | safe }};
-   l3 = {{ l3 | safe }};
    </script>
 {% endblock %}
 
@@ -30,58 +26,6 @@
                 </div>
 
                 <div class="right">
-                    <div class="select_group">
-                        <div class="select_div">
-                            <label>名称</label>
-                            <div class="my_input dropdown">
-                                <button class="btn btn-default dropdown-toggle" type="button" id="select_product_name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span data-id="" class="current_value"></span>
-                                    <span class="caret"></span>
-                                </button>
-                                <ul data-type="product_name" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                                    {% for name in l1.keys() %}
-                                        <li onclick="select_value($(this))"  class="select_value">{{ name }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="select_div">
-                            <label>规格</label>
-                            <div class="my_input dropdown">
-                                <button class="btn btn-default dropdown-toggle" type="button" id="select_specification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span data-id="" class="current_value "></span>
-                                    <span class="caret"></span>
-                                </button>
-                                <ul data-type="specification" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                                    <li></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="select_div">
-                            <label>净含量</label>
-                            <div class="my_input dropdown">
-                                <button class="btn btn-default dropdown-toggle" type="button" id="select_net_contents" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span data-role-id="" class="current_value"></span>
-                                    <span class="caret"></span>
-                                </button>
-                                <ul data-type="net_contents" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                                    <li></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="select_div">
-                            <label>包装比例</label>
-                            <div class="my_input dropdown">
-                                <button class="btn btn-default dropdown-toggle" type="button" id="select_package_ratio" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span data-id="" class="current_value"></span>
-                                    <span class="caret"></span>
-                                </button>
-                                <ul data-type="package_ratio" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                                    <li></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
                     <button id="new_task" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
                        新建生产任务
                     </button>
@@ -89,29 +33,37 @@
             </div>
 
             <div class="table_outer">
-                <table id="file_list" class="table table-hover">
+                <table id="task_list" class="table table-hover">
                     <tr class="info">
                         <th class="select"></th>
-                        <th>文件名</th>
-                        <th>文件大小</th>
-                        <th>有效记录</th>
-                        <th>无效记录</th>
+                        <th>任务名称</th>
                         <th>产品信息</th>
-                        <th>导入日期</th>
+                        <th>计划数量</th>
+                        <th>生产数量</th>
+                        <th>任务状态</th>
+                        <th>开始日期</th>
+                        <th>结束日期</th>
+                        <th>创建日期</th>
+                        <th></th>
                     </tr>
-                    {% for file in files %}
-                        <tr id="{{ file._id }}">
+                    {% for task in tasks %}
+                        <tr id="{{ task._id }}">
                             <td  class="select">
-                                <input data-id="{{ file._id }}" type="checkbox" >
+                                <input data-id="{{ task._id }}" type="checkbox" >
                             </td>
-                            <td class="file_name">{{ file.file_name }}</td>
-                            <td class="file_size">{{ file.file_size }}</td>
-                            <td class="valid_count">{{ file.valid_count }}</td>
-                            <td class="invalid_count">{{ file.invalid_count }}</td>
-                            <td class="product_info">
-                                {{ file.product_name + " " + file.specification + " " + (file.net_contents | string) + " " + file.package_ratio }}
+                            <td class="task_name">{{ task.task_name }}</td>
+                            <td data-id="{{ task.product_id }}" class="product_info">
+                                {{ task.product_name + " " + task.specification + " " + (task.net_contents | string) + " " + task.package_ratio }}
                             </td>
-                            <td class="import_time">{{ file.import_time | short_date3 }}</td>
+                            <td class="plan_number">{{ task.plan_number }}</td>
+                            <td class="actual_number">{{ task.actual_number if task.actual_number else 0 }}</td>
+                            <td class="status">{{ "停止" if task.status == 0 else "执行中" }}</td>
+                            <td class="begin_time">{{ task.begin | short_date2 }}</td>
+                            <td class="end_time">{{ task.end | short_date2 }}</td>
+                            <td class="create_time">{{ task.create | short_date2 }}</td>
+                            <td class="edit_td">
+                                <button data-id="{{ task._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_product">编辑</button>
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -145,48 +97,28 @@
     <div class="modal_outer">
         <div class="modal_inner">
             <div class="modal_top">
-                <h3 id="modal_title">
-                    添加产品
+                <h3 class="modal_title">
+                    新增生产任务
                 </h3>
             </div>
             <div class="modal_mid">
 
-                <!--
-                    <div class="line">
-                        <label>产品名称</label><input type="text" id="product_name">
-                    </div>
-                    <div class="line">
-                        <label>产品规格</label><input type="text" id="specification">
-                        </div>
-                    <div class="line">
-                        <label>净含量</label><input type="text" id="net_contents" placeholder="单位: 毫升/ml">
-                        </div>
-                    <div class="line">
-                        <label>包装比例</label>
-                        <div class="my_package">
-                            <input type="text" class="left" id="package_ratio">
-                            <span class="my_sep">:</span>
-                            <input type="text" class="my_one right" value="1">
-                        </div>
-                    </div>
-                -->
-
                 <div class="line select_div">
-                    <label>名称</label>
+                    <label>产品名称</label>
                     <div class="my_input dropdown">
                         <button class="btn btn-default dropdown-toggle" type="button" id="select_product_name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             <span data-id="" class="current_value"></span>
                             <span class="caret"></span>
                         </button>
                         <ul data-type="product_name" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                            {% for name in l1.keys() %}
-                                <li onclick="select_value($(this))"  class="select_value">{{ name }}</li>
+                            {% for k, v in selector.items() %}
+                                <li onclick="select_value($(this))" data-id="{{ v }}"  class="select_value">{{ k }}</li>
                             {% endfor %}
                         </ul>
                     </div>
                 </div>
                 <div class="line select_div">
-                    <label>规格</label>
+                    <label>产品规格</label>
                     <div class="my_input dropdown">
                         <button class="btn btn-default dropdown-toggle" type="button" id="select_specification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             <span data-id="" class="current_value "></span>
@@ -221,42 +153,26 @@
                         </ul>
                     </div>
                 </div>
-
+                <div class="line">
+                    <label>生产任务名称</label>
+                    <div class="my_input dropdown">
+                        <input id="task_name" type="text" placeholder="区分不同任务">
+                    </div>
+                </div>
+                <div class="line">
+                    <label>计划生产数量</label>
+                    <div class="my_input dropdown">
+                        <input id="plan_number" type="text" placeholder="计划数量">
+                    </div>
+                </div>
 
             </div>
             <div class="modal_bot">
-                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
-                <button id="submit" class="btn btn-md btn-primary last">保存</button>
+                <button class="close_medal btn btn-md btn-default first">关闭</button>
+                <button id="submit_task" class="btn btn-md btn-primary last">保存</button>
             </div>
         </div>
     </div>
-
-    <!--上传模态框部分-->
-    <div class="modal_outer_progress">
-        <div class="modal_inner">
-            <div class="modal_top">
-                <h3 id="modal_title_progress">
-                    条码导入
-                </h3>
-            </div>
-            <div class="modal_mid">
-                <div class="line upload_line">
-                    <div>正在上传文件</div>
-                    <div id="my_progress" class="progress">
-                        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
-
-                        </div>
-                        <span class="my_per">0%</span>
-                    </div>
-                </div>
-                <div class="line process_line">
-                    <span>数据处理中.视文件的大小,可能需要数分钟...</span>
-                    <i class="fa fa-spinner fa-pulse fa-4x"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 
 {% endblock %}
