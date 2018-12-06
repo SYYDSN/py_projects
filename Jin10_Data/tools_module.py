@@ -24,7 +24,6 @@ from uuid import uuid4
 from werkzeug.contrib.cache import RedisCache
 from werkzeug.contrib.cache import SimpleCache
 from log_module import get_logger
-from module.system_module import User
 
 
 """公用的函数和装饰器"""

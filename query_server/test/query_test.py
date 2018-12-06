@@ -7,6 +7,7 @@ if __root_path not in sys.path:
 import orm_module
 from pymongo import WriteConcern
 from uuid import uuid4
+import random
 import datetime
 
 
@@ -127,14 +128,16 @@ class TempRecord(orm_module.BaseDoc):
 
 def generator_file():
     """生成一个导入的文件"""
-    with open("500万.txt", "a", encoding="utf-8") as f:
-
-        for x in range(500 * 10000):
+    now = str(int(datetime.datetime.now().timestamp()))
+    with open("100万.txt", "a", encoding="utf-8") as f:
+        count = 100000000000000
+        for x in range(100 * 10000):
             if x % 100000 == 0:
                 print("{}万, {}".format(x / 10000, datetime.datetime.now()))
             else:
                 pass
-            s = uuid4().hex
+            s = now + str(count + 1)
+            count += 1
             print(s, file=f)
 
 

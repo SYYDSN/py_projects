@@ -350,7 +350,7 @@ def parse_calendar_data(item) -> dict:
     return data
 
 
-def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> list:
+def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> (list, tuple):
     """
     取金10数据的日历
     :param b:
@@ -361,8 +361,7 @@ def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> list:
     w = WebDriverWait(b, timeout=1)
     today_dom = get_dom(wait=w, find_type="class", cond="jin-rili_content-title", lot=False)
     year, month, day = re.findall("\d{2,4}", today_dom.text)
-    current_date = "{}{}{}".format(year, month, day)
-    today = datetime.date.today().strftime("%Y%m%d")
+    current_date = "{}-{}-{}".format(year, month, day)
     items = get_dom(wait=w, find_type="css", cond=".jin-rili_body .jin-rili_content", lot=True)
     doms1 = items[0]  # 数据一览
     doms2 = items[1]  # 财经大事
@@ -374,22 +373,38 @@ def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> list:
         if len(temp) > 0:
             d1.append(temp)
     """目前只处理数据日历"""
-    return d1
+    return d1, current_date
 
 
 if __name__ == "__main__":
     u = "http://127.0.0.1:7999/news"
     browser = get_browser(headless=True, browser_class=1)
     open_url(url=u, browser=browser)
+    prev_refresh = datetime.datetime.now()
     while 1:
-        calendar_data = get_calendar_data(browser)
+        now = datetime.datetime.now()
+        if (now - prev_refresh).total_seconds() > 3600:
+            """1小时刷新一次页面"""
+            prev_refresh = now
+            browser.delete_all_cookies()  # 清理缓存
+            browser.refresh()             # 刷新页面
+        else:
+            pass
+        calendar_data, last_date = get_calendar_data(browser)
         news_data = get_news_data(b=browser)
-        # print(calendar_data[0])
         data = {
             "strategy": [],
             "news": news_data,
             "calendar": calendar_data
         }
-        save_data(data)
-        time.sleep(5)
+        save_data(data=data, last_date=last_date)
+        end = datetime.datetime.now()
+        print(now)
+        print(end)
+        delay = (end - now).total_seconds() - 5
+        print("delay is {}".format(delay))
+        if delay < 0:
+            pass
+        else:
+            time.sleep(delay)
     pass

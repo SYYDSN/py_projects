@@ -24,6 +24,7 @@
                 </div>
 
                 <div class="right">
+                    <label>选择导入的产品: </label>
                     <div class="select_group">
                         <div class="select_div">
                             <label>名称</label>
@@ -91,7 +92,6 @@
                         <th>文件名</th>
                         <th>文件大小</th>
                         <th>有效记录</th>
-                        <th>无效记录</th>
                         <th>产品信息</th>
                         <th>导入日期</th>
                     </tr>
@@ -103,7 +103,6 @@
                             <td class="file_name">{{ file.file_name }}</td>
                             <td class="file_size">{{ file.file_size }}</td>
                             <td class="valid_count">{{ file.valid_count }}</td>
-                            <td class="invalid_count">{{ file.invalid_count }}</td>
                             <td  data-id="{{ file.product_id }}" class="product_info">
                                 {{ file.product_name + " " + file.specification + " " + (file.net_contents | string) + " " + file.package_ratio }}
                             </td>

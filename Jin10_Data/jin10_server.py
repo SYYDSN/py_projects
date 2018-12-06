@@ -2,6 +2,7 @@
 from flask import Flask
 from flask import render_template
 from module.data_module import load_data
+from tools_module import *
 
 
 app = Flask(__name__)
@@ -24,7 +25,9 @@ def news_func():
 
 @app.route("/info", methods=['post', 'get'])
 def info_func():
-    data = load_data()
+    f = get_arg(request, "json", "0")
+    f = True if str(f) == "1" else False
+    data = load_data(to_json=f)
     return data
 
 

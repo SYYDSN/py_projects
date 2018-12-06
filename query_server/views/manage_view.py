@@ -47,13 +47,12 @@ navs = [
         {"name": "条码信息概要", "path": "/manage/code_summary"},
         {"name": "条码信息导入", "path": "/manage/code_import"},
         {"name": "条码信息导出", "path": "/manage/code_export"},
-        {"name": "提取印刷条码", "path": "/manage/code_pick"},
-        {"name": "条码数据同步", "path": "/manage/code_sync"},
         {"name": "查询条码信息", "path": "/manage/code_query"},
     ]},
     {"name": "生产任务", "path": "/manage/task_summary", "class": "fa fa-server", "children": [
         {"name": "生产任务概况", "path": "/manage/task_summary"},
-        {"name": "生产任务列表", "path": "/manage/task_manage"}
+        {"name": "生产任务列表", "path": "/manage/task_manage"},
+        {"name": "条码回传记录", "path": "/manage/task_sync"}
     ]},
     {"name": "系统管理", "path": "/manage/user",  "class": "fa fa-bar-chart", "children": [
         {"name": "权限组管理", "path": "/manage/role"},

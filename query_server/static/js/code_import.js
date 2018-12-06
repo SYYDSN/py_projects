@@ -1,4 +1,20 @@
 $(function(){
+    // 是否四级联动选择框就绪? 就绪返回产品id,不就绪返回空字符串
+    var select_success = function(){
+        var product_id = "";
+        var product_name = $.trim($("#select_product_name .current_value").text());
+        var specification = $.trim($("#select_specification .current_value").text());
+        var net_contents = $.trim($("#select_net_contents .current_value").text());
+        var package_ratio  = $.trim($("#select_package_ratio .current_value").text());
+        if(product_name === "" || specification === "" || net_contents === "" || package_ratio === ""){
+            console.log("还未选择正确的产品信息!");
+        }
+        else {
+            product_id = $.trim($("#select_package_ratio .current_value").attr("data-id"));
+        }
+        return product_id;
+    };
+
     /*上传成功事件*/
     var upload_success = function(resp){
         $(".file_path").text("");
@@ -47,7 +63,13 @@ $(function(){
 
     // 弹出选择上传文件框
     $("#open_file").click(function(){
-        $("#upload_file").click();
+        if(select_success() === ""){
+            alert("请先选择产品信息");
+            return false;
+        }
+        else {
+            $("#upload_file").click();
+        }
     });
 
     // 选择文件后,自动上传

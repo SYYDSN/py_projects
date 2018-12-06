@@ -571,6 +571,14 @@ class ProduceTask(orm_module.BaseDoc):
         cls.delete_many(filter_dict={"_id": {"$in": ids}})
         return mes
 
+    @classmethod
+    def task_summary(cls) -> dict:
+        """
+        查看所有任务的概况/统计信息
+        :return:
+        """
+
+
 
 if __name__ == "__main__":
     """添加一个管理员"""
