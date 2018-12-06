@@ -76,7 +76,7 @@ class PrintCode(orm_module.BaseDoc):
         db_client = orm_module.get_client()
         write_concern = orm_module.get_write_concern()
         table = "code_info"
-        f = {"print_id": {"$exists": False}, "status": 0}
+        f = {"print_id": {"$exists": False}, "product_id": product_id, "status": 0}
         col = orm_module.get_conn(table_name=table, db_client=db_client)
         me = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)
         pipeline = list()

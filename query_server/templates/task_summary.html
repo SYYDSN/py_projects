@@ -1,0 +1,89 @@
+{% extends "standard_page.html" %}
+
+{% block css %}
+   <link rel="stylesheet" href="/static/css/task_summary.css">
+   <script>
+   </script>
+{% endblock %}
+
+{% block show_area %}
+
+    <div class="right_top">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="请输入搜索关键字...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Go!</button>
+              </span>
+        </div>
+    </div>
+
+    <div class="code_list_outer">
+        <div class="code_list_inner">
+            <div class="insert_div">
+                <div class="left">
+                    <i class="fa fa-list-ul"></i>
+                    <span id="clear_condition">所有信息</span>
+                </div>
+
+                <div class="right">
+                    <button id="new_task" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                       新建生产任务
+                    </button>
+                </div>
+            </div>
+
+            <div class="table_outer">
+                <div class="statistics_info">
+                    <!--统计信息-->
+                </div>
+
+            </div>
+
+            <div class="bottom_div">
+                <div class="left">
+
+                </div>
+                <div class="right">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--弹框部分-->
+    <div class="modal_outer">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 class="modal_title">
+                    新增生产任务
+                </h3>
+            </div>
+            <div class="modal_mid">
+
+                <div class="line">
+                    <label>生产任务名称</label>
+                    <div class="my_input dropdown">
+                        <input id="task_name" type="text" placeholder="区分不同任务">
+                    </div>
+                </div>
+                <div class="line">
+                    <label>计划生产数量</label>
+                    <div class="my_input dropdown">
+                        <input id="plan_number" type="text" placeholder="计划数量">
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal_bot">
+                <button class="close_medal btn btn-md btn-default first">关闭</button>
+                <button id="submit_task" class="btn btn-md btn-primary last">保存</button>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/task_summary.js"></script>
+{% endblock %}

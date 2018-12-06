@@ -162,9 +162,11 @@ $(function(){
         }
         else{
             var current_div = $(this).parents(".select_div:first");
-            var text = $.trim(current_div.prev().find(".current_value").text());
-            var a_id = $(this).attr("data-id");
-            var args = {"product_name": text, "_id": a_id, "type": "selector"};
+            var product_name = $.trim($("#select_product_name .current_value").text());
+            var args = {
+                "type": "selector",
+                "product_name": product_name
+            };
             $.post("/manage/product", args, function(resp){
                 var json = JSON.parse(resp);
                 var status = json['message'];
@@ -197,9 +199,13 @@ $(function(){
         }
         else{
             var current_div = $(this).parents(".select_div:first");
-            var text = $.trim(current_div.prev().find(".current_value").text());
-            var a_id = $(this).attr("data-id");
-            var args = {"specification": text, "_id": a_id, "type": "selector"};
+            var product_name = $.trim($("#select_product_name .current_value").text());
+            var specification = $.trim($("#select_specification .current_value").text());
+            var args = {
+                "type": "selector",
+                "product_name": product_name,
+                "specification": specification
+            };
             $.post("/manage/product", args, function(resp){
                 var json = JSON.parse(resp);
                 var status = json['message'];
@@ -233,8 +239,13 @@ $(function(){
         else{
             var current_div = $(this).parents(".select_div:first");
             var text = $.trim(current_div.prev().find(".current_value").text());
-            var a_id = $(this).attr("data-id");
-            var args = {"net_contents": text, "_id": a_id, "type": "selector"};
+            var product_name = $.trim($("#select_product_name .current_value").text());
+            var specification = $.trim($("#select_specification .current_value").text());
+            var args = {
+                "net_contents": text, "type": "selector",
+                "product_name": product_name,
+                "specification": specification
+            };
             $.post("/manage/product", args, function(resp){
                 var json = JSON.parse(resp);
                 var status = json['message'];
@@ -273,7 +284,7 @@ $(function(){
         var $ul = $obj.parents("ul:first");
         if($.trim($ul.attr("data-type")) === "product_name"){
             var $next_ul = $("ul[data-type='specification']");
-            var args = {"product_name": text, "_id": a_id, "type": "selector"};
+            var args = {"product_name": text, "type": "selector"};
             $.post("/manage/product", args, function(resp){
                 var json = JSON.parse(resp);
                 var status = json['message'];
@@ -296,7 +307,12 @@ $(function(){
         }
         else if($.trim($ul.attr("data-type")) === "specification"){
             var $next_ul = $("[data-type='net_contents']");
-            var args = {"specification": text, "_id": a_id, "type": "selector"};
+            var product_name = $.trim($("#select_product_name .current_value").text());
+            var args = {
+                "specification": text,
+                "product_name": product_name,
+                "type": "selector"
+            };
             $.post("/manage/product", args, function(resp){
                 var json = JSON.parse(resp);
                 var status = json['message'];
@@ -319,7 +335,13 @@ $(function(){
         }
         else if($.trim($ul.attr("data-type")) === "net_contents"){
             var $next_ul = $("[data-type='package_ratio']");
-            var args = {"net_contents": text, "_id": a_id, "type": "selector"};
+            var product_name = $.trim($("#select_product_name .current_value").text());
+            var specification = $.trim($("#select_specification .current_value").text());
+            var args = {
+                "net_contents": text, "type": "selector",
+                "product_name": product_name,
+                "specification": specification
+            };
             $.post("/manage/product", args, function(resp){
                 var json = JSON.parse(resp);
                 var status = json['message'];

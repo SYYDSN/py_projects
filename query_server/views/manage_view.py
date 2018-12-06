@@ -147,7 +147,7 @@ class CodeImportView(MyView):
             page_index = get_arg(request, "page", 1)
             s = {"upload_time": -1}
             selector = Product.selector_data()
-            render_data.update(selector)
+            render_data['selector'] = selector
             result = UploadFile.paging_info(filter_dict=access_filter, page_index=page_index, sort_cond=s)
             disk_import_file = UploadFile.all_file_name()  # 获取磁盘上的所有文件名
             files = result['data']
@@ -230,7 +230,7 @@ class CodeExportView(MyView):
             page_index = get_arg(request, "page", 1)
             s = {"upload_time": -1}
             selector = Product.selector_data()
-            render_data.update(selector)
+            render_data['selector'] = selector
             result = PrintCode.paging_info(filter_dict=access_filter, page_index=page_index, sort_cond=s)
             files = result['data']
             render_data.update(result)
@@ -328,6 +328,7 @@ class ProduceTaskView(MyView):
         elif key == "summary":
             """生产任务概况"""
             render_data['page_title'] = "生产任务概况"
+            return render_template("task_summary.html", **render_data)
             pass
         else:
             return abort(404)
@@ -339,6 +340,8 @@ class ProduceTaskView(MyView):
         1. add          添加任务
         2. edit         修改任务
         3. delete       删除任务
+        4. start_task       开始任务
+        5. stop_task       停止任务
         :param user:
         :return:
         """
@@ -383,21 +386,43 @@ class ProduceTaskView(MyView):
                         mes['message'] = "success"
                     else:
                         mes['message'] = "插入失败"
-                elif the_type == "cancel":
-                    """撤销导入条码操作"""
-                    ids = []
-                    try:
-                        ids = json.loads(get_arg(request, "ids"))
-                    except Exception as e:
-                        print(e)
-                    finally:
-                        if len(ids) == 0:
-                            mes['message'] = "没有需要撤销的文件记录"
-                        else:
-                            ids = [ObjectId(x) for x in ids]
-                            mes = UploadFile.cancel_data(f_ids=ids)
+                elif the_type == "start_task":
+                    """开始任务"""
+                    _id = ObjectId(get_arg(request, "_id", None))
+                    f = {"_id": _id}
+                    task = ProduceTask.find_one(filter_dict=f)
+                    if isinstance(task.get("begin"), datetime.datetime):
+                        args = {
+                            "status": 1,
+                            "end": None
+                        }
+                    else:
+                        args = {
+                            "status": 1,
+                            "begin": datetime.datetime.now()
+                        }
+                    u = {"$set": args}
+                    r = ProduceTask.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
+                    if isinstance(r, dict):
+                        mes['message'] = "success"
+                    else:
+                        mes['message'] = "操作失败"
+                elif the_type == "stop_task":
+                    """停止任务"""
+                    _id = ObjectId(get_arg(request, "_id", None))
+                    f = {"_id": _id}
+                    args = {
+                        "status": 0,
+                        "end": datetime.datetime.now()
+                    }
+                    u = {"$set": args}
+                    r = ProduceTask.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
+                    if isinstance(r, dict):
+                        mes['message'] = "success"
+                    else:
+                        mes['message'] = "操作失败"
                 elif the_type == "delete":
-                    """批量删除文件和日志"""
+                    """批量删除任务"""
                     ids = []
                     try:
                         ids = json.loads(get_arg(request, "ids"))
@@ -408,8 +433,7 @@ class ProduceTaskView(MyView):
                             mes['message'] = "没有发现需要删除的文件"
                         else:
                             ids = [ObjectId(x) for x in ids]
-                            include_record = get_arg(request, "include_record")
-                            mes = UploadFile.delete_file_and_record(ids=ids, include_record=include_record)
+                            mes = ProduceTask.delete_tasks(ids=ids)
 
                 else:
                     mes['message'] = "无效的操作类型:{}".format(the_type)

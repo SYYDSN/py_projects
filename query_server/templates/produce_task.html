@@ -62,6 +62,11 @@
                             <td class="end_time">{{ task.end | short_date2 }}</td>
                             <td class="create_time">{{ task.create | short_date2 }}</td>
                             <td class="edit_td">
+                                {% if task.status == 0 %}
+                                    <button data-id="{{ task._id }}" class="start_task btn btn-xs btn-default btn-primary edit_product">开始</button>
+                                {% else %}
+                                    <button data-id="{{ task._id }}" class="stop_task btn btn-xs btn-default btn-primary edit_product">停止</button>
+                                {% endif %}
                                 <button data-id="{{ task._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_product">编辑</button>
                             </td>
                         </tr>
@@ -73,11 +78,8 @@
                 <div class="left">
                     <input type="checkbox" id="check_all">
                     <span>全选</span>
-                    <button id="cancel_import" type="button" class="btn btn-sm btn-default btn-primary">
-                        撤销已导入数据
-                    </button>
-                    <button id="delete_import2" type="button" class="btn btn-sm btn-default btn-primary">
-                        删除文件和日志
+                    <button id="delete_task" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除任务
                     </button>
                 </div>
                 <div class="right">

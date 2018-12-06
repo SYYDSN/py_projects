@@ -124,14 +124,14 @@ class Product(orm_module.BaseDoc):
         if filter_dict is None:
             add = {"$addFields": {"name": "$product_name"}}
             pipeline.append(add)
-        elif "product_name" in filter_dict:
-            add = {"$addFields": {"name": "$specification"}}
+        elif "product_name" in filter_dict and "specification" in filter_dict and "net_contents" in filter_dict:
+            add = {"$addFields": {"name": "$package_ratio"}}
             pipeline.append(add)
-        elif "specification" in filter_dict:
+        elif "product_name" in filter_dict and "specification" in filter_dict:
             add = {"$addFields": {"name": "$net_contents"}}
             pipeline.append(add)
-        elif "net_contents" in filter_dict:
-            add = {"$addFields": {"name": "$package_ratio"}}
+        elif "product_name" in filter_dict:
+            add = {"$addFields": {"name": "$specification"}}
             pipeline.append(add)
         else:
             pass
@@ -558,6 +558,18 @@ class ProduceTask(orm_module.BaseDoc):
         }
         r = ProduceTask.query(**kw)
         return r
+
+    @classmethod
+    def delete_tasks(cls, ids: list) -> dict:
+        """
+        批量删除任务
+        :param ids:
+        :return:
+        """
+        mes = {"message": "success"}
+        ids = [x if isinstance(x, ObjectId) else ObjectId(x) for x in ids]
+        cls.delete_many(filter_dict={"_id": {"$in": ids}})
+        return mes
 
 
 if __name__ == "__main__":
