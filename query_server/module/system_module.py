@@ -518,7 +518,7 @@ class ProduceTask(orm_module.BaseDoc):
     _table_name = "produce_task"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['task_name'] = str
+    type_dict['paging_info'] = str    # 生产批号
     type_dict['task_desc'] = str
     type_dict['plan_number'] = int  # 计划生产数量
     type_dict['actual_number'] = int  # 实际生产数量

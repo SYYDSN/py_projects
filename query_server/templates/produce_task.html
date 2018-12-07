@@ -36,7 +36,7 @@
                 <table id="task_list" class="table table-hover">
                     <tr class="info">
                         <th class="select"></th>
-                        <th>任务名称</th>
+                        <th>生产批号</th>
                         <th>产品信息</th>
                         <th>计划数量</th>
                         <th>生产数量</th>
@@ -51,7 +51,7 @@
                             <td  class="select">
                                 <input data-id="{{ task._id }}" type="checkbox" >
                             </td>
-                            <td class="task_name">{{ task.task_name }}</td>
+                            <td class="batch_sn">{{ task.batch_sn }}</td>
                             <td data-id="{{ task.product_id }}" class="product_info">
                                 {{ task.product_name + " " + task.specification + " " + (task.net_contents | string) + " " + task.package_ratio }}
                             </td>
@@ -156,9 +156,9 @@
                     </div>
                 </div>
                 <div class="line">
-                    <label>生产任务名称</label>
+                    <label>生产批号</label>
                     <div class="my_input dropdown">
-                        <input id="task_name" type="text" placeholder="区分不同任务">
+                        <input id="batch_sn" type="text" placeholder="区分不同任务">
                     </div>
                 </div>
                 <div class="line">

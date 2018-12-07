@@ -352,12 +352,12 @@ class ProduceTaskView(MyView):
             if key == "manage":
                 the_type = get_arg(request, "type", "")
                 product_id = ObjectId(get_arg(request, "product_id", None))
-                task_name = get_arg(request, "task_name", "")
+                batch_sn = get_arg(request, "batch_sn", "")
                 plan_number = int(get_arg(request, "plan_number", "0"))
                 if the_type == "add":
                     """新建任务"""
                     args = {
-                        "task_name": task_name,
+                        "batch_sn": batch_sn,
                         "plan_number": plan_number,
                         "create": datetime.datetime.now(),
                         "status": 0,
@@ -372,7 +372,7 @@ class ProduceTaskView(MyView):
                     """编辑任务"""
                     _id = ObjectId(get_arg(request, "_id", None))
                     args = {
-                        "task_name": task_name,
+                        "batch_sn": batch_sn,
                         "plan_number": plan_number,
                         "create": datetime.datetime.now(),
                         "status": 0,

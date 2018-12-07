@@ -51,7 +51,7 @@ $(function(){
     var fill_info = function(id_str){
         id_str = id_str.startsWith("#")? id_str: "#" + id_str;
         var $tr = $(id_str);
-        var task_name = $.trim($tr.find(".task_name").text());
+        var batch_sn = $.trim($tr.find(".batch_sn").text());
         var product_id  = $.trim($tr.find(".product_info").attr("data-id"));
         var p = $.trim($tr.find(".product_info").text()).split(" ");
         var product_name = p[0];
@@ -59,7 +59,7 @@ $(function(){
         var net_contents = p[2];
         var package_ratio = p[3];
         var plan_number = $.trim($tr.find(".plan_number").text());
-        $("#task_name").val(task_name);
+        $("#batch_sn").val(batch_sn);
         $("#select_product_name .current_value").text(product_name).attr("data-id", product_id);
         $("#select_specification .current_value").text(specification).attr("data-id", product_id);
         $("#select_net_contents .current_value").text(net_contents).attr("data-id", product_id);
@@ -73,7 +73,7 @@ $(function(){
     $("#submit_task").click(function(){
         var product_id = select_success();
         var plan_number = parseInt($.trim($("#plan_number").val()));
-        var task_name = $.trim($("#task_name").val());
+        var batch_sn = $.trim($("#batch_sn").val());
         if(product_id === ""){
             alert("请选择产品种类");
             return false;
@@ -82,13 +82,13 @@ $(function(){
             alert("计划生产数量必须是数字");
             return false;
         }
-        else if(task_name === ""){
+        else if(batch_sn === ""){
             alert("任务名称必须");
             return false;
         }
         else{
             var args = {
-                "task_name": task_name,
+                "batch_sn": batch_sn,
                 "product_id": product_id,
                 "plan_number": plan_number
             };
