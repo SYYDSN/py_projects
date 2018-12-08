@@ -197,6 +197,7 @@ $(function(){
                 }
                 else{
                     alert(status);
+                    $(".close_medal").click();
                 }
             });
         });

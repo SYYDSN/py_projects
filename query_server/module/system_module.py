@@ -510,6 +510,44 @@ class Embedded(orm_module.BaseDoc):
     """
     type_dict['children'] = dict
 
+    @classmethod
+    def allow_control_ip(cls, ip: str) -> bool:
+        """
+        检查主控板是否ip冲突?不冲突返回True
+        :param ip:
+        :return:
+        """
+        f = {"ip": ip}
+        col = cls.get_collection()
+        r = col.find_one(filter=f)
+        if r is None:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def allow_execute_ip(cls, ip: str) -> bool:
+        """
+        检查执行板是否ip冲突?不冲突返回True
+        :param ip:
+        :return:
+        """
+        pipeline = []
+        p1 = {"$project": {
+            "_id": 0,
+            "ip_item": {"$objectToArray": "$children"},
+        }}
+        w1 = {"$unwind": "$ip_item"}
+        pipeline.append(p1)
+        pipeline.append(w1)
+        col = cls.get_collection()
+        r = col.aggregate(pipeline=pipeline)
+        r = [x['ip_item']['v'] for x in r]
+        if ip in r:
+            return False
+        else:
+            return True
+
 
 class ProduceTask(orm_module.BaseDoc):
     """
@@ -529,34 +567,85 @@ class ProduceTask(orm_module.BaseDoc):
     type_dict['product_id'] = ObjectId
 
     @classmethod
-    def paging_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10, can_json: bool = False) -> dict:
+    def paging_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10) -> dict:
         """
-        分页查看生产任务信息.
+        分页查看生产任务信息.由于涉及的关系复杂,这里使用了cls.aggregate函数
         :param filter_dict: 过滤器,由用户的权限生成
         :param page_index: 页码(当前页码)
         :param page_size: 每页多少条记录
-        :param can_json: 转换成可以json的字典?
         :return:
         """
         filter_dict.update({"status": {"$ne": -1}})
-        join_cond = list()
-        product_cond = {
-            "table_name": "product_info",
-            "local_field": "product_id",
-            "foreign_field": "_id",
-            "flat": True
-        }
-        join_cond.append(product_cond)
+        pipeline = list()
 
-        kw = {
-            "filter_dict": filter_dict,
-            "join_cond": join_cond,  # join查询角色表 role_info
-            "sort_cond": [('create', -1), ('begin', -1)],  # 主文档排序条件
-            "page_index": page_index,  # 当前页
-            "page_size": page_size,  # 每页多少条记录
-            "can_json": can_json
+        product_cond = {
+            "$lookup": {
+                "from": "product_info",
+                "let": {"pid": "$product_id"},
+                "pipeline": [
+                    {"$match": {"$expr": {"$eq": ["$_id", "$$pid"]}}},
+                    {"$project": {"_id": 0}}
+                ],
+                "as": "product_item"
+            }
         }
-        r = ProduceTask.query(**kw)
+        pipeline.append(product_cond)
+        rep1 = {
+            '$replaceRoot':  # 从根文档替换
+                {'newRoot':  # 作为新文档
+                    {
+                        '$mergeObjects': [  # 混合文档.value是一个数组,用第二个元素覆盖第一个.注意这个顺序很重要.
+                            {'$arrayElemAt': ["$product_item", 0]},
+                            # 取上一阶段结果中.列表字段(数组的第一个元素指示)的第0个(数组的最后一个元素指示))
+                            '$$ROOT']  # 标识根文档
+                    }
+                }
+        }
+        pipeline.append(rep1)
+        pipeline.append({"$project": {"product_item": 0}})
+        code_lookup = {
+            "$lookup": {
+                "from": "code_info",
+                "let": {  # let 用来创建新的变量.
+                    "pid": "$product_id"
+                },
+                "pipeline": [  # 嵌套的管道查询,
+                    {
+                        "$match":
+                            {"$expr":
+                                {
+                                    "$and":
+                                        [
+                                            {"$eq": ["$product_id", "$$pid"]},
+                                            {"$eq": [{"$type": "$print_id"}, "objectId"]}
+                                        ]
+                                },
+                            }
+                    },
+                    {"$count": "code_count"}
+                ],
+                "as": "code_item"
+            }
+        }
+        pipeline.append(code_lookup)
+        rep2 = {
+            '$replaceRoot':  # 从根文档替换
+                {'newRoot':  # 作为新文档
+                    {
+                        '$mergeObjects': [  # 混合文档.value是一个数组,用第二个元素覆盖第一个.注意这个顺序很重要.
+                            {'$arrayElemAt': ["$code_item", 0]},
+                            # 取上一阶段结果中.列表字段(数组的第一个元素指示)的第0个(数组的最后一个元素指示))
+                            '$$ROOT']  # 标识根文档
+                    }
+                }
+        }
+        pipeline.append(rep2)
+        # pipeline.append({"$project": {"code_item": 0}})
+
+        r = ProduceTask.aggregate(pipeline=pipeline, page_size=page_size, page_index=page_index)
+        # col = cls.get_collection()
+        # r = col.aggregate(pipeline=pipeline)
+        # r = [x for x in r]
         return r
 
     @classmethod
@@ -601,5 +690,6 @@ if __name__ == "__main__":
     #         if r is None:
     #             f['password'] = "123456"
     #             r = col.insert_one(document=f, session=ses)
-    Product.selector_data()
+    # ProduceTask.paging_info(filter_dict=dict())
+    Embedded.allow_execute_ip("192.168.1.24")
     pass

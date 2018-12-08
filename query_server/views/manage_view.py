@@ -46,7 +46,7 @@ navs = [
     {"name": "条码信息", "path": "/manage/code_summary", "class": "fa fa-qrcode", "children": [
         {"name": "条码信息概要", "path": "/manage/code_summary"},
         {"name": "条码信息导入", "path": "/manage/code_import"},
-        {"name": "条码信息导出", "path": "/manage/code_export"},
+        {"name": "导出打印条码", "path": "/manage/code_export"},
         {"name": "查询条码信息", "path": "/manage/code_query"},
     ]},
     {"name": "生产任务", "path": "/manage/task_summary", "class": "fa fa-server", "children": [
@@ -328,7 +328,14 @@ class ProduceTaskView(MyView):
             """生产任务概况"""
             render_data['page_title'] = "生产任务概况"
             return render_template("task_summary.html", **render_data)
-            pass
+        elif key == "sync":
+            """任务同步/条码回传"""
+            render_data['page_title'] = "条码同步记录"
+            sync_data = TaskSync.paging_info(filter_dict=access_filter)
+            sync_list = sync_data.pop("data", [])
+            render_data.update(sync_data)
+            render_data['sync_list'] = sync_list
+            return render_template("task_sync.html", **render_data)
         else:
             return abort(404)
 
@@ -896,27 +903,34 @@ class ManageDeviceView(MyView):
                     """编辑主控板"""
                     line_id = ObjectId(get_arg(request, "line_id", ""))
                     ip = get_arg(request, "ip", "")
-                    f = {"_id": ObjectId(_id)}
-                    u = {"$set": {"line_id": line_id, "ip": ip}}
-                    kw = {
-                        "filter_dict": f,
-                        "update_dict": u
-                    }
-                    r = Embedded.find_one_and_update(**kw)
-                    if ip == r.get('ip') and line_id == r.get("line_id"):
-                        mes['message'] = "success"
+                    """先检查ip是否有冲突?"""
+                    if Embedded.allow_control_ip(ip):
+                        f = {"_id": ObjectId(_id)}
+                        u = {"$set": {"line_id": line_id, "ip": ip}}
+                        kw = {
+                            "filter_dict": f,
+                            "update_dict": u
+                        }
+                        r = Embedded.find_one_and_update(**kw)
+                        if ip == r.get('ip') and line_id == r.get("line_id"):
+                            mes['message'] = "success"
+                        else:
+                            mes['message'] = "修改主控板信息失败"
                     else:
-                        mes['message'] = "修改主控板信息失败"
+                        mes['message'] = "ip地址冲突"
                 elif operate == "add":
                     """添加"""
                     line_id = ObjectId(get_arg(request, "line_id", ""))
                     ip = get_arg(request, "ip", "")
-                    doc = {"line_id": line_id, "ip": ip}
-                    r = Embedded.insert_one(doc=doc)
-                    if r is None:
-                        mes['message'] = "插入失败"
+                    if Embedded.allow_control_ip(ip):
+                        doc = {"line_id": line_id, "ip": ip}
+                        r = Embedded.insert_one(doc=doc)
+                        if r is None:
+                            mes['message'] = "插入失败"
+                        else:
+                            mes['message'] = "success"
                     else:
-                        mes['message'] = "success"
+                        mes['message'] ='ip地址冲突'
                 elif operate == "delete":
                     """删除"""
                     _id = get_arg(request, "_id", "")
@@ -937,19 +951,22 @@ class ManageDeviceView(MyView):
                     if raw is None:
                         mes['message'] = "对象不存在"
                     else:
-                        children = raw.get('children', dict())
-                        children[key] = ip
-                        f = {"_id": ObjectId(_id)}
-                        u = {"$set": {"children": children}}
-                        kw = {
-                            "filter_dict": f,
-                            "update_dict": u
-                        }
-                        r = Embedded.find_one_and_update(**kw)
-                        if isinstance(r, dict):
-                            mes['message'] = "success"
+                        if Embedded.allow_execute_ip(ip):
+                            children = raw.get('children', dict())
+                            children[key] = ip
+                            f = {"_id": ObjectId(_id)}
+                            u = {"$set": {"children": children}}
+                            kw = {
+                                "filter_dict": f,
+                                "update_dict": u
+                            }
+                            r = Embedded.find_one_and_update(**kw)
+                            if isinstance(r, dict):
+                                mes['message'] = "success"
+                            else:
+                                mes['message'] = "添加执行板信息失败"
                         else:
-                            mes['message'] = "添加执行板信息失败"
+                            mes['message'] = 'ip地址冲突'
                 elif operate == "edit":
                     """编辑"""
                     key = get_arg(request, "key", '')
@@ -964,46 +981,53 @@ class ManageDeviceView(MyView):
                     else:
                         if old_id != _id:
                             """调整了主控板"""
-                            children = raw.get('children', dict())
-                            children.pop(key, None)
-                            u = {"$set": {"children": children}}
-                            kw = {
-                                "filter_dict": {"_id": old_id},
-                                "update_dict": u
-                            }
-                            r = Embedded.find_one_and_update(**kw)
-                            if isinstance(r, dict):
-                                n = Embedded.find_by_id(o_id=_id, to_dict=True)
-                                if n is None:
-                                    mes['message'] = "新主控板不存在"
-                                else:
-                                    children = n.get('children', dict())
-                                    children[key] = ip
-                                    u = {"$set": {"children": children}}
-                                    kw = {
-                                        "filter_dict": {"_id": _id},
-                                        "update_dict": u
-                                    }
-                                    r2 = Embedded.find_one_and_update(**kw)
-                                    if isinstance(r2, dict):
-                                        mes['message'] = "success"
+                            if Embedded.allow_execute_ip(ip):
+                                children = raw.get('children', dict())
+                                children.pop(key, None)
+                                u = {"$set": {"children": children}}
+                                kw = {
+                                    "filter_dict": {"_id": old_id},
+                                    "update_dict": u
+                                }
+                                r = Embedded.find_one_and_update(**kw)
+                                if isinstance(r, dict):
+                                    n = Embedded.find_by_id(o_id=_id, to_dict=True)
+                                    if n is None:
+                                        mes['message'] = "新主控板不存在"
                                     else:
-                                        mes['message'] = "修改执行板信息失败"
+                                        children = n.get('children', dict())
+                                        children[key] = ip
+                                        u = {"$set": {"children": children}}
+                                        kw = {
+                                            "filter_dict": {"_id": _id},
+                                            "update_dict": u
+                                        }
+                                        r2 = Embedded.find_one_and_update(**kw)
+                                        if isinstance(r2, dict):
+                                            mes['message'] = "success"
+                                        else:
+                                            mes['message'] = "修改执行板信息失败"
+                                else:
+                                    mes['message'] = "修改原始主控板信息失败"
                             else:
-                                mes['message'] = "修改原始主控板信息失败"
+                                mes['message'] = 'ip地址冲突'
                         else:
-                            children = raw.get('children', dict())
-                            children[key] = ip
-                            u = {"$set": {"children": children}}
-                            kw = {
-                                "filter_dict": {"_id": old_id},
-                                "update_dict": u
-                            }
-                            r = Embedded.find_one_and_update(**kw)
-                            if isinstance(r, dict):
-                                mes['message'] = "success"
+                            """没有调整主控板,只是调整同一主控板下面的控制板"""
+                            if Embedded.allow_execute_ip(ip):
+                                children = raw.get('children', dict())
+                                children[key] = ip
+                                u = {"$set": {"children": children}}
+                                kw = {
+                                    "filter_dict": {"_id": old_id},
+                                    "update_dict": u
+                                }
+                                r = Embedded.find_one_and_update(**kw)
+                                if isinstance(r, dict):
+                                    mes['message'] = "success"
+                                else:
+                                    mes['message'] = "修改执行板信息失败"
                             else:
-                                mes['message'] = "修改执行板信息失败"
+                                mes['message'] = 'ip地址冲突'
                 elif operate == "delete":
                     """删除"""
                     key = get_arg(request, "key", "")

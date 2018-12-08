@@ -7,6 +7,7 @@ if __root_path not in sys.path:
 import orm_module
 from flask import request
 import datetime
+from log_module import get_logger
 import re
 import json
 import numpy as np
@@ -21,6 +22,7 @@ from io import TextIOWrapper
 2. 合成导出文件
 """
 
+logger = get_logger()
 root_dir = __root_path
 cache = orm_module.RedisCache()
 ObjectId = orm_module.ObjectId
@@ -327,12 +329,12 @@ class UploadFile(orm_module.BaseDoc):
                         col2.delete_many(filter={"file_id": _id})
                         doc['status'] = 0
                     else:
-                        pass  # 成功
-                    r = col1.insert_one(document=doc)
-                    if isinstance(r, orm_module.InsertOneResult):
-                        pass  # 成功
-                    else:
-                        mes['message'] = "保存导入记录失败"
+                        """成功"""
+                        r = col1.insert_one(document=doc)
+                        if isinstance(r, orm_module.InsertOneResult):
+                            pass  # 成功
+                        else:
+                            mes['message'] = "保存导入记录失败"
 
             else:
                 mes['message'] = "没有发现产品信息"
@@ -505,11 +507,13 @@ class TaskSync(orm_module.BaseDoc):
     _table_name = "task_sync"
     type_dict = dict()
     type_dict['_id'] = ObjectId
+    type_dict['control_ip'] = str           # 主控板ip
     type_dict['file_name'] = str           # 上传的时候使用的文件名
     type_dict['file_type'] = str           # 上传的时候使用的文件的类型
     type_dict['task_id'] = ObjectId        # 关连的任务id
     type_dict['desc'] = str                # 解析失败会在这里备注,否则会分类显示条码数量
     type_dict['count'] = int               # 条码数量
+    type_dict['status'] = int               # code_info数据库status修改结果. 完成1,
     type_dict['product_id'] = ObjectId     # 关连的产品id
     type_dict['embedded_id'] = ObjectId    # 关连的主控板id
     type_dict['time'] = datetime.datetime  # 同步日期
@@ -555,72 +559,102 @@ class TaskSync(orm_module.BaseDoc):
             except FileNotFoundError as e:
                 print(e)
                 desc = "文件没有找到"
+            except Exception as e:
+                print(e)
+                desc = "读取文件时发生错误"
             finally:
                 if desc != "":
+                    """读取文件有问题"""
                     doc['count'] = 0
                     doc['desc'] = desc
                     mes['message'] = "error"
                     cls.insert_one(doc=doc)
                 else:
-                    values = file_info.pop('values', None)
+                    """读取文件成功"""
                     file_size = os.path.getsize(f_p)
-
-
-                    if values is None or len(values) == 0:
+                    doc['file_size'] = file_size
+                    status = file_info['message']
+                    if status != "success":
+                        doc['desc'] = status
                         mes['message'] = "没有在文件里发现条码信息"
                     else:
+                        count = file_info['count']
+                        doc['count'] = count
+                        data = file_info.pop('data', None)
                         w = orm_module.get_write_concern()
                         db_client = orm_module.get_client()
                         col1 = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client, write_concern=w)
                         col2 = orm_module.get_conn(table_name="code_info", db_client=db_client, write_concern=w)
                         """数据可能会很大,不能使用事务,开始批量更新"""
-                        values = [{"_id": x, "status": 0, "file_id": _id, "product_id": product_id} for x in values]
                         begin = datetime.datetime.now()
                         r = None  # 批量插入状态位
-                        count = 1
-                        for docs in cls.split_list(array=values):
-                            try:
-                                r = col2.insert_many(documents=docs, ordered=False, bypass_document_validation=True)
-                                print("第{}批成功".format(count))
-                                count += 1
-                            except orm_module.BulkWriteError as e1:
-                                mes['message'] = "有重复的数据"
-                                r = None
-                            except Exception as e:
-                                mes['message'] = "{}".format(e)
-                                r = None
-                            finally:
-                                if isinstance(r, orm_module.InsertManyResult):
-                                    pass
-                                else:
+                        for k, v in data.items():
+                            if k != 1:
+                                """不是一级码,数量有限"""
+                                f = {"_id": {"$in": v}}
+                                u = {"$set": {"status": 1, "level": k}}
+                                r = col2.update_many(filter=f, update=u)
+                                if r is None:
                                     """出错了"""
-                                    print("第{}批出错了".format(count))
                                     break
+                            else:
+                                count = 1
+                                for ids in cls.split_list(array=v):
+                                    try:
+                                        f = {"_id": {"$in": ids}}
+                                        u = {"$set": {"status": 1, "level": k}}
+                                        r = col2.update_many(filter=f, update=u)
+                                        # r = col2.update_many(filter=f, update=u, bypass_document_validation=True)
+                                        print("第{}批成功".format(count))
+                                        count += 1
+                                    except Exception as e:
+                                        mes['message'] = "{}".format(e)
+                                        r = None
+                                    finally:
+                                        if isinstance(r, orm_module.UpdateResult):
+                                            pass
+                                        else:
+                                            """出错了"""
+                                            print("第{}批出错了".format(count))
+                                            break
                         end = datetime.datetime.now()
                         print((end - begin).total_seconds())
-                        doc = {
-                            "_id": _id,
-                            "file_name": file_name,
-                            "product_id": product_id,
-                            "storage_name": storage_name,
-                            "file_size": file_size,
-                            "file_type": file_type,
-                            "valid_count": file_info['valid_count'],
-                            "status": 1,
-                            "upload_time": now,
-                            "import_time": now
-                        }
                         if r is None:
                             """出错了,回退数据"""
-                            col2.delete_many(filter={"file_id": _id})
+                            for k, v in data.items():
+                                if k != 1:
+                                    """不是一级码,数量有限"""
+                                    f = {"_id": {"$in": v}}
+                                    u = {"$set": {"status": 0, "level": None}}
+                                    r = col2.update_many(filter=f, update=u)
+                                else:
+                                    count = 1
+                                    for ids in cls.split_list(array=v):
+                                        try:
+                                            f = {"_id": {"$in": ids}}
+                                            u = {"$set": {"status": 0, "level": None}}
+                                            r = col2.update_many(filter=f, update=u,
+                                                                 bypass_document_validation=True)
+                                            print("第{}批成功".format(count))
+                                            count += 1
+                                        except Exception as e:
+                                            mes['message'] = "{}".format(e)
+                                            logger.exception(e)
+                                            r = None
+                                        finally:
+                                            if isinstance(r, orm_module.InsertManyResult):
+                                                pass
+                                            else:
+                                                """出错了"""
+                                                print("第{}批出错了".format(count))
                             doc['status'] = 0
                         else:
-                            pass  # 成功
+                            doc['status'] = 1  # 成功
                         r = col1.insert_one(document=doc)
                         if isinstance(r, orm_module.InsertOneResult):
                             pass  # 成功
                         else:
-                            mes['message'] = "保存导入记录失败"
+                            mes['message'] = "保存回传数据失败"
 
         return mes
 
@@ -648,6 +682,41 @@ class TaskSync(orm_module.BaseDoc):
         data = json.loads(content)
         return data
 
+    @staticmethod
+    def add_group(group: dict, level: int, sn: str) -> dict:
+        """
+        cls.group_code的辅助函数,用于把条码信息分类然后返回
+        :param group:
+        :param level:
+        :param sn:
+        :return:
+        """
+        d = list() if group.get(level) is None else group[level]
+        d.append(sn)
+        group[level] = d
+
+    @classmethod
+    def group_code(cls, codes: list, code_package: dict = None) -> dict:
+        """
+        把回传的字典类型的数据按照条码的级别归类.以方便快速批量修改
+        :param codes:
+        :param code_package: 递归专用,无需传递此参数
+        :return:
+        """
+        code_package = dict() if code_package is None else code_package
+        for x in codes:
+            if isinstance(x, list):
+                cls.group_code(codes=x, code_package=code_package)
+            elif isinstance(x, dict):
+                level = int(x.get("level").strip()) if isinstance(x.get("level"), str) else x.get("level")
+                code = x.get("code")
+                cls.add_group(group=code_package, level=level, sn=code)
+                children = x.get("children")
+                cls.group_code(codes=children, code_package=code_package)
+            else:
+                cls.add_group(group=code_package, level=1, sn=x)
+        return code_package
+
     @classmethod
     def read_file(cls, file_path: str) -> dict:
         """
@@ -657,21 +726,36 @@ class TaskSync(orm_module.BaseDoc):
         :return:
         """
         res = None
-        mes = {""}
-        data = list()
+        mes = {"message": "success"}
         if file_path.lower().endswith(".json") or file_path.lower().endswith(".zip"):
+            data = list()
             if file_path.lower().endswith(".json"):
+                """读取json文件"""
                 file = open(file=file_path, mode="r", encoding="utf-8")
-
+                data = cls.parse_json(file.read())
+                file.close()
             else:
+                """读取压缩文件"""
                 file = zipfile.ZipFile(file=file_path, mode="r", compression=zipfile.ZIP_DEFLATED)
                 name_list = file.namelist()
                 if len(name_list) == 0:
                     mes['message'] = "压缩文件为空"
                 else:
-                    data = list()
                     for name in name_list:
                         temp = cls.parse_json(file.read(name=name))
+                        data.append(temp)
+                file.close()
+            result = cls.group_code(codes=data)
+            desc = ""
+            count = 0
+            for k, v in result.items():
+                temp = len(v)
+                desc += "{}级码: {}个;".format(k, temp)
+                count += temp
+            desc += "共计 {}条".format(count)
+            mes['desc'] = desc
+            mes['count'] = count
+            mes["data"] = result
         else:
             mes['message'] = "格式错误.只能是json或者zip格式的文件"
         return mes
@@ -717,7 +801,7 @@ class TaskSync(orm_module.BaseDoc):
         return mes
 
     @classmethod
-    def paging_info(cls, filter_dict: dict, sort_cond: dict, page_index: int = 1, page_size: int = 10,
+    def paging_info(cls, filter_dict: dict, sort_cond: dict = None, page_index: int = 1, page_size: int = 10,
                     can_json: bool = False) -> dict:
         """
         分页查看角色信息
@@ -728,6 +812,7 @@ class TaskSync(orm_module.BaseDoc):
         :param can_json: 转换成可以json的字典?
         :return:
         """
+        sort_cond = {"time": -1} if sort_cond is None else sort_cond
         join_cond = {
             "table_name": "product_info",
             "local_field": "product_id",
@@ -750,7 +835,7 @@ if __name__ == "__main__":
     # UploadFile.import_code("5bf3aad85e32d75611898054")
     # UploadFile.all_file_name()
     f = "/home/walle/work/projects/query_server/task_sync"
-    f_name2 = "task_error.json"
+    f_name2 = "task.json"
     f_name1 = "task.zip"
     p = os.path.join(f, f_name2)
     TaskSync.read_file(p)

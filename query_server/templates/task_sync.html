@@ -1,7 +1,7 @@
 {% extends "standard_page.html" %}
 
 {% block css %}
-   <link rel="stylesheet" href="/static/css/produce_task.css">
+   <link rel="stylesheet" href="/static/css/task_sync.css">
    <script>
    </script>
 {% endblock %}
@@ -33,10 +33,10 @@
             </div>
 
             <div class="table_outer">
-                <table id="task_list" class="table table-hover">
+                <table id="sync_list" class="table table-hover">
                     <tr class="info">
                         <th class="select"></th>
-                        <th>生产批号</th>
+                        <th>主控ip</th>
                         <th>产品信息</th>
                         <th>计划数量</th>
                         <th>可用条码</th>
@@ -78,20 +78,10 @@
 
             <div class="bottom_div">
                 <div class="left">
-                    <input type="checkbox" id="check_all">
-                    <span>全选</span>
-                    <button id="delete_task" type="button" class="btn btn-sm btn-default btn-primary">
-                        删除任务
-                    </button>
+
                 </div>
                 <div class="right">
-                    <i id="prev_page" class="fa fa-caret-left"></i>
-                    <span id="page_count">{{ current_page }}/{{ total_page }}</span>
-                    <i id="next_page" class="fa fa-caret-right"></i>
-                    <input type="text" id="page_num">
-                    <button id="jump_btn" type="button" class="btn btn-sm btn-default btn-primary">
-                        Go
-                    </button>
+
                 </div>
             </div>
         </div>
@@ -107,58 +97,8 @@
             </div>
             <div class="modal_mid">
 
-                <div class="line select_div">
-                    <label>产品名称</label>
-                    <div class="my_input dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="select_product_name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <span data-id="" class="current_value"></span>
-                            <span class="caret"></span>
-                        </button>
-                        <ul data-type="product_name" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                            {% for k, v in selector.items() %}
-                                <li onclick="select_value($(this))" data-id="{{ v }}"  class="select_value">{{ k }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-                <div class="line select_div">
-                    <label>产品规格</label>
-                    <div class="my_input dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="select_specification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <span data-id="" class="current_value "></span>
-                            <span class="caret"></span>
-                        </button>
-                        <ul data-type="specification" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                            <li></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="line select_div">
-                    <label>净含量</label>
-                    <div class="my_input dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="select_net_contents" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <span data-role-id="" class="current_value"></span>
-                            <span class="caret"></span>
-                        </button>
-                        <ul data-type="net_contents" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                            <li></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="line select_div">
-                    <label>包装比例</label>
-                    <div class="my_input dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="select_package_ratio" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <span data-id="" class="current_value"></span>
-                            <span class="caret"></span>
-                        </button>
-                        <ul data-type="package_ratio" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                            <li></li>
-                        </ul>
-                    </div>
-                </div>
                 <div class="line">
-                    <label>生产批号</label>
+                    <label>生产任务名称</label>
                     <div class="my_input dropdown">
                         <input id="batch_sn" type="text" placeholder="区分不同任务">
                     </div>
@@ -182,5 +122,5 @@
 {% endblock %}
 
 {% block js %}
-    <script src="/static/js/produce_task.js"></script>
+    <script src="/static/js/task_sync.js"></script>
 {% endblock %}

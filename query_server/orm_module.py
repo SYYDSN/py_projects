@@ -2133,7 +2133,7 @@ class BaseDoc:
     def aggregate(cls, pipeline: list = None, page_size: int = 10, ruler: int = 5, page_index: int = 1) -> dict:
         """
         带分页的聚合查询,本函数最大限度了提供了聚合查询的自由度.在使用cls.jquery函数不方便时,请使用本函数
-
+        聚合管道内的第一个阶段必须是$match或者空
         :param pipeline:  聚合管道
         :param page_size: 每页多少条记录
         :param ruler: 翻页器最多显示几个页码？
@@ -2148,14 +2148,25 @@ class BaseDoc:
             "pages": pages
         }
         """
-        pipeline = list() if pipeline is None else pipeline
-        """加入统计总数的阶段"""
-        count_cond = {"$addFields": PipelineStage.add_count()}
-        """在第一个$match之后插入统计阶段"""
-        if len(pipeline) > 1 and pipeline[0].get("$match") is not None:
-            pipeline.insert(1, count_cond)
+        pipeline = [{"$match": dict()}] if pipeline is None else pipeline
+        if "$match" not in pipeline[0]:
+            ms = "管道的第一个阶段必须是$match"
+            warnings.warn(ms)
+            m = {"$match": dict()}
+            pipeline.insert(0, m)
         else:
-            pipeline.insert(0, count_cond)
+            pass
+        table_name = cls._table_name
+        ses = get_conn(table_name=table_name)
+        """统计总数"""
+        match = pipeline[0]
+        p2 = [match, {"$count": "total"}]
+        r2 = [x for x in ses.aggregate(pipeline=p2)]
+        if len(r2) > 0:
+            record_count = r2[0]['total']
+        else:
+            record_count = 0
+
         """处理每页包含多少数据?"""
         if isinstance(page_size, int):
             pass
@@ -2182,13 +2193,11 @@ class BaseDoc:
         pipeline.append({"$skip": skip})
         pipeline.append({"$limit": page_size})
 
-        table_name = cls._table_name
-        ses = get_conn(table_name=table_name)
         r = ses.aggregate(pipeline=pipeline)
         r = [x for x in r]
         """开始计算分页数据"""
         length = len(r)
-        record_count = 0 if length == 0 else r[0]['total']
+        record_count = 0 if length == 0 else record_count
         page_count = math.ceil(record_count / page_size)  # 共计多少页?
         delta = int(ruler / 2)
         range_left = 1 if (page_index - delta) <= 1 else page_index - delta
@@ -2337,13 +2346,7 @@ class BaseDoc:
             PipelineStage.join(pipeline=pipeline, **join_cond)
         else:
             pass
-        # if isinstance(join_cond, dict) and len(join_cond) > 0:
-        #     lookup = join_cond
-        #     pipeline.append({"$lookup": lookup})
-        # elif isinstance(join_cond, list) and len(join_cond) > 0:
-        #     [pipeline.append({"$lookup": x}) for x in join_cond]
-        # else:
-        #     pass
+
         r = ses.aggregate(pipeline=pipeline)
         r = [x for x in r]
         """开始计算分页数据"""

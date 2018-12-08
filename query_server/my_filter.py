@@ -118,6 +118,27 @@ def __get_age(birth: datetime.datetime) -> str:
         return ''
 
 
+def __deposit_warning(plan: int, deposit: int) -> str:
+    """
+    根据计划数量和空白条码余量,计算警示字体的颜色
+    :param plan:   计划数量
+    :param deposit:  空白条码余量
+    :return:
+    """
+    if deposit < (plan / 3):
+        if deposit < 10000:
+            color = "#d71345"
+        else:
+            color = "#f26522"
+    elif deposit < plan:
+        color = "#426ab3"
+    elif deposit >= plan:
+        color = "#1d953f"
+    else:
+        color = ""
+    return "color:{}".format(color)
+
+
 def mount_plugin(app):
     """注册自定义的过滤器和测试器"""
     app.jinja_env.filters['short_num'] = __short_num
@@ -131,6 +152,7 @@ def mount_plugin(app):
     app.jinja_env.filters['str_time'] = __str_time
     app.jinja_env.filters['is_list'] = __is_list
     app.jinja_env.filters['get_age'] = __get_age
+    app.jinja_env.filters['deposit_warning'] = __deposit_warning
 
 
 if __name__ == "__main__":

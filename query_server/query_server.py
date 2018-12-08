@@ -10,6 +10,7 @@ from tools_module import get_arg
 from flask_session import Session
 from my_filter import mount_plugin
 from module.code_module import CodeInfo
+from module.file_module import TaskSync
 import json
 import datetime
 
@@ -69,13 +70,8 @@ def query_func():
 
 @app.route("/upload", methods=['post'])
 def upload_func():
-    """查询条码信息"""
-    mes = {"message": "success"}
-    sn = get_arg(request, "sn_queue", "")
-    r = CodeInfo.query_code(code=sn)
-    result = "{}, {}".format(sn, r)
-    mes['result'] = result
-    print(mes)
+    """同步任务结果/回传条码数据"""
+    mes = TaskSync.upload(req=request)
     return json.dumps(mes)
 
 
