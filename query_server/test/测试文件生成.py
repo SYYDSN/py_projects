@@ -78,8 +78,22 @@ def generator_task_sync(num: int = 10):
         print("{}条记录回传数据生成完毕".format(l2 * l3 * l1 * num))
 
 
+def generator_task_sync2(data: dict = None):
+    """根据字典内容生成一个回传的文件"""
+    data = ['1001545335508113034954870', '1006951171005253082167380'] if data is None else data
+    json_data = ''
+    file_name = "task3.json"
+    with open(file_name, "w", encoding="utf-8") as f:
+        json_data = json.dumps(data)
+        f.write(json_data)
+        f.close()
+        z = zipfile.ZipFile(file="task3.zip", mode="w", compression=zipfile.ZIP_DEFLATED)
+        z.write(filename=file_name)
+        z.close()
+
+
 
 if __name__ == "__main__":
     # TempRecord.insert_mongodb()
-    generator_task_sync(10)
+    generator_task_sync2()
     pass

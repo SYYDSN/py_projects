@@ -18,6 +18,32 @@
     </div>
 
     <div class="code_list_outer">
+        <div class="base_info">
+            <div class="item">
+                <label>
+                    生产任务总数:
+                </label>
+                <span>
+                    {{ base_info.total }}
+                </span>
+            </div>
+            <div class="item">
+                <label>
+                    计划生产总量:
+                </label>
+                <span>
+                    {{ base_info.plan_count }}
+                </span>
+            </div>
+            <div class="item">
+                <label>
+                    已下发任务数:
+                </label>
+                <span>
+                    {{ base_info.execute }}
+                </span>
+            </div>
+        </div>
         <div class="code_list_inner">
             <div class="insert_div">
                 <div class="left">
@@ -57,8 +83,8 @@
                                 {{ task.product_name + " " + task.specification + " " + (task.net_contents | string) + " " + task.package_ratio }}
                             </td>
                             <td class="plan_number">{{ task.plan_number }}</td>
-                            <td class="code_count" style="{{ task.plan_number | deposit_warning(task.code_count if task.code_count else 0) }}">{{ task.code_count if task.code_count and task.code_count > 0 else 0 }}</td>
-                            <td class="actual_number">{{ task.actual_number if task.actual_number else 0 }}</td>
+                            <td class="blank_count" style="{{ task.blank_count | deposit_warning(task.blank_count if task.blank_count else 0) }}">{{ task.blank_count if task.blank_count and task.blank_count > 0 else 0 }}</td>
+                            <td class="actual_number">{{ task.sync_count if task.sync_count else 0 }}</td>
                             <td class="status">{{ "停止" if task.status == 0 else "执行中" }}</td>
                             <td class="begin_time">{{ task.begin | short_date2 }}</td>
                             <td class="end_time">{{ task.end | short_date2 }}</td>

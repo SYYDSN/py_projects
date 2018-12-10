@@ -28,8 +28,29 @@
 .right_main .code_list_outer {
   min-height: calc(100% - 55px);
   width: 100%;
-  padding: 80px 30px 0 30px;
+  padding: 30px 30px 0 30px;
   height: calc(100% - 55px);
+}
+.right_main .code_list_outer >.base_info {
+  width: 100%;
+  height: 30px;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+.right_main .code_list_outer >.base_info >.item {
+  width: 33%;
+  height: 100%;
+  text-align: center;
+}
+.right_main .code_list_outer >.base_info >.item >label {
+  color: #717171;
+}
+.right_main .code_list_outer >.base_info >.item >span {
+  color: #337ab7;
 }
 .right_main .code_list_outer .code_list_inner {
   height: calc(100% - 30px);

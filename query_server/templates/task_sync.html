@@ -18,6 +18,32 @@
     </div>
 
     <div class="code_list_outer">
+        <div class="base_info">
+            <div class="item">
+                <label>
+                    生产任务总数:
+                </label>
+                <span>
+                    {{ base_info.total }}
+                </span>
+            </div>
+            <div class="item">
+                <label>
+                    计划生产总量:
+                </label>
+                <span>
+                    {{ base_info.plan_count }}
+                </span>
+            </div>
+            <div class="item">
+                <label>
+                    已下发任务数:
+                </label>
+                <span>
+                    {{ base_info.execute }}
+                </span>
+            </div>
+        </div>
         <div class="code_list_inner">
             <div class="insert_div">
                 <div class="left">

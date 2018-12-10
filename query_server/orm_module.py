@@ -94,10 +94,10 @@ class DBCommandListener(monitoring.CommandListener):
     2.必须要使用的情况下,注意不要对性能造成影响.
     """
     def started(self, event):
-        # command_name = event.command_name
-        # command_dict = event.command
-        # database_name = event.database_name
-        # ms = "{} 数据库的 {} 命令开始,参数:{}".format(database_name, command_name, command_dict)
+        command_name = event.command_name
+        command_dict = event.command
+        database_name = event.database_name
+        ms = "{} 数据库的 {} 命令开始,参数:{}".format(database_name, command_name, command_dict)
         # print(ms)
         # logger.info(ms)
         pass

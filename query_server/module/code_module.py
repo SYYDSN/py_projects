@@ -269,6 +269,7 @@ class CodeInfo(orm_module.BaseDoc):
     type_dict['print_id'] = ObjectId   # 打印批次id PrintCode._id
     type_dict['file_id'] = ObjectId     # 导入时的文件id  UploadFile._id
     type_dict['sync_id'] = ObjectId     # 嵌入式回传结果时的文件id  TaskSync._id
+    type_dict['output_id'] = ObjectId     # 到处生产结果时的文件id  OutputCode._id
     type_dict['parent_id'] = str     # 父级条码的id,顶层箱码没有这一项或者为null. 注意这个类型是字符串
     type_dict['level'] = int     # 条码的级别,只是在最后回传结果的时候才能确定.
     """
@@ -293,6 +294,30 @@ class CodeInfo(orm_module.BaseDoc):
                 {
                     "product_id": product_id,
                     "print_id": {"$exists": printed}
+                }
+        }
+        projection = {"$project": {"_id": 1}}
+        count = {"$count": "total"}
+        pipeline = [match, projection, count]
+        col = cls.get_collection()
+        r = col.aggregate(pipeline=pipeline)
+        r = [x for x in r]
+        return 0 if len(r) == 0 else r[0]['total']
+
+    @classmethod
+    def can_output(cls, product_id: ObjectId) -> int:
+        """
+        统计可导出的条码(已完成生产)数量
+        :param product_id:
+        :return:
+        """
+        match = {
+            "$match":
+                {
+                    "product_id": product_id,
+                    "status": 1,
+                    "sync_id": {"$type": "objectId"},
+                    "output_id": {"$exists": False}
                 }
         }
         projection = {"$project": {"_id": 1}}
@@ -509,11 +534,158 @@ class CodeInfo(orm_module.BaseDoc):
         条码的统计信息预览
         :return:
         """
+        col = cls.get_collection()
         pipeline = []
-        m = {"$group": {""}}
+        resp = dict()
+        g = {
+            "$group":
+                {
+                    "_id":
+                        {
+                            "$switch":
+                                {
+                                    "branches": [
+                                        {
+                                            "case": {"$eq": [{"$type": "$print_id"}, "objectId"]},  # 打印过的
+                                            "then": "printed"
+                                        }
+                                    ],
+                                    "default": "deposit"
+                                }
+                        },
+                    "count": {"$sum": 1},
+                    "not_used_count":
+                        {
+                            "$sum":
+                                {
+                                    "$cond":
+                                        {
+                                            "if": {"$in": ["$status", [0, None]]},
+                                            "then": 1,
+                                            "else": 0
+                                        }
+                                }
+
+                        },
+                    "used_count":
+                        {
+                            "$sum":
+                                {
+                                    "$cond":
+                                        {
+                                            "if": {"$eq": ["$status", 1]},
+                                            "then": 1,
+                                            "else": 0
+                                        }
+                                }
+
+                        },
+                    "sync_count":
+                        {
+                            "$sum":
+                                {
+                                    "$cond":
+                                        {
+                                            "if": {
+                                                "$and":
+                                                    [
+                                                        {"$eq": ["$status", 1]},
+                                                        {"$eq": [{"$type": "$sync_id"}, "objectId"]}
+                                                    ]
+                                            },
+                                            "then": 1,
+                                            "else": 0
+                                        }
+                                }
+
+                        },
+                    "not_sync_count":
+                        {
+                            "$sum":
+                                {
+                                    "$cond":
+                                        {
+                                            "if": {
+                                                "$and":
+                                                    [
+                                                        {"$eq": ["$status", 1]},
+                                                        {"$ne": [{"$type": "$sync_id"}, "objectId"]}
+                                                    ]
+                                            },
+                                            "then": 1,
+                                            "else": 0
+                                        }
+                                }
+
+                        },
+                    "output_count":
+                        {
+                            "$sum":
+                                {
+                                    "$cond":
+                                        {
+                                            "if": {
+                                                "$and":
+                                                    [
+                                                        {"$eq": ["$status", 1]},
+                                                        {"$eq": [{"$type": "$sync_id"}, "objectId"]},
+                                                        {"$eq": [{"$type": "$output_id"}, "objectId"]}
+                                                    ]
+                                            },
+                                            "then": 1,
+                                            "else": 0
+                                        }
+                                }
+                        },
+                    "not_output_count":
+                        {
+                            "$sum":
+                                {
+                                    "$cond":
+                                        {
+                                            "if": {
+                                                "$and":
+                                                    [
+                                                        {"$eq": ["$status", 1]},
+                                                        {"$eq": [{"$type": "$sync_id"}, "objectId"]},
+                                                        {"$ne": [{"$type": "$output_id"}, "objectId"]}
+                                                    ]
+                                            },
+                                            "then": 1,
+                                            "else": 0
+                                        }
+                                }
+                        },
+                }
+        }
+
+        pipeline.append(g)
+        r = col.aggregate(pipeline=pipeline)
+        r = [x for x in r]
+        total = 0
+        for x in r:
+            if x['_id'] == "printed":
+                """已打印条码"""
+                temp = x['count']
+                total += temp
+                resp['printed'] = temp   # 已打印
+                resp['not_used'] = x['not_used_count']  # 已打印未使用
+                resp['used'] = x['used_count']  # 已打印已使用
+                resp['sync'] = x['sync_count']  # 已使用已同步过
+                resp['not_sync'] = x['not_sync_count']  # 已使用未同步过
+                resp['output'] = x['output_count']  # 已同步过已导出过
+                resp['not_output'] = x['not_output_count']  # 已同步过已导出过
+            else:
+                """未打印条码"""
+                temp = x['count']
+                total += temp
+                resp['deposit'] = temp  # 未打印
+        resp['total'] = total
+        return resp
 
 
 if __name__ == "__main__":
     # CodeInfo.query_code("23132104307180149268677481490882207")
-    CodeInfo.replace_code("23132100917116379735071455644638667", "23132102805841430218730720125819577")
+    # CodeInfo.replace_code("23132100917116379735071455644638667", "23132102805841430218730720125819577")
+    CodeInfo.preview()
     pass

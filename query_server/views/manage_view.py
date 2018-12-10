@@ -44,12 +44,12 @@ navs = [
         # {"name": "嵌入式", "path": "/manage/device_embed"}
     ]},
     {"name": "条码信息", "path": "/manage/code_tools", "class": "fa fa-qrcode", "children": [
-        {"name": "条码统计信息", "path": "/manage/code_tools"},
         {"name": "条码信息导入", "path": "/manage/code_import"},
-        {"name": "导出打印条码", "path": "/manage/code_export"}
+        {"name": "导出打印条码", "path": "/manage/code_export"},
+        {"name": "导出生产条码", "path": "/manage/code_pickle"},
     ]},
     {"name": "生产任务", "path": "/manage/task_summary", "class": "fa fa-server", "children": [
-        {"name": "生产任务概况", "path": "/manage/task_summary"},
+        # {"name": "生产任务概况", "path": "/manage/task_summary"},  # 暂时不用
         {"name": "生产任务列表", "path": "/manage/task_manage"},
         {"name": "条码回传记录", "path": "/manage/task_sync"}
     ]},
@@ -152,30 +152,56 @@ class DownLoadSyncFileView(MyView):
             return abort(403)  # 权限不足
 
 
-class CodeToolsView(MyView):
-    """条码基本信息和工具视图函数"""
-    _rule = "/code_tools"
+class DownLoadOutputFileView(MyView):
+    """下载生产完成的导出文件函数"""
+    _rule = "/output_file/<file_name>"
     _allowed_view = [0, 3]
-    _name = "条码工具"
+    _allowed_edit = []
+    _allowed_delete = []
+    _name = "下载生产完成的导出文件"
+
+    @check_session
+    def get(self, user: dict, file_name: str):
+        """
+        下载
+        :param user:
+        :param file_name:
+        :return:
+        """
+        access_filter = self.operate_filter(user=user, operate="view")
+        if isinstance(access_filter, dict):
+            directory = os.path.join(__project_dir__, "output_code")
+            return send_from_directory(directory=directory, filename=file_name, attachment_filename=file_name,
+                                       as_attachment=True)
+        else:
+            return abort(403)  # 权限不足
+
+
+class CodePickleView(MyView):
+    """导出生产条码视图函数"""
+    _rule = "/code_pickle"
+    _allowed_view = [0, 3]
+    _name = "导出生产条码"
 
     @check_session
     def get(self, user: dict):
-        """返回条码基本信息和工具界面"""
-        render_data['page_title'] = "条码统计信息"
+        """导出生产条码视图界面"""
+        render_data['page_title'] = "导出生产条码"
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
         access_filter = self.operate_filter(user)   # 数据访问权
         render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
-
+        base_info = CodeInfo.preview()
+        render_data['base_info'] = base_info
         if isinstance(access_filter, dict):
             page_index = get_arg(request, "page", 1)
             s = {"upload_time": -1}
             selector = Product.selector_data()
             render_data['selector'] = selector
-            result = CodeInfo.paging_info(filter_dict=access_filter, page_index=page_index, sort_cond=s)
-
-            files = result['data']
-
-            return render_template("code_import.html", **render_data)
+            result = OutputCode.paging_info(filter_dict=access_filter, page_index=page_index, sort_cond=s)
+            data = result.pop("data", list())
+            render_data.update(result)
+            render_data['files'] = data
+            return render_template("code_pickle.html", **render_data)
         else:
             return abort(401, "access refused!")
 
@@ -194,42 +220,49 @@ class CodeToolsView(MyView):
         if f is None:
             pass
         else:
-            upload = request.headers.get("upload-file", "0", str)
-            if upload == "1":
-                """上传文件"""
-                mes = UploadFile.upload(request)
-            else:
-                the_type = get_arg(request, "type", "")
-                if the_type == "cancel":
-                    """撤销导入条码操作"""
-                    ids = []
-                    try:
-                        ids = json.loads(get_arg(request, "ids"))
-                    except Exception as e:
-                        print(e)
-                    finally:
-                        if len(ids) == 0:
-                            mes['message'] = "没有需要撤销的文件记录"
-                        else:
-                            ids = [ObjectId(x) for x in ids]
-                            mes = UploadFile.cancel_data(f_ids=ids)
-                elif the_type == "delete":
-                    """批量删除文件和日志"""
-                    ids = []
-                    try:
-                        ids = json.loads(get_arg(request, "ids"))
-                    except Exception as e:
-                        print(e)
-                    finally:
-                        if len(ids) == 0:
-                            mes['message'] = "没有发现需要删除的文件"
-                        else:
-                            ids = [ObjectId(x) for x in ids]
-                            include_record = get_arg(request, "include_record")
-                            mes = UploadFile.delete_file_and_record(ids=ids, include_record=include_record)
+            the_type = get_arg(request, "type", "")
+            if the_type == "count":
+                """统计可导出条码余量"""
+                mes['message'] = "success"
+                p_id = get_arg(request, "product_id", None)
+                p_id = ObjectId(p_id)
+                mes['count'] = CodeInfo.can_output(product_id=p_id)
+            elif the_type == "export":
+                """生成导出文件"""
+                p_id = get_arg(request, "product_id", None)
+                number = int(get_arg(request, "number", "0"))
+                p_id = ObjectId(p_id)
+                mes = OutputCode.export(product_id=p_id, number=number)
+            elif the_type == "cancel":
+                """撤销导出条码操作"""
+                ids = []
+                try:
+                    ids = json.loads(get_arg(request, "ids"))
+                except Exception as e:
+                    print(e)
+                finally:
+                    if len(ids) == 0:
+                        mes['message'] = "没有需要撤销的文件记录"
+                    else:
+                        ids = [ObjectId(x) for x in ids]
+                        mes = PrintCode.cancel_data(f_ids=ids)
+            elif the_type == "delete":
+                """批量删除文件和日志"""
+                ids = []
+                try:
+                    ids = json.loads(get_arg(request, "ids"))
+                except Exception as e:
+                    print(e)
+                finally:
+                    if len(ids) == 0:
+                        mes['message'] = "没有发现需要删除的文件"
+                    else:
+                        ids = [ObjectId(x) for x in ids]
+                        include_record = get_arg(request, "include_record")
+                        mes = PrintCode.delete_file_and_record(ids=ids, include_record=include_record)
 
-                else:
-                    mes['message'] = "无效的操作类型:{}".format(the_type)
+            else:
+                mes['message'] = "无效的操作类型:{}".format(the_type)
         return json.dumps(mes)
 
 
@@ -246,6 +279,8 @@ class CodeImportView(MyView):
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
         access_filter = self.operate_filter(user)   # 数据访问权
         render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
+        base_info = CodeInfo.preview()
+        render_data['base_info'] = base_info
 
         if isinstance(access_filter, dict):
             page_index = get_arg(request, "page", 1)
@@ -329,6 +364,8 @@ class CodeExportView(MyView):
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
         access_filter = self.operate_filter(user)   # 数据访问权
         render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
+        base_info = CodeInfo.preview()
+        render_data['base_info'] = base_info
 
         if isinstance(access_filter, dict):
             page_index = get_arg(request, "page", 1)
@@ -415,6 +452,8 @@ class ProduceTaskView(MyView):
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
         access_filter = self.operate_filter(user)  # 数据访问权
         render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
+        base_info = ProduceTask.task_summary()
+        render_data['base_info'] = base_info  # 生产任务概况
         if key == "manage":
             """返回生产任务管理界面"""
             render_data['page_title'] = "生产任务管理"
@@ -430,7 +469,7 @@ class ProduceTaskView(MyView):
             else:
                 return abort(401, "access refused!")
         elif key == "summary":
-            """生产任务概况"""
+            """生产任务概况,暂时不用"""
             render_data['page_title'] = "生产任务概况"
             return render_template("task_summary.html", **render_data)
         elif key == "sync":
@@ -1253,10 +1292,14 @@ LogoutView.register(manage_blueprint)
 DownLoadPrintFileView.register(app=manage_blueprint)
 """下载任务执行回传的文件函数"""
 DownLoadSyncFileView.register(app=manage_blueprint)
+"""下载生产完成的导出文件函数"""
+DownLoadOutputFileView.register(app=manage_blueprint)
 """导入条码页面"""
 CodeImportView.register(app=manage_blueprint)
 """导出条码页面"""
 CodeExportView.register(app=manage_blueprint)
+"""导出生产结果页面"""
+CodePickleView.register(app=manage_blueprint)
 """生产任务管理"""
 ProduceTaskView.register(app=manage_blueprint)
 """管理公司信息接口"""

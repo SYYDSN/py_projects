@@ -136,7 +136,7 @@ class PrintCode(orm_module.BaseDoc):
                                 matched_count = r3.matched_count
                                 modified_count = r3.modified_count
                                 if len(codes) == matched_count == modified_count:
-                                    pass # 成功
+                                    pass  # 成功
                                 else:
                                     ms = "更新了{}条条码状态, 其中{}条更新成功".format(matched_count, modified_count)
                                     mes['message'] = ms
@@ -238,10 +238,6 @@ class PrintCode(orm_module.BaseDoc):
 class OutputCode(orm_module.BaseDoc):
     """
     导出最终条码记录
-    本例尚未完善!!!!!!!!!!!!!!!!!!!!!!!:
-    1. 导出的时候是按照日期区间导出的吗?
-    2. 导出的时候是全部产品混在一起还是按照产品类别导出?
-    3. 文件格式是什么类型的?如何定义?
     """
     _table_name = "output_code"
     type_dict = dict()
@@ -267,7 +263,7 @@ class OutputCode(orm_module.BaseDoc):
             os.makedirs(EXPORT_DIR)
         else:
             pass
-        file_path = os.path.join(EXPORT_DIR, "{}".format(file_name))
+        file_path = os.path.join(OUTPUT_CODE, "{}".format(file_name))
         data = ['{}\r\n'.format(x) for x in data]
         with open(file=file_path, mode="w", encoding="utf-8") as f:
             f.writelines(data)
@@ -277,7 +273,7 @@ class OutputCode(orm_module.BaseDoc):
     @classmethod
     def export(cls, number: int, product_id: ObjectId, file_name: str = None, desc: str = '') -> dict:
         """
-        导出要打印的条码记录
+        导出已生产的条码记录
         :param number: 导出数量
         :param product_id: 产品id
         :param file_name: 文件名
@@ -288,7 +284,7 @@ class OutputCode(orm_module.BaseDoc):
         db_client = orm_module.get_client()
         write_concern = orm_module.get_write_concern()
         table = "code_info"
-        f = {"print_id": {"$exists": False}, "product_id": product_id, "status": 0}
+        f = {"sync_id": {"$type": "objectId"}, "product_id": product_id}
         col = orm_module.get_conn(table_name=table, db_client=db_client)
         me = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)
         pipeline = list()
@@ -328,7 +324,7 @@ class OutputCode(orm_module.BaseDoc):
                             inserted_id = r2.inserted_id
                             """批量更新"""
                             f = {"_id": {"$in": codes}}
-                            u = {"$set": {"print_id": inserted_id}}
+                            u = {"$set": {"output_id": inserted_id}}
                             r3 = col.update_many(filter=f, update=u, session=ses)
                             if isinstance(r3, orm_module.UpdateResult):
                                 matched_count = r3.matched_count
@@ -340,10 +336,10 @@ class OutputCode(orm_module.BaseDoc):
                                     mes['message'] = ms
                                     ses.abort_transaction()
                             else:
-                                mes['message'] = "标记导出文件出错,函数未正确执行"
+                                mes['message'] = "标记已生产的导出文件出错,函数未正确执行"
                                 ses.abort_transaction()
                         else:
-                            mes['message'] = "批量更新条码导出记录出错"
+                            mes['message'] = "批量更新已生产条码导出记录出错"
                             ses.abort_transaction()
         return mes
 
@@ -406,11 +402,11 @@ class OutputCode(orm_module.BaseDoc):
         else:
             pass
         ids = [str(x) for x in ids]
-        names = os.listdir(EXPORT_DIR)
+        names = os.listdir(OUTPUT_CODE)
         for name in names:
             prefix = name.split(".")[0]
             if prefix in ids:
-                os.remove(os.path.join(EXPORT_DIR, name))
+                os.remove(os.path.join(OUTPUT_CODE, name))
             else:
                 pass
         return mes
@@ -424,17 +420,17 @@ class OutputCode(orm_module.BaseDoc):
         """
         mes = {"message": "success"}
         ids2 = [x if isinstance(x, ObjectId) else ObjectId(x) for x in f_ids]
-        f = {"print_id": {"$in": ids2}}
+        f = {"output_id": {"$in": ids2}}
         w = orm_module.get_write_concern()
         col = orm_module.get_conn(table_name="code_info", write_concern=w)
-        u = {"$unset": {"print_id": ""}}
+        u = {"$unset": {"output_id": ""}}
         col.update_many(filter=f, update=u)
         mes = cls.delete_file_and_record(ids=ids2, include_record=True)
         return mes
 
 
 class UploadFile(orm_module.BaseDoc):
-    """上传文件的记录/导入记录"""
+    """上传空白条码文件的记录/导入记录"""
     _table_name = "upload_file_history"
     type_dict = dict()
     type_dict['_id'] = ObjectId
@@ -881,12 +877,13 @@ class TaskSync(orm_module.BaseDoc):
                 f = {"sync_id": sync_id}
                 u = {"$set": {"task_id": task_id}}
                 r = col2.update_many(filter=f, update=u, upsert=False, session=ses)
-                if isinstance(r, orm_module.UpdateResult) and r.matched_count > 0 and r.modified_count > 0:
+                if isinstance(r, orm_module.UpdateResult) and r.matched_count > 0:
                     """匹配到记录了"""
-                    f2 = {"_id": task_id}
+                    f2 = {"_id": sync_id}
                     u2 = {"$set": {"task_id": task_id}}
-                    r2 = col1.find_one_and_update(filter=f2, update=u2, upsert=False, session=ses)
-                    if isinstance(r2, orm_module.UpdateResult) and r2.matched_count > 0 and r2.modified_count > 0:
+                    after = orm_module.ReturnDocument.AFTER
+                    r2 = col1.find_one_and_update(filter=f2, update=u2, upsert=False, return_document=after, session=ses)
+                    if isinstance(r2, dict) and task_id == r2['task_id']:
                         """修改成功"""
                         pass
                     else:
@@ -980,8 +977,12 @@ class TaskSync(orm_module.BaseDoc):
                     mes['message'] = "压缩文件为空"
                 else:
                     for name in name_list:
-                        temp = cls.parse_json(file.read(name=name))
-                        data.append(temp)
+                        content = file.read(name=name)
+                        if content == '':
+                            print("{}是空文件".format(name))
+                        else:
+                            temp = cls.parse_json(file.read(name=name))
+                            data.append(temp)
                 file.close()
             result = cls.group_code(codes=data)
             desc = ""
@@ -1017,7 +1018,7 @@ class TaskSync(orm_module.BaseDoc):
         for name in names:
             prefix = name.split(".")[0]
             if prefix in ids:
-                os.remove(os.path.join(IMPORT_DIR, name))
+                os.remove(os.path.join(TASK_SYNC, name))
             else:
                 pass
         return mes
@@ -1034,7 +1035,8 @@ class TaskSync(orm_module.BaseDoc):
         f = {"sync_id": {"$in": ids2}}
         w = orm_module.get_write_concern()
         col = orm_module.get_conn(table_name="code_info", write_concern=w)
-        col.delete_many(filter=f)
+        u = {"$unset": {"sync_id": ""}}
+        col.update_many(filter=f, update=u)
         mes = cls.delete_file_and_record(ids=ids2, include_record=True)
         return mes
 

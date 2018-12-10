@@ -607,7 +607,8 @@ class ProduceTask(orm_module.BaseDoc):
             "$lookup": {
                 "from": "code_info",
                 "let": {  # let 用来创建新的变量.
-                    "pid": "$product_id"
+                    "pid": "$product_id",
+                    "tid": "$_id"
                 },
                 "pipeline": [  # 嵌套的管道查询,
                     {
@@ -622,7 +623,31 @@ class ProduceTask(orm_module.BaseDoc):
                                 },
                             }
                     },
-                    {"$count": "code_count"}
+                    {   "$group":
+                            {
+                                "_id": "$product_id",
+                                "blank_count": {"$sum": 1},
+                                "sync_count":
+                                    {
+                                        "$sum":
+                                            {
+                                                "$cond":
+                                                    {
+                                                        "if":
+                                                            {"$and":
+                                                                [
+                                                                    {"$eq": ["$task_id", "$$tid"]},
+                                                                    {"$eq": [{"$type": "$sync_id"}, "objectId"]}
+                                                                ]
+                                                            },
+                                                        "then": 1,
+                                                        "else": 0
+
+                                                    }
+                                            }
+                                    }
+                            }
+                    }
                 ],
                 "as": "code_item"
             }
@@ -643,9 +668,19 @@ class ProduceTask(orm_module.BaseDoc):
         # pipeline.append({"$project": {"code_item": 0}})
 
         r = ProduceTask.aggregate(pipeline=pipeline, page_size=page_size, page_index=page_index)
-        # col = cls.get_collection()
-        # r = col.aggregate(pipeline=pipeline)
-        # r = [x for x in r]
+        if 'data' in r:
+            data = r['data']
+            resp = []
+            for x in data:
+                item = x.pop("code_item", list())
+                if len(item) == 0:
+                    x['sync_count'] = 0
+                    x['blank_count'] = 0
+                else:
+                    x['sync_count'] = item[0]['sync_count']
+                    x['blank_count'] = item[0]['blank_count']
+                resp.append(x)
+            r['data'] = resp
         return r
 
     @classmethod
@@ -666,6 +701,18 @@ class ProduceTask(orm_module.BaseDoc):
         查看所有任务的概况/统计信息
         :return:
         """
+        r = cls.find(filter_dict=dict())
+        total = 0  # 所有任务
+        execute = 0  # 执行中的任务
+        plan_count = 0  # 计划产量.
+        for x in r:
+            total += 1
+            if x['status'] == 1:
+                execute += 1
+            else:
+                pass
+            plan_count += x['plan_number']
+        return {"total": total, "execute": execute, "plan_count": plan_count}
 
 
 
@@ -691,5 +738,6 @@ if __name__ == "__main__":
     #             f['password'] = "123456"
     #             r = col.insert_one(document=f, session=ses)
     # ProduceTask.paging_info(filter_dict=dict())
-    Embedded.allow_execute_ip("192.168.1.24")
+    # Embedded.allow_execute_ip("192.168.1.24")
+    ProduceTask.task_summary()
     pass
