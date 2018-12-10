@@ -268,6 +268,7 @@ class CodeInfo(orm_module.BaseDoc):
     type_dict['task_id'] = ObjectId  # 生产任务id,ProduceTask._id 和product_id有数据冗余,可以检验是否当前生产数据
     type_dict['print_id'] = ObjectId   # 打印批次id PrintCode._id
     type_dict['file_id'] = ObjectId     # 导入时的文件id  UploadFile._id
+    type_dict['sync_id'] = ObjectId     # 嵌入式回传结果时的文件id  TaskSync._id
     type_dict['parent_id'] = str     # 父级条码的id,顶层箱码没有这一项或者为null. 注意这个类型是字符串
     type_dict['level'] = int     # 条码的级别,只是在最后回传结果的时候才能确定.
     """
@@ -501,6 +502,15 @@ class CodeInfo(orm_module.BaseDoc):
             return r['_id']
         else:
             return -1
+
+    @classmethod
+    def preview(cls) -> dict:
+        """
+        条码的统计信息预览
+        :return:
+        """
+        pipeline = []
+        m = {"$group": {""}}
 
 
 if __name__ == "__main__":

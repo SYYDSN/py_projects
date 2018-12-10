@@ -68,9 +68,26 @@
 .right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
   width: calc(100% - 100px);
+  padding-right: 30px;
+  color: #717171;
+}
+.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group >.small_title {
+  font-weight: 700;
+  margin-right: 30px;
+}
+.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group >div {
+  margin-left: 20px;
+}
+.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group >div >label {
+  font-weight: 400;
+}
+.right_main .code_list_outer .code_list_inner .insert_div > .right >.select_group >div >input {
+  -moz-outline-radius: 5px;
+  border: 1px solid #c8c8c8;
+  border-radius: 5px;
 }
 .right_main .code_list_outer .code_list_inner .insert_div > .right >.btn-default {
   margin-left: 15px;
@@ -79,10 +96,14 @@
   min-height: calc(100% - 100px);
   overflow-y: scroll;
 }
-.right_main .code_list_outer .code_list_inner .table_outer .statistics_info {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+.right_main .code_list_outer .code_list_inner .table_outer > .table tr th {
+  border-top: none;
+  text-align: center;
+  color: #717171;
+}
+.right_main .code_list_outer .code_list_inner .table_outer > .table tr td {
+  text-align: center;
+  color: rgba(127,124,124,0.9);
 }
 .right_main .code_list_outer .code_list_inner .bottom_div {
   height: 50px;

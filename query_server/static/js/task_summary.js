@@ -1,4 +1,16 @@
 $(function(){
+    // 初始化时间选择器
+    $(".date_picker").datetimepicker({
+        language: "zh-CN",
+        weekStart: 1,  // 星期一作为一周的开始
+        minView: 2,  // 不显示小时和分
+        startView: 2,
+        autoclose: true,  // 选定日期后是否立即关闭选择器
+        format: "yyyy-mm-dd",
+    });
+
+    /***************old*******************/
+
     // 清除模态框残留信息
     var clear_modal = function(){
         $(".modal_outer .current_value").text("").attr("data-id", "");
@@ -10,18 +22,7 @@ $(function(){
     $(".pop_modal").each(function(){
         var $this = $(this);
         $this.click(function(){
-            var $this = $(this);
-            var text = $.trim($this.text());
-            var title = "新增生产任务";
-            clear_modal();   // 清除模态框残留信息
-            if(text.indexOf("编辑") !== -1){
-                title = "编辑生产任务";
-                var id_str = $.trim($this.attr("data-id"));
-                fill_info(id_str);   // 填充信息
-            }
-            else{}
-            $(".modal_title").text(title);
-            $(".modal_outer").css("display", "flex");
+            alert("功能尚未实现...");
         });
     });
 

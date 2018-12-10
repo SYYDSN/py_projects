@@ -37,39 +37,45 @@
                     <tr class="info">
                         <th class="select"></th>
                         <th>主控ip</th>
-                        <th>产品信息</th>
-                        <th>计划数量</th>
-                        <th>可用条码</th>
-                        <th>生产数量</th>
-                        <th>任务状态</th>
-                        <th>开始日期</th>
-                        <th>结束日期</th>
-                        <th>创建日期</th>
-                        <th></th>
+                        <th>文件名</th>
+                        <th>文件大小</th>
+                        <th>批号</th>
+                        <th>条码总数</th>
+                        <th>同步状态</th>
+                        <th>备注</th>
+                        <th>回传时间</th>
+                        <th>操作</th>
                     </tr>
-                    {% for task in tasks %}
-                        <tr id="{{ task._id }}">
+                    {% for sync in sync_list %}
+                        <tr id="{{ sync._id }}">
                             <td  class="select">
-                                <input data-id="{{ task._id }}" type="checkbox" >
+                                <input data-id="{{ sync._id }}" type="checkbox" >
                             </td>
-                            <td class="batch_sn">{{ task.batch_sn }}</td>
-                            <td data-id="{{ task.product_id }}" class="product_info">
-                                {{ task.product_name + " " + task.specification + " " + (task.net_contents | string) + " " + task.package_ratio }}
+                            <td class="embedded_ip">{{ sync.embedded_ip }}</td>
+                            <td class="file_name">
+                                <a target="_blank" href="/manage/sync_file/{{ sync._id }},{{ sync.file_suffix }}">{{ sync.file_name }}</a>
                             </td>
-                            <td class="plan_number">{{ task.plan_number }}</td>
-                            <td class="code_count" style="{{ task.plan_number | deposit_warning(task.code_count if task.code_count else 0) }}">{{ task.code_count if task.code_count and task.code_count > 0 else 0 }}</td>
-                            <td class="actual_number">{{ task.actual_number if task.actual_number else 0 }}</td>
-                            <td class="status">{{ "停止" if task.status == 0 else "执行中" }}</td>
-                            <td class="begin_time">{{ task.begin | short_date2 }}</td>
-                            <td class="end_time">{{ task.end | short_date2 }}</td>
-                            <td class="create_time">{{ task.create | short_date2 }}</td>
-                            <td class="edit_td">
-                                {% if task.status == 0 %}
-                                    <button data-id="{{ task._id }}" class="start_task btn btn-xs btn-default btn-primary edit_product">开始</button>
+                            <td class="file_size">{{ sync.file_size }}</td>
+                            <td data-id="{{ sync.task_id }}" class="task_info">{{ sync.batch_sn }}</td>
+                            <td class="code_count" >{{ sync.count if sync.count else 0 }}</td>
+                            <td class="status">
+                                {% if sync.status == 1 and  sync.task_id %}
+                                    完成
+                                {% elif sync.status == 1 and  not sync.task_id %}
+                                    未关联任务
                                 {% else %}
-                                    <button data-id="{{ task._id }}" class="stop_task btn btn-xs btn-default btn-primary edit_product">停止</button>
+                                    数据解析失败
                                 {% endif %}
-                                <button data-id="{{ task._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_product">编辑</button>
+                            </td>
+                            <td class="desc" >{{ sync.desc }}</td>
+                            <td class="create_time">{{ sync.time | short_date3 }}</td>
+                            <td class="edit_td">
+                                {% if sync.status == 1 and sync.task_id %}
+                                    <button data-id="{{ sync._id }}" data-task-id="{{ sync.task_id }}" data-batch-sn="{{ sync.batch_sn }}" class="re_relate_task btn btn-xs btn-default btn-primary pop_modal">重新关联</button>
+                                {% elif sync.status == 1 and not sync.task_id  %}
+                                    <button data-id="{{ sync._id }}" class="relate_task btn btn-xs btn-default btn-primary pop_modal">关联任务</button>
+                                {% else %}
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
@@ -78,10 +84,23 @@
 
             <div class="bottom_div">
                 <div class="left">
-
+                    <input type="checkbox" id="check_all">
+                    <span>全选</span>
+                    <button id="cancel_sync" type="button" class="btn btn-sm btn-default btn-primary">
+                        清除已回传的条码
+                    </button>
+                    <button id="delete_sync" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除回传的文件和日志
+                    </button>
                 </div>
                 <div class="right">
-
+                    <i id="prev_page" class="fa fa-caret-left"></i>
+                    <span id="page_count">{{ current_page }}/{{ total_page }}</span>
+                    <i id="next_page" class="fa fa-caret-right"></i>
+                    <input type="text" id="page_num">
+                    <button id="jump_btn" type="button" class="btn btn-sm btn-default btn-primary">
+                        Go
+                    </button>
                 </div>
             </div>
         </div>
@@ -92,28 +111,30 @@
         <div class="modal_inner">
             <div class="modal_top">
                 <h3 class="modal_title">
-                    新增生产任务
+                    关联生产任务
                 </h3>
             </div>
             <div class="modal_mid">
 
                 <div class="line">
-                    <label>生产任务名称</label>
+                    <label>生产任务批号</label>
                     <div class="my_input dropdown">
-                        <input id="batch_sn" type="text" placeholder="区分不同任务">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span></span>
+                                <span data-id="" class="current_value"></span>
+                                <span class="caret"></span>
+                            </button>
+                          <ul class="dropdown-menu dropdown-menu-right select_task" aria-labelledby="dropdownMenu1">
+                            {% for task in tasks %}
+                                <li data-id="{{ task._id }}" onclick="select_value($(this))">{{ task.batch_sn }}</li>
+                            {% endfor %}
+                          </ul>
                     </div>
                 </div>
-                <div class="line">
-                    <label>计划生产数量</label>
-                    <div class="my_input dropdown">
-                        <input id="plan_number" type="text" placeholder="计划数量">
-                    </div>
-                </div>
-
             </div>
             <div class="modal_bot">
                 <button class="close_medal btn btn-md btn-default first">关闭</button>
-                <button id="submit_task" class="btn btn-md btn-primary last">保存</button>
+                <button id="submit_sync" class="btn btn-md btn-primary last">保存</button>
             </div>
         </div>
     </div>

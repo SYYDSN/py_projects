@@ -1,7 +1,11 @@
 {% extends "standard_page.html" %}
 
 {% block css %}
+   <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
    <link rel="stylesheet" href="/static/css/task_summary.css">
+    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+    <!--日期选择器本地化语言-->
+    <script src="/static/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
    <script>
    </script>
 {% endblock %}
@@ -26,25 +30,98 @@
                 </div>
 
                 <div class="right">
-                    <button id="new_task" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
-                       新建生产任务
+                    <div class="select_group">
+                        <div class="small_title">
+                            选择生产周期
+                        </div>
+                        <div class="begin_div">
+                            <label>
+                            开始时间:
+                        </label>
+                        <input type="text" id="export_begin" class="date_picker">
+                        </div>
+                        <div class="begin_div">
+                            <label>
+                            结束时间:
+                        </label>
+                        <input type="text" id="export_end" class="date_picker">
+                        </div>
+                    </div>
+                    <button id="create_file" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                       新建导出文件
                     </button>
                 </div>
             </div>
 
             <div class="table_outer">
-                <div class="statistics_info">
-                    <!--统计信息-->
-                </div>
-
+                <table id="sync_list" class="table table-hover">
+                    <tr class="info">
+                        <th class="select"></th>
+                        <th>导出日期</th>
+                        <th>文件名</th>
+                        <th>文件大小</th>
+                        <th>关联批号</th>
+                        <th>条码总数</th>
+                        <th>生产开始时间</th>
+                        <th>生产截止时间</th>
+                    </tr>
+                    {% for sync in sync_list %}
+                        <tr id="{{ sync._id }}">
+                            <td  class="select">
+                                <input data-id="{{ sync._id }}" type="checkbox" >
+                            </td>
+                            <td class="embedded_ip">{{ sync.embedded_ip }}</td>
+                            <td class="file_name">
+                                <a target="_blank" href="/manage/sync_file/{{ sync._id }},{{ sync.file_suffix }}">{{ sync.file_name }}</a>
+                            </td>
+                            <td class="file_size">{{ sync.file_size }}</td>
+                            <td data-id="{{ sync.task_id }}" class="task_info">{{ sync.batch_sn }}</td>
+                            <td class="code_count" >{{ sync.count if sync.count else 0 }}</td>
+                            <td class="status">
+                                {% if sync.status == 1 and  sync.task_id %}
+                                    完成
+                                {% elif sync.status == 1 and  not sync.task_id %}
+                                    未关联任务
+                                {% else %}
+                                    数据解析失败
+                                {% endif %}
+                            </td>
+                            <td class="desc" >{{ sync.desc }}</td>
+                            <td class="create_time">{{ sync.time | short_date3 }}</td>
+                            <td class="edit_td">
+                                {% if sync.status == 1 and sync.task_id %}
+                                    <button data-id="{{ sync._id }}" data-task-id="{{ sync.task_id }}" data-batch-sn="{{ sync.batch_sn }}" class="re_relate_task btn btn-xs btn-default btn-primary pop_modal">重新关联</button>
+                                {% elif sync.status == 1 and not sync.task_id  %}
+                                    <button data-id="{{ sync._id }}" class="relate_task btn btn-xs btn-default btn-primary pop_modal">关联任务</button>
+                                {% else %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
             </div>
 
             <div class="bottom_div">
                 <div class="left">
-
+                    <input type="checkbox" id="check_all">
+                    <span>全选</span>
+                    <!--
+                    <button id="cancel_sync" type="button" class="btn btn-sm btn-default btn-primary">
+                        清除已回传的条码
+                    </button>
+                    -->
+                    <button id="delete_sync" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除导出的文件和日志
+                    </button>
                 </div>
                 <div class="right">
-
+                    <i id="prev_page" class="fa fa-caret-left"></i>
+                    <span id="page_count">{{ current_page }}/{{ total_page }}</span>
+                    <i id="next_page" class="fa fa-caret-right"></i>
+                    <input type="text" id="page_num">
+                    <button id="jump_btn" type="button" class="btn btn-sm btn-default btn-primary">
+                        Go
+                    </button>
                 </div>
             </div>
         </div>

@@ -12,7 +12,7 @@ import requests
 
 def upload_task_sync():
     """上传任务同步文件"""
-    with open("task.zip", mode='rb') as file:
+    with open("task2.zip", mode='rb') as file:
         files = {"file": file}
         r = requests.post("http://127.0.0.1:7012/upload", files=files)
         print(r)

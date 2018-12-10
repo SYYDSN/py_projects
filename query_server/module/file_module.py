@@ -29,6 +29,7 @@ ObjectId = orm_module.ObjectId
 IMPORT_DIR = os.path.join(__root_path, "import_data")  # 上传文件的默认目录
 EXPORT_DIR = os.path.join(__root_path, "export_data")  # 导出文件的默认目录
 TASK_SYNC = os.path.join(__root_path, "task_sync")  # 回传文件的默认目录
+OUTPUT_CODE = os.path.join(__root_path, "output_code")  # 导出最终条码的默认目录
 TEMP = os.path.join(__root_path, "temp")  # 临时目录
 if not os.path.exists(IMPORT_DIR):
     os.makedirs(IMPORT_DIR)
@@ -36,6 +37,8 @@ if not os.path.exists(EXPORT_DIR):
     os.makedirs(EXPORT_DIR)
 if not os.path.exists(TASK_SYNC):
     os.makedirs(TASK_SYNC)
+if not os.path.exists(OUTPUT_CODE):
+    os.makedirs(OUTPUT_CODE)
 if not os.path.exists(TEMP):
     os.makedirs(TEMP)
 
@@ -46,7 +49,205 @@ class PrintCode(orm_module.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['file_name'] = str   # 文件名,包含
-    type_dict['file_size'] = int   # 文件名,包含
+    type_dict['file_size'] = int   # 文件大小
+    type_dict['count'] = int   # 导出数量
+    type_dict['product_id'] = ObjectId
+    type_dict['desc'] = str  # 备注
+    type_dict['time'] = datetime.datetime  # 导出打印条码的时间
+
+    orm_module.collection_exists(table_name=_table_name, auto_create=True)
+
+    @classmethod
+    def pickle(cls, file_name: str, data: list) -> int:
+        """
+        把数据保存到文件.
+        :param file_name: file_name 其实就是记录id
+        :param data:
+        :return: file_size
+        """
+        if not os.path.exists(EXPORT_DIR):
+            os.makedirs(EXPORT_DIR)
+        else:
+            pass
+        file_path = os.path.join(EXPORT_DIR, "{}".format(file_name))
+        data = ['{}\r\n'.format(x) for x in data]
+        with open(file=file_path, mode="w", encoding="utf-8") as f:
+            f.writelines(data)
+        size = os.path.getsize(file_path)
+        return size
+
+    @classmethod
+    def export(cls, number: int, product_id: ObjectId, file_name: str = None, desc: str = '') -> dict:
+        """
+        导出要打印的条码记录
+        :param number: 导出数量
+        :param product_id: 产品id
+        :param file_name: 文件名
+        :param desc: 备注
+        :return:
+        """
+        mes = {"message": "success"}
+        db_client = orm_module.get_client()
+        write_concern = orm_module.get_write_concern()
+        table = "code_info"
+        f = {"print_id": {"$exists": False}, "product_id": product_id, "status": 0}
+        col = orm_module.get_conn(table_name=table, db_client=db_client)
+        me = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)
+        pipeline = list()
+        pipeline.append({'$match': f})
+        pipeline.append({"$project": {"_id": 1}})
+        with db_client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=write_concern):
+                r = col.aggregate(pipeline=pipeline, allowDiskUse=True, session=ses)
+                codes = [x["_id"] for x in r]
+                count = len(codes)
+                if count < number:
+                    mes['message'] = "空白条码存量不足: 需求: {},库存: {}".format(number, count)
+                else:
+                    """保存文件"""
+                    codes = codes[0: number]
+                    _id = ObjectId()
+                    save_name = "{}.txt".format(str(_id))
+                    file_size = cls.pickle(file_name=save_name, data=codes)
+                    if not isinstance(file_size, int):
+                        mes['message'] = "保存导出文件失败"
+                        ses.abort_transaction()
+                    else:
+                        """创建一个实例"""
+                        now = datetime.datetime.now()
+                        file_name = file_name if file_name is not None else "{}.txt".format(now.strftime("%Y-%m-%d %H:%M:%S"))
+                        doc = {
+                            "_id": _id,
+                            "product_id": product_id,
+                            "desc": desc,
+                            "file_name": file_name,
+                            "file_size": file_size,
+                            "count": number,
+                            "time": now
+                        }
+                        r2 = me.insert_one(document=doc, session=ses)
+                        if isinstance(r2, orm_module.InsertOneResult):
+                            inserted_id = r2.inserted_id
+                            """批量更新"""
+                            f = {"_id": {"$in": codes}}
+                            u = {"$set": {"print_id": inserted_id}}
+                            r3 = col.update_many(filter=f, update=u, session=ses)
+                            if isinstance(r3, orm_module.UpdateResult):
+                                matched_count = r3.matched_count
+                                modified_count = r3.modified_count
+                                if len(codes) == matched_count == modified_count:
+                                    pass # 成功
+                                else:
+                                    ms = "更新了{}条条码状态, 其中{}条更新成功".format(matched_count, modified_count)
+                                    mes['message'] = ms
+                                    ses.abort_transaction()
+                            else:
+                                mes['message'] = "标记导出文件出错,函数未正确执行"
+                                ses.abort_transaction()
+                        else:
+                            mes['message'] = "批量更新条码导出记录出错"
+                            ses.abort_transaction()
+        return mes
+
+    @classmethod
+    def paging_info(cls, filter_dict: dict, sort_cond: dict, page_index: int = 1, page_size: int = 10,
+                    can_json: bool = False) -> dict:
+        """
+        分页查看角色信息
+        :param filter_dict: 过滤器,由用户的权限生成
+        :param sort_cond: 过滤器,由用户的权限生成
+        :param page_index: 页码(当前页码)
+        :param page_size: 每页多少条记录
+        :param can_json: 转换成可以json的字典?
+        :return:
+        """
+        join_cond = {
+            "table_name": "product_info",
+            "local_field": "product_id",
+            "flat": True
+        }
+        kw = {
+            "filter_dict": filter_dict,
+            "join_cond": join_cond,
+            "sort_cond": sort_cond,
+            "page_index": page_index,
+            "page_size": page_size,
+            "can_json": can_json
+        }
+        res = cls.query(**kw)
+        return res
+
+    @classmethod
+    def all_file_name(cls) -> list:
+        """
+        获取import_data目录下,所有文件的名字(不包括扩展名).
+        用于和数据库记录比对看哪个文件在磁盘上存在?
+        :return:
+        """
+        names = os.listdir(IMPORT_DIR)
+        resp = []
+        for name in names:
+            if os.path.isfile(os.path.join(IMPORT_DIR, name)):
+                resp.append(name[0: 24])
+            else:
+                pass
+        return resp
+
+    @classmethod
+    def delete_file_and_record(cls, ids: list, include_record: bool = False) -> dict:
+        """
+        批量删除文件和导入记录.
+        :param ids:
+        :param include_record: 是否连记录一起删除?
+        :return:
+        """
+        mes = {"message": "success"}
+        ids = [x if isinstance(x, ObjectId) else ObjectId(x) for x in ids]
+        if include_record:
+            cls.delete_many(filter_dict={"_id": {"$in": ids}})
+        else:
+            pass
+        ids = [str(x) for x in ids]
+        names = os.listdir(EXPORT_DIR)
+        for name in names:
+            prefix = name.split(".")[0]
+            if prefix in ids:
+                os.remove(os.path.join(EXPORT_DIR, name))
+            else:
+                pass
+        return mes
+
+    @classmethod
+    def cancel_data(cls, f_ids: list) -> dict:
+        """
+        撤销导入的文件
+        :param f_ids: 文件id的list
+        :return:
+        """
+        mes = {"message": "success"}
+        ids2 = [x if isinstance(x, ObjectId) else ObjectId(x) for x in f_ids]
+        f = {"print_id": {"$in": ids2}}
+        w = orm_module.get_write_concern()
+        col = orm_module.get_conn(table_name="code_info", write_concern=w)
+        u = {"$unset": {"print_id": ""}}
+        col.update_many(filter=f, update=u)
+        mes = cls.delete_file_and_record(ids=ids2, include_record=True)
+        return mes
+
+
+class OutputCode(orm_module.BaseDoc):
+    """
+    导出最终条码记录
+    本例尚未完善!!!!!!!!!!!!!!!!!!!!!!!:
+    1. 导出的时候是按照日期区间导出的吗?
+    2. 导出的时候是全部产品混在一起还是按照产品类别导出?
+    3. 文件格式是什么类型的?如何定义?
+    """
+    _table_name = "output_code"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['file_name'] = str   # 文件名,包含
+    type_dict['file_size'] = int   # 文件大小
     type_dict['count'] = int   # 导出数量
     type_dict['product_id'] = ObjectId
     type_dict['desc'] = str  # 备注
@@ -507,15 +708,15 @@ class TaskSync(orm_module.BaseDoc):
     _table_name = "task_sync"
     type_dict = dict()
     type_dict['_id'] = ObjectId
-    type_dict['control_ip'] = str           # 主控板ip
     type_dict['file_name'] = str           # 上传的时候使用的文件名
+    type_dict['file_suffix'] = str           # 上传的时候使用的文件名后缀,用于和_id拼接文件名
     type_dict['file_type'] = str           # 上传的时候使用的文件的类型
     type_dict['task_id'] = ObjectId        # 关连的任务id
     type_dict['desc'] = str                # 解析失败会在这里备注,否则会分类显示条码数量
     type_dict['count'] = int               # 条码数量
-    type_dict['status'] = int               # code_info数据库status修改结果. 完成1,
+    type_dict['status'] = int               # code_info数据同步是否完成?. 完成1, 0未完脸任务, -1 已清除回传的信息
     type_dict['product_id'] = ObjectId     # 关连的产品id
-    type_dict['embedded_id'] = ObjectId    # 关连的主控板id
+    type_dict['embedded_ip'] = str         # 关连的主控板ip地址
     type_dict['time'] = datetime.datetime  # 同步日期
 
     @classmethod
@@ -537,7 +738,8 @@ class TaskSync(orm_module.BaseDoc):
             file_name = file.filename
             file_type = file.content_type
             _id = ObjectId()
-            storage_name = "{}.{}".format(str(_id), file_name.split(".")[-1])
+            file_suffix = file_name.split(".")[-1]
+            storage_name = "{}.{}".format(str(_id), file_suffix)
             f_p = os.path.join(dir_path, storage_name)
             with open(f_p, "wb") as f:
                 file.save(dst=f)  # 保存文件
@@ -546,9 +748,10 @@ class TaskSync(orm_module.BaseDoc):
             doc = {
                 "_id": _id,
                 "file_name": file_name,
+                "file_suffix": file_suffix,
                 "storage_name": storage_name,
                 "file_type": file_type,
-                "embedded_id":  req.remote_addr,
+                "embedded_ip":  req.remote_addr,
                 "time": now
             }
             """读取文件信息"""
@@ -592,20 +795,22 @@ class TaskSync(orm_module.BaseDoc):
                             if k != 1:
                                 """不是一级码,数量有限"""
                                 f = {"_id": {"$in": v}}
-                                u = {"$set": {"status": 1, "level": k}}
+                                u = {"$set": {"status": 1, "level": k, "sync_id": _id}}
                                 r = col2.update_many(filter=f, update=u)
                                 if r is None:
                                     """出错了"""
                                     break
+                                else:
+                                    """正常"""
+                                    pass
                             else:
                                 count = 1
                                 for ids in cls.split_list(array=v):
                                     try:
                                         f = {"_id": {"$in": ids}}
-                                        u = {"$set": {"status": 1, "level": k}}
+                                        u = {"$set": {"status": 1, "level": k, "sync_id": _id}}
                                         r = col2.update_many(filter=f, update=u)
-                                        # r = col2.update_many(filter=f, update=u, bypass_document_validation=True)
-                                        print("第{}批成功".format(count))
+                                        print("第{}批成功.match: {}".format(count, r.matched_count))
                                         count += 1
                                     except Exception as e:
                                         mes['message'] = "{}".format(e)
@@ -656,6 +861,39 @@ class TaskSync(orm_module.BaseDoc):
                         else:
                             mes['message'] = "保存回传数据失败"
 
+        return mes
+
+    @classmethod
+    def relate_task(cls, sync_id: ObjectId, task_id: ObjectId) -> dict:
+        """
+        关联任务
+        :param sync_id:
+        :param task_id:
+        :return:
+        """
+        mes = {"message": "success"}
+        db_client = orm_module.get_client()
+        col1 = cls.get_collection()
+        col2 = orm_module.get_conn(table_name="code_info")
+        w = orm_module.get_write_concern()
+        with db_client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=w):
+                f = {"sync_id": sync_id}
+                u = {"$set": {"task_id": task_id}}
+                r = col2.update_many(filter=f, update=u, upsert=False, session=ses)
+                if isinstance(r, orm_module.UpdateResult) and r.matched_count > 0 and r.modified_count > 0:
+                    """匹配到记录了"""
+                    f2 = {"_id": task_id}
+                    u2 = {"$set": {"task_id": task_id}}
+                    r2 = col1.find_one_and_update(filter=f2, update=u2, upsert=False, session=ses)
+                    if isinstance(r2, orm_module.UpdateResult) and r2.matched_count > 0 and r2.modified_count > 0:
+                        """修改成功"""
+                        pass
+                    else:
+                        mes['message'] = '修改同步记录失败'
+                else:
+                    ses.abort_transaction()
+                    mes['message'] = "没有找到对应的条码记录"
         return mes
 
     @classmethod
@@ -775,7 +1013,7 @@ class TaskSync(orm_module.BaseDoc):
         else:
             pass
         ids = [str(x) for x in ids]
-        names = os.listdir(IMPORT_DIR)
+        names = os.listdir(TASK_SYNC)
         for name in names:
             prefix = name.split(".")[0]
             if prefix in ids:
@@ -785,15 +1023,15 @@ class TaskSync(orm_module.BaseDoc):
         return mes
 
     @classmethod
-    def cancel_data(cls, f_ids: list) -> dict:
+    def cancel_data(cls, ids: list) -> dict:
         """
         撤销导入的文件
-        :param f_ids: 文件id的list
+        :param ids: cls._id的list
         :return:
         """
         mes = {"message": "success"}
-        ids2 = [x if isinstance(x, ObjectId) else ObjectId(x) for x in f_ids]
-        f = {"file_id": {"$in": ids2}}
+        ids2 = [x if isinstance(x, ObjectId) else ObjectId(x) for x in ids]
+        f = {"sync_id": {"$in": ids2}}
         w = orm_module.get_write_concern()
         col = orm_module.get_conn(table_name="code_info", write_concern=w)
         col.delete_many(filter=f)
@@ -814,8 +1052,9 @@ class TaskSync(orm_module.BaseDoc):
         """
         sort_cond = {"time": -1} if sort_cond is None else sort_cond
         join_cond = {
-            "table_name": "product_info",
-            "local_field": "product_id",
+            "table_name": "produce_task",
+            "local_field": "task_id",
+            "field_map": {"batch_sn": "batch_sn", "_id": 0},
             "flat": True
         }
         kw = {

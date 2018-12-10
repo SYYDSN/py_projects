@@ -34,6 +34,7 @@ def generator_import_file():
 def generator_task_sync(num: int = 10):
     """生成一个回传的文件"""
     now = str(int(datetime.datetime.now().timestamp()))
+    # now = '15441752831'
     l1 = 40
     l2 = 20
     l3 = 10
@@ -80,5 +81,5 @@ def generator_task_sync(num: int = 10):
 
 if __name__ == "__main__":
     # TempRecord.insert_mongodb()
-    generator_task_sync(100)
+    generator_task_sync(10)
     pass

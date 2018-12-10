@@ -1,4 +1,6 @@
 default_blue = #286090
+title_grey = rgba(113, 113, 113, 1)
+text_grey = rgba(127, 124, 124, 0.9)
 .right_main
     background-color #ebedf0
     height 55px
@@ -55,19 +57,37 @@ default_blue = #286090
                     >.select_group
                         display flex
                         flex-direction row
-                        justify-content flex-start
+                        justify-content flex-end
                         align-items center
                         width calc(100% - 100px)
+                        padding-right 30px
+                        color title_grey
+                        >.small_title
+                            font-weight 700
+                            margin-right 30px
+                        >div
+                            margin-left 20px
+                            >label
+                                font-weight 400
+                            >input
+                                -moz-outline-radius 5px
+                                border 1px solid rgba(200, 200, 200, 1)
+                                border-radius 5px
                     >.btn-default
                         margin-left 15px
 
             .table_outer
                 min-height calc(100% - 100px)
                 overflow-y scroll
-                .statistics_info
-                    display flex
-                    flex-direction row
-                    justify-content flex-start
+                > .table
+                    tr
+                        th
+                            border-top none
+                            text-align center
+                            color title_grey
+                        td
+                            text-align center
+                            color text_grey
 
             .bottom_div
                 height 50px

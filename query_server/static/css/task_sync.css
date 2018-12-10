@@ -72,10 +72,14 @@
   min-height: calc(100% - 100px);
   overflow-y: scroll;
 }
-.right_main .code_list_outer .code_list_inner .table_outer .statistics_info {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+.right_main .code_list_outer .code_list_inner .table_outer > .table tr th {
+  border-top: none;
+  text-align: center;
+  color: #717171;
+}
+.right_main .code_list_outer .code_list_inner .table_outer > .table tr td {
+  text-align: center;
+  color: rgba(127,124,124,0.9);
 }
 .right_main .code_list_outer .code_list_inner .bottom_div {
   height: 50px;
@@ -127,7 +131,7 @@
 }
 .right_main .modal_outer > .modal_inner {
   width: 500px;
-  height: 560px;
+  height: 240px;
   margin-top: -20%;
   border-radius: 5px;
   background-color: #fff;
@@ -161,32 +165,33 @@
   width: 30%;
   font-weight: 400;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .my_input {
   width: calc(100% - 6em) !important;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >input {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .my_input > input {
   width: 100%;
   border: 1px solid #c8c8c8;
   border-radius: 5px;
   padding: 8px;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >.btn {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .my_input > .btn {
   width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >.btn >.current_value {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .my_input > .btn > .current_value {
   display: block;
   min-height: 1.5em;
   width: 95%;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >ul {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .my_input > ul {
   width: 100%;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >ul >li {
+.right_main .modal_outer > .modal_inner .modal_mid .line > .my_input > ul > li {
   width: 100%;
+  text-align: center;
 }
 .right_main .modal_outer > .modal_inner .modal_bot {
   padding-bottom: 20px;
