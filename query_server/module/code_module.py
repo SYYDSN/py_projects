@@ -655,7 +655,7 @@ class CodeInfo(orm_module.BaseDoc):
                                             "else": 0
                                         }
                                 }
-                        },
+                        }
                 }
         }
 
@@ -683,9 +683,70 @@ class CodeInfo(orm_module.BaseDoc):
         resp['total'] = total
         return resp
 
+    @classmethod
+    def find_info(cls, filter_dict: dict) -> dict:
+        """
+        查找单条条码信息
+        :param filter_dict:
+        :return:
+        """
+        pipeline = []
+        m = {"$match": filter_dict}
+        pipeline.append(m)
+        l1 = {
+            "$lookup":
+                {
+                    "from": "product_info",
+                    "let": {"pid": "$product_id"},
+                    "pipeline":
+                        [
+                            {
+                                "$match": {"$expr": {"$eq": ['$_id', "$$pid"]}}
+                            },
+                            {
+                                "$addFields":
+                                    {
+                                        "product_info": {""
+                                                "$concat":
+                                            [
+                                                "$product_name", " ",
+                                                "$specification", " ",
+                                                "$net_contents", " ",
+                                                "$package_ratio"
+                                            ]
+                                        }
+                                    }
+                            },
+                            {"$project": {"_id": 0, "product_info": 1}}
+                        ]
+                    ,
+                    "as": "product_item"
+                }
+        }
+        r1 = {
+            '$replaceRoot':  # 从根文档替换
+                {'newRoot':  # 作为新文档
+                    {
+                        '$mergeObjects':
+                            [
+                                {'$arrayElemAt': ["$product_item", 0]},
+                                '$$ROOT'  # 标识根文档
+                            ]
+                    }
+                }
+        }
+        rm1 = {"$project": {"product_item": 0}}
+        pipeline.append(l1)
+        pipeline.append(r1)
+        pipeline.append(rm1)
+        col = cls.get_collection()
+        r = col.aggregate(pipeline=pipeline)
+        r = [x for x in r]
+        return r
+
 
 if __name__ == "__main__":
     # CodeInfo.query_code("23132104307180149268677481490882207")
     # CodeInfo.replace_code("23132100917116379735071455644638667", "23132102805841430218730720125819577")
-    CodeInfo.preview()
+    CodeInfo.find_info({"_id": "15441752831100000000000004"})
     pass

@@ -177,6 +177,43 @@ class DownLoadOutputFileView(MyView):
             return abort(403)  # 权限不足
 
 
+class CodeInfoView(MyView):
+    """查询/替换条码信息"""
+    _rule = "/code_info"
+    _allowed_view = [0, 3]
+    _allowed_edit = [0, 3]
+    _allowed_delete = []
+    _name = "查询/替换条码信息"
+
+    @check_session
+    def post(self, user: dict):
+        """
+        :param user:
+        :return:
+        """
+        mes = {"message": "success"}
+        the_type = get_arg(request, "type", "")
+        if the_type == "query":
+            """查询条码信息"""
+            _id = get_arg(request, "_id", "")
+            if isinstance(_id, str) and len(_id) == 24:
+                _id = ObjectId(_id)
+                f = {"_id": _id}
+                code = CodeInfo.find_info(filter_dict=f)
+            else:
+                mes['message'] = "没有_id参数"
+
+        elif the_type == "replace":
+            """替换条码"""
+            pass
+        elif the_type == "reset":
+            """重置条码"""
+            pass
+        else:
+            mes['message'] = '404'
+        return json.dumps(mes)
+
+
 class CodePickleView(MyView):
     """导出生产条码视图函数"""
     _rule = "/code_pickle"
