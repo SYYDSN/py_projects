@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import os
+import sys
+__root_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+if __root_path not in sys.path:
+    sys.path.append(__root_path)
 import requests
 import datetime
 from tornado.httpclient import AsyncHTTPClient

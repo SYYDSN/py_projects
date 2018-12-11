@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import socket
 import select
-from module.code_module import CodeInfo
+from module.log_tools import SystemLog
 from module.code_module import SocketListener
 
 
@@ -28,7 +28,7 @@ class WebServer:
         # 3.设为被动套接字
         self.tcp_server.listen(128)
 
-    def run(self):
+    def run(self, debug: bool = False):
         print("server run on {}:{}".format(self.host, self.port))
         """运行一个服务器"""
         # 1.把服务器设置为非阻塞模式
@@ -52,6 +52,17 @@ class WebServer:
                     client_dict[client.fileno()] = client
                     """发送欢迎数据"""
                     client.send("{} connected, welcome!".format(addr).encode("utf-8"))
+                    """记录日志"""
+                    c_ip, c_port = client.getsockname()
+                    ms = "用户已连接: ip={},port={}".format(c_ip, c_port)
+                    kw = {
+                        "file": __file__,
+                        "func": self.__class__.__name__,
+                        "log_type": "连接",
+                        "content": ms,
+                        "ip": c_ip
+                    }
+                    SystemLog.log(**kw)
                 else:
                     # 有客户端发送数据过来,但是该如何去获得这个客户端呢？
                     client = client_dict[fd]
@@ -72,48 +83,46 @@ class WebServer:
                         if data and data != "":
                             """处理接收到的数据"""
                             # 说明客户端发送数据过来了
+                            if debug:
+                                kw = {
+                                    "file": __file__,
+                                    "func": self.__class__.__name__,
+                                    "log_type": "接收数据",
+                                    "content": ms,
+                                    "ip": c_ip
+                                }
+                                SystemLog.log(**kw)
                             print(data)
                             resp = SocketListener.listen(mes=data, ip=c_ip, port=c_port)
                             client.send(resp.encode(encoding="utf-8"))
-                            # c_str = "{}:{}".format(c_ip, c_port)
-                            # client.send('{}我已经收到你的数据了！\n'.format(c_str).encode('utf-8'))
-                            # if data.startswith("CheckTraceCodeCanUse"):
-                            #     """
-                            #     条码合格判定
-                            #     请求检测数据是否合格: CheckTraceCodeCanUse, 10401911001201805011536541033317
-                            #     系统检测条码合格返回数据格式: 10401911001201805011536541033317,1
-                            #     系统检测条码重复返回数据格式: 10401911001201805011536541033317,2
-                            #     系统检测条码非当前生产数据格式: 10401911001201805011536541033317,3
-                            #     系统检测条码格式错误: 10401911001201805011536541033317,4
-                            #     条码加请求检测结果后的返回值，返回值为以上定义的 1-4数据。
-                            #     """
-                            #     code = data.split(",")[-1].strip("")
-                            #     r = CodeInfo.query_code(code=code)
-                            #     resp = '{},{}'.format(code, r).encode('utf-8')
-                            #     print(resp)
-                            #     client.send(resp)
-                            #     pass
-                            # elif data.startswith("UploadTraceCodeToDb"):
-                            #     """
-                            #     UploadTraceCodeToDb
-                            #     请求检测数据是否合格: UploadTraceCodeToDb, 10401911001201805011536541033317,
-                            #     10401911001201805011536541033318, 10401911001201805011536541033319,
-                            #     10401911001201805011536541033311, 10401911001201805011536541033312,
-                            #     ……
-                            #     系统检测条码合格返回数据格式: UploadTraceCodeToDb ,10401911001201805011536541033317,1
-                            #     系统数据返回格式解释: 用请求的接口名，加第一个请求的条码内容，加结果。
-                            #     1. 代表本次请求接口处理成功，0则代表本次接口处理数据失败。
-                            #     """
-                            #     pass
-                            # else:
-                            #     client.send('{}你发送的数据我未能理解: data={}！\n'.format(c_str, data).encode('utf-8'))
+                            if debug:
+                                kw = {
+                                    "file": __file__,
+                                    "func": self.__class__.__name__,
+                                    "log_type": "返回数据",
+                                    "content": ms,
+                                    "ip": c_ip
+                                }
+                                SystemLog.log(**kw)
                         else:
                             # 说明客户端已经关闭了
+                            # print('{}:{}已断开！\n'.format(c_ip, c_port))
+                            c_ip, c_port = client.getsockname()
                             print('{}:{}已断开！\n'.format(c_ip, c_port))
                             client_dict[fd].close()
                             client_dict.pop(fd)
-                            # 需要把该客户端注册的事件取消掉
+                            """需要把该客户端注册的事件取消掉"""
                             epoll.unregister(fd)
+                            """记录日志"""
+                            ms = "用户已断开: ip={},port={}".format(c_ip, c_port)
+                            kw = {
+                                "file": __file__,
+                                "func": self.__class__.__name__,
+                                "log_type": "断开",
+                                "content": ms,
+                                "ip": c_ip
+                            }
+                            SystemLog.log(**kw)
 
             # 遍历client字典中每个客户端对应的fd
             # for fd, sock in client_dict.items():
@@ -134,7 +143,8 @@ def main():
     # print(cpu_num)
     # for i in range(int(cpu_num/2)):
     #     os.fork()
-    server.run()
+    # server.run()
+    server.run(debug=True)
 
 
 if __name__ == '__main__':

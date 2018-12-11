@@ -31,16 +31,22 @@ class TCPClient:
         client = self.client
         client.sendall(s)
 
-    def listen(self, delay: float = 2):
+    def listen(self, delay: float = 2, debug: bool = False):
         """
 
         :return:
         """
         client = self.client
         self.stop = False
+        count = 1
         while not self.stop:
             data = client.recv(1024).decode(encoding="utf-8")
             print(data)
+            if not debug and count >= 2:
+                count += 1
+                self.stop = True
+            else:
+                count += 1
             time.sleep(delay)
             s = "CheckTraceCodeCanUse, {}".format(uuid4().hex)
             client.sendall(s.encode(encoding="utf-8"))

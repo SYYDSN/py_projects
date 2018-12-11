@@ -350,6 +350,170 @@ $(function(){
         }
     });
 
+    /**以下是工具类函数,用于搜索,替换和重置**/
+
+    // 清除搜索结果框内容
+    var clear_result = function(){
+        $(".modal_outer_search_result .show_result span").text("");
+        $(".modal_outer_search_result .show_result .item").attr("data-id", "");
+    };
+
+    // 弹出搜寻结果模态框
+    var pop_search_status = function(){
+        clear_result(); // 清除上次搜索结果
+        $(".modal_outer_search_result").css("display", "flex");
+        $(".modal_outer_search_result .wait_result").css("display", "flex");
+        $(".modal_outer_search_result .result_zone").css("display", "none");
+    };
+
+    // 显示搜索条码结果
+    var show_search_result = function(data, side){
+        side = (side === undefined || side === "left")? "left": "right";
+        var raw = $(".modal_outer_search_result .raw_code");
+        if(side === "left"){
+            $(".modal_outer_search_result .wait_result").css("display", "none");
+            $(".modal_outer_search_result .result_zone").css("display", "flex");
+        }
+        else{
+            raw = $(".modal_outer_search_result .new_code");
+        }
+        raw.attr("data-id", data['_id']); // id
+        raw.find(".code").text(data['_id']);  // 条码
+        raw.find(".product_info").text(data['product_info']);  // 产品信息
+        raw.find(".batch_sn").text(data['batch_sn']);  // 生产批号
+        raw.find(".print_time").text(data['print_time']);  // 打印日期
+        raw.find(".sync_time").text(data['sync_time']);  // 回传日期
+        raw.find(".output_time").text(data['output_time']);  // 导出日期
+        raw.find(".status").text(parseInt(data['status']) ===1?"已使用": (parseInt(data['status'])===0?"未使用": "废止"));  // 状态
+        raw.find(".level").text(data['level']);  // 码级
+    };
+
+    // 顶部条码信息搜索事件
+    var search_code = function(code){
+        var args = {
+            "type": "query",
+            "_id": code
+        };
+        var url = "/manage/code_info";
+        pop_search_status();
+        $.post(url, args, function(resp){
+            var json = JSON.parse(resp);
+            var status = json['message'];
+            if(status === "success"){
+                show_search_result(json['data']);
+            }
+            else{
+                alert(status);
+                $(".modal_outer_search_result").css("display", "none");
+            }
+        });
+    };
+
+    // 搜索条码框后面的go按钮的点击事件
+    $(".right_top .search_code_btn").click(function(){
+        var code = $.trim($(".right_top .search_code_input").val());
+        if(code === ""){
+            // nothing...
+        }
+        else{
+            search_code(code);
+        }
+    });
+
+    // 搜索条码框回车事件
+    $(".right_top .search_code_input").keydown(function(event){
+        var key = event.keyCode;
+        if(key === 13){
+            $(".right_top .search_code_btn").click();
+        }else{}
+    });
+
+    // 关闭搜索结果模态框
+    $("#close_search_result").click(function(){
+        $(".modal_outer_search_result").css("display", "none");
+    });
+
+    // 重置条码按钮事件
+    $("#reset_btn").click(function(){
+        var _id = $.trim($(".modal_outer_search_result .raw_code").attr("data-id"));
+        if(_id === ""){
+            // nothing....
+        }
+        else{
+            var con = confirm("这将重置条码信息为未使用状态,你确定吗?");
+            if(con){
+                var url = "/manage/code_info";
+                var args = {
+                    "type": "reset",
+                    "_id": _id
+                };
+                $(".modal_process").css("display","flex");
+                $.post(url, args, function(resp){
+                    $(".modal_process").css("display","none");
+                    var json = JSON.parse(resp);
+                    var status = json['message'];
+                    if(status === "success"){
+                        alert("成功");
+                        clear_result();  // 清除上次搜索结果
+                        show_search_result(json['data'], "left");
+                    }
+                    else{
+                        alert(status);
+                    }
+                });
+            }else{}
+        }
+    });
+
+    // 替换条码按钮的点击事件.
+    $("#replace_btn").click(function(){
+        var new_id = prompt("请输入新的条码");
+        if(new_id.length < 12){
+            alert("请输入正确的条码信息");
+            return false;
+        }
+        else{
+            replace_code(new_id);
+        }
+    });
+
+    // 替换条码函数
+    var replace_code = function(new_id){
+        var old_id = $.trim($(".modal_outer_search_result .raw_code").attr("data-id"));
+        if(old_id === "" || new_id === ""){
+            alert("条码信息不能为空");
+        }
+        else if(old_id === new_id){
+            alert("无需替换");
+        }
+        else{
+            var con = confirm("这将交换2个条码的状态信息,你确定吗?");
+            if(con){
+                var url = "/manage/code_info";
+                var args = {
+                    "type": "replace",
+                    "old_id": old_id,
+                    "new_id": new_id
+                };
+                $(".modal_process").css("display","flex");
+                $.post(url, args, function(resp){
+                    $(".modal_process").css("display","none");
+                    var json = JSON.parse(resp);
+                    var status = json['message'];
+                    if(status === "success"){
+                        alert("成功");
+                        var data = json['data'];
+                        clear_result();  // 清除上次搜索结果
+                        show_search_result(data[0], "left");
+                        show_search_result(data[1], "right");
+                    }
+                    else{
+                        alert(status);
+                    }
+                });
+            }else{}
+        }
+    };
     
     /*全选事件*/
     $("#check_all").click(function(){

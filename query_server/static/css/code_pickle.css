@@ -4,6 +4,7 @@
 /*modal部分*/
 /*生成下载文件modal部分*/
 /*查询条码结果modal部分*/
+/*等待后台处理modal部分*/
 }
 .right_main .right_top {
   width: 100%;
@@ -346,17 +347,18 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 9999;
+  z-index: 9998;
   float: left;
   background-color: rgba(180,180,180,0.9);
   display: flex;
+  display: none;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 }
 .right_main .modal_outer_search_result > .modal_inner {
-  width: 600px;
-  height: 360px;
+  width: 780px;
+  height: 480px;
   margin-top: -20%;
   border-radius: 5px;
   background-color: #fff;
@@ -426,4 +428,66 @@
 .right_main .modal_outer_search_result > .modal_inner .modal_mid .result_zone >.show_result >.item >.item_line >span {
   color: #717171;
   width: calc(100% - 5em);
+}
+.right_main .modal_outer_search_result > .modal_inner .modal_bot {
+  padding: 35px 0 20px 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid #d3d3d3;
+}
+.right_main .modal_outer_search_result > .modal_inner .modal_bot > button {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.right_main .modal_outer_search_result > .modal_inner .modal_bot > .first {
+  margin-right: 10px;
+}
+.right_main .modal_outer_search_result > .modal_inner .modal_bot > .last {
+  margin-left: 10px;
+}
+.right_main .modal_process {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  float: left;
+  background-color: rgba(180,180,180,0.9);
+  display: flex;
+  display: none;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.right_main .modal_process > .modal_inner {
+  width: 360px;
+  height: 180px;
+  margin-top: -20%;
+  border-radius: 5px;
+  background-color: #fff;
+  border: 1px solid #c8c8c8;
+}
+.right_main .modal_process > .modal_inner .modal_top {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #a0a0a0;
+}
+.right_main .modal_process > .modal_inner .modal_top > h3 {
+  color: #969696;
+}
+.right_main .modal_process > .modal_inner .modal_mid .line {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+.right_main .modal_process > .modal_inner .modal_mid .line >i {
+  margin-top: 20px;
 }

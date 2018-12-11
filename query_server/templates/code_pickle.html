@@ -8,9 +8,9 @@
 
     <div class="right_top">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="请输入搜索关键字...">
+            <input type="text" class="form-control search_code_input" placeholder="请输入条码信息...">
             <span class="input-group-btn">
-                <button class="btn btn-default" type="button">Go!</button>
+                <button class="btn btn-default search_code_btn" type="button">Go!</button>
               </span>
         </div>
     </div>
@@ -51,14 +51,6 @@
             </div>
             <div class="item">
                 <label>
-                    已同步:
-                </label>
-                <span>
-                    {{ base_info.sync }}
-                </span>
-            </div>
-            <div class="item">
-                <label>
                     未同步:
                 </label>
                 <span>
@@ -67,10 +59,18 @@
             </div>
             <div class="item">
                 <label>
-                    已导出:
+                    已同步:
                 </label>
                 <span>
-                    {{ base_info.output }}
+                    {{ base_info.sync }}
+                </span>
+            </div>
+            <div class="item">
+                <label>
+                    已关联任务:
+                </label>
+                <span>
+                    {{ base_info.related }}
                 </span>
             </div>
             <div class="item">
@@ -79,6 +79,14 @@
                 </label>
                 <span>
                     {{ base_info.not_output }}
+                </span>
+            </div>
+            <div class="item">
+                <label>
+                    已导出:
+                </label>
+                <span>
+                    {{ base_info.output }}
                 </span>
             </div>
         </div>
@@ -276,12 +284,12 @@
                 </div>
                 <div class="line result_zone">
                     <div class="show_result">
-                        <div class="item raw_code">
+                        <div data-id="" class="item raw_code">
                             <div class="item_line">
                                 <label>
                                     条码:
                                 </label>
-                                <span class="value">
+                                <span class="value code">
 
                                 </span>
                             </div>
@@ -289,7 +297,7 @@
                                 <label>
                                     产品信息:
                                 </label>
-                                <span class="value">
+                                <span class="value product_info">
 
                                 </span>
                             </div>
@@ -297,15 +305,31 @@
                                 <label>
                                     生产批号:
                                 </label>
-                                <span class="value">
+                                <span class="value batch_sn">
+
+                                </span>
+                            </div>
+                            <div class="item_line">
+                                <label>
+                                    打印日期:
+                                </label>
+                                <span class="value print_time">
 
                                 </span>
                             </div>
                              <div class="item_line">
                                 <label>
-                                    生产日期:
+                                    回传日期:
                                 </label>
-                                <span class="value">
+                                <span class="value sync_time">
+
+                                </span>
+                            </div>
+                            <div class="item_line">
+                                <label>
+                                    导出日期:
+                                </label>
+                                <span class="value output_time">
 
                                 </span>
                             </div>
@@ -313,7 +337,7 @@
                                 <label>
                                     状态:
                                 </label>
-                                <span class="value">
+                                <span class="value status">
 
                                 </span>
                             </div>
@@ -321,17 +345,17 @@
                                 <label>
                                     码级:
                                 </label>
-                                <span class="value">
+                                <span class="value level">
 
                                 </span>
                             </div>
                         </div>
-                        <div class="item new_code">
+                        <div data-id="" class="item new_code">
                             <div class="item_line">
                                 <label>
                                     条码:
                                 </label>
-                                <span class="value">
+                                <span class="value code">
 
                                 </span>
                             </div>
@@ -339,7 +363,7 @@
                                 <label>
                                     产品信息:
                                 </label>
-                                <span class="value">
+                                <span class="value product_info">
 
                                 </span>
                             </div>
@@ -347,15 +371,31 @@
                                 <label>
                                     生产批号:
                                 </label>
-                                <span class="value">
+                                <span class="value batch_sn">
+
+                                </span>
+                            </div>
+                            <div class="item_line">
+                                <label>
+                                    打印日期:
+                                </label>
+                                <span class="value print_time">
 
                                 </span>
                             </div>
                              <div class="item_line">
                                 <label>
-                                    生产日期:
+                                    回传日期:
                                 </label>
-                                <span class="value">
+                                <span class="value sync_time">
+
+                                </span>
+                            </div>
+                            <div class="item_line">
+                                <label>
+                                    导出日期:
+                                </label>
+                                <span class="value output_time">
 
                                 </span>
                             </div>
@@ -363,7 +403,7 @@
                                 <label>
                                     状态:
                                 </label>
-                                <span class="value">
+                                <span class="value status">
 
                                 </span>
                             </div>
@@ -371,12 +411,33 @@
                                 <label>
                                     码级:
                                 </label>
-                                <span class="value">
+                                <span class="value level">
 
                                 </span>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="modal_bot">
+                <button id="close_search_result" class="btn btn-md btn-default first">关闭</button>
+                <button id="reset_btn" class="btn btn-md btn-primary last">重置</button>
+                <button id="replace_btn" class="btn btn-md btn-primary last">替换</button>
+            </div>
+        </div>
+    </div>
+
+    <!--等待后台处理模态框部分-->
+    <div class="modal_process">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 id="modal_title_process">
+                    正在处理请求,请稍后...
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line">
+                    <i class="fa fa-spinner fa-pulse fa-4x"></i>
                 </div>
             </div>
         </div>

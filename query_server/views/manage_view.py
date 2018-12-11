@@ -45,8 +45,8 @@ navs = [
     ]},
     {"name": "条码信息", "path": "/manage/code_tools", "class": "fa fa-qrcode", "children": [
         {"name": "条码信息导入", "path": "/manage/code_import"},
-        {"name": "导出打印条码", "path": "/manage/code_export"},
-        {"name": "导出生产条码", "path": "/manage/code_pickle"},
+        {"name": "提取打印条码", "path": "/manage/code_export"},
+        {"name": "导出查询替换", "path": "/manage/code_pickle"},
     ]},
     {"name": "生产任务", "path": "/manage/task_summary", "class": "fa fa-server", "children": [
         # {"name": "生产任务概况", "path": "/manage/task_summary"},  # 暂时不用
@@ -193,24 +193,39 @@ class CodeInfoView(MyView):
         """
         mes = {"message": "success"}
         the_type = get_arg(request, "type", "")
-        if the_type == "query":
-            """查询条码信息"""
-            _id = get_arg(request, "_id", "")
-            if isinstance(_id, str) and len(_id) == 24:
-                _id = ObjectId(_id)
-                f = {"_id": _id}
-                code = CodeInfo.find_info(filter_dict=f)
+        _id = get_arg(request, "_id", "")
+        _id = _id if _id else get_arg(request, "old_id", "")
+        if isinstance(_id, str) and len(_id) > 18:
+            if the_type == "query":
+                """查询条码信息"""
+                access_filter = self.operate_filter(user=user, operate="view")
+                if isinstance(access_filter, dict):
+                    access_filter.update({"_id": _id})
+                    code = CodeInfo.find_info(filter_dict=access_filter, can_json=True)
+                    mes['data'] = code
+                else:
+                    mes['message'] = "401"
+            elif the_type == "replace":
+                """替换条码"""
+                access_filter = self.operate_filter(user=user, operate="edit")
+                if isinstance(access_filter, dict):
+                    new_id = get_arg(request, "new_id", "")
+                    mes = CodeInfo.replace_info(_id, new_id)
+                else:
+                    mes['message'] = "401"
+            elif the_type == "reset":
+                """重置条码"""
+                access_filter = self.operate_filter(user=user, operate="edit")
+                if isinstance(access_filter, dict):
+                    access_filter.update({"_id": _id})
+                    mes = CodeInfo.reset_info(filter_dict=access_filter)
+                else:
+                    mes['message'] = "401"
             else:
-                mes['message'] = "没有_id参数"
-
-        elif the_type == "replace":
-            """替换条码"""
-            pass
-        elif the_type == "reset":
-            """重置条码"""
-            pass
+                mes['message'] = '404'
         else:
-            mes['message'] = '404'
+            mes['message'] = "没有_id参数"
+
         return json.dumps(mes)
 
 
@@ -282,7 +297,7 @@ class CodePickleView(MyView):
                         mes['message'] = "没有需要撤销的文件记录"
                     else:
                         ids = [ObjectId(x) for x in ids]
-                        mes = PrintCode.cancel_data(f_ids=ids)
+                        mes = OutputCode.cancel_data(f_ids=ids)
             elif the_type == "delete":
                 """批量删除文件和日志"""
                 ids = []
@@ -296,7 +311,7 @@ class CodePickleView(MyView):
                     else:
                         ids = [ObjectId(x) for x in ids]
                         include_record = get_arg(request, "include_record")
-                        mes = PrintCode.delete_file_and_record(ids=ids, include_record=include_record)
+                        mes = OutputCode.delete_file_and_record(ids=ids, include_record=include_record)
 
             else:
                 mes['message'] = "无效的操作类型:{}".format(the_type)
@@ -1331,6 +1346,8 @@ DownLoadPrintFileView.register(app=manage_blueprint)
 DownLoadSyncFileView.register(app=manage_blueprint)
 """下载生产完成的导出文件函数"""
 DownLoadOutputFileView.register(app=manage_blueprint)
+"""查询/替换条码信息"""
+CodeInfoView.register(app=manage_blueprint)
 """导入条码页面"""
 CodeImportView.register(app=manage_blueprint)
 """导出条码页面"""

@@ -1035,7 +1035,7 @@ class TaskSync(orm_module.BaseDoc):
         f = {"sync_id": {"$in": ids2}}
         w = orm_module.get_write_concern()
         col = orm_module.get_conn(table_name="code_info", write_concern=w)
-        u = {"$unset": {"sync_id": ""}}
+        u = {"$unset": {"sync_id": "", "task_id": "", "level": ""}}
         col.update_many(filter=f, update=u)
         mes = cls.delete_file_and_record(ids=ids2, include_record=True)
         return mes
