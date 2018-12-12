@@ -81,9 +81,9 @@ def generator_task_sync(num: int = 10):
 def generator_task_sync2(data: dict = None):
     """根据字典内容生成一个回传的文件"""
     data = [
-        '1006951171005253082167380',
-        '1001545335508113034954870',
-        '23132102805841430218730720125819577'
+        {"code": "1234", "level": 2, "children": ["3343,", "2211", "5112"]},
+        {"code": "1235", "level": 2, "children": ["3344,", "2212", "5113"]},
+        {"code": "1236", "level": 2, "children": ["3345,", "2213", "5114"]},
     ] if data is None else data
     json_data = ''
     file_name = "task3.json"

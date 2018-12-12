@@ -131,9 +131,16 @@ class SocketListener(orm_module.BaseDoc):
             elif mes.startswith("apply_code"):
                 """申请条码"""
                 resp = CodeInfo.apply_code(old_id=code)
+                resp = str(resp) if not isinstance(resp, str) else resp
             elif mes.startswith("code_details"):
                 """查询条码详情"""
                 resp = CodeInfo.code_details(code=code)
+                resp = str(resp) if not isinstance(resp, str) else resp
+            elif mes.startswith("replace_code"):
+                """替换2个条码信息"""
+                code1 = mes.split(",")[1].strip()
+                resp = CodeInfo.replace_code(code_a=code1, code_b=code)
+                resp = str(resp) if not isinstance(resp, str) else resp
             elif mes.startswith("UploadTraceCodeToDb"):
                 """
                 UploadTraceCodeToDb
@@ -172,15 +179,8 @@ class CodeInfo(orm_module.BaseDoc):
             如果此条码如果查询到此条码.  print_id不存在,返回值3.  表示此条码尚未打印
             如果程序执行出错.返回 -1
     3. 条码替换: 嵌入式向服务器发出一条替换条码的信息,信息中顺序包含A和B两个条码. 意思是用B条码替换A条码的位置.
-            <1>. 如果 .A条码的status=1, print_id存在.且 B条码status=0, print_id存在.那么服务器将执行以下操作后返回1:
-                 1).设置A条码的status=0.B条码的status=1.
-                 2).如果A条码有parent_id,那么设置B.patent_id=A.parent_id
-                 3).搜寻数据库中,parent_id=A._id的条码,修改这些条码的parent_id=B._id
-            <2>. 如果 .A条码的status=1, print_id存在.且 B条码status=1, print_id存在.返回0.表示B条码已使用.
-            <3>. 如果 .A条码的status=1, print_id存在.且 B条码print_id不存在.返回2.表示B条码不可用.
-            <4>. 如果 .A条码的status=0, print_id存在.返回3.表示A条码无需替换
-            <5>. 如果 .A条码的print_id不存在.返回4.表示A条码未打印
-            <6>. 如果 .A条码不存在.返回5.表示A条码未打印
+            返回1 表示成功
+            返回0 表示有一个条码信息错误或者不存在
             如果程序执行出错.返回 -1
     4. 临时申请条码: 此操作用于将一条未打印的条码标记为已打印状态并返回给嵌入式设备.
        嵌入式设备需要发送一个产品id给服务端(服务端会提供一个查询产品信息的接口)

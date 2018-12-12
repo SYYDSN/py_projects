@@ -88,22 +88,39 @@ class WebServer:
                                     "file": __file__,
                                     "func": self.__class__.__name__,
                                     "log_type": "接收数据",
-                                    "content": ms,
+                                    "content": data,
                                     "ip": c_ip
                                 }
                                 SystemLog.log(**kw)
                             print(data)
+                            error = None
                             resp = SocketListener.listen(mes=data, ip=c_ip, port=c_port)
-                            client.send(resp.encode(encoding="utf-8"))
-                            if debug:
-                                kw = {
-                                    "file": __file__,
-                                    "func": self.__class__.__name__,
-                                    "log_type": "返回数据",
-                                    "content": ms,
-                                    "ip": c_ip
-                                }
-                                SystemLog.log(**kw)
+                            try:
+                                client.send(resp.encode(encoding="utf-8"))
+                            except ConnectionResetError as e:
+                                print(e)
+                                error = str(e)
+                            finally:
+                                if debug and error is None:
+                                    """调试模式"""
+                                    kw = {
+                                        "file": __file__,
+                                        "func": self.__class__.__name__,
+                                        "log_type": "返回数据",
+                                        "content": resp,
+                                        "ip": c_ip
+                                    }
+                                    SystemLog.log(**kw)
+                                elif error is not None:
+                                    ms = "向客户端发送消息时出错,消息:{}, 错误原因:{}".format(resp, error)
+                                    kw = {
+                                        "file": __file__,
+                                        "func": self.__class__.__name__,
+                                        "log_type": "返回数据",
+                                        "content": ms,
+                                        "ip": c_ip
+                                    }
+                                    SystemLog.log(**kw)
                         else:
                             # 说明客户端已经关闭了
                             # print('{}:{}已断开！\n'.format(c_ip, c_port))

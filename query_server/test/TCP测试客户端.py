@@ -8,12 +8,12 @@ from tcp_tools.tcp_client import TCPClient
 
 
 cli = TCPClient()
-cli.connect("127.0.0.1", 32000)
+cli.connect("47.99.105.196", 32000)
 
 
 def check_code():
     """检查条码信息"""
-    cli.send_message("code_details, 23132102805841430218730720125819577")
+    cli.send_message("replace_code, 23132102805841430218730720125819577, 1011486229375867227118080")
     cli.listen(delay=2, debug=False)
 
 

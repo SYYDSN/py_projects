@@ -2,6 +2,7 @@
 import socket
 from uuid import uuid4
 from threading import Thread
+import json
 import time
 
 
@@ -42,6 +43,13 @@ class TCPClient:
         while not self.stop:
             data = client.recv(1024).decode(encoding="utf-8")
             print(data)
+            try:
+                d = json.loads(data)
+                for k, v in d.items():
+                    print(k, v)
+            except Exception as e:
+                print(e)
+                pass
             if not debug and count >= 2:
                 count += 1
                 self.stop = True
