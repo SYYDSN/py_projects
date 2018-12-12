@@ -3,7 +3,7 @@ socket.on('connect', function() {
     socket.emit('mes', {data: 'I\'m 中 connected!'});
 });
 
-socket.on('mes', function(json){;
+socket.on('mes', function(json){
     console.log(json);
     var str = json['message'];
     if(str !== undefined && str !== ""){

@@ -769,7 +769,7 @@ class ManageProductView(MyView):
         if isinstance(access_filter, dict):
             page_index = get_arg(request, "page", 1)
             r = Product.query(filter_dict=access_filter, page_index=page_index)  # 产品列表
-            products = r.pop("data")
+            products = r.pop("data", list())
             render_data['products'] = products
             render_data.update(r)
             company = Company.find_one(filter_dict=dict())
@@ -893,7 +893,7 @@ class ManageUserView(MyView):
             access_filter.update({"role_id": {"$ne": ObjectId("5bdfad388e76d6efa7b92d9e")}})
             page_index = get_arg(request, "page", 1)
             r = User.paging_info(filter_dict=access_filter, page_index=page_index)  # 用户列表
-            users = r.pop("data")
+            users = r.pop("data", list())
             f = {"_id": {"$ne": ObjectId("5bdfad388e76d6efa7b92d9e")}}
             projection = ["_id", "role_name"]
             roles = Role.find(filter_dict=f, projection=projection)
@@ -986,7 +986,7 @@ class ManageRoleView(MyView):
             access_filter.update({"role_name": {"$ne": "root"}})
             page_index = get_arg(request, "page", 1)
             r = Role.paging_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
-            roles = r.pop("data")
+            roles = r.pop("data", list())
             render_data['roles'] = roles
             render_data.update(r)
             all_rules = orm_module.FlaskUrlRule.find(filter_dict=dict())  # 所有的访问规则
@@ -1072,7 +1072,7 @@ class ManageDeviceView(MyView):
         else:
             page_index = get_arg(request, "page", 1)
             r = ProductLine.paging_info(filter_dict=access_filter, page_index=page_index)  # 角色列表
-            lines = r.pop("data")
+            lines = r.pop("data", list())
             render_data['lines'] = lines
             embedded = Embedded.find(filter_dict=access_filter)
             embedded_dict = {x["_id"]: {"ip": x['ip'], "children": x.get('children', dict())} for x in embedded}

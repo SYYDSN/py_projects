@@ -33,12 +33,13 @@ from pymongo.errors import DuplicateKeyError
 
 cache = RedisCache()
 logger = get_logger()
-# user = "proot"              # 数据库用户名
-# password = "Prject@0429"       # 数据库密码
+user = "test1"              # 数据库用户名
+password = "test@723456"       # 数据库密码
 # db_name = "project_db"        # 库名称
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 
 db_name = "test_db"
+
 
 """mongodb配置信息"""
 """
@@ -55,8 +56,8 @@ mongodb_setting = {
     # 'authMechanism': mechanism,  # 加密
     "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
     # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
-    # "username": user,       # 用户名
-    # "password": password    # 密码
+    "username": user,       # 用户名
+    "password": password    # 密码
 }
 
 

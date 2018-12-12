@@ -94,7 +94,7 @@ class WebServer:
                                 SystemLog.log(**kw)
                             print(data)
                             error = None
-                            resp = SocketListener.listen(mes=data, ip=c_ip, port=c_port)
+                            resp = SocketListener.listen(mes=data)
                             try:
                                 client.send(resp.encode(encoding="utf-8"))
                             except ConnectionResetError as e:

@@ -461,7 +461,7 @@ class UploadFile(orm_module.BaseDoc):
             mes['message'] = "没有找到上传的文件"
         else:
             product_id = req.headers.get("product_id", None)
-            print(product_id)
+            print("product_id is {}".format(product_id))
             if isinstance(product_id, str) and len(product_id) == 24:
                 product_id = ObjectId(product_id)
                 file_name = file.filename

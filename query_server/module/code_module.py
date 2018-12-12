@@ -55,110 +55,64 @@ def get_code_length() -> int:
     return length
 
 
-class SocketListener(orm_module.BaseDoc):
+class SocketListener:
     """
     socket(tcp)请求监听器
     """
-    _table_name = "socket_record"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    type_dict['request'] = str
-    type_dict['response'] = str
-    type_dict['client_ip'] = str
-    type_dict['client_port'] = int
-    type_dict['time'] = datetime.datetime
 
     @classmethod
-    def log(cls, req: str, resp, ip: str, port: (int, str)) -> None:
-        """
-        记录日志
-        :param req: tcp客户端请求的字符串格式
-        :param resp: 响应的字符串格式
-        :param ip:  客户ip
-        :param port: 客户端端口
-        :return:
-        """
-        now = datetime.datetime.now()
-        doc = {
-            "request": req, "response": resp, "client_id": ip, 'client_port': port,
-            "time": now
-        }
-        write_concern = orm_module.get_write_concern()
-        col = cls.get_collection(write_concern=write_concern)
-        r = None
-        try:
-            r = col.insert_one(document=doc)
-        except Exception as e:
-            logger.exception(msf=e)
-        finally:
-            if r is None:
-                ms = "{}: SocketListener.log未能返回正确的插入结果, doc={}".format(now, doc)
-                logger.exception(ms)
-            else:
-                pass
-
-    @classmethod
-    def listen(cls, mes: str, ip: str, port: (int, str)) -> str:
+    def listen(cls, mes: str) -> str:
         """
         监听Tcp通讯
         :param mes: tcp客户端请求的字符串格式
-        :param ip:  客户ip
-        :param port: 客户端端口
         :return: 响应的字符串格式
         """
-        try:
-            port = int(port)
-        except Exception as e:
-            print(e)
-        finally:
-            code = mes.split(",")[-1].strip()
-            if mes.startswith("CheckTraceCodeCanUse"):
-                """
-                条码合格判定
-                请求检测数据是否合格: CheckTraceCodeCanUse, 10401911001201805011536541033317
-                系统检测条码合格返回数据格式: 10401911001201805011536541033317,1    
-                系统检测条码重复返回数据格式: 10401911001201805011536541033317,2 
-                系统检测条码非当前生产数据格式: 10401911001201805011536541033317,3 
-                系统检测条码格式错误: 10401911001201805011536541033317,4 
-                条码加请求检测结果后的返回值，返回值为以上定义的 1-4数据。
-                """
-                r = CodeInfo.query_code(code=code)
-                resp = '{},{}'.format(code, r)
-            elif mes.startswith("reset_code"):
-                """重设条码"""
-                r = CodeInfo.reset_cord(code)
-                resp = '{},{}'.format(code, r)
-            elif mes.startswith("apply_code"):
-                """申请条码"""
-                resp = CodeInfo.apply_code(old_id=code)
-                resp = str(resp) if not isinstance(resp, str) else resp
-            elif mes.startswith("code_details"):
-                """查询条码详情"""
-                resp = CodeInfo.code_details(code=code)
-                resp = str(resp) if not isinstance(resp, str) else resp
-            elif mes.startswith("replace_code"):
-                """替换2个条码信息"""
-                code1 = mes.split(",")[1].strip()
-                resp = CodeInfo.replace_code(code_a=code1, code_b=code)
-                resp = str(resp) if not isinstance(resp, str) else resp
-            elif mes.startswith("UploadTraceCodeToDb"):
-                """
-                UploadTraceCodeToDb
-                请求检测数据是否合格: UploadTraceCodeToDb, 10401911001201805011536541033317, 
-                10401911001201805011536541033318, 10401911001201805011536541033319, 
-                10401911001201805011536541033311, 10401911001201805011536541033312,
-                ……
-                系统检测条码合格返回数据格式: UploadTraceCodeToDb ,10401911001201805011536541033317,1
-                系统数据返回格式解释: 用请求的接口名，加第一个请求的条码内容，加结果。
-                1. 代表本次请求接口处理成功，0则代表本次接口处理数据失败。
-                """
-                resp = "UploadTraceCodeToDb api not implemented!"
-            else:
-                resp = 'not implemented data={}！\n'.format(mes)
+        code = mes.split(",")[-1].strip()
+        if mes.startswith("CheckTraceCodeCanUse"):
+            """
+            条码合格判定
+            请求检测数据是否合格: CheckTraceCodeCanUse, 10401911001201805011536541033317
+            系统检测条码合格返回数据格式: 10401911001201805011536541033317,1    
+            系统检测条码重复返回数据格式: 10401911001201805011536541033317,2 
+            系统检测条码非当前生产数据格式: 10401911001201805011536541033317,3 
+            系统检测条码格式错误: 10401911001201805011536541033317,4 
+            条码加请求检测结果后的返回值，返回值为以上定义的 1-4数据。
+            """
+            r = CodeInfo.query_code(code=code)
+            resp = '{},{}'.format(code, r)
+        elif mes.startswith("reset_code"):
+            """重设条码"""
+            r = CodeInfo.reset_cord(code)
+            resp = '{},{}'.format(code, r)
+        elif mes.startswith("apply_code"):
+            """申请条码"""
+            resp = CodeInfo.apply_code(old_id=code)
+            resp = str(resp) if not isinstance(resp, str) else resp
+        elif mes.startswith("code_details"):
+            """查询条码详情"""
+            resp = CodeInfo.code_details(code=code)
+            resp = str(resp) if not isinstance(resp, str) else resp
+        elif mes.startswith("replace_code"):
+            """替换2个条码信息"""
+            code1 = mes.split(",")[1].strip()
+            resp = CodeInfo.replace_code(code_a=code1, code_b=code)
+            resp = str(resp) if not isinstance(resp, str) else resp
+        elif mes.startswith("UploadTraceCodeToDb"):
+            """
+            UploadTraceCodeToDb
+            请求检测数据是否合格: UploadTraceCodeToDb, 10401911001201805011536541033317, 
+            10401911001201805011536541033318, 10401911001201805011536541033319, 
+            10401911001201805011536541033311, 10401911001201805011536541033312,
+            ……
+            系统检测条码合格返回数据格式: UploadTraceCodeToDb ,10401911001201805011536541033317,1
+            系统数据返回格式解释: 用请求的接口名，加第一个请求的条码内容，加结果。
+            1. 代表本次请求接口处理成功，0则代表本次接口处理数据失败。
+            """
+            resp = "UploadTraceCodeToDb api not implemented!"
+        else:
+            resp = 'not implemented data={}！\n'.format(mes)
 
-            """记录结果"""
-            cls.log(req=mes, resp=resp, ip=ip, port=port)
-            return resp
+        return resp
 
 
 class CodeInfo(orm_module.BaseDoc):

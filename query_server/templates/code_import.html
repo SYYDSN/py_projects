@@ -104,7 +104,7 @@
                             <td class="file_size">{{ file.file_size }}</td>
                             <td class="valid_count">{{ file.valid_count }}</td>
                             <td  data-id="{{ file.product_id }}" class="product_info">
-                                {{ file.product_name + " " + file.specification + " " + (file.net_contents | string) + " " + file.package_ratio }}
+                                {{ (file.product_name if file.product_name else "") + " " + (file.specification if file.specification else "") + " " + (file.net_contents | string) + " " + (file.package_ratio if file.package_ratio else "")  }}
                             </td>
                             <td class="import_time">{{ file.import_time | short_date3 }}</td>
                         </tr>

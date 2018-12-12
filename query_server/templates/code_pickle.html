@@ -184,7 +184,7 @@
                             <td class="count">{{ file.count }}</td>
                             <td class="download"><a target="_blank" href="/manage/output_file/{{ file._id }}.txt">下载</a></td>
                             <td data-id="{{ file.product_id }}" class="product_info">
-                                {{ file.product_name + " " + file.specification + " " + (file.net_contents | string) + " " + file.package_ratio }}
+                                {{ (file.product_name if file.product_name else "") + " " + (file.specification if file.specification else "") + " " + (file.net_contents | string) + " " + (file.package_ratio if file.package_ratio else "")  }}
                             </td>
                             <td class="export_time">{{ file.time | short_date3 }}</td>
                         </tr>

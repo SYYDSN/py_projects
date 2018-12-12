@@ -80,7 +80,8 @@
                             </td>
                             <td class="batch_sn">{{ task.batch_sn }}</td>
                             <td data-id="{{ task.product_id }}" class="product_info">
-                                {{ task.product_name + " " + task.specification + " " + (task.net_contents | string) + " " + task.package_ratio }}
+                                {{ (task.product_name if task.product_name else "") + " " + (task.specification if task.specification else "") + " " + (task.net_contents | string) + " " + (task.package_ratio if task.package_ratio else "")  }}
+
                             </td>
                             <td class="plan_number">{{ task.plan_number }}</td>
                             <td class="blank_count" style="{{ task.blank_count | deposit_warning(task.blank_count if task.blank_count else 0) }}">{{ task.blank_count if task.blank_count and task.blank_count > 0 else 0 }}</td>

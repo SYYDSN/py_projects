@@ -194,17 +194,20 @@ $(function () {
         var args = {
             "type": "delete",
             "ids": JSON.stringify(d)
-        }
-        $.post(location.pathname, args, function (resp) {
-            var json = JSON.parse(resp);
-            var status = json['message'];
-            if (status === "success") {
-                alert("删除成功");
-                location.reload();
-            } else {
-                alert(status);
-            }
-        });
+        };
+        var con = confirm("可能会导致关联的条码和任务丢失产品信息,你确认吗?");
+        if(con){
+            $.post(location.pathname, args, function (resp) {
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if (status === "success") {
+                    alert("删除成功");
+                    location.reload();
+                } else {
+                    alert(status);
+                }
+            });
+        }else{}
     });
 
     /*全选事件*/

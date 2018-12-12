@@ -18,6 +18,7 @@ socketio = SocketIO(app)
 def io_client_func():
     return render_template("io_client.html")
 
+
 @socketio.on('mes')
 def handle_my_custom_event(json_str):
     print('received json: ' + str(json_str))
