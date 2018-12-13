@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="/static/css/manage/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/manage/font-awesome.min.css">
+    <script src="/static/js/manage/jquery-3.2.1.min.js"></script>
+    <script src="/static/js/manage/bootstrap.min.js"></script>
+    <script src="/static/js/manage/jquery_extends.js"></script>
+    <link rel="stylesheet" href="/static/css/manage/template.css">
+
+    {% block standard_page_css %}
+    {% endblock %}
+
+    {% block css %}
+    {% endblock %}
+
+    <title>{{ page_title }}</title>
+</head>
+<body>
+
+{% block body %}
+{% endblock %}
+
+</body>
+
+{% block standard_page_js %}
+{% endblock %}
+
+{% block js %}
+{% endblock %}
+
+</html>

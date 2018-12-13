@@ -63,7 +63,7 @@ def sms_func(user: dict = None, key: str = ""):
                 """更新手机绑定信息"""
                 f = {"_id": _id}
                 u = {"$set": {"phone": phone}}
-                r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                r = WXUser.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
                 if isinstance(r, dict):
                     """成功"""
                     session['user_id'] = r['_id']

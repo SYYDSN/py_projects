@@ -254,12 +254,12 @@ def _calculate_exit_trade(trade: dict) -> bool:
     f = {"code": product_map[product]['code']}
     ss = [("platform_time", -1)]
     ses = mongo_db.get_conn(table_name="quotation")
-    one = ses.find_one(filter=f, sort=ss)
+    one = ses.find_one(filter=f, sort=ss)   # 寻找报价
     if one is not None:
         exit_price = one['price']
         trade['exit_time'] = datetime.datetime.now()
     else:
-        exit_price = x['exit_price']  # 离场点位
+        exit_price = trade['exit_price']  # 离场点位
     """计算各种参数"""
     enter_price = float(trade['enter_price']) if isinstance(trade['enter_price'], str) else trade['enter_price']  # 进场点位
     info = product_map[product]
@@ -340,7 +340,7 @@ def calculate_trade(raw_signal: dict) -> None:
         raw_signal.pop("_id")
         f = {"record_id": raw_signal.pop("record_id"), "change": raw_signal.pop("change")}
         u = {"$set": raw_signal}
-        r = Trade.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+        r = Trade.find_one_and_update(filter_dict=f, update_dict=u, upsert=True)
         if r is None:
             ms = "保存trade失败! f:{}, u: {}".format(f, u)
             logger.exception(msg=ms)
@@ -518,7 +518,7 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
         f = {"record_id": doc_dict['record_id'], "change": "raw"}
         if case_type == "exit":
             """取以前的价格和入场时间"""
-            r = Trade.find_one_plus(filter_dict=f, instance=False)
+            r = Trade.find_one(filter_dict=f)
             if r is None:
                 ms = "原始信号离场时,trade查找失败,:{}".format(f)
                 logger.exception(ms)
@@ -565,7 +565,7 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
             """离场"""
             f["change"] = {"$ne": "raw"}
             f['exit_price'] = {"$in": [None, 0.0, 0]}  # 经常不明原因的找不到信号.暂时无法判定是不是问题?
-            r = Trade.find_plus(filter_dict=f, to_dict=True)
+            r = Trade.find(filter_dict=f)
             if len(r) == 0:
                 ms = "虚拟信号离场时,,trade查找失败,:{}".format(f)
                 logger.exception(ms)
@@ -726,7 +726,7 @@ class RawRequestInfo(mongo_db.BaseDoc):
         :return:
         """
         instance = cls.instance(req)
-        return instance.save_plus()
+        return instance.save()
 
 
 class Signal(mongo_db.BaseDoc):
@@ -1120,7 +1120,7 @@ class Signal(mongo_db.BaseDoc):
         :return:
         """
         f = {"creator_name": {"$exists": True}}
-        all_record = cls.find_plus(filter_dict=f, to_dict=True, can_json=False)
+        all_record = cls.find(filter_dict=f)
         teacher_dict = dict()
         for record in all_record:
             name = record['creator_name']
@@ -1136,7 +1136,7 @@ class Signal(mongo_db.BaseDoc):
                 t_id = teacher_dict[name]
                 f = {"_id": record['_id']}
                 u = {"$set": {"creator_id": t_id}}
-                cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                cls.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
 
 
 class Trade(Signal):
@@ -1155,7 +1155,8 @@ class Trade(Signal):
     type_dict['enter_time'] = datetime.datetime  # 开单时间
     type_dict['exit_time'] = datetime.datetime  # 平仓时间
     type_dict['update_time'] = datetime.datetime  # 平仓时间,为了兼容报表的冗余字段
-    type_dict['the_type'] = str  # 订单类型
+    # type_dict['the_type'] = str  # 订单类型  普通/非农/  废止
+    type_dict['case_type'] = str  #  enter/exit  判断 进场/离场 的依据
     type_dict['teacher_name'] = str  #
     type_dict['teacher_id'] = ObjectId  #
     type_dict['product'] = str  # 产品名称
@@ -1186,7 +1187,7 @@ class Trade(Signal):
         """
         f = {"record_id": {"$exists": True}, "create_time": {"$gte": mongo_db.get_datetime_from_str("2018-6-1")}}
         s = {"create_time": -1}
-        rs = Signal.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
+        rs = Signal.find(filter_dict=f, sort_dict=s, to_dict=True)
         Deposit.delete_many(filter_dict={"_id": {"$exists": True}})
         cls.delete_many(filter_dict={"_id": {"$exists": True}})
         for x in rs:
@@ -1203,92 +1204,206 @@ class Trade(Signal):
         # generator_signal_and_save(raw_signal=signal)
         process_case(doc_dict=signal, raw=True)
 
+    @classmethod
+    def preview(cls, filter_dict: dict ) -> dict:
+        """
+        交易的统计信息预览
+        :param filter_dict:
+        :return:
+        """
+        col = cls.get_collection()
+        pipeline = []
+        m = {"$match": {"teacher_id": {"$in": Teacher.selector_data(project=['_id'])}}}
+        pipeline.append(m)
+        resp = dict()
+        g = {
+            "$group":
+                {
+                    "_id":
+                        {
+                            "$switch":
+                                {
+                                    "branches": [
+                                        {
+                                            "case": {"$eq": ["case_type", "exit"]},  # 离场的
+                                            "then": "exit"
+                                        }
+                                    ],
+                                    "default": "enter"                               # 进场的
+                                }
+                        },
+                    "count": {"$sum": 1},
+                    "win_count":
+                        {
+                            "$sum":
+                                {
+                                    "$cond":
+                                        {
+                                            "if": {"$gte": ["$the_profit", 0]},
+                                            "then": 1,
+                                            "else": 0
+                                        }
+                                }
+
+                        },
+                    "used_count":
+                        {
+                            "$sum":
+                                {
+                                    "$cond":
+                                        {
+                                            "if": {"$eq": ["$status", 1]},
+                                            "then": 1,
+                                            "else": 0
+                                        }
+                                }
+
+                        }
+                }
+        }
+
+        pipeline.append(g)
+        r = col.aggregate(pipeline=pipeline)
+        r = [x for x in r]
+        total = 0
+        for x in r:
+            if x['_id'] == "exit":
+                """已离场"""
+                temp = x['count']
+                total += temp
+                resp['printed'] = temp  # 已打印
+                resp['not_used'] = x['not_used_count']  # 已打印未使用
+                resp['used'] = x['used_count']  # 已打印已使用
+                resp['sync'] = x['sync_count']  # 已使用已同步过
+                resp['not_sync'] = x['not_sync_count']  # 已使用未同步过
+                resp['related'] = x['related_count']  # 已同步未关联任务
+                resp['output'] = x['output_count']  # 已同步过已关联任务已导出过
+                resp['not_output'] = x['not_output_count']  # 已同步过已关联任务未导出过
+            else:
+                """未立场"""
+                temp = x['count']
+                total += temp
+                resp['deposit'] = temp  # 未打印
+        resp['total'] = total
+        return resp
+
+    @classmethod
+    def paging_info(cls, filter_dict: dict = None, page_size: int = 10, ruler: int = 5, page_index: int = 1) -> dict:
+        """
+        分页查询
+        :param filter_dict:
+        :param page_size:
+        :param ruler:
+        :param page_index:
+        :return:
+        """
+        filter_dict = {"the_type": "exit"} if filter_dict is None else filter_dict
+        pipeline = []
+        m = {"$match": filter_dict}
+        s = {"$sort": {"enter_time": -1}}
+        p = {
+            "$project":
+                {
+                    "direction": 1, "enter_time": 1, "the_type": 1,
+                    "teacher_id": 1, "teacher_name": 1, "exit_time": 1,
+                    "enter_price": 1, "exit_price": 1, "the_profit": 1,
+                    "formula": 1, "product": 1, "code": 1
+                 }
+             }
+        pipeline.append(m)
+        pipeline.append(p)
+        pipeline.append(s)
+        resp = cls.aggregate(pipeline=pipeline, page_size=page_size, page_index=page_index, ruler=ruler)
+        return resp
+
+
 
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
-    a = {
-        "_id" : ObjectId("6267a444c5aee8250b3e142b"),
-        "creator_name" : "语昂",
-        "datetime" : "2018-08-06T01:28:25.000Z",
-        "app_id" : "5a45b8436203d26b528c7881",
-        "app_name" : "分析师交易记录",
-        "create_time" : "2018-08-21T12:28:31.843Z",
-        "creator_id" : "5a1e680642f8c1bffc5dbd6f",
-        "direction" : "买入",
-        "each_cost" : 100.0,
-        "each_profit" : 700.0,
-        "each_profit_dollar" : 800.0,
-        "enter_price" : 27800.0,
-        "entry_id" : "5a45b90254ca00466b3c0cd1",
-        "op" : "data_create",
-        "p_coefficient" : 10.0,
-        "product" : "恒指",
-        "profit" : 800.0,
-        "receive_time" : "2018-08-06T09:44:48.707Z",
-        "record_id" : "5b67a43fed59cc4e636bf822",
-        "send_time_enter" : "2018-08-06T09:28:36.158Z",
-        "t_coefficient" : 1.0,
-        "the_type" : "普通",
-        "token_name" : "策略助手 小迅",
-        "update_time" : "2018-08-21T12:44:47.899Z",
-        "updater_id" : "5a1e680642f8c1bffc5dbd6f",
-        "updater_name" : "语昂",
-        "exit_price" : 0,
-        "exit_reason" : "",
-        "send_time_exit" : "2018-08-06T09:44:48.824Z"
-    }
-    b = {
-        "_id": ObjectId("5b67a444c5aee8250b3e142b"),
-        "creator_name": "语昂",
-        "datetime": "2018-08-06T01:28:25.000Z",
-        "app_id": "5a45b8436203d26b528c7881",
-        "app_name": "分析师交易记录",
-        "change": "raw",
-        "case_type": "exit",
-        "create_time": "2018-08-21T12:28:31.843Z",
-        "teacher_id": "5a1e680642f8c1bffc5dbd6f",
-        "direction": "买入",
-        "each_cost": 100.0,
-        "each_profit": 700.0,
-        "each_profit_dollar": 800.0,
-        "enter_price": 27364.0,
-        "entry_id": "5a45b90254ca00466b3c0cd1",
-        "op": "data_update",
-        "p_coefficient": 10.0,
-        "product": "恒指",
-        "profit": 0.0,
-        "receive_time": "2018-08-06T09:44:48.707Z",
-        "record_id": "5b67a43fed59cc4e636bf822",
-        "send_time_enter": "2018-08-06T09:28:36.158Z",
-        "t_coefficient": 1.0,
-        "the_type": "普通",
-        "token_name": "策略助手 小迅",
-        "update_time": "2018-08-21T12:44:47.899Z",
-        "updater_id": "5a1e680642f8c1bffc5dbd6f",
-        "updater_name": "语昂",
-        "exit_price": 27389,
-        "exit_reason": "保护利润，提前离场",
-        "send_time_exit": "2018-08-06T09:44:48.824Z"
-    }
-    # s = Signal(**b)
-    # Trade.sync_from_signal(s)
-    """测试获取价格"""
-    # th_time = mongo_db.get_datetime_from_str("2018-8-12 16:00:00")
-    # get_price(p_name="黄金", the_time=th_time)
-    """测试计算单子盈利"""
-    # calculate_trade(b)
-    """测试 celery"""
-    mes_dict = {
-      'product': '原油',
-      'order_type': '开仓',
-      'enter_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),
-      'exit_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),  # 只有平仓才有
-      't_id': '5bbd3279c5aee8250bbe17d0',
-      't_name': '非功',
-      'enter_price': 69.955,
-      'exit_price': 69.955,  # 只有平仓才有
-    }
-    send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
+    # a = {
+    #     "_id" : ObjectId("6267a444c5aee8250b3e142b"),
+    #     "creator_name" : "语昂",
+    #     "datetime" : "2018-08-06T01:28:25.000Z",
+    #     "app_id" : "5a45b8436203d26b528c7881",
+    #     "app_name" : "分析师交易记录",
+    #     "create_time" : "2018-08-21T12:28:31.843Z",
+    #     "creator_id" : "5a1e680642f8c1bffc5dbd6f",
+    #     "direction" : "买入",
+    #     "each_cost" : 100.0,
+    #     "each_profit" : 700.0,
+    #     "each_profit_dollar" : 800.0,
+    #     "enter_price" : 27800.0,
+    #     "entry_id" : "5a45b90254ca00466b3c0cd1",
+    #     "op" : "data_create",
+    #     "p_coefficient" : 10.0,
+    #     "product" : "恒指",
+    #     "profit" : 800.0,
+    #     "receive_time" : "2018-08-06T09:44:48.707Z",
+    #     "record_id" : "5b67a43fed59cc4e636bf822",
+    #     "send_time_enter" : "2018-08-06T09:28:36.158Z",
+    #     "t_coefficient" : 1.0,
+    #     "the_type" : "普通",
+    #     "token_name" : "策略助手 小迅",
+    #     "update_time" : "2018-08-21T12:44:47.899Z",
+    #     "updater_id" : "5a1e680642f8c1bffc5dbd6f",
+    #     "updater_name" : "语昂",
+    #     "exit_price" : 0,
+    #     "exit_reason" : "",
+    #     "send_time_exit" : "2018-08-06T09:44:48.824Z"
+    # }
+    # b = {
+    #     "_id": ObjectId("5b67a444c5aee8250b3e142b"),
+    #     "creator_name": "语昂",
+    #     "datetime": "2018-08-06T01:28:25.000Z",
+    #     "app_id": "5a45b8436203d26b528c7881",
+    #     "app_name": "分析师交易记录",
+    #     "change": "raw",
+    #     "case_type": "exit",
+    #     "create_time": "2018-08-21T12:28:31.843Z",
+    #     "teacher_id": "5a1e680642f8c1bffc5dbd6f",
+    #     "direction": "买入",
+    #     "each_cost": 100.0,
+    #     "each_profit": 700.0,
+    #     "each_profit_dollar": 800.0,
+    #     "enter_price": 27364.0,
+    #     "entry_id": "5a45b90254ca00466b3c0cd1",
+    #     "op": "data_update",
+    #     "p_coefficient": 10.0,
+    #     "product": "恒指",
+    #     "profit": 0.0,
+    #     "receive_time": "2018-08-06T09:44:48.707Z",
+    #     "record_id": "5b67a43fed59cc4e636bf822",
+    #     "send_time_enter": "2018-08-06T09:28:36.158Z",
+    #     "t_coefficient": 1.0,
+    #     "the_type": "普通",
+    #     "token_name": "策略助手 小迅",
+    #     "update_time": "2018-08-21T12:44:47.899Z",
+    #     "updater_id": "5a1e680642f8c1bffc5dbd6f",
+    #     "updater_name": "语昂",
+    #     "exit_price": 27389,
+    #     "exit_reason": "保护利润，提前离场",
+    #     "send_time_exit": "2018-08-06T09:44:48.824Z"
+    # }
+    # # s = Signal(**b)
+    # # Trade.sync_from_signal(s)
+    # """测试获取价格"""
+    # # th_time = mongo_db.get_datetime_from_str("2018-8-12 16:00:00")
+    # # get_price(p_name="黄金", the_time=th_time)
+    # """测试计算单子盈利"""
+    # # calculate_trade(b)
+    # """测试 celery"""
+    # mes_dict = {
+    #   'product': '原油',
+    #   'order_type': '开仓',
+    #   'enter_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),
+    #   'exit_time': datetime.datetime(2018, 10, 18, 3, 53, 11, 670692),  # 只有平仓才有
+    #   't_id': '5bbd3279c5aee8250bbe17d0',
+    #   't_name': '非功',
+    #   'enter_price': 69.955,
+    #   'exit_price': 69.955,  # 只有平仓才有
+    # }
+    # send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
+    Trade.preview()
     pass
 
 

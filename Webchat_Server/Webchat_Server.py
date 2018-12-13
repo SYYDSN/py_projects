@@ -4,8 +4,10 @@ from flask import send_from_directory
 from flask import render_template
 from views.user_views import user_blueprint
 from views.teacher_views import teacher_blueprint
+from views.manage_view import manage_blueprint
 from flask import request
 from flask import session
+from my_filter import mount_plugin
 from flask_session import Session
 from flask import make_response
 from flask import redirect
@@ -35,6 +37,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持
 SESSION_TYPE = "redis"
 app.register_blueprint(user_blueprint)
 app.register_blueprint(teacher_blueprint)
+app.register_blueprint(manage_blueprint)
 Session(app)
 port = 8080
 app_id = "wx0caf19ad3fd15e71"                       # 盛汇app_id
@@ -43,71 +46,9 @@ app_id = "wx66711dbfd84a50c4"                       # 汇赢app_id
 app_secret = "d9186b6cef15534427c02f6ee7085a9f"     # 汇赢app_secret
 
 
-"""自定义过滤器"""
+"""注册jinja2自定义过滤器"""
 
-
-def short_num(num: float) -> float:
-    """不保留小数"""
-    return int(num)
-
-
-def short_num1(num: float) -> float:
-    """保留1位小数"""
-    return round(num, 1)
-
-
-def short_num2(num: float) -> float:
-    """保留2位小数"""
-    return round(num, 2)
-
-
-def short_date(d: datetime.datetime) -> str:
-    """
-    日期格式化,返回'x月x日'这样的格式
-    :param d:
-    :return:
-    """
-    return "{}月{}日".format(d.month, d.day)
-
-
-def short_date2(d: datetime.datetime) -> str:
-    """
-    日期格式化,返回'x月x日 12时xx分'这样的格式
-    :param d:
-    :return:
-    """
-    return "{}月{}日 {}时{}分".format(d.month, d.day, d.hour, d.minute)
-
-
-def startswith(string: str, pre: str) -> bool:
-    """
-    检查一个字符串是否以特定的字符串序列开头?
-    :param string: 待检测字符串
-    :param pre:
-    :return:
-    """
-    return string.startswith(pre)
-
-
-def endswith(string: str, end: str) -> bool:
-    """
-    检查一个字符串是否以特定的字符串序列结尾?
-    :param string: 待检测字符串
-    :param end:
-    :return:
-    """
-    return string.endswith(end)
-
-
-"""注册jinja2过滤器"""
-
-app.jinja_env.filters['short_num'] = short_num
-app.jinja_env.filters['short_num1'] = short_num1
-app.jinja_env.filters['short_num2'] = short_num2
-app.jinja_env.filters['short_date'] = short_date
-app.jinja_env.filters['short_date2'] = short_date2
-app.jinja_env.tests['startswith'] = startswith
-app.jinja_env.tests['endswith'] = endswith
+mount_plugin(app)  # 注册jinja2的自定义过滤器
 
 
 """工具函数"""
@@ -298,8 +239,7 @@ def logger_request_info():
         "xml": xml_data,
         "time": now
     }
-    mes = RawWebChatMessage(**data)
-    mes.save_plus()
+    RawWebChatMessage.insert_one(doc=data)
 
 
 if __name__ == '__main__':

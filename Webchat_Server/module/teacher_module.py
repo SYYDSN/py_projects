@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+
 __project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_path not in sys.path:
     sys.path.append(__project_path)
@@ -11,10 +12,8 @@ import hashlib
 from module.pickle_data import *
 from werkzeug.contrib.cache import SimpleCache
 
-
 ObjectId = mongo_db.ObjectId
 simple_cache = SimpleCache()
-
 
 """
 此模块用于根据老师喊单的信号，生成对应的虚拟老师数据
@@ -67,7 +66,7 @@ class Deposit(mongo_db.BaseDoc):
         :param min_money: 最低额度.加金金额必须大于此额度.
         :return: 实际的加金额度.
         """
-        l = [10000,  15000, 20000, 30000, 50000, 100000]
+        l = [10000, 15000, 20000, 30000, 50000, 100000]
         r = 0
         for x in l:
             if min_money * 2 <= x:
@@ -81,7 +80,7 @@ class Deposit(mongo_db.BaseDoc):
 class TeacherImage(mongo_db.BaseFile):
     """老师相关图片"""
     _table_name = "teacher_image"
-    
+
 
 class Teacher(mongo_db.BaseDoc):
     """
@@ -130,9 +129,9 @@ class Teacher(mongo_db.BaseDoc):
     """真实老师的id取自简道云"""
     type_dict['_id'] = ObjectId
     """真实老师的name可能取自简道云(也可再修改)"""
-    type_dict['name'] = str   # 展示的名字，比如青云老师等
-    type_dict['phone'] = str   # 手机号码，用来登录
-    type_dict['password'] = str   # 密码.md5加密
+    type_dict['name'] = str  # 展示的名字，比如青云老师等
+    type_dict['phone'] = str  # 手机号码，用来登录
+    type_dict['password'] = str  # 密码.md5加密
     type_dict['real_name'] = str  # 真实姓名，非必须
     type_dict['head_img'] = str  # 头像文件相当与项目根目录的路径
     type_dict['img'] = str  # 半身像文件相当与项目根目录的路径
@@ -272,10 +271,10 @@ class Teacher(mongo_db.BaseDoc):
             t1 = {"name": "{}_正向".format(v), "native": False, "from_id": k, "direction": "follow"}
             t2 = {"name": "{}_反向".format(v), "native": False, "from_id": k, "direction": "reverse"}
             t3 = {"name": "{}_随机".format(v), "native": False, "from_id": k, "direction": "random"}
-            cls(**t).save_plus()
-            cls(**t1).save_plus()
-            cls(**t2).save_plus()
-            cls(**t3).save_plus()
+            cls(**t).save()
+            cls(**t1).save()
+            cls(**t2).save()
+            cls(**t3).save()
 
     @classmethod
     def follow_count(cls) -> dict:
@@ -285,7 +284,7 @@ class Teacher(mongo_db.BaseDoc):
         """
         f = dict()
         p = ["_id", "name", "head_img"]
-        ts = cls.find_plus(filter_dict=f, projection=p, to_dict=True)
+        ts = cls.find(filter_dict=f, projection=p)
         t_ids = [x['_id'] for x in ts]
         # t_ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
         ses = mongo_db.get_conn(table_name="wx_user")
@@ -296,7 +295,8 @@ class Teacher(mongo_db.BaseDoc):
         # pipeline = [m, u]
         r = ses.aggregate(pipeline=pipeline)
         count = {x['_id']: x['total'] for x in r}
-        ts = {x['_id']: {"name": x['name'], "head_img": x.get("head_img", "/static/images/head_image/t1.jpg")} for x in ts}
+        ts = {x['_id']: {"name": x['name'], "head_img": x.get("head_img", "/static/images/head_image/t1.jpg")} for x in
+              ts}
         res = dict()
         for k, v in ts.items():
             temp = dict()
@@ -316,7 +316,7 @@ class Teacher(mongo_db.BaseDoc):
         f = {
             "create_date": {"$gt": mongo_db.get_datetime_from_str("2018-9-3 0:0:0")}
         }
-        data = cls.find_plus(filter_dict=f, to_dict=True)
+        data = cls.find(filter_dict=f)
         data = {x["_id"]: x for x in data if not x.get("hide")}
         """查询老师的跟随人数"""
         d = cls.follow_count()
@@ -329,7 +329,8 @@ class Teacher(mongo_db.BaseDoc):
         return res
 
     @classmethod
-    def single_info(cls, t_id: (str, ObjectId), begin: (str, datetime.datetime) = None, end: (str, datetime.datetime) = None) -> dict:
+    def single_info(cls, t_id: (str, ObjectId), begin: (str, datetime.datetime) = None,
+                    end: (str, datetime.datetime) = None) -> dict:
         """
         老师的个人页面，有图表，持仓和历史数据
         图表数据改为柱装图 2019-9-17
@@ -356,7 +357,7 @@ class Teacher(mongo_db.BaseDoc):
 
     @classmethod
     def single_info2(cls, t_id: (str, ObjectId), begin: (str, datetime.datetime) = None,
-                    end: (str, datetime.datetime) = None) -> dict:
+                     end: (str, datetime.datetime) = None) -> dict:
         """
         老师的个人页面，有图表，持仓和历史数据
         cls.single_info的替代函数，两者的差别是：
@@ -379,7 +380,7 @@ class Teacher(mongo_db.BaseDoc):
         return data
 
     @classmethod
-    def history_and_hold(cls,t_id: (str, ObjectId), prev: int = 60) -> dict:
+    def history_and_hold(cls, t_id: (str, ObjectId), prev: int = 60) -> dict:
         """
         获取老师最近的60天持仓和交易历史
         :param t_id:
@@ -396,7 +397,6 @@ class Teacher(mongo_db.BaseDoc):
         history = [x for x in r]
         hold = [x for x in history if x['case_type'] == "enter"]
         return {"hold": hold, "history": history}
-
 
     @classmethod
     def get_hold(cls, t_id: (str, ObjectId), h_id: (str, ObjectId) = None) -> (None, dict, list):
@@ -418,7 +418,7 @@ class Teacher(mongo_db.BaseDoc):
                 return res[0]
 
     @classmethod
-    def chart_data(cls, t_id: (str, ObjectId), begin: datetime.datetime = None, end: datetime.datetime = None) -> dict:
+    def chart_data(cls, t_id: (str, ObjectId), begin: datetime.datetime = None, end: datetime.datetime = None) -> list:
         """
         查询老师个人的图表数据，目前是输出三种：　２０１８－１１－２５
         1. 按照周切分的胜率柱状图
@@ -440,7 +440,7 @@ class Teacher(mongo_db.BaseDoc):
             "_id": {"$isoWeek": "$enter_time"},
             "teacher_name": {"$first": "$teacher_name"},
             # "cases": {"$push": "$enter_time"},  # 单子的日期
-            "all_case": {"$sum": 1},            # 总单子数
+            "all_case": {"$sum": 1},  # 总单子数
             "win_case": {"$sum": {"$cond": {"if": {"$gte": ["$the_profit", 0]}, "then": 1, "else": 0}}},  # 胜单
             "sum_profit": {"$sum": "$the_profit"},
             "sum_lots": {"$sum": "$lots"}
@@ -456,8 +456,6 @@ class Teacher(mongo_db.BaseDoc):
         res = [x for x in res]
         return res
 
-
-
     @classmethod
     def direction_map(cls, include_raw: bool = True) -> dict:
         """
@@ -467,7 +465,7 @@ class Teacher(mongo_db.BaseDoc):
         :return:
         """
         f = {"create_date": {"$gt": mongo_db.get_datetime_from_str("2018-9-3 0:0:0")}}
-        ts = Teacher.find_plus(filter_dict=f, to_dict=True)
+        ts = Teacher.find(filter_dict=f)
         t_dict = dict()  # 方向和老师的字典
         for t in ts:
             d = t.get("direction")
@@ -499,7 +497,7 @@ class Teacher(mongo_db.BaseDoc):
         :return:
         """
         r_t = ['北仑', '乐天', '秦观', '宗晨', '宇向']  # 真实老师
-        v_t = [                               # 虚拟老师
+        v_t = [  # 虚拟老师
             '豪何', '誉杰', '东晖', '铭远',
             '俊彦', '扬波', '宜修', '凯风',
             '孟林', '子中', '一鸣', '连彬',
@@ -534,10 +532,10 @@ class Teacher(mongo_db.BaseDoc):
                 "from_id": from_id, "direction": "random",
                 "phone": str(n).zfill(4), "password": pw
             }
-            cls.instance(**t1).save_plus()
-            cls.instance(**t2).save_plus()
-            cls.instance(**t3).save_plus()
-            cls.instance(**t).save_plus()
+            cls.instance(**t1).save()
+            cls.instance(**t2).save()
+            cls.instance(**t3).save()
+            cls.instance(**t).save()
 
     @classmethod
     def trade_history(cls, t_id: ObjectId, filter_dict: dict, page_size: int = 50, can_json: bool = False) -> list:
@@ -546,6 +544,7 @@ class Teacher(mongo_db.BaseDoc):
         :param t_id:  老师id
         :param filter_dict:  查询条件字典,
         :param page_size:  一页有多少条记录?
+        :param can_json:
         :return:
         """
         filter_dict["teacher_id"] = t_id
@@ -555,7 +554,7 @@ class Teacher(mongo_db.BaseDoc):
         ses = mongo_db.get_conn(table_name="trade")
         args = {
             "filter": filter_dict,
-            "sort": sort_list,   # 可能是None,但是没问题.
+            "sort": sort_list,  # 可能是None,但是没问题.
             "projection": projection,
             "limit": page_size
         }
@@ -594,9 +593,20 @@ class Teacher(mongo_db.BaseDoc):
         } for x in a_list]  # 添加每月胜率
         return a_list
 
+    @classmethod
+    def selector_data(cls, project: list = None) -> list:
+        """
+        获取老师的选择器对象
+        :return:
+        """
+        f = {"native": True, "direction": {"$exists": False}}
+        p = ["_id", "name"] if project is None else project
+        r = cls.find(filter_dict=f, projection=p)
+        resp = [x for x in r]
+        return resp
+
 
 if __name__ == "__main__":
     """查询单个老师的持仓记录"""
-    t_id = ObjectId("5b8c5451dbea62189b5c28ed")
-    Teacher.chart_data(t_id=t_id)
+    print(Teacher.count(filter_dict={}))
     pass

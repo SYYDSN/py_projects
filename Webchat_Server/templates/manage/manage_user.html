@@ -1,0 +1,142 @@
+{% extends "manage/standard_page.html" %}
+
+{% block css %}
+   <link rel="stylesheet" href="/static/css/manage/manage_user.css">
+{% endblock %}
+
+{% block show_area %}
+
+    <div class="right_top">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="请输入搜索关键字...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Go!</button>
+              </span>
+        </div>
+    </div>
+
+    <div class="user_list_outer">
+        <div class="user_list_inner">
+            <div class="insert_div">
+                <div class="left">
+                    <i class="fa fa-list-ul"></i>
+                    <span id="clear_condition">所有信息</span>
+                </div>
+                <div class="right">
+                    <button id="add_user" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                        添加用户
+                    </button>
+                </div>
+            </div>
+            <div class="table_outer">
+                <table id="user_list" class="table table-hover">
+                    <tr class="info">
+                        <th class="select"></th>
+                        <th>账户</th>
+                        <th>权限组</th>
+                        <th>姓名</th>
+                        <th>部门</th>
+                        <th>创建日期</th>
+                        <th>用户状态</th>
+                        <th>操作</th>
+                    </tr>
+                    {% for user in users %}
+                        <tr id="{{ user._id }}">
+                            <td  class="select">
+                                <input  data-id="{{ user._id }}" type="checkbox" >
+                            </td>
+                            <td class="user_name">{{ user.user_name }}</td>
+                            <td data-id="{{ user.role_id }}" class="role">
+                                {{ user.role_name }}
+                            </td>
+                            <td class="nick_name">{{ user.nick_name }}</td>
+                            <td data-id="{{ user.dept_id }}" class="dept">{{ user.dept_name if user.dept_name else "默认部门" }}</td>
+                            <td class="create_time">{{ user.time | short_date2 }}</td>
+                            <td data-status="{{ user.status }}" class="status">{{ "正常" if user.status == 1 else "禁用" }}</td>
+                            <td class="operation">
+                                <button data-id="{{ user._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_user">编辑</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="bottom_div">
+                <div class="left">
+                    <input type="checkbox" id="check_all">
+                    <span>全选</span>
+                    <button id="delete_user" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除
+                    </button>
+                </div>
+                <div class="right">
+                    <i id="prev_page" class="fa fa-caret-left"></i>
+                    <span id="page_count">{{ current_page }}/{{ total_page }}</span>
+                    <i id="next_page" class="fa fa-caret-right"></i>
+                    <input type="text" id="page_num">
+                    <button id="jump_btn" type="button" class="btn btn-sm btn-default btn-primary">
+                        Go
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--弹框部分-->
+    <div class="modal_outer">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 id="modal_title">
+                    添加用户
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line">
+                    <label>工作组</label>
+                        <div class="my_input dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span></span>
+                                <span data-role-id="" class="current_role"></span>
+                                <span class="caret"></span>
+                            </button>
+                          <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                            {% for role in roles %}
+                                <li data-id="{{ role._id }}" class="select_role">{{ role.role_name }}</li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                </div>
+                <div class="line">
+                    <label>姓名</label><input type="text" id="nick_name">
+                </div>
+                <div class="line">
+                    <label>账户</label><input type="text" id="user_name">
+                    </div>
+                <div class="line">
+                    <label>密码</label><input type="password" id="u_password1">
+                    </div>
+                <div class="line">
+                    <label>重复密码</label><input type="password" id="u_password2">
+                </div>
+                <div class="line">
+                    <label>用户状态</label>
+                    <div class="my_status">
+                        <button class="left status_value select_status" data-value="1">正常</button>
+                        <button class="right status_value" data-value="0">禁用</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal_bot">
+                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
+                <button id="submit" class="btn btn-md btn-primary last">保存</button>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/manage/jquery.md5.js"></script>
+    <script src="/static/js/manage/manage_user.js"></script>
+{% endblock %}

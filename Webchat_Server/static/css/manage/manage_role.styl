@@ -1,0 +1,211 @@
+default_blue = #286090
+.right_main
+    background-color #ebedf0
+    height 55px
+    .right_top
+        width 100%
+        font-size 16px
+        > .input-group
+            padding 10px 15px
+            > .form-control
+                background-color #d3d3d3
+                border none
+                border-top-left-radius 8px !important
+                border-bottom-left-radius 8px !important
+                -moz-border-radius-topleft 8px !important
+                -moz-border-radius-bottomleft 8px !important
+            button
+                background-color #d3d3d3
+                border-top-right-radius 8px !important
+                border-bottom-right-radius 8px !important
+                -moz-border-radius-topright 8px !important
+                -moz-border-radius-bottomright 8px !important
+    .role_list_outer
+        min-height calc(100% - 55px)
+        width 100%
+        padding 80px 30px 0 30px
+        height calc(100% - 55px)
+        .role_list_inner
+            height calc(100% - 30px)
+            width 100%
+            background-color #fefefe
+            padding 10px 20px 30px 20px
+            .insert_div
+                width 100%
+                height 50px
+                display flex
+                flex-direction row
+                justify-content space-between
+                align-items center
+                > .left:hover
+                    cursor pointer
+                > .left
+                    > i
+                        color default_blue
+                        margin-right 1em
+                    > #clear_condition
+                        color default_blue
+                > .right
+                    #add_role
+                        background-color default_blue
+            .table_outer
+                min-height calc(100% - 100px)
+                overflow-y scroll
+                #role_list
+                    .select
+                        width 30px
+                    tr
+                        th
+                            border-top none
+                            text-align center
+                            color rgba(113, 113, 113, 1)
+                        td
+                            text-align center
+                            color rgba(127, 124, 124, 0.9)
+                        > .rules
+                            overflow-y ellipsis
+
+            .bottom_div
+                height 50px
+                width 100%
+                display flex
+                flex-direction row
+                justify-content space-between
+                align-items center
+                > .left
+                    color default_blue
+                > .right
+                    color default_blue
+                    font-size 16px
+                    display flex
+                    flex-direction row
+                    justify-content center
+                    align-items center
+                    #page_num
+                        width 50px
+                        border 1px solid #d3d3d3
+                        border-radius 10px
+                        padding 4px
+                        margin-right 10px
+                    > .fa
+                        font-size 36px
+                        padding 0 15px
+                    > .fa:hover
+                        cursor pointer
+
+    /*modal部分*/
+    .modal_outer
+        position absolute
+        top 0
+        left 0
+        width 100%
+        height 100%
+        z-index: 9999
+        float left
+        background-color rgba(180, 180, 180, 0.9)
+        display flex
+        flex-direction row
+        justify-content center
+        align-items center
+        display none
+        > .modal_inner
+            width 600px
+            height 500px
+            margin-top -20%
+            border-radius 5px
+            background-color rgba(255, 255, 255, 1)
+            border 1px solid rgba(200, 200, 200, 1)
+            .modal_top
+                display flex
+                flex-direction row
+                justify-content center
+                align-items center
+                border-bottom 1px solid rgba(160, 160, 160, 1)
+                > h3
+                    color rgba(150, 150, 150, 1)
+            .modal_mid
+                padding 20px 0
+                .line
+                    width 100%
+                    display flex
+                    flex-direction row
+                    justify-content center
+                    align-items center
+                    padding 15px 50px 15px 15px
+                    > .all_rules
+                        width 100%
+                        list-style-type none
+                        height 240px
+                        overflow-y scroll
+                        padding 20px
+                        border 1px solid rgba(160, 160, 160, 1)
+                        > li
+                            display flex
+                            flex-direction row
+                            justify-content flex-start
+                            align-items center
+                            border 1px solid lightgrey
+                            border-radius 6px
+                            padding 5px 10px
+                            margin-bottom 5px
+                            >.right
+                                width 20em
+                                >.inner_line
+                                    width 100%
+                                    min-height 37px
+                                    display flex
+                                    flex-direction row
+                                    justify-content flex-start
+                                    align-items center
+                                    border-bottom 1px solid lightgrey
+                                    >.operate
+                                        width 3em
+                                        display inline-block
+                                        padding-left 8px 20px
+                                        color #337ab7
+                                        text-align center
+                                        font-size 16px
+                                    > .rule_value
+                                        display inline-block
+                                        width 3em
+                                        text-align center
+                                        margin 0.5em
+                                        color rgba(51, 51, 51, 1)
+                                        background-color lightgrey
+                                        border 1px solid rgba(160, 160, 160, 1)
+                                        border-radius 2px
+                                    > .rule_value:hover
+                                        cursor pointer
+                                    > .select_value
+                                        color #ffffff
+                                        background-color #337ab7
+                                        border-color #337ab7
+
+
+                                >.last_inner_line
+                                    border-bottom none
+                            > .left
+                                width calc(100% - 20em)
+                                display flex
+                                flex-direction column
+                                justify-content center
+                                align-items center
+                                >.view_name
+                                    font-size 16px
+                                    text-align center
+                                    color #337ab7
+                                >.view_desc
+                                    padding 3px 5px
+            .modal_bot
+                padding-bottom 20px
+                display flex
+                flex-direction row
+                justify-content center
+                align-items center
+                > button
+                    padding-left 30px
+                    padding-right 30px
+                > .first
+                    margin-right 10px
+                > .last
+                    margin-left 10px

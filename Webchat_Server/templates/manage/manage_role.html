@@ -1,0 +1,151 @@
+{% extends "manage/standard_page.html" %}
+
+{% block css %}
+   <link rel="stylesheet" href="/static/css/manage/manage_role.css">
+{% endblock %}
+
+{% block show_area %}
+
+    <div class="right_top">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="请输入搜索关键字...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Go!</button>
+              </span>
+        </div>
+    </div>
+
+    <div class="role_list_outer">
+        <div class="role_list_inner">
+            <div class="insert_div">
+                <div class="left">
+                    <i class="fa fa-list-ul"></i>
+                    <span id="clear_condition">所有信息</span>
+                </div>
+                <div class="right">
+                    <button id="add_role" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                        添加角色
+                    </button>
+                </div>
+            </div>
+            <div class="table_outer">
+                <table id="role_list" class="table table-hover">
+                    <tr class="info">
+                        <th class="select"></th>
+                        <th>角色/权限组名</th>
+                        <th>成员数</th>
+                        <th>操作</th>
+                    </tr>
+                    {% for role in roles %}
+                        <tr id="{{ role._id }}">
+                            <td  class="select">
+                                <input data-id="{{ role._id }}" type="checkbox" >
+                            </td>
+                            <td class="role_name">{{ role.role_name }}</td>
+                            <td class="user_count">{{ role.user_count if role.user_count else 0 }}</td>
+                            <td class="operation">
+                                <button data-name="{{ role.role_name }}" data-id="{{ role._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_role">编辑</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="bottom_div">
+                <div class="left">
+                    <input type="checkbox" id="check_all">
+                    <span>全选</span>
+                    <button id="delete_role" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除
+                    </button>
+                </div>
+                <div class="right">
+                    <i id="prev_page" class="fa fa-caret-left"></i>
+                    <span id="page_count">{{ current_page }}/{{ total_page }}</span>
+                    <i id="next_page" class="fa fa-caret-right"></i>
+                    <input type="text" id="page_num">
+                    <button id="jump_btn" type="button" class="btn btn-sm btn-default btn-primary">
+                        Go
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--弹框部分-->
+    <div class="modal_outer">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 data-current-id="" id="modal_title">
+                    添加角色
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line">
+                    <label>角色名</label><input type="text" id="role_name">
+                    </div>
+                <div class="line">
+                    <ul class="all_rules">
+                        {% for rule in rules %}
+                            <li id="{{ rule._id }}" data-url="{{ rule.url_path }}" class="rule">
+                                <div class="left">
+                                    <div title="{{ rule.url_path }}" class="view_name">{{ rule.name }}</div>
+                                    <div title="{{ rule.url_path }}" class="view_desc">{{ rule.desc }}</div>
+                                </div>
+                                <div class="right" data-url="{{ rule.url_path }}">
+                                    <div class="inner_line view_rule">
+                                        <span class="operate">
+                                            访问
+                                        </span>
+                                        {% for item in rule.rules.get('view', dict()) %}
+                                           {% if loop.index0 == 0 %}
+                                                <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
+                                           {% else %}
+                                               <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
+                                           {% endif %}
+                                       {% endfor %}
+                                    </div>
+                                    <div class="inner_line edit_rule">
+                                        <span class="operate">
+                                            修改
+                                        </span>
+                                        {% for item in rule.rules.get('edit', dict()) %}
+                                           {% if loop.index0 == 0 %}
+                                                <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
+                                           {% else %}
+                                               <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
+                                           {% endif %}
+                                       {% endfor %}
+                                    </div>
+                                   <div class="inner_line delete last_inner_line">
+                                        <span class="operate last_operate">
+                                            删除
+                                        </span>
+                                        {% for item in rule.rules.get('delete', dict()) %}
+                                           {% if loop.index0 == 0 %}
+                                                <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
+                                           {% else %}
+                                               <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
+                                           {% endif %}
+                                       {% endfor %}
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+            </div>
+            <div class="modal_bot">
+                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
+                <button id="submit" class="btn btn-md btn-primary last">保存</button>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/manage/manage_role.js"></script>
+{% endblock %}

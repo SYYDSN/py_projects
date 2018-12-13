@@ -7,7 +7,12 @@ import warnings
 import datetime
 import calendar
 import hashlib
+import functools
 from flask import request
+from flask.views import MethodView
+from flask import Flask
+from flask import Blueprint
+from collections import OrderedDict
 from uuid import uuid4
 from bson.objectid import ObjectId
 from bson.code import Code
@@ -15,6 +20,7 @@ from bson.errors import InvalidId
 from bson.dbref import DBRef
 from bson.son import SON
 from bson.binary import Binary
+import socket
 import numpy as np
 import re
 import math
@@ -26,6 +32,7 @@ from pymongo import WriteConcern
 from pymongo.collection import Collection
 from log_module import get_logger
 from pymongo import ReturnDocument
+from pymongo.results import *
 import gridfs
 from pymongo.errors import *
 import warnings
@@ -1712,7 +1719,7 @@ class BaseDoc:
         """
         table_name = cls.get_table_name()
         ses = get_conn(table_name)
-        result = ses.count(filter=filter_dict, session=session, **kwargs)
+        result = ses.count_documents(filter=filter_dict, session=session, **kwargs)
         return result
 
     @classmethod
@@ -1776,56 +1783,21 @@ class BaseDoc:
         return result
 
     @classmethod
-    def find_one(cls, filter_dict: dict = None, *args, **kwargs) -> dict:
+    def find_one(cls, filter_dict: dict = None, can_json: bool = False, *args, **kwargs) -> dict:
         """
         根据条件查找对象,返回单个对象的实例
         :param filter_dict:
+        :param can_json:
         :param args:
         :param kwargs:
         :return:
         """
         ses = cls.get_collection()
         result = ses.find_one(filter=filter_dict, *args, **kwargs)
-        return result
-
-    @classmethod
-    def find_one_plus(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
-                      instance: bool = False, can_json: bool = False):
-        """
-        find_one的增强版，有sort的功能，在查询一个结果的时候，比sort效率高很多
-        同理也需要一个find_plus作为find的增强版
-        :param filter_dict:  查询的条件，
-        :param sort_dict: 排序的条件  比如: {"time": -1}  # -1表示倒序
-        :param projection:    投影数组,决定输出哪些字段?
-        :param instance: 返回的是实例还是doc对象？默认是doc对象
-        :param can_json: 是否转为可json 的dict?这个有联动性,can_json为真instance一定未假
-        :return: None, dict,实例或者doc对象。
-        """
         if can_json:
-            instance = False
-        table_name = cls._table_name
-        ses = get_conn(table_name=table_name)
-        if sort_dict is None or len(sort_dict) == 0:
-            result = ses.find_one(filter=filter_dict)
+            return to_flat_dict(result)
         else:
-            sort_list = [(k, v) for k, v in sort_dict.items()]
-            args = {
-                "filter": filter_dict,
-                "sort": sort_list,  # 可能是None,但是没问题.
-                "projection": projection
-            }
-            args = {k: v for k, v in args.items() if v is not None}
-            result = ses.find_one(**args)
-        if result is None:
             return result
-        else:
-            if not instance:
-                if can_json:
-                    return to_flat_dict(result)
-                else:
-                    return result
-            else:
-                return cls(**result)
 
     @classmethod
     def find_one_and_delete(cls, filter_dict: dict, sort_dict: dict = None, projection: list = None,
@@ -1859,9 +1831,6 @@ class BaseDoc:
     def find_one_and_update(cls, filter_dict: dict, update_dict: dict, projection: list = None, sort_dict: dict = None, upsert: bool = True,
                             return_document: str="after"):
         """
-        本方法是find_one_and_update和find_alone_and_update的增强版.推荐使用本方法!
-        和本方法相比find_one_and_update和find_alone_and_update更简单易用.
-        本方法更灵活,只是在设置参数时要求更高.
         找到一个文档然后更新它，(如果找不到就插入)
         :param filter_dict: 查找时匹配参数 字典
         :param update_dict: 更新的数据，字典,注意例子中参数的写法,有$set和$inc两种更新方式.
@@ -2825,6 +2794,8 @@ class MyView(MethodView):
         :return:
         """
         res = []
+        """navs是引用传值,这里要小心了,第一次需要拷贝一下,防止影响别人调用"""
+        nav_list = navs.copy() if rules is None else navs
         if rules is None:
             """先计算rules的值"""
             if isinstance(user, dict):
@@ -2843,7 +2814,7 @@ class MyView(MethodView):
                     else:
                         if role_id == self.__class__._root_role:
                             """是管理员"""
-                            res = navs
+                            res = nav_list
                             return res       # 管理员拥有所有页面的访问权
                         else:
                             ses = get_conn(table_name=role_table)
@@ -2852,14 +2823,14 @@ class MyView(MethodView):
                                 ms = "无效的role_id: {}".format(role_id)
                                 raise ValueError(ms)
                             else:
-                                all_rules = role.get("rules")
-                                rules = all_rules.get("view", dict())
-                                res.extend(self.check_nav(navs=navs, user=user, rules=rules))
+                                rules = role.get("rules", dict())
+                                # rules = all_rules.get("view", dict())
+                                res.extend(self.check_nav(navs=nav_list, user=user, rules=rules))
             else:
                 ms = "错误的user对象:{}".format(user)
                 raise ValueError(ms)
         else:
-            for nav in navs:
+            for nav in nav_list:
                 if "children" in nav:
                     children = nav['children']
                     children = self.check_nav(navs=children, user=user, rules=rules)
@@ -2867,7 +2838,8 @@ class MyView(MethodView):
                     res.append(nav)
                 else:
                     url_path = nav['path']
-                    value = rules.get(url_path, 0)
+                    value_dict = rules.get(url_path, dict())
+                    value = value_dict.get("view", 0)
                     if value == 0:
                         pass
                     else:
@@ -2927,8 +2899,8 @@ class MyView(MethodView):
                             raise ValueError(ms)
                         else:
                             rules = role.get("rules", dict())
-                            operate_rules = rules.get(operate, dict())
-                            value = operate_rules.get(url_path, 0)
+                            operate_rules = rules.get(url_path, dict())
+                            value = operate_rules.get(operate, 0)
                             res = cls._get_filter(user_id=user['_id'], access_value=value, operate=operate)
         else:
             ms = "user_dict必须字典类型"

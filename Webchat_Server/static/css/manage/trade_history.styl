@@ -1,0 +1,219 @@
+default_blue = #286090
+title_grey = rgba(113, 113, 113, 1)
+text_grey = rgba(127, 124, 124, 0.9)
+.right_main
+    background-color #ebedf0
+    /*顶部搜索区域开始*/
+    .right_top
+        width 100%
+        font-size 16px
+        height 50px
+    /*顶部搜索区域开始*/
+    .code_list_outer
+        min-height calc(100% - 55px)
+        width 100%
+        padding 80px 30px 0 30px
+        height calc(100% - 55px)
+        .code_list_inner
+            height calc(100% - 30px)
+            width 100%
+            background-color #fefefe
+            padding 10px 20px 30px 20px
+            .insert_div
+                width 100%
+                height 50px
+                display flex
+                flex-direction row
+                justify-content space-between
+                align-items center
+                > .left:hover
+                    cursor pointer
+                > .left
+                    width 10%
+                    > i
+                        color default_blue
+                        margin-right 1em
+                    > #clear_condition
+                        color default_blue
+                > .right
+                    width 90%
+                    display flex
+                    flex-direction row
+                    justify-content flex-end
+                    align-items center
+                    >.select_group
+                        display flex
+                        flex-direction row
+                        justify-content flex-end
+                        align-items center
+                        //width calc(100% - 100px)
+                        padding-right 30px
+                        color title_grey
+                        >.small_title
+                            font-weight 700
+                            margin-right 30px
+                        >div
+                            margin-left 20px
+                            display flex
+                            flex-direction row
+                            justify-content flex-start
+                            align-items center
+                            >label
+                                font-weight 400
+                            >input
+                                -moz-outline-radius 5px
+                                border 1px solid rgba(200, 200, 200, 1)
+                                width 8em
+                                height 30px
+                                margin-left 5px
+                                padding-left 10px
+                                border-radius 5px
+                        >.my_input
+                                position relative
+                                height 30px
+                                >.deposit
+                                    color default_blue
+                                >button
+                                    height 30px
+                                    background-color #eee
+                                    border 1px solid #c8c8c8
+                                    >.current_value
+                                        display inline-block
+                                        width 5em
+                                >ul
+                                    min-width 5em
+                                    width 100%
+                                    >li
+                                        width 100%
+                                        text-align center
+                                    >li:hover
+                                        cursor pointer
+                                        background-color #dfdfdf
+                                        border-bottom 1px solid #c1c1c1
+                                        border-radius 2px 2px 2px #c1c1c1
+                    >.btn-default
+                        margin-left 15px
+
+            .table_outer
+                min-height calc(100% - 100px)
+                overflow-y scroll
+                > .table
+                    tr
+                        th
+                            border-top none
+                            text-align center
+                            color title_grey
+                        td
+                            text-align center
+                            color text_grey
+
+            .bottom_div
+                height 50px
+                width 100%
+                display flex
+                flex-direction row
+                justify-content space-between
+                align-items center
+                > .left
+                    color default_blue
+                > .right
+                    color default_blue
+                    font-size 16px
+                    display flex
+                    flex-direction row
+                    justify-content center
+                    align-items center
+                    #page_num
+                        width 50px
+                        border 1px solid #d3d3d3
+                        border-radius 10px
+                        padding 4px
+                        margin-right 10px
+                    > .fa
+                        font-size 36px
+                        padding 0 15px
+                    > .fa:hover
+                        cursor pointer
+
+    /*modal部分*/
+    .modal_outer
+        position absolute
+        top 0
+        left 0
+        width 100%
+        height 100%
+        z-index: 9999
+        float left
+        background-color rgba(180, 180, 180, 0.9)
+        display flex
+        flex-direction row
+        justify-content center
+        align-items center
+        display none
+        > .modal_inner
+            width 500px
+            height 560px
+            margin-top -20%
+            border-radius 5px
+            background-color rgba(255, 255, 255, 1)
+            border 1px solid rgba(200, 200, 200, 1)
+            .modal_top
+                display flex
+                flex-direction row
+                justify-content center
+                align-items center
+                border-bottom 1px solid rgba(160, 160, 160, 1)
+                > h3
+                    color rgba(150, 150, 150, 1)
+            .modal_mid
+                padding 20px 0
+                .line
+                    width 100%
+                    display flex
+                    flex-direction row
+                    justify-content center
+                    align-items center
+                    padding 15px 50px 15px 15px
+                    font-size 16px
+                    > label
+                        display block
+                        text-align center
+                        width 30%
+                        font-weight 400
+                    >.my_input
+                        width calc(100% - 6em) !important
+                        >input
+                            width 100%
+                            border 1px solid rgba(200, 200, 200, 1)
+                            border-radius 5px
+                            padding 8px
+                        >.btn
+                            width 100%
+                            display flex
+                            flex-direction row
+                            justify-content flex-end
+                            align-items center
+                            >.current_value
+                                display block
+                                min-height 1.5em
+                                width 95%
+                        >ul
+                            width 100%
+                            >li
+                                width 100%
+            .modal_bot
+                padding-bottom 20px
+                display flex
+                flex-direction row
+                justify-content center
+                align-items center
+                > button
+                    padding-left 30px
+                    padding-right 30px
+                > .first
+                    margin-right 10px
+                > .last
+                    margin-left 10px
+
+
+

@@ -1,0 +1,56 @@
+{% extends "manage/template.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/manage/login.css">
+{% endblock %}
+
+{% block body %}
+    <div class="top">
+        {{ project_name }}
+    </div>
+    <div class="outer">
+        <div class="inner">
+            <div class="title">
+                <span class="sep"></span>
+                <span class="my_h1">用户登录</span>
+            </div>
+            <div class="content">
+                <div class="line">
+                    <div class="left">
+                        <span>用</span>
+                        <span>户</span>
+                        <span>名</span>
+                    </div>
+                    <div class="right">
+                        <span>:</span>
+                        <input type="text" id="user_name" placeholder="请输入账户名">
+                    </div>
+                </div>
+                <div class="warning" id="name_error">
+                    用户名不能为空
+                </div>
+                <div class="line">
+                    <div class="left">
+                        <span>密</span>
+                        <span>码</span>
+                    </div>
+                    <div class="right">
+                        <span>:</span>
+                        <input type="password" id="password" placeholder="请输入密码">
+                    </div>
+                </div>
+                <div class="warning" id="pwd_error">
+                    密码不能为空
+                </div>
+                <div class="line">
+                    <button type="button" id="sub_btn" class="btn btn-primary">登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/manage/jquery.md5.js"></script>
+    <script src="/static/js/manage/login.js"></script>
+{% endblock %}

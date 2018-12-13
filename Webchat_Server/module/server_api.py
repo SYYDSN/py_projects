@@ -50,7 +50,7 @@ class JSAPITicket(mongo_db.BaseDoc):
         res = None
         f = dict()
         s = {"time": -1}
-        one = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+        one = cls.find_one(filter_dict=f, sort=s)
         flag = False
         if one is None:
             flag = True
@@ -156,7 +156,7 @@ class AccessToken(mongo_db.BaseDoc):
         res = None
         f = dict()
         s = {"time": -1}
-        one = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+        one = cls.find_one(filter_dict=f, sort=s)
         flag = False
         if one is None:
             flag = True

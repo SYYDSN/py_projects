@@ -53,7 +53,7 @@ def login() -> str:
         else:
             f = {"phone": phone}
             p = ['phone', 'name', 'password']
-            t = Teacher.find_one_plus(filter_dict=f, projection=p, instance=False)
+            t = Teacher.find_one(filter_dict=f, projection=p)
             if t is None:
                 mes['message'] = "用户不存在"
             else:
@@ -153,7 +153,7 @@ def file_func(action: str = "", table_name: str = ""):
                     head_img = "/teacher/file/view/{}?fid={}".format(table_name, _id)
                     f = {"_id": t_id}
                     u = {"$set": {"head_img": head_img}}
-                    r = Teacher.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                    r = Teacher.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
                     if r is None:
                         mes['message'] = '更新老师头像信息失败'
                     else:
@@ -396,7 +396,7 @@ def process_case_page2(teacher: dict = None):
             if old_pw is None:
                 """修改除密码之外的资料"""
                 u = {"$set": args}
-                r = Teacher.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                r = Teacher.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
                 if r is None:
                     mes['message'] = "更新个人资料失败"
                 else:
@@ -406,7 +406,7 @@ def process_case_page2(teacher: dict = None):
                 if old_pw == teacher['password']:
                     """旧密码正确"""
                     u = {"$set": args}
-                    r = Teacher.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+                    r = Teacher.find_one_and_update(filter_dict=f, update_dict=u, upsert=True)
                     if r is None:
                         mes['message'] = "修改密码失败"
                     else:

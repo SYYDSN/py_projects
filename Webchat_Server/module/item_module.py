@@ -198,7 +198,7 @@ class EventHandler:
                     """关注公众号"""
                     f = {"openid": openid}
                     u = {"$set": {"subscribe": 1}}
-                    WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+                    WXUser.find_one_and_update(filter_dict=f, update_dict=u, upsert=True)
                     # 文本不能换行
                     data = "你好，欢迎关注汇赢智能！ \n 独立创新的智能交易平台，为用户提供全球先进的跟随交易系统以及优质的信号源；完善风控体系，让科技颠覆收益，让智能负责收益！"
                     data = "你好，欢迎关注汇赢智能！ \n 独立创新的智能交易平台,为用户提供全球先进的跟随交易系统以及优质的信号源;完善风控体系,让科技颠覆收益,让智能负责收益!"
@@ -210,7 +210,7 @@ class EventHandler:
                     print(ms)
                     f = {"openid": openid}
                     u = {"$set": {"subscribe": 0}}
-                    WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                    WXUser.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
                 elif event == "scan":
                     """扫码"""
                     event_key = xml['EventKey']  # 场景id
@@ -490,7 +490,7 @@ class TeacherRank(mongo_db.BaseDoc):
         the_time = cur_time - datetime.timedelta(days=7 * prev_week)
         y, w, d = the_time.isocalendar()  # 年, 全年的第几周? 这天是星期几?
         f = {"year": y, "week": w}
-        res = cls.find_one_plus(filter_dict=f, instance=False)
+        res = cls.find_one(filter_dict=f)
         if res is None or re_build:
             """没有查到/强行重新生成,生成一个新的记录"""
             begin = mongo_db.get_datetime_from_str("{}".format((the_time - datetime.timedelta(days=d - 1)).strftime("%F")))
@@ -506,7 +506,7 @@ class TeacherRank(mongo_db.BaseDoc):
             rank = [{"t_id": k, "win": v['win']} for k, v in rank_dict.items()]
             rank.sort(key=lambda obj: obj['win'], reverse=True)
             u = {"$set": {"begin": begin, "end": end, "time": datetime.datetime.now(), "rank": rank}}
-            res = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+            res = cls.find_one_and_update(filter_dict=f, update_dict=u, upsert=True)
         else:
             pass
         return res
@@ -601,7 +601,7 @@ class Score(mongo_db.BaseDoc):
             """重新计算历史积分"""
             f = {"user_id": user_id}
             s = {"time": -1}
-            rs = cls.find_plus(filter_dict=f, sort_dict=s, to_dict=True)
+            rs = cls.find(filter_dict=f, sort_dict=s)
             score = 0
             inserts = list()
             init = False  # 初始化过？
@@ -655,7 +655,7 @@ class Score(mongo_db.BaseDoc):
         res = list()
         f = {"follow.0": {"$exists": True}}  # 有关注老师的用户
         p = ['_id', "follow", 'score']
-        us = WXUser.find_plus(filter_dict=f, projection=p, to_dict=True)
+        us = WXUser.find(filter_dict=f, projection=p)
         now = datetime.datetime.now()
         rank = TeacherRank.get_rank(cur_time=now)
         """扣分:上周排行第一 -500, 第二 -300, 第三-200, 第四第五-100， >6 -50"""
@@ -703,7 +703,7 @@ class Score(mongo_db.BaseDoc):
                     """积分不够扣分的,直接解除关注就行了"""
                     f = {"_id": u_id}
                     u = {"$set": {"follow": []}}
-                    r = WXUser.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=False)
+                    r = WXUser.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
                     if r is None:
                         ms = "用户:{} 解除关注失败".format(u_id)
                         print(ms)
@@ -782,7 +782,7 @@ class WXUser(mongo_db.BaseDoc):
             init = cls.instance(**info_dict)
             init = init.get_dict(ignore=['_id', "openid"])
             u = {"$set": init}
-            res = cls.find_one_and_update_plus(filter_dict=f, update_dict=u, upsert=True)
+            res = cls.find_one_and_update(filter_dict=f, update_dict=u, upsert=True)
         return res
 
     @classmethod

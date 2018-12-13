@@ -24,6 +24,7 @@ from module.teacher_module import Teacher
 from werkzeug.contrib.cache import RedisCache
 from log_module import get_logger
 from log_module import recode
+from module.admin_module import Admin
 from module.item_module import WXUser
 
 
@@ -86,6 +87,23 @@ def clear_platform_session():
     keys = list(session.keys())
     [session.pop(x, None) for x in keys]
     return False
+
+
+def check_admin_session(f):
+    """检测管理员用户是否登录的装饰器"""
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        admin_id = session.get("_id")  # 检测session中的user_id
+        if isinstance(admin_id, ObjectId):
+            admin = Admin.find_by_id(o_id=admin_id, to_dict=True)
+        else:
+            admin = None
+        if admin is None:
+            return redirect(url_for("manage_blueprint.login_func"))
+        else:
+            kwargs['admin'] = admin
+            return f(*args, **kwargs)
+    return decorated_function
 
 
 def check_platform_session(f):
