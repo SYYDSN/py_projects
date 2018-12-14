@@ -8,6 +8,8 @@ python的插件也是要安装的
 
 sudo apt install uwsgi-plugin-python3
 
+最好是 sudo apt-get install uwsgi-plugins-all 一步到位
+
 你可以用 --version查看版本我当前的版本是2.015
 
 uwsgi有独立部署和作为web容器的后端部署两种方式.这两种方式最主要的差别是前者可以直接访问,而后者需要部署在类似nginx这样的服务器的后面.

@@ -62,5 +62,39 @@ uwsgi 部署方式.
 2. 安装python3插件
     apt install uwsgi-plugin-python3
     或者直接 sudo apt install uwsgi-plugins-all 安装所有的插件
-uwsgi --http-socket 127.0.0.1:7011 --plugin python3 --wsgi-file test_server.py --callable app --process 8 --threads 2
+<1>反向代理 
+命令行 uwsgi --http-socket 127.0.0.1:7011 --plugin python3 --wsgi-file test_server.py --callable app --process 8 --threads 2
+nginx配置
+server
+{
+    listen 80;
+    server_name www.bhxxjs.cn;
+    location / {
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://47.99.105.196:7005;  # 反向代理配置
+    }
+    access_log logs/www.bhxxjs.cn_access.log;
+}
+<2> 纯后台. 反向代理的速度不够快.应该让uwsgi做纯后台,配合nginx.
+命令行 uwsgi --socket 127.0.0.1:7011 --plugin python3 --wsgi-file test_server.py --callable app --process 8 --threads 2
+nginx配置
+server
+{
+    listen 80;
+    server_name www.bhxxjs.cn;
+    location / {
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        include uwsgi_params;  # uwsgi配置
+        uwsgi_pass 127.0.0.1:7005;  # uwsgi配置
+        uwsgi_param UWSGI_CHDIR  /home/web/BiH_site;     #uwsgi 项目目录
+        uwsgi_param UWSGI_SCRIPT bih_server:app;         # uwsgi项目app,bih_server是入口文件的名字.
+    }
+    access_log logs/www.bhxxjs.cn_access.log;
+}
 """

@@ -185,15 +185,35 @@ class ManageTradeView(MyView):
             if key == "history":
                 """交易历史"""
                 render_data['page_title'] = "交易历史"
-                page_index = get_arg(request, "page", 1)
                 selector = Teacher.selector_data()
-                t_ids = [x["_id"] for x in selector]
                 render_data['selector'] = selector
-                access_filter.update({"teacher_id": {"$in": t_ids}})
-                result = Trade.paging_info(filter_dict=access_filter, page_index=page_index)
-                files = result['data']
+                page_index = get_arg(request, "page", 1)
+                page_size = get_arg(request, "size", 15)
+                begin = mongo_db.get_datetime_from_str(get_arg(request, "begin", None))
+                end = mongo_db.get_datetime_from_str(get_arg(request, "end", None))
+                kw = dict()
+                case_type = get_arg(request, "case_type", '')
+                if case_type == "":
+                    pass
+                else:
+                    kw['case_type'] = case_type
+                teacher_id = ObjectId(get_arg(request, "teacher_id", '')) if get_arg(request, "teacher_id", '') != "" else get_arg(request, "teacher_id", '')
+                if isinstance(teacher_id, ObjectId):
+                    kw['teacher_id'] = teacher_id
+                else:
+                    t_ids = [x["_id"] for x in selector]
+                    kw['teacher_id'] = {"$in": t_ids}
+                if isinstance(end, datetime.datetime):
+                    kw['exit_time'] = {"$lte": end}
+                if isinstance(begin, datetime.datetime):
+                    kw['enter_time'] = {"$gte": begin}
+
+                access_filter.update(kw)
+                result = Trade.paging_info(filter_dict=access_filter, page_size=page_size, page_index=page_index)
+                preview = Trade.preview(filter_dict=access_filter)
+                trades = result['data']
                 render_data.update(result)
-                render_data['files'] = files
+                render_data['trades'] = trades
                 return render_template("manage/trade_history.html", **render_data)
             else:
                 return abort(404)

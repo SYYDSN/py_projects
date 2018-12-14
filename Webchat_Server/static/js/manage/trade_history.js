@@ -17,6 +17,8 @@ $(function(){
     // 根据用户选择的条件过滤信息
     var filter_info = function(){
         var args = get_url_arg_dict();
+        var case_type = $(".select_type .current_value").attr("data-id");
+        args['case_type'] = case_type;
         var teacher_id = $(".select_teacher .current_value").attr("data-id");
         args['teacher_id'] = teacher_id;
         var begin = $.trim($("#trade_begin").val());
@@ -34,6 +36,7 @@ $(function(){
         }
         var url = build_url(location.pathname, kw);
         console.log(url);
+        location.href = url;
     };
 
     $("#filter_info").click(function(){
@@ -145,5 +148,18 @@ $(function(){
         }
     });
 
+    /*全选事件*/
+    $("#check_all").click(function(){
+        var checked = $("#check_all:checked").length === 1? true: false;
+        if(checked){
+            $(".table_outer .select >input[type='checkbox']").prop("checked", true);
+        }
+        else{
+            $(".table_outer .select >input[type='checkbox']").prop("checked", false);
+        }
+    });
+
+    // 翻页事件
+    PageHandler();
 
 });

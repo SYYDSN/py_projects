@@ -1205,16 +1205,26 @@ class Trade(Signal):
         process_case(doc_dict=signal, raw=True)
 
     @classmethod
-    def preview(cls, filter_dict: dict ) -> dict:
+    def preview(cls, filter_dict: dict = None) -> dict:
         """
         交易的统计信息预览
         :param filter_dict:
         :return:
         """
+        begin = mongo_db.get_datetime_from_str("2018-8-1")
+        ids = [x['_id'] for x in Teacher.selector_data(project=['_id'])]
+        f = {
+            "teacher_id": {"$in": ids},
+            "case_type": {"$exists": True},
+            "enter_time": {"$exists": True, "$gt": begin}
+        }
         col = cls.get_collection()
         pipeline = []
-        m = {"$match": {"teacher_id": {"$in": Teacher.selector_data(project=['_id'])}}}
+        m = {"$match": f}
         pipeline.append(m)
+        if filter_dict is not None:
+            pipeline.append({"$match": filter_dict})
+            pass
         resp = dict()
         g = {
             "$group":
@@ -1225,7 +1235,7 @@ class Trade(Signal):
                                 {
                                     "branches": [
                                         {
-                                            "case": {"$eq": ["case_type", "exit"]},  # 离场的
+                                            "case": {"$eq": ["$case_type", "exit"]},  # 离场的
                                             "then": "exit"
                                         }
                                     ],
@@ -1246,18 +1256,9 @@ class Trade(Signal):
                                 }
 
                         },
-                    "used_count":
+                    "profit_count":
                         {
-                            "$sum":
-                                {
-                                    "$cond":
-                                        {
-                                            "if": {"$eq": ["$status", 1]},
-                                            "then": 1,
-                                            "else": 0
-                                        }
-                                }
-
+                            "$sum": "$the_profit"
                         }
                 }
         }
@@ -1271,20 +1272,18 @@ class Trade(Signal):
                 """已离场"""
                 temp = x['count']
                 total += temp
-                resp['printed'] = temp  # 已打印
-                resp['not_used'] = x['not_used_count']  # 已打印未使用
-                resp['used'] = x['used_count']  # 已打印已使用
-                resp['sync'] = x['sync_count']  # 已使用已同步过
-                resp['not_sync'] = x['not_sync_count']  # 已使用未同步过
-                resp['related'] = x['related_count']  # 已同步未关联任务
-                resp['output'] = x['output_count']  # 已同步过已关联任务已导出过
-                resp['not_output'] = x['not_output_count']  # 已同步过已关联任务未导出过
+                resp['exit'] = temp                 # 已离场
+                resp['win'] = x['win_count']  # 盈利的单子
+                profit_count = x['profit_count']  # 总盈利
+                resp['profit'] = round(profit_count, 2)  # 单位美元
+
             else:
-                """未立场"""
+                """未离场"""
                 temp = x['count']
                 total += temp
-                resp['deposit'] = temp  # 未打印
+                resp['hold'] = temp  # 持仓
         resp['total'] = total
+        resp['win_rate'] = round((resp['win'] / total) * 100, 1)
         return resp
 
     @classmethod
@@ -1297,7 +1296,7 @@ class Trade(Signal):
         :param page_index:
         :return:
         """
-        filter_dict = {"the_type": "exit"} if filter_dict is None else filter_dict
+        filter_dict = {"case_type": "exit"} if filter_dict is None else filter_dict
         pipeline = []
         m = {"$match": filter_dict}
         s = {"$sort": {"enter_time": -1}}

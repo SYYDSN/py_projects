@@ -52,7 +52,7 @@ def login() -> str:
             mes['message'] = "必要参数不能为空"
         else:
             f = {"phone": phone}
-            p = ['phone', 'name', 'password']
+            p = ['phone', 'name', 'password', "native"]
             t = Teacher.find_one(filter_dict=f, projection=p)
             if t is None:
                 mes['message'] = "用户不存在"

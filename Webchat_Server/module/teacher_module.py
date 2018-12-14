@@ -114,6 +114,7 @@ class Teacher(mongo_db.BaseDoc):
     0001 北仑
 
     默认密码都是 xd123457
+    0000 非攻 是测试账户 密码:Xd@123457
     老师,Message_server项目有一个同名的类，不同的是：
     Message_Server项目下的Teacher类主要负责item_module.Trade.sync_from_signal(生成虚拟老师交易信号)时取老师列表。
     Webchat_Server项目项目下的Teacher类，主要负责老师的管理。（属性，头像的修改）
