@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import abort
 from flask import send_from_directory
+from flask import send_file
 from flask import render_template
 from views.user_views import user_blueprint
 from views.teacher_views import teacher_blueprint
@@ -101,6 +102,12 @@ def validate_token(timestamp: str, nonce: str, signature: str) -> bool:
 
 
 """视图函数"""
+
+
+@app.route("/favicon.ico")
+def favicon_func():
+    """地址栏图标"""
+    return send_file("static/images/favicon.ico", mimetype="image/jpeg")
 
 
 @app.route('/')

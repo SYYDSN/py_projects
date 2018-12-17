@@ -189,8 +189,16 @@ class ManageTradeView(MyView):
                 render_data['selector'] = selector
                 page_index = get_arg(request, "page", 1)
                 page_size = get_arg(request, "size", 15)
-                begin = mongo_db.get_datetime_from_str(get_arg(request, "begin", None))
-                end = mongo_db.get_datetime_from_str(get_arg(request, "end", None))
+                begin = None
+                try:
+                    begin = mongo_db.get_datetime_from_str(get_arg(request, "begin", None))
+                except Exception as e:
+                    print(e)
+                end = None
+                try:
+                    end = mongo_db.get_datetime_from_str(get_arg(request, "end", None))
+                except Exception as e:
+                    print(e)
                 kw = dict()
                 case_type = get_arg(request, "case_type", '')
                 if case_type == "":
@@ -203,14 +211,52 @@ class ManageTradeView(MyView):
                 else:
                     t_ids = [x["_id"] for x in selector]
                     kw['teacher_id'] = {"$in": t_ids}
-                if isinstance(end, datetime.datetime):
-                    kw['exit_time'] = {"$lte": end}
-                if isinstance(begin, datetime.datetime):
-                    kw['enter_time'] = {"$gte": begin}
+                if case_type == "":
+                    """看全部"""
+                    if isinstance(begin, datetime.datetime):
+                        kw['enter_time'] = {"$gte": begin}
+                        if isinstance(end, datetime.datetime):
+                            kw['exit_time'] = {"$lte": end}
+                        else:
+                            pass
+                    else:
+                        if isinstance(end, datetime.datetime):
+                            kw['exit_time'] = {"$lte": end}
+                        else:
+                            pass
+                elif case_type == "enter":
+                    """只看持仓的"""
+                    if isinstance(begin, datetime.datetime):
+                        temp = {"$gte": begin}
+                        if isinstance(end, datetime.datetime):
+                            temp['$lte'] = end
+                            kw['enter_time'] = temp
+                        else:
+                            pass
+                    else:
+                        if isinstance(end, datetime.datetime):
+                            kw['enter_time'] = {"$lte": end}
+                        else:
+                            pass
+                else:
+                    """只看离场的"""
+                    if isinstance(begin, datetime.datetime):
+                        temp = {"$gte": begin}
+                        if isinstance(end, datetime.datetime):
+                            temp['$lte'] = end
+                            kw['exit_time'] = temp
+                        else:
+                            pass
+                    else:
+                        if isinstance(end, datetime.datetime):
+                            kw['exit_time'] = {"$lte": end}
+                        else:
+                            pass
 
                 access_filter.update(kw)
                 result = Trade.paging_info(filter_dict=access_filter, page_size=page_size, page_index=page_index)
                 preview = Trade.preview(filter_dict=access_filter)
+                render_data['preview'] = preview
                 trades = result['data']
                 render_data.update(result)
                 render_data['trades'] = trades

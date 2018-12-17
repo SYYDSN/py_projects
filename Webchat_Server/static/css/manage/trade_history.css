@@ -5,9 +5,29 @@
 /*modal部分*/
 }
 .right_main .right_top {
+  padding: 0 30px;
   width: 100%;
-  font-size: 16px;
+  font-size: 14px;
   height: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+.right_main .right_top >.summary {
+  width: 25%;
+  background-color: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.right_main .right_top >.summary >.title {
+  color: #717171;
+}
+.right_main .right_top >.summary >.value {
+  color: #286090;
 }
 .right_main .code_list_outer {
   min-height: calc(100% - 55px);

@@ -270,7 +270,6 @@ def parse_news(item, b) -> dict:
     """
     id_str = item.get_attribute("id")
     t = datetime.datetime.strptime(id_str, "%Y%m%d%H%M%S%f")
-    w = WebDriverWait(b, timeout=0.01)
     dom = None
     try:
         dom = item.find_element_by_class_name("is-only-text")
@@ -330,24 +329,38 @@ def parse_calendar_data(item) -> dict:
         td_forecast = tds[5].text.strip()  # 预测值
         td_publish = tds[6].text.strip()  # 公布值
         td_effect = tds[7].text.strip()  # 影响
+        d = {
+            "time": a_time,
+            "title": title,
+            "star": star,
+            "prev": td_prev,
+            "forecast": td_forecast,
+            "publish": td_publish,
+            "effect": td_effect
+        }
     else:
-        title = tds[1].text.strip()  #
-        level = re.findall("\d{2}", tds[2].get_attribute("style"))
-        star = 0 if len(level) == 0 else int(int(level[0]) / 20)
-        td_prev = tds[3].text.strip()  # 前值
-        td_forecast = tds[4].text.strip()  # 预测值
-        td_publish = tds[5].text.strip()  # 公布值
-        td_effect = tds[6].text.strip()  # 影响
-    data = {
-        "time": a_time,
-        "title": title,
-        "star": star,
-        "prev": td_prev,
-        "forecast": td_forecast,
-        "publish": td_publish,
-        "effect": td_effect
-    }
-    return data
+        if len(tds) < 7:
+            """无数据"""
+            print(tds[0].text)
+            d = dict()
+        else:
+            title = tds[1].text.strip()  #
+            level = re.findall("\d{2}", tds[2].get_attribute("style"))
+            star = 0 if len(level) == 0 else int(int(level[0]) / 20)
+            td_prev = tds[3].text.strip()  # 前值
+            td_forecast = tds[4].text.strip()  # 预测值
+            td_publish = tds[5].text.strip()  # 公布值
+            td_effect = tds[6].text.strip()  # 影响
+            d = {
+                "time": a_time,
+                "title": title,
+                "star": star,
+                "prev": td_prev,
+                "forecast": td_forecast,
+                "publish": td_publish,
+                "effect": td_effect
+            }
+    return d
 
 
 def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> (list, tuple):

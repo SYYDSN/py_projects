@@ -1283,7 +1283,7 @@ class Trade(Signal):
                 total += temp
                 resp['hold'] = temp  # 持仓
         resp['total'] = total
-        resp['win_rate'] = round((resp['win'] / total) * 100, 1)
+        resp['win_rate'] = 0 if total == 0 else round((resp.get('win', 0) / total) * 100, 1)
         return resp
 
     @classmethod
@@ -1306,11 +1306,11 @@ class Trade(Signal):
                     "direction": 1, "enter_time": 1, "the_type": 1,
                     "teacher_id": 1, "teacher_name": 1, "exit_time": 1,
                     "enter_price": 1, "exit_price": 1, "the_profit": 1,
-                    "formula": 1, "product": 1, "code": 1
+                    "formula": 1, "product": 1, "code": 1, "each_cost": 1
                  }
              }
         pipeline.append(m)
-        pipeline.append(p)
+        # pipeline.append(p)
         pipeline.append(s)
         resp = cls.aggregate(pipeline=pipeline, page_size=page_size, page_index=page_index, ruler=ruler)
         return resp
@@ -1402,7 +1402,7 @@ if __name__ == "__main__":
     #   'exit_price': 69.955,  # 只有平仓才有
     # }
     # send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
-    Trade.preview()
+    Trade.paging_info(filter_dict={'case_type': 'exit', 'teacher_id': ObjectId('5b8c5452dbea62189b5c28f5')})
     pass
 
 

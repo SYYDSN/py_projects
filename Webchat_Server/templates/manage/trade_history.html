@@ -13,29 +13,21 @@
 {% block show_area %}
 
     <div class="right_top">
-        <div class="summary">
-            <span>持仓/离场:</span>
-            <span>{{ preview.hold if preview.hold else 0  }}/{{  }}</span>
+        <div class="summary total">
+            <span class="title">总数:</span>
+            <span class="value">{{ preview.total if preview.total else 0  }}</span>
         </div>
-        <div class="summary">
-            <span>离场:</span>
-            <span></span>
+        <div class="summary exit">
+            <span class="title">离场:</span>
+            <span class="value">{{ preview.exit if preview.exit else 0 }}</span>
         </div>
-        <div class="summary">
-            <span>持仓:</span>
-            <span></span>
+        <div class="summary hold">
+            <span class="title">持仓:</span>
+            <span class="value">{{ preview.hold if preview.hold else 0  }}</span>
         </div>
-        <div class="summary">
-            <span>总数:</span>
-            <span></span>
-        </div>
-        <div class="summary">
-            <span>总数:</span>
-            <span></span>
-        </div>
-        <div class="summary">
-            <span>总数:</span>
-            <span></span>
+        <div class="summary win_rate">
+            <span class="title">胜率:</span>
+            <span class="value">{{ preview.win_rate if preview.win_rate else 0 }}%</span>
         </div>
     </div>
 
@@ -57,7 +49,7 @@
                                 <span data-id="" class="current_value "></span>
                                 <span class="caret"></span>
                             </button>
-                            <ul data-type="teachers" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                            <ul data-type="type" class="types dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
                                 <li onclick="select_value($(this))" data-id="">全部</li>
                                 <li onclick="select_value($(this))" data-id="enter">持仓中</li>
                                 <li onclick="select_value($(this))" data-id="exit">已离场</li>
@@ -73,7 +65,7 @@
                                 <span data-id="" class="current_value "></span>
                                 <span class="caret"></span>
                             </button>
-                            <ul data-type="teachers" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                            <ul data-type="teachers" class="teachers dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
                                 <li onclick="select_value($(this))" data-id="">全部</li>
                                 {% for x in selector %}
                                     <li onclick="select_value($(this))" data-id="{{ x._id }}">{{ x.name }}</li>
@@ -89,13 +81,13 @@
                             <label>
                             开始:
                         </label>
-                        <input type="text" readonly="readonly" id="trade_begin" class="form-control date_picker">
+                        <input type="text" id="trade_begin" class="form-control date_picker">
                         </div>
                         <div class="begin_div">
                             <label>
                             结束:
                         </label>
-                        <input type="text" readonly="readonly" id="trade_end" class="form-control date_picker">
+                        <input type="text" id="trade_end" class="form-control date_picker">
                         </div>
                     </div>
                     <button id="filter_info" type="button" class="btn btn-default btn-sm btn-primary">
@@ -108,7 +100,8 @@
                 <table id="trade_list" class="table table-hover">
                     <tr class="info">
                         <th class="select"></th>
-                        <th>产品</th>
+                        <th>产品代码</th>
+                        <th>产品名称</th>
                         <th>方向</th>
                         <th>老师</th>
                         <th>进场价</th>
@@ -116,14 +109,15 @@
                         <th>盈利(美元)</th>
                         <th>进场时间</th>
                         <th>离场时间</th>
-                        <th>操作</th>
+                        <!--<th>操作</th>-->
                     </tr>
                     {% for trade in trades %}
                         <tr id="{{ trade._id }}">
                             <td  class="select">
                                 <input data-id="{{ trade._id }}" type="checkbox" >
                             </td>
-                            <td class="product" data-id="{{ trade.code }}">{{ trade.product }}</td>
+                            <td class="product_code">{{ trade.code }}</td>
+                            <td class="product_name">{{ trade.product }}</td>
                             <td class="direction" style="color: {{'#e35e57' if trade.direction == '买入' else '#17b640' }}">{{ trade.direction }}</td>
                             <td class="teacher" data-id="{{ trade.teacher_id }}">
                                 {{ trade.teacher_name }}
@@ -135,9 +129,11 @@
                             </td>
                             <td  class="enter_time">{{ trade.enter_time| short_date3 }}</td>
                             <td  class="exit_time">{{ trade.exit_time | short_date3 }}</td>
+                            <!--
                             <td>
                                 <button data-id="{{ trade._id }}" class="change_direction btn btn-xs btn-default btn-primary edit_user">反转方向</button>
                             </td>
+                            -->
                         </tr>
                     {% endfor %}
                 </table>

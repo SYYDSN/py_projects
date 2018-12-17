@@ -17,12 +17,16 @@ $(function(){
     // 根据用户选择的条件过滤信息
     var filter_info = function(){
         var args = get_url_arg_dict();
+        // 离场/持仓
         var case_type = $(".select_type .current_value").attr("data-id");
         args['case_type'] = case_type;
+        // 选择老师
         var teacher_id = $(".select_teacher .current_value").attr("data-id");
         args['teacher_id'] = teacher_id;
+        // 开始日期
         var begin = $.trim($("#trade_begin").val());
         args['begin'] = begin;
+        // 结束日期
         var end = $.trim($("#trade_end").val());
         args['end'] = end;
         var kw = {};
@@ -30,7 +34,11 @@ $(function(){
             var v = args[k];
             if(v === undefined || v === ""){
                // nothing...
-            }else{
+            }
+            else if(k === "page"){
+                kw[k] = 1;
+            }
+            else{
                  kw[k] = v;
             }
         }
@@ -39,9 +47,49 @@ $(function(){
         location.href = url;
     };
 
+    // 查询按钮点击事件
     $("#filter_info").click(function(){
         filter_info();
     });
+
+    // 根据url参数重置所有选择器状态
+    (function(){
+        var kw = get_url_arg_dict();  // 生成url的参数字典
+        // 离场/持仓
+        var case_type = kw['case_type'];
+        if(case_type !== undefined && case_type !== ""){
+            var $types = $(".types li");
+            $types.each(function(){
+                var $li = $(this);
+                var key = $.trim($li.attr("data-id"));
+                if(key === case_type){
+                    $(".select_type .current_value").attr("data-id", key).text($.trim($li.text()));
+                }
+            });
+        }else{}
+        // 选择老师
+        var teacher_id = kw['teacher_id'];
+        if(teacher_id !== undefined && teacher_id !== ""){
+            var $ts = $(".teachers li");
+            $ts.each(function(){
+                var $li = $(this);
+                var key = $.trim($li.attr("data-id"));
+                if(key === teacher_id){
+                    $(".select_teacher .current_value").attr("data-id", key).text($.trim($li.text()));
+                }
+            });
+        }else{}
+        // 开始日期
+        var begin = kw['begin'];
+        if(begin !== undefined && begin !== ""){
+            $("#trade_begin").val(begin);
+        }else{}
+        // 结束日期
+        var end = kw['end'];
+        if(end !== undefined && end !== ""){
+            $("#trade_end").val(end);
+        }else{}
+    })();
 
     // 清除模态框残留信息
     var clear_modal = function(){
