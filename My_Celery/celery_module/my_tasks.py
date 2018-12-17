@@ -7,6 +7,7 @@ if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import requests
 from uuid import uuid4
+import json
 from celery_module.my_celery import app
 
 
@@ -22,7 +23,7 @@ def send_uuid():
 
 @app.task
 def add(x, y):
-    return int(x) + int(y)
+    return json.dumps({"result": int(x) + int(y)})
 
 
 if __name__ == "__main__":

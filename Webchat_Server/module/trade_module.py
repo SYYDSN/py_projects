@@ -306,6 +306,7 @@ def _calculate_exit_trade(trade: dict) -> bool:
     client = mongo_db.get_client()
     t1 = client[mongo_db.db_name][Trade.get_table_name()]
     t2 = client[mongo_db.db_name][Teacher.get_table_name()]
+    resp = False
     with client.start_session(causal_consistency=True) as ses:
         with ses.start_transaction():
             t1_f = {"_id": trade["_id"]}
@@ -324,6 +325,8 @@ def _calculate_exit_trade(trade: dict) -> bool:
             }}
             r2 = t2.find_one_and_update(filter=t2_f, update=t2_u, upsert=True, session=ses)
             print(r2)
+            resp = True
+    return resp
 
 
 def calculate_trade(raw_signal: dict) -> None:
@@ -362,92 +365,99 @@ def calculate_trade(raw_signal: dict) -> None:
         7. profit_amount 历史交易总盈利
         8. profit_ratio 和 win_ratio 盈利率和胜率
         """
-        """计算盈利总额,盈利率"""
-        x = raw_signal
-        # change = x.get("change")
-        teacher_id = x['teacher_id']
-        teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
-        deposit = teacher.get('deposit', 0)
-        profit_amount = teacher.get('profit_amount', 0)
-        deposit_amount = teacher.get('deposit_amount', 0)
-        case_count = teacher.get('case_count', 0)
-        win_count = teacher.get('win_count', 0)
-        product = x['product']
-        """取离场价格"""
-        f = {"code": product_map[product]['code']}
-        ss = [("platform_time", -1)]
-        ses = mongo_db.get_conn(table_name="quotation")
-        one = ses.find_one(filter=f, sort=ss)
-        if one is not None:
-            exit_price = one['price']
-            x['exit_time'] = datetime.datetime.now()
-        else:
-            exit_price = x['exit_price']  # 离场点位
-        """计算各种参数"""
-        enter_price = float(x['enter_price']) if isinstance(x['enter_price'], str) else x['enter_price']  # 进场点位
-        info = product_map[product]
-        p_v = info['p_val']   # 点值
-        p_d = info['p_diff']  # 点差
-        p_a = info['p_arg']  # 系数
-        comm = info['comm']   # 每手佣金
-        t_c = x['t_coefficient']                  # 空单/多单
-        """"""
-        # each_profit_dollar = ((exit_price - enter_price) * t_c - p_d/p_a) * p_v * p_a  # 2018-9-20废止, 每手盈利美元毛利(尚未扣除佣金)
-        each_profit_dollar = (exit_price - enter_price) * t_c * p_v * p_a  # 每手盈利美元毛利(尚未扣除佣金)
-        """计算公式(尚未扣除佣金)"""
-        formula = "(exit_price - enter_price) * t_c * p_v * p_a=({} - {}) * {} * {} * {}".format(exit_price,
-                                                                                                 enter_price, t_c, p_v,
-                                                                                                 p_a)
-        x['formula'] = formula
-        each_profit = each_profit_dollar - comm
-        x['each_profit_dollar'] = each_profit_dollar
-        x['each_profit'] = each_profit
-
-        x['p_val'] = p_v
-        x['p_diff'] = p_d
-        x['p_arg'] = p_a
-        x['comm'] = comm
-        lots = 1  # 最少手数
-        try:
-            lots = x['lots']
-        except Exception as e:
-            print(e)
-            print(x)
-        the_profit = lots * each_profit  # 本次交易盈利
-        x['the_profit'] = the_profit
-        if the_profit >= 0:
-            win_count += 1
+        """计算盈利总额,盈利率并保存老师对应的统计信息"""
+        flag = _calculate_exit_trade(trade=raw_signal)
+        if not flag:
+            title = "_calculate_exit_trade 函数没有正确的返回:{}".format(datetime.datetime.now())
+            content = "trade={}".format(raw_signal)
+            send_mail(title=title, content=content)
         else:
             pass
-        case_count += 1
-        win_ratio = round((win_count / case_count) * 100, 2)
-        deposit += the_profit
-        profit_amount += the_profit
-        print(x)
-        print(teacher)
-        profit_ratio = round((profit_amount / deposit_amount) * 100, 2)  # 盈利率
-        client = mongo_db.get_client()
-        t1 = client[mongo_db.db_name][Trade.get_table_name()]
-        t2 = client[mongo_db.db_name][Teacher.get_table_name()]
-        with client.start_session(causal_consistency=True) as ses:
-            with ses.start_transaction():
-                t1_f = {"_id": x["_id"]}
-                t1_u = {"$set": {k: v for k, v in x.items() if k != "_id"}}
-                r1 = t1.find_one_and_update(filter=t1_f, update=t1_u, upsert=True)
-                print(r1)
-                t2_f = {"_id": teacher_id}
-                t2_u = {"$set": {
-                    'deposit': deposit,
-                    'deposit_amount': deposit_amount,
-                    'profit_amount': profit_amount,
-                    'profit_ratio': profit_ratio,
-                    "case_count": case_count,
-                    "win_count": win_count,
-                    "win_ratio": win_ratio,
-                }}
-                r2 = t2.find_one_and_update(filter=t2_f, update=t2_u, upsert=True)
-                print(r2)
-    """发送钉钉消息"""
+        # x = raw_signal
+        # # change = x.get("change")
+        # teacher_id = x['teacher_id']
+        # teacher = Teacher.find_by_id(o_id=teacher_id, to_dict=True)
+        # deposit = teacher.get('deposit', 0)
+        # profit_amount = teacher.get('profit_amount', 0)
+        # deposit_amount = teacher.get('deposit_amount', 0)
+        # case_count = teacher.get('case_count', 0)
+        # win_count = teacher.get('win_count', 0)
+        # product = x['product']
+        # """取离场价格"""
+        # f = {"code": product_map[product]['code']}
+        # ss = [("platform_time", -1)]
+        # ses = mongo_db.get_conn(table_name="quotation")
+        # one = ses.find_one(filter=f, sort=ss)
+        # if one is not None:
+        #     exit_price = one['price']
+        #     x['exit_time'] = datetime.datetime.now()
+        # else:
+        #     exit_price = x['exit_price']  # 离场点位
+        # """计算各种参数"""
+        # enter_price = float(x['enter_price']) if isinstance(x['enter_price'], str) else x['enter_price']  # 进场点位
+        # info = product_map[product]
+        # p_v = info['p_val']   # 点值
+        # p_d = info['p_diff']  # 点差
+        # p_a = info['p_arg']  # 系数
+        # comm = info['comm']   # 每手佣金
+        # t_c = x['t_coefficient']                  # 空单/多单
+        # """"""
+        # # each_profit_dollar = ((exit_price - enter_price) * t_c - p_d/p_a) * p_v * p_a  # 2018-9-20废止, 每手盈利美元毛利(尚未扣除佣金)
+        # each_profit_dollar = (exit_price - enter_price) * t_c * p_v * p_a  # 每手盈利美元毛利(尚未扣除佣金)
+        # """计算公式(尚未扣除佣金)"""
+        # formula = "(exit_price - enter_price) * t_c * p_v * p_a=({} - {}) * {} * {} * {}".format(exit_price,
+        #                                                                                          enter_price, t_c, p_v,
+        #                                                                                          p_a)
+        # x['formula'] = formula
+        # each_profit = each_profit_dollar - comm
+        # x['each_profit_dollar'] = each_profit_dollar
+        # x['each_profit'] = each_profit
+        #
+        # x['p_val'] = p_v
+        # x['p_diff'] = p_d
+        # x['p_arg'] = p_a
+        # x['comm'] = comm
+        # lots = 1  # 最少手数
+        # try:
+        #     lots = x['lots']
+        # except Exception as e:
+        #     print(e)
+        #     print(x)
+        # the_profit = lots * each_profit  # 本次交易盈利
+        # x['the_profit'] = the_profit
+        # if the_profit >= 0:
+        #     win_count += 1
+        # else:
+        #     pass
+        # case_count += 1
+        # win_ratio = round((win_count / case_count) * 100, 2)
+        # deposit += the_profit
+        # profit_amount += the_profit
+        # print(x)
+        # print(teacher)
+        # profit_ratio = round((profit_amount / deposit_amount) * 100, 2)  # 盈利率
+        # client = mongo_db.get_client()
+        # t1 = client[mongo_db.db_name][Trade.get_table_name()]
+        # t2 = client[mongo_db.db_name][Teacher.get_table_name()]
+        # with client.start_session(causal_consistency=True) as ses:
+        #     with ses.start_transaction():
+        #         t1_f = {"_id": x["_id"]}
+        #         t1_u = {"$set": {k: v for k, v in x.items() if k != "_id"}}
+        #         r1 = t1.find_one_and_update(filter=t1_f, update=t1_u, upsert=True)
+        #         print(r1)
+        #         t2_f = {"_id": teacher_id}
+        #         t2_u = {"$set": {
+        #             'deposit': deposit,
+        #             'deposit_amount': deposit_amount,
+        #             'profit_amount': profit_amount,
+        #             'profit_ratio': profit_ratio,
+        #             "case_count": case_count,
+        #             "win_count": win_count,
+        #             "win_ratio": win_ratio,
+        #         }}
+        #         r2 = t2.find_one_and_update(filter=t2_f, update=t2_u, upsert=True)
+        #         print(r2)
+    """入场和离场的单子都需要发送钉钉消息"""
 
     if raw_signal['teacher_id'] == ObjectId("5bbd3279c5aee8250bbe17d0"):
         """非功老师是测试账户,无需发送钉钉消息"""
@@ -1315,7 +1325,17 @@ class Trade(Signal):
         resp = cls.aggregate(pipeline=pipeline, page_size=page_size, page_index=page_index, ruler=ruler)
         return resp
 
-
+    @classmethod
+    def batch_modify(cls, ids: list, save: bool = True) -> dict:
+        """
+        批量修改订单.
+        行为:
+        1. 讲需要修改的订单按照老师id分组
+        2.
+        :param ids:
+        :param save:
+        :return:
+        """
 
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""

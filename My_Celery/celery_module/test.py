@@ -9,7 +9,7 @@ from celery_module.my_tasks import *
 from celery import group
 
 
-# g1 = group([add.s(x=x, y=x) for x in range(4)])
-# print(g1().get())
-g2 = group([add.s(x=x) for x in range(4)])
-print(g2(y=10).get())
+g1 = group([add.s(x=x, y=x) for x in range(4)])
+print(add.delay(3, 3).get(timeout=1))
+# g2 = group([add.s(x=x) for x in range(4)])
+# print(g2(y=10).get())

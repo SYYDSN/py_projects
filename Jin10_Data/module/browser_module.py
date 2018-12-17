@@ -38,8 +38,7 @@ logger = get_logger()
 chrome_driver = os.path.join(__project_dir__, "resource/chromedriver")  # chromedriver的路径
 firefox_driver = os.path.join(__project_dir__, "resource/geckodriver")  # firfoxdriver的路径
 os.environ["ChromeDriver"] = chrome_driver  # 必须配置,否则会在execute_script的时候报错.
-# browser = webdriver.Chrome(chrome_driver)
-# wait = WebDriverWait(browser, 10)
+prev_calendar_date = None  # 上一条日历的日期,专门应对多条合并数据日历的格式(共用日期和国家的td的情况)
 
 
 def get_browser(headless: bool = True, browser_class: int = 1) -> Firefox:
@@ -319,9 +318,11 @@ def parse_calendar_data(item) -> dict:
     # title = item.find_element_by_class_name("jin-table_alignLeft").text.strip()
     # level = re.findall("\d{2}", item.find_element_by_class_name("jin-star_active").get_attribute("style"))
     tds = item.find_elements_by_tag_name("td")
-    a_time = tds[0].text.strip()  #
     print(len(tds))
     if len(tds) == 9:
+        a_time = tds[0].text.strip()
+        global prev_calendar_date
+        prev_calendar_date = a_time
         title = tds[2].text.strip()  #
         level = re.findall("\d{2}", tds[3].find_element_by_class_name("jin-star_active").get_attribute("style"))
         star = 0 if len(level) == 0 else int(int(level[0]) / 20)
@@ -344,13 +345,20 @@ def parse_calendar_data(item) -> dict:
             print(tds[0].text)
             d = dict()
         else:
-            title = tds[1].text.strip()  #
-            level = re.findall("\d{2}", tds[2].get_attribute("style"))
+            """
+            如果是合并多条数据日历的情况.在这多条数据中.
+            1. 第一条数据td的长度是9.
+            2. 其他数据的td的长度是7
+            """
+            a_time = prev_calendar_date  # prev_calendar_date是全局变量
+            title = tds[0].text.strip()  #
+            # level = re.findall("\d{2}", tds[2].get_attribute("style"))
+            level = re.findall("\d{2}", tds[1].find_element_by_class_name("jin-star_active").get_attribute("style"))
             star = 0 if len(level) == 0 else int(int(level[0]) / 20)
-            td_prev = tds[3].text.strip()  # 前值
-            td_forecast = tds[4].text.strip()  # 预测值
-            td_publish = tds[5].text.strip()  # 公布值
-            td_effect = tds[6].text.strip()  # 影响
+            td_prev = tds[2].text.strip()  # 前值
+            td_forecast = tds[3].text.strip()  # 预测值
+            td_publish = tds[4].text.strip()  # 公布值
+            td_effect = tds[5].text.strip()  # 影响
             d = {
                 "time": a_time,
                 "title": title,
