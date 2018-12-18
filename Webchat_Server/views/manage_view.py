@@ -269,10 +269,9 @@ class ManageTradeView(MyView):
     @check_admin_session
     def post(self, user: dict):
         """
-        req_type 代表请求的类型, 有3种:
-        1. add          添加产品
-        2. edit         修改产品
-        3. delete       删除产品
+        req_type 代表请求的类型, 有2种:
+        1. reverse         反转交易
+        2. delete          删除交易
         :param user:
         :return:
         """
