@@ -267,16 +267,17 @@ class ManageTradeView(MyView):
             return abort(401, "access refused!")
 
     @check_admin_session
-    def post(self, user: dict):
+    def post(self, key: str, admin: dict):
         """
         req_type 代表请求的类型, 有2种:
         1. reverse         反转交易
         2. delete          删除交易
-        :param user:
+        :param key: 这个参数目前没有,主要是和路由规则保持一致
+        :param admin:
         :return:
         """
         mes = {"message": "access refused"}
-        f = self.operate_filter(user)  # 数据访问权
+        f = self.operate_filter(admin)  # 数据访问权
         if f is None:
             pass
         else:
@@ -307,7 +308,7 @@ class ManageTradeView(MyView):
                         ids = [ObjectId(x) for x in ids]
                         mes = PrintCode.cancel_data(f_ids=ids)
             elif the_type == "delete":
-                """批量删除文件和日志"""
+                """批量删除交易"""
                 ids = []
                 try:
                     ids = json.loads(get_arg(request, "ids"))
@@ -315,11 +316,11 @@ class ManageTradeView(MyView):
                     print(e)
                 finally:
                     if len(ids) == 0:
-                        mes['message'] = "没有发现需要删除的文件"
+                        mes['message'] = "没有发现需要删除的交易"
                     else:
                         ids = [ObjectId(x) for x in ids]
-                        include_record = get_arg(request, "include_record")
-                        mes = PrintCode.delete_file_and_record(ids=ids, include_record=include_record)
+                        handler = admin['_id']
+                        mes = Trade.batch_delete(ids=ids, handler=handler)
 
             else:
                 mes['message'] = "无效的操作类型:{}".format(the_type)

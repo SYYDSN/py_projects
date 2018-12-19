@@ -157,6 +157,10 @@
 .right_main .code_list_outer .code_list_inner .bottom_div > .left {
   color: #286090;
 }
+.right_main .code_list_outer .code_list_inner .bottom_div > .left >.handler_tips {
+  padding: 20px;
+  opacity: 0.4;
+}
 .right_main .code_list_outer .code_list_inner .bottom_div > .right {
   color: #286090;
   font-size: 16px;

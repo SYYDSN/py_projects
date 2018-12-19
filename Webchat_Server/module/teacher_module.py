@@ -228,6 +228,7 @@ class Teacher(mongo_db.BaseDoc):
     @classmethod
     def rebuild(cls) -> None:
         """
+        这是一个很少使用的函数
         从交易信号中，初始化老师，如果你想重置所有的老师，请手动清空旧的老师列表,
         仅在初始化时候使用。
         :return:
@@ -361,7 +362,7 @@ class Teacher(mongo_db.BaseDoc):
                      end: (str, datetime.datetime) = None) -> dict:
         """
         老师的个人页面，有图表，持仓和历史数据
-        cls.single_info的替代函数，两者的差别是：
+        本函数是cls.single_info的替代函数，两者的差别是：
         single_info　提供的是按照产品分组，以周切分的胜率统计 2018-11-25
         single_info２　提供的是:
             １.按照周切分的胜率柱状图
@@ -403,6 +404,7 @@ class Teacher(mongo_db.BaseDoc):
     def get_hold(cls, t_id: (str, ObjectId), h_id: (str, ObjectId) = None) -> (None, dict, list):
         """
         获取老师的持仓记录
+        相对history_and_hold,这是一个较旧的函数.仅仅为了提供持仓数据
         :param t_id: Teacher._id
         :param h_id: Trade._id
         :return:
@@ -483,60 +485,6 @@ class Teacher(mongo_db.BaseDoc):
                     else:
                         t_dict[d] = [t]
         return t_dict
-
-    @classmethod
-    def import_info(cls):
-        """
-        此数据已被修改，请参考Teacher类的最新定义
-        导入老师信息,这是个很少使用的函数,每次使用前,请仔细阅读代码.进行
-        相应的修改之后再运行.
-        0001/北仑, 0005/乐天, 0009/秦观, 0013/宗晨, 0017/宇向
-        密码:xd123457
-        1. 导入的老师都是真实老师,
-        2. 虚拟虚拟老师.以1:4的比例自动生成,
-        3. 真实老师和虚拟老师都可以修改资料. 但虚拟老师不能登录.
-        :return:
-        """
-        r_t = ['北仑', '乐天', '秦观', '宗晨', '宇向']  # 真实老师
-        v_t = [  # 虚拟老师
-            '豪何', '誉杰', '东晖', '铭远',
-            '俊彦', '扬波', '宜修', '凯风',
-            '孟林', '子中', '一鸣', '连彬',
-            '越林', '自宾', '成其'
-        ]
-        n = 0
-        s = 'xd123457'  # 密码
-        pw = hashlib.md5(s.encode()).hexdigest()
-        for name in r_t:
-            _id = ObjectId()
-            from_id = _id
-            n += 1
-            t = {
-                "_id": _id, "name": name, "native": True, "from_id": from_id,
-                "phone": str(n).zfill(4), "password": pw
-            }
-            n += 1
-            t1 = {
-                "name": "{}".format(v_t.pop()), "native": False,
-                "from_id": from_id, "direction": "follow",
-                "phone": str(n).zfill(4), "password": pw
-            }
-            n += 1
-            t2 = {
-                "name": "{}".format(v_t.pop()), "native": False,
-                "from_id": from_id, "direction": "reverse",
-                "phone": str(n).zfill(4), "password": pw
-            }
-            n += 1
-            t3 = {
-                "name": "{}".format(v_t.pop()), "native": False,
-                "from_id": from_id, "direction": "random",
-                "phone": str(n).zfill(4), "password": pw
-            }
-            cls.instance(**t1).save()
-            cls.instance(**t2).save()
-            cls.instance(**t3).save()
-            cls.instance(**t).save()
 
     @classmethod
     def trade_history(cls, t_id: ObjectId, filter_dict: dict, page_size: int = 50, can_json: bool = False) -> list:

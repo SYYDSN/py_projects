@@ -166,8 +166,8 @@ $(function(){
         $current_value.text(t_name).attr("data-id", t_id);
     };
 
-    /*删除任务*/
-    $("#delete_task").click(function(){
+    /*删除交易*/
+    $("#delete_trade").click(function(){
         var d = [];
         $(".select > input[type='checkbox']:checked").each(function(){
             var $this = $(this);
@@ -178,7 +178,7 @@ $(function(){
             "type": "delete",
             "ids": JSON.stringify(d)
         };
-        var p = confirm("删除已开始的任务可能导致相关作业无法同步,你确定吗!");
+        var p = confirm("删除交易可能会对关联的数据造成影响,你确定吗!");
         if(p){
             $.post(location.pathname, args, function(resp){
                 var json = JSON.parse(resp);

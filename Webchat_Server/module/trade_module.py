@@ -1149,6 +1149,20 @@ class Signal(mongo_db.BaseDoc):
                 cls.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
 
 
+class TradeLog(mongo_db.BaseDoc):
+    """
+    记录对喊单的记录的操作日志.包括修改,删除,甚至其他的
+    """
+    _table_name = "trade_log"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['before'] = dict  # 操作前
+    type_dict['after'] = dict    # 操作后
+    type_dict['handler'] = ObjectId  # 操作者id
+    type_dict['type'] = str  # 操作类型,目前只有delete/edit/reverse  删除/编辑/修改
+    type_dict['time'] = datetime.datetime
+
+
 class Trade(Signal):
     """
     （老师的喊单）交易, 包括虚拟老师和真实老师的都会保存在这里.
@@ -1324,6 +1338,65 @@ class Trade(Signal):
         pipeline.append(s)
         resp = cls.aggregate(pipeline=pipeline, page_size=page_size, page_index=page_index, ruler=ruler)
         return resp
+
+    @classmethod
+    def batch_delete(cls, ids: list, handler: ObjectId) -> dict:
+        """
+        批量修改订单.有2种操作:
+        行为:
+        1. 讲需要修改的订单按照老师id分组
+        2. 计算删除后的影响
+        3. 修改Trade和老师对应的信息
+        4. 写入日志(TradeLog)
+        :param ids:
+        :param handler:
+        :return:
+        """
+        mes = {"message": "success"}
+        ids = [
+            (ObjectId(x) if isinstance(x, str) and len(x) ==24 else x)
+            for x in ids
+        ]
+        f = {"_id": {"$in": ids}}
+        db_client = mongo_db.get_client()
+        w = mongo_db.get_write_concern()
+        col1 = mongo_db.get_conn(table_name=cls.get_table_name(), db_client=db_client)
+        col2 = mongo_db.get_conn(table_name=TradeLog.get_table_name(), db_client=db_client)
+        with db_client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=w):
+                """先查找记录"""
+                r1 = col1.find(filter=f, session=ses)
+                r1 = [x for x in r1]
+                if len(r1) > 0:
+                    """开始删除"""
+                    r2 = col1.delete_many(filter=f, session=ses)
+                    if isinstance(r2, mongo_db.DeleteResult):
+                        """删除成功,组装日志"""
+                        logs = []
+                        for x in r1:
+                            temp = {
+                                "before": x,
+                                "type": "delete",
+                                "handler": handler
+                            }
+                            logs.append(temp)
+                        r3 = col2.insert_many(documents=logs, session=ses)
+                        if isinstance(r3, mongo_db.InsertManyResult):
+                            """成功"""
+                            pass
+                        else:
+                            """日志记录失败"""
+                            mes['message'] = '日志记录失败'
+                            ses.abort_transaction()
+                    else:
+                        """删除失败"""
+                        mes['message'] = '删除失败'
+                        ses.abort_transaction()
+                else:
+                    """没有找到对应的交易记录"""
+                    mes['message'] = "没有找到对应的交易记录"
+                    ses.abort_transaction()
+        return mes
 
     @classmethod
     def batch_modify(cls, ids: list, save: bool = True) -> dict:
