@@ -166,6 +166,36 @@ $(function(){
         $current_value.text(t_name).attr("data-id", t_id);
     };
 
+    /*反转交易*/
+    $("#reverse_trade").click(function(){
+        var d = [];
+        $(".select > input[type='checkbox']:checked").each(function(){
+            var $this = $(this);
+            var _id = $.trim($this.attr("data-id"));
+            d.push(_id);
+        });
+        var args = {
+            "type": "reverse",
+            "ids": JSON.stringify(d)
+        };
+        var p = confirm("反转交易方向可能会对关联的数据造成影响,你确定吗!");
+        if(p){
+            $.post(location.pathname, args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status === "success"){
+                    alert("反转成功");
+                    location.reload();
+                }else{
+                    alert(status);
+                }
+            });
+        }
+        else{
+            // ...
+        }
+    });
+
     /*删除交易*/
     $("#delete_trade").click(function(){
         var d = [];

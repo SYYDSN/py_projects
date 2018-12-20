@@ -89,6 +89,8 @@ else:
         "minPoolSize": 2,  # 最小连接池,默认是0.
         "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
         "authSource": db_name,  # 验证数据库
+        "username": user,  # 用户名
+        "password": password  # 密码
     }
 
 

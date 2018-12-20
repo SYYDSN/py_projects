@@ -78,7 +78,7 @@ class MyView(MethodView):
         return "post"
 
 
-app.add_url_rule("/class", view_func=MyView.as_view("name1"))
+app.add_url_rule("/test", view_func=MyView.as_view("name1"))
 
 
 if __name__ == "__main__":

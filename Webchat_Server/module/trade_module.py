@@ -378,7 +378,15 @@ def calculate_trade(raw_signal: dict) -> None:
             logger.exception(msg=ms)
             print(ms)
         else:
-            pass
+            """记录开单日志,防止丢失日志"""
+            """组装TradeLog日志"""
+            temp = {
+                "before": r,
+                "type": "enter",  # 开单
+                "handler": r['teacher_id'],
+                "time": datetime.datetime.now()
+            }
+            TradeLog.insert_one(doc=temp)
     else:
         """
         每手盈利计算公式:
@@ -563,7 +571,6 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
                 logger.exception(ms)
                 send_mail(title="trade查找失败{}".format(now), content=ms)
             else:
-
                 doc_dict['enter_price'] = r['enter_price']
                 doc_dict['enter_time'] = r['enter_time']
                 doc_dict['product'] = r['product']
@@ -573,33 +580,34 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
         """生成虚拟信号"""
         if doc_dict['case_type'] == "enter":
             """进场"""
-            t_map = Teacher.direction_map(include_raw=False)
-            print("process_case, 开始随机生成{}位老师的虚拟信号".format(len(t_map)))
-            # t_map = dict()  # 生产环境请注销
-            for k, t in t_map.items():
-                temp = doc_dict.copy()
-                temp["_id"] = ObjectId()
-                temp['native'] = False
-                teacher = random.choice(t)
-                teacher_id = teacher['_id']
-                temp['teacher_id'] = teacher_id
-                temp['teacher_name'] = teacher['name']
-                change = k
-                temp['change'] = change
-                if change == "follow":
-                    temp['direction'] = native_direction
-                elif change == "reverse" and native_direction == "买入":
-                    temp['direction'] = "卖出"
-                elif change == "reverse" and native_direction == "卖出":
-                    temp['direction'] = "买入"
-                else:
-                    temp['direction'] = random.choice(["买入", "卖出"])
-                """延时操作"""
-                count_down = random.randint(30, 1600)  # 延迟操作的秒数,表示在原始信号发出后多久进行操作?
-                json_obj = mongo_db.to_flat_dict(temp)
-                count_down = 10  # 测试专用
-                send_virtual_trade.apply_async(countdown=count_down, kwargs={"trade_json": json_obj})
-                print("process_case, {}秒后发送虚拟老师进场数据(call celery_send_virtual_trade). info={}".format(count_down, json_obj))
+            """停止发送虚拟信号 2018-12-20"""
+            # t_map = Teacher.direction_map(include_raw=False)
+            # print("process_case, 开始随机生成{}位老师的虚拟信号".format(len(t_map)))
+            # # t_map = dict()  # 生产环境请注销
+            # for k, t in t_map.items():
+            #     temp = doc_dict.copy()
+            #     temp["_id"] = ObjectId()
+            #     temp['native'] = False
+            #     teacher = random.choice(t)
+            #     teacher_id = teacher['_id']
+            #     temp['teacher_id'] = teacher_id
+            #     temp['teacher_name'] = teacher['name']
+            #     change = k
+            #     temp['change'] = change
+            #     if change == "follow":
+            #         temp['direction'] = native_direction
+            #     elif change == "reverse" and native_direction == "买入":
+            #         temp['direction'] = "卖出"
+            #     elif change == "reverse" and native_direction == "卖出":
+            #         temp['direction'] = "买入"
+            #     else:
+            #         temp['direction'] = random.choice(["买入", "卖出"])
+            #     """延时操作"""
+            #     count_down = random.randint(30, 1600)  # 延迟操作的秒数,表示在原始信号发出后多久进行操作?
+            #     json_obj = mongo_db.to_flat_dict(temp)
+            #     count_down = 10  # 测试专用
+            #     send_virtual_trade.apply_async(countdown=count_down, kwargs={"trade_json": json_obj})
+            #     print("process_case, {}秒后发送虚拟老师进场数据(call celery_send_virtual_trade). info={}".format(count_down, json_obj))
         else:
             """离场"""
             f["change"] = {"$ne": "raw"}
@@ -996,9 +1004,14 @@ class Signal(mongo_db.BaseDoc):
 
     def send(self):
         """
+        此函数应该被弃用  2018-12-20
+
         输出发送到钉钉机器人的消息字典，此函数应该被子类覆盖
         :return:
         """
+        title = "废弃的函数被调用,Single.send {}".format(datetime.datetime.now())
+        content = "{}".format(self.get_dict())
+        send_mail(title=title, content=content)
         # self.replace_column()
         print(self.__dict__)
         create_time = self.get_attr("create_time")
@@ -1410,7 +1423,8 @@ class Trade(Signal):
                             temp = {
                                 "before": x,
                                 "type": "delete",
-                                "handler": handler
+                                "handler": handler,
+                                "time": datetime.datetime.now()
                             }
                             logs.append(temp)
                         r3 = col2.insert_many(documents=logs, session=ses)
@@ -1438,18 +1452,19 @@ class Trade(Signal):
         return mes
 
     @classmethod
-    def batch_reverse(cls, ids: list) -> bool:
+    def batch_reverse(cls, ids: list, handler: ObjectId) -> dict:
         """
         批量反转订单.
         行为:
         1. 讲需要修改的订单按照老师id分组
         2.
         :param ids:
+        :param handler:
         :return:
         """
         mes = {"message": "success"}
         for _id in ids:
-            r = cls.reverse(_id=_id)
+            r = cls.reverse(_id=_id, handler=handler)
             if r:
                 pass
             else:
@@ -1461,7 +1476,7 @@ class Trade(Signal):
             t_ids = col.distinct(key="teacher_id", filter=f)
             """重新统计老师的数据"""
             r = Teacher.re_calculate(ids=t_ids)
-            if isinstance(f, dict):
+            if isinstance(r, dict):
                 pass
             else:
                 mes['message'] = "未能重新计算统计结果"
@@ -1470,10 +1485,11 @@ class Trade(Signal):
         return mes
 
     @classmethod
-    def reverse(cls, _id: ObjectId) -> bool:
+    def reverse(cls, _id: ObjectId, handler: ObjectId) -> bool:
         """
         反转订单
         :param _id:
+        :param handler:
         :return:
         """
         trade = cls.find_by_id(o_id=_id, to_dict=True)
@@ -1518,6 +1534,7 @@ class Trade(Signal):
                 "comm": comm,
             }
             resp = calculate_profit(**kw)
+            kw.update({"the_profit": resp['each_profit'] * trade.get("lots", 1)})
             kw.update(resp)
             update.update(kw)
         """写入数据库"""
@@ -1525,8 +1542,23 @@ class Trade(Signal):
         u = {"$set": update}
         r = cls.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
         if isinstance(r, dict):
-            return True
+            """反转成功,组装日志"""
+            temp = {
+                "before": trade,
+                "type": "reverse",
+                "after": r,
+                "handler": handler,
+                "time": datetime.datetime.now()
+            }
+            r3 = TradeLog.insert_one(doc=temp)
+            if isinstance(r3, ObjectId):
+                """成功"""
+                return True
+            else:
+                """日志记录失败"""
+                return False
         else:
+            """反转失败"""
             return False
 
 

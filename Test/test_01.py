@@ -1,26 +1,19 @@
 # -*- coding: utf-8 -*-
-import orm_module
-import datetime
+import requests
+import json
 
 
-ObjectId = orm_module.ObjectId
-
-
-class User(orm_module.BaseDoc):
-    _table_name = "user_info"
-    type_dict = dict()
-    type_dict['_id'] = ObjectId
-    type_dict['user_name'] = str
-    type_dict['age'] = int
-    type_dict['time'] = datetime.datetime
+def send_message(method: str = 'get', data: dict = None) -> None:
+    url = "http://127.0.0.1:7011/test"
+    data = {"hello": "world"} if data is None else data
+    if method.lower() == "get":
+        r = requests.post(url=url, json=data)
+    else:
+        r = requests.post(url=url, json=data)
+        pass
+    print(r.text)
 
 
 if __name__ == "__main__":
-    kw = {
-        "user_name": "李四",
-        'age': 12,
-        "dict": {"name": "sds", "l":[1,2,3,4,5]},
-        "time": datetime.datetime.now()
-    }
-    User.insert_one(doc=kw)
+    send_message()
     pass

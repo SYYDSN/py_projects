@@ -282,20 +282,8 @@ class ManageTradeView(MyView):
             pass
         else:
             the_type = get_arg(request, "type", "")
-            if the_type == "count":
-                """统计条码余量"""
-                mes['message'] = "success"
-                p_id = get_arg(request, "product_id", None)
-                p_id = ObjectId(p_id)
-                mes['count'] = CodeInfo.deposit(product_id=p_id)
-            elif the_type == "export":
-                """生成导出文件"""
-                p_id = get_arg(request, "product_id", None)
-                number = int(get_arg(request, "number", "0"))
-                p_id = ObjectId(p_id)
-                mes = PrintCode.export(product_id=p_id, number=number)
-            elif the_type == "cancel":
-                """撤销导出条码操作"""
+            if the_type == "reverse":
+                """反转交易方向"""
                 ids = []
                 try:
                     ids = json.loads(get_arg(request, "ids"))
@@ -303,10 +291,11 @@ class ManageTradeView(MyView):
                     print(e)
                 finally:
                     if len(ids) == 0:
-                        mes['message'] = "没有需要撤销的文件记录"
+                        mes['message'] = "没有发现需要删除的交易"
                     else:
                         ids = [ObjectId(x) for x in ids]
-                        mes = PrintCode.cancel_data(f_ids=ids)
+                        handler = admin['_id']
+                        mes = Trade.batch_reverse(ids=ids, handler=handler)
             elif the_type == "delete":
                 """批量删除交易"""
                 ids = []
@@ -321,7 +310,6 @@ class ManageTradeView(MyView):
                         ids = [ObjectId(x) for x in ids]
                         handler = admin['_id']
                         mes = Trade.batch_delete(ids=ids, handler=handler)
-
             else:
                 mes['message'] = "无效的操作类型:{}".format(the_type)
         return json.dumps(mes)
