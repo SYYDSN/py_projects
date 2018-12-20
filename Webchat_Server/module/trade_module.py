@@ -233,6 +233,35 @@ def is_exit(trade: dict) -> bool:
     return resp
 
 
+def calculate_profit(exit_price: float, enter_price: float, p_v, p_a, t_c, comm) -> dict:
+    """
+    计算利润
+    :param exit_price: 离场
+    :param enter_price: 进场
+    :param p_v: 点值
+    :param p_a: 系数
+    :param t_c: 空单/多单
+    :param comm: 每手佣金
+    :return:
+    {
+    formula: formula, # 公式
+    each_profit_dollar:each_profit_dollar,  # 每手毛利润
+    each_profit:each_profit # 没手净利润(去掉佣金)
+    }
+    """
+    each_profit_dollar = (exit_price - enter_price) * t_c * p_v * p_a  # 每手盈利美元毛利(尚未扣除佣金)
+    """计算公式(尚未扣除佣金)"""
+    formula = "(exit_price - enter_price) * t_c * p_v * p_a=({} - {}) * {} * {} * {}".format(exit_price, enter_price,
+                                                                                             t_c, p_v, p_a)
+    each_profit = each_profit_dollar - comm
+    resp = {
+        "formula": formula,  # 公式
+        "each_profit_dollar": each_profit_dollar,  # 每手毛利润
+        "each_profit": each_profit  # 没手净利润(去掉佣金)
+    }
+    return resp
+
+
 def _calculate_exit_trade(trade: dict) -> bool:
     """
     计算离场单子并写入数据库. 在此之前,需要调用is_exit函数判断trade是否需要计算?
@@ -1220,6 +1249,7 @@ class Trade(Signal):
     @classmethod
     def sync_from_signal(cls, signal: (dict, Signal)):
         """
+        不常用函数
         根据实际开仓信号,参照老师列表.生成真实老师和虚拟老师的喊单记录,存入trade表
         :param signal:
         :return:
@@ -1235,7 +1265,8 @@ class Trade(Signal):
         :param filter_dict:
         :return:
         """
-        begin = mongo_db.get_datetime_from_str("2018-8-1")
+        """所有交易的起始时间以此为准"""
+        begin = mongo_db.get_datetime_from_str("2018-7-1")
         ids = [x['_id'] for x in Teacher.selector_data(project=['_id'])]
         f = {
             "teacher_id": {"$in": ids},
@@ -1280,7 +1311,7 @@ class Trade(Signal):
                                 }
 
                         },
-                    "profit_count":
+                    "profit_amount":
                         {
                             "$sum": "$the_profit"
                         }
@@ -1298,8 +1329,8 @@ class Trade(Signal):
                 total += temp
                 resp['exit'] = temp                 # 已离场
                 resp['win'] = x['win_count']  # 盈利的单子
-                profit_count = x['profit_count']  # 总盈利
-                resp['profit'] = round(profit_count, 2)  # 单位美元
+                profit_amount = x['profit_amount']  # 总盈利
+                resp['profit'] = round(profit_amount, 2)  # 单位美元
 
             else:
                 """未离场"""
@@ -1358,6 +1389,8 @@ class Trade(Signal):
             for x in ids
         ]
         f = {"_id": {"$in": ids}}
+        col = cls.get_collection()
+        t_ids = col.distinct(key="teacher_id", filter=f)
         db_client = mongo_db.get_client()
         w = mongo_db.get_write_concern()
         col1 = mongo_db.get_conn(table_name=cls.get_table_name(), db_client=db_client)
@@ -1396,19 +1429,106 @@ class Trade(Signal):
                     """没有找到对应的交易记录"""
                     mes['message'] = "没有找到对应的交易记录"
                     ses.abort_transaction()
+        if mes['message'] == "success":
+            """重新统计老师的数据"""
+            Teacher.re_calculate(ids=t_ids)
+        else:
+            """出错,放弃"""
+            pass
         return mes
 
     @classmethod
-    def batch_modify(cls, ids: list, save: bool = True) -> dict:
+    def batch_reverse(cls, ids: list) -> bool:
         """
-        批量修改订单.
+        批量反转订单.
         行为:
         1. 讲需要修改的订单按照老师id分组
         2.
         :param ids:
-        :param save:
         :return:
         """
+        mes = {"message": "success"}
+        for _id in ids:
+            r = cls.reverse(_id=_id)
+            if r:
+                pass
+            else:
+                mes['message'] = "异常的错误"
+                break
+        if mes['message'] == "success":
+            col = cls.get_collection()
+            f = {"_id": {"$in": ids}}
+            t_ids = col.distinct(key="teacher_id", filter=f)
+            """重新统计老师的数据"""
+            r = Teacher.re_calculate(ids=t_ids)
+            if isinstance(f, dict):
+                pass
+            else:
+                mes['message'] = "未能重新计算统计结果"
+        else:
+            pass
+        return mes
+
+    @classmethod
+    def reverse(cls, _id: ObjectId) -> bool:
+        """
+        反转订单
+        :param _id:
+        :return:
+        """
+        trade = cls.find_by_id(o_id=_id, to_dict=True)
+        case_type = trade.get('case_type')
+        update = dict()
+        if case_type is None:
+            if trade.get("exit_price") is not None and trade.get("exit_time") is not None:
+                case_type = "exit"
+            else:
+                case_type = "enter"
+        else:
+            pass
+        update["case_type"] = case_type
+        direction = trade.get('direction')
+        if direction == "买入":
+            direction = "卖出"
+        else:
+            direction = "买入"
+        update["direction"] = direction
+        if case_type == "enter":
+            """未离场,无需计算"""
+            pass
+        else:
+            """需要计算的"""
+            if direction == "买入":
+                t_c = 1
+            else:
+                t_c = -1
+            enter_price = trade.get("enter_price", 0)
+            exit_price = trade.get("exit_price", 0)
+            product = trade['product']
+            info = product_map[product]
+            p_v = info['p_val']  # 点值
+            p_a = info['p_arg']  # 系数
+            comm = info['comm']  # 每手佣金
+            kw = {
+                "enter_price": enter_price,
+                "exit_price": exit_price,
+                "p_v": p_v,
+                "p_a": p_a,
+                "t_c": t_c,
+                "comm": comm,
+            }
+            resp = calculate_profit(**kw)
+            kw.update(resp)
+            update.update(kw)
+        """写入数据库"""
+        f = {"_id": _id}
+        u = {"$set": update}
+        r = cls.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
+        if isinstance(r, dict):
+            return True
+        else:
+            return False
+
 
 if __name__ == "__main__":
     """一个模拟的老师发送交易信号的字典对象，用于初始化Signal类"""
@@ -1495,7 +1615,7 @@ if __name__ == "__main__":
     #   'exit_price': 69.955,  # 只有平仓才有
     # }
     # send_template_message.delay(mes_type="new_order_message2", mes_dict=mes_dict)
-    Trade.paging_info(filter_dict={'case_type': 'exit', 'teacher_id': ObjectId('5b8c5452dbea62189b5c28f5')})
+    # Trade.paging_info(filter_dict={'case_type': 'exit', 'teacher_id': ObjectId('5b8c5452dbea62189b5c28f5')})
     pass
 
 

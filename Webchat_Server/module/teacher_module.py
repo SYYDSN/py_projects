@@ -144,11 +144,15 @@ class Teacher(mongo_db.BaseDoc):
     type_dict['native'] = bool  # 是否是真实的teacher？
     type_dict['from_id'] = ObjectId  # 虚拟老师专有，发源老师id，保持不连，除非修改
     type_dict['direction'] = str  # 虚拟老师专有，跟的方向，有三种 follow/reverse/random
-    type_dict['profit_ratio'] = float  # 盈利率, 每次close时候计算
-    type_dict['profit_amount'] = float  # 总额.每次close时候计算
-    type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
     type_dict['lots_range'] = list  # 手数范围.
     type_dict['hide'] = bool  # 是否隐藏?
+    type_dict['deposit'] = float  # 存款,当前本金.每次close时候计算
+    type_dict['deposit_amount'] = float  # 累计存款,所有本金.会累计每次加金的综合
+    type_dict['profit_ratio'] = float  # 盈利率, 每次close时候计算
+    type_dict['profit_amount'] = float  # 总额.每次close时候计算
+    type_dict['win_ratio'] = float  # 胜率
+    type_dict['win_count'] = int  # 胜场统计
+    type_dict['case_count'] = int  # 喊单总计
 
     @classmethod
     def instance(cls, **kwargs):
@@ -409,7 +413,7 @@ class Teacher(mongo_db.BaseDoc):
         :param h_id: Trade._id
         :return:
         """
-        begin = mongo_db.get_datetime_from_str("2018-08-27 17:00:00")
+        begin = mongo_db.get_datetime_from_str("2018-07-01 17:00:00")
         end = datetime.datetime.now()
         res = hold_info_from_db(t_id=t_id, begin=begin, end=end, h_id=h_id)
         if h_id is None:
@@ -554,8 +558,90 @@ class Teacher(mongo_db.BaseDoc):
         resp = [x for x in r]
         return resp
 
+    @classmethod
+    def re_calculate(cls, ids: list = None) -> dict:
+        """
+        重新计算老师的胜率,盈利率
+        :param ids: 老师的id,ObjectId的数组
+        :return:
+        """
+        if ids is None or len(ids) == 0:
+            ids = [x['_id'] for x in Teacher.selector_data(project=['_id'])]
+        else:
+            pass
+        """所有交易的起始时间以此为准"""
+        begin = mongo_db.get_datetime_from_str("2018-7-1")
+        pipeline = []
+        m = {"$match": {
+            "teacher_id": {"$in": ids},
+            "case_type": {"$exists": True},
+            "enter_time": {"$exists": True, "$gt": begin}
+        }}
+        pipeline.append(m)
+        g = {
+            "$group":
+                {
+                    "_id": "$teacher_id",
+                    "case_count": {"$sum": 1},
+                    "win_count":
+                        {
+                            "$sum":
+                                {
+                                    "$cond":
+                                        {
+                                            "if": {"$gte": ["$the_profit", 0]},
+                                            "then": 1,
+                                            "else": 0
+                                        }
+                                }
+
+                        },
+                    "profit_amount":
+                        {
+                            "$sum": "$the_profit"
+                        }
+                }
+        }
+        pipeline.append(g)
+        col = mongo_db.get_conn(table_name="trade")
+        r = col.aggregate(pipeline=pipeline)
+        r = [x for x in r]
+        resp = {
+            x['_id']:
+                {
+                    "case_count": x.get('case_count', 0),   # 喊单总计
+                    "win_count": x.get('win_count', 0),       # 胜场统计
+                    "profit_amount": x.get('profit_amount', 0),  # 盈利累加
+                 }
+            for x in r}
+        f = {"_id": {"$in": ids}}
+        projection = ["_id", "deposit_amount"]
+        deposit_amounts = {x['_id']: x['deposit_amount'] for x in cls.find(filter_dict=f, projection=projection)}
+        for _id, item in resp.items():
+            """计算盈利率"""
+            deposit_amount = deposit_amounts.get(_id, 0)
+            if deposit_amount == 0:
+                profit_ratio = 0
+            else:
+                profit_ratio = item.get("profit_amount", 0) / deposit_amount
+            item['profit_ratio'] = profit_ratio
+            """计算胜率"""
+            total = item.get("case_count", 0)
+            if total == 0:
+                win_ratio = 0
+            else:
+                win_ratio = item.get("win_count", 0) / total
+            item['win_ratio'] = win_ratio
+            f = {"_id": _id}
+            u = {"$set": item}
+            cls.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
+        return resp
+
+
 
 if __name__ == "__main__":
     """查询单个老师的持仓记录"""
-    print(Teacher.count(filter_dict={}))
+    # print(Teacher.count(filter_dict={}))
+    ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
+    Teacher.re_calculate(ids=ids)
     pass

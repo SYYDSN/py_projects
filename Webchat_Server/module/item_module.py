@@ -617,12 +617,12 @@ class Score(mongo_db.BaseDoc):
             now = datetime.datetime.now()
             if not init:
                 temp = {
-                    "type": "init", "num": 0, "user_id": user_id,
+                    "type": "init", "num": 50, "user_id": user_id,
                     "desc": "用户初始化", "time": now
                 }
                 inserts.append(temp)
             if not bind_phone:
-                score += 1000
+                # score += 1000
                 temp = {
                     "type": "bind_phone", "num": 100, "user_id": user_id,
                     "desc": "绑定手机", "time": now
