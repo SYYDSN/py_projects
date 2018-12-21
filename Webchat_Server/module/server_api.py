@@ -49,7 +49,7 @@ class JSAPITicket(mongo_db.BaseDoc):
         """
         res = None
         f = dict()
-        s = {"time": -1}
+        s = [("time", -1)]
         one = cls.find_one(filter_dict=f, sort=s)
         flag = False
         if one is None:
@@ -155,7 +155,7 @@ class AccessToken(mongo_db.BaseDoc):
         """
         res = None
         f = dict()
-        s = {"time": -1}
+        s = [("time", -1)]
         one = cls.find_one(filter_dict=f, sort=s)
         flag = False
         if one is None:
@@ -213,7 +213,7 @@ class AccessToken(mongo_db.BaseDoc):
                 data['time'] = datetime.datetime.now()
                 data['token'] = token
                 data['expires'] = expires
-                cls.insert_one(**data)
+                cls.insert_one(doc=data)
                 res['data'] = data
         else:
             res['message'] = "服务器返回错误的状态:{}".format(r.status_code)

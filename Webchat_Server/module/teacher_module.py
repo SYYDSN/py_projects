@@ -610,7 +610,7 @@ class Teacher(mongo_db.BaseDoc):
             x['_id']:
                 {
                     "case_count": x.get('case_count', 0),   # 喊单总计
-                    "win_count": x.get('win_count', 0),       # 胜场统计
+                    "win_count": round(x.get('win_count', 0), 2),       # 胜场统计
                     "profit_amount": x.get('profit_amount', 0),  # 盈利累加
                  }
             for x in r}
@@ -623,7 +623,7 @@ class Teacher(mongo_db.BaseDoc):
             if deposit_amount == 0:
                 profit_ratio = 0
             else:
-                profit_ratio = item.get("profit_amount", 0) / deposit_amount
+                profit_ratio = round((item.get("profit_amount", 0) / deposit_amount * 100), 2)
             item['profit_ratio'] = profit_ratio
             """计算胜率"""
             total = item.get("case_count", 0)
@@ -643,5 +643,5 @@ if __name__ == "__main__":
     """查询单个老师的持仓记录"""
     # print(Teacher.count(filter_dict={}))
     ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
-    Teacher.re_calculate(ids=ids)
+    Teacher.re_calculate()
     pass
