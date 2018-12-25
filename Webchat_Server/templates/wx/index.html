@@ -59,7 +59,7 @@
                                             <img src="{{ x.head_img }}" />{{ x.name }}
                                         </p>
                                         <p class="num">
-                                            <span style={{"color:#e35e57" if x.profit_ratio | float >= 0 else "color:#17b640"}}>{{ x.profit_ratio }}</span>累积收益率
+                                            <span style={{"color:#e35e57" if x.profit_ratio | float >= 0 else "color:#17b640"}}>{{ x.profit_ratio | short_num2 }}</span>累积收益率
                                         </p>
                                         <p class="history">
                                             <span>{{ x.total }}</span>历史跟随
