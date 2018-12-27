@@ -5,7 +5,7 @@ from flask import request
 from views.manage_view import manage_blueprint
 from flask import session
 from flask import send_file
-from module.item_module import TempRecord
+from module.log_tools import SystemLog
 from tools_module import get_arg
 from flask_session import Session
 from my_filter import mount_plugin
@@ -71,6 +71,20 @@ def query_func():
 @app.route("/upload", methods=['post'])
 def upload_func():
     """同步任务结果/回传条码数据"""
+    """先要记录请求信息"""
+    req_files = request.files
+    c_ip = request.remote_addr
+    data = {}
+    for arg_name, storage in req_files.items():
+        data[arg_name] = storage.filename
+    kw = {
+        "file": __file__,
+        "func": "query_server.upload_func",
+        "log_type": "回传数据",
+        "content": data,
+        "ip": c_ip
+    }
+    SystemLog.log(**kw)
     mes = TaskSync.upload(req=request)
     return json.dumps(mes)
 

@@ -18,7 +18,6 @@ def upload_task_sync():
         print(r)
 
 
-
 if __name__ == "__main__":
     upload_task_sync()
     pass
