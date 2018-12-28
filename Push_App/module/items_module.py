@@ -10,6 +10,15 @@ import random
 
 
 ObjectId = orm_module.ObjectId
+start_img_dir = os.path.join(__project_dir__, "resource", "start_image")
+
+
+def check_start_dir():
+    """检查启动图片目录"""
+    if not os.path.exists(start_img_dir):
+        os.makedirs(path=start_img_dir)
+    else:
+        pass
 
 
 """对象类"""
@@ -256,6 +265,39 @@ class User(orm_module.BaseDoc):
                     else:
                         mes['message'] = "原始密码错误"
         return mes
+
+
+class StartArgs(orm_module.BaseDoc):
+    """
+    启动参数,
+    其中的启动图片建议如下:
+    像素 1080*1920
+    长宽比 9:16
+    """
+    _table_name = "start_args"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['delay'] = int  # 启动延迟
+    type_dict['img_url'] = str  # 启动图片地址(不包含主机地址)
+    type_dict['time'] = datetime.datetime
+
+    @classmethod
+    def get_last(cls) -> dict:
+        """
+        获取最新的启动参数
+        :return:
+        """
+        mes = {"message": "success"}
+        s = [("time", -1)]
+        r = cls.find_one(filter_dict=dict(), sort=s)
+        if r is None:
+            mes['delay'] = 1
+            mes['img_url'] = ""
+        else:
+            mes['delay'] = r.get("delay", 1)
+            mes['img_url'] = r.get("img_url", "")
+        return mes
+
 
 
 if __name__ == "__main__":

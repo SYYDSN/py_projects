@@ -92,11 +92,39 @@ def location_func():
     mes = {"message": "success"}
     json_data = request.json
     if json_data is None or len(json_data) == 0:
-        print("没有发现json数据")
+        ms = "没有发现json参数"
+        print(ms)
+        mes['message'] = ms
     else:
         """处理数据"""
         try:
             mes = Location.save_data(json_data=json_data)
+        except Exception as e:
+            print(e)
+            mes['message'] = "db error"
+        finally:
+            pass
+    return json.dumps(mes)
+
+
+@app.route("/start_args", methods=['post', 'get'])
+@check_auth
+def start_args_func():
+    """
+    查询启动参数
+    :return:
+    """
+    mes = {"message": "success"}
+    json_data = request.json
+    if json_data is None or len(json_data) == 0:
+        ms = "没有发现json参数"
+        print(ms)
+        mes['message'] = ms
+    else:
+        """处理数据"""
+        try:
+            registration_id = json_data.get("registration_id")
+            mes = StartArgs.get_last()
         except Exception as e:
             print(e)
             mes['message'] = "db error"

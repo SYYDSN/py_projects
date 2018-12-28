@@ -81,6 +81,36 @@ class LogoutView(MyView):
         return self.get()
 
 
+class UploadView(MyView):
+    """上传图片/文件视图"""
+    _rule = "upload/<file_type>"
+    _allowed_view = [0, 3]
+    _allowed_edit = []
+    _allowed_delete = []
+    _name = "上传文件"
+
+    @check_session
+    def get(self, user: dict):
+        """
+        上传
+        :param user:
+        :param file_name:
+        :return:
+        """
+        access_filter = self.operate_filter(user=user, operate="view")
+        if isinstance(access_filter, dict):
+            directory = os.path.join(__project_dir__, "export_data")
+            return send_from_directory(directory=directory, filename=file_name, attachment_filename=file_name,
+                                       as_attachment=True)
+        else:
+            return abort(403)  # 权限不足
+
+    def post(self, user: dict):
+        return self.get(uer=user)
+
+
+
+
 class DownLoadPrintFileView(MyView):
     """下载批量打印的文件函数"""
     _rule = "/print_file/<file_name>"
