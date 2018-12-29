@@ -94,7 +94,7 @@ default_blue = #286090
             .table_outer
                 min-height calc(100% - 100px)
                 overflow-y scroll
-                #file_list
+                >.table
                     .select
                         width 30px
                     tr
@@ -150,8 +150,8 @@ default_blue = #286090
         align-items center
         display none
         > .modal_inner
-            width 500px
-            height 400px
+            width 800px
+            height 600px
             margin-top -20%
             border-radius 5px
             background-color rgba(255, 255, 255, 1)
@@ -178,34 +178,37 @@ default_blue = #286090
                         text-align center
                         width 30%
                         font-weight 400
-                    > input, .my_package
+                    >textarea
+                        height 120px
+                    >.last,input,textarea
                         outline none
                         width 70%
                         padding 5px
                         border 1px solid rgba(180, 180, 180, 1)
                         border-radius 6px
                         box-shadow none
-                    .my_package
-                        border none
+                    >.last
                         display flex
                         flex-direction row
                         justify-content flex-start
                         align-items center
-                        > input
-                            border 1px solid #b4b4b4
-                            outline none
-                            width 46%
-                            padding 4px 5px
-                        > .left
-                            maegin-right -1px
-                            border-radius 6px 0 0 6px
-                        > .right
-                            margin-left -1px
-                            border-radius 0 6px 6px 0
-                        > span
-                            display inline-block
-                            text-align center
-                            width 10%
+                        border none
+                        >input
+                            border-top-right-radius 0
+                            border-bottom-right-radius 0
+                        >#mes_icon_url
+                            background-color lightgrey
+                            width calc(100% - 47px)
+                        >#mes_icon
+                            display block
+                            width 35px
+                            height 32px
+                            margin 2px 2px 2px 8px
+                            border-top-right-radius 6px
+                            border-bottom-right-radius 6px
+                            border 1px solid rgba(180, 180, 180, 1)
+                        >#upload_img
+                            display none
             .modal_bot
                 padding-bottom 20px
                 display flex

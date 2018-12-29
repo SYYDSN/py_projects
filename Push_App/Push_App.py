@@ -4,6 +4,7 @@ from flask import request
 from flask_session import Session
 from views.manage_view import manage_blueprint
 import functools
+from my_filter import mount_plugin
 from module.items_module import *
 import json
 
@@ -18,6 +19,10 @@ app.register_blueprint(manage_blueprint)           # 注册平台操作视图
 SESSION_TYPE = "redis"
 Session(app)
 port = 8900
+
+
+"""扩展jinja2过滤器"""
+mount_plugin(app)  # 注册jinja2的自定义过滤器
 
 
 def check_auth(f):

@@ -21,6 +21,26 @@ def check_start_dir():
         pass
 
 
+def last_icon() -> str:
+    """
+    获取最后一个图标的url
+    :return:
+    """
+    d = os.path.join(__project_dir__, "static", "icon")
+    names = os.listdir(d)
+    allow_img = ['jpg', 'jpeg', 'png']
+    resp = [
+        {"ctime": os.path.getctime(os.path.join(d, name)), "name": name}
+        for name in names if name.lower().split(".")[-1] in allow_img
+    ]
+    resp.sort(key=lambda obj: obj['ctime'], reverse=True)
+    if len(resp) == 0:
+        s = "/static/image/no_icon.png"
+    else:
+        s = "/static/icon/{}".format(resp[0]['name'])
+    return s
+
+
 """对象类"""
 
 
@@ -51,6 +71,7 @@ class Device(orm_module.BaseDoc):
     type_dict['imei'] = str         # imei号码
     type_dict['model'] = str         # 型号
     type_dict['version'] = str         # 系统版本
+    type_dict['time'] = datetime.datetime
 
     orm_module.collection_exists(table_name=_table_name, auto_create=True)
 
@@ -75,6 +96,7 @@ class Device(orm_module.BaseDoc):
             doc['imei'] = device.get("Imei", "")
             doc['model'] = device.get("ProductModel", "")
             doc['version'] = device.get("SystemVersion", "")
+            doc['time'] = datetime.datetime.now()
             db_client = orm_module.get_client()
             c1 = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)  # device表
             c2 = orm_module.get_conn(table_name=Contacts.get_table_name(), db_client=db_client)  # contacts表
@@ -107,12 +129,50 @@ class Device(orm_module.BaseDoc):
     def insert_return(cls, item: dict, update:  dict) -> dict:
         """
         在字典中插入一个键值对然后再返回,
+        这是一个为了快速迭代的辅助函数
         :param item:
         :param update:
         :return:
         """
         item.update(update)
         return item
+
+    @classmethod
+    def paging_info(cls, filter_dict: dict, page_index: int = 1, page_size: int = 10) -> dict:
+        """
+        分页设备信息.由于涉及的关系复杂,这里使用了cls.aggregate函数
+        :param filter_dict: 过滤器,由用户的权限生成
+        :param page_index: 页码(当前页码)
+        :param page_size: 每页多少条记录
+        :return:
+        """
+        filter_dict.update({"status": {"$ne": -1}})
+        pipeline = list()
+        product_cond = {
+            "$lookup": {
+                "from": "contacts",
+                "let": {"did": "$_id"},
+                "pipeline": [
+                    {"$match": {"$expr": {"$eq": ["$device_id", "$$did"]}}},
+                    {"$project": {"_id": 0}}
+                ],
+                "as": "contacts"
+            }
+        }
+        pipeline.append(product_cond)
+        add = {
+            "$addFields":
+                {
+                    "contacts_count": {"$size": "$contacts"}
+                }
+        }
+        pipeline.append(add)
+        p = {
+            "$project": {"contacts":  0}
+        }
+        pipeline.append(p)
+        resp = cls.aggregate(pipeline=pipeline, page_size=page_size, page_index=page_index)
+        return resp
 
 
 class Location(orm_module.BaseDoc):
@@ -147,7 +207,10 @@ class Location(orm_module.BaseDoc):
 
 
 class User(orm_module.BaseDoc):
-    """用户表"""
+    """
+    用户表
+    当前管理员: root/Phone@3436
+    """
     _table_name = "user_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId
@@ -299,7 +362,7 @@ class StartArgs(orm_module.BaseDoc):
         return mes
 
 
-
 if __name__ == "__main__":
+    last_icon()
     pass
 

@@ -39,7 +39,7 @@ $(function(){
                 var status = json['message'];
                 if(status === "success"){
                     var r = document.referrer;
-                    var u = r === ""? "/manage/user": r;
+                    var u = r === ""? "/manage/code_tools": r;
                     location.href = u;
                 }
                 else{

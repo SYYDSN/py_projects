@@ -32,8 +32,8 @@ render_data = dict()  # 用来渲染的数据
 render_data['project_name'] = project_name
 """导航菜单"""
 navs = [
-    {"name": "消息推送", "path": "/manage/message", "class": "fa fa-exclamation-circle", "children": [
-        {"name": "消息推送", "path": "/manage/product"}
+    {"name": "设备管理", "path": "/manage/device_list", "class": "fa fa-exclamation-circle", "children": [
+        {"name": "设备列表", "path": "/manage/device_list"}
     ]}
 ]
 
@@ -109,8 +109,6 @@ class UploadView(MyView):
         return self.get(uer=user)
 
 
-
-
 class DownLoadPrintFileView(MyView):
     """下载批量打印的文件函数"""
     _rule = "/print_file/<file_name>"
@@ -135,62 +133,33 @@ class DownLoadPrintFileView(MyView):
             return abort(403)  # 权限不足
 
 
-class ManageUserView(MyView):
-    """管理用户页面视图函数"""
-    _rule = "/user"
-    _allowed_view = [0, 1, 3]
-    _name = "用户管理"
-
-    @classmethod
-    def _get_filter(cls, user_id: ObjectId, access_value: int, operate: str = "view") -> dict:
-        """
-        根据用户信息和访问级别的值.构建并返回一个用于查询的字典.此函数应该只被cls.identity调用.
-        当你重新定义过访问级别的值后.请重构此函数
-        :param user_id: 过滤器中的字段,一般是user_id,也可能是其他字段.不同的视图类请重构此函数.
-        :param access_value:
-        :param operate:
-        :return: 返回None表示禁止访问
-        """
-        res = None
-        _access_rules = cls._access_rules
-        d = list(_access_rules.keys())
-        if access_value not in d:
-            ms = "权限值:{} 未被定义".format(access_value)
-            raise ValueError(ms)
-        else:
-            if access_value == 1:
-                res = {"_id": user_id}
-            elif access_value == 2:
-                ms = "未实现的访问级别控制: {}".format(access_value)
-                raise NotImplementedError(ms)
-            elif access_value == 3:
-                res = dict()
-            else:
-                pass
-        return res
+class ManagePhoneView(MyView):
+    """管理设备视图函数"""
+    _rule = "/device_<key>"
+    _allowed_view = [0, 3]
+    _name = "设备管理"
 
     @check_session
-    def get(self, user: dict):
-        """返回管理用户界面"""
-        render_data['page_title'] = "用户管理"
+    def get(self, user: dict, key:  str):
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
         access_filter = self.operate_filter(user)  # 数据访问权
         c = self.check_nav(navs=navs, user=user)  # 导航访问权
         render_data['navs'] = c
-
         if isinstance(access_filter, dict):
-            """不显示管理员用户"""
-            access_filter.update({"role_id": {"$ne": ObjectId("5bdfad388e76d6efa7b92d9e")}})
-            page_index = get_arg(request, "page", 1)
-            r = User.paging_info(filter_dict=access_filter, page_index=page_index)  # 用户列表
-            users = r.pop("data", list())
-            f = {"_id": {"$ne": ObjectId("5bdfad388e76d6efa7b92d9e")}}
-            projection = ["_id", "role_name"]
-            roles = Role.find(filter_dict=f, projection=projection)
-            render_data['users'] = users
-            render_data['roles'] = roles
-            render_data.update(r)
-            return render_template("manage_user.html", **render_data)
+            """允许访问的用户"""
+            if key == "list":
+                """设备列表"""
+                render_data['page_title'] = "设备列表"
+                page_index = get_arg(request, "page", 1)
+                info = Device.paging_info(filter_dict=access_filter, page_index=page_index)
+                phones = info.pop("data", list())
+                render_data.update(info)
+                render_data['phones'] = phones
+                prev_icon = last_icon()  # 上一次使用的图标
+                render_data['prev_icon'] = prev_icon
+                return render_template("phone_list.html", **render_data)
+            else:
+                return abort(404)
         else:
             return abort(401, "access refused!")
 
@@ -301,8 +270,8 @@ LoginView.register(manage_blueprint)
 LogoutView.register(manage_blueprint)
 """下载批量打印的文件函数"""
 DownLoadPrintFileView.register(app=manage_blueprint)
-"""管理用户页面"""
-ManageUserView.register(app=manage_blueprint)
+"""管理移动设备页面"""
+ManagePhoneView.register(app=manage_blueprint)
 """查看修改自己的信息"""
 SelfInfoView.register(app=manage_blueprint)
 

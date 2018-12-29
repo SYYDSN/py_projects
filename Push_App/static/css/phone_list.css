@@ -121,15 +121,15 @@
   min-height: calc(100% - 100px);
   overflow-y: scroll;
 }
-.right_main .code_list_outer .code_list_inner .table_outer #file_list .select {
+.right_main .code_list_outer .code_list_inner .table_outer >.table .select {
   width: 30px;
 }
-.right_main .code_list_outer .code_list_inner .table_outer #file_list tr th {
+.right_main .code_list_outer .code_list_inner .table_outer >.table tr th {
   border-top: none;
   text-align: center;
   color: #717171;
 }
-.right_main .code_list_outer .code_list_inner .table_outer #file_list tr td {
+.right_main .code_list_outer .code_list_inner .table_outer >.table tr td {
   text-align: center;
   color: rgba(127,124,124,0.9);
 }
@@ -182,8 +182,8 @@
   display: none;
 }
 .right_main .modal_outer > .modal_inner {
-  width: 500px;
-  height: 400px;
+  width: 800px;
+  height: 600px;
   margin-top: -20%;
   border-radius: 5px;
   background-color: #fff;
@@ -216,8 +216,12 @@
   width: 30%;
   font-weight: 400;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line > input,
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package {
+.right_main .modal_outer > .modal_inner .modal_mid .line >textarea {
+  height: 120px;
+}
+.right_main .modal_outer > .modal_inner .modal_mid .line >.last,
+.right_main .modal_outer > .modal_inner .modal_mid .line input,
+.right_main .modal_outer > .modal_inner .modal_mid .line textarea {
   outline: none;
   width: 70%;
   padding: 5px;
@@ -225,31 +229,32 @@
   border-radius: 6px;
   box-shadow: none;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package {
-  border: none;
+.right_main .modal_outer > .modal_inner .modal_mid .line >.last {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  border: none;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package > input {
+.right_main .modal_outer > .modal_inner .modal_mid .line >.last >input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.right_main .modal_outer > .modal_inner .modal_mid .line >.last >#mes_icon_url {
+  background-color: #d3d3d3;
+  width: calc(100% - 47px);
+}
+.right_main .modal_outer > .modal_inner .modal_mid .line >.last >#mes_icon {
+  display: block;
+  width: 35px;
+  height: 32px;
+  margin: 2px 2px 2px 8px;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
   border: 1px solid #b4b4b4;
-  outline: none;
-  width: 46%;
-  padding: 4px 5px;
 }
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package > .left {
-  maegin-right: -1px;
-  border-radius: 6px 0 0 6px;
-}
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package > .right {
-  margin-left: -1px;
-  border-radius: 0 6px 6px 0;
-}
-.right_main .modal_outer > .modal_inner .modal_mid .line .my_package > span {
-  display: inline-block;
-  text-align: center;
-  width: 10%;
+.right_main .modal_outer > .modal_inner .modal_mid .line >.last >#upload_img {
+  display: none;
 }
 .right_main .modal_outer > .modal_inner .modal_bot {
   padding-bottom: 20px;

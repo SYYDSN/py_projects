@@ -1,0 +1,222 @@
+{% extends "standard_page.html" %}
+
+{% block css %}
+   <link rel="stylesheet" href="/static/css/phone_list.css">
+{% endblock %}
+
+{% block show_area %}
+
+    <div class="right_top">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="请输入搜索关键字...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Go!</button>
+              </span>
+        </div>
+    </div>
+
+    <div class="code_list_outer">
+        <div class="code_list_inner">
+            <div class="insert_div">
+                <div class="left">
+                    <i class="fa fa-list-ul"></i>
+                    <span id="clear_condition">所有信息</span>
+                </div>
+
+                <div class="right">
+                    <!--
+                    <div class="select_group">
+                        <div class="select_div">
+                            <label>名称</label>
+                            <div class="my_input dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="select_product_name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span data-id="" class="current_value"></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul data-type="product_name" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+{#                                    {% for k, v in selector.items() %}#}
+{#                                        <li onclick="select_value($(this))" data-id="{{ v }}"  class="select_value">{{ k }}</li>#}
+{#                                    {% endfor %}#}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="select_div">
+                            <label>规格</label>
+                            <div class="my_input dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="select_specification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span data-id="" class="current_value "></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul data-type="specification" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="select_div">
+                            <label>净含量</label>
+                            <div class="my_input dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="select_net_contents" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span data-role-id="" class="current_value"></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul data-type="net_contents" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="select_div">
+                            <label>包装比例</label>
+                            <div class="my_input dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="select_package_ratio" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span data-id="" class="current_value"></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul data-type="package_ratio" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="select_div">
+                            <label>库存:</label>
+                            <div class="my_input">
+                                <span class="deposit">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                    <button id="push_message" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                        自定义推送
+                    </button>
+                </div>
+            </div>
+
+            <div class="table_outer">
+                <table id="phone_list" class="table table-hover">
+                    <tr class="info">
+                        <th class="select"></th>
+                        <th>推送ID</th>
+                        <th>设备品牌</th>
+                        <th>设备型号</th>
+                        <th>系统版本</th>
+                        <th>IMEI</th>
+                        <th>联系人数量</th>
+                        <th>上传日期</th>
+                    </tr>
+                    {% for phone in phones %}
+                        <tr id="{{ phone._id }}">
+                            <td  class="select">
+                                <input data-id="{{ phone._id }}" type="checkbox" >
+                            </td>
+                            <td class="_id">{{ phone._id }}</td>
+                            <td class="brand">{{ phone.brand | upper }}</td>
+                            <td class="model">{{ phone.model | upper }}</td>
+                            <td class="version">{{ phone.version }}</td>
+                            <td class="imei">{{ phone.imei }}</td>
+                            <td class="contacts_count">{{ phone.contacts_count }}</td>
+                            <td class="upload_time">{{ phone.time | short_date3 }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="bottom_div">
+                <div class="left">
+                    <input type="checkbox" id="check_all">
+                    <span>全选</span>
+                    <button id="cancel_export" type="button" class="btn btn-sm btn-default btn-primary">
+                        撤销已导出数据
+                    </button>
+                    <button id="delete_export" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除已导出的文件和日志
+                    </button>
+                </div>
+                <div class="right">
+                    <i id="prev_page" class="fa fa-caret-left"></i>
+                    <span id="page_count">{{ current_page }}/{{ total_page }}</span>
+                    <i id="next_page" class="fa fa-caret-right"></i>
+                    <input type="text" id="page_num">
+                    <button id="jump_btn" type="button" class="btn btn-sm btn-default btn-primary">
+                        Go
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--弹框部分-->
+    <div class="modal_outer">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 id="modal_title">
+                    推送消息
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line">
+                    <label>设备id</label><textarea placeholder="请输入推送id.以空格或者逗号分割." id="push_ids"></textarea>
+                </div>
+                <div class="line">
+                    <label>消息标题</label><input type="text" id="mes_title">
+                </div>
+                <div class="line">
+                    <label>链接地址</label><input type="text" id="mes_url">
+                </div>
+                <div class="line">
+                    <label>内容摘要</label><input type="text" id="mes_desc">
+                </div>
+                <div class="line">
+                    <label>图标地址</label>
+                    <div class="last">
+                        <input type="text" readonly="readonly" id="mes_icon_url" placeholder="点击上传图标">
+                        <!--
+                            <input id="select_image" type="file" accept="image/*" capture="camera" multiple>
+                            accept表示打开系统文件目录
+                            accept="image/*"  打开相册
+                            accept="video/*"  打开视频
+                            capture  指调用哪些设备
+                            capture='microphone'   调用录音机
+                            capture='camera'       调用相机
+                            capture='camcorder'    调用摄像机
+                            file类型的input还有一个 multiple 的单值属性.表示同时提供打开文件和设备的选项.
+                            IOS中, multiple  属性无效. 必须写2个input来自行实现选择.
+                            判断是否是苹果手机的方法:
+                            navigator.userAgent.toLowerCase() == "iphone os"
+                            由于目前拍摄的照片尺寸过大,所以暂时关闭拍照的功能(没有capture="camera" 和 multiple属性)
+                        -->
+                        <input type="file" id="upload_img" accept="image/*">
+                        <img id="mes_icon" src="{{ prev_icon }}">
+                    </div>
+                </div>
+            </div>
+            <div class="modal_bot">
+                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
+                <button id="submit" class="btn btn-md btn-primary last">保存</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!--生成下载文件模态框部分-->
+    <div class="modal_outer_progress">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 id="modal_title_progress">
+                    生成文件
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line process_line">
+                    <span>数据处理中.视文件的大小,可能需要数分钟...</span>
+                    <i class="fa fa-spinner fa-pulse fa-4x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/phone_list.js"></script>
+{% endblock %}

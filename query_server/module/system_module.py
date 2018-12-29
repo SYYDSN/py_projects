@@ -623,7 +623,7 @@ class ProduceTask(orm_module.BaseDoc):
                                 },
                             }
                     },
-                    {   "$group":
+                    { "$group":
                             {
                                 "_id": "$product_id",
                                 "blank_count": {"$sum": 1},
