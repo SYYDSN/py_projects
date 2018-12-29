@@ -5,6 +5,7 @@ __root_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __root_path not in sys.path:
     sys.path.append(__root_path)
 import orm_module
+import gzip
 from flask import request
 import datetime
 from log_module import get_logger
@@ -13,6 +14,7 @@ import json
 import numpy as np
 import chardet
 import zipfile
+import warnings
 from io import TextIOWrapper
 
 
@@ -933,7 +935,7 @@ class TaskSync(orm_module.BaseDoc):
     @classmethod
     def group_code(cls, codes: list, code_package: dict = None) -> dict:
         """
-        把回传的字典类型的数据按照条码的级别归类.以方便快速批量修改
+        把回传的字典类型的数组按照条码的级别归类.以方便快速批量修改
         :param codes:
         :param code_package: 递归专用,无需传递此参数
         :return:
@@ -971,19 +973,55 @@ class TaskSync(orm_module.BaseDoc):
                 file.close()
             else:
                 """读取压缩文件"""
-                file = zipfile.ZipFile(file=file_path, mode="r", compression=zipfile.ZIP_DEFLATED)
-                name_list = file.namelist()
-                if len(name_list) == 0:
-                    mes['message'] = "压缩文件为空"
-                else:
-                    for name in name_list:
-                        content = file.read(name=name)
-                        if content == '':
-                            print("{}是空文件".format(name))
+                try:
+                    file = zipfile.ZipFile(file=file_path, mode="r", compression=zipfile.ZIP_DEFLATED)
+                    name_list = file.namelist()
+                    if len(name_list) == 0:
+                        mes['message'] = "压缩文件为空"
+                    else:
+                        for name in name_list:
+                            content = file.read(name=name)
+                            if content == '':
+                                print("{}是空文件".format(name))
+                            else:
+                                temp = cls.parse_json(content=content)
+                                data.extend(temp)
+                    file.close()
+                except zipfile.BadZipFile as e:
+                    ms = str(e)
+                    logger.exception(msg=ms)
+                    warnings.warn(message=ms)
+                    file = gzip.open(filename=file_path)
+                    content = None
+                    try:
+                        content = file.read()
+                    except OSError as e:
+                        ms = str(e)
+                        logger.exception(msg=ms)
+                        warnings.warn(message=ms)
+                        mes['message'] = "作为gzip类型读取失败"
+                    except Exception as e:
+                        ms = str(e)
+                        logger.exception(msg=ms)
+                        warnings.warn(message=ms)
+                        mes['message'] = "处理gzip文件时遇到错误: {}".format(ms)
+                    finally:
+                        file.close()
+                        if content is None:
+                            """处理出错了"""
+                            pass
+                        elif content == '':
+                            print("{}是空文件".format(file_path))
                         else:
-                            temp = cls.parse_json(file.read(name=name))
-                            data.append(temp)
-                file.close()
+                            temp = cls.parse_json(content=content)
+                            data.extend(temp)
+                except Exception as e:
+                    ms = str(e)
+                    logger.exception(msg=ms)
+                    warnings.warn(message=ms)
+                    mes['message'] = "读取zip文件时发生未知错误: {}".format(ms)
+                finally:
+                    pass
             result = cls.group_code(codes=data)
             desc = ""
             count = 0
