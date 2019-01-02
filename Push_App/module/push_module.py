@@ -16,10 +16,12 @@ AUTH = "MDIxMzFjYzA5OWU5NGYwNzQxN2QwOWE5OjZmNzA3ZmZlMzVmNzZjOTZjMmQ3YWQ3Mw=="
 headers = {"Authorization": "Basic {}".format(AUTH)}
 
 
-def push_mes(alert: str, cid: str = None, platform: (dict, None) = None, tags: (dict, None) = None) -> dict:
+def push_mes(alert: str, title: str, url: str, cid: str = None, platform: (dict, None) = None, tags: (dict, None) = None) -> dict:
     """
     构建发送参数字典并推送消息
-    :param alert:  通知栏提醒
+    :param alert:  内容摘要
+    :param title:  消息标题
+    :param url:  消息链接
     :param cid:  防止重复的消息的唯一性id
     :param platform:  {"platform": ["ios","android"]}/"all"
     :param tags:
@@ -37,32 +39,21 @@ def push_mes(alert: str, cid: str = None, platform: (dict, None) = None, tags: (
         "notification": {
             "android": {
                 "alert": alert,
-                "title": "Send to Android",
+                "title": title,
                 "builder_id": 1,
                 "large_icon": "http://www.jiguang.cn/largeIcon.jpg",
-                "intent": {
-                    "url": "intent:#Intent;component=com.jiguang.push/com.example.jpushdemo.SettingActivity;end",
-                },
                 "extras": {
-                    "newsid": 321
+                    "HTTPURL": url,
                 }
             },
             "ios": {
-                "alert": "Hi, JPush!",
+                "alert": alert,
                 "sound": "default",
                 "badge": "+1",
                 "thread-id": "default",
                 "extras": {
-                    "newsid": 321
+                    "HTTPURL": url,
                 }
-            }
-        },
-        "message": {
-            "msg_content": "Hi,JPush",
-            "content_type": "text",
-            "title": "msg",
-            "extras": {
-                "key": "value"
             }
         },
         "options": {
@@ -79,10 +70,8 @@ def push_mes(alert: str, cid: str = None, platform: (dict, None) = None, tags: (
     return mes
 
 
-
-
 if __name__ == "__main__":
     uid = uuid4().hex
-    tags = {"registration_id": ["1a0018970a8d065e7b0"]}
-    push_mes(alert="hello world", tags=tags)
+    tags = {"registration_id": ["170976fa8ad9fd6f9ad"]}
+    push_mes(alert="hello world", title="my title", url="http://www.middear.cn")
     pass

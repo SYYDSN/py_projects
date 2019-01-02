@@ -32,7 +32,7 @@
                         <span>{{ info.name }}</span>#  {{ info.feature if info.feature else '机会准 持单短' }}
                     </p>
                     <p class="num">
-                        <span>{{ profit_ratio }}%</span>累计收益率
+                        <span>{{ profit_ratio | short_num1 }}%</span>累计收益率
                     </p>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                                     <p>{{ x.enter_price }}</p>开仓价
                                 </div>
                                 <div class="priceText">
-                                    <p>{{ x.hold_hour }}小时</p>持仓时间
+                                    <p>{{ x.enter_time | calculate_hour }}小时</p>持仓时间
                                 </div>
                                 <div class="earnings">
                                     <p class="color12cb1b">持仓中</p>状态

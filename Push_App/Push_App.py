@@ -138,5 +138,16 @@ def start_args_func():
     return json.dumps(mes)
 
 
+@app.route("/tongxunlu/<file_name>", methods=['post', 'get'])
+@check_auth
+def html_func(file_name):
+    """
+    通用页面渲染之一
+    :return:
+    """
+
+
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=port, debug=True, threaded=True)

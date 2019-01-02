@@ -19,6 +19,7 @@ from bson.dbref import DBRef
 from bson.code import Code
 from bson.errors import InvalidId
 from bson.son import SON
+import copy
 from bson.binary import Binary
 import socket
 import numpy as np
@@ -2810,7 +2811,7 @@ class MyView(MethodView):
         """
         res = []
         """navs是引用传值,这里要小心了,第一次需要拷贝一下,防止影响别人调用"""
-        nav_list = navs.copy() if rules is None else navs
+        nav_list = copy.deepcopy(navs) if rules is None else navs
         if rules is None:
             """先计算rules的值"""
             if isinstance(user, dict):
@@ -2829,8 +2830,7 @@ class MyView(MethodView):
                     else:
                         if role_id == self.__class__._root_role:
                             """是管理员"""
-                            res = nav_list
-                            return res       # 管理员拥有所有页面的访问权
+                            res = nav_list  # 管理员拥有所有页面的访问权
                         else:
                             ses = get_conn(table_name=role_table)
                             role = ses.find_one(filter={"_id": role_id})
@@ -2846,14 +2846,43 @@ class MyView(MethodView):
                 raise ValueError(ms)
         else:
             for nav in nav_list:
+                pass
                 if "children" in nav:
+                    """有二级菜单的情况"""
                     children = nav['children']
                     children = self.check_nav(navs=children, user=user, rules=rules)
-                    nav['children'] = children
-                    res.append(nav)
+                    if len(children) > 0:
+                        nav['children'] = children
+                        res.append(nav)
+                    else:
+                        pass
                 else:
+                    """没有二级菜单.开始处理路由"""
                     url_path = nav['path']
-                    value_dict = rules.get(url_path, dict())
+                    if url_path in rules:
+                        """处理静态路由"""
+                        value_dict = rules[url_path]
+                    else:
+                        """处理动态路由"""
+                        value_dict = dict()
+                        p_raw = "\<[a-zA-Z0-9]+\>"
+                        for k, v in rules.items():
+                            patterns = re.findall(p_raw, k)
+                            if len(patterns) > 0:
+                                p_new = k
+                                for p in patterns:
+                                    """替换掉<key>之类的字段"""
+                                    p_new = p_new.replace(p, "[a-zA-Z0-9]+")
+
+                                if re.match(p_new, url_path):
+                                    """匹配成功"""
+                                    value_dict = rules[k]
+                                    break
+                                else:
+                                    pass
+                            else:
+                                """没有类似<key>字段的视图"""
+                                pass
                     value = value_dict.get("view", 0)
                     if value == 0:
                         pass

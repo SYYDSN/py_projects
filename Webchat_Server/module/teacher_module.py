@@ -313,6 +313,18 @@ class Teacher(mongo_db.BaseDoc):
         return res
 
     @classmethod
+    def hold_overflow(cls, teacher_id: ObjectId) -> bool:
+        """
+        检查老师是否持仓过多?超过5个,超过了就不能开单了.
+        :param teacher_id:
+        :return:
+        """
+        f = {"teacher_id": teacher_id, "case_type": "enter"}
+        col = mongo_db.get_conn(table_name="trade")
+        r = col.count_documents(filter=f)
+        return True if r >= 5 else False
+
+    @classmethod
     def index(cls, begin: datetime.datetime = None, end: datetime.datetime = None):
         """
         返回首页所用的信息,一个以胜率排序的列表,元素包含胜率.和跟随人数
@@ -394,14 +406,15 @@ class Teacher(mongo_db.BaseDoc):
         :return:
         """
         now = datetime.datetime.now()
-        prev = now - datetime.timedelta(days=60)
+        prev = now - datetime.timedelta(days=prev)
         t_id = ObjectId(t_id) if isinstance(t_id, str) and len(t_id) == 24 else t_id
         f = {"teacher_id": t_id, "enter_time": {"$gte": prev}}
         s = [("enter_time", -1)]
         ses = mongo_db.get_conn(table_name="trade")
         r = ses.find(filter=f, sort=s)
-        history = [x for x in r]
-        hold = [x for x in history if x['case_type'] == "enter"]
+        history = list()
+        hold = list()
+        [hold.append(x) if x['case_type'] == "enter" else history.append(x) for x in r]
         return {"hold": hold, "history": history}
 
     @classmethod
@@ -643,5 +656,5 @@ if __name__ == "__main__":
     """查询单个老师的持仓记录"""
     # print(Teacher.count(filter_dict={}))
     ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
-    Teacher.re_calculate()
+    print(Teacher.single_info2(ObjectId("5b8c5451dbea62189b5c28eb")))
     pass

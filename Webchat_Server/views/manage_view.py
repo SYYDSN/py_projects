@@ -318,7 +318,7 @@ class ManageTradeView(MyView):
                 render_data.update(result)
                 render_data['trades'] = trades
                 current_rule = self.current_rule_value(role_id=admin['role_id'], operate="delete")
-                render_data['allowed_delete'] = current_rule
+                render_data['allowed_delete'] = 1 if self.is_root(user=admin) else current_rule
                 return render_template("manage/trade_history.html", **render_data)
             else:
                 return abort(404)

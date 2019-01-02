@@ -118,7 +118,10 @@ class AdminRole(orm_module.BaseDoc):
 
 
 class Admin(orm_module.BaseDoc):
-    """用户表"""
+    """
+    用户表
+    当前管理员: trade_manage/Wx@123457
+    """
     _table_name = "admin_info"
     type_dict = dict()
     type_dict['_id'] = ObjectId

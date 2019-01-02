@@ -5,6 +5,17 @@ import datetime
 """自定义jinja2的过滤器"""
 
 
+def __calculate_hour(a_time: datetime.datetime) -> float:
+    """
+    计算给定的时间到现在经历了多少个小时,保留一位小数点.
+    :param a_time:
+    :return:
+    """
+    delta = datetime.datetime.now() - a_time
+    r = round(delta.total_seconds() / 3600, 1)
+    return r
+
+
 def __short_num(num: float) -> float:
     """不保留小数"""
     return int(num)
@@ -141,6 +152,7 @@ def __deposit_warning(plan: int, deposit: int) -> str:
 
 def mount_plugin(app):
     """注册自定义的过滤器和测试器"""
+    app.jinja_env.filters['calculate_hour'] = __calculate_hour
     app.jinja_env.filters['short_num'] = __short_num
     app.jinja_env.filters['short_num1'] = __short_num1
     app.jinja_env.filters['short_num2'] = __short_num2
