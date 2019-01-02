@@ -335,45 +335,48 @@ def process_case_page2(teacher: dict = None):
                         send_mail(title=title, content=content)
                         mes = {"message": "缺少离场价格"}
             else:
-                """2 这是进场"""
-                """2.1 先处理进场时间"""
-                enter_time_s = args.get("enter_time", '')
-                enter_time = mongo_db.get_datetime_from_str(enter_time_s)
-                if isinstance(enter_time, datetime.datetime):
-                    args['enter_time'] = enter_time
+                """2 这是进场, 先检查是否持仓过多"""
+                if Teacher.hold_overflow(teacher_id=teacher['_id']):
+                    mes['message'] = "持仓超过上限"
                 else:
-                    title = "{}进场时没有传递进场时间".format(now)
-                    content = "老师id: {}, trade_id:{}, enter_time:{}".format(t_id, _id, enter_time_s)
-                    logger.exception(msg=title + content)
-                    send_mail(title=title, content=content)
-                    args['enter_time'] = now
-                """2.2 处理进场价格"""
-                enter_price = None
-                enter_price_s = args.pop("enter_price", None)
-                try:
-                    enter_price = float(enter_price_s)
-                except Exception as e:
-                    print(e)
-                finally:
-                    if isinstance(enter_price, float):
-                        args['enter_price'] = float(enter_price)
-                        args['_id'] = ObjectId()
-                        args['case_type'] = "enter"
-                        args['each_profit'] = 0.0
-                        args['lots'] = 1
-                        args['native_direction'] = args['direction']
-                        args['record_id'] = args['_id']
-                        if process_case(doc_dict=args, raw=True):
-                            """成功"""
-                            mes['message'] = 'success'
-                        else:
-                            mes = {"message": "操作失败"}
+                    """可以进场, 2.1 先处理进场时间"""
+                    enter_time_s = args.get("enter_time", '')
+                    enter_time = mongo_db.get_datetime_from_str(enter_time_s)
+                    if isinstance(enter_time, datetime.datetime):
+                        args['enter_time'] = enter_time
                     else:
-                        title = "{}进场时没有传递进场价格".format(now)
-                        content = "老师id: {}, trade_id:{},enter_price:{} ".format(t_id, _id, enter_price_s)
+                        title = "{}进场时没有传递进场时间".format(now)
+                        content = "老师id: {}, trade_id:{}, enter_time:{}".format(t_id, _id, enter_time_s)
                         logger.exception(msg=title + content)
                         send_mail(title=title, content=content)
-                        mes = {"message": "缺少进场价格"}
+                        args['enter_time'] = now
+                    """2.2 处理进场价格"""
+                    enter_price = None
+                    enter_price_s = args.pop("enter_price", None)
+                    try:
+                        enter_price = float(enter_price_s)
+                    except Exception as e:
+                        print(e)
+                    finally:
+                        if isinstance(enter_price, float):
+                            args['enter_price'] = float(enter_price)
+                            args['_id'] = ObjectId()
+                            args['case_type'] = "enter"
+                            args['each_profit'] = 0.0
+                            args['lots'] = 1
+                            args['native_direction'] = args['direction']
+                            args['record_id'] = args['_id']
+                            if process_case(doc_dict=args, raw=True):
+                                """成功"""
+                                mes['message'] = 'success'
+                            else:
+                                mes = {"message": "操作失败"}
+                        else:
+                            title = "{}进场时没有传递进场价格".format(now)
+                            content = "老师id: {}, trade_id:{},enter_price:{} ".format(t_id, _id, enter_price_s)
+                            logger.exception(msg=title + content)
+                            send_mail(title=title, content=content)
+                            mes = {"message": "缺少进场价格"}
         elif the_type == "trade_history":
             """历史喊单"""
             p = get_arg(request, "product", "")  # 是否对产品种类进行了筛选?
