@@ -7,9 +7,6 @@ $(function(){
         }
     );
 
-    // 点击点击上传图标input事件
-    $("#mes_icon_url").click(function(){$("#upload_img").click();});
-
     // 撤销导出的数据
     $("#cancel_export").click(function(){
         var d = [];
@@ -71,41 +68,31 @@ $(function(){
         }
     });
 
-    // 导出打印条码
-    $("#pickle_file").click(function(){
-        var product_id = select_success();
-        var count = parseInt($.trim($(".my_input .deposit").text()));
-        if(product_id.length === 24 && count > 0){
-            var cn = prompt(`请输入需要导出的条码数目(不能大于${count})`);
-            var number = parseInt(cn);
-            if(isNaN(number) || number > count){
-                alert("导出数量必须是数字");
-            }else{
-                $(".modal_outer_progress").css("display", "flex");
-                var args = {
-                    "type": 'export',
-                    "product_id": product_id,
-                    "number": number
-                };
-                $.post(location.pathname, args, function(resp){
-                    $(".modal_outer_progress").css("display", "none");
-                    var json = JSON.parse(resp);
-                    var status = json['message'];
-                    if(status === "success"){
-                        alert("生成成功!");
-                        location.reload();
-                    }
-                    else{
-                        alert(status);
-                    }
-                });
+    // 批量推送消息的函数
+    var push_message = function(id_str){
+        // ids待发送消息的客户端的极光id的和空格组成的字符串
+        var id_str = $.trim($("#push_ids").val()).split(" ");
+        var ids = [];
+        for(var id of id_str){
+            if(id === ""){
+                // nothing...
+            }
+            else{
+                ids.push(id);
             }
         }
-        else{
-            // nothing...
-            alert("请先查询条码库存");
+        console.log(ids);
+        if(ids.length === 0){
+            alert("请输入有效的推送id,id之间用空格隔开!");
+            return false;
         }
-    });
+        else{
+            // 通知栏标题,不设值就是app的名字.
+            var bar_title = $.trim();
+            // 消息标题,设置了会覆盖bar_title
+            var mes_title = $.trim();
+        }
+    };
 
     
     /*全选事件*/

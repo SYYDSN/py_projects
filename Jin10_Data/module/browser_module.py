@@ -406,7 +406,6 @@ if __name__ == "__main__":
         now = datetime.datetime.now()
         if (now - prev_refresh).total_seconds() > 3600:
             """1小时刷新一次页面"""
-            prev_refresh = now
             browser.delete_all_cookies()  # 清理缓存
             browser.refresh()             # 刷新页面
         else:
@@ -424,8 +423,7 @@ if __name__ == "__main__":
         print(end)
         delay = (end - now).total_seconds() - 5
         print("delay is {}".format(delay))
-        if delay < 0:
-            pass
-        else:
-            time.sleep(delay)
+        delay = all(delay) if delay < 0 else 1
+        prev_refresh = end
+        time.sleep(delay)
     pass

@@ -19,6 +19,9 @@ from module.admin_module import *
 from module.trade_module import *
 from module.trade_module import Teacher
 from tools_module import *
+from bson.son import SON
+from collections import OrderedDict
+import warnings
 
 
 """"
@@ -170,9 +173,42 @@ class DownLoadOutputFileView(MyView):
 
 class ManageTradeView(MyView):
     """交易管理视图函数"""
+    _access_rules = OrderedDict()  # 定义访问级别
+    _access_rules[0] = "禁止访问"
+    _access_rules[1] = "允许操作"
     _rule = "/trade_<key>"
-    _allowed_view = [0, 3]
+    _allowed_view = [0, 1]
     _name = "交易管理"
+
+    """
+    注意:
+    trade表中有大量的没有the_profit的离场单,并且case_type字段没有的离场单也很多. 都暂时忽略.
+    现阶段case_type是必须的,case_type==exit是离场单,the_profit>=0 是胜单
+    """
+
+    @classmethod
+    def _get_filter(cls, user: dict, access_value: int, operate: str = "view") -> dict:
+        """
+        根据用户信息和访问级别的值.构建并返回一个用于查询的字典.此函数应该只被cls.identity调用.
+        当你重新定义过访问级别的值后.请重构此函数.注意,你可以根据operate的类型不同,分别针对类型去重构过滤器.
+        :param user: 用户信息字典.不同的视图类请重构此函数.
+        :param access_value:
+        :param operate:  权限的类型 分为 view/edit/delete  查看/编辑/删除
+        :return: 返回None表示禁止访问
+        """
+        ms = "已重新定义过权限范围过滤器"
+        warnings.warn(message=ms)
+        res = None
+        d = cls.get_rules(operate=operate)
+        if access_value not in d:
+            ms = "权限值:{} 未被定义".format(access_value)
+            raise ValueError(ms)
+        else:
+            if access_value == 1:
+                res = dict()
+            else:
+                pass
+        return res
 
     @check_admin_session
     def get(self, admin: dict, key):
@@ -252,6 +288,27 @@ class ManageTradeView(MyView):
                             kw['exit_time'] = {"$lte": end}
                         else:
                             pass
+                only_win = get_arg(request, "only_win", '-1')
+                try:
+                    only_win = int(only_win)
+                except Exception as e:
+                    print(e)
+                    only_win = -1
+                finally:
+                    if only_win == 1:
+                        """只看胜场"""
+                        kw['the_profit'] = {
+                            "$exists": True,
+                            "$gte": 0
+                        }
+                    elif only_win == 0:
+                        """只看负场"""
+                        kw['the_profit'] = {
+                            "$exists": True,
+                            "$lt": 0
+                        }
+                    else:
+                        pass
 
                 access_filter.update(kw)
                 result = Trade.paging_info(filter_dict=access_filter, page_size=page_size, page_index=page_index)
@@ -260,6 +317,8 @@ class ManageTradeView(MyView):
                 trades = result['data']
                 render_data.update(result)
                 render_data['trades'] = trades
+                current_rule = self.current_rule_value(role_id=admin['role_id'], operate="delete")
+                render_data['allowed_delete'] = current_rule
                 return render_template("manage/trade_history.html", **render_data)
             else:
                 return abort(404)
@@ -291,25 +350,29 @@ class ManageTradeView(MyView):
                     print(e)
                 finally:
                     if len(ids) == 0:
-                        mes['message'] = "没有发现需要删除的交易"
+                        mes['message'] = "没有发现需要反转的交易"
                     else:
                         ids = [ObjectId(x) for x in ids]
                         handler = admin['_id']
                         mes = Trade.batch_reverse(ids=ids, handler=handler)
             elif the_type == "delete":
                 """批量删除交易"""
-                ids = []
-                try:
-                    ids = json.loads(get_arg(request, "ids"))
-                except Exception as e:
-                    print(e)
-                finally:
-                    if len(ids) == 0:
-                        mes['message'] = "没有发现需要删除的交易"
-                    else:
-                        ids = [ObjectId(x) for x in ids]
-                        handler = admin['_id']
-                        mes = Trade.batch_delete(ids=ids, handler=handler)
+                rule = self.current_rule_value(role_id=admin['role_id'], operate="delete")
+                if rule == 1:
+                    ids = []
+                    try:
+                        ids = json.loads(get_arg(request, "ids"))
+                    except Exception as e:
+                        print(e)
+                    finally:
+                        if len(ids) == 0:
+                            mes['message'] = "没有发现需要删除的交易"
+                        else:
+                            ids = [ObjectId(x) for x in ids]
+                            handler = admin['_id']
+                            mes = Trade.batch_delete(ids=ids, handler=handler)
+                else:
+                    mes['message'] = "权限不足"
             else:
                 mes['message'] = "无效的操作类型:{}".format(the_type)
         return json.dumps(mes)
@@ -322,11 +385,11 @@ class ManageUserView(MyView):
     _name = "用户管理"
 
     @classmethod
-    def _get_filter(cls, user_id: ObjectId, access_value: int, operate: str = "view") -> dict:
+    def _get_filter(cls, user: dict, access_value: int, operate: str = "view") -> dict:
         """
         根据用户信息和访问级别的值.构建并返回一个用于查询的字典.此函数应该只被cls.identity调用.
         当你重新定义过访问级别的值后.请重构此函数
-        :param user_id: 过滤器中的字段,一般是user_id,也可能是其他字段.不同的视图类请重构此函数.
+        :param user: 用户信息字典.不同的视图类请重构此函数.
         :param access_value:
         :param operate:
         :return: 返回None表示禁止访问
@@ -339,7 +402,7 @@ class ManageUserView(MyView):
             raise ValueError(ms)
         else:
             if access_value == 1:
-                res = {"_id": user_id}
+                res = {"_id": user['_id']}
             elif access_value == 2:
                 ms = "未实现的访问级别控制: {}".format(access_value)
                 raise NotImplementedError(ms)

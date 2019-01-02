@@ -42,6 +42,22 @@
                 <div class="right">
                     <div class="select_group">
                         <div class="small_title">
+                            选择结果
+                        </div>
+                        <div class="my_input dropdown">
+                            <button class="only_win btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span data-id="-1" class="current_value ">不限</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul data-type="values" class="values dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                <li onclick="select_value($(this))" data-id="-1">不限</li>
+                                <li onclick="select_value($(this))" data-id="1">胜场</li>
+                                <li onclick="select_value($(this))" data-id="0">负场</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="select_group">
+                        <div class="small_title">
                             选择类型
                         </div>
                         <div class="my_input dropdown">
@@ -148,7 +164,7 @@
                         反转订单方向
                     </button>
 
-                    <button id="delete_trade" type="button" class="btn btn-sm btn-default btn-primary">
+                    <button id="delete_trade" data-rule="{{ allowed_delete }}" style="{{'display: none' if allowed_delete != 1 else ''}}" type="button" class="btn btn-sm btn-default btn-primary">
                         删除订单
                     </button>
                     <span class="handler_tips">

@@ -164,29 +164,6 @@
                 <div class="line">
                     <label>内容摘要</label><input type="text" id="mes_desc">
                 </div>
-                <div class="line">
-                    <label>图标地址</label>
-                    <div class="last">
-                        <input type="text" readonly="readonly" id="mes_icon_url" placeholder="点击上传图标">
-                        <!--
-                            <input id="select_image" type="file" accept="image/*" capture="camera" multiple>
-                            accept表示打开系统文件目录
-                            accept="image/*"  打开相册
-                            accept="video/*"  打开视频
-                            capture  指调用哪些设备
-                            capture='microphone'   调用录音机
-                            capture='camera'       调用相机
-                            capture='camcorder'    调用摄像机
-                            file类型的input还有一个 multiple 的单值属性.表示同时提供打开文件和设备的选项.
-                            IOS中, multiple  属性无效. 必须写2个input来自行实现选择.
-                            判断是否是苹果手机的方法:
-                            navigator.userAgent.toLowerCase() == "iphone os"
-                            由于目前拍摄的照片尺寸过大,所以暂时关闭拍照的功能(没有capture="camera" 和 multiple属性)
-                        -->
-                        <input type="file" id="upload_img" accept="image/*">
-                        <img id="mes_icon" src="{{ prev_icon }}">
-                    </div>
-                </div>
             </div>
             <div class="modal_bot">
                 <button id="close_medal" class="btn btn-md btn-default first">关闭</button>

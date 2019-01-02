@@ -2721,7 +2721,7 @@ class MyView(MethodView):
     千万不要 _allowed_edit = None 或者不设置.那样默认的等于和_allowed_view一样的设置
 
     子类继承的时候,建议重写以下函数以实现精确的权限控制:
-    1. cls.__get_filter  
+    1. cls._get_filter  
     用于详细定义和权限值对应的过滤器.这个函数只有uer_id(用户id),access_value(权限值) operate(访问类型),返回过滤器字典
     """
 
@@ -2746,7 +2746,7 @@ class MyView(MethodView):
     @classmethod
     def set_url_prefix(cls, url_prefix: str) -> None:
         """
-        设置路由规则的前缀
+        设置路由规则的前缀,在注册视图的时候自动调用
         :param url_prefix:
         :return:
         """
@@ -2839,7 +2839,11 @@ class MyView(MethodView):
                     res.append(nav)
                 else:
                     url_path = nav['path']
-                    value_dict = rules.get(url_path, dict())
+                    if url_path in rules:
+                        value_dict = rules[url_path]
+                    else:
+                        """处理动态路由"""
+                        value_dict = rules.get(url_path, dict())
                     value = value_dict.get("view", 0)
                     if value == 0:
                         pass
@@ -2893,6 +2897,10 @@ class MyView(MethodView):
                         """是管理员"""
                         res = dict()
                     else:
+                        value = cls.get_rule_value(role_id=role_id, url_path=url_path, role_table=role_table,
+                                                   operate=operate)
+                        res = cls._get_filter(user=user, access_value=value, operate=operate)
+                        """2019-1-2 注销,以函数替代,以便可以直接提取权限值.提高灵活性
                         ses = get_conn(table_name=role_table)
                         role = ses.find_one(filter={"_id": role_id})
                         if role is None:
@@ -2902,18 +2910,56 @@ class MyView(MethodView):
                             rules = role.get("rules", dict())
                             operate_rules = rules.get(url_path, dict())
                             value = operate_rules.get(operate, 0)
-                            res = cls._get_filter(user_id=user['_id'], access_value=value, operate=operate)
+                            res = cls._get_filter(user=user, access_value=value, operate=operate)
+                        """
         else:
             ms = "user_dict必须字典类型"
             raise ValueError(ms)
         return res
 
     @classmethod
-    def _get_filter(cls, user_id: ObjectId, access_value: int, operate: str = "view") -> dict:
+    def get_rule_value(cls, role_id: ObjectId, url_path: str = None,  role_table: str = "role_info",
+                       operate: str = "view") -> int:
+        """
+        根据角色id获取用户在当前视图类的operate指定的操作下的权限的值
+        :param role_id:
+        :param url_path:
+        :param role_table:
+        :param operate:
+        :return:
+        """
+        url_path = cls.get_full_path() if url_path is None else url_path
+        ses = get_conn(table_name=role_table)
+        role = ses.find_one(filter={"_id": role_id})
+        if role is None:
+            ms = "无效的role_id: {}".format(role_id)
+            raise ValueError(ms)
+        else:
+            rules = role.get("rules", dict())
+            operate_rules = rules.get(url_path, dict())
+            value = operate_rules.get(operate, 0)
+        return value
+
+    def current_rule_value(self, role_id: ObjectId, url_path: str = None,  role_table: str = "role_info",
+                           operate: str = "view") -> int:
+        """
+        根据角色id获取用户在当前视图类的operate指定的操作下的权限的值,是cls.get_rule_value的是实例方法,目的是简化实例中获取用户的
+        权限的值
+        :param role_id:
+        :param url_path:
+        :param role_table:
+        :param operate:
+        :return:
+        """
+        cls = self.__class__
+        return cls.get_rule_value(role_id=role_id, url_path=url_path, role_table=role_table, operate=operate)
+
+    @classmethod
+    def _get_filter(cls, user: dict, access_value: int, operate: str = "view") -> dict:
         """
         根据用户信息和访问级别的值.构建并返回一个用于查询的字典.此函数应该只被cls.identity调用.
         当你重新定义过访问级别的值后.请重构此函数.注意,你可以根据operate的类型不同,分别针对类型去重构过滤器.
-        :param user_id: 过滤器中的字段,一般是user_id,也可能是其他字段.不同的视图类请重构此函数.
+        :param user: 用户信息字典.不同的视图类请重构此函数.
         :param access_value:
         :param operate:  权限的类型 分为 view/edit/delete  查看/编辑/删除
         :return: 返回None表示禁止访问
@@ -2927,7 +2973,7 @@ class MyView(MethodView):
             raise ValueError(ms)
         else:
             if access_value == 1:
-                res = {"user_id": user_id}
+                res = {"user_id": user['_id']}
             elif access_value == 2:
                 ms = "未实现的访问级别控制: {}".format(access_value)
                 raise NotImplementedError(ms)

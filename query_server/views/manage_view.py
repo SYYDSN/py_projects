@@ -852,11 +852,11 @@ class ManageUserView(MyView):
     _name = "用户管理"
 
     @classmethod
-    def _get_filter(cls, user_id: ObjectId, access_value: int, operate: str = "view") -> dict:
+    def _get_filter(cls, user: dict, access_value: int, operate: str = "view") -> dict:
         """
         根据用户信息和访问级别的值.构建并返回一个用于查询的字典.此函数应该只被cls.identity调用.
         当你重新定义过访问级别的值后.请重构此函数
-        :param user_id: 过滤器中的字段,一般是user_id,也可能是其他字段.不同的视图类请重构此函数.
+        :param user: 用户信息字典.不同的视图类请重构此函数.
         :param access_value:
         :param operate:
         :return: 返回None表示禁止访问
@@ -869,7 +869,7 @@ class ManageUserView(MyView):
             raise ValueError(ms)
         else:
             if access_value == 1:
-                res = {"_id": user_id}
+                res = {"_id": user['_id']}
             elif access_value == 2:
                 ms = "未实现的访问级别控制: {}".format(access_value)
                 raise NotImplementedError(ms)

@@ -17,6 +17,9 @@ $(function(){
     // 根据用户选择的条件过滤信息
     var filter_info = function(){
         var args = get_url_arg_dict();
+        // 胜场/负场
+        var only_win = $(".only_win .current_value").attr("data-id");
+        args['only_win'] = only_win;
         // 离场/持仓
         var case_type = $(".select_type .current_value").attr("data-id");
         args['case_type'] = case_type;
@@ -55,6 +58,18 @@ $(function(){
     // 根据url参数重置所有选择器状态
     (function(){
         var kw = get_url_arg_dict();  // 生成url的参数字典
+        // 胜场/负场
+        var only_win = kw['only_win'];
+        if(only_win !== undefined && only_win !== ""){
+            var $values = $(".values li");
+            $values.each(function(){
+                var $li = $(this);
+                var key = $.trim($li.attr("data-id"));
+                if(key === only_win){
+                    $(".only_win .current_value").attr("data-id", key).text($.trim($li.text()));
+                }
+            });
+        }else{}
         // 离场/持仓
         var case_type = kw['case_type'];
         if(case_type !== undefined && case_type !== ""){

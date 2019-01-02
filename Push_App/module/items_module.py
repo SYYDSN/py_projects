@@ -27,6 +27,10 @@ def last_icon() -> str:
     :return:
     """
     d = os.path.join(__project_dir__, "static", "icon")
+    if os.path.exists(d):
+        pass
+    else:
+        os.makedirs(name=d)
     names = os.listdir(d)
     allow_img = ['jpg', 'jpeg', 'png']
     resp = [
