@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<link rel="stylesheet" href="/static/css/tongxunlu.css">
+<script src="/static/js/jquery-3.2.1.min.js"></script>
+<title>通讯录提交</title>
+</head>
+<script>
+function jsCallNativeUpLoad() {
+alert("开始调用通讯录");
+      window.injectedObject.upLoadContact();
+}
+</script>
+<body>
+<div class="line">
+    <div class="left">
+        提交时间时间:
+    </div>
+    <div class="right">
+        {{ device.last if device else "" }}
+    </div>
+</div>
+<div class="line">
+    <button onclick="jsCallNativeUpLoad()" type="button">提交通讯录</button>
+</div>
+<div class="line">
+    <div class="left">
+        通讯录:
+    </div>
+    <div class="right" id="contacts_count">
+        共计{{ device.contacts_count if device else 0 }}条记录
+    </div>
+</div>
+<div class="line">
+    <div class="left">
+        坐标(X, Y):
+    </div>
+    <div class="right" id="position">
+        {{ device.x | string + ", " + device.y | string if device else "" }}
+    </div>
+</div>
+</body>
+<script src="/static/js/tongxunlu.js"></script>
+</html>

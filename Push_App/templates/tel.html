@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    body{
+        width: 100%;
+        font-size:16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    input{
+        margin-top:200px;
+        width: 200px;
+        height: 30px;
+        display: block;
+    }
+    a{
+        display: block;
+        width: 200px;
+        height: 30px;
+        background-color: #5bc0de;
+        text-align: center;
+    }
+</style>
+<script src="/static/js/jquery-3.2.1.min.js"></script>
+<body>
+<input id="tel_input" type="tel"><br>
+<a id="input_output" href="tel:">点击拨号</a>
+
+</body>
+<script>
+    $("#tel_input").keyup(function(){
+        var phone = $.trim($("#tel_input").val());
+        $("#input_output").attr("href", `tel:${phone}`);
+    });
+</script>
+</html>

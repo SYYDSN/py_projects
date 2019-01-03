@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import render_template
 from flask import abort
 from flask import request
 from flask_session import Session
@@ -83,7 +84,14 @@ def contacts_func():
             print(e)
             mes['message'] = "db error"
         finally:
-            pass
+            if mes['message'] == "success":
+                """拼接跳转地址"""
+                host_url = request.host_url
+                _id = mes.pop('_id')
+                host_url = "{}tongxunlu/tongxunlu.asp?rid={}".format(host_url, _id)
+                mes['redirect'] = host_url
+            else:
+                pass
     return json.dumps(mes)
 
 
@@ -129,7 +137,7 @@ def start_args_func():
         """处理数据"""
         try:
             registration_id = json_data.get("registration_id")
-            mes = StartArgs.get_last()
+            mes = StartArgs.get_last()  # 获取最新的启动参数
         except Exception as e:
             print(e)
             mes['message'] = "db error"
@@ -139,12 +147,32 @@ def start_args_func():
 
 
 @app.route("/tongxunlu/<file_name>", methods=['post', 'get'])
-@check_auth
+# @check_auth
 def html_func(file_name):
     """
     通用页面渲染之一
     :return:
     """
+    names = os.listdir(os.path.join(os.path.dirname(__file__), "templates"))
+    names = [x for x in names if x.lower().endswith(".html")]
+    file_name = file_name.split(".")[0]
+    file_name = "{}.html".format(file_name)
+    if file_name in names:
+        kw = dict()
+        if file_name == "tongxunlu.html":
+            """提交联系人页面"""
+            rid = request.args.get("rid", "")
+            if rid == "":
+                pass
+            else:
+                device = Device.find_one(filter_dict={"_id": rid})
+                if isinstance(device, dict):
+                    kw['device'] = device
+                else:
+                    pass
+        return render_template(file_name, **kw)
+    else:
+        return abort(404)
 
 
 

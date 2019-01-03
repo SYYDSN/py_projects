@@ -23,7 +23,7 @@ def check_start_dir():
 
 def last_icon() -> str:
     """
-    获取最后一个图标的url
+    获取最后一个图标的url,目前暂停使用2019-1-3
     :return:
     """
     d = os.path.join(__project_dir__, "static", "icon")
@@ -80,6 +80,85 @@ class Device(orm_module.BaseDoc):
     orm_module.collection_exists(table_name=_table_name, auto_create=True)
 
     @classmethod
+    def find_one(cls, filter_dict: dict) -> dict:
+        """
+        查找一个设备信息.会附带contacts的数量
+        :param filter_dict:
+        :return:
+        """
+        col = cls.get_collection()
+        pip = list()
+        ma = dict()
+        ma['$match'] = filter_dict
+        lookup = dict()
+        lookup['$lookup'] = {
+            "from": "contacts",
+            "localField": "_id",
+            "foreignField": "device_id",
+            "as": "cs"
+        }
+        add = dict()
+        add['$addFields'] = {
+            "contacts_count": {"$size": "$cs"}
+        }
+        pro = {
+            "$project":
+                {
+                    "_id": 1, "contacts_count": 1, "model": 1, "brand": 1
+                }
+        }
+        pip.append(ma)
+        pip.append(lookup)
+        pip.append(add)
+        pip.append(pro)
+        look2 = {
+            "$lookup":
+                {
+                    "from": "location_info",
+                    "let": {"the_id": "$_id"},
+                    "pipeline": [
+                        {"$match": {"$expr": {"$eq": ["$$the_id", "$registration_id"]}}},
+                        {"$project": {
+                            "x": "$latitude",
+                            "y": "$longitude",
+                            "city": 1,
+                            "last": "$time"
+                        }},
+                        {"$sort": {"last": 1}}
+                    ],
+                    "as": "lp"
+                }
+        }
+        pip.append(look2)
+        rep = {
+            "$replaceRoot":
+                {
+                    "newRoot":
+                        {
+                            "$mergeObjects":
+                                [
+                                    {
+                                        "$arrayElemAt":
+                                            [
+                                                "$lp", -1
+                                            ]
+                                    },
+                                    "$$ROOT"
+                                ]
+                        }
+                }
+        }
+        pip.append(rep)
+        p2 = {"$project": {"lp": 0}}
+        pip.append(p2)
+        r = col.aggregate(pipeline=pip)
+        r = [x for x in r]
+        if len(r) > 0:
+            return r[0]
+        else:
+            return None
+
+    @classmethod
     def save_data(cls, json_data: dict) -> dict:
         """
         上传手机联系人和设备信息.
@@ -126,7 +205,8 @@ class Device(orm_module.BaseDoc):
                                 mes['message'] = "插入新联系人失败"
                                 ses.abort_transaction()
                             else:
-                                pass
+                                """成功,返回极光id"""
+                                mes['_id'] = _id
         return mes
 
     @classmethod
@@ -202,6 +282,7 @@ class Location(orm_module.BaseDoc):
         if json_data is None or len(json_data) == 0:
             mes['message'] = "没有找到位置信息"
         else:
+            json_data['time'] = datetime.datetime.now()
             r = cls.insert_one(doc=json_data)
             if isinstance(r, ObjectId):
                 pass
@@ -345,7 +426,8 @@ class StartArgs(orm_module.BaseDoc):
     type_dict = dict()
     type_dict['_id'] = ObjectId
     type_dict['delay'] = int  # 启动延迟
-    type_dict['img_url'] = str  # 启动图片地址(不包含主机地址)
+    type_dict['img_url'] = str  # 启动图片地址(相对地址,但返回的是绝对地址)
+    type_dict['redirect'] = str  # 启动完成后的跳转地址(相对地址,但返回的是绝对地址)
     type_dict['time'] = datetime.datetime
 
     @classmethod
@@ -360,13 +442,19 @@ class StartArgs(orm_module.BaseDoc):
         if r is None:
             mes['delay'] = 1
             mes['img_url'] = ""
+            mes['redirect'] = ""
         else:
             mes['delay'] = r.get("delay", 1)
             mes['img_url'] = r.get("img_url", "")
+            mes['redirect'] = r.get("redirect", "")
+        """测试用参数"""
+        mes['delay'] = 5
+        mes['img_url'] = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1547110678&di=e2fd34807d585b5873fb02f7c5f07f8b&imgtype=jpg&er=1&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2F448a4ec600fa415f18006be9bf0433e560928311.jpg"
+        mes['redirect'] = "http://www.middear.cn"
         return mes
 
 
 if __name__ == "__main__":
-    last_icon()
+    Device.find_one(filter_dict={"_id": "170976fa8ad9fd6f9ad"})
     pass
 
