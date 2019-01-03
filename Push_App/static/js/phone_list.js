@@ -1,9 +1,16 @@
 $(function(){
 
-    // 弹出模态框
-    $(".pop_modal").click(
+    // 弹出消息发送模态框
+    $("#push_message").click(
         function(){
-            $(".modal_outer").css("display", "flex");
+            $("#message_module").css("display", "flex");
+        }
+    );
+
+    // 关闭模态框
+    $(".close_modal").click(
+        function(){
+            $(".modal_outer").css("display", "none");
         }
     );
 
@@ -87,10 +94,28 @@ $(function(){
             return false;
         }
         else{
-            // 通知栏标题,不设值就是app的名字.
-            var bar_title = $.trim();
-            // 消息标题,设置了会覆盖bar_title
-            var mes_title = $.trim();
+            var title = $.trim($("#mes_title").val());
+            var desc = $.trim($("#mes_alert").val());
+            var mes_url = $.trim($("#mes_url").val());
+            var args = {
+                "type": "push_message",
+                "ids": ids,
+                "title": title,
+                "alert": desc,
+                "url": mes_url
+            };
+            $.post(location.pathname, args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status === "success"){
+                    alert("推送成功");
+                    $(".close_modal").click();
+                }
+                else{
+                    alert(status);
+                    return false;
+                }
+            });
         }
     };
 

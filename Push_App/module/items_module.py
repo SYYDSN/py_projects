@@ -255,6 +255,46 @@ class Device(orm_module.BaseDoc):
             "$project": {"contacts":  0}
         }
         pipeline.append(p)
+        look2 = {
+            "$lookup":
+                {
+                    "from": "location_info",
+                    "let": {"the_id": "$_id"},
+                    "pipeline": [
+                        {"$match": {"$expr": {"$eq": ["$$the_id", "$registration_id"]}}},
+                        {"$project": {
+                            "x": "$latitude",
+                            "y": "$longitude",
+                            "city": 1,
+                            "last": "$time"
+                        }},
+                        {"$sort": {"last": 1}}
+                    ],
+                    "as": "lp"
+                }
+        }
+        pipeline.append(look2)
+        rep = {
+            "$replaceRoot":
+                {
+                    "newRoot":
+                        {
+                            "$mergeObjects":
+                                [
+                                    {
+                                        "$arrayElemAt":
+                                            [
+                                                "$lp", -1
+                                            ]
+                                    },
+                                    "$$ROOT"
+                                ]
+                        }
+                }
+        }
+        pipeline.append(rep)
+        p2 = {"$project": {"lp": 0}}
+        pipeline.append(p2)
         resp = cls.aggregate(pipeline=pipeline, page_size=page_size, page_index=page_index)
         return resp
 

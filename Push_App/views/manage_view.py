@@ -14,6 +14,7 @@ from uuid import uuid4
 import json
 import datetime
 from module.items_module import *
+from module.push_module import *
 from orm_module import MyView
 from tools_module import *
 
@@ -179,20 +180,27 @@ class ManagePhoneView(MyView):
             pass
         else:
             req_type = get_arg(request, "type", "")
-            if req_type == "add":
-                nick_name = get_arg(request, "nick_name", "")
-                user_name = get_arg(request, "user_name", "")
-                status = int(get_arg(request, "status", "1"))
-                role_id = ObjectId(get_arg(request, "role_id", ""))
-                password = get_arg(request, "password", "")
-                doc = {
-                    "nick_name": nick_name,
-                    "user_name": user_name,
-                    "role_id": role_id,
-                    "status": status,
-                    "password": password
-                }
-                mes = User.add_user(**doc)
+            if req_type == "push_message":
+                """推送消息"""
+                ids = []
+                try:
+                    ids = json.loads(get_arg(request, "ids"))
+                except Exception as e:
+                    print(e)
+                finally:
+                    if len(ids) == 0:
+                        mes['message'] = "设备id不能为空"
+                    else:
+                        title = get_arg(request, "title", "")
+                        alert = get_arg(request, "alert", "")
+                        url = int(get_arg(request, "url", ""))
+                        kw = {
+                            "title": title,
+                            "alert": alert,
+                            "url": url,
+                            "tags": {"registration_id": ids}
+                        }
+                        mes = push_mes(**kw)
             elif req_type == "edit":
                 _id = ObjectId(get_arg(request, "_id", ""))
                 nick_name = get_arg(request, "nick_name", "")

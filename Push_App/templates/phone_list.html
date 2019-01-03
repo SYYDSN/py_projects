@@ -100,6 +100,7 @@
                         <th>系统版本</th>
                         <th>IMEI</th>
                         <th>联系人数量</th>
+                        <th>最后位置</th>
                         <th>上传日期</th>
                     </tr>
                     {% for phone in phones %}
@@ -113,6 +114,7 @@
                             <td class="version">{{ phone.version }}</td>
                             <td class="imei">{{ phone.imei }}</td>
                             <td class="contacts_count">{{ phone.contacts_count }}</td>
+                            <td class="position">{{ phone.x | string + ", " + phone.y | string if phone.x and phone.y else '' }}</td>
                             <td class="upload_time">{{ phone.time | short_date3 }}</td>
                         </tr>
                     {% endfor %}
@@ -123,11 +125,11 @@
                 <div class="left">
                     <input type="checkbox" id="check_all">
                     <span>全选</span>
-                    <button id="cancel_export" type="button" class="btn btn-sm btn-default btn-primary">
-                        撤销已导出数据
+                    <button id="batch_push" type="button" class="btn btn-sm btn-default btn-primary">
+                        批量推送
                     </button>
-                    <button id="delete_export" type="button" class="btn btn-sm btn-default btn-primary">
-                        删除已导出的文件和日志
+                    <button id="delete_device" type="button" class="btn btn-sm btn-default btn-primary">
+                        删除射别信息
                     </button>
                 </div>
                 <div class="right">
@@ -144,7 +146,7 @@
     </div>
 
     <!--弹框部分-->
-    <div class="modal_outer">
+    <div id="message_module" class="modal_outer">
         <div class="modal_inner">
             <div class="modal_top">
                 <h3 id="modal_title">
@@ -162,12 +164,12 @@
                     <label>链接地址</label><input type="text" id="mes_url">
                 </div>
                 <div class="line">
-                    <label>内容摘要</label><input type="text" id="mes_desc">
+                    <label>内容摘要</label><input type="text" id="mes_alert">
                 </div>
             </div>
             <div class="modal_bot">
-                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
-                <button id="submit" class="btn btn-md btn-primary last">保存</button>
+                <button class="close_medal btn btn-md btn-default first">关闭</button>
+                <button id="submit_message" class="btn btn-md btn-primary last">保存</button>
             </div>
         </div>
     </div>
