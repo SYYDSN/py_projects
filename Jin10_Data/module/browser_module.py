@@ -476,7 +476,7 @@ def reboot_plan(current: datetime.datetime = None) -> None:
     """
     per = memory_percent()
     current = datetime.datetime.now() if not isinstance(current, datetime.datetime) else current
-    if per >= 35:
+    if per >= 95:
         """清除日志,立即重启"""
         clear_log()
         title = "立即重启金10数据系统:{}".format(current)
