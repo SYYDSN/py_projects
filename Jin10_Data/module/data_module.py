@@ -29,12 +29,13 @@ class JinTenData(orm_module.BaseDoc):
     type_dict['time'] = datetime.datetime  # 写入时间
 
     @classmethod
-    def record(cls, data: dict, last_update: datetime.datetime) -> None:
+    def record(cls, data: dict, last_update: datetime.datetime, clear_prev: int = 1) -> None:
         """
         比对last_update决定是否更新时间?如果last_update一致,就只更新最后一条记录的time,
         否则新插入一条记录.
         :param data:
         :param last_update:
+        :param clear_prev: 清除几个小时之前的记录?(因为单条记录可能很大,所以需要清除一下)
         :return:
         """
         s = [("time", -1)]
@@ -44,6 +45,8 @@ class JinTenData(orm_module.BaseDoc):
             u = {"$set": {"time": now}}
             cls.find_one_and_update(filter_dict={"_id": r['_id']}, update_dict=u)
         else:
+            prev = now - datetime.timedelta(hours=clear_prev)
+            cls.delete_many(filter_dict={"time": {"$lt": prev}})
             doc = {"data": data, "time": now, "last_update": last_update}
             cls.insert_one(doc=doc)
 
@@ -104,5 +107,4 @@ def load_data(to_json: bool = True) -> str:
 
 
 if __name__ == "__main__":
-    j.save()
     pass

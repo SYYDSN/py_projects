@@ -84,6 +84,9 @@
                         </div>
                     </div>
                     -->
+                    <button id="start_args" type="button" class="btn btn-default btn-sm btn-primary">
+                        设置启动参数
+                    </button>
                     <button id="push_message" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
                         自定义推送
                     </button>
@@ -129,7 +132,7 @@
                         批量推送
                     </button>
                     <button id="delete_device" type="button" class="btn btn-sm btn-default btn-primary">
-                        删除射别信息
+                        删除设备
                     </button>
                 </div>
                 <div class="right">
@@ -145,7 +148,53 @@
         </div>
     </div>
 
-    <!--弹框部分-->
+    <!--设置启动参数弹框部分-->
+    <div id="start_module" class="modal_outer">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 id="modal_title2">
+                    设置启动参数
+                </h3>
+            </div>
+            <div class="modal_mid">
+                <div class="line">
+                    <label>启动延迟</label><input value="{{ delay }}" type="text" id="start_delay" placeholder="单位:秒;只能输入数字.">
+                </div>
+                <div class="line">
+                    <label>跳转地址</label><input value="{{ redirect }}" type="text" id="redirect_url" placeholder="启动完成后跳转地址">
+                </div>
+                <div class="line">
+                    <label>图片地址</label>
+                    <input value="{{ img_url }}" type="text" style="background-color: lightgrey" id="img_url" readonly="readonly" placeholder="图片尺寸1080*1920">
+                    <!--
+                        <input id="select_image" type="file" accept="image/*" capture="camera" multiple>
+                        accept表示打开系统文件目录
+                        accept="image/*"  打开相册
+                        accept="video/*"  打开视频
+                        capture  指调用哪些设备
+                        capture='microphone'   调用录音机
+                        capture='camera'       调用相机
+                        capture='camcorder'    调用摄像机
+                        file类型的input还有一个 multiple 的单值属性.表示同时提供打开文件和设备的选项.
+                        IOS中, multiple  属性无效. 必须写2个input来自行实现选择.
+                        判断是否是苹果手机的方法:
+                        navigator.userAgent.toLowerCase() == "iphone os"
+                        由于目前拍摄的照片尺寸过大,所以暂时关闭拍照的功能(没有capture="camera" 和 multiple属性)
+                    -->
+                    <input id="select_image" style="display: none" type="file" accept="image/*">
+                </div>
+                <div style="display: none" class="line">
+                <img id="preview_img" src="{{ img_url }}">
+            </div>
+            </div>
+            <div class="modal_bot">
+                <button class="close_modal btn btn-md btn-default first">关闭</button>
+                <button id="submit_args" class="btn btn-md btn-primary last">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <!--推送消息弹框部分-->
     <div id="message_module" class="modal_outer">
         <div class="modal_inner">
             <div class="modal_top">
@@ -155,7 +204,7 @@
             </div>
             <div class="modal_mid">
                 <div class="line">
-                    <label>设备id</label><textarea placeholder="请输入推送id.以空格或者逗号分割." id="push_ids"></textarea>
+                    <label>设备id</label><textarea placeholder="请输入推送id, id之间以空格分割." id="push_ids"></textarea>
                 </div>
                 <div class="line">
                     <label>消息标题</label><input type="text" id="mes_title">
@@ -168,8 +217,8 @@
                 </div>
             </div>
             <div class="modal_bot">
-                <button class="close_medal btn btn-md btn-default first">关闭</button>
-                <button id="submit_message" class="btn btn-md btn-primary last">保存</button>
+                <button class="close_modal btn btn-md btn-default first">关闭</button>
+                <button id="submit_message" class="btn btn-md btn-primary last">发送</button>
             </div>
         </div>
     </div>
@@ -180,12 +229,12 @@
         <div class="modal_inner">
             <div class="modal_top">
                 <h3 id="modal_title_progress">
-                    生成文件
+                    发送消息
                 </h3>
             </div>
             <div class="modal_mid">
                 <div class="line process_line">
-                    <span>数据处理中.视文件的大小,可能需要数分钟...</span>
+                    <span>正在处理中,请稍后...</span>
                     <i class="fa fa-spinner fa-pulse fa-4x"></i>
                 </div>
             </div>

@@ -5,12 +5,14 @@ __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import orm_module
+from flask import request
 import datetime
 import random
 
 
 ObjectId = orm_module.ObjectId
 start_img_dir = os.path.join(__project_dir__, "resource", "start_image")
+IMAGE_DIR = os.path.join(__project_dir__, "static", "start_image")  # 上传启动图片的默认目录
 
 
 def check_start_dir():
@@ -298,6 +300,35 @@ class Device(orm_module.BaseDoc):
         resp = cls.aggregate(pipeline=pipeline, page_size=page_size, page_index=page_index)
         return resp
 
+    @classmethod
+    def batch_delete(cls, ids: list) -> dict:
+        """
+        批量删除设备和联系人
+        :param ids: _id的数组
+        :return:
+        """
+        mes = {"message": "success"}
+        f1 = {"_id": {"$in": ids}}
+        f2 = {"device_id": {"$in": ids}}
+        db_client = orm_module.get_client()
+        col1 = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)
+        col2 = orm_module.get_conn(table_name=Contacts.get_table_name(), db_client=db_client)
+        with db_client.start_session(causal_consistency=True) as ses:
+            with ses.start_transaction(write_concern=orm_module.get_write_concern()):
+                r1 = col1.delete_many(filter=f1, session=ses)
+                if isinstance(r1, orm_module.DeleteResult):
+                    r2 = col2.delete_many(filter=f2, session=ses)
+                    if isinstance(r2, orm_module.DeleteResult):
+                        """成功"""
+                        pass
+                    else:
+                        mes['message'] = "删除联系人失败"
+                        ses.abort_transaction()
+                else:
+                    mes['message'] = "删除设备出错"
+                    ses.abort_transaction()
+        return mes
+
 
 class Location(orm_module.BaseDoc):
     """
@@ -492,6 +523,75 @@ class StartArgs(orm_module.BaseDoc):
         mes['img_url'] = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1547110678&di=e2fd34807d585b5873fb02f7c5f07f8b&imgtype=jpg&er=1&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2F448a4ec600fa415f18006be9bf0433e560928311.jpg"
         mes['redirect'] = "http://www.middear.cn"
         return mes
+
+
+class UploadImageHistory(orm_module.BaseDoc):
+    """上传图片记录"""
+    _table_name = "upload_image_history"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['file_name'] = str
+    type_dict['storage_name'] = str
+    type_dict['file_size'] = int  # 单位字节
+    type_dict['file_type'] = str
+    type_dict['upload_time'] = datetime.datetime
+
+    @classmethod
+    def upload(cls, req: request, dir_path: str = None) -> dict:
+        """
+        上传条码文件
+        :param req:
+        :param dir_path: 保存上传文件的目录
+        :return:
+        """
+        dir_path = IMAGE_DIR if dir_path is None else dir_path
+        if not os.path.exists(dir_path):
+            os.makedirs(path=dir_path)
+        mes = {"message": "success"}
+        file = req.files.get("file")
+        if file is None:
+            mes['message'] = "没有找到上传的文件"
+        else:
+            file_name = file.filename.lower()
+            file_type = file.content_type
+            _id = ObjectId()
+            suffix = file_name.split(".")[-1]
+            storage_name = "{}.{}".format(str(_id), suffix)
+            f_p = os.path.join(dir_path, storage_name)
+            with open(f_p, "wb") as f:
+                file.save(dst=f)  # 保存文件
+            file_size = os.path.getsize(f_p)
+            doc = {
+                "_id": _id,
+                "file_name": file_name,
+                "file_type": file_type,
+                "file_size": file_size,
+                "storage_name": storage_name,
+                "time": datetime.datetime.now()
+            }
+            r = cls.insert_one(doc=doc)
+            if r == _id:
+                mes['img_url'] = "manage/image/view?fid={}".format(storage_name)
+            else:
+                mes['message'] = "保存纪录失败"
+        return mes
+
+
+class MessageHistory(orm_module.BaseDoc):
+    """
+    推送的消息的历史.
+    消息会保存在数据库中,并且会标记是否已读?
+    这样一旦客户不在线,推送失败后,打开App还是可以看到未读的消息.
+    """
+    _table_name = "message_history"
+    type_dict = dict()
+    type_dict['_id'] = ObjectId
+    type_dict['device_id'] = str  # Device._id
+    type_dict['title'] = str
+    type_dict['alert'] = str
+    type_dict['url'] = str
+    type_dict['viewed'] = bool  # 消息是否已查看? 默认未查看
+    type_dict['time'] = datetime.datetime  # 发送时间
 
 
 if __name__ == "__main__":

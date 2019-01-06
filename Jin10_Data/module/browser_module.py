@@ -21,6 +21,8 @@ from mail_module import send_mail
 from log_module import get_logger
 from selenium.webdriver import Chrome
 import re
+import shutil
+import psutil
 import time
 from module.data_module import save_data
 import datetime
@@ -324,8 +326,11 @@ def parse_calendar_data(item) -> dict:
         global prev_calendar_date
         prev_calendar_date = a_time
         title = tds[2].text.strip()  #
+        star = get_star(tds[3])
+        """注销旧方法 2019-1-5
         level = re.findall("\d{2}", tds[3].find_element_by_class_name("jin-star_active").get_attribute("style"))
         star = 0 if len(level) == 0 else int(int(level[0]) / 20)
+        """
         td_prev = tds[4].text.strip()  # 前值
         td_forecast = tds[5].text.strip()  # 预测值
         td_publish = tds[6].text.strip()  # 公布值
@@ -353,8 +358,11 @@ def parse_calendar_data(item) -> dict:
             a_time = prev_calendar_date  # prev_calendar_date是全局变量
             title = tds[0].text.strip()  #
             # level = re.findall("\d{2}", tds[2].get_attribute("style"))
+            star = get_star(tds[1])
+            """注销旧方法之2019-1-5
             level = re.findall("\d{2}", tds[1].find_element_by_class_name("jin-star_active").get_attribute("style"))
             star = 0 if len(level) == 0 else int(int(level[0]) / 20)
+            """
             td_prev = tds[2].text.strip()  # 前值
             td_forecast = tds[3].text.strip()  # 预测值
             td_publish = tds[4].text.strip()  # 公布值
@@ -369,6 +377,38 @@ def parse_calendar_data(item) -> dict:
                 "effect": td_effect
             }
     return d
+
+
+def get_star(dom) -> int:
+    """
+    获取一个数据日历记录的星级
+    :param dom:
+    :return:
+    """
+    i = None
+    try:
+        i = dom.find_element_by_class_name("jin-star_active")
+    except NoSuchElementException as e:
+        print(e)
+        try:
+            i = dom.find_element_by_class_name("jin-star_important")
+        except NoSuchElementException as e2:
+            print(e2)
+        except Exception as e4:
+            print(e4)
+            logger.exception(e4)
+        finally:
+            pass
+    except Exception as e3:
+        print(e3)
+        logger.exception(e3)
+    finally:
+        if i is None:
+            star = 0
+        else:
+            level = re.findall("\d{2}", i.get_attribute("style"))
+            star = 0 if len(level) == 0 else int(int(level[0]) / 20)
+        return star
 
 
 def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> (list, tuple):
@@ -397,17 +437,85 @@ def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> (list, tu
     return d1, current_date
 
 
-if __name__ == "__main__":
+def memory_percent() -> float:
+    """
+    获取当前内存的占用比例
+    :return: 内存占用比例, 小于100的浮点数
+    """
+    mem = psutil.virtual_memory()
+    return mem.percent
+
+
+def clear_log() -> None:
+    """
+    清除日志文件
+    :return:
+    """
+    p = os.path.join(__project_dir__, "logs")
+    if os.path.exists(p):
+        names = os.listdir(p)
+        size = 0
+        for name in names:
+            size += os.path.getsize(os.path.join(p, name))
+        print("日志文件尺寸: {}M".format(round((size / 1000000), 1)))
+        shutil.rmtree(p)
+        print("清理完毕")
+    else:
+        pass
+
+
+def reboot_plan(current: datetime.datetime = None) -> None:
+    """
+    检查系统是否需要重启系统.
+    行为:
+    1. 计划重启, 内存占用率利用率超过75%后,将在临陈4:30重启
+    2. 紧急重启. 内存占用率超95%时,立即重启.
+    重启之前都会清除日志文件.
+    :param current:
+    :return:
+    """
+    per = memory_percent()
+    current = datetime.datetime.now() if not isinstance(current, datetime.datetime) else current
+    if per >= 35:
+        """清除日志,立即重启"""
+        clear_log()
+        title = "立即重启金10数据系统:{}".format(current)
+        content = "当前内存使用率: {}".format(per)
+        send_mail(title=title, content=content)
+        os.system("reboot")
+    elif per >= 75:
+        h = current.hour
+        m = current.minute
+        if h == 4 and abs(m - 20) < 10:
+            """凌晨4:30分左右"""
+            clear_log()
+            title = "维护重启金10数据系统:{}".format(current)
+            content = "当前内存使用率: {}".format(per)
+            send_mail(title=title, content=content)
+            os.system("reboot")
+        else:
+            pass
+    else:
+        pass
+
+
+def regular() -> None:
+    """
+    定期执行爬虫任务
+    :return:
+    """
     u = "http://127.0.0.1:7999/news"
     browser = get_browser(headless=True, browser_class=1)
     open_url(url=u, browser=browser)
     prev_refresh = datetime.datetime.now()
+    title = "金10数据系统已启动:{}".format(prev_refresh)
+    send_mail(title=title)
     while 1:
         now = datetime.datetime.now()
         if (now - prev_refresh).total_seconds() > 3600:
             """1小时刷新一次页面"""
             browser.delete_all_cookies()  # 清理缓存
-            browser.refresh()             # 刷新页面
+            browser.refresh()  # 刷新页面
         else:
             pass
         calendar_data, last_date = get_calendar_data(browser)
@@ -423,7 +531,13 @@ if __name__ == "__main__":
         print(end)
         delay = (end - now).total_seconds() - 5
         print("delay is {}".format(delay))
-        delay = all(delay) if delay < 0 else 1
+        delay = 1 if delay < 0 else delay
         prev_refresh = end
+        """检查是否需要重启"""
+        reboot_plan(current=now)
         time.sleep(delay)
+
+
+if __name__ == "__main__":
+    regular()
     pass

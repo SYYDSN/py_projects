@@ -82,56 +82,71 @@ class LogoutView(MyView):
         return self.get()
 
 
-class UploadView(MyView):
-    """上传图片/文件视图"""
-    _rule = "upload/<file_type>"
+class ImageView(MyView):
+    """查看/上传图片视图"""
+    _rule = "/image/<key>"
     _allowed_view = [0, 3]
     _allowed_edit = []
     _allowed_delete = []
     _name = "上传文件"
 
-    @check_session
-    def get(self, user: dict):
+    def get(self, key: str):
         """
         上传
-        :param user:
-        :param file_name:
+        :param key:
         :return:
         """
-        access_filter = self.operate_filter(user=user, operate="view")
-        if isinstance(access_filter, dict):
-            directory = os.path.join(__project_dir__, "export_data")
-            return send_from_directory(directory=directory, filename=file_name, attachment_filename=file_name,
-                                       as_attachment=True)
+        user_id = session.get("_id")
+        if isinstance(user_id, str) and len(user_id) == 24:
+            user = User.find_by_id(o_id=user_id, to_dict=True)
         else:
-            return abort(403)  # 权限不足
-
-    def post(self, user: dict):
-        return self.get(uer=user)
-
-
-class DownLoadPrintFileView(MyView):
-    """下载批量打印的文件函数"""
-    _rule = "/print_file/<file_name>"
-    _allowed_view = [0, 3]
-    _allowed_edit = []
-    _allowed_delete = []
-    _name = "下载批量打印的文件"
-
-    @check_session
-    def get(self, user: dict, file_name: str):
-        """
-        下载
-        :param user:
-        :param file_name:
-        :return:
-        """
-        access_filter = self.operate_filter(user=user, operate="view")
-        if isinstance(access_filter, dict):
-            directory = os.path.join(__project_dir__, "export_data")
-            return send_from_directory(directory=directory, filename=file_name, attachment_filename=file_name, as_attachment=True)
+            user = None
+        access_filter = user if user is None else self.operate_filter(user=user, operate="view")
+        if key == "view":
+            """
+            查看图片,权限要求:
+            1. 请求头
+            2. 同域名
+            """
+            hd = request.headers
+            key = "app-key"
+            flag = False
+            if key in hd:
+                v = headers.get(key)
+                if v == "affa687b-faed-45b8-b69b-17fdddea40fb":
+                    flag = True
+                else:
+                    pass
+            else:
+                host_url = request.host_url
+                referrer = request.referrer
+                if isinstance(referrer, str) and host_url in referrer:
+                    flag = True
+            if flag:
+                fid = get_arg(request, "fid", "")
+                directory = IMAGE_DIR
+                r = UploadImageHistory.find_by_id(o_id=fid, to_dict=True)
+                if isinstance(r, dict):
+                    file_name = r['storage_name']
+                    return send_from_directory(directory=directory, filename=file_name,
+                                               attachment_filename=file_name, as_attachment=True)
+                else:
+                    return abort(404)
+            else:
+                abort(403)
+        elif key == "upload":
+            """上传图片"""
+            if isinstance(access_filter, dict):
+                mes = UploadImageHistory.upload(req=request)
+                mes['img_url'] = "{}{}".format(request.host_url, mes['img_url'])
+                return json.dumps(mes)
+            else:
+                return abort(403)
         else:
-            return abort(403)  # 权限不足
+            return abort(403)
+
+    def post(self, key: str):
+        return self.get(key=key)
 
 
 class ManagePhoneView(MyView):
@@ -156,8 +171,13 @@ class ManagePhoneView(MyView):
                 phones = info.pop("data", list())
                 render_data.update(info)
                 render_data['phones'] = phones
-                prev_icon = last_icon()  # 上一次使用的图标
-                render_data['prev_icon'] = prev_icon
+                start_args = StartArgs.find_one(filter_dict=dict(), sort=[("time", -1)])
+                if start_args is None:
+                    start_args = {"delay": "", "img_url": "", "redirect": ""}
+
+                else:
+                    pass
+                render_data.update(start_args)
                 return render_template("phone_list.html", **render_data)
             else:
                 return abort(404)
@@ -165,12 +185,13 @@ class ManagePhoneView(MyView):
             return abort(401, "access refused!")
 
     @check_session
-    def post(self, user: dict):
+    def post(self, key: str, user: dict):
         """
         req_type 代表请求的类型, 有3种:
-        1. add          添加用户
-        2. edit         修改用户
-        3. delete       删除用户
+        1. push_message          推送消息
+        2. delete_device         删除设备
+        3. start_args            设置启动参数
+        :param key: 用于匹配路由,防止抛出异常
         :param user:
         :return:
         """
@@ -193,7 +214,7 @@ class ManagePhoneView(MyView):
                     else:
                         title = get_arg(request, "title", "")
                         alert = get_arg(request, "alert", "")
-                        url = int(get_arg(request, "url", ""))
+                        url = get_arg(request, "url", "")
                         kw = {
                             "title": title,
                             "alert": alert,
@@ -201,34 +222,40 @@ class ManagePhoneView(MyView):
                             "tags": {"registration_id": ids}
                         }
                         mes = push_mes(**kw)
-            elif req_type == "edit":
-                _id = ObjectId(get_arg(request, "_id", ""))
-                nick_name = get_arg(request, "nick_name", "")
-                user_name = get_arg(request, "user_name", "")
-                status = int(get_arg(request, "status", "1"))
-                role_id = ObjectId(get_arg(request, "role_id", ""))
-                password = get_arg(request, "password", "")
-
-                f.update({"_id": _id})
-                u = {"$set": {
-                    "nick_name": nick_name,
-                    "user_name": user_name,
-                    "role_id": role_id,
-                    "status": status,
-                    "last": datetime.datetime.now()
-                }}
-                if password != '':
-                    u['$set']['password'] = password
-                else:
-                    pass
-                User.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
-                mes['message'] = "success"
-            elif req_type == "delete":
-                ids = json.loads(get_arg(request, "ids"))
-                ids = [ObjectId(x) for x in ids]
-                f.update({"_id": {"$in": ids}})
-                User.delete_many(filter_dict=f)
-                mes['message'] = "success"
+            elif req_type == "delete_device":
+                """删除设备"""
+                ids = []
+                try:
+                    ids = json.loads(get_arg(request, "ids"))
+                except Exception as e:
+                    print(e)
+                finally:
+                    if len(ids) == 0:
+                        mes['message'] = "设备id不能为空"
+                    else:
+                        mes = Device.batch_delete(ids=ids)
+            elif req_type == "start_args":
+                """设置启动参数"""
+                delay = get_arg(request, "delay", "1")
+                try:
+                    delay = int(delay)
+                except Exception as e:
+                    print(e)
+                    delay = 1
+                finally:
+                    img_url = get_arg(request, "img_url", "")
+                    redirect_url = get_arg(request, "redirect", "")
+                    doc = {
+                        "delay": delay,
+                        "redirect": redirect_url,
+                        "img_url": img_url,
+                        "time": datetime.datetime.now()
+                    }
+                    r = StartArgs.insert_one(doc=doc)
+                    if isinstance(r, ObjectId):
+                        mes['message'] = "success"
+                    else:
+                        mes['message'] = "保存失败"
             else:
                 mes['message'] = "无效的类型: {}".format(req_type)
         return json.dumps(mes)
@@ -277,7 +304,7 @@ LoginView.register(manage_blueprint)
 """注销"""
 LogoutView.register(manage_blueprint)
 """下载批量打印的文件函数"""
-DownLoadPrintFileView.register(app=manage_blueprint)
+ImageView.register(app=manage_blueprint)
 """管理移动设备页面"""
 ManagePhoneView.register(app=manage_blueprint)
 """查看修改自己的信息"""
