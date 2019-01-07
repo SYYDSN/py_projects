@@ -49,6 +49,7 @@ mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1
 """
 mongodb_setting = {
     "host": "39.108.67.178:27017",   # 数据库服务器地址 服务器是3.4版本的
+    "connect": False,  # 立即建立数据库链接还是等待第一次数据库操作时链接? fork安全起见,建议为False
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
@@ -87,6 +88,16 @@ class DBCommandListener(monitoring.CommandListener):
         # ms = "Error: {} 数据库的 {} 命令执行失败,参数:{}".format(database_name, command_name, command_dict)
         # print(ms)
         # logger.exception(ms)
+        failure = event.failure
+        error_msg = failure.get("errmsg")
+        if error_msg is None:
+            pass
+        elif error_msg == "Authentication failed.":
+            """登录失败"""
+            title = "{}数据库登录失败! {}".format(db_name, datetime.datetime.now())
+            print(title)
+        else:
+            pass
         pass
 
 
@@ -182,22 +193,12 @@ monitoring.register(DBHeartBeatListener())
 monitoring.register(DBTopologyListener())
 
 
-class DB:
-    """自定义单例模式客户端连接池"""
-    def __new__(cls):
-        if not hasattr(cls, "instance"):
-            conns = pymongo.MongoClient(**mongodb_setting)
-            cls.instance = conns
-
-        return cls.instance
-
-
 def get_client() -> pymongo.MongoClient:
     """
     获取一个MongoClient(一般用于生成客户端session执行事物操作)
     :return:
     """
-    mongo_client = DB()
+    mongo_client = pymongo.MongoClient(**mongodb_setting)
     return mongo_client
 
 

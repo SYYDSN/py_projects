@@ -655,6 +655,7 @@ class Teacher(mongo_db.BaseDoc):
 if __name__ == "__main__":
     """查询单个老师的持仓记录"""
     # print(Teacher.count(filter_dict={}))
-    ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
-    print(Teacher.single_info2(ObjectId("5b8c5451dbea62189b5c28eb")))
+    # ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
+    # print(Teacher.single_info2(ObjectId("5b8c5451dbea62189b5c28eb")))
+    Teacher.re_calculate()
     pass

@@ -138,6 +138,9 @@ def start_args_func():
         try:
             registration_id = json_data.get("registration_id")
             mes = StartArgs.get_last()  # 获取最新的启动参数
+            img_url = mes['img_url']
+            if img_url != "":
+                mes['img_url'] = "{}{}".format(request.host_url, img_url)
         except Exception as e:
             print(e)
             mes['message'] = "db error"

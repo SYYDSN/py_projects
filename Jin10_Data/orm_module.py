@@ -57,7 +57,6 @@ port = 27017
 user = "jin_root"              # 数据库用户名
 password = "Jin10@love"       # 数据库密码
 db_name = "jin10_db"        # 库名称
-connect = True            # 立即开始在后台连接到MongoDB,否则在第一次操作时连接。
 mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据库加密方式不同。
 local = False                  # 是否使用本机数据库?
 if local:
@@ -72,10 +71,11 @@ mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1
 """远程服务器配置"""
 mongodb_setting = {
     "host": "{}:{}".format(host, port),   # 数据库服务器地址
-    "connect": connect,              #
+    "connect": False,  # 立即建立数据库链接还是等待第一次数据库操作时链接? fork安全起见,建议为False
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
+    "waitQueueMultiple": 10,  # 可等待的线程的数量
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
@@ -217,22 +217,12 @@ monitoring.register(DBHeartBeatListener())
 monitoring.register(DBTopologyListener())
 
 
-class DB:
-    """自定义单例模式客户端连接池"""
-    def __new__(cls):
-        if not hasattr(cls, "instance"):
-            conns = pymongo.MongoClient(**mongodb_setting)
-            cls.instance = conns
-
-        return cls.instance
-
-
 def get_client() -> pymongo.MongoClient:
     """
     获取一个MongoClient(一般用于生成客户端session执行事物操作)
     :return:
     """
-    mongo_client = DB()
+    mongo_client = pymongo.MongoClient(**mongodb_setting)
     return mongo_client
 
 

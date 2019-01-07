@@ -315,10 +315,10 @@ def process_case_page2(teacher: dict = None):
                     if isinstance(exit_price, float):
                         args['exit_price'] = float(exit_price)
                         ses = mongo_db.get_conn(table_name="trade")
-                        f = {"_id": ObjectId(_id)}
+                        f = {"_id": ObjectId(_id), "case_type": "enter"}
                         obj = ses.find_one(filter=f)
                         if obj is None:
-                            mes["message":] = "订单不存在"
+                            mes["message":] = "订单不存在或已离场"
                         else:
                             args['case_type'] = "exit"
                             obj.update(args)

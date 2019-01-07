@@ -181,6 +181,7 @@ $(function(){
         }
         let file_data = $obj[0].files[0];
         var opts = {
+            "app-key": "affa687b-faed-45b8-b69b-17fdddea40fb",
             file_name: file_name,
             file_data: file_data,
             max_size: 4000,  // 最大4M

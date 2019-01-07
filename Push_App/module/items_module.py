@@ -202,6 +202,7 @@ class Device(orm_module.BaseDoc):
                             ses.abort_transaction()
                         else:
                             contacts = [cls.insert_return(x, {"device_id": _id}) for x in contacts]
+                            print("联系人数量: {}".format(len(contacts)))
                             r2 = c2.insert_many(documents=contacts)
                             if r2 is None:
                                 mes['message'] = "插入新联系人失败"
@@ -232,8 +233,9 @@ class Device(orm_module.BaseDoc):
         :param page_size: 每页多少条记录
         :return:
         """
-        filter_dict.update({"status": {"$ne": -1}})
         pipeline = list()
+        pipeline.append({"$match": filter_dict})
+        pipeline.append({"$sort": {"time": -1}})
         product_cond = {
             "$lookup": {
                 "from": "contacts",
@@ -310,17 +312,24 @@ class Device(orm_module.BaseDoc):
         mes = {"message": "success"}
         f1 = {"_id": {"$in": ids}}
         f2 = {"device_id": {"$in": ids}}
+        f3 = {"registration_id": {"$in": ids}}
         db_client = orm_module.get_client()
         col1 = orm_module.get_conn(table_name=cls.get_table_name(), db_client=db_client)
         col2 = orm_module.get_conn(table_name=Contacts.get_table_name(), db_client=db_client)
+        col3 = orm_module.get_conn(table_name=Location.get_table_name(), db_client=db_client)
         with db_client.start_session(causal_consistency=True) as ses:
             with ses.start_transaction(write_concern=orm_module.get_write_concern()):
                 r1 = col1.delete_many(filter=f1, session=ses)
                 if isinstance(r1, orm_module.DeleteResult):
                     r2 = col2.delete_many(filter=f2, session=ses)
                     if isinstance(r2, orm_module.DeleteResult):
-                        """成功"""
-                        pass
+                        r3 = col3.delete_many(filter=f3, session=ses)
+                        if isinstance(r3, orm_module.DeleteResult):
+                            """成功"""
+                            pass
+                        else:
+                            mes['message'] = "删除位置信息失败"
+                            ses.abort_transaction()
                     else:
                         mes['message'] = "删除联系人失败"
                         ses.abort_transaction()
@@ -519,9 +528,9 @@ class StartArgs(orm_module.BaseDoc):
             mes['img_url'] = r.get("img_url", "")
             mes['redirect'] = r.get("redirect", "")
         """测试用参数"""
-        mes['delay'] = 5
-        mes['img_url'] = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1547110678&di=e2fd34807d585b5873fb02f7c5f07f8b&imgtype=jpg&er=1&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2F448a4ec600fa415f18006be9bf0433e560928311.jpg"
-        mes['redirect'] = "http://www.middear.cn"
+        # mes['delay'] = 5
+        # mes['img_url'] = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1547110678&di=e2fd34807d585b5873fb02f7c5f07f8b&imgtype=jpg&er=1&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2F448a4ec600fa415f18006be9bf0433e560928311.jpg"
+        # mes['redirect'] = "http://www.middear.cn"
         return mes
 
 
@@ -546,7 +555,7 @@ class UploadImageHistory(orm_module.BaseDoc):
         """
         dir_path = IMAGE_DIR if dir_path is None else dir_path
         if not os.path.exists(dir_path):
-            os.makedirs(path=dir_path)
+            os.makedirs(name=dir_path)
         mes = {"message": "success"}
         file = req.files.get("file")
         if file is None:
@@ -571,7 +580,7 @@ class UploadImageHistory(orm_module.BaseDoc):
             }
             r = cls.insert_one(doc=doc)
             if r == _id:
-                mes['img_url'] = "manage/image/view?fid={}".format(storage_name)
+                mes['img_url'] = "manage/image/view?fid={}".format(str(_id))
             else:
                 mes['message'] = "保存纪录失败"
         return mes

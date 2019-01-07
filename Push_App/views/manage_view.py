@@ -92,53 +92,33 @@ class ImageView(MyView):
 
     def get(self, key: str):
         """
-        上传
         :param key:
         :return:
         """
         user_id = session.get("_id")
-        if isinstance(user_id, str) and len(user_id) == 24:
+        if isinstance(user_id, ObjectId):
             user = User.find_by_id(o_id=user_id, to_dict=True)
         else:
             user = None
         access_filter = user if user is None else self.operate_filter(user=user, operate="view")
         if key == "view":
             """
-            查看图片,权限要求:
-            1. 请求头
-            2. 同域名
+            查看图片,无权限要求
             """
-            hd = request.headers
-            key = "app-key"
-            flag = False
-            if key in hd:
-                v = headers.get(key)
-                if v == "affa687b-faed-45b8-b69b-17fdddea40fb":
-                    flag = True
-                else:
-                    pass
+
+            fid = get_arg(request, "fid", "")
+            directory = IMAGE_DIR
+            r = UploadImageHistory.find_by_id(o_id=fid, to_dict=True)
+            if isinstance(r, dict):
+                file_name = r['storage_name']
+                return send_from_directory(directory=directory, filename=file_name,
+                                           attachment_filename=file_name, as_attachment=True)
             else:
-                host_url = request.host_url
-                referrer = request.referrer
-                if isinstance(referrer, str) and host_url in referrer:
-                    flag = True
-            if flag:
-                fid = get_arg(request, "fid", "")
-                directory = IMAGE_DIR
-                r = UploadImageHistory.find_by_id(o_id=fid, to_dict=True)
-                if isinstance(r, dict):
-                    file_name = r['storage_name']
-                    return send_from_directory(directory=directory, filename=file_name,
-                                               attachment_filename=file_name, as_attachment=True)
-                else:
-                    return abort(404)
-            else:
-                abort(403)
+                return abort(404)
         elif key == "upload":
             """上传图片"""
             if isinstance(access_filter, dict):
                 mes = UploadImageHistory.upload(req=request)
-                mes['img_url'] = "{}{}".format(request.host_url, mes['img_url'])
                 return json.dumps(mes)
             else:
                 return abort(403)

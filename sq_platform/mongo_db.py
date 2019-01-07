@@ -44,11 +44,13 @@ mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1
 mongodb_setting = {
     # "host": "127.0.0.1:27017",   # 数据库服务器地址            mongos 1
     "host": "safego.org:20000",   # 数据库服务器地址            mongos 1
+    "connect": False,  # 立即建立数据库链接还是等待第一次数据库操作时链接? fork安全起见,建议为False
     # "host": "pltf.safego.org:7171",   # 数据库服务器地址          mongos 2
     # "host": "pltf.safego.org:8181",   # 数据库服务器地址        mongos 3
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 800,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
+    "waitQueueMultiple": 10,  # 可等待的线程的数量
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
@@ -188,22 +190,12 @@ monitoring.register(DBHeartBeatListener())
 monitoring.register(DBTopologyListener())
 
 
-class DB:
-    """自定义单例模式客户端连接池"""
-    def __new__(cls):
-        if not hasattr(cls, "instance"):
-            conns = pymongo.MongoClient(**mongodb_setting)
-            cls.instance = conns
-
-        return cls.instance
-
-
 def get_client() -> pymongo.MongoClient:
     """
     获取一个MongoClient(一般用于生成客户端session执行事物操作)
     :return:
     """
-    mongo_client = DB()
+    mongo_client = pymongo.MongoClient(**mongodb_setting)
     return mongo_client
 
 
