@@ -1486,10 +1486,12 @@ class Trade(Signal):
             return False
 
     @classmethod
-    def fix_error(cls, t_ids: list = None) -> None:
+    def fix_error(cls, t_ids: list = None, auto_fix: bool = False) -> None:
         """
-        修复订单中的错误
+        修复订单中的错误, 也可以用来检查
+        订单中,离场价格异常的情况(离场价格和公式中的价格不一致)
         :param t_ids:
+        :param auto_fix: 是否修复错误?
         :return:
         """
         begin = mongo_db.get_datetime_from_str("2018-7-1")
@@ -1537,13 +1539,16 @@ class Trade(Signal):
                     if len(resp) == 0:
                         pass
                     else:
-                        f2 = {"_id": x['_id']}
-                        kw.update(resp)
-                        lots = x.get("lots", 1)
-                        kw['the_profit'] = resp['each_profit'] * lots
-                        kw['lots'] = lots
-                        u = {"$set": kw}
-                        cls.find_one_and_update(filter_dict=f2, update_dict=u, upsert=False)
+                        if auto_fix:
+                            f2 = {"_id": x['_id']}
+                            kw.update(resp)
+                            lots = x.get("lots", 1)
+                            kw['the_profit'] = resp['each_profit'] * lots
+                            kw['lots'] = lots
+                            u = {"$set": kw}
+                            cls.find_one_and_update(filter_dict=f2, update_dict=u, upsert=False)
+                        else:
+                            pass
             else:
                 pass
 
