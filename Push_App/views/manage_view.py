@@ -13,6 +13,7 @@ from flask import abort
 from uuid import uuid4
 import json
 import datetime
+from flask_cors import cross_origin
 from module.items_module import *
 from module.push_module import *
 from orm_module import MyView
@@ -189,19 +190,21 @@ class ManagePhoneView(MyView):
                 except Exception as e:
                     print(e)
                 finally:
+                    tags = None
                     if len(ids) == 0:
-                        mes['message'] = "设备id不能为空"
+                        pass
                     else:
-                        title = get_arg(request, "title", "")
-                        alert = get_arg(request, "alert", "")
-                        url = get_arg(request, "url", "")
-                        kw = {
-                            "title": title,
-                            "alert": alert,
-                            "url": url,
-                            "tags": {"registration_id": ids}
-                        }
-                        mes = push_mes(**kw)
+                        tags = {"registration_id": ids}
+                    title = get_arg(request, "title", "")
+                    alert = get_arg(request, "alert", "")
+                    url = get_arg(request, "url", "")
+                    kw = {
+                        "title": title,
+                        "alert": alert,
+                        "url": url,
+                        "tags": tags
+                    }
+                    mes = push_mes(**kw)
             elif req_type == "delete_device":
                 """删除设备"""
                 ids = []

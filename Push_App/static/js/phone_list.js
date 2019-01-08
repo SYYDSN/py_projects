@@ -107,38 +107,34 @@ $(function(){
             }
         }
         console.log(ids);
-        if(ids.length === 0){
-            alert("请输入有效的推送id,id之间用空格隔开!");
-            return false;
-        }
-        else{
-            var title = $.trim($("#mes_title").val());
-            var desc = $.trim($("#mes_alert").val());
-            var mes_url = $.trim($("#mes_url").val());
-            var args = {
-                "type": "push_message",
-                "ids": JSON.stringify(ids),
-                "title": title,
-                "alert": desc,
-                "url": mes_url
-            };
-            progress("show", "发送消息");
-            $.post(location.pathname, args, function(resp){
-                progress("hide");
-                var json = JSON.parse(resp);
-                var status = json['message'];
-                if(status === "success"){
-                    alert("推送成功");
-                    $(".close_modal").click();
-                    $("#check_all").prop("checked", false);
-                    $(".table_outer .select >input[type='checkbox']").prop("checked", false);  // 取消选择
-                }
-                else{
-                    alert(status);
-                    return false;
-                }
-            });
-        }
+
+        var title = $.trim($("#mes_title").val());
+        var desc = $.trim($("#mes_alert").val());
+        var mes_url = $.trim($("#mes_url").val());
+        var args = {
+            "type": "push_message",
+            "ids": JSON.stringify(ids),
+            "title": title,
+            "alert": desc,
+            "url": mes_url
+        };
+        progress("show", "发送消息");
+        $.post(location.pathname, args, function(resp){
+            progress("hide");
+            var json = JSON.parse(resp);
+            var status = json['message'];
+            if(status === "success"){
+                alert("推送成功");
+                $(".close_modal").click();
+                $("#check_all").prop("checked", false);
+                $(".table_outer .select >input[type='checkbox']").prop("checked", false);  // 取消选择
+            }
+            else{
+                alert(status);
+                return false;
+            }
+        });
+
     };
 
     // 模态框发送按钮点击事件

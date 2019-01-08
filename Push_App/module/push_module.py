@@ -65,8 +65,9 @@ def push_mes(alert: str, title: str, url: str, cid: str = None, platform: (dict,
     else:
         pass
     u = "https://api.jpush.cn/v3/push"
+    print(args)
     r = requests.post(url=u, json=args, headers=headers)
-    print(r)
+    print(r.json())
     return mes
 
 
