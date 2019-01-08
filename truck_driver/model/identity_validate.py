@@ -53,7 +53,7 @@ class GlobalSignature(mongo_db.BaseDoc):
         :return: 实例
         """
         obj = cls(from_unc=True)
-        obj.save_plus()
+        obj.save()
         return obj.get_dict()
 
     @classmethod
@@ -65,8 +65,8 @@ class GlobalSignature(mongo_db.BaseDoc):
         """
         """目前没有过期时间"""
         f = dict()
-        s = {"time": -1}
-        one = cls.find_one_plus(filter_dict=f, sort_dict=s, instance=False)
+        s = [("time", -1)]
+        one = cls.find_one(filter_dict=f, sort=s)
         """表为空或者没有有效的signature,重新生成一个signature"""
         if one is None:
             one = cls.__add_signature()

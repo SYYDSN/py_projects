@@ -60,7 +60,15 @@ def save_data(data, last_date):
     current_date = "{} {}".format(last_date, ("0:0:0" if len(data['news']) == 0 else data['news'][0]['time']))
     current_date = datetime.datetime.strptime(current_date, "%Y-%m-%d %H:%M:%S")
     JinTenData.record(data=data, last_update=current_date)
-    cache.set(key=cache_key, value=data, timeout=300)
+    cache.set(key=cache_key, value=data, timeout=30)
+
+
+def check_date(date_str: str) -> None:
+    """
+    检查时间是否落后太多?
+    :param date_str:
+    :return:
+    """
 
 
 def load_data(to_json: bool = True) -> str:
