@@ -15,6 +15,12 @@ app.config['SECRET_KEY'] = secret
 socketio = SocketIO(app)
 
 
+@app.route("/")
+def index_func():
+    print("ok")
+    return "ok"
+
+
 @app.route("/io_client")
 def io_client_func():
     return render_template("io_client.html")

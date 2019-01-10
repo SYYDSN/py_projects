@@ -1,17 +1,27 @@
-var socket = io.connect('wss://' + document.domain + ':' + location.port);
-socket.on('connect', function() {
-    socket.emit('mes', {data: 'I\'m 中 connected!'});
-});
+var ws_url = 'wss://' + document.domain + ':' + location.port + "/echo";
+var socket = new ReconnectingWebSocket(ws_url);
 
-socket.on('mes', function(json){
+var on_open = function() {
+    socket.send(JSON.stringify({data: 'I\'m 中 connected!'}));
+};
+
+var on_message = function(json){
     console.log(json);
-    var str = json['message'];
+    var str = json['data'];
     if(str !== undefined && str !== ""){
         var div = $(`<div>${str}</div>`);
         $(".show").append(div);
     }
 
-});
+};
+
+var init = function(){
+    socket.onopen = on_open;
+    socket.onmessage = on_message;
+};
+
+init();
+
 
 nick_name = prompt("请输入你的昵称");
 while($.trim(nick_name) === ""){
@@ -23,7 +33,7 @@ $("#submit").click(function(){
     if(str !== ""){
         var data = {"message": `${nick_name} 说: ${str}`};
 
-        socket.emit("mes", data);
+        socket.send(JSON.stringify({"mes": data}));
         $("input").val("");
     }
 });

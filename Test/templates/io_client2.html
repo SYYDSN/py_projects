@@ -1,9 +1,9 @@
-{% extends "template.html" %}
+{% extends "tornado_template.html" %}
 
 {% block css %}
     <link rel="stylesheet" href="/static/css/io_client.css">
     <script type="text/javascript" src="/static/js/socket.io.js"></script>
-{% endblock %}
+{% end %}
 
 {% block body %}
     <div class="show">
@@ -13,8 +13,9 @@
         <input type="text" placeholder="请输入...">
     <button type="button" class="btn btn-md btn-primary" id="submit">提交</button>
     </div>
-{% endblock %}
+{% end %}
 
 {% block js %}
+    <script src="/static/js/reconnecting-websocket.min.js"></script>
     <script src="/static/js/io_client2.js"></script>
-{% endblock %}
+{% end %}
