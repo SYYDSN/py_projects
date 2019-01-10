@@ -1,4 +1,4 @@
-var socket = io.connect('ws://' + document.domain + ':' + location.port);
+var socket = io.connect('wss://' + document.domain + ':' + location.port);
 socket.on('connect', function() {
     socket.emit('mes', {data: 'I\'m 中 connected!'});
 });

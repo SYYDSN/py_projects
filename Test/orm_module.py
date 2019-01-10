@@ -48,7 +48,7 @@ hostname = socket.gethostname()
 cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设置决定
 s_cache = SimpleCache()      # 使用内存的缓存,重启/关机就清空了.
 logger = get_logger()
-host = "127.0.0.1"
+host = "47.100.23.19:27017"
 user = "test1"              # 数据库用户名
 password = "test@723456"       # 数据库密码
 db_name = "test_db"        # 库名称
@@ -63,35 +63,23 @@ mechanism = "SCRAM-SHA-1"      # 加密方式，注意，不同版本的数据�
 注意,使用连接池就不能使用mongos load balancer
 mongos load balancer的典型连接方式: client = MongoClient('mongodb://host1,host2,host3/?localThresholdMS=30')
 """
-if hostname != "walle-pc":
-    """远程服务器配置"""
-    mongodb_setting = {
-        "host": "47.99.105.196:27017",   # 数据库服务器地址
-        "connect": connect,              #
-        "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
-        "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
-        "minPoolSize": 0,  # 最小连接池,默认是0.
-        "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
-        "authSource": db_name,  # 验证数据库
-        'authMechanism': mechanism,  # 加密
-        "readPreference": "primary",  # 读偏好,主
-        # "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
-        # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
-        "username": user,       # 用户名
-        "password": password    # 密码
-    }
-else:
-    mongodb_setting = {
-        "host": "{}:27017".format(host),   # 数据库服务器地址
-        "connect": connect,
-        "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
-        "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
-        "minPoolSize": 2,  # 最小连接池,默认是0.
-        "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
-        "authSource": db_name,  # 验证数据库
-        "username": user,  # 用户名
-        "password": password  # 密码
-    }
+
+mongodb_setting = {
+    "host": host,   # 数据库服务器地址
+    "connect": connect,              #
+    "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
+    "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
+    "minPoolSize": 0,  # 最小连接池,默认是0.
+    "waitQueueMultiple": 10,  # 可等待的线程的数量
+    "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
+    "authSource": db_name,  # 验证数据库
+    'authMechanism': mechanism,  # 加密
+    "readPreference": "primary",  # 读偏好,主
+    # "readPreference": "primaryPreferred",  # 读偏好,优先从盘,如果是从盘优先, 那就是读写分离模式
+    # "readPreference": "secondaryPreferred",  # 读偏好,优先从盘,读写分离
+    "username": user,       # 用户名
+    "password": password    # 密码
+}
 
 
 class DBCommandListener(monitoring.CommandListener):

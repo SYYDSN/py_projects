@@ -76,6 +76,7 @@ mongodb_setting = {
     "localThresholdMS": 30,  # 本地超时的阈值,默认是15ms,服务器超过此时间没有返回响应将会被排除在可用服务器范围之外
     "maxPoolSize": 100,  # 最大连接池,默认100,不能设置为0,连接池用尽后,新的请求将被阻塞处于等待状态.
     "minPoolSize": 0,  # 最小连接池,默认是0.
+    "waitQueueMultiple": 10,  # 可等待的线程的数量
     "waitQueueTimeoutMS": 30000,  # 连接池用尽后,等待空闲数据库连接的超时时间,单位毫秒. 不能太小.
     "authSource": db_name,  # 验证数据库
     'authMechanism': mechanism,  # 加密
