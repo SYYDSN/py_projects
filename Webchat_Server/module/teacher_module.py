@@ -124,6 +124,17 @@ class Teacher(mongo_db.BaseDoc):
     2018-9-2 新增老师
     为了便于统计成绩和管理,原来的老师会慢慢的停止使用,使用新的一批老师账户来操作.中间会有过度期.2套账户都可以使用
     新的账户体系.
+    2919-1-12b 旧账户体系失效. 目前有小的账户是(特征是invalid字段没有)
+    [
+        ObjectId('5b8c5451dbea62189b5c28eb'), ObjectId('5b8c5451dbea62189b5c28ed'), ObjectId('5b8c5451dbea62189b5c28ee'),
+        ObjectId('5b8c5451dbea62189b5c28ea'), ObjectId('5b8c5451dbea62189b5c28f0'), ObjectId('5b8c5451dbea62189b5c28f1'),
+        ObjectId('5b8c5451dbea62189b5c28f2'), ObjectId('5b8c5451dbea62189b5c28ef'), ObjectId('5b8c5452dbea62189b5c28f4'),
+        ObjectId('5b8c5452dbea62189b5c28f5'), ObjectId('5b8c5452dbea62189b5c28f6'), ObjectId('5b8c5452dbea62189b5c28f3'),
+        ObjectId('5b8c5452dbea62189b5c28f8'), ObjectId('5b8c5452dbea62189b5c28f9'), ObjectId('5b8c5452dbea62189b5c28fa'),
+        ObjectId('5b8c5452dbea62189b5c28f7'), ObjectId('5b8c5452dbea62189b5c28fc'), ObjectId('5b8c5452dbea62189b5c28fd'),
+        ObjectId('5b8c5452dbea62189b5c28fe'), ObjectId('5b8c5452dbea62189b5c28fb')
+    ]
+    非功老师的id是ObjectId("5bbd3279c5aee8250bbe17d0"),多了一个hide=true的属性
     """
     _table_name = "teacher"
     type_dict = dict()
@@ -153,6 +164,7 @@ class Teacher(mongo_db.BaseDoc):
     type_dict['win_ratio'] = float  # 胜率
     type_dict['win_count'] = int  # 胜场统计
     type_dict['case_count'] = int  # 喊单总计
+    type_dict['invalid'] = bool  # 标记为真的不纳入有效统计范围,trade中也有这个字段. 2019-1-12b
 
     @classmethod
     def instance(cls, **kwargs):
@@ -330,9 +342,12 @@ class Teacher(mongo_db.BaseDoc):
         返回首页所用的信息,一个以胜率排序的列表,元素包含胜率.和跟随人数
         :return:
         """
-        """默认查询近30天的胜率数据"""
+        """
+        查询invalid字段不存在,而且hide不存在的老师. 2019-1-12b
+        """
         f = {
-            "create_date": {"$gt": mongo_db.get_datetime_from_str("2018-9-3 0:0:0")}
+            "invalid": {"$exists": False},
+            "hide": {"$exists": False}
         }
         data = cls.find(filter_dict=f)
         data = {x["_id"]: x for x in data if not x.get("hide")}
@@ -562,7 +577,7 @@ class Teacher(mongo_db.BaseDoc):
     @classmethod
     def selector_data(cls, project: list = None) -> list:
         """
-        获取老师的选择器对象
+        获取老师的选择器对象,包含虚拟老师
         :return:
         """
         f = {"native": True, "direction": {"$exists": False}}
@@ -657,5 +672,5 @@ if __name__ == "__main__":
     # print(Teacher.count(filter_dict={}))
     # ids = [ObjectId("5bbd3279c5aee8250bbe17d0")]
     # print(Teacher.single_info2(ObjectId("5b8c5451dbea62189b5c28eb")))
-    Teacher.re_calculate()
+    Teacher.index()
     pass

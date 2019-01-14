@@ -212,7 +212,7 @@ class ManageTradeView(MyView):
 
     @check_admin_session
     def get(self, admin: dict, key):
-        """返回条码信息导出界面"""
+        """返回交易历史记录界面"""
         render_data['cur_user'] = admin  # 当前用户,这个变量名要保持不变
         access_filter = self.operate_filter(admin)   # 数据访问权
         render_data['navs'] = self.check_nav(navs=navs, user=admin)  # 导航访问权
