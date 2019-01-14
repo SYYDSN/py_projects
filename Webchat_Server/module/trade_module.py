@@ -1161,7 +1161,7 @@ class Trade(Signal):
     type_dict['the_profit'] = float  # 本次交易总盈利
     type_dict['t_coefficient'] = float  # （交易）系数 -1/1
     type_dict['formula'] = str  # 计算公式
-    type_dict['invalid'] = bool  # 标记为真的不纳入有效统计范围,teacher中也有这个字段. 2019-1-12b
+    # type_dict['invalid'] = bool  # 标记为真的不纳入有效统计范围,teacher中也有这个字段. 暂时未处理 2019-1-12b
     type_dict['p_coefficient'] = float  # （点值）系数 废止2018-8-21
     type_dict['a_coefficient'] = float  # 开仓价随机系数 废止2018-8-21
     type_dict['b_coefficient'] = float  # 平仓价随机系数 废止2018-8-21

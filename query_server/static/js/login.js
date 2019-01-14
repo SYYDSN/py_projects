@@ -39,7 +39,7 @@ $(function(){
                 var status = json['message'];
                 if(status === "success"){
                     var r = document.referrer;
-                    var u = r === ""? "/manage/product": r;
+                    var u = r === "" || r.endsWith(location.pathname)? "/manage/product": r;
                     location.href = u;
                 }
                 else{
