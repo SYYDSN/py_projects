@@ -1221,6 +1221,8 @@ class BaseDoc:
     _table_name = "table_name"  
     """
 
+    # collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
+
     def table_name(self) -> str:
         """获取表名"""
         return self._table_name

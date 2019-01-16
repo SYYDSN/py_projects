@@ -65,6 +65,8 @@ class Product(orm_module.BaseDoc):
     type_dict['last'] = datetime.datetime
     type_dict['time'] = datetime.datetime
 
+    orm_module.collection_exists(table_name=_table_name, auto_create=True)  # 自动创建表.事务不会自己创建表
+
     @classmethod
     def add(cls, **kwargs) -> dict:
         """
