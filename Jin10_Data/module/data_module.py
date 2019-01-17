@@ -47,7 +47,7 @@ class JinTenData(orm_module.BaseDoc):
             return dict() if resp is None else resp
 
     @classmethod
-    def record(cls, data: dict, last_date: str, clear_prev: int = 1) -> bool:
+    def record(cls, data: dict, last_date: datetime.datetime, clear_prev: int = 1) -> bool:
         """
         比对last_update决定是否更新时间?如果last_update一致,就只更新最后一条记录的time,
         否则新插入一条记录.
@@ -57,21 +57,36 @@ class JinTenData(orm_module.BaseDoc):
         :return: 是否需要更新缓存?
         """
         resp = False
+        now = datetime.datetime.now()
         r = cls.last_record()
         new_news = data.get("data", dict()).get("news")
         if isinstance(new_news, list) and len(new_news) > 0:
             new_last = new_news[0]['time']
+            new_text = new_news[0]['text']
             old_news = r.get("data", dict()).get("news")
             flag = False
             if isinstance(old_news, list) and len(old_news) > 0:
+                old_last = new_news[0]['time']
+                old_text = new_news[0]['text']
+                if old_last == new_last and old_text == new_text:
+                    """相同,更新time即可"""
+                    f = {"_id": r['_id']}
+                    u = {"$set": {"time": now}}
+                    cls.find_one_and_update(filter_dict=f, update_dict=u)
+                else:
+                    """应该插入文档"""
+                    flag = True
             else:
                 flag = True
             if flag:
-                now = datetime.datetime.now()
                 doc = {
-                    "time":
+                    "data": data,
+                    "time": now,
+                    "last_update": last_date
                 }
-                cls.find_one_and_update(filter_dict={"_id": r['_id']}, update_dict=u)
+                cls.insert_one(doc=doc)
+                prev = now - datetime.timedelta(hours=clear_prev)
+                cls.delete_many(filter_dict={"time": {"$lt": prev}})
                 resp = True
             else:
                 pass
@@ -80,15 +95,15 @@ class JinTenData(orm_module.BaseDoc):
         return resp
 
 
-def save_data(data, last_date):
+def save_data(data, last_date: str):
     """
     :param data:
-    :param last_date: 最新一条新闻的日期,用于判断是否需要更新,废止,用最后一条新闻替代
+    :param last_date: 最新一条新闻的日期,用于判断是否需要更新,字符串 2019-1-1的形式
     :return:
     """
-    # current_date = "{} {}".format(last_date, ("0:0:0" if len(data['news']) == 0 else data['news'][0]['time']))
-    # current_date = datetime.datetime.strptime(current_date, "%Y-%m-%d %H:%M:%S")
-    flag = JinTenData.record(data=data)
+    current_date = "{} {}".format(last_date, ("0:0:0" if len(data['news']) == 0 else data['news'][0]['time']))
+    current_date = datetime.datetime.strptime(current_date, "%Y-%m-%d %H:%M:%S")
+    flag = JinTenData.record(data=data, last_date=current_date)
     if flag:
         cache.set(key=cache_key, value=data, timeout=30)
 
@@ -125,7 +140,12 @@ def load_data(to_json: bool = True) -> str:
     data = cache.get(key=cache_key)
     resp = "^^"
     if data is None:
-        pass
+        r = JinTenData.last_record()
+        if r is None:
+            pass
+        else:
+            data = r['data']
+            cache.set(key=cache_key, value=data, timeout=30)
     else:
         if to_json:
             resp = json.dumps(data)
