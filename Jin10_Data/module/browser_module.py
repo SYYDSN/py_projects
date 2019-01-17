@@ -411,7 +411,7 @@ def get_star(dom) -> int:
         return star
 
 
-def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> (list, tuple):
+def get_calendar_data(b: WebDriver) -> (list, tuple):
     """
     取金10数据的日历
     :param b:
@@ -422,7 +422,7 @@ def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> (list, tu
     w = WebDriverWait(b, timeout=1)
     today_dom = get_dom(wait=w, find_type="class", cond="jin-rili_content-title", lot=False)
     year, month, day = re.findall("\d{2,4}", today_dom.text)
-    current_date = "{}-{}-{}".format(year, month, day)
+    last_date_str = "{}-{}-{}".format(year, month, day)
     items = get_dom(wait=w, find_type="css", cond=".jin-rili_body .jin-rili_content", lot=True)
     doms1 = items[0]  # 数据一览
     doms2 = items[1]  # 财经大事
@@ -434,7 +434,7 @@ def get_calendar_data(b: WebDriver, last: datetime.datetime = None) -> (list, tu
         if len(temp) > 0:
             d1.append(temp)
     """目前只处理数据日历"""
-    return d1, current_date
+    return d1, last_date_str
 
 
 def memory_percent() -> float:
@@ -476,6 +476,8 @@ def reboot_plan(current: datetime.datetime = None) -> None:
     """
     per = memory_percent()
     current = datetime.datetime.now() if not isinstance(current, datetime.datetime) else current
+    h = current.hour
+    m = current.minute
     if per >= 95:
         """清除日志,立即重启"""
         clear_log()
@@ -483,10 +485,9 @@ def reboot_plan(current: datetime.datetime = None) -> None:
         content = "当前内存使用率: {}".format(per)
         send_mail(title=title, content=content)
         os.system("reboot")
-    elif per >= 75:
-        h = current.hour
-        m = current.minute
-        if h == 4 and abs(m - 20) < 10:
+    else:
+        if h == 4 and abs(m - 20) < 10 and per >= 50:
+
             """凌晨4:30分左右"""
             clear_log()
             title = "维护重启金10数据系统:{}".format(current)
@@ -495,8 +496,6 @@ def reboot_plan(current: datetime.datetime = None) -> None:
             os.system("reboot")
         else:
             pass
-    else:
-        pass
 
 
 def regular() -> None:
@@ -520,12 +519,15 @@ def regular() -> None:
             pass
         calendar_data, last_date = get_calendar_data(browser)
         news_data = get_news_data(b=browser)
-        data = {
-            "strategy": [],
-            "news": news_data,
-            "calendar": calendar_data
-        }
-        save_data(data=data, last_date=last_date)
+        if len(news_data) == 0 and len(calendar_data) == 0:
+            pass
+        else:
+            data = {
+                "strategy": [],
+                "news": news_data,
+                "calendar": calendar_data
+            }
+            save_data(data=data, last_date=last_date)
         end = datetime.datetime.now()
         print(now)
         print(end)

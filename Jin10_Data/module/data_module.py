@@ -7,6 +7,7 @@ if __project_dir__ not in sys.path:
 import orm_module
 import json
 import datetime
+from mail_module import send_mail
 
 
 ObjectId = orm_module.ObjectId
@@ -29,38 +30,67 @@ class JinTenData(orm_module.BaseDoc):
     type_dict['time'] = datetime.datetime  # 写入时间
 
     @classmethod
-    def record(cls, data: dict, last_update: datetime.datetime, clear_prev: int = 1) -> None:
+    def last_record(cls) -> dict:
+        """
+        获取数据库最新的一条记录
+        :return:
+        """
+        resp = None
+        s = [("time", -1)]
+        try:
+            resp = cls.find_one(sort=s)
+        except Exception as e:
+            print(e)
+            title = "读取最后一条金10数据出错: {}".format(datetime.datetime.now())
+            send_mail(title=title)
+        finally:
+            return dict() if resp is None else resp
+
+    @classmethod
+    def record(cls, data: dict, last_date: str, clear_prev: int = 1) -> bool:
         """
         比对last_update决定是否更新时间?如果last_update一致,就只更新最后一条记录的time,
         否则新插入一条记录.
         :param data:
-        :param last_update:
+        :param last_date: 金10日历的日期的字符串
         :param clear_prev: 清除几个小时之前的记录?(因为单条记录可能很大,所以需要清除一下)
-        :return:
+        :return: 是否需要更新缓存?
         """
-        s = [("time", -1)]
-        r = cls.find_one(sort=s)
-        now = datetime.datetime.now()
-        if isinstance(r, dict) and last_update == r['last_update']:
-            u = {"$set": {"time": now}}
-            cls.find_one_and_update(filter_dict={"_id": r['_id']}, update_dict=u)
+        resp = False
+        r = cls.last_record()
+        new_news = data.get("data", dict()).get("news")
+        if isinstance(new_news, list) and len(new_news) > 0:
+            new_last = new_news[0]['time']
+            old_news = r.get("data", dict()).get("news")
+            flag = False
+            if isinstance(old_news, list) and len(old_news) > 0:
+            else:
+                flag = True
+            if flag:
+                now = datetime.datetime.now()
+                doc = {
+                    "time":
+                }
+                cls.find_one_and_update(filter_dict={"_id": r['_id']}, update_dict=u)
+                resp = True
+            else:
+                pass
         else:
-            prev = now - datetime.timedelta(hours=clear_prev)
-            cls.delete_many(filter_dict={"time": {"$lt": prev}})
-            doc = {"data": data, "time": now, "last_update": last_update}
-            cls.insert_one(doc=doc)
+            pass
+        return resp
 
 
 def save_data(data, last_date):
     """
     :param data:
-    :param last_date: 最新一条新闻的日期,用于判断是否需要更新
+    :param last_date: 最新一条新闻的日期,用于判断是否需要更新,废止,用最后一条新闻替代
     :return:
     """
-    current_date = "{} {}".format(last_date, ("0:0:0" if len(data['news']) == 0 else data['news'][0]['time']))
-    current_date = datetime.datetime.strptime(current_date, "%Y-%m-%d %H:%M:%S")
-    JinTenData.record(data=data, last_update=current_date)
-    cache.set(key=cache_key, value=data, timeout=30)
+    # current_date = "{} {}".format(last_date, ("0:0:0" if len(data['news']) == 0 else data['news'][0]['time']))
+    # current_date = datetime.datetime.strptime(current_date, "%Y-%m-%d %H:%M:%S")
+    flag = JinTenData.record(data=data)
+    if flag:
+        cache.set(key=cache_key, value=data, timeout=30)
 
 
 def check_date(date_str: str) -> None:
