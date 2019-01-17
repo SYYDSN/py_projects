@@ -11,6 +11,7 @@ ajax测试服务器
 
 
 app = Flask(__name__)
+CORS(app=app)
 port = 8001                      # 配置端口
 
 
@@ -27,6 +28,7 @@ def common_func(key):
         mes['message'] = "not found!"
     else:
         mes['data'] = values
+    print(mes)
     return json.dumps(mes)
 
 
