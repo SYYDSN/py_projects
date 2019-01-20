@@ -8,6 +8,7 @@ from flask.views import MethodView
 from flask import Flask
 from flask.blueprints import Blueprint
 from collections import OrderedDict
+from units.peewee_sql import *
 
 
 """
@@ -18,7 +19,13 @@ from collections import OrderedDict
 class MyView(MethodView):
     """
     自定义视图.可以定制用户的访问权限
-    字典_access_rules用来定义权限的之对应的级别
+    字典_access_rules用来定义权限的之对应的级别.如果想有更多的访问级别限制,请扩展_access_rules字典.比如:
+    _access_rules[0] = "禁止访问"
+    _access_rules[1] = "允许访问全部"
+    _access_rules[2] = "允许访问本部门"
+    _access_rules[3] = "允许访问本组"
+    ....
+
     """
     _access_rules = OrderedDict()           # 定义访问级别
     _access_rules[0] = "禁止访问"
@@ -146,6 +153,28 @@ class MyView(MethodView):
                     pass
 
 
+class Rule(BaseModel):
+    """
+    (权限组的)规则
+    """
+
+    class Meta:
+        table_name = "rule_info"
+
+
+class Role(BaseModel):
+    """
+    权限组
+    """
+
+    class Meta:
+        table_name = "role_info"
+
+
+models = [
+    Rule, Role
+]
+db.create_tables(models=models)
 
 
 if __name__ == "__main__":

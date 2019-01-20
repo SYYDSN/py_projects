@@ -26,7 +26,8 @@ setting = {
     "stale_timeout": 300,
     "database": "wise_oa",
     "user": "root",
-    "password": "Xx@mysql312"
+    # "password": "Xx@mysql312"
+    "password": "123456"
 }
 
 db = PooledMySQLDatabase(**setting)
@@ -41,6 +42,12 @@ class BaseModel(Model):
     3. 有关返回值,如果你查询一条记录,直接调用get_dict即可,如果查询多条记录,那就是[x.get_dict() for x in result]
     4. 如果你要自定义一个非自增长的int主键或者uuid主键,请不要使用PrimaryKeyField,而是id = IntegerField(primary_key=True)
 
+    """
+
+    """
+    这里定义字段,例如: 
+    id = PrimaryKeyField(int)
+    name = CharField(unique=True)
     """
 
     class Meta:

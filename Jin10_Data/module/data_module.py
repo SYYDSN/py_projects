@@ -59,15 +59,15 @@ class JinTenData(orm_module.BaseDoc):
         resp = False
         now = datetime.datetime.now()
         r = cls.last_record()
-        new_news = data.get("data", dict()).get("news")
+        new_news = data.get("news")
         if isinstance(new_news, list) and len(new_news) > 0:
             new_last = new_news[0]['time']
             new_text = new_news[0]['text']
             old_news = r.get("data", dict()).get("news")
             flag = False
             if isinstance(old_news, list) and len(old_news) > 0:
-                old_last = new_news[0]['time']
-                old_text = new_news[0]['text']
+                old_last = old_news[0]['time']
+                old_text = old_news[0]['text']
                 if old_last == new_last and old_text == new_text:
                     """相同,更新time即可"""
                     f = {"_id": r['_id']}
@@ -114,6 +114,8 @@ def check_date(date_str: str) -> None:
     :param date_str:
     :return:
     """
+
+
 
 
 def load_data(to_json: bool = True) -> str:

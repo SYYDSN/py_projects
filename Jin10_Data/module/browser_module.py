@@ -531,7 +531,7 @@ def regular() -> None:
         end = datetime.datetime.now()
         print(now)
         print(end)
-        delay = (end - now).total_seconds() - 8
+        delay = 8 - (end - now).total_seconds()
         print("delay is {}".format(delay))
         delay = 1 if delay < 0 else delay
         prev_refresh = end
