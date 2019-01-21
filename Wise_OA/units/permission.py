@@ -16,6 +16,33 @@ from units.peewee_sql import *
 """
 
 
+class ViewUrlRule(BaseModel):
+    """
+        保存.App所有的路由规则. 任何一个视图函数允许的三种访问方法(view/edit/delete)的权限的取值范围都在这里保存
+    """
+    id = PrimaryKeyField()
+    view_name = CharField()  # 视图函数名称. 就是视图函数的类名,一个视图函数只有一个view_name
+    methods = JSONField()  # 函数支持的方法,
+    url_path = CharField(max_length=1000)  # 路由url
+    """
+    rule_dict 是个字典.大致的样子如下
+    rule_dict = {
+                    "view": {
+                            1: 
+                        }
+                }
+    """
+    rule_dict = JSONField()
+    rule_value = IntegerField()  # 权限规则的值,取自MyView._access_rules的key
+    rule_desc = CharField(max_length=1000)   # 规则的备注.取自MyView._access_rules的value
+
+    class Meta:
+        table_name = "view_url_rule"
+
+
+db.drop_tables(models=ViewUrlRule)   # 每次重启都要删除这个表
+
+
 class MyView(MethodView):
     """
     自定义视图.可以定制用户的访问权限
@@ -73,6 +100,24 @@ class MyView(MethodView):
             return False
 
     @classmethod
+    def get_rules(cls, operate: str = "view") -> list:
+        """
+        获取某种类型的操作设定的权限值的集合
+        :param operate: 权限的类型 分为 view/edit/delete  查看/编辑/删除
+        :return:
+        """
+        res = list()
+        if operate == "view":
+            res = cls._allowed_view
+        elif operate == "edit":
+            res = cls._allowed_view if cls._allowed_edit is None else cls._allowed_edit
+        elif operate == "delete":
+            res = cls.get_rules("edit") if cls._allowed_delete is None else cls._allowed_delete
+        else:
+            pass
+        return res
+
+    @classmethod
     def __set_url_prefix(cls, url_prefix: str) -> None:
         """
         设置路由规则的前缀,在注册视图的时候自动调用
@@ -82,11 +127,30 @@ class MyView(MethodView):
         cls._url_prefix = url_prefix
 
     @classmethod
+    def get_url_prefix(cls) -> str:
+        """
+        获取路由规则的前缀
+        :return:
+        """
+        return cls._url_prefix
+
+    @classmethod
+    def get_full_path(cls, url_path: str = None) -> str:
+        """
+        获取url_path的完全路径
+        :param url_path:
+        :return:
+        """
+        url_path = cls._rule if url_path is None or url_path == "" else url_path
+        return url_path if cls.get_url_prefix() == "" else "{}{}".format(cls.get_url_prefix(), url_path)
+
+    @classmethod
     def register(cls, app: (Flask, Blueprint), rule: str = None) -> None:
         """
-        注册视图函数.
-        :param app:
-        :param rule:
+        注册视图函数. 视图函数的规则定义忽略请求的方法而重视url
+        :param app:   app或者blueprint
+        :param rule:  想对于app根路径/或者蓝图根路径(/blueprint)的视图函数的url,也可以在定义类的时候设置 cls._rule,
+                      不过在本函数中的rule参数会覆盖 cls._rule,
         :return:
         """
         methods = cls.methods
@@ -101,16 +165,8 @@ class MyView(MethodView):
                 raise ValueError(ms)
             else:
                 endpoint = cls._endpoint if cls._endpoint else cls.__name__
-                rule = rule if rule.startswith("/") else "/{}".format(rule)
-                if isinstance(app, Blueprint):
-                    url_prefix = app.url_prefix
-                else:
-                    url_prefix = ""
-                cls.__set_url_prefix(url_prefix=url_prefix)
                 app.add_url_rule(rule=rule, view_func=cls.as_view(name=endpoint), methods=methods)
-                url_path = "{}{}".format(url_prefix, rule)
                 """处理允许访问的值"""
-
                 view_rules = list()
                 for val in cls.get_rules("view"):
                     if val in cls._access_rules:
@@ -172,7 +228,7 @@ class Role(BaseModel):
 
 
 models = [
-    Rule, Role
+    ViewRule, Rule, Role
 ]
 db.create_tables(models=models)
 

@@ -8,12 +8,26 @@ import datetime
 import logging
 from uuid import uuid4
 from peewee import *
+import json
 from playhouse.pool import PooledMySQLDatabase
 
 
 """
 数据库连接模块
 """
+
+
+class JSONField(Field):
+    """
+    自定义的JSON类型
+    """
+    field_type = 'json'
+
+    def db_value(self, value):
+        return json.dumps(value)
+
+    def python_value(self, value):
+        return json.loads(value)
 
 
 logger = logging.getLogger("peewee")
@@ -78,32 +92,16 @@ class BaseModel(Model):
         return cls._meta.sorted_field_names
 
 
-class Employee(BaseModel):
-    id = PrimaryKeyField(str)
-    user_name = CharField(unique=True)
-
-
-class Manager(BaseModel):
-    employee_id = UUIDField(unique=True)
-    message = TextField()
-    create_date = DateTimeField(default=datetime.datetime.now)
-    is_published = BooleanField(default=True)
-
-
 class Job(BaseModel):
-    model = "job_info"
+    haha = JSONField()
     name = CharField(unique=True)
 
-
-class Person(BaseModel):
-    id = PrimaryKeyField()
-    name = CharField()
-    job_id = ForeignKeyField(model=Job, backref="person")
-    create_time = DateTimeField(default=datetime.datetime.now)
+    class Meta:
+        table_name = "job_info"
 
 
 models = [
-    BaseModel, Manager, Employee, Job, Person
+    Job
 ]
 db.create_tables(models=models)
 
@@ -119,14 +117,18 @@ if __name__ == "__main__":
     ##
     # cols = Person.all_fields()
     # cols.extend(Job.all_fields())
-    p = dict()
-    try:
-        resp = Person.select(Person, Job).join(Job).where(Person.name == "张三").get()
-        """如果是查询多个,那就是[x.get_dict() for x in p]"""
-        p = resp.get_dict()
-    except Person.DoesNotExist as e:
-        print(e)
-    finally:
-        print(p)
-
+    # p = dict()
+    # try:
+    #     resp = Person.select(Person, Job).join(Job).where(Person.name == "张三").get()
+    #     """如果是查询多个,那就是[x.get_dict() for x in p]"""
+    #     p = resp.get_dict()
+    # except Person.DoesNotExist as e:
+    #     print(e)
+    # finally:
+    #     print(p)
+    """测试json字段类型"""
+    j = Job(haha={"name": "jack"}, name='tom')
+    j.save()
+    # j = Job.get(Job.name=='tom')
+    # print(j.haha)
     pass
