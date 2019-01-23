@@ -13,6 +13,7 @@ from flask import abort
 from uuid import uuid4
 import json
 import datetime
+from units.permission import MyView
 from tools_module import *
 
 
@@ -29,6 +30,7 @@ project_name = "生产线条码管理系统"
 render_data = dict()  # 用来渲染的数据
 render_data['project_name'] = project_name
 """导航菜单"""
+
 navs = [
     {"name": "产品信息", "path": "/manage/product", "class": "fa fa-exclamation-circle", "children": [
         {"name": "基本信息管理", "path": "/manage/product"}
@@ -57,7 +59,7 @@ navs = [
 
 class LoginView(MyView):
     """登录页面和登录函数"""
-    _rule = "/login"
+    _url_path = "/login"
     _allowed_view = [3]
     _allowed_delete = []
     _allowed_edit = []
@@ -84,7 +86,7 @@ class LoginView(MyView):
 
 class LogoutView(MyView):
     """注销视图"""
-    _rule = "/logout"
+    _url_path = "/logout"
     _allowed_view = [3]
     _allowed_delete = []
     _allowed_edit = []
@@ -100,11 +102,11 @@ class LogoutView(MyView):
 
 class DownLoadPrintFileView(MyView):
     """下载批量打印的文件函数"""
-    _rule = "/print_file/<file_name>"
+    _url_path = "/print_file/<file_name>"
     _allowed_view = [0, 3]
     _allowed_edit = []
     _allowed_delete = []
-    _name = "下载批量打印的文件"
+    _name = "下载文件"
 
     @check_session
     def get(self, user: dict, file_name: str):
@@ -122,198 +124,22 @@ class DownLoadPrintFileView(MyView):
             return abort(403)  # 权限不足
 
 
-class DownLoadSyncFileView(MyView):
-    """下载任务执行回传的文件函数"""
-    _rule = "/sync_file/<file_name>"
+class View1(MyView):
+    """测试视图1"""
+    _url_path = "/view1"
     _allowed_view = [0, 3]
-    _allowed_edit = []
-    _allowed_delete = []
-    _name = "下载任务执行回传的文件"
-
-    @check_session
-    def get(self, user: dict, file_name: str):
-        """
-        下载
-        :param user:
-        :param file_name:
-        :return:
-        """
-        access_filter = self.operate_filter(user=user, operate="view")
-        if isinstance(access_filter, dict):
-            directory = os.path.join(__project_dir__, "task_sync")
-            return send_from_directory(directory=directory, filename=file_name, attachment_filename=file_name,
-                                       as_attachment=True)
-        else:
-            return abort(403)  # 权限不足
-
-
-class DownLoadOutputFileView(MyView):
-    """下载生产完成的导出文件函数"""
-    _rule = "/output_file/<file_name>"
-    _allowed_view = [0, 3]
-    _allowed_edit = []
-    _allowed_delete = []
-    _name = "下载生产完成的导出文件"
-
-    @check_session
-    def get(self, user: dict, file_name: str):
-        """
-        下载
-        :param user:
-        :param file_name:
-        :return:
-        """
-        access_filter = self.operate_filter(user=user, operate="view")
-        if isinstance(access_filter, dict):
-            directory = os.path.join(__project_dir__, "output_code")
-            return send_from_directory(directory=directory, filename=file_name, attachment_filename=file_name,
-                                       as_attachment=True)
-        else:
-            return abort(403)  # 权限不足
-
-
-class CodeInfoView(MyView):
-    """查询/替换条码信息"""
-    _rule = "/code_info"
-    _allowed_view = [0, 3]
-    _allowed_edit = [0, 3]
-    _allowed_delete = []
-    _name = "查询/替换条码信息"
-
-    @check_session
-    def post(self, user: dict):
-        """
-        :param user:
-        :return:
-        """
-        mes = {"message": "success"}
-        the_type = get_arg(request, "type", "")
-        _id = get_arg(request, "_id", "")
-        _id = _id if _id else get_arg(request, "old_id", "")
-        if isinstance(_id, str) and len(_id) > 18:
-            if the_type == "query":
-                """查询条码信息"""
-                access_filter = self.operate_filter(user=user, operate="view")
-                if isinstance(access_filter, dict):
-                    access_filter.update({"_id": _id})
-                    code = CodeInfo.find_info(filter_dict=access_filter, can_json=True)
-                    mes['data'] = code
-                else:
-                    mes['message'] = "401"
-            elif the_type == "replace":
-                """替换条码"""
-                access_filter = self.operate_filter(user=user, operate="edit")
-                if isinstance(access_filter, dict):
-                    new_id = get_arg(request, "new_id", "")
-                    mes = CodeInfo.replace_info(_id, new_id)
-                else:
-                    mes['message'] = "401"
-            elif the_type == "reset":
-                """重置条码"""
-                access_filter = self.operate_filter(user=user, operate="edit")
-                if isinstance(access_filter, dict):
-                    access_filter.update({"_id": _id})
-                    mes = CodeInfo.reset_info(filter_dict=access_filter)
-                else:
-                    mes['message'] = "401"
-            else:
-                mes['message'] = '404'
-        else:
-            mes['message'] = "没有_id参数"
-
-        return json.dumps(mes)
-
-
-class CodePickleView(MyView):
-    """导出生产条码视图函数"""
-    _rule = "/code_pickle"
-    _allowed_view = [0, 3]
-    _name = "导出生产条码"
+    _name = "测试视图1"
 
     @check_session
     def get(self, user: dict):
         """导出生产条码视图界面"""
-        render_data['page_title'] = "导出生产条码"
+        render_data['page_title'] = "测试视图1"            # 页面的标题
         render_data['cur_user'] = user  # 当前用户,这个变量名要保持不变
-        access_filter = self.operate_filter(user)   # 数据访问权
-        render_data['navs'] = self.check_nav(navs=navs, user=user)  # 导航访问权
-        base_info = CodeInfo.preview()
-        render_data['base_info'] = base_info
-        if isinstance(access_filter, dict):
-            page_index = get_arg(request, "page", 1)
-            s = {"upload_time": -1}
-            selector = Product.selector_data()
-            render_data['selector'] = selector
-            result = OutputCode.paging_info(filter_dict=access_filter, page_index=page_index, sort_cond=s)
-            data = result.pop("data", list())
-            render_data.update(result)
-            render_data['files'] = data
-            return render_template("code_pickle.html", **render_data)
+        rule_value = self.rule_value(user=user, rule_type='view')
+        if rule_value > 0:
+            return "ok"
         else:
             return abort(401, "access refused!")
-
-    @check_session
-    def post(self, user: dict):
-        """
-        req_type 代表请求的类型, 有3种:
-        1. add          添加产品
-        2. edit         修改产品
-        3. delete       删除产品
-        :param user:
-        :return:
-        """
-        mes = {"message": "access refused"}
-        f = self.operate_filter(user)  # 数据访问权
-        if f is None:
-            pass
-        else:
-            the_type = get_arg(request, "type", "")
-            if the_type == "count":
-                """统计可导出条码余量"""
-                mes['message'] = "success"
-                p_id = get_arg(request, "product_id", None)
-                p_id = ObjectId(p_id)
-                mes['count'] = CodeInfo.can_output(product_id=p_id)
-            elif the_type == "export":
-                """生成导出文件"""
-                p_id = get_arg(request, "product_id", None)
-                number = int(get_arg(request, "number", "0"))
-                p_id = ObjectId(p_id)
-                mes = OutputCode.export(product_id=p_id, number=number)
-            elif the_type == "cancel":
-                """撤销导出条码操作"""
-                ids = []
-                try:
-                    ids = json.loads(get_arg(request, "ids"))
-                except Exception as e:
-                    print(e)
-                finally:
-                    if len(ids) == 0:
-                        mes['message'] = "没有需要撤销的文件记录"
-                    else:
-                        ids = [ObjectId(x) for x in ids]
-                        mes = OutputCode.cancel_data(f_ids=ids)
-            elif the_type == "delete":
-                """批量删除文件和日志"""
-                ids = []
-                try:
-                    ids = json.loads(get_arg(request, "ids"))
-                except Exception as e:
-                    print(e)
-                finally:
-                    if len(ids) == 0:
-                        mes['message'] = "没有发现需要删除的文件"
-                    else:
-                        ids = [ObjectId(x) for x in ids]
-                        include_record = get_arg(request, "include_record")
-                        mes = OutputCode.delete_file_and_record(ids=ids, include_record=include_record)
-
-            else:
-                mes['message'] = "无效的操作类型:{}".format(the_type)
-        return json.dumps(mes)
-
-
-        return json.dumps(mes)
 
 
 class SelfInfoView(MyView):

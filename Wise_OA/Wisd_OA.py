@@ -5,6 +5,7 @@ from flask import request
 from flask import session
 from flask import send_file
 from flask_session import Session
+from views.manage_view import manage_blueprint
 from my_filter import mount_plugin
 import json
 import datetime
