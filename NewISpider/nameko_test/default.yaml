@@ -1,0 +1,13 @@
+AMQP_URI: "pyamqp://remote_client:NewSpider-123@192.168.2.154"
+rpc_exchange: 'nameko-rpc'
+max_workers: 10
+parent_calls_tracked: 10
+
+LOGGING:
+    version: 1
+    handlers:
+        console:
+            class: logging.StreamHandler
+    root:
+        level: DEBUG
+        handlers: [console]
