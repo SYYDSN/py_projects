@@ -29,7 +29,7 @@ class TempRecord(orm_module.BaseDoc):
         orm_module.BaseDoc.__init__(self, **kw)
 
     @classmethod
-    def test_query(cls, num: int = 1000, desc: str = None, write_concern: (dict, WriteConcern) = None) ->dict:
+    def test_query(cls, num: int = 1000, desc: str = None, write_concern: (dict, WriteConcern) = None) -> dict:
         """
         测试查询的速度.
         :param num: 查询次数
