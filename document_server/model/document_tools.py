@@ -28,9 +28,9 @@ def list_dir(replace_path: str = "") -> dict:
     for r in r1:
         l2 = os.listdir(r)
         l2 = [x for x in l2 if os.path.isfile(os.path.join(r, x))]
-        if "readme.md" in l2:
+        if "不同python部署方式测试对比.md" in l2:
             """找到有效的目录"""
-            readme_path = os.path.join(r, "readme.md")
+            readme_path = os.path.join(r, "不同python部署方式测试对比.md")
             project_name = ""
             with open(readme_path, "r", encoding="utf-8") as f:
                 for line in f:
@@ -58,9 +58,9 @@ def get_project(project_path: str, replace_path: str = "") -> dict:
     res = dict()
     if os.path.exists(project_path) and os.path.isdir(project_path):
         l2 = os.listdir(project_path)
-        if "readme.md" in l2:
+        if "不同python部署方式测试对比.md" in l2:
             """找到有效的目录"""
-            readme_path = os.path.join(project_path, "readme.md")
+            readme_path = os.path.join(project_path, "不同python部署方式测试对比.md")
             project_name = ""
             with open(readme_path, "r", encoding="utf-8") as f:
                 for line in f:
@@ -127,7 +127,7 @@ def markdown_to_html(raw: str) -> str:
 
 
 if __name__ == "__main__":
-    x = get_md("/home/walle/work/projects/document_server/document/readme.md")
+    x = get_md("/home/walle/work/projects/document_server/document/不同python部署方式测试对比.md")
     print(x)
     r = markdown_to_html(x)
     print(r)

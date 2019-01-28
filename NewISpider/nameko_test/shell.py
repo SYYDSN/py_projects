@@ -13,6 +13,12 @@ with ClusterRpcProxy(config=config) as cluster_rpc:
 
 
 with ClusterRpcProxy(config=config) as cluster_rpc:
-    r = cluster_rpc.greeting_server.hello("jack")
+    r = cluster_rpc.greeting_server2.hello("jack")
     print(r)
     print(datetime.datetime.now())
+
+import zerorpc
+
+c = zerorpc.Client()
+c.connect("tcp://0.0.0.0:4242")
+print(c.add_42(12))

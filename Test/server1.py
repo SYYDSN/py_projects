@@ -25,6 +25,7 @@ app.jinja_env.filters['aab'] = aab
 def index_func2():
     return abort(403)
 
+
 @app.route("/reg", methods=['post', 'get'])
 def index_func():
     method = request.method.lower()
