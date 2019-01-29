@@ -23,28 +23,37 @@
                     <span id="clear_condition">所有信息</span>
                 </div>
                 <div class="right">
-                    <button id="add_role" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
-                        添加角色
+                    <input type="file" name="file" style="display: none" id="upload_file">
+                    <span class="file_path"></span>
+                    <button id="add_md" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
+                        上传文档
                     </button>
                 </div>
             </div>
             <div class="table_outer">
-                <table id="role_list" class="table table-hover">
+                <table id="doc_list" class="table table-hover">
                     <tr class="info">
                         <th class="select"></th>
-                        <th>角色/权限组名</th>
-                        <th>成员数</th>
+                        <th>文档名</th>
+                        <th>文档大小</th>
+                        <th>文档类型</th>
+                        <th>上传时间</th>
                         <th>操作</th>
                     </tr>
-                    {% for role in roles %}
-                        <tr id="{{ role._id }}">
+                    {% for doc in docs %}
+                        <tr id="{{ doc.id }}">
                             <td  class="select">
-                                <input data-id="{{ role._id }}" type="checkbox" >
+                                <input data-id="{{ doc.id }}" type="checkbox" >
                             </td>
-                            <td class="role_name">{{ role.role_name }}</td>
-                            <td class="user_count">{{ role.user_count if role.user_count else 0 }}</td>
+                            <td class="file_name">{{ doc.file_name }}</td>
+                            <td class="file_size">{{ doc.file_size }}</td>
+                            <td class="file_type">{{ doc.file_type }}</td>
+                            <td class="create_time">{{ doc.create_time }}</td>
                             <td class="operation">
-                                <button data-name="{{ role.role_name }}" data-id="{{ role._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_role">编辑</button>
+                                <button data-id="{{ doc.id }}" class="pop_modal btn btn-xs btn-default btn-primary view_doc">预览</button>
+                                {% if cur_user.id == doc.user_id %}
+                                    <button data-name="{{ doc.file_name }}" data-id="{{ doc.id }}" class="pop_modal btn btn-xs btn-default btn-primary delete_doc">删除</button>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

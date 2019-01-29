@@ -11,6 +11,7 @@ from toolbox.tools_module import check_session
 from toolbox.my_filter import mount_plugin
 from flask_session import Session
 from module.user_module import *
+from module.md_module import *
 import datetime
 
 
@@ -68,6 +69,7 @@ def nav_bar():
     ]
     return navs
 
+
 @app.route('/favicon.ico')
 def favicon_func():
     return send_file("static/image/favicon.ico")
@@ -113,6 +115,17 @@ def common_func(user: dict, file_name):
     else:
         return abort(404)
 
+
+@app.route("/upload", methods=['post', 'get'])
+@check_session
+def upload_func(user: dict):
+    """
+    上传文件
+    :param user:
+    :return:
+    """
+    resp = Document.upload_file(req=request, user=user, force=True)
+    return json.dumps(resp)
 
 
 if __name__ == '__main__':
