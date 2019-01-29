@@ -46,7 +46,7 @@ MongoDB4+ 的持久化类   2018-10-11
 
 version = "0.0.4"
 
-print("ORM模块当前版本号: {}".format(version))
+print("Mongodb ORM模块当前版本号: {}".format(version))
 
 hostname = socket.gethostname()
 cache = RedisCache()         # 使用redis的缓存.数据的保存时间由设置决定
