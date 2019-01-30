@@ -51,7 +51,7 @@ default_blue = #286090
             .table_outer
                 min-height calc(100% - 100px)
                 overflow-y scroll
-                #role_list
+                .table
                     .select
                         width 30px
                     tr
@@ -99,7 +99,7 @@ default_blue = #286090
         top 0
         left 0
         width 100%
-        height 100%
+        height auto
         z-index: 9999
         float left
         background-color rgba(180, 180, 180, 0.9)
@@ -109,103 +109,40 @@ default_blue = #286090
         align-items center
         display none
         > .modal_inner
-            width 600px
-            height 500px
-            margin-top -20%
+            width 85%
+            //height calc(100% - 100px)
+            margin-top 50px
             border-radius 5px
             background-color rgba(255, 255, 255, 1)
             border 1px solid rgba(200, 200, 200, 1)
             .modal_top
+                position relative
                 display flex
                 flex-direction row
                 justify-content center
                 align-items center
                 border-bottom 1px solid rgba(160, 160, 160, 1)
                 > h3
+                    text-align center
                     color rgba(150, 150, 150, 1)
+                >i
+                    color rgba(150, 150, 150, 1)
+                    position absolute
+                    right 10px
+                    top 4px
+                    display block
+                >i:hover
+                    cursor pointer
+
             .modal_mid
-                padding 20px 0
-                .line
-                    width 100%
-                    display flex
-                    flex-direction row
-                    justify-content center
-                    align-items center
-                    padding 15px 50px 15px 15px
-                    > .all_rules
-                        width 100%
-                        list-style-type none
-                        height 240px
-                        overflow-y scroll
-                        padding 20px
-                        border 1px solid rgba(160, 160, 160, 1)
-                        > li
-                            display flex
-                            flex-direction row
-                            justify-content flex-start
-                            align-items center
-                            border 1px solid lightgrey
-                            border-radius 6px
-                            padding 5px 10px
-                            margin-bottom 5px
-                            >.right
-                                width 20em
-                                >.inner_line
-                                    width 100%
-                                    min-height 37px
-                                    display flex
-                                    flex-direction row
-                                    justify-content flex-start
-                                    align-items center
-                                    border-bottom 1px solid lightgrey
-                                    >.operate
-                                        width 3em
-                                        display inline-block
-                                        padding-left 8px 20px
-                                        color #337ab7
-                                        text-align center
-                                        font-size 16px
-                                    > .rule_value
-                                        display inline-block
-                                        width 3em
-                                        text-align center
-                                        margin 0.5em
-                                        color rgba(51, 51, 51, 1)
-                                        background-color lightgrey
-                                        border 1px solid rgba(160, 160, 160, 1)
-                                        border-radius 2px
-                                    > .rule_value:hover
-                                        cursor pointer
-                                    > .select_value
-                                        color #ffffff
-                                        background-color #337ab7
-                                        border-color #337ab7
+                padding 30px
+                width 100%
+
+    #pdf_modal
+        height 100%
+        > .modal_inner
+            height calc(100% - 100px)
+            >#pdf_html
+                height 100%
 
 
-                                >.last_inner_line
-                                    border-bottom none
-                            > .left
-                                width calc(100% - 20em)
-                                display flex
-                                flex-direction column
-                                justify-content center
-                                align-items center
-                                >.view_name
-                                    font-size 16px
-                                    text-align center
-                                    color #337ab7
-                                >.view_desc
-                                    padding 3px 5px
-            .modal_bot
-                padding-bottom 20px
-                display flex
-                flex-direction row
-                justify-content center
-                align-items center
-                > button
-                    padding-left 30px
-                    padding-right 30px
-                > .first
-                    margin-right 10px
-                > .last
-                    margin-left 10px

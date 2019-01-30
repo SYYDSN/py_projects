@@ -1,6 +1,7 @@
 #  -*- coding: utf-8 -*-
 import os
 import sys
+
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
@@ -14,14 +15,13 @@ from peewee import *
 import json
 import warnings
 from playhouse.pool import PooledMySQLDatabase
-
+from playhouse.shortcuts import model_to_dict
 
 """
 数据库连接模块
 """
 
-
-version = "0.0.1"
+version = "0.0.2"
 
 print("Peewee ORM模块当前版本号: {}".format(version))
 
@@ -59,7 +59,7 @@ def other_can_json(obj):
     elif isinstance(obj, list):
         return [other_can_json(x) for x in obj]
     elif isinstance(obj, dict):
-            return {k: other_can_json(v) for k, v in obj.items()}
+        return {k: other_can_json(v) for k, v in obj.items()}
     else:
         return obj
 
@@ -119,13 +119,20 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
             date_str = search.group()
             pattern_0 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d$')  # 时间匹配2017-01-01
             pattern_1 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00
-            pattern_2 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
-            pattern_3 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01 12:00:00.000
-            pattern_4 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$') # 时间匹配2017-01-01 12:00:00 000
-            pattern_5 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
-            pattern_6 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$') # 时间匹配2017-01-01T12:00:00.000
-            pattern_7 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
-            pattern_8 = re.compile(r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
+            pattern_2 = re.compile(
+                r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01 12:00:00
+            pattern_3 = re.compile(
+                r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\.\d+$')  # 时间匹配2017-01-01 12:00:00.000
+            pattern_4 = re.compile(
+                r'^[1-2]\d{3}-[01]?\d-[0-3]?\d [012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01 12:00:00 000
+            pattern_5 = re.compile(
+                r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d$')  # 时间匹配2017-01-01T12:00:00
+            pattern_6 = re.compile(
+                r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d+$')  # 时间匹配2017-01-01T12:00:00.000
+            pattern_7 = re.compile(
+                r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\.\d{1,3}Z$')  # 时间匹配2017-01-01T12:00:00.000Z
+            pattern_8 = re.compile(
+                r'^[1-2]\d{3}-[01]?\d-[0-3]?\dT[012]?\d:[0-6]?\d:[0-6]?\d\s\d+$')  # 时间匹配2017-01-01T12:00:00 000
 
             if pattern_8.match(date_str):
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S %f")
@@ -159,7 +166,7 @@ def get_datetime_from_str(date_str: str) -> datetime.datetime:
         logger.info(ms, exc_info=True, stack_info=True)
 
 
-def generator_password(raw: str)->str:
+def generator_password(raw: str) -> str:
     """
     生成密码，使用md5加密
     :param raw: 原始密码
@@ -254,16 +261,23 @@ class BaseModel(Model):
     """
 
     class Meta:
-        database = db              # 可被继承
+        database = db  # 可被继承
         table_name = "base_model"  # 定义表名,不定义的话直接是类名转成小写. 不可被继承
 
-    def get_dict(self, flat: bool = False) -> dict:
+    def get_dict(self, recurse: bool = False, backrefs: bool = False,projection: list = None, exclude: list = None,
+                 max_depth: int = None, mm: bool = False, flat: bool = False) -> dict:
         """
-        获取查询出来的数据的字典类型,注意,这个字典的key是在类中定义的key而不是数据库中对应表的真实列名.
-        :param flat:  是否转换成可以json序列化的字典?
+        :param recurse:  是否递归外键
+        :param backrefs:  是否递归相关对象的列表
+        :param projection:  投影
+        :param exclude:  排除的字段
+        :param max_depth:  最大递归深度. 0表示不限制
+        :param mm:  many to many 是否处理多对多
+        :param flat:  是否进行json序列化检查
         :return:
         """
-        data = self.__dict__.get('__data__')
+        data = model_to_dict(model=self, recurse=recurse, backrefs=backrefs, only=projection, exclude=exclude,
+                             max_depth=max_depth, manytomany=mm)
         if flat:
             data = to_flat_dict(data)
         return data

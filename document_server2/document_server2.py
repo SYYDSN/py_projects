@@ -61,10 +61,6 @@ def nav_bar():
     navs = [
         {"name": "文档管理", "path": "/document_list", "class": "fa fa-exclamation-circle", "children": [
             {"name": "文档列表", "path": "/document_list"},
-            {"name": "文档详情", "path": "/document_detail"}
-        ]},
-        {"name": "个人中心", "path": "/info_detail", "class": "fa fa-exclamation-circle", "children": [
-            {"name": "个人详情", "path": "/info_detail"},
         ]}
     ]
     return navs
@@ -88,7 +84,7 @@ def login_func():
         return json.dumps(mes)
 
 
-@app.route("/<file_name>", methods=['get', 'post'])
+@app.route("/html/<file_name>", methods=['get', 'post'])
 @check_session
 def common_func(user: dict, file_name):
     """
@@ -108,12 +104,78 @@ def common_func(user: dict, file_name):
             kw = dict()
             kw['cur_user'] = user
             kw['navs'] = nav_bar()
+            if file_name == "document_list.html":
+                """文档列表页"""
+                page_index = get_arg(request, "page_num", 1)
+                kw.update(Document.paginate(page_index=page_index))
             return render_template(file_name, **kw)
         else:
             """各种请求"""
-            pass
     else:
         return abort(404)
+
+
+@app.route("/download_file/<_id>")
+def download_func(_id):
+    """
+    下载文件
+    :param _id:
+    :return:
+    """
+    f_id = None
+    try:
+        f_id = int(_id)
+    except Exception as e:
+        print(e)
+    finally:
+        if isinstance(f_id, int):
+            resp = Document.get_file_path(file_id=f_id)
+            file_path = resp['file_path']
+            file_name = resp['file_name']
+            file_type = resp['file_type']
+            """把文件名的中文从utf-8转成latin-1,这是防止中文的文件名造成的混乱"""
+            file_name = file_name.encode().decode('latin-1')
+            return send_file(
+                filename_or_fp=file_path,
+                attachment_filename=file_name,
+                as_attachment=False,
+                mimetype=file_type
+            )
+        else:
+            return abort(404)
+
+
+@app.route("/read_file")
+def read_file_func():
+    """
+    读取
+    :return:
+    """
+    _id = get_arg(request, "_id", None)
+    f_id = None
+    try:
+        f_id = int(_id)
+    except Exception as e:
+        print(e)
+    finally:
+        if isinstance(f_id, int):
+            resp = Document.get_file_path(file_id=f_id)
+            file_path = resp['file_path']
+            file_name = resp['file_name']
+            file_type = resp['file_type']
+            if file_type.find("markdown") != -1:
+                with open(file=file_path, encoding="utf-8", mode="r") as f:
+                    text = f.read()
+                resp = {
+                    "text": text,
+                    "file_name": file_name,
+                    "file_type": file_type
+                }
+            else:
+                resp = {"file_name": file_name, "text": "不支持的文件格式: {}".format(file_name)}
+            return json.dumps(resp)
+        else:
+            return abort(404)
 
 
 @app.route("/upload", methods=['post', 'get'])

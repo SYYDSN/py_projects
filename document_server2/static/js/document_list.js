@@ -12,7 +12,7 @@ $(function () {
         var json = JSON.parse(resp);
         var status = json['message'];
         if(status === "success"){
-            alert("导入成功!");
+            alert("上传成功!");
         }
         else{
             alert(status);
@@ -81,6 +81,39 @@ $(function () {
         $(".modal_outer_progress").css("display", "flex");
         $.upload(opts);
     };
+
+    /*预览md文件*/
+    $(".view_doc").each(function(){
+        var $this = $(this);
+        $this.click(function(){
+            var _id = $this.attr("data-id");
+            $.get("/read_file", {_id: _id}, function(resp){
+                var json = JSON.parse(resp);
+                var text = json['text'];
+                var converter = new showdown.Converter();
+                var html = converter.makeHtml(text);
+                $("#modal_title").html(json['file_name']);
+                $("#doc_html").html(html);
+                $("#doc_modal").css("display", "flex");
+            });
+        });
+    });
+
+    /*预览pdf文件*/
+    $(".view_pdf").each(function(){
+        var $this = $(this);
+        $this.click(function(){
+            var _id = $this.attr("data-id");
+            var url = `/download_file/${_id}`;
+            PDFObject.embed(url, "#pdf_html");
+            $("#pdf_modal").css("display", "flex");
+        });
+    });
+
+    // 关闭模态框
+    $(".close_modal").click(function(){
+        $(".modal_outer").css("display", "none");
+    });
 
     /*全选事件*/
     $("#check_all").click(function () {

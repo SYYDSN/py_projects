@@ -4,7 +4,7 @@ import sys
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
-from module.sqlite_module import *
+from module.sql_module import *
 
 
 class User(BaseModel):
@@ -24,6 +24,7 @@ class User(BaseModel):
         table_name = "user_info"
 
     @classmethod
+    @db.connection_context()
     def reg(cls, user_name: str, password: str, **kwargs) -> dict:
         """
         注册用户
@@ -52,6 +53,7 @@ class User(BaseModel):
             return mes
 
     @classmethod
+    @db.connection_context()
     def login(cls, user_name: str, password: str) -> dict:
         """
         注册用户
@@ -78,6 +80,7 @@ class User(BaseModel):
             return mes
 
     @classmethod
+    @db.connection_context()
     def edit(cls, doc: dict) -> dict:
         """
         更新信息
@@ -106,6 +109,7 @@ class User(BaseModel):
                 return mes
 
     @classmethod
+    @db.connection_context()
     def remove(cls, user_id: int) -> dict:
         """
         删除用户

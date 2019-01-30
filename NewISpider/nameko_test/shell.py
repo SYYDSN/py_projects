@@ -17,8 +17,3 @@ with ClusterRpcProxy(config=config) as cluster_rpc:
     print(r)
     print(datetime.datetime.now())
 
-import zerorpc
-
-c = zerorpc.Client()
-c.connect("tcp://0.0.0.0:4242")
-print(c.add_42(12))

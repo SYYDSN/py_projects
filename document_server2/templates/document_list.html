@@ -40,17 +40,21 @@
                         <th>上传时间</th>
                         <th>操作</th>
                     </tr>
-                    {% for doc in docs %}
+                    {% for doc in data %}
                         <tr id="{{ doc.id }}">
                             <td  class="select">
                                 <input data-id="{{ doc.id }}" type="checkbox" >
                             </td>
                             <td class="file_name">{{ doc.file_name }}</td>
                             <td class="file_size">{{ doc.file_size }}</td>
-                            <td class="file_type">{{ doc.file_type }}</td>
+                            <td class="file_type">{{ doc.file_type.split("/")[-1] }}</td>
                             <td class="create_time">{{ doc.create_time }}</td>
                             <td class="operation">
-                                <button data-id="{{ doc.id }}" class="pop_modal btn btn-xs btn-default btn-primary view_doc">预览</button>
+                                {% if doc.file_type == "text/markdown" %}
+                                    <button data-id="{{ doc.id }}" class="pop_modal btn btn-xs btn-default btn-primary view_doc">预览</button>
+                                {% else %}
+                                    <button data-id="{{ doc.id }}" class="pop_modal btn btn-xs btn-default btn-primary view_pdf">预览</button>
+                                {% endif %}
                                 {% if cur_user.id == doc.user_id %}
                                     <button data-name="{{ doc.file_name }}" data-id="{{ doc.id }}" class="pop_modal btn btn-xs btn-default btn-primary delete_doc">删除</button>
                                 {% endif %}
@@ -62,11 +66,13 @@
 
             <div class="bottom_div">
                 <div class="left">
+                    <!--
                     <input type="checkbox" id="check_all">
                     <span>全选</span>
                     <button id="delete_role" type="button" class="btn btn-sm btn-default btn-primary">
                         删除
                     </button>
+                    -->
                 </div>
                 <div class="right">
                     <i id="prev_page" class="fa fa-caret-left"></i>
@@ -82,72 +88,34 @@
     </div>
 
     <!--弹框部分-->
-    <div class="modal_outer">
+    <div id="doc_modal" class="modal_outer">
         <div class="modal_inner">
             <div class="modal_top">
                 <h3 data-current-id="" id="modal_title">
                     添加角色
                 </h3>
+                <i class="close_modal fa fa-times fa-3x" aria-hidden="true"></i>
             </div>
-            <div class="modal_mid">
-                <div class="line">
-                    <label>角色名</label><input type="text" id="role_name">
-                    </div>
-                <div class="line">
-                    <ul class="all_rules">
-                        {% for rule in rules %}
-                            <li id="{{ rule._id }}" data-url="{{ rule.url_path }}" class="rule">
-                                <div class="left">
-                                    <div title="{{ rule.url_path }}" class="view_name">{{ rule.name }}</div>
-                                    <div title="{{ rule.url_path }}" class="view_desc">{{ rule.desc }}</div>
-                                </div>
-                                <div class="right" data-url="{{ rule.url_path }}">
-                                    <div class="inner_line view_rule">
-                                        <span class="operate">
-                                            访问
-                                        </span>
-                                        {% for item in rule.rules.get('view', dict()) %}
-                                           {% if loop.index0 == 0 %}
-                                                <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
-                                           {% else %}
-                                               <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
-                                           {% endif %}
-                                       {% endfor %}
-                                    </div>
-                                    <div class="inner_line edit_rule">
-                                        <span class="operate">
-                                            修改
-                                        </span>
-                                        {% for item in rule.rules.get('edit', dict()) %}
-                                           {% if loop.index0 == 0 %}
-                                                <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
-                                           {% else %}
-                                               <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
-                                           {% endif %}
-                                       {% endfor %}
-                                    </div>
-                                   <div class="inner_line delete last_inner_line">
-                                        <span class="operate last_operate">
-                                            删除
-                                        </span>
-                                        {% for item in rule.rules.get('delete', dict()) %}
-                                           {% if loop.index0 == 0 %}
-                                                <span title="{{ item.desc }}" class="first_value rule_value select_value">{{ item.value }}</span>
-                                           {% else %}
-                                               <span title="{{ item.desc }}" class="rule_value">{{ item.value }}</span>
-                                           {% endif %}
-                                       {% endfor %}
-                                    </div>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+
+            <div id="doc_html" class="modal_mid">
 
             </div>
-            <div class="modal_bot">
-                <button id="close_medal" class="btn btn-md btn-default first">关闭</button>
-                <button id="submit" class="btn btn-md btn-primary last">保存</button>
+        </div>
+
+    </div>
+
+    <!--弹框部分-->
+    <div id="pdf_modal" class="modal_outer">
+        <div class="modal_inner">
+            <div class="modal_top">
+                <h3 data-current-id="" id="pdf_modal_title">
+                    添加角色
+                </h3>
+                <i class="close_modal fa fa-times fa-3x" aria-hidden="true"></i>
+            </div>
+
+            <div id="pdf_html" class="modal_mid">
+
             </div>
         </div>
 
@@ -156,5 +124,8 @@
 {% endblock %}
 
 {% block js %}
+    <script src="/static/js/showdown.min.js"></script>
+    <!--显示pdf 的插件-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.1.1/pdfobject.min.js"></script>
     <script src="/static/js/document_list.js"></script>
 {% endblock %}
