@@ -8,21 +8,42 @@
 
     <div class="right_top">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="请输入搜索关键字...">
+            <input type="text" id="top_search_input"  class="form-control" placeholder="请输入搜索关键字...">
             <span class="input-group-btn">
-                <button class="btn btn-default" type="button">Go!</button>
+                <button id="top_search_btn" class="btn btn-default" type="button">Go!</button>
               </span>
         </div>
     </div>
 
     <div class="role_list_outer">
+        <div class="series_div">
+        <button class="btn btn-default btn-primary btn-xs series-btn">全部</button>
+            {% for series in series_list  %}
+                <button class="btn btn-default btn-xs series-btn">{{ series }}</button>
+            {% endfor %}
+        </div>
         <div class="role_list_inner">
             <div class="insert_div">
                 <div class="left">
                     <i class="fa fa-list-ul"></i>
                     <span id="clear_condition">所有信息</span>
                 </div>
+
+
                 <div class="right">
+                    <label>请选择上传的文档类别</label>
+                    <div class="my_input dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="select_series" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <span data-id="" class="current_value">内部文档</span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul data-type="package_ratio" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                <li class="selected_series">内部文档</li>
+                                <li class="selected_series">学习资料</li>
+                                <li class="selected_series">标准规范</li>
+                        </ul>
+                    </div>
+
                     <input type="file" name="file" style="display: none" id="upload_file">
                     <span class="file_path"></span>
                     <button id="add_md" type="button" class="pop_modal btn btn-default btn-sm btn-primary">
@@ -35,8 +56,9 @@
                     <tr class="info">
                         <th class="select"></th>
                         <th>文档名</th>
+                        <th>文档类别</th>
+                        <th>文档 格式</th>
                         <th>文档大小</th>
-                        <th>文档类型</th>
                         <th>上传时间</th>
                         <th>操作</th>
                     </tr>
@@ -46,8 +68,9 @@
                                 <input data-id="{{ doc.id }}" type="checkbox" >
                             </td>
                             <td class="file_name">{{ doc.file_name }}</td>
-                            <td class="file_size">{{ doc.file_size }}</td>
+                            <td class="file_series">{{ doc.file_series }}</td>
                             <td class="file_type">{{ doc.file_type.split("/")[-1] }}</td>
+                            <td class="file_size">{{ doc.file_size }}</td>
                             <td class="create_time">{{ doc.create_time }}</td>
                             <td class="operation">
                                 {% if doc.file_type == "text/markdown" %}

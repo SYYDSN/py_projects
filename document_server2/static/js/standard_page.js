@@ -92,13 +92,13 @@ $(function(){
                 "pw_n1": $.md5(pw_n1),
                 "pw_n2": $.md5(pw_n2)
             };
-            $.post("/manage/self_info", args, function(resp){
+            $.post("/self_info", args, function(resp){
                 var json = JSON.parse(resp);
                 console.log(json);
                 var status = json['message'];
                 if(status === "success"){
                     alert("修改密码成功,请重新登录");
-                    location.href = "/manage/login";
+                    location.href = "/login";
                 }
                 else{
                     alert(status);
@@ -127,7 +127,7 @@ $(function(){
             "type": "change_nick",
             "nick_name": nick_name
         };
-        $.post("/manage/self_info", args, function(resp){
+        $.post("/self_info", args, function(resp){
             var json = JSON.parse(resp);
             console.log(json);
             var status = json['message'];

@@ -68,8 +68,9 @@ $(function () {
             file_name = "file"
         }
         let file_data = $obj[0].files[0];
-
+        let file_series = $.trim($("#select_series .current_value").text());
         var opts = {
+            headers: {"series":encodeURIComponent(file_series)},
             file_name: file_name,
             file_data: file_data,
             max_size: 900000,
@@ -113,6 +114,85 @@ $(function () {
     // 关闭模态框
     $(".close_modal").click(function(){
         $(".modal_outer").css("display", "none");
+    });
+
+    // 选择上传文件类别
+    $(".selected_series").each(function(){
+        var $this = $(this);
+        $this.click(function(){
+            $("#select_series .current_value").text($this.text());
+        });
+    });
+
+    // 跳转函数
+    var redirect_to = function(arg_name, arg_value){
+        var args = get_url_arg_dict();
+        args[arg_name] = arg_value;
+        var url = build_url(args);
+        location.href = url;
+    };
+
+    // 分类按钮点击事件
+    $(".series-btn").each(function(){
+        var $this = $(this);
+        $this.click(function(){
+            var value = $.trim($(this).text());
+            redirect_to("file_series", value);
+        });
+    });
+
+    // 载入页面事件
+    (function(){
+        var args = get_url_arg_dict();
+        var file_series = args['file_series'];
+        if(file_series === undefined){
+            // nothing...
+        }
+        else{
+            $(".series-btn").each(function(){
+                var $this = $(this);
+                if(file_series === $.trim($this.text())){
+                    $this.addClass("btn-primary");
+                }
+                else{
+                    $this.removeClass("btn-primary");
+                }
+            });
+        }
+        var word = args['word'];
+        if(word === undefined){
+            // nothing...
+        }
+        else{
+            $("#top_search_input").val(word);
+        }
+    })();
+
+    // delete_doc
+    $(".delete_doc").each(function(){
+        var $this = $(this);
+        $this.click(function(){
+            var f_id = $.trim($this.attr("data-id"));
+            var args = {"f_id": f_id};
+            $.post("/remove_one", args, function(resp){
+                var json = JSON.parse(resp);
+                var status = json['message'];
+                if(status === "success"){
+                    alert("删除成功");
+                    location.reload();
+                }
+                else{
+                    alert(status);
+                    return false;
+                }
+            });
+        });
+    });
+
+    // 顶部导航Go点击事件
+    $("#top_search_btn").click(function(){
+        var value = $.trim($("#top_search_input").val());
+            redirect_to("word", value);
     });
 
     /*全选事件*/

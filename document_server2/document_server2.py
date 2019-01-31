@@ -2,6 +2,8 @@
 import os
 from flask import Flask
 from flask import render_template
+from flask import redirect
+from flask import url_for
 from flask import request
 from flask import session
 from flask import abort
@@ -18,14 +20,14 @@ import datetime
 app = Flask(__name__)
 key_str = os.urandom(24)  # 生成密钥，为session服务。
 app.config['SECRET_KEY'] = key_str  # 配置会话密钥
-app.config['SESSION_TYPE'] = "redis"  # session类型为redis
+# app.config['SESSION_TYPE'] = "redis"  # session类型为redis
+app.config['SESSION_TYPE'] = "filesystem"  # session类型
 app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持久化的会话的生存时间
-SESSION_TYPE = "redis"
 
 
 Session(app)
-port = 7878
+port = 9500
 mount_plugin(app)  # 注册jinja2的自定义过滤器
 
 
@@ -84,6 +86,12 @@ def login_func():
         return json.dumps(mes)
 
 
+@app.route('/logout', methods=['get', 'post'])
+def logout_func():
+    session.clear()
+    return redirect(url_for("login_func"))
+
+
 @app.route("/html/<file_name>", methods=['get', 'post'])
 @check_session
 def common_func(user: dict, file_name):
@@ -106,8 +114,21 @@ def common_func(user: dict, file_name):
             kw['navs'] = nav_bar()
             if file_name == "document_list.html":
                 """文档列表页"""
-                page_index = get_arg(request, "page_num", 1)
-                kw.update(Document.paginate(page_index=page_index))
+                series_list = Document.get_series()
+                kw['series_list'] = series_list
+                page_index = get_arg(request, "page_num", 1)  # 页码
+                file_series = get_arg(request, "file_series", "全部")  # 文件类别
+                f = dict()
+                if file_series == "全部":
+                    pass
+                else:
+                    f['file_series'] = file_series
+                word = get_arg(request, "word",  None)  # 关键词
+                if word is None:
+                    pass
+                else:
+                    f['word'] = word
+                kw.update(Document.paginate(where=f, page_index=page_index))
             return render_template(file_name, **kw)
         else:
             """各种请求"""
@@ -188,6 +209,56 @@ def upload_func(user: dict):
     """
     resp = Document.upload_file(req=request, user=user, force=True)
     return json.dumps(resp)
+
+
+@app.route("/remove_one", methods=['post', 'get'])
+@check_session
+def remove_one_func(user: dict):
+    """
+    删除文件
+    :param user:
+    :return:
+    """
+    doc_id = get_arg(request, "doc_id", -1)
+    user_id = user['id']
+    resp = Document.upload_file(user_id=user_id, doc_id=doc_id)
+    return json.dumps(resp)
+
+
+@app.route("/self_info", methods=['post', 'get'])
+@check_session
+def self_info(user: dict):
+    """
+    修改个人信息
+    :param user:
+    :return:
+    """
+    mes = {"message": "success"}
+    r_id = get_arg(request, "_id", 0)
+    _id = 0
+    try:
+        _id = int(r_id)
+    except Exception as e:
+        print(e)
+    finally:
+        if _id == 0:
+            mes['message'] = "错误的用户id"
+        else:
+            if user['id'] == _id:
+                t = get_arg(request, "type")
+                if t == "change_nick":
+                    nick_name = get_arg(request, "nick_name", "")
+                    mes = User.change_nick(user_id=user['id'], nick_name=nick_name)
+                elif t == "change_pw":
+                    pw_old = get_arg(request, "pw_old", "")
+                    pw_n1 = get_arg(request, "pw_n1", "")
+                    pw_n2 = get_arg(request, "pw_n2", "")
+                    mes = User.change_pw(user_id=user['id'], old_pw=pw_old, pw1=pw_n1, pw2=pw_n2)
+                else:
+                    mes['message'] = "未知的操作: {}".format(t)
+            else:
+                mes['message'] = "只能修改自己的信息"
+        return json.dumps(mes)
 
 
 if __name__ == '__main__':

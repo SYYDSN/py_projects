@@ -23,10 +23,24 @@ default_blue = #286090
     .role_list_outer
         min-height calc(100% - 55px)
         width 100%
-        padding 80px 30px 0 30px
+        padding 5px 30px 0 30px
         height calc(100% - 55px)
+        .series_div
+            //background-color  #fefefe
+            //border-radius 6px
+            padding 0 10px
+            height 25px
+            width 100%
+            margin-bottom 15px
+            display flex
+            flex-direction row
+            justify-content flex-start
+            align-items center
+            >.series-btn
+                border none
+                margin-right 20px
         .role_list_inner
-            height calc(100% - 30px)
+            height calc(100% - 40px)
             width 100%
             background-color #fefefe
             padding 10px 20px 30px 20px
@@ -46,6 +60,27 @@ default_blue = #286090
                     > #clear_condition
                         color default_blue
                 > .right
+                    display flex
+                    flex-direction row
+                    justify-content flex-end
+                    align-items center
+                    >label
+                        color rgba(113, 113, 113, 1)
+                        margin-right 15px
+                    > .my_input
+                        margin-right 80px
+                        position relative
+                        > button
+                            height 32px
+                            > .current_value
+                                display inline-block
+                                width 8.8em
+                        > ul
+                            width 5em
+                            > li
+                                text-align center
+                            > li:hover
+                                cursor pointer
                     #add_role
                         background-color default_blue
             .table_outer

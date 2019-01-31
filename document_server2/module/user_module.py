@@ -110,6 +110,38 @@ class User(BaseModel):
 
     @classmethod
     @db.connection_context()
+    def change_pw(cls, user_id: int, old_pw: str, pw1: str, pw2: str) -> dict:
+        """
+        修改密码
+        :param user_id:
+        :param old_pw:
+        :param pw1:
+        :param pw2:
+        :return:
+        """
+        mes = {"message": "success"}
+        user = cls.select().where(cls.id == user_id).get()
+        if old_pw != user.password:
+            mes['message'] = "旧密码不正确"
+        else:
+            if pw1 != pw2:
+                mes['message'] = "两次输入的新密码不一致"
+            else:
+                user.password = pw1
+                user.save()
+        return mes
+
+    @classmethod
+    @db.connection_context()
+    def change_nick(cls, user_id: int, nick_name: str) -> dict:
+        mes = {"message": "success"}
+        user = cls.select().where(cls.id == user_id).get()
+        user.nick_name = nick_name
+        user.save()
+        return mes
+
+    @classmethod
+    @db.connection_context()
     def remove(cls, user_id: int) -> dict:
         """
         删除用户
@@ -144,8 +176,14 @@ if __name__ == "__main__":
     #     "role": "root",
     #     "nick_name": "系统管理员"
     # }
-    # r = User.reg(**doc)
-    # print(r)
+    doc = {
+        "user_name": "user_01",
+        "password": '78b5585f9a45c2c60fd66d5e2aa08f88',
+        "role": "user",
+        "nick_name": "张三"
+    }
+    r = User.reg(**doc)
+    print(r)
     # User.login(user_name="root", password="as")
     # sql = 'select * from user_info'
     # r = db.execute_sql(sql=sql)
