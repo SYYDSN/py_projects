@@ -1,5 +1,7 @@
 # 组织架构, 身份验证和权限管理
 
+本项目地址 [https://github.com/iSpidercom/OrganizationAndAuthentication](https://github.com/iSpidercom/OrganizationAndAuthentication)
+
 ## 文件夹说明
 
 * authorization_package 组织架构
