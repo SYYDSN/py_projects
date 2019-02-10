@@ -139,5 +139,5 @@ if __name__ == "__main__":
     #     "creator": 12
     # }
     # print(Employee.add_record(**args))
-    Employee.account_login("admin", "", 1)
+    Employee.account_login("admin", "", 2)
     pass
