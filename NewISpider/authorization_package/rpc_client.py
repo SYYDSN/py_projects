@@ -15,6 +15,9 @@ from django.http import HttpRequest
 """token检查的RPC客户端"""
 
 
+server = "tcp://127.0.0.1:4242"   # rpc服务器地址, 请按照实际地址修改
+
+
 class RPC(dict):
     """
     提供验证token的服务的类
@@ -25,6 +28,10 @@ class RPC(dict):
             return True
         else:
             return False
+
+    def to_json(self) -> str:
+        """转换成json格式"""
+        return ujson.dumps({k: v for k, v in self.items()})
 
     @classmethod
     def before(cls, req: object):
@@ -49,7 +56,7 @@ class RPC(dict):
         if isinstance(response, dict):
             response = to_flat_dict(response)
             c = zerorpc.Client()
-            c.connect("tcp://127.0.0.1:4242")  # 连接到rpc服务器
+            c.connect(server)  # 连接到rpc服务器
             event_id = self.get('event_id')
             if event_id is None:
                 e2 = {
@@ -116,7 +123,7 @@ class RPC(dict):
             init['post_args'] = {k: v for k, v in req.form.items()}
             init['json_args'] = req.json
             c = zerorpc.Client()
-            c.connect("tcp://127.0.0.1:4242")  # 连接到rpc服务器
+            c.connect(server)  # 连接到rpc服务器
             oid = None
             try:
                 oid = c.before_request(init)
@@ -168,7 +175,7 @@ class RPC(dict):
             init['post_args'] = post_args
             init['json_args'] = json_args
             c = zerorpc.Client()
-            c.connect("tcp://127.0.0.1:4242")  # 连接到rpc服务器
+            c.connect(server)  # 连接到rpc服务器
             oid = None
             try:
                 oid = c.before_request(init)
@@ -257,4 +264,9 @@ def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
 
 
 if __name__ == "__main__":
+    r = RPC(a="me")
+    if r:
+        print(1)
+    else:
+        print(0)
     pass

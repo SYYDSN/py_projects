@@ -12,3 +12,12 @@
 * toolbox 包含: 日志工具, 邮件工具和flask工具
 * views  视图部分.
 * zerorpc_test  zerorpc的测试工具包
+
+## 相关技术文档
+
+* [api文档](/views/api文档.md)
+* [rpc文档](/rpc文档.md)
+
+## 更新日志
+
+* 2019-2-11 增加rpc客户端的账户密码检测,token验证的api和rpc功能
