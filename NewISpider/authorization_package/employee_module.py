@@ -104,8 +104,138 @@ class Employee(BaseModel):
         #     (cls.user_name == user_name) & (cls.password == password)
         # ).get()
         # obj.get_dict(recurse=True, backrefs=True)
-        obj = cls.select(cls, Job,).join_from(cls, Job, on=(Job.id == cls.job_id), attr='log').join_from(cls, Dept).where(cls.id==2).get()
+        obj = cls.select(
+            cls, Job, UserRole, Dept, Hotel
+        ).join_from(
+            cls, UserRole
+        ).join_from(
+            cls, Dept
+        ).join_from(
+            cls, Hotel
+        ).join_from(
+            cls, Job, on=(Job.id == cls.job_id), attr='log'
+        ).where(cls.id == 2).get()
         obj.get_dict(recurse=True, backrefs=True)
+        """
+        测试用的返回体.
+        resp = {
+            "message": "success",
+            "apps": [                 # 可用的app列表
+                      {
+                        "project_name":'PMS',
+                       "path":'/firstIndex'
+                      },
+                      {
+                        "project_name":'内控店控',
+                        "path":'/organizationchart'
+                      },
+                      {
+                        "project_name":'会员',
+                        "path":'/member'
+                      },
+                      {
+                        "project_name":'铁管家',
+                        "path":'/ironsteward'
+                      },
+                      {
+                        "project_name":'会管家',
+                        "path":'/firstIndex'
+                      },
+        
+                      {
+                        "project_name":'销控宝',
+                        "path":'/firstIndex'
+                      },
+                      {
+                        "project_name":'库管家',
+                        "path":'/firstIndex'
+                      },
+                      {
+                        "project_name":'地管家',
+                        "path":'/firstIndex'
+                      },
+                      {
+                        "project_name":'钱管家',
+                        "path":'/firstIndex'
+                      },
+                      {
+                        "project_name":'车管家',
+                        "path":'/firstIndex'
+                      },
+                      {
+                        "project_name":'客管家',
+                        "path":'/firstIndex'
+                      },
+                      {
+                        "project_name":'任务体系',
+                        "path":'/firstIndex'
+                      }
+                ],
+            "user_id": 5,
+            "real_name": "张三",
+            "job": "系统管理员",
+            "role_id": 12,
+        }
+        """
+        resp = {
+            "message": "success",
+            "apps": [  # 可用的app列表
+                {
+                    "project_name": 'PMS',
+                    "path": '/firstIndex'
+                },
+                {
+                    "project_name": '内控店控',
+                    "path": '/organizationchart'
+                },
+                {
+                    "project_name": '会员',
+                    "path": '/member'
+                },
+                {
+                    "project_name": '铁管家',
+                    "path": '/ironsteward'
+                },
+                {
+                    "project_name": '会管家',
+                    "path": '/firstIndex'
+                },
+
+                {
+                    "project_name": '销控宝',
+                    "path": '/firstIndex'
+                },
+                {
+                    "project_name": '库管家',
+                    "path": '/firstIndex'
+                },
+                {
+                    "project_name": '地管家',
+                    "path": '/firstIndex'
+                },
+                {
+                    "project_name": '钱管家',
+                    "path": '/firstIndex'
+                },
+                {
+                    "project_name": '车管家',
+                    "path": '/firstIndex'
+                },
+                {
+                    "project_name": '客管家',
+                    "path": '/firstIndex'
+                },
+                {
+                    "project_name": '任务体系',
+                    "path": '/firstIndex'
+                }
+            ],
+            "user_id": 5,
+            "real_name": "张三",
+            "job": "系统管理员",
+            "role_id": 12,
+        }
+        return resp
 
 
 models = [Employee]

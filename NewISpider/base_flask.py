@@ -3,9 +3,11 @@ from flask import Flask
 from flask import request
 import ujson
 from flask_cors import CORS
+from views.oauth_view import oauth_blueprint
 
 
 app = Flask(__name__)
+app.register_blueprint(oauth_blueprint)
 CORS(app=app)
 
 

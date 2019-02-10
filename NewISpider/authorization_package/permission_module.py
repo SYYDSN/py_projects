@@ -39,6 +39,7 @@ class RuleTemplate(BaseModel):
     api_url = CharField(max_length=191, unique=True, help_text="接口的url地址,不包含host,port和参数的全路径接口path,唯一")
     rule_name = CharField(max_length=128, unique=True, help_text=" 接口/规则的名字.唯一")
     desc = CharField(max_length=1000, default='', help_text='描述.本接口是干什么的?')
+    level = IntegerField(default=0, help_text="权限的级别,0是系统管理员才能设定的选先,1是集团管理员可设定的, 2 是酒店管理员可设定的")
     status = IntegerField(default=1, help_text="是否可用,默认是可用.0的话就不能被选择加入权限组了.")
     reg_time = DateTimeField(default=datetime.datetime.now, help_text="注册时间")
 
@@ -635,8 +636,10 @@ class UserRoleNav(BaseModel):
        用户角色能访问的navigation的规则
        """
     id = AutoField(primary_key=True)
-    role_id = ForeignKeyField(model=UserRole, column_name="role_id", field="id", help_text="角色id", backref="role_id")
-    nav_id = ForeignKeyField(model=UsableApp, column_name="nav_id", field="id", help_text="可用的app_id", backref="role_id")
+    role_id = ForeignKeyField(model=UserRole, column_name="role_id", field="id", help_text="角色id", backref="role_navs")
+    raw_nav_id = IntegerField(help_text="原始nav的id,NavigationTemplate.id")
+    app_id = IntegerField(help_text="可用的app_id,UsableApp.id")
+    nav_status = IntegerField(default=1, help_text="导航是否可用?")
 
     create_time = DateTimeField(default=datetime.datetime.now, help_text="创建时间")
     last_time = DateTimeField(default=datetime.datetime.now, help_text="最后一次修改时间")
@@ -653,7 +656,7 @@ class UserRoleRule(BaseModel):
     这个表里的信息是从RuleTemplate中复制过来的
     """
     id = AutoField(primary_key=True)
-    role_id = ForeignKeyField(model=UserRole, column_name="role_id", field="id", help_text="角色id", backref="rule_id")
+    role_id = ForeignKeyField(model=UserRole, column_name="role_id", field="id", help_text="角色id", backref="role_rules")
     raw_rule = ForeignKeyField(model=RuleAndGroupTemplateRelation, field="id", column_name="raw_rule_id",
                                backref="user_rule", help_text="原始权限id, 指向RuleAndGroupTemplateRelation.id")
     permission_value = IntegerField(default=0, help_text="权限值")
@@ -678,6 +681,7 @@ models = [
     UserRole,
     UserRoleApp,
     UserRoleRule,
+    UserRoleNav,
 ]
 db.create_tables(models=models)
 
@@ -709,5 +713,5 @@ if __name__ == "__main__":
     """更新权限组模板"""
     # RuleGroupTemplate.update_group_template(user_id=12, group_id=3, group_name="用户管理", desc="管理本酒店员工账户")
     """添加角色"""
-    print(UserRole.add_record(id=9, role_name="系统管理员", creator=12, hotel_group_id=1, hotel_id=3))
+    # print(UserRole.add_record(id=9, role_name="系统管理员", creator=12, hotel_group_id=1, hotel_id=3))
     pass
