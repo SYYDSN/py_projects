@@ -23,24 +23,19 @@ from toolbox.tools_module import *
 """
 
 """注册蓝图"""
-url_prefix = "/manage"
-manage_blueprint = Blueprint("manage_blueprint", __name__, url_prefix=url_prefix, template_folder="templates")
+url_prefix = "/oauth/v1.0/"
+oauth_blueprint = Blueprint("oauth_blueprint", __name__, url_prefix=url_prefix, template_folder="templates")
 
 
 class LoginView(MethodView):
     """登录页面和登录函数"""
 
-    def operate(self, *args, **kwargs):
-        pass
-        return
-
     def get(self, *args, **kwargs):
-        data = self.operate(*args, **kwargs)
         return self.post()
-
 
     def post(self):
         """检查用户登录"""
+        mes = {"message": "success"}
         user_name = get_arg(request, "user_name", "")
         password = get_arg(request, "password", "")
         mes = User.login(user_name=user_name, password=password)

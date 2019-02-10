@@ -179,39 +179,61 @@ def generator_password(raw: str) -> str:
         return hashlib.md5(raw.encode(encoding="utf-8")).hexdigest()
 
 
-def merge_dict(dict1: dict, dict2: dict) -> dict:
+def update_dict(dict1: dict, dict2: dict) -> dict:
     """
-    把两个字典合并成一个字典。和update方法不同,键相同的值不进行替换而是进行合并, 目的是保留尽可能多的信息
-    一些合并时候的规则如下
-    1. 有数据>''>None
-    2. 数据长度大保留
-    3. 数组格式合并去重
-    4. 字典格式递归
+    把两个字典合并成一个字典。并返回
     :param dict1: 参与合并的字典1
     :param dict2: 参与合并的字典2
     :return: 合并的结果
     """
-    keys = list(dict1.keys())
-    keys.extend(list(dict2.keys()))
-    res = dict()
-    for key in keys:
-        v1 = dict1.get(key)
-        v2 = dict2.get(key)
-        if v1 is None:
-            res[key] = v2
-        elif v2 is None:
-            res[key] = v1
-        else:
-            if isinstance(v1, list) and isinstance(v2, list):
-                v1.extend(v2)
-                res[key] = v1
-            elif isinstance(v1, dict) and isinstance(v2, dict):
-                res[key] = merge_dict(v1, v2)
-            elif isinstance(v1, str) and isinstance(v2, str):
-                res[key] = v1 if len(v1) > len(v2) else v2
-            else:
-                res[key] = v1
-    return res
+    dict1.update(dict2)
+    return dict1
+
+
+def unique_str_in_box(box: list, a_str: str) -> bool:
+    """
+    检查一个字符串是否在box中唯一.
+    如果唯一,就把字符串加入box,返回True,否则直接返回False
+    :param box:
+    :param a_str:
+    :return: 唯一返回True,否则返回False
+    """
+    if a_str not in box:
+        box.append(a_str)
+        return True
+    else:
+        return False
+
+
+def join_composite_keys(doc: dict, keys: list, separator: str = "") -> str:
+    """
+    把一个字典类型的文档的复合键取出来.
+    :param doc: 待提取复合键的文档
+    :param keys: 复合键名的序列,这个应该是去重后的序列
+    :param separator: 分割符,默认为空字符
+    :return: 组合后的复合键的字符串
+    """
+    a_list = [(k, str(v)) for k, v in doc.items() if k in keys]
+    a_list.sort(key=lambda obj: obj[0])
+    return separator.join([x[-1] for x in a_list])
+
+
+def check_composite_keys(raw_doc, keys: (list, tuple, set) = None) -> list:
+    """
+    检查一组拥有复合键的字典类型的文档,去掉从重复的文档
+    :param raw_doc: 可能存在重复情况的拥有复合键的字典对象
+    :param keys:  复合键的序列,
+    :return:
+    """
+    result = list()
+    if len(raw_doc) > 1:
+        keys = keys if isinstance(keys, set) else set(keys)
+        keys = list(keys)
+        temp_list = list()
+        result = [x for x in raw_doc if unique_str_in_box(box=temp_list, a_str=join_composite_keys(doc=x, keys=keys))]
+    else:
+        result = raw_doc
+    return result
 
 
 class JSONField(Field):
@@ -233,7 +255,7 @@ logger.setLevel(logging.DEBUG)
 host = "rm-bp11oah59lpcl62l42o.mysql.rds.aliyuncs.com"
 user = "yilu2018"
 password = "KsYl888Parasite"
-host = "127.0.0.1"
+# host = "127.0.0.1"
 if host == "127.0.0.1":
     user = "root"
     password = "123456"
@@ -242,7 +264,7 @@ setting = {
     "port": 3306,
     "max_connections": 100,
     "stale_timeout": 300,
-    "database": "doc_server_db",
+    "database": "walle_test",
     "user": user,
     "password": password
 }
@@ -271,7 +293,7 @@ class BaseModel(Model):
         database = db  # 可被继承
         table_name = "base_model"  # 定义表名,不定义的话直接是类名转成小写. 不可被继承
 
-    def get_dict(self, recurse: bool = False, backrefs: bool = False,projection: list = None, exclude: list = None,
+    def get_dict(self, recurse: bool = False, backrefs: bool = False, projection: list = None, exclude: list = None,
                  max_depth: int = None, mm: bool = False, flat: bool = False) -> dict:
         """
         :param recurse:  是否递归外键
@@ -304,6 +326,112 @@ class BaseModel(Model):
         :return:
         """
         return cls._meta.sorted_field_names
+
+    @classmethod
+    @db.connection_context()
+    def add_record(cls, **kwargs) -> dict:
+        """
+        添加一条记录
+        :param kwargs:
+        :return:
+        """
+        mes = {"message": "success"}
+        kwargs.pop("id", None)
+        sql = None
+        names = cls.all_field_names()
+        creator = kwargs.get("creator")
+        if "last_user" in names and "last_user" not in kwargs and creator is not None:
+            kwargs['last_user'] = creator
+        else:
+            pass
+        try:
+            sql = cls.insert(**kwargs)
+        except Exception as e:
+            logger.exception(e)
+            print(e)
+            s = e.args[-1]
+            if "has no attribute" in s:
+                error_key = s.split(" ")[-1]
+                mes['message'] = "错误的属性名: {}".format(error_key)
+            else:
+                mes['message'] = "创建模型失败,请查看系统日志"
+        finally:
+            if sql is not None:
+                inserted_id = 0
+                try:
+                    inserted_id = sql.execute()
+                except Exception as e:
+                    logger.exception(e)
+                    print(e)
+                    s = e.args[-1]
+                    if "Duplicate entry" in s:
+                        mes['message'] = "关键字重复"
+                    else:
+                        mes['message'] = "数据保存失败"
+                finally:
+                    if inserted_id != 0:
+                        mes['inserted_id'] = inserted_id
+                    else:
+                        pass
+            else:
+                pass
+            return mes
+
+    @classmethod
+    @db.connection_context()
+    def update_record(cls, id: int, **kwargs) -> dict:
+        """
+        更新一条记录
+        :param id:
+        :param kwargs:
+        :return:
+        """
+        mes = {"message": "success"}
+        kwargs.pop("id", None)
+        obj = None
+        try:
+            obj = cls.get_by_id(pk=id)
+        except DoesNotExist as e:
+            logger.exception(e)
+            print(e)
+            mes['message'] = "对象不存在"
+        finally:
+            if obj is not None:
+                for k, v in kwargs.items():
+                    setattr(obj, k, v)
+                names = cls.all_field_names()
+                if "last_time" in names and "last_user" not in kwargs:
+                    kwargs['last_time'] = datetime.datetime.now()
+                else:
+                    pass
+                obj.save()
+            else:
+                pass
+            return mes
+
+    @classmethod
+    @db.connection_context()
+    def delete_record(cls, id: int) -> dict:
+        """
+        删除一条记录
+        :param id:
+        :return:
+        """
+        mes = {"message": "success"}
+        obj = None
+        try:
+            obj = cls.get_by_id(pk=id)
+        except DoesNotExist as e:
+            logger.exception(e)
+            print(e)
+            mes['message'] = "对象不存在"
+        finally:
+            if obj is not None:
+                obj.delete_instance()
+            else:
+                pass
+            return mes
+
 
 
 # models = [BaseModel]

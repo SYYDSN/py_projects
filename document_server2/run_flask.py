@@ -63,7 +63,12 @@ uwsgi 部署方式.
     apt install uwsgi-plugin-python3
     或者直接 sudo apt install uwsgi-plugins-all 安装所有的插件
 <1>反向代理 
-命令行 uwsgi --http-socket 127.0.0.1:7011 --plugin python3 --wsgi-file test_server.py --callable app --process 8 --threads 2
+命令行 
+uwsgi --http-socket 127.0.0.1:7011 --plugin python3 --wsgi-file test_server.py --callable app --process 8 --threads 2
+uwsgi --http-socket 127.0.0.1:9500 --plugin python3 --wsgi-file document_server2.py --callable app --process 6 --threads 2
+或者一个异步的做法(需要应用程序/代码支持)
+uwsgi --http-socket 127.0.1:9500 --plugins python3,ugreen --async 100 --ugreen --wsgi-file document_server2.py --callable app
+
 nginx配置
 server
 {

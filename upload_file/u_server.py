@@ -34,7 +34,11 @@ def favicon_func():
 @app.route("/")
 def upload_demo():
     """上传页面"""
-    return render_template("upload_demo.html", page_title="批量上传")
+    id = request.args.get("id")
+    if str(id) == "123":
+        return render_template("upload_demo.html", page_title="批量上传")
+    else:
+        return abort(404)
 
 
 @app.route("/file/<action>", methods=['post', 'get'])
@@ -62,7 +66,6 @@ def file_func(action):
         """获取文件/图片"""
         pass
     return json.dumps(mes)
-
 
 
 @app.before_request

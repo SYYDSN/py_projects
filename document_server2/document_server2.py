@@ -12,6 +12,7 @@ from toolbox.tools_module import get_arg
 from toolbox.tools_module import check_session
 from toolbox.my_filter import mount_plugin
 from flask_session import Session
+from redis import Redis
 from module.user_module import *
 from module.md_module import *
 import datetime
@@ -20,8 +21,9 @@ import datetime
 app = Flask(__name__)
 key_str = os.urandom(24)  # 生成密钥，为session服务。
 app.config['SECRET_KEY'] = key_str  # 配置会话密钥
-# app.config['SESSION_TYPE'] = "redis"  # session类型为redis
-app.config['SESSION_TYPE'] = "filesystem"  # session类型
+app.config['SESSION_TYPE'] = "redis"  # session类型为redis
+app.config['SESSION_REDIS'] = Redis(host="47.98.113.173", password="yilu2018", port=6379)  # redis连接
+# app.config['SESSION_TYPE'] = "filesystem"  # session类型
 app.config['SESSION_PERMANENT'] = True  # 如果设置为True，则关闭浏览器session就失效
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)  # 持久化的会话的生存时间
 
@@ -68,6 +70,11 @@ def nav_bar():
     return navs
 
 
+@app.route("/hello")
+def hello_func():
+    return "hello world!"
+
+
 @app.route('/favicon.ico')
 def favicon_func():
     return send_file("static/image/favicon.ico")
@@ -94,7 +101,7 @@ def logout_func():
 
 @app.route("/html/<file_name>", methods=['get', 'post'])
 @check_session
-def common_func(user: dict, file_name):
+def common_func(user: dict, file_name: str = ""):
     """
     通用视图函数
     :param user:
@@ -223,6 +230,17 @@ def remove_one_func(user: dict):
     user_id = user['id']
     resp = Document.upload_file(user_id=user_id, doc_id=doc_id)
     return json.dumps(resp)
+
+
+@app.route("/check_name", methods=['post', 'get'])
+@check_session
+def check_name_func(user: dict):
+    """
+    上传时,检查文件名是否重复.
+    :return:
+    """
+    file_name = get_arg(request, "file_name", "")
+
 
 
 @app.route("/self_info", methods=['post', 'get'])
