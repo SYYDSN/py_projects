@@ -82,11 +82,16 @@ class Employee(BaseModel):
     @db.connection_context()
     def account_login(cls, user_name: str, password: str, hotel_id: int) -> dict:
         """
-        账户密码登录
+        账户密码登录,
         :param user_name:
         :param password:
         :param hotel_id:
         :return:
+        用户登录成功后, 查询用户的
+        1. app可访问列表.
+        2. Role的id
+        3. 一个时间戳
+
         """
         # mes = {"message": "success"}
         # cols = [
@@ -99,7 +104,7 @@ class Employee(BaseModel):
         #     (cls.user_name == user_name) & (cls.password == password)
         # ).get()
         # obj.get_dict(recurse=True, backrefs=True)
-        obj = cls.select(cls, Job).join_from(cls, Job, on=(Job.id == cls.job_id), attr='log').where(cls.id==2).get()
+        obj = cls.select(cls, Job,).join_from(cls, Job, on=(Job.id == cls.job_id), attr='log').join_from(cls, Dept).where(cls.id==2).get()
         obj.get_dict(recurse=True, backrefs=True)
 
 

@@ -87,7 +87,7 @@ class RuleTemplate(BaseModel):
         return mes
 
 
-class AppModule(BaseModel):
+class AppTemplate(BaseModel):
     """
     app模块信息
     """
@@ -100,7 +100,7 @@ class AppModule(BaseModel):
     last_user = IntegerField(help_text="最后修改人.指向系统管理员id")
 
     class Meta:
-        table_name = "app_module"
+        table_name = "app_template"
 
     @classmethod
     @db.connection_context()
@@ -320,6 +320,19 @@ class UsableApp(BaseModel):
             return mes
 
 
+class NavigationTemplate(BaseModel):
+    """
+    导航模板,可以多级,但受前端布局的限制.
+    """
+    id = AutoField(primary_key=True)
+    name = CharField(max_length=128, help_text="导航栏名字")
+    path = CharField(max_length=128, help_text="导航栏相对路径(url地址)")
+    level = IntegerField(default=0, help_text="导航栏的层级,0 是最高一级的根导航")
+
+    class Meta:
+        table_name = "navigation_template"
+
+
 class RuleGroupTemplate(BaseModel):
     """
     权限规则组模板.系统管理员操作
@@ -327,11 +340,12 @@ class RuleGroupTemplate(BaseModel):
     系统只有一套权限组.理论上: 只有系统管理员能够才能创建一个规则组.
     在创建角色的时候.都从本表选择权限组进行权限设置的.即使是对单个权限的设置.
     也是必须归属于权限组的权限才可以进行权限值设置.无权限组归属的权限无法被选择和设置权限的值
+    App->模块->子模块->业务权限
     """
 
     group_name = CharField(max_length=128, help_text="权限组名称")
     desc = CharField(max_length=1000, default='权限组说明')
-    app_id = ForeignKeyField(column_name="app_id", model=AppModule, field=AppModule.id, backref="rule_group")
+    app_id = IntegerField(help_text="指向AppTemple.id的外键")
     is_public = IntegerField(default=1, help_text='本权限组是否面向用户开放?')
     create_time = DateTimeField(default=datetime.datetime.now, help_text="创建时间")
     last_time = DateTimeField(default=datetime.datetime.now, help_text="最后一次修改时间")
@@ -604,8 +618,8 @@ class UserRoleApp(BaseModel):
     用户角色能访问的app的规则
     """
     id = AutoField(primary_key=True)
-    role_id = ForeignKeyField(model=UserRole, column_name="role_id", field="id", help_text="角色id", backref="rule_id")
-    app_id = ForeignKeyField(model=UsableApp, column_name="app_id", field="id", help_text="可用的app_id", backref="app_id")
+    role_id = IntegerField(help_text="Role.id的外键.角色id")
+    app_id = IntegerField(help_text="指向AppTemple.id的外键,可用的app_id")
 
     create_time = DateTimeField(default=datetime.datetime.now, help_text="创建时间")
     last_time = DateTimeField(default=datetime.datetime.now, help_text="最后一次修改时间")
@@ -614,6 +628,23 @@ class UserRoleApp(BaseModel):
 
     class Meta:
         table_name = "user_role_app"
+
+
+class UserRoleNav(BaseModel):
+    """
+       用户角色能访问的navigation的规则
+       """
+    id = AutoField(primary_key=True)
+    role_id = ForeignKeyField(model=UserRole, column_name="role_id", field="id", help_text="角色id", backref="role_id")
+    nav_id = ForeignKeyField(model=UsableApp, column_name="nav_id", field="id", help_text="可用的app_id", backref="role_id")
+
+    create_time = DateTimeField(default=datetime.datetime.now, help_text="创建时间")
+    last_time = DateTimeField(default=datetime.datetime.now, help_text="最后一次修改时间")
+    creator = IntegerField(help_text='创建人.指向系统管/酒店理员id')
+    last_user = IntegerField(help_text="最后修改人.指向系统/酒店管理员id")
+
+    class Meta:
+        table_name = "user_role_nav"
 
 
 class UserRoleRule(BaseModel):
@@ -642,7 +673,7 @@ models = [
     RuleTemplate,
     RuleGroupTemplate,
     RuleAndGroupTemplateRelation,
-    AppModule,
+    AppTemplate,
     UsableApp,
     UserRole,
     UserRoleApp,
@@ -672,7 +703,7 @@ if __name__ == "__main__":
     # result = RuleGroupTemplate.create_group_template(**args)
     # print(result)
     """添加app"""
-    # AppModule.add_app(user_id=12, app_name="财务管理", desc="heheh")
+    # AppTemplate.add_app(user_id=12, app_name="财务管理", desc="heheh")
     """添加可用的app"""
     # print(UsableApp.add_record(user_id=12, app_id=1, hotel_group_id=2))
     """更新权限组模板"""
