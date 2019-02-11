@@ -4,7 +4,7 @@ import sys
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
-from orm_unit.sql_module import *
+from orm_unit.peewee_orm import *
 from authorization_package.organization import *
 from authorization_package.permission_module import *
 import logging

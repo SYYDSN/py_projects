@@ -5,7 +5,7 @@ import sys
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
-from orm_unit.sql_module import *
+from orm_unit.peewee_orm import *
 import datetime
 from toolbox.log_module import get_logger
 
@@ -30,7 +30,7 @@ class RuleRegisterException(BaseException):
 # 系统定义部分
 
 
-class RuleTemplate(BaseModel):
+class RawRule(BaseModel):
     """
     (业务接口的)权限规则模板,
     权限规则和api视图路由是1:1的关系
@@ -44,7 +44,7 @@ class RuleTemplate(BaseModel):
     reg_time = DateTimeField(default=datetime.datetime.now, help_text="注册时间")
 
     class Meta:
-        table_name = "rule_template"
+        table_name = "raw_rule"
 
     @classmethod
     @db.connection_context()
@@ -337,7 +337,7 @@ class NavigationTemplate(BaseModel):
 class RuleGroupTemplate(BaseModel):
     """
     权限规则组模板.系统管理员操作
-    权限组模板和权限模板(RuleTemplate)是n:n的关系
+    权限组模板和权限模板(RawRule)是n:n的关系
     系统只有一套权限组.理论上: 只有系统管理员能够才能创建一个规则组.
     在创建角色的时候.都从本表选择权限组进行权限设置的.即使是对单个权限的设置.
     也是必须归属于权限组的权限才可以进行权限值设置.无权限组归属的权限无法被选择和设置权限的值
@@ -490,12 +490,12 @@ class RuleGroupTemplate(BaseModel):
 
 class RuleAndGroupTemplateRelation(BaseModel):
     """
-    记录权限组模板和权限模板(RuleTemplate)之间关系的表.
+    记录权限组模板和权限模板(RawRule)之间关系的表.
     系统/酒店管理员在创建角色的时候,实际上都是从这个表拷贝的信息
     """
-    id = AutoField(primary_key=True, verbose_name="记录权限组模板和权限模板(RuleTemplate)之间关系的表")
+    id = AutoField(primary_key=True, verbose_name="记录权限组模板和权限模板(RawRule)之间关系的表")
     group_id = ForeignKeyField(model=RuleGroupTemplate, column_name="group_id", field="id", backref="relation", help_text="权限规则组模板RuleGroupTemplate.id")
-    rule_id = ForeignKeyField(model=RuleTemplate, column_name="rule_id", field="id", backref="relation", help_text="权限规则RuleTemplate.id")
+    rule_id = ForeignKeyField(model=RawRule, column_name="rule_id", field="id", backref="relation", help_text="权限规则RuleTemplate.id")
     api_url = CharField(help_text="冗余字段,从RuleTemplate.api_url")
     rule_name = CharField(help_text="冗余字段,从RuleTemplate.rule_name拷贝")
     permission_value = IntegerField(default=0, help_text="权限值")
@@ -631,25 +631,6 @@ class UserRoleApp(BaseModel):
         table_name = "user_role_app"
 
 
-class UserRoleNav(BaseModel):
-    """
-       用户角色能访问的navigation的规则
-       """
-    id = AutoField(primary_key=True)
-    role_id = ForeignKeyField(model=UserRole, column_name="role_id", field="id", help_text="角色id", backref="role_navs")
-    raw_nav_id = IntegerField(help_text="原始nav的id,NavigationTemplate.id")
-    app_id = IntegerField(help_text="可用的app_id,UsableApp.id")
-    nav_status = IntegerField(default=1, help_text="导航是否可用?")
-
-    create_time = DateTimeField(default=datetime.datetime.now, help_text="创建时间")
-    last_time = DateTimeField(default=datetime.datetime.now, help_text="最后一次修改时间")
-    creator = IntegerField(help_text='创建人.指向系统管/酒店理员id')
-    last_user = IntegerField(help_text="最后修改人.指向系统/酒店管理员id")
-
-    class Meta:
-        table_name = "user_role_nav"
-
-
 class UserRoleRule(BaseModel):
     """
     用户角色的权限规则,
@@ -669,11 +650,8 @@ class UserRoleRule(BaseModel):
         table_name = "user_role_rule"
 
 
-
-
-
 models = [
-    RuleTemplate,
+    RawRule,
     RuleGroupTemplate,
     RuleAndGroupTemplateRelation,
     AppTemplate,
@@ -681,7 +659,6 @@ models = [
     UserRole,
     UserRoleApp,
     UserRoleRule,
-    UserRoleNav,
 ]
 db.create_tables(models=models)
 
@@ -692,7 +669,7 @@ if __name__ == "__main__":
     #     "api_url": "/system/user/add",
     #     "api_name": "管理员添加用户"
     # }
-    # RuleTemplate.register_rule(**args)
+    # RawRule.register_rule(**args)
     # """创建权限组"""
     # args = {
     #     "user_id": 12,
