@@ -170,7 +170,7 @@ def generator_password(raw: str) -> str:
     """
     生成密码，使用md5加密
     :param raw: 原始密码
-    :return: md5加密后的秘密啊
+    :return: md5加密后的
     """
     if not isinstance(raw, str):
         ms = "原始密码必须是str类型，期待一个str，得到一个{}".format(type(raw))
@@ -263,6 +263,10 @@ class EntityExtends:
     """
 
 
+class Demo2(db.Entity):
+    table_ = "demo2"  # 定义表名
+
+
 class Demo(db.Entity):
     """
     一个类构建的示例
@@ -275,12 +279,13 @@ class Demo(db.Entity):
     price = Required(py_type=Decimal, precision=10, scale=2)  # 10进制,保留2位小数
     gender = Required(py_type=str, autostrip=True)  # 自动剔除空格,
     # composite_index(name, "b")   # 复合索引
-    job = Required(str, column="job")  # 指定列名
+    job = Required(str, column="job", default="worker")  # 指定列名
     age = Required(int, default=20, min=16, max=40)  # 默认值, 最小值,最大值
     desc = Required(str, lazy=True)  # lazy是懒加载
     brother = Optional(str, nullable=True)
-    # city = Required("City")  # 外键 参数是类名
-    child = Set("Child", reverse="parent")   # 一对多, 双方都设置的话就是多对多
+    brother2 = Optional(str, nullable=False)
+    city = Required("Demo1", column="city2")  # 外键 参数是类名
+    # child = Set("Child", reverse="parent")   # 一对多, 双方都设置的话就是多对多
     money = Required(float, py_check=lambda val: val > 5000)  # 值检查函数
     create = Required(py_type=datetime.datetime, precision=6)  # mysql特殊参数,设置为6可以保存小数秒
 
@@ -298,8 +303,23 @@ class Demo(db.Entity):
         pass
 
 
-db.generate_mapping()
+class Demo1(db.Entity):
+    table_ = "demo1"  # 定义表名
+    name = Required(str, default="张三")
+    demo = Set("Demo")    # 配合city = Required(Demo1)设置外键
+
+
+db.generate_mapping(create_tables=True)
 
 
 if __name__ == "__main__":
+    init = {
+
+    }
+    # with db_session:
+    #     demo = Demo1.get(id=1)
+    #     demo.name = "李四2"
+    #     demo = Demo1()
+    #     print(flush())
+    #     demo
     pass

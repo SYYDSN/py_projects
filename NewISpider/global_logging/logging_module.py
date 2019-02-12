@@ -1,12 +1,13 @@
 #  -*- coding: utf-8 -*-
 import os
 import sys
+
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
-from orm_unit.nosql_module import *
-from authorization_package.authorization_tools import encode_1
-from authorization_package.authorization_tools import decode_1
+from product.nosql_module import *
+from product.mic_service import *
+from
 
 
 """全局日志模块"""
@@ -45,6 +46,9 @@ class GlobalJournal(BaseDoc):
         """记录操作的入日志"""
         authorization = doc.get("authorization", "")
         resp = decode_1(authorization)
+        e = doc.get("exception", "")
+        e = "业务逻辑代码未正确相应" if e == "" else e
+        doc['exception'] = e
         doc['enter_time'] = datetime.datetime.now()
         obj_id = cls.insert_one(doc=doc, write_concern=get_write_concern())
         resp['event_id'] = str(obj_id)
