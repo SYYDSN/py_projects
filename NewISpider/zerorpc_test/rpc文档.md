@@ -21,7 +21,7 @@ from rpc_client import RPC
 
 def some_view(request):
     """某视图函数"""
-    checked = RPC(request)  # 检查请求的authorization是否合法?
+    checked = RPC.before(request)  # 检查请求的authorization是否合法?
     if checked:
         """authorization合法"""
         user_id = checked['user_id']  # 用户id

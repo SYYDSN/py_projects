@@ -5,7 +5,7 @@ __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
 import zerorpc
-from global_logging.logging_module import Server1
+from journal.logging_module import Server1
 
 """生产环境的zero-rpc的服务器"""
 

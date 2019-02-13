@@ -309,7 +309,7 @@ class Demo1(db.Entity):
     demo = Set("Demo")    # 配合city = Required(Demo1)设置外键
 
 
-db.generate_mapping(create_tables=True)
+# db.generate_mapping(create_tables=True)
 
 
 if __name__ == "__main__":

@@ -5,9 +5,9 @@ import sys
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
-from my_product.nosql_module import *
-from my_product.mic_service import *
-from
+from nosql_module import *
+from auth.auth_tools import *
+
 
 
 """全局日志模块"""
@@ -45,7 +45,7 @@ class GlobalJournal(BaseDoc):
     def before_request(cls, doc: dict) -> dict:
         """记录操作的入日志"""
         authorization = doc.get("authorization", "")
-        resp = decode_1(authorization)
+        resp = check_token(authorization)
         e = doc.get("exception", "")
         e = "业务逻辑代码未正确相应" if e == "" else e
         doc['exception'] = e
