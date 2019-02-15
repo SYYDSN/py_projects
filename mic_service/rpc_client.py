@@ -110,6 +110,8 @@ class RPC(dict):
                     data.update(result)
                 data.pop("authorization", None)
                 response.data = data
+                response._is_rendered = False
+                response.render()
                 return response
         else:
             ms = "response参数必须是字典,json或者Response对象"
