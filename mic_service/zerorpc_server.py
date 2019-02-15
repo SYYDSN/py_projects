@@ -20,7 +20,7 @@ class Cooler(
 
 
 if __name__ == "__main__":
-    port = 4242
+    port = 9518
     s = zerorpc.Server(Cooler())
     s.bind("tcp://0.0.0.0:{}".format(port))
     print("zero-rpc running on {} ...".format(port))

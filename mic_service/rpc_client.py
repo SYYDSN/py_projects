@@ -10,12 +10,14 @@ from bson.objectid import ObjectId
 import datetime
 from flask.globals import LocalProxy
 from django.http import HttpRequest
+from rest_framework.request import Request
+from rest_framework.response import Response
 
 
 """token检查的RPC客户端"""
 
 
-server = "tcp://127.0.0.1:4242"   # rpc服务器地址, 请按照实际地址修改
+server = "tcp://192.168.2.154:9518"   # rpc服务器地址, 请按照实际地址修改
 
 
 class RPC(dict):
@@ -38,54 +40,79 @@ class RPC(dict):
         """记录用户操作的入日志,这是个快捷方式"""
         return cls.check_request(req)
 
-    def after(self, response: (dict, list, str), to_json: bool = True) -> (str, dict):
+    @classmethod
+    def after(cls, response: (dict, str), to_json: bool = True) -> (str, dict):
         """记录用户操作的出日志,这是个快捷方式"""
-        return self.record_response(response, to_json)
+        return cls.record_response(response, to_json)
 
-    def record_response(self, response: (dict, list, str), to_json: bool = True) -> (str, dict):
+    @classmethod
+    def record_response(cls, response: (dict, str, Response), to_json: bool = True) -> (str, dict):
         """
         记录返回结果
         :param response: 函数运行的返回体.必须是字典或者json.
-        :param to_json: 是否将返回值转换为json.
+        :param to_json: 是否将返回值转换为json. 对django此参数武侠
         :return: json
         """
         if isinstance(response, str):
             response = ujson.loads(response)
         else:
             pass
-        if isinstance(response, (dict, list)):
+        if isinstance(response, dict):
             response = to_flat_dict(response)
             c = zerorpc.Client()
             c.connect(server)  # 连接到rpc服务器
-            event_id = self.get('event_id')
-            if event_id is None:
+            result = dict()
+            try:
+                result = c.after_response(response)
+            except Exception as error:
+                error_str = str(error)
+                response['message'] = error_str
+                print(error)
                 e2 = {
-                        "error": str("12"),
-                        "file": __file__,
-                        "func": sys._getframe().f_code.co_name
-                    }
-                c.record_error(doc=e2)
-                c.close()
-            else:
-                args = {
-                    "_id": event_id,
-                    "response": response
+                    "error": error_str,
+                    "file": __file__,
+                    "func": sys._getframe().f_code.co_name
                 }
-                try:
-                    c.after_response(args)
-                except Exception as error:
-                    print(error)
-                    e2 = {
-                        "error": str(error),
-                        "file": __file__,
-                        "func": sys._getframe().f_code.co_name
-                    }
-                    c.record_error(doc=e2)
-                finally:
-                    c.close()
-            return ujson.dumps(response) if to_json else response
+                c.record_error(doc=e2)
+            finally:
+                c.close()
+                if len(result) == 0:
+                    response['message'] = "日志记录未正确相应"
+                else:
+                    response.update(result)
+                response.pop("authorization", None)
+                return ujson.dumps(response) if to_json else response
+        elif isinstance(response, Response):
+            """
+            django的rest_framework的响应对象
+            """
+            data = response.data
+            c = zerorpc.Client()
+            c.connect(server)  # 连接到rpc服务器
+            result = dict()
+            try:
+                result = c.after_response(data)
+            except Exception as error:
+                error_str = str(error)
+                data['message'] = error_str
+                print(error)
+                e2 = {
+                    "error": error_str,
+                    "file": __file__,
+                    "func": sys._getframe().f_code.co_name
+                }
+                c.record_error(doc=e2)
+            finally:
+                c.close()
+                if len(result) == 0:
+                    data['message'] = "日志记录未正确相应"
+                else:
+                    data.update(result)
+                data.pop("authorization", None)
+                response.data = data
+                return response
         else:
-            ms = "response参数必须是字典或者json格式"
+            ms = "response参数必须是字典,json或者Response对象"
             raise TypeError(ms)
 
     @classmethod
@@ -112,7 +139,7 @@ class RPC(dict):
             init['user_agent'] = req.headers.get("user_agent")
             authorization = req.headers.get("authorization")
             if authorization is None:
-                pass
+                resp['message'] = "authorization error"
             else:
                 init['authorization'] = authorization
             init['user_id'] = 0
@@ -124,9 +151,9 @@ class RPC(dict):
             init['json_args'] = req.json
             c = zerorpc.Client()
             c.connect(server)  # 连接到rpc服务器
-            oid = None
+            result = None
             try:
-                oid = c.before_request(init)
+                result = c.before_request(init)
             except Exception as error:
                 print(error)
                 e2 = {
@@ -139,11 +166,12 @@ class RPC(dict):
                 c.close()
                 e = datetime.datetime.now()
                 print((e - b).total_seconds())
-                if isinstance(oid, dict):
-                    resp.update(oid)
+                validate_result = result['message']
+                if validate_result == "success":
+                    resp['user_info'] = result['user_info']
                 else:
-                    resp['message'] = "保存数据失败,请联系管理员"
-        elif isinstance(req, HttpRequest):
+                    resp['message'] = validate_result
+        elif isinstance(req, (HttpRequest, Request)):
             """django的请求"""
             b = datetime.datetime.now()
             ip = req.META['HTTP_X_FORWARDED_FOR'] if req.META.get('HTTP_X_FORWARDED_FOR') else req.META['REMOTE_ADDR']
@@ -164,7 +192,7 @@ class RPC(dict):
             init['ip'] = ip
             init['user_agent'] = user_agent
             if authorization is None:
-                pass
+                resp['message'] = "authorization error"
             else:
                 init['authorization'] = authorization
             init['user_id'] = 0
@@ -176,9 +204,9 @@ class RPC(dict):
             init['json_args'] = json_args
             c = zerorpc.Client()
             c.connect(server)  # 连接到rpc服务器
-            oid = None
+            result = None
             try:
-                oid = c.before_request(init)
+                result = c.before_request(init)
             except Exception as error:
                 print(error)
                 e2 = {
@@ -191,10 +219,11 @@ class RPC(dict):
                 c.close()
                 e = datetime.datetime.now()
                 print((e - b).total_seconds())
-                if isinstance(oid, dict):
-                    resp.update(oid)
+                validate_result = result['message']
+                if validate_result == "success":
+                    resp['user_info'] = result['user_info']
                 else:
-                    resp['message'] = "保存数据失败,请联系管理员"
+                    resp['message'] = validate_result
         else:
             web_framework = req.__class__.__name__
             ms = "未意料的web框架类型: {}".format(web_framework)

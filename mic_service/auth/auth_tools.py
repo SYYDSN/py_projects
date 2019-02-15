@@ -27,6 +27,16 @@ default_secret = uuid4().hex
 # default_secret = "dffgdgfdfg456456t4ygdgtrey656r5y656y54yyyr5544565"  # 测试用
 
 
+def set_cache(auth: str, user_info: dict) -> None:
+    """
+    使用uuid作为key,用户信息字典作为值设置缓存,7200秒生命期
+    :param auth:
+    :param user_info:
+    :return:
+    """
+    cache.set(key=auth, value=user_info, timeout=7200)
+
+
 def get_auth(**kwargs) -> dict:
     """
     加密v 1版本. 对用户信息的键值对对象保存在redis里,返回uuid给客户端做token
@@ -45,21 +55,52 @@ def get_auth(**kwargs) -> dict:
     else:
         kwargs['expire'] = (datetime.datetime.now() + datetime.timedelta(hours=2))
         key = uuid4().hex
-        cache.set(key=key, value=kwargs, timeout=7200)
+        set_cache(auth=key, user_info=kwargs)
         res['authorization'] = key
     return res
 
 
-def remove_auth(authorization: str = None) -> None:
+def consume_auth(authorization: str) -> tuple:
     """
-    从redis移除authorization
+    消费authorization,
     :param authorization:
     :return:
     """
-    if authorization is None:
+    k1 = authorization
+    data = cache.get(key=authorization)
+    resp = None
+    if data is None:
+        print("authorization error")
         pass
+        new_auth = None
     else:
-        cache.delete(key=authorization)
+        """
+        开始消费
+        """
+        if isinstance(data, str):
+            """
+           authorization 用过的uuid, data是新的authorization
+            """
+            key = data
+            data = cache.get(key=key)
+            if isinstance(data, dict):
+                resp = data
+                new_auth = key
+            else:
+                new_auth = None
+        elif isinstance(data, dict):
+            """
+            authorization是新的,未使用过的.
+            """
+            old_auth = authorization
+            new_auth = uuid4().hex
+            cache.set(key=old_auth, value=new_auth, timeout=600)
+            set_cache(auth=new_auth, user_info=data)
+            resp = data
+        else:
+            new_auth = None
+
+    return resp, new_auth
 
 
 def check_token(authorization: str) -> dict:
@@ -74,29 +115,19 @@ def check_token(authorization: str) -> dict:
     :return: {'message': 'success', 'payload': 用户信息字典}
     """
     res = {"message": "success"}
-    user_info = cache.get(key=authorization)
+    user_info, new_authorization = consume_auth(authorization=authorization)
     if user_info is None:
         res['message'] = "authorization invalid"  # 密文无效
     else:
-
         expire = user_info.pop("expire", None)
         now = datetime.datetime.now()
         if expire is None or (isinstance(expire, datetime.datetime) and now > expire):
             """过期"""
             res['message'] = "expire timeout"  # 生存期超时或者时间戳无效
         else:
-            pass
+            res['new_authorization'] = new_authorization
+            res['user_info'] = user_info
     return res
-
-
-def new_token(old_authorization: str) -> str:
-    """
-    生成一个新的authorization,同时作废旧的authorization
-    :param old_authorization:  旧authorization
-    :return:  新authorization
-    """
-    remove_auth(old_authorization)
-    return
 
 
 """v2系列版本的不保证可用性"""
@@ -199,4 +230,5 @@ if __name__ == "__main__":
     # print(r)
     # r2 = decode_2(r['authorization'])
     # print(r2)
+    sample()
     pass

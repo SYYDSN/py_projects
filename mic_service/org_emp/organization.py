@@ -47,8 +47,8 @@ class HotelGroup(db.Entity):
     """logo图片保存在图片数据库中(mongodb),这里保存的只是一个logo图片的id,使用的时候根据这个id向图片服务器请求图片"""
     logo = Optional(str, max_len=128, nullable=True)
     """酒店集团照片保存在图片数据库中(mongodb),这里保存的只是一个酒店集团照片的id,使用的时候根据这个id向图片服务器请求图片"""
-    photo = Optional(str, max_len=128, ullable=True)  # 酒店照片
-    status = Required(int, help_text="",  default=1)  # 状态, 0代表未禁用, 1代表正常
+    photo = Optional(str, max_len=128, nullable=True)  # 酒店照片
+    status = Required(int, default=1)  # 状态, 0代表未禁用, 1代表正常
 
     create_time = Required(datetime.datetime, default=datetime.datetime.now)  # 创建时间
     last_time = Optional(datetime.datetime, default=datetime.datetime.now, nullable=True)  # 最后一次的修改时间
@@ -90,8 +90,8 @@ class Hotel(db.Entity):
     """logo图片保存在图片数据库中(mongodb),这里保存的只是一个logo图片的id,使用的时候根据这个id向图片服务器请求图片"""
     logo = Optional(str, max_len=128, nullable=True)
     """酒店集团照片保存在图片数据库中(mongodb),这里保存的只是一个酒店集团照片的id,使用的时候根据这个id向图片服务器请求图片"""
-    photo = Optional(str, max_len=128, ullable=True)  # 酒店照片
-    status = Required(int, help_text="", default=1)  # 状态, 0代表未禁用, 1代表正常
+    photo = Optional(str, max_len=128, nullable=True)  # 酒店照片
+    status = Required(int, default=1)  # 状态, 0代表未禁用, 1代表正常
 
     create_time = Required(datetime.datetime, default=datetime.datetime.now)  # 创建时间
     last_time = Required(datetime.datetime, default=datetime.datetime.now)  # 修改时间
@@ -141,6 +141,8 @@ class Job(db.Entity):
     last_user = Required("Employee", reverse="updated_jobs")  # 最后修改人.指向系统管理员id
     create_time = Required(datetime.datetime, default=datetime.datetime.now)  # 创建时间
     last_time = Required(datetime.datetime, default=datetime.datetime.now)  # 修改时间
+
+    employees = Set("Employee")  # 担任本岗位的员工
 
 
 # db.generate_mapping(create_tables=True)

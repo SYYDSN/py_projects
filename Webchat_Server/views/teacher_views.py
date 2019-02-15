@@ -310,6 +310,7 @@ def process_case_page2(teacher: dict = None):
                 try:
                     exit_price = float(exit_price_s)
                 except Exception as e:
+                    logger.exception(e)
                     print(e)
                 finally:
                     if isinstance(exit_price, float):

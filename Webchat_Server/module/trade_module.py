@@ -283,12 +283,29 @@ def _calculate_exit_trade(trade: dict) -> bool:
     f = {"code": product_map[product]['code']}
     ss = [("platform_time", -1)]
     ses = mongo_db.get_conn(table_name="quotation")
+    """
+    担心可能引起价格不准, 暂时停用. 2019-2-14
     one = ses.find_one(filter=f, sort=ss)   # 寻找报价
     if one is not None:
         exit_price = one['price']
         trade['exit_time'] = datetime.datetime.now()
     else:
         exit_price = trade['exit_price']  # 离场点位
+    """
+    """修复价格不准的hug的尝试, 2019-2-14"""
+    exit_price = trade['exit_price']
+    if isinstance(exit_price, (float, int)):
+        pass
+    else:
+        one = ses.find_one(filter=f, sort=ss)  # 寻找报价
+        if one is not None:
+            exit_price = one['price']
+            trade['exit_time'] = datetime.datetime.now()
+        else:
+            title = "离场价格缺失"
+            content = "{}: {}".format(datetime.datetime.now(), trade)
+            send_mail(title, content)
+            exit_price = 0  # 赋值一个错误的价格引发下面的异常
     """计算各种参数"""
     enter_price = float(trade['enter_price']) if isinstance(trade['enter_price'], str) else trade['enter_price']  # 进场点位
     info = product_map[product]
@@ -558,7 +575,9 @@ def process_case(doc_dict: dict, raw: bool = False) -> bool:
     else:
         pass
     """接受原始喊单和虚拟立即保存数据并发送模板信息"""
-    print("process_case, 准备发送给_generator_signal的消息: real_teacher={}, raw_signal={}".format(raw, doc_dict))
+    ms = "process_case, 准备发送给_generator_signal的消息: real_teacher={}, raw_signal={}".format(raw, doc_dict)
+    print(ms)
+    logger.exception(ms)
     _generator_signal(raw_signal=doc_dict, real_teacher=raw)
     return True
 

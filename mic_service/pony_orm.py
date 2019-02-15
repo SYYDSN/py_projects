@@ -255,12 +255,45 @@ db = Database()
 db.bind(**setting)
 
 
-class EntityExtends:
+class EntityExtends(db.Entity):
     """
     db.Entity的方法扩展.
     1. 使用多继承来扩展实体类的方法.
     2. 使用@property装饰器来扩展属性和限制对属性值的值(混合方法/属性)
     """
+
+    @classmethod
+    @db_session
+    def add_instance(cls, **kwargs) -> dict:
+        """
+        添加一个对象
+        :param kwargs:
+        :return:
+        """
+        mes = {"message": "success"}
+        obj = None
+        try:
+            obj = cls(**kwargs)
+        except ValueError as e:
+            logger.exception(e)
+            print(e)
+            mes['message'] = "参数的值错误"
+        except TypeError as e:
+            logger.exception(e)
+            print(e)
+            mes['message'] = "参数的类型错误"
+        except Exception as e:
+            logger.exception(e)
+            print(e)
+            mes['message'] = "未知错误: {}".format(e)
+        finally:
+            if isinstance(obj, cls):
+                obj.flush()
+                obj_id = obj.id
+                mes['id'] = obj_id
+            else:
+                pass
+            return mes
 
 
 class Demo2(db.Entity):
@@ -309,17 +342,36 @@ class Demo1(db.Entity):
     demo = Set("Demo")    # 配合city = Required(Demo1)设置外键
 
 
-# db.generate_mapping(create_tables=True)
+class Person(db.Entity):
+    name = Required(str)
+    age = Required(int)
+
+    @classmethod
+    @db_session
+    def add(cls, name: str, age: int) -> dict:
+        """
+        添加
+        :param name:
+        :param age:
+        :return:
+        """
+        mes = {"message": "success"}
+        p = cls(name=name, age=age)
+        p.flush()
+        return mes
+
+
+db.generate_mapping(create_tables=True)
 
 
 if __name__ == "__main__":
-    init = {
-
-    }
+    # init = {
+    #
+    # }
     # with db_session:
     #     demo = Demo1.get(id=1)
     #     demo.name = "李四2"
     #     demo = Demo1()
     #     print(flush())
-    #     demo
+    # Person.add_instance(name="dfdf", age=datetime.datetime.now())
     pass

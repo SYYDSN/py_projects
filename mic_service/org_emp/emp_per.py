@@ -1,6 +1,7 @@
 #  -*- coding: utf-8 -*-
 import os
 import sys
+
 __project_dir__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if __project_dir__ not in sys.path:
     sys.path.append(__project_dir__)
@@ -8,11 +9,9 @@ import logging
 from org_emp.organization import *
 from pony_orm import *
 
-
 logger = logging.getLogger('peewee')
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
-
 
 """
 app, 用户, 权限
@@ -52,7 +51,7 @@ class App(db.Entity):
     has_entry = Required(int, sql_default=0)  # 是否有自己的登录入口?
     name_en = Optional(str, max_len=128)  # 模块英文名
     desc = Optional(str, max_len=1000, nullable=True)  # 备注
-    desc_en = Optional(str, max_len=1000, nullable=True)  #英文 备注
+    desc_en = Optional(str, max_len=1000, nullable=True)  # 英文 备注
 
     creator = Required("Employee", reverse="inserted_apps")  # 创建人.指向管理员id
     last_user = Required("Employee", reverse="updated_apps")  # 最后修改人.指向系统管理员id
@@ -62,7 +61,7 @@ class App(db.Entity):
     root_id = Optional("App", nullable=True)  # 根app的id,
     children_ids = Set("App")  # 所有后代的app的id
     parent_id = Optional("App", nullable=True, reverse="parent_id")  # 上一级app的id, 为0表示自己是顶层元素
-    hotel_group_relations = Set("HGroupApp")   # 一个app记录有多条关系记录
+    hotel_group_relations = Set("HGroupApp")  # 一个app记录有多条关系记录
     rule_relations = Set("AppRuleRelation")  # app直接对应的AppRuleRelation的记录
 
 
@@ -202,40 +201,40 @@ class Employee(db.Entity):
     _table_ = "employee"
     user_name = Required(str, max_len=64)  # 用户名,用来登录.和酒店id构成联合唯一索引
     password = Required(str, max_len=128)  # 密码.md5
-    face_id = Optional(str, max_len=128,  nullable=True)  # 面部识别的id,暂时是假的
+    face_id = Optional(str, max_len=128, nullable=True)  # 面部识别的id,暂时是假的
     user_card_id = Optional(str, max_len=128, nullable=True)  # 用户卡id,预留给员工卡登录,暂空
     work_id = Optional(str, max_len=128, nullable=True)  # 工号, 可以用来做唯一性判定
     work_start = Optional(datetime.datetime, nullable=True)  # 参加工作日期
     entry_date = Optional(datetime.datetime, nullable=True)  # 入职时间
     work_status = Required(int, default=1)  # 在职状态,1在职,0离职
-    dept_id = Optional(Dept, nullable=True, reverse="id")  # 部门id
-    job_id = Optional(Job, nullable=True, column="job_id")  # 职务id
-    head_image = Required(str,max_len=128)  # 头像图片的id,文件名或者唯一地址
-    real_name = Required(str,max_len=128)  # 真实姓名, 可以登记英文或者中文")
-    real_name_en = Required(str,max_len=128)  # 真实姓名, 可以登记英文或者中文
-    nick_name = Required(str,max_len=128)  # 昵称", default='')
-    gender = Required(str,choices=("男", "女"), verbose_name="gender")  # 性别, 中文的男女即可
+    dept_id = Optional(Dept, nullable=True, reverse="employees")  # 部门id
+    job_id = Optional(Job, nullable=True, column="employees")  # 职务id
+    head_image = Required(str, max_len=128)  # 头像图片的id,文件名或者唯一地址
+    real_name = Required(str, max_len=128)  # 真实姓名, 可以登记英文或者中文")
+    real_name_en = Required(str, max_len=128)  # 真实姓名, 可以登记英文或者中文
+    nick_name = Required(str, max_len=128)  # 昵称", default='')
+    gender = Required(str, max_len=10)  # 性别, 中文的男女即可
     birth_date = Optional(datetime.datetime, nullable=True)  # 出生年月
     blood_type = Optional(str, nullable=True)  # 血型, 可选"A", "B", "O", "AB", "其他", "
-    degree = Optional(str,nullable=True)  # 学历小学及以下", "初中", "高中/技校", "大专", "本科及以上", "
-    phone = Required(str,max_len=40)  # 手机号码, 和work_status, hotel_group_id联合做唯一判定")
-    homeland = Required(str,max_len=128)  # 祖籍")
-    birth_place = Required(str,nullable=True)  # 出生地")
-    domicile_place = Required(str,max_len=128)  # 户口所在地")
-    live_place = Required(str,max_len=128)  # 现在居住地")
-    address = Required(str,max_len=128)  # 居住地址")
-    political_status = Required(str,choices=("无", "共青团员", "共产党员", "其他"))  # 政治面貌")
-    email = Required(str,max_len=128, nullable=True)  # 电子邮件")
-    wx_code = Required(str,max_len=128, nullable=True)  # 微信号")
-    open_id = Required(str,max_len=128, nullable=True)  # 微信open_id")
-    union_id = Required(str,max_len=128, nullable=True)  # 微信union_id")
-    qq = Required(str,max_len=128, nullable=True)  # qq号码")
-    weibo = Required(str,max_len=128, nullable=True)  # 新浪微博")
+    degree = Optional(str, nullable=True)  # 学历小学及以下", "初中", "高中/技校", "大专", "本科及以上", "
+    phone = Required(str, max_len=40)  # 手机号码, 和work_status, hotel_group_id联合做唯一判定")
+    homeland = Required(str, max_len=128)  # 祖籍")
+    birth_place = Required(str, nullable=True)  # 出生地")
+    domicile_place = Required(str, max_len=128)  # 户口所在地")
+    live_place = Required(str, max_len=128)  # 现在居住地")
+    address = Required(str, max_len=128)  # 居住地址")
+    political_status = Required(str, max_len=40, default="其他")  # 政治面貌"无", "共青团员", "共产党员", "其他"
+    email = Required(str, max_len=128, nullable=True)  # 电子邮件")
+    wx_code = Required(str, max_len=128, nullable=True)  # 微信号")
+    open_id = Required(str, max_len=128, nullable=True)  # 微信open_id")
+    union_id = Required(str, max_len=128, nullable=True)  # 微信union_id")
+    qq = Required(str, max_len=128, nullable=True)  # qq号码")
+    weibo = Required(str, max_len=128, nullable=True)  # 新浪微博")
 
     create_time = Required(datetime.datetime, default=datetime.datetime.now)  # 创建时间
     last_time = Optional(datetime.datetime, default=datetime.datetime.now, nullable=True)  # 最后一次的修改时间
-    creator = Required("Employee", reverse="inserted")  # 创建人
-    last_user = Required("Employee", reverse="updated")  # 最后修改人
+    creator = Optional("Employee", reverse="inserted_employees")  # 创建人
+    last_user = Optional("Employee", reverse="updated_employees")  # 最后修改人
 
     hotel_id = Required(Hotel)  # 酒店id
     composite_key(hotel_id, user_name)  # 复合键, 酒店下用户名唯一
@@ -264,7 +263,6 @@ class Employee(db.Entity):
     inserted_employees = Set("Employee", reverse="creator")  # 用户插入的Employee的id的list
     updated_employees = Set("Employee", reverse="last_user")  # 用户修改的Employee的id的list
     employee_rule_mapping = Set(EmployeeRuleMapping, reverse="employee_id")  # 和本用户相关的所有用户权限映射的记录
-
 
     def account_login(cls, user_name: str, password: str, hotel_id: int) -> dict:
         """
@@ -402,7 +400,6 @@ class Employee(db.Entity):
 
 
 db.generate_mapping(create_tables=True)
-
 
 if __name__ == "__main__":
     pass
