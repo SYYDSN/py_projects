@@ -17,7 +17,7 @@ from rest_framework.response import Response
 """token检查的RPC客户端"""
 
 
-server = "tcp://192.168.2.154:9518"   # rpc服务器地址, 请按照实际地址修改
+server = "tcp://47.98.113.173:9518"   # rpc服务器地址, 请按照实际地址修改
 
 
 class RPC(dict):
@@ -295,9 +295,8 @@ def to_flat_dict(a_dict, ignore_columns: list = list()) -> dict:
 
 
 if __name__ == "__main__":
-    r = RPC(a="me")
-    if r:
-        print(1)
-    else:
-        print(0)
+    c = zerorpc.Client()
+    c.connect(server)  # 连接到rpc服务器
+    print(c.hello())
+    c.close()
     pass

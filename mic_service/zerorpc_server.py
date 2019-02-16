@@ -17,6 +17,8 @@ class Cooler(
     """
     服务器,只需要继承具体的服务类即可.注意这些服务类中不可有同名的实例方法
     """
+    def hello(self):
+        return "hello rpc!"
 
 
 if __name__ == "__main__":
