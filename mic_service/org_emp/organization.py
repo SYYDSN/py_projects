@@ -17,7 +17,7 @@ from pony_orm import *
 """
 
 
-class HotelGroup(db.Entity):
+class HotelGroup(db.Entity, Parent2):
     """
     酒店集团
     酒店集团在组织架构上是酒店的上层组织. 酒店集团和酒店之间是1:n的关系,
@@ -57,6 +57,7 @@ class HotelGroup(db.Entity):
 
     app_relations = Set("HGroupApp")  # 他一个集团有多个可用的app状态.
     hotels = Set("Hotel")  # 他一个集团有1到多个下属酒店或者同级机构(默认的有个集团总部)
+    employees = Set("Employee")
 
 
 class Hotel(db.Entity):
@@ -146,7 +147,9 @@ class Job(db.Entity):
 
 
 # db.generate_mapping(create_tables=True)
+# db.generate_mapping()
 
 
 if __name__ == "__main__":
+
     pass

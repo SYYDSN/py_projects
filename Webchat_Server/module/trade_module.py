@@ -1506,6 +1506,76 @@ class Trade(Signal):
             return False
 
     @classmethod
+    def edit(cls, _id: ObjectId, handler: ObjectId, info_dict: dict) -> dict:
+        """
+        反转订单
+        :param _id:
+        :param handler:
+        :param info_dict:
+        :return:
+        """
+        mes = {"message": "success"}
+        trade = cls.find_by_id(o_id=_id, to_dict=True)
+        if trade is None:
+            mes['message'] = "交易id不存在"
+        else:
+            case_type = trade.get('case_type')
+            update = info_dict
+            if case_type == "enter":
+                """未离场,无需计算"""
+                pass
+            else:
+                """需要计算的"""
+                direction = update['direction']
+                if direction == "买入":
+                    t_c = 1
+                else:
+                    t_c = -1
+                enter_price = update.get("enter_price", 0)
+                exit_price = update.get("exit_price", 0)
+                product = update['product']
+                info = product_map[product]
+                p_v = info['p_val']  # 点值
+                p_a = info['p_arg']  # 系数
+                comm = info['comm']  # 每手佣金
+                kw = {
+                    "enter_price": enter_price,
+                    "exit_price": exit_price,
+                    "p_v": p_v,
+                    "p_a": p_a,
+                    "t_c": t_c,
+                    "comm": comm,
+                }
+                resp = calculate_profit(**kw)
+                kw.update({"the_profit": resp['each_profit'] * trade.get("lots", 1), "direction": direction})
+                kw.update(resp)
+                update.update(kw)
+            """写入数据库"""
+            f = {"_id": _id}
+            u = {"$set": update}
+            r = cls.find_one_and_update(filter_dict=f, update_dict=u, upsert=False)
+            if isinstance(r, dict):
+                """修改成功,组装日志"""
+                temp = {
+                    "before": trade,
+                    "type": "reverse",
+                    "after": r,
+                    "handler": handler,
+                    "time": datetime.datetime.now()
+                }
+                r3 = TradeLog.insert_one(doc=temp)
+                if isinstance(r3, ObjectId):
+                    """成功"""
+                    pass
+                else:
+                    """日志记录失败"""
+                    mes['message'] = "日志保存失败"
+            else:
+                """修改记录失败"""
+                mes['message'] = "保存失败"
+        return mes
+
+    @classmethod
     def fix_error(cls, t_ids: list = None, auto_fix: bool = False) -> None:
         """
         修复订单中的错误, 也可以用来检查

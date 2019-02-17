@@ -67,6 +67,18 @@ def __short_date3(d: datetime.datetime) -> str:
         return ""
 
 
+def __short_date4(d: datetime.datetime) -> str:
+    """
+    日期格式化,返回'xxxx-x-x xx:xx:xx'这样的格式
+    :param d:
+    :return:
+    """
+    if d:
+        return d.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        return ""
+
+
 def __startswith(string: str, pre: str) -> bool:
     """
     检查一个字符串是否以特定的字符串序列开头?
@@ -159,6 +171,7 @@ def mount_plugin(app):
     app.jinja_env.filters['short_date'] = __short_date
     app.jinja_env.filters['short_date2'] = __short_date2
     app.jinja_env.filters['short_date3'] = __short_date3
+    app.jinja_env.filters['short_date4'] = __short_date4
     app.jinja_env.tests['startswith'] = __startswith
     app.jinja_env.tests['endswith'] = __endswith
     app.jinja_env.filters['str_time'] = __str_time

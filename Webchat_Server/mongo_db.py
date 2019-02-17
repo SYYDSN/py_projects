@@ -2951,9 +2951,12 @@ class MyView(MethodView):
             ms = "无效的role_id: {}".format(role_id)
             raise ValueError(ms)
         else:
-            rules = role.get("rules", dict())
-            operate_rules = rules.get(url_path, dict())
-            value = operate_rules.get(operate, 0)
+            if role_id == cls._root_role:  # 管理员
+                value = 1
+            else:
+                rules = role.get("rules", dict())
+                operate_rules = rules.get(url_path, dict())
+                value = operate_rules.get(operate, 0)
         return value
 
     def current_rule_value(self, role_id: ObjectId, url_path: str = None,  role_table: str = "role_info",

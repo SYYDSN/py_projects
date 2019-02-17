@@ -236,7 +236,8 @@ class Employee(db.Entity):
     creator = Optional("Employee", reverse="inserted_employees")  # 创建人
     last_user = Optional("Employee", reverse="updated_employees")  # 最后修改人
 
-    hotel_id = Required(Hotel)  # 酒店id
+    hotel_group_id = Optional(HotelGroup)  # 集团id
+    hotel_id = Optional(Hotel)  # 酒店id
     composite_key(hotel_id, user_name)  # 复合键, 酒店下用户名唯一
     composite_key(hotel_id, phone, work_status)  # 复合键, 酒店下在职人员时间手机号码唯一
     inserted_hotel_groups = Set(HotelGroup, reverse="creator")  # 用户插入的酒店集团的id的list
@@ -402,4 +403,19 @@ class Employee(db.Entity):
 db.generate_mapping(create_tables=True)
 
 if __name__ == "__main__":
+    init = {
+        "full_name": "ddfdf",
+        "short_name": "ddfdf",
+        "address_1": "sddddddddddddddddddsd号",
+        "audit": 1,
+        "position": "21,121",
+        "city": "上海",
+        "code": "fc12b",
+        "country_code": "0086",
+        "order_value": 1,
+        "status": 1,
+        "creator": 5,
+        "last_user": 5
+    }
+    HotelGroup.add_one(**init)
     pass

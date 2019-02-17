@@ -8,10 +8,10 @@ $(function(){
     $(".date_picker").datetimepicker({
         language: "zh-CN",
         weekStart: 1,  // 星期一作为一周的开始
-        minView: 2,  // 不显示小时和分
+        minView: 0,  // 2不显示小时和分
         startView: 2,
         autoclose: true,  // 选定日期后是否立即关闭选择器
-        format: "yyyy-mm-dd",
+        format: "yyyy-mm-dd hh:ii:ss",
     });
 
     // 根据用户选择的条件过滤信息
@@ -106,6 +106,15 @@ $(function(){
         }else{}
     })();
 
+    // 下拉菜单li选择事件
+    $(".dropdown > ul > li").each(function(){
+        var $this = $(this);
+        $this.click(function(){
+            var text = $.trim($this.text());
+            $this.parents(".dropdown").first().find(".current_value").text(text);
+        });
+    });
+
     // 清除模态框残留信息
     var clear_modal = function(){
         $(".modal_outer .current_value").text("").attr("data-id", "");
@@ -113,11 +122,21 @@ $(function(){
         $("#submit_task").attr("data-id", "");
     };
 
-    // 弹出模态框
+    // 弹出编辑交易模态框
     $(".pop_modal").each(function(){
         var $this = $(this);
         $this.click(function(){
-            alert("功能尚未实现...");
+            clear_modal();
+            var $tr = $this.parents("tr").first();
+            $(".trade_modal_outer .modal_mid").attr("data-id", $.trim($this.attr("data-id")));
+            $("#teacher").val( $.trim($tr.find(".teacher").text()));
+            $("#direction").text( $.trim($tr.find(".direction").text()));
+            $("#product").text( $.trim($tr.find(".product_name").text()));
+            $("#enter_time").val( $.trim($tr.find(".enter_time").attr("data-val")));
+            $("#enter_price").val( $.trim($tr.find(".enter_price").text()));
+            $("#exit_time").val( $.trim($tr.find(".exit_time").attr("data-val")));
+            $("#exit_price").val( $.trim($tr.find(".exit_price").text()));
+            $(".trade_modal_outer").css("display", "flex");
         });
     });
 
@@ -129,48 +148,38 @@ $(function(){
 
 
     // 模态框提交按钮的事件
-    $("#submit_task").click(function(){
-        var product_id = select_success();
-        var plan_number = parseInt($.trim($("#plan_number").val()));
-        var batch_sn = $.trim($("#batch_sn").val());
-        if(product_id === ""){
-            alert("请选择产品种类");
-            return false;
-        }
-        else if(isNaN(plan_number)){
-            alert("计划生产数量必须是数字");
-            return false;
-        }
-        else if(batch_sn === ""){
-            alert("任务名称必须");
-            return false;
-        }
-        else{
-            var args = {
-                "batch_sn": batch_sn,
-                "product_id": product_id,
-                "plan_number": plan_number
-            };
-            var text = $.trim($(".modal_outer .modal_title").text());
-            if(text.indexOf("编辑") !== -1){
-                args['type'] = "edit";
-                var _id = $("#submit_task").attr("data-id");
-                args['_id'] = _id;
+    $("#submit_trade").click(function(){
+        var _id = $.trim($(".trade_modal_outer .modal_mid").attr("data-id"));
+        var product = $.trim($("#product").text());
+        var direction = $.trim($("#direction").text());
+        var teacher_name = $.trim($("#teacher").val());
+        var enter_time = $.trim($("#enter_time").val());
+        var enter_price = $.trim($("#enter_price").val());
+        var exit_time = $.trim($("#exit_time").val());
+        var exit_price = $.trim($("#exit_price").val());
+
+        var args = {
+            "type": "edit",
+            "_id": _id,
+            "teacher_name": teacher_name,
+            "product": product,
+            "direction": direction,
+            "enter_time": enter_time,
+            "enter_price": enter_price,
+            "exit_time": exit_time,
+            "exit_price": exit_price,
+        };
+        $.post(location.pathname, args, function(resp){
+            var json = JSON.parse(resp);
+            var status = json['message'];
+            if(status === "success"){
+                alert("操作成功");
+                location.reload();
+            }else{
+                alert(status);
             }
-            else{
-                args['type'] = "add";
-            }
-            $.post(location.pathname, args, function(resp){
-                var json = JSON.parse(resp);
-                var status = json['message'];
-                if(status === "success"){
-                    alert("操作成功");
-                    location.reload();
-                }else{
-                    alert(status);
-                }
-            });
-        }
+        });
+
     });
 
     // 选择器点击事件

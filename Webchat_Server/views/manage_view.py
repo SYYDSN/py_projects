@@ -22,6 +22,7 @@ from tools_module import *
 from bson.son import SON
 from collections import OrderedDict
 import warnings
+import datetime
 
 
 """"
@@ -371,6 +372,41 @@ class ManageTradeView(MyView):
                             ids = [ObjectId(x) for x in ids]
                             handler = admin['_id']
                             mes = Trade.batch_delete(ids=ids, handler=handler)
+                else:
+                    mes['message'] = "权限不足"
+            elif the_type == "edit":
+                """修改交易"""
+                rule = self.current_rule_value(role_id=admin['role_id'], operate="edit")
+                if rule == 1:
+                    _id = get_arg(request, "_id", "")
+                    if isinstance(_id, str) and len(_id) == 24:
+                        _id = ObjectId(_id)
+                        up = dict()
+                        try:
+                            product = get_arg(request, "product")
+                            direction = get_arg(request, "direction")
+                            enter_price = float(get_arg(request, "enter_price", 0))
+                            exit_price = float(get_arg(request, "exit_price", 0))
+                            enter_time = datetime.datetime.strptime(get_arg(request, "enter_time"), "%Y-%m-%d %H:%M:%S")
+                            exit_time = datetime.datetime.strptime(get_arg(request, "exit_time"), "%Y-%m-%d %H:%M:%S")
+                            up['product'] = product
+                            up['direction'] = direction
+                            up['enter_price'] = enter_price
+                            up['exit_price'] = exit_price
+                            up['enter_time'] = enter_time
+                            up['exit_time'] = exit_time
+                        except Exception as e:
+                            print(e)
+                            logger.exception(e)
+                            mes['message'] = "错误的参数"
+                        finally:
+                            if len(up) == 6:
+                                handler = admin['_id']
+                                mes = Trade.edit(_id=_id, handler=handler, info_dict=up)
+                            else:
+                                pass
+                    else:
+                        mes['message'] = "错误的_id信息"
                 else:
                     mes['message'] = "权限不足"
             else:

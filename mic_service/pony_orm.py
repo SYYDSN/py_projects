@@ -361,7 +361,29 @@ class Person(db.Entity):
         return mes
 
 
-db.generate_mapping(create_tables=True)
+# class Person1(Person):
+#     age = Required(int)
+
+class Parent1(db.Entity):
+    id = PrimaryKey(int, auto=True)
+    name = Required(str, 40)
+
+
+class Parent2:
+
+    @classmethod
+    @db_session
+    def add_one(cls, **kwargs):
+        one = cls(**kwargs)
+        one
+
+
+class Child(db.Entity, Parent2):
+    name = Required(str)
+    age = Required(int, size=8)
+
+
+# db.generate_mapping(create_tables=True)
 
 
 if __name__ == "__main__":
@@ -374,4 +396,5 @@ if __name__ == "__main__":
     #     demo = Demo1()
     #     print(flush())
     # Person.add_instance(name="dfdf", age=datetime.datetime.now())
+    Child.add_one(name="jack", age=12)
     pass

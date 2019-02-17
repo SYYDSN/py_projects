@@ -125,7 +125,7 @@
                         <th>盈利(美元)</th>
                         <th>进场时间</th>
                         <th>离场时间</th>
-                        <!--<th>操作</th>-->
+                        <th>操作</th>
                     </tr>
                     {% for trade in trades %}
                         <tr id="{{ trade._id }}">
@@ -143,8 +143,11 @@
                             <td class="the_profit" title="{{ trade.formula }}" style="color: {{'#e35e57' if trade.the_profit and trade.the_profit >= 0 else '#17b640' }}">
                                 {{ (trade.the_profit | short_num2) if trade.the_profit else trade.the_profit }}
                             </td>
-                            <td  class="enter_time">{{ trade.enter_time| short_date3 }}</td>
-                            <td  class="exit_time">{{ trade.exit_time | short_date3 }}</td>
+                            <td  class="enter_time" data-val="{{ trade.enter_time | short_date4 }}">{{ trade.enter_time| short_date3 }}</td>
+                            <td  class="exit_time" data-val="{{ trade.exit_time | short_date4 }}">{{ trade.exit_time | short_date3 }}</td>
+                            <td class="operation">
+                                <button data-id="{{ trade._id }}" class="pop_modal btn btn-xs btn-default btn-primary edit_trade">编辑</button>
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -180,32 +183,83 @@
     </div>
 
     <!--弹框部分-->
-    <div class="modal_outer">
+    <div class="modal_outer trade_modal_outer">
         <div class="modal_inner">
             <div class="modal_top">
                 <h3 class="modal_title">
-                    新增生产任务
+                    编辑交易信息
                 </h3>
             </div>
-            <div class="modal_mid">
+            <div class="modal_mid" data-id="">
 
                 <div class="line">
-                    <label>生产任务名称</label>
-                    <div class="my_input dropdown">
-                        <input id="batch_sn" type="text" placeholder="区分不同任务">
+                    <label>操作老师</label>
+                    <div class="my_input ">
+                        <input id="teacher" type="text" readonly style="background-color: lightgrey" placeholder="区分不同任务">
                     </div>
                 </div>
                 <div class="line">
-                    <label>计划生产数量</label>
+                    <label>相关产品</label>
                     <div class="my_input dropdown">
-                        <input id="plan_number" type="text" placeholder="计划数量">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="select_specification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <span id="product" data-id="" class="current_value "></span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul data-type="specification" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                            <li>黄金</li>
+                            <li>白银</li>
+                            <li>原油</li>
+                            <li>恒指</li>
+                            <li>欧元</li>
+                            <li>英镑</li>
+                            <li>日元</li>
+                            <li>澳元</li>
+                            <li>加元</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="line">
+                    <label>交易方向</label>
+                    <div class="my_input dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="select_specification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <span id="direction" data-id="" class="current_value "></span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul data-type="specification" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                            <li>买入</li>
+                            <li>卖出</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="line">
+                    <label>入场时间</label>
+                    <div class="my_input">
+                        <input class="date_picker" id="enter_time" type="text" placeholder="计划数量">
+                    </div>
+                </div>
+                <div class="line">
+                    <label>入场价格</label>
+                    <div class="my_input">
+                        <input id="enter_price" type="text" placeholder="计划数量">
+                    </div>
+                </div>
+                <div class="line">
+                    <label>离场时间</label>
+                    <div class="my_input">
+                        <input class="date_picker" id="exit_time" type="text" placeholder="计划数量">
+                    </div>
+                </div>
+                <div class="line">
+                    <label>离场价格</label>
+                    <div class="my_input">
+                        <input id="exit_price" type="text" placeholder="计划数量">
                     </div>
                 </div>
 
             </div>
             <div class="modal_bot">
                 <button class="close_medal btn btn-md btn-default first">关闭</button>
-                <button id="submit_task" class="btn btn-md btn-primary last">保存</button>
+                <button id="submit_trade" class="btn btn-md btn-primary last">保存</button>
             </div>
         </div>
     </div>

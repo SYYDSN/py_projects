@@ -200,8 +200,8 @@
 }
 .right_main .modal_outer > .modal_inner {
   width: 500px;
-  height: 560px;
-  margin-top: -20%;
+  height: 650px;
+  margin-top: -15%;
   border-radius: 5px;
   background-color: #fff;
   border: 1px solid #c8c8c8;
@@ -236,6 +236,9 @@
 }
 .right_main .modal_outer > .modal_inner .modal_mid .line >.my_input {
   width: calc(100% - 6em) !important;
+}
+.right_main .modal_outer > .modal_inner .modal_mid .line >.my_input .current_value {
+  text-align: left;
 }
 .right_main .modal_outer > .modal_inner .modal_mid .line >.my_input >input {
   width: 100%;
